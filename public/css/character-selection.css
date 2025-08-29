@@ -1,0 +1,171 @@
+.c-i.c-i-stats .bonus-mission-title {
+	height: 10vh;
+	margin-top:4vh;
+    background: url(./../images/icons/toast-bg.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    color: #000 !important;
+	font-size: larger !important;
+}
+.c-i.c-i-stats .bonus-mission-desc {
+	justify-content: flex-start !important;
+	padding:1vh 0
+}
+.c-i.c-i-stats .bonus-mission-desc img {
+	height: 6vh !important;
+	margin-right: 1.5vh;
+}
+.char-selection-center-inner .c-i {
+	z-index: 2 !important
+}
+.char-selection-center-inner {
+	max-height: 100% !important;
+	height:100% !important;
+	padding:5vh 4vh 6vh 4vh !important;
+	position: relative;
+	margin:0 !important;
+	flex-direction: column;
+	max-width: 100% !important;
+	aspect-ratio: 376 / 741;
+	background-image:url(./../images/ui/modal2.png) !important;
+	background-size: 100% 100% !important;
+	background-repeat: no-repeat !important;
+	background-position: center center
+}
+.c-i.c-i-race {
+	padding-top:2vh !important
+}
+.c-i .w-50.flex-jc-end {
+	color:#9d987f !important;
+}
+
+.char-selection-ui {
+	position: fixed;
+	top:0;
+	left:0;
+	width:100%;
+	height: 100%;
+	z-index: 9998;
+	opacity: 1;
+	animation: fade-in 1s;
+	-webkit-animation: fade-in 1s
+}
+.char-selection-ui.fade-out {
+	opacity: 0;
+	animation: fade-out-me 1s;
+	-webkit-animation: fade-out-me 1s
+}
+.c-i-choose {
+	font-size:3vh !important;
+	color:#f7f7f7cc !important;
+	height:20vh;
+	position: relative;
+	left:0;
+	width: 100%;
+	background:url(./../images/icons/txtbg.png), radial-gradient(#000000, transparent, transparent);
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size:56vh auto, cover !important
+}
+.char-selection-right, .char-selection-left {
+	width: 30%;
+	height:100%;
+	cursor: pointer;
+}
+.no-dark {
+	background:transparent;
+}
+@property --cs-color1 {
+	syntax: '<color>';
+	initial-value: rgba(0, 0, 0, 0.5);
+	inherits: false;
+}
+@property --cs-color2 {
+	syntax: '<color>';
+	initial-value: rgba(0, 0, 0, 0);
+	inherits: false;
+}
+.char-selection-ui:has(.char-selection-left.no-dark) {
+	background:linear-gradient(90deg, var(--cs-color2), var(--cs-color1));
+	animation: lighten-selection-area-left .3s ease;
+	-webkit-animation: lighten-selection-area-left .3s ease;
+}
+.char-selection-ui:has(.char-selection-right.no-dark) {
+	background:linear-gradient(90deg, var(--cs-color1), var(--cs-color2));
+	animation: lighten-selection-area-right .3s ease;
+	-webkit-animation: lighten-selection-area-right .3s ease;
+}
+@keyframes lighten-selection-area-left {
+	from {
+		--cs-color1: rgba(0,0,0,0);
+		--cs-color2: rgba(0,0,0,0);
+	}
+	to {
+		--cs-color1: rgba(0,0,0,0.5);
+		--cs-color2: rgba(0,0,0,0);
+	}
+}
+@keyframes lighten-selection-area-right {
+	from {
+		--cs-color1: rgba(0,0,0,0);
+		--cs-color2: rgba(0,0,0,0);
+	}
+	to {
+		--cs-color1: rgba(0,0,0,0.5);
+		--cs-color2: rgba(0,0,0,0);
+	}
+}
+.char-selection-center {
+	width:40%;
+	height:100%;
+	padding:5vh 0;
+	overflow-y: auto;
+	display: flex;
+	align-items: center;
+}
+.char-selection-center-inner {
+	max-height:calc(100% - 6vh);
+	background-position: center;
+}
+.char-selection-center-inner:has(.c-i-choose) {
+	background:radial-gradient(#000, transparent, transparent);
+	border:none
+}
+.char-selection-center-inner .c-i-btn {
+	padding:2.5vh 0
+}
+.char-selection-center-inner table {
+	width:100% !important
+}
+.char-selection-center-inner table tr td:first-child {
+	text-align: right !important;
+	width:40% !important
+}
+.char-selection-center-inner table tr td {
+	padding-top:.4vh;
+	padding-bottom:.4vh
+}
+.char-selection-center-inner table tr td:last-child {
+	padding-right: 12%;
+}
+.c-i {
+	font-size:2.6vh !important;
+	color:#f7f7f7ab !important;
+	padding: .75vh;
+}
+.c-i-name {
+	font-size: 3vh !important;
+	color:#cfc180 !important;
+	font-weight: 600;
+}
+.char-selection-ui:has(.c-i-choose) {
+	background:none !important
+}
+
+
+.c-i.c-i-stats {
+	flex:1;
+	justify-content: flex-start !important;
+    flex-direction: inherit;
+}

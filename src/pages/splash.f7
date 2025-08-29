@@ -1,0 +1,313 @@
+<template>
+	<div class="page" data-name="splash">
+		<div id="wrapper" style="position:relative">
+			<div id="game-pad">
+				<canvas id="bg"></canvas>
+				<div class="canvas" id="sprite-obj-back"></div>
+				<div class="parallax" id="droad50"></div>
+				<div class="parallax" id="droad85"></div>
+				<div class="parallax" id="droad90"></div>
+				<canvas id="bg-sprite-obj"></canvas>
+				<div class="canvas" id="sprite-obj-90"></div>
+				<canvas id="road"></canvas>
+				<div class="parallax" id="droad"></div>
+				<canvas id="obj"></canvas>
+				<canvas id="sprite-obj"></canvas>
+				<div class="canvas" id="constant-obj"></div>
+				<div class="full canvas-alike" id="css-canvas"></div>
+				<canvas id="gore"></canvas>
+				<canvas id="enemies"></canvas>
+				<canvas id="damage-frames"></canvas>
+				<canvas id="obj-foreground"></canvas>
+				<div class="parallax" id="dobj-foreground"></div>
+				<div class="full canvas-alike" id="css-canvas-foreground"></div>
+			</div>
+			<div id="game-pad-left"></div>
+			<div id="game-pad-right"></div>
+			<div id="game-ui" class="full">
+				<img src="./images/icons/enemy-left.png" class="enemy-left-arrow v-none" />
+				<img src="./images/icons/enemy-right.png" class="enemy-right-arrow v-none" />
+				<div id="top-nav" class="flex flex-jc-start">
+				</div>
+				<div id="mini-menu">
+					
+				</div>
+				<div data-key="u" class="skill placed-skill action v-none" id="skill9">
+
+				</div>
+				<svg id="use-progress" xmlns="http://www.w3.org/2000/svg" version="1.1" class="v-none">
+					<circle cx="6.5vh" cy="6.5vh" r="5.5vh" stroke-lineup="round" />
+				</svg>
+				<div class="skill placed-skill action talk-btn" id="skill10">
+
+				</div>
+				<div data-key="i" class="skill placed-skill action hand-btn" id="skill11">
+
+				</div>
+				<div data-key="f" class="skill placed-skill v-none atk-sf" id="chain-skill-2">
+					<img draggable="false" ondragstart="return false;" />
+				</div>
+				<div data-key="r" class="skill placed-skill v-none def-sf" id="chain-skill-1">
+					<img draggable="false" ondragstart="return false;" />
+				</div>
+				<div data-key="f" class="skill placed-skill v-none atk-sf" id="chain-skill-4">
+					<img draggable="false" ondragstart="return false;" />
+				</div>
+				<div data-key="r" class="skill placed-skill v-none def-sf" id="chain-skill-3">
+					<img draggable="false" ondragstart="return false;" />
+				</div>
+				<div data-key="h" class="skill locked def-sf" id="skill2">
+
+				</div>
+				<div data-key="j" class="skill locked atk-sf" id="skill3">
+
+				</div>
+				<div data-key="k" class="skill locked atk-sf" id="skill4">
+
+				</div>
+				<div data-key="l" class="skill locked atk-sf" id="skill5">
+
+				</div>
+				<div data-key="e" class="skill locked rage-sf" id="skill6">
+
+				</div>
+				<div data-key="t" class="skill tag-sf" id="skill12">
+
+				</div>
+				<div data-key="q" class="skill weapon-skill locked" id="skill8">
+
+				</div>
+				<div data-key="g" class="skill def-sf" id="skill7">
+
+				</div>
+				<div data-key=" " class="skill locked atk-sf" id="skill1">
+
+				</div>
+				<div id="pot-btn" data-key="p" class="skill def-sf flex">
+					<img src="./images/icons/pot.png" /> 
+					<span id="main-pot-count">0</span>
+				</div>
+				<div class="skill-charge" id="skill7-cd-1">
+
+				</div>
+				<div class="skill-charge" id="skill7-cd-2">
+
+				</div>
+				<div class="skill-charge" id="skill7-cd-3">
+
+				</div>
+				<div id="add-player" style="cursor:pointer" class="flex" >
+					+
+				</div>
+				<div id="auto-mode-on-off" style="cursor:pointer" class="flex" >
+					A
+				</div>
+				<div id="hit-count" class="flex v-none" style="font-weight:600;font-size:6vh">
+					<div class="flex full scalable">
+						<span class="flex">
+							<div data-digit="x" class="hit-count-img hit-count-img-1"></div>
+							<div data-digit="x" class="hit-count-img hit-count-img-2"></div>
+							<div data-digit="x" class="hit-count-img hit-count-img-3"></div>
+							<div data-digit="x" class="hit-count-img hit-count-img-4"></div>
+							<img class="hit-count-img-last" src="./images/frames/hits.png" />
+						</span>
+					</div>
+				</div>
+				<div class="enemy-profile flex flex-jc-start">
+					<div data-key="1" id='common-skill-1' class="flex common">
+
+					</div>
+					<div data-key="2" id='common-skill-2' class="flex common">
+
+					</div>
+					<div data-key="3" id='common-skill-3' class="flex common">
+
+					</div>
+					<div data-key="4" id='common-skill-4' class="flex common">
+
+					</div>
+				</div>
+				<div id="world-mini-map">
+					<div id="world-mini-map-area" class="full">
+						<div class="world-mini-map-img"></div>
+						<img src="./images/ui/skill.png" />
+					</div>
+				</div>
+				<div id="chat-board" class="expanded d-none">
+					<div class="cb-top-nav flex flex-jc-end">
+							<div class="h-100 flex" id="cb-expand">
+							</div>
+					</div>
+					<div class="cb-content">
+						<div class="cb-inner">
+						
+						</div>
+					</div>
+				</div>
+				<div class="my-pop-up-wrapper flex close-on-click show-ui" id="game-menu">
+				</div>
+			</div>
+			<div style="height:1vh;width:100%;background:#ffffff20;border:1px solid #000000de">
+				<div id="main-exp-bar" style="box-shadow:inset 0px 0px .2vh #000;width:0%;height:100%;background:linear-gradient(0deg, transparent, orange, transparent)"></div>
+			</div>
+		</div>
+		<div id="Frame" class="animate-me-600 full" style="visibility:hidden; box-shadow:inset 0px 0px 100px #000;position:absolute;top:0;left:0"></div>
+		<div id="splash" class="full flex flex-ai-end splash" style="display:flex !important;position:relative">
+			<div style="height:20%;width:100%" class="flex loading-logo-wrapper">
+				<div id="loading-tip" class="flex">
+					
+				</div>
+				<img class="loading-logo d-none" id="game-start-loading-wrapper" src="./images/icons/loading.png"/>
+			</div>
+		</div>
+		<div id="first-splash" style="background-color:#000" class="full flex d-none flex-ai-end splash">
+			
+		</div>
+		<div class="flex my-pop-up-wrapper" id="game-over">
+			<div id="game-over-content" class="flex">
+				
+			</div>
+		</div>
+		<div class="flex my-pop-up-wrapper" id="user-actions">
+			<div id="user-actions-content" class="flex">
+				
+			</div>
+		</div>
+		<div class="flex my-pop-up-wrapper close-on-click" id="board-scroll">
+			<div id="board-scroll-content" class="flex" style="padding-bottom:10%;width:42%;height:100%;color:#262626;background:url(./images/main/board/concept.png);background-size:100% 100% !important">
+		
+			</div>
+		</div>
+	</div>
+</template>
+<script>
+	export default (props, { $on }) => {
+		const installDusts = function() {
+			floatDusts();
+		}
+		const goToDungeon = function(_num) {
+			portToDungeon(_num);
+		}
+		const restartPvp = function() {
+			restartPVPMatch();
+		}
+		// const sbp = function(_num) {
+		// 	switchBookPage(_num);
+		// }
+		const rh = function() {
+			reviveHere();
+		}
+		const ral = function() {
+			reviveAtLobby();
+		}
+		$on('pageAfterIn', (e, page) => {
+			//app.statusbar.hide();
+			_css = document.getElementById('css-canvas');
+			_cssF = document.getElementById('css-canvas-foreground');
+			_canvas1 = document.getElementById('bg');
+			c2 = _canvas1.getContext('2d', { alpha: false });
+			_canvasB = document.getElementById('bg-sprite-obj');
+			c5 = _canvasB.getContext('2d');
+			_canvasR = document.getElementById('road');
+			_canvas3 = document.getElementById('obj');
+			c6 = _canvas3.getContext('2d');
+			_canvasS = document.getElementById('sprite-obj');
+			_cNPC = _canvasS.getContext('2d');
+			_canvasAnimated90 = document.getElementById('sprite-obj-90');
+			_canvasF = document.getElementById('obj-foreground');
+			c9 = _canvasF.getContext('2d');
+			_canvas5 = document.getElementById('enemies');
+			c10 = _canvas5.getContext('2d');
+			_canvasDMG = document.getElementById('damage-frames');
+			cDMG = _canvasDMG.getContext('2d');
+			_canvasSPB = document.getElementById('sprite-obj-back');
+			_canvasGore = document.getElementById('gore');
+			cGore = _canvasGore.getContext('2d');
+			_commons = document.querySelectorAll('.common');
+			c2.imageSmoothingEnabled = cDMG.imageSmoothingEnabled = c6.imageSmoothingEnabled =
+				c5.imageSmoothingEnabled = c9.imageSmoothingEnabled = c10.imageSmoothingEnabled
+				= cGore.imageSmoothingEnabled = false;
+			_navbar = document.getElementById('top-nav');
+			_gamePad = document.getElementById('game-pad');
+			_gameUI = document.getElementById('game-ui');
+			_hitCount = document.getElementById('hit-count');
+			_finishingMove = document.getElementById('skill9');
+			_hitCountValues = document.querySelectorAll('.hit-count-img');
+			_canvas = _gamePad;
+			const addEvent = function(_id, _char) {
+				const _skillbtn = document.getElementById(_id);
+				_skillbtn.addEventListener("mousedown", function() {
+					mainCharacter.keyboard.mouseDown(_char);
+				});
+				_skillbtn.addEventListener("mouseup", function() {
+					mainCharacter.keyboard.mouseUp(_char);
+				});
+				_skillbtn.addEventListener("touchcancel", function() {
+					mainCharacter.keyboard.mouseUp(_char);
+				});
+				_skillbtn.addEventListener("touchend", function() {
+					mainCharacter.keyboard.mouseUp(_char);
+				});
+				_skillbtn.addEventListener("touchstart", function() {
+					mainCharacter.keyboard.mouseDown(_char);
+				});
+			}
+			addEvent('skill1', ' ');
+			addEvent('skill2', 'h');
+			addEvent('skill3', 'j');
+			addEvent('skill4', 'k');
+			addEvent('skill5', 'l');
+			addEvent('skill6', 'e');
+			addEvent('skill7', 'g');
+			addEvent('skill8', 'q');
+			addEvent('skill9', 'u');
+			addEvent('skill10', 'u');
+			addEvent('skill11', 'u');
+			addEvent('skill12', 't');
+			addEvent('chain-skill-2', 'f');
+			addEvent('chain-skill-1', 'r');
+			addEvent('chain-skill-4', 'f');
+			addEvent('chain-skill-3', 'r');
+			addEvent('common-skill-1', '1');
+			addEvent('common-skill-2', '2');
+			addEvent('common-skill-3', '3');
+			addEvent('common-skill-4', '4');
+			addEvent('pot-btn', 'p');
+			window.addEventListener('error', function(ex) {
+				alert(ex.message + ' ' + ex.filename + ' ' + ex.lineno);
+			});
+			chainSkills = {
+				skill1: document.getElementById('chain-skill-1'),
+				skill2: document.getElementById('chain-skill-2'),
+				skill3: document.getElementById('chain-skill-3'),
+				skill4: document.getElementById('chain-skill-4')
+			};
+			actionButtons = document.querySelectorAll('.action');
+			// document.getElementById('pot-btn').addEventListener('click', function() {
+			// 	drinkPot();
+			// });
+			document.getElementById('auto-mode-on-off').addEventListener('click', function() {
+				switchAutoMode();
+			});
+			_talkBtn = document.getElementById('skill10');
+			_useBtn = document.getElementById('skill11');
+			testMap = getParameterByName('map');
+			testFrames = getParameterByName('frame');
+			__globalDistance = getParameterByName('d');
+			unlockAll = getParameterByName('unlock');
+			fps = getParameterByName('fps') ?? _defaultFPS;
+			msPrev = window.performance.now();
+			msPrevChars = window.performance.now();
+			msPerFrame = 900 / fps;
+
+			_gamePad.oncontextmenu = function (event) {
+				event.preventDefault();
+				event.stopPropagation();
+				event.stopImmediatePropagation();
+				return false;
+			}
+		});
+		
+		return $render;
+	}
+</script>

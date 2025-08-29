@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="tr.wot.gameapp" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Warriors Of Tengri</name>
+    <description>Sample Apache Cordova App</description>
+    <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
+        Apache Cordova Team
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+<allow-navigation href="*" />
+<allow-intent href="*" />
+<allow-navigation href="http://*/*" />
+<allow-navigation href="https://*/*" />
+<allow-intent href="http://*/*" />
+<allow-intent href="https://*/*" />
+
+    <allow-navigation href="*" />
+<platform name="electron">
+    	<preference name="ElectronSettingsFilePath" value="res/electron/settings.json" />
+	<icon src="res/icon/electron/icon.png" />	
+</platform>
+    <platform name="android">
+	<preference name="StatusBarOverlaysWebView" value="false" />
+	<resource-file src="res/drawable/ic_launcher.png" target="app/src/main/res/drawable/ic_launcher.png" />
+	<resource-file src="res/android/values/colors.xml" target="app/src/main/res/values/colors.xml" />
+	<resource-file src="res/android/values/themes.xml" target="app/src/main/res/values/themes.xml" />
+      <preference name="Orientation" value="landscape" />
+      <preference name="AndroidWindowBackground" value="#000000" />
+      <preference name="StatusBarBackgroundColor" value="#000000" />
+      <preference name="StatusBarStyle" value="lightcontent" />
+      <preference name="NavigationBarBackgroundColor" value="#000000" />
+      <access origin="*" /> 
+      <allow-navigation href="*" />
+      <preference name="android-minSdkVersion" value="21" />
+      <preference name="android-targetSdkVersion" value="36" />
+      <preference name="android-compileSdkVersion" value="36" />
+      <preference name="android-buildToolsVersion" value="36.0.0" />
+      <preference name="SplashMaintainAspectRatio" value="true" />
+      <icon src="res/icon/android/icon.png" density="ldpi" />
+      <icon src="res/icon/android/icon.png" density="mdpi" />
+      <icon src="res/icon/android/icon.png" density="hdpi" />
+      <icon src="res/icon/android/icon.png" density="xhdpi" />
+      <icon src="res/icon/android/icon.png" density="xxhdpi" />
+      <icon src="res/icon/android/icon.png" density="xxxhdpi" />
+    </platform>
+    <preference name="DisallowOverscroll" value="true" />
+<preference name="WebViewBounce" value="false" />
+    <preference name="BackupWebStorage" value="local" />
+    <preference name="Suppresses3DTouchGesture" value="true" />
+    <preference name="Allow3DTouchLinkPreview" value="false" />
+<preference name="StatusBarBackgroundColor" value="#000000" />
+<preference name="NavigationBarBackgroundColor" value="#000000" />
+<preference name="StatusBarStyle" value="lightcontent" />
+<preference name="StatusBarOverlaysWebView" value="false" />
+	<preference name="SplashScreenDelay" value="0" />
+	<preference name="AutoHideSplashScreen" value="true" />
+	<preference name="ShowSplashScreenSpinner" value="false" />
+	<preference name="SplashScreen" value="none" />
+    <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
+    <preference name="AllowInlineMediaPlayback" value="true" />
+</widget>

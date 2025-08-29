@@ -1,0 +1,51 @@
+{
+  "name": "buildtest",
+  "private": true,
+  "version": "1.0.0",
+  "description": "BuildTest",
+  "license": "UNLICENSED",
+  "scripts": {
+    "minify-html": "html-minifier-terser --input-dir ./www --output-dir ./www --collapse-whitespace --remove-comments --minify-js true --file-ext html",
+    "obfuscate-js": "javascript-obfuscator www/js --output www/js --compact true --string-array true",
+    "prepare-www": "npm run obfuscate-js",
+    "start": "npm run dev",
+    "dev": "cross-env NODE_ENV=development vite",
+    "build": "cross-env NODE_ENV=production vite build",
+    "build-cordova": "cross-env TARGET=cordova cross-env NODE_ENV=production vite build && node ./build/build-cordova.js && cd cordova && cordova build",
+    "build-cordova-ios": "cross-env TARGET=cordova cross-env NODE_ENV=production vite build && node ./build/build-cordova.js && npm run prepare-www && cd cordova && cordova build ios",
+    "cordova-ios": "cross-env TARGET=cordova cross-env NODE_ENV=production vite build && node ./build/build-cordova.js && cd cordova && cordova run ios",
+    "build-cordova-android": "cross-env TARGET=cordova cross-env NODE_ENV=production vite build && node ./build/build-cordova.js && npm run prepare-www && cd cordova && cordova build android",
+    "cordova-android": "cross-env TARGET=cordova cross-env NODE_ENV=production vite build && node ./build/build-cordova.js && cd cordova && cordova run android",
+    "postinstall": "cpy --flat ./node_modules/framework7-icons/fonts/*.* ./src/fonts/ && cpy --flat ./node_modules/material-icons/iconfont/*.* ./src/fonts/"
+  },
+  "browserslist": [
+    "IOS >= 15",
+    "Safari >= 15",
+    "last 5 Chrome versions",
+    "last 5 Firefox versions"
+  ],
+  "dependencies": {
+    "cordova": "^6.1.1",
+    "dom7": "^4.0.6",
+    "framework7": "^8.3.0",
+    "framework7-icons": "^5.0.5",
+    "material-icons": "^1.13.12",
+    "skeleton-elements": "^4.0.1",
+    "swiper": "^11.0.5"
+  },
+  "devDependencies": {
+    "clean-css-cli": "^5.6.3",
+    "cpy-cli": "^5.0.0",
+    "cross-env": "^7.0.3",
+    "html-minifier-cli": "^0.1.0",
+    "html-minifier-terser": "^7.2.0",
+    "javascript-obfuscator": "^4.1.1",
+    "postcss-preset-env": "^9.3.0",
+    "rollup": "^4.9.0",
+    "rollup-plugin-framework7": "^1.2.1",
+    "vite": "^7.0.0",
+    "vite-plugin-html": "^3.2.0"
+  },
+  "main": "postcss.config.js",
+  "author": ""
+}

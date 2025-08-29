@@ -1,0 +1,11 @@
+{
+    "browserWindow": {
+	"autoHideMenuBar": true,
+        "resizable": false,
+        "fullscreen": true,
+        "webPreferences": {
+            "devTools": false,
+            "plugins": true
+        }
+    }
+}

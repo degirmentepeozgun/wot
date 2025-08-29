@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link href="common.css?x=10" rel="stylesheet" />
+	<link href="responsive.css?r=20" rel="stylesheet" />
+	<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+	<script src="data.js"></script>
+	
+	<title>(WoT) Warriors Of Tengri</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property='og:title' content='Warriors of Tengri'/>
+<meta property='og:image' content='images/logo-rect.png'/>
+<meta property='og:description' content='Wrath of Erlik'/>
+<meta property='og:url' content='https//www.warriorsoftengri.com/'/>
+</head>
+<div id="nav-bar" class="flex" style="position: fixed;top:0;left:0;z-index: 2">
+	<div style="width:62%;height:100%;position:relative" class="flex">
+		<div class="logo flex" style="position:absolute;left:-40%;width:30%;height:100%">
+			<img src="images/logo-rect.png" style="max-height: 70%;padding-left: 5vw;filter:drop-shadow(0px 0px .5vh #000);-webkit-filter:drop-shadow(0px 0px .5vh #000);" />
+		</div>
+		<div class="flex navbar-item" style="overflow:hidden;position:absolute;height:120%;left:.5%;border-bottom-left-radius:1vw;width:20%;box-shadow:inset 0px 0px 1.5vh #000">
+			<a href="#home" style="width:100%;height:100%" class="flex one-line">HOME</a>
+		</div>
+		<div class="flex navbar-item" style="overflow:hidden;position: absolute; height: 120%; left: 20%; border-bottom-left-radius: .5vw; width: 20%; box-shadow: inset 0px 0px 1.5vh #000">
+			<a href="#game" style="width:100%;height:100%" class="flex one-line">GAME</a>
+		</div>
+		<div class="flex navbar-item" style="overflow:hidden;position: absolute; height: 120%; left: 40%; width: 20%; box-shadow: inset 0px 0px 1.5vh #000">
+			<a href="#concept" style="width:100%;height:100%" class="flex one-line">CONCEPT</a>
+		</div>
+		<div class="flex navbar-item" style="overflow:hidden;position: absolute; height: 120%; left: 60%; border-bottom-right-radius: .5vw; width: 20%; box-shadow: inset 0px 0px 1.5vh #000">
+			<a href="#content" style="width:100%;height:100%" class="flex one-line">CONTENT</a>
+		</div>
+		<div class="flex navbar-item" style="overflow:hidden;position: absolute; height: 120%; left: 79.5%; border-bottom-right-radius: 1vw; width: 20%; box-shadow: inset 0px 0px 1.5vh #000">
+			<a href="#end" style="width:100%;height:100%" class="flex one-line">CONTACT US</a>
+		</div>
+	</div>
+</div>
+<body style="padding-top:8vh">
+		<div class="mobile-sign flex" style="display: none;height:100%;flex-direction:column">
+			<img src="images/sign.png" />
+			<div style="flex:1;opacity:.5;padding-bottom:5%" class="flex flex-ai-end">
+				<img src="images/logo-rect.png" style="max-width:40%;padding-left: 5vw;filter:drop-shadow(0px 0px .5vh #b21308);-webkit-filter:drop-shadow(0px 0px .5vh #b21308);" />
+			</div>
+		</div>
+	<div id="content">
+		<a name="home"></a>
+		<div class="card-holder" style="background: url(images/chain.png), url(images/chain.png); background-repeat: repeat-y, repeat-y; background-position: 12% 0, 40% 0">
+			<div class="card card-reversed">
+				<div class="flex">
+					<div class="presentation-wrapper flex">
+						<div class="video-wrapper">
+							<iframe allowfullscreen="allowfullscreen"
+									mozallowfullscreen="mozallowfullscreen"
+									msallowfullscreen="msallowfullscreen"
+									oallowfullscreen="oallowfullscreen"
+									webkitallowfullscreen="webkitallowfullscreen"
+									style="width:100%;height:100%"
+									src="https://www.youtube.com/embed/1uTIBWOOBGQ?rel=0" frameborder="0"></iframe>
+						</div>
+					</div>
+					<div class="card-content" style="text-align: left !important;">
+						<div class="card-title">
+							About Us
+						</div>
+						<div style="padding-bottom:.25em"><b style="color:#ffffffee">Özgün Değirmentepe</b> (Lead Developer)</div>
+						<div style="padding-left:2%">
+							<span style="color:#ffffffd8">Experience:</span> 15 years<br />
+							<span style="color:#ffffffd8">Interests:</span> Software Architecture, Big Data, Mobile Apps adn Gaming<br />
+							<span style="color:#ffffffd8">Specialities:</span> Databases, Javascript, C#, Distributed Apps
+						</div><br />
+						<div style="padding-bottom:.25em"><b style="color:#ffffffee">Mehmet Canpolat:</b> (Art Designer & Developer)</div>
+						<div style="padding-left:2%">
+							<span style="color:#ffffffd8">Experience:</span> 15 years<br />
+							<span style="color:#ffffffd8">Interests:</span> Writing Books, Stories, Gaming, Music and Drawing<br />
+							<span style="color:#ffffffd8">Specialities:</span> Hand Drawing, Character Designs, Visual Effects
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- <div style="width:100%;aspect-ratio: 1917/945;">
+			<img class="lazy lady" style="width:100%;height:100%" data-src="images/ss/2-1t.png" alt="Block mostly absorbs damage depends on your fatiquee">
+		</div> -->
+		<div class="card-holder" style="background: url(images/chain.png), url(images/chain.png); background-repeat: repeat-y, repeat-y; background-position: 60% 0, 88% 0">
+			<div class="card">
+				<div class="flex">
+					<div class="card-content">
+						<div class="card-title">
+							How Did We Start?
+						</div>
+						<p>
+							<span class="cap">W</span>e are big fan of 2D/2.5D Side Scroller RPG games. Prefered online and real-time pvp playable ones which is too hard to find with strategic
+							gameplay with a smart dodge/block/counter mechanics. We played Fantasy Fighter, League of Stickman, Dragon Nest, HIT, Darkness Rises and lastly
+							Undecember which are very good games but never satisfied us 100% because of low player population and lazy supports so Mehmet and I started a long journey to
+							build the mechanics of our dreams on July 2023 and it turned into a serious game. Hope you like it.
+						</p><br />
+						<p>
+							<span class="cap">T</span>his video is our first try on the week we start after digging some start-up mechanics
+						</p>
+					</div>
+					<div class="presentation-wrapper flex">
+						<div class="video-wrapper">
+							<iframe allowfullscreen="allowfullscreen"
+									mozallowfullscreen="mozallowfullscreen"
+									msallowfullscreen="msallowfullscreen"
+									oallowfullscreen="oallowfullscreen"
+									webkitallowfullscreen="webkitallowfullscreen"
+									style="width:100%;height:100%" src="https://www.youtube.com/embed/59yPJ6mdmD8?rel=0" frameborder="0"></iframe>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card-holder" style="background: url(images/chain.png), url(images/chain.png); background-repeat: repeat-y, repeat-y; background-position: 12% 0, 40% 0">
+			<div class="card card-reversed">
+				<div class="flex">
+					<div class="card-content" style="width:100%">
+						<div class="card-title">
+							Inspired From?
+						</div>
+						<p>
+							<span class="cap">O</span>f course we inspired from old games like Golden Axe, Moon Stone, Blaz Blue RR (Currently Active), Fantasy Fighter for creating parallax environments and sprite based hand-drawn 2D style.
+							About designing characters we inspired from Turkish Myth Sources and Dede Korkut Tales. About action style and mechanics we prefered Arcade Style and fast-paced realtime combat
+							with dodge/block/counter/dash moves to gain advantage against enemy with using strategy thats why the gameplay wont be P2W and we believe it will satisfy every kind and style of players.
+							About the time and the story we inspired from Conan-Age and the book named Norad which is also written by Mehmet CANPOLAT, we tried to catch a Horror/Medieval/Caotic atmosphere with tension filled moments
+							by bloody effects & sound effects during storyline.
+						</p><br />
+						<p>
+							<span class="cap">S</span>ome cult games of big companies like King Of Fighters, Metal Slug, Dungeon Fighter are increasing
+							popularity year by year and these kind of classic side-scroller games always place on top. That makes us to feel we are completely on the right way
+							about inspiration of these kind of games and looking forward to be one of them as a Turkish Company.
+							<a style="color:#F4BB44 !important" target="_blank" href="https://vgsales.fandom.com/wiki/Dungeon_Fighter_Online">You can see the revenue of Dungeon Fighter Online</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="flex card-title" style="height:10vh;padding:4vh 0;background: #080808cc;margin-top:4vh; border-radius: 10vh; box-shadow:0px 0px .5vh #1c160a, 0.5vh 0.5vh 2vh #000">
+			WHAT WE DID?
+		</div>
+		<a name="game"></a>
+		<div class="card-holder" style="background: url(images/chain.png), url(images/chain.png); background-repeat: repeat-y, repeat-y; background-position: 60% 0, 88% 0">
+			<div class="card">
+				<div class="flex flex-ai-start">
+					<div class="card-content" style="width:100%">
+						<div class="card-title flex">
+							1 - About Main Characters & Animations
+						</div>
+						<div class="baguetteBoxOne gallery flex" style="border:none !important">
+							<div style="width:30%;margin:1.66%">
+								<a href="images/ss/0-1.png" data-caption="BERSERKER" style="aspect-ratio: 426/586;width:100%">
+									<img class="lazy" data-src="images/ss/0-1.png" alt="BERSERKER">
+								</a>
+								<div style="padding:2% 0;text-align: center !important;">BERSERKER</div>
+							</div>
+							<div style="width:30%;margin:1.66%">
+								<a href="images/ss/0-2.png" data-caption="RANGER" style="aspect-ratio: 426/586;width:100%">
+									<img class="lazy" data-src="images/ss/0-2.png" alt="RANGER">
+								</a>
+								<div style="padding:2% 0;text-align: center !important">RANGER</div>
+							</div>
+							<div style="width:30%;margin:1.66%">
+								<a href="images/ss/0-3.png" data-caption="ASSASSIN" style="aspect-ratio: 426/586;width:100%">
+									<img class="lazy" data-src="images/ss/0-3.png" alt="ASSASSIN">
+								</a>
+								<div style="padding:2% 0;text-align: center !important">ASSASSIN</div>
+							</div>
+						</div>
+						<div style="width:100%" class="flex flex-ai-start">
+							<div style="width:50%;padding-right: 20px;">
+								<ul style="padding-inline-start: 20px;">
+									<li>3x Playable Characters</li>
+									<li>Idle or Entering In Combat animations</li>
+									<li>Around 50x animations for playable characters</li>
+									<li>4x Stun and 2x Hit animations</li>
+									<li>2x Throwing Air animations</li>
+									<li>Ground and Air Knockbacks</li>
+									<li>Release animation (After couple of damage taken)</li>
+									<li>Escaping animation when you are in crowd-control (Chain skill with long cooldown)</li>
+									<li>Getting up and Counter-Attack animation (Chain skill with long cooldonw)</li>
+									<li>Block and Hit during Block animation</li>
+									<li>Activating Rage Mode</li>
+									<li>Ranged Attack</li>
+									<li>Air Attack</li>
+									<li>Ground Attack</li>
+									<li>1x more Air or Ground attack depends on character class</li>
+									<li>1x more Chain Attack depends on character class</li>
+									<li>Normal Attack</li>
+									<li>3x to 6x different Normal Attack combo animation during hold</li>
+									<li>Hug animation agains closest enemy if you can handle with its weight</li>
+									<li>Hugged by enemy animation</li>
+									<li>2x Death animation depends on your last situation (Air or Ground)</li>
+									<li>Defensive skill like increasing defense or health per second</li>
+									<li>Dodge/Roll skill with chargable cooldown</li>
+									<li>Dash (for running away from attacker)</li>
+									<li>Charge (for getting close to attackable enemy)</li>
+									<li>Skill Break (depends on the attack priority)</li>
+									<li>Skill Cancel (you can cancel some of your own skills if you sense any disadventage state)</li>
+									<li>Parry (when attacks are in same priority)</li>
+									<li>Channeling skill (taking time to cast completely but canceling in any damage or move)</li>
+									<li>Pull/Push skills (pulling enemy close to you or pushing enemy far away with yourself)</li>
+									<li>Finishing Move animations depends on enemy</li>
+									<li>Run/Walk animations which depends on distance</li>
+								</ul>
+								<br />
+								<div><b class="cap" style="color:#fff;font-size: large !important">NOTE</b>&nbsp;All animations have sounds already with different variations</div>
+							</div>
+							<div style="width:50%" class="flex flex-ai-start">
+								<div class="presentation-wrapper flex" style="height:100%;width:100%">
+									<div class="baguetteBoxOne gallery" style="border:none !important">
+										<a href="images/ss/2-1.png" data-caption="Block mostly absorbs damage depends on your fatique" style="width:100%">
+											<img class="lazy" data-src="images/ss/2-1t.png" alt="Block mostly absorbs damage depends on your fatiquee">
+										</a>
+										<div style="padding:2% 0">Block mostly absorbs damage depends on your fatique</div>
+										<a href="images/ss/2-2.png" data-caption="Chain moves appear when you are in crowd-control" style="width:100%">
+											<img class="lazy" data-src="images/ss/2-2t.png" alt="Chain moves appear when you are in crowd-control">
+										</a>
+										<div style="padding:2% 0">Chain moves appear when you are in crowd-control</div>
+										<a href="images/ss/2-3.png" style="width:100%" data-caption="You can combo your enemy until it enters release mode">
+											<img class="lazy" data-src="images/ss/2-3t.png" alt="You can combo your enemy until it enters release mode">
+										</a>
+										<div style="padding:2% 0">You can combo your enemy until it enters release mode</div>
+										<a href="images/ss/2-4.png" style="width:100%" data-caption="When you time your block move well you can counter">
+											<img class="lazy" data-src="images/ss/2-4t.png" alt="" title="When you time your block move well you can counter">
+										</a>
+										<div style="padding:2% 0">When you time your block move well you can counter</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card-holder">
+			<div class="card card-reversed">
+				<div class="flex">
+					<div class="card-content">
+						<div class="card-title flex">
+							2 - About PVE (Player Versus Environment)
+						</div>
+						<div class="baguetteBoxOne gallery flex" style="border:none !important">
+							<div style="width:46%;margin:2%">
+								<a href="images/ss/5-0.png" data-caption="DEDE KORKUT" style="aspect-ratio: 426/586;width:100%">
+									<img class="lazy" data-src="images/ss/5-0.png" alt="DEDE KORKUT">
+								</a>
+								<div style="padding:2% 0;text-align: center !important;">DEDE KORKUT (NPC)</div>
+							</div>
+							<div style="width:46%;margin:2%">
+								<a href="images/ss/5-1.png" data-caption="TEMİR HAN" style="aspect-ratio: 426/586;width:100%">
+									<img class="lazy" data-src="images/ss/5-1.png" alt="TEMİR HAN">
+								</a>
+								<div style="padding:2% 0;text-align: center !important;">TEMİR HAN (NPC)</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-1.png" data-caption="Parallax Designed Environments" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-1t.png" alt="Parallax Designed Environments">
+								</a>
+								<div style="padding:2% 0">Parallax Designed Environments</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-2.png" data-caption="Traps, Chests and Interactive Objects" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-2t.png" alt="Traps, Chests and Interactive Objects">
+								</a>
+								<div style="padding:2% 0">Traps, Chests and Interactive Objects</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-3.png" data-caption="Npc and Dialogs" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-3t.png" alt="Npc and Dialogs">
+								</a>
+								<div style="padding:2% 0">Npc and Dialogs</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-4.png" data-caption="Main and Side Quests" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-4t.png" alt="Main and Side Quests">
+								</a>
+								<div style="padding:2% 0">Main and Side Quests</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-10.png" data-caption="Different Quest Styles" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-10t.png" alt="Different Quest Styles">
+								</a>
+								<div style="padding:2% 0">Different Quest Styles</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-5.png" data-caption="Coop Mode" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-5t.png" alt="Coop Mode">
+								</a>
+								<div style="padding:2% 0">Coop Mode</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-15.png" data-caption="Recruit Squad Member" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-15t.png" alt="Recruit Squad Member">
+								</a>
+								<div style="padding:2% 0">Recruit Squad Member</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-6.png" data-caption="Upgrade Skills" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-6t.png" alt="Upgrade Skills">
+								</a>
+								<div style="padding:2% 0">Upgrade Skills</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-7.png" data-caption="Map and discover new locations" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-7t.png" alt="Map and discover new locations">
+								</a>
+								<div style="padding:2% 0">Map and discover new locations</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-8.png" data-caption="Smart Enemies with 4x difficulty level" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-8t.png" alt="Smart Enemies with 4x difficulty level">
+								</a>
+								<div style="padding:2% 0">Smart Enemies with 4x difficulty level</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-9.png" data-caption="Different level and grade monsters" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-9t.png" alt="Different level and grade monsters">
+								</a>
+								<div style="padding:2% 0">Different level and grade monsters</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-11.png" data-caption="Enemy cast area declaration" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-11t.png" alt="Enemy cast area declaration">
+								</a>
+								<div style="padding:2% 0">Enemy cast area declaration</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-12.png" data-caption="Blood & Gore Scenes" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-12t.png" alt="Blood & Gore Scenes">
+								</a>
+								<div style="padding:2% 0">Blood & Gore Scenes</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-14.png" data-caption="Common Skills & Inventory" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-14t.png" alt="Common Skills & Inventory">
+								</a>
+								<div style="padding:2% 0">Common Skills & Inventory</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-21.png" data-caption="Powerful StoryLine" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-21t.png" alt="Powerful StoryLine">
+								</a>
+								<div style="padding:2% 0">Friendly Fire On Enemies</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-13.png" data-caption="Boss Fights" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-13t.png" alt="Boss Fights">
+								</a>
+								<div style="padding:2% 0">Boss Fights</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-16.png" data-caption="Item Drops" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-16t.png" alt="Item Drops">
+								</a>
+								<div style="padding:2% 0">Item Drops</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-17.png" data-caption="Buff/Debuff System" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-17t.png" alt="Buff/Debuff System">
+								</a>
+								<div style="padding:2% 0">Buff/Debuff System</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-18.png" data-caption="Switch with squad member" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-18t.png" alt="Switch with squad member">
+								</a>
+								<div style="padding:2% 0">Switch with squad member</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-19.png" data-caption="Weather Status" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-19t.png" alt="Weather Status">
+								</a>
+								<div style="padding:2% 0">Weather Status</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/3-20.png" data-caption="Powerful StoryLine" style="width:100%">
+									<img class="lazy" data-src="images/ss/3-20t.png" alt="Powerful StoryLine">
+								</a>
+								<div style="padding:2% 0">Powerful StoryLine</div>
+							</div>
+						</div>
+						<div style="height:8vh" class="flex card-title">A Boss-Fight Sample</div>
+						<div>
+							<iframe allowfullscreen="allowfullscreen"
+									mozallowfullscreen="mozallowfullscreen"
+									msallowfullscreen="msallowfullscreen"
+									oallowfullscreen="oallowfullscreen"
+									webkitallowfullscreen="webkitallowfullscreen"
+									style="width:100%;aspect-ratio: 16/9;" src="https://www.youtube.com/embed/8vI3OI3X08U?rel=0" frameborder="0" "></iframe>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card-holder">
+			<div class="card card-reversed">
+				<div class="flex">
+					<div class="card-content">
+						<div class="card-title flex">
+							3 - About PVP (Player Versus Player)
+						</div>
+						<div>
+							<iframe allowfullscreen="allowfullscreen"
+									mozallowfullscreen="mozallowfullscreen"
+									msallowfullscreen="msallowfullscreen"
+									oallowfullscreen="oallowfullscreen"
+									webkitallowfullscreen="webkitallowfullscreen"
+									style="width:100%;aspect-ratio: 16/9;" src="https://www.youtube.com/embed/VcMtFt0bYPU?rel=0" frameborder="0" "></iframe>
+						</div>
+						<div class="baguetteBoxOne gallery flex" style="border:none !important">
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/4-1.png" data-caption="Damage Types & Immunities" style="width:100%">
+									<img class="lazy" data-src="images/ss/4-1t.png" alt="Damage Types & Immunities">
+								</a>
+								<div style="padding:2% 0">Damage Types & Immunities</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/4-2.png" data-caption="1v1 Arenas" style="width:100%">
+									<img class="lazy" data-src="images/ss/4-2t.png" alt="1v1 Arenas">
+								</a>
+								<div style="padding:2% 0">1v1 Arenas</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/4-3.png" data-caption="3v3 Team BattleGrounds" style="width:100%">
+									<img class="lazy" data-src="images/ss/4-3t.png" alt="3v3 Team BattleGrounds">
+								</a>
+								<div style="padding:2% 0">3v3 Team BattleGrounds</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/4-4.png" data-caption="Become MVP of Your Team" style="width:100%">
+									<img class="lazy" data-src="images/ss/4-4t.png" alt="Become MVP of Your Team">
+								</a>
+								<div style="padding:2% 0">Become MVP of Your Team</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/4-5.png" data-caption="Ghost Mode" style="width:100%">
+									<img class="lazy" data-src="images/ss/4-5t.png" alt="Ghost Mode">
+								</a>
+								<div style="padding:2% 0">Ghost Mode</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/4-6.png" data-caption="Gain & Redeem Your Rage Points" style="width:100%">
+									<img class="lazy" data-src="images/ss/4-6t.png" alt="Gain & Redeem Your Rage Points">
+								</a>
+								<div style="padding:2% 0">Gain & Redeem Your Rage Points</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/4-7.png" data-caption="Make Killing Sprees" style="width:100%">
+									<img class="lazy" data-src="images/ss/4-7t.png" alt="Make Killing Sprees">
+								</a>
+								<div style="padding:2% 0">Make Killing Sprees</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/4-8.png" data-caption="Protection With Invisible Frames" style="width:100%">
+									<img class="lazy" data-src="images/ss/4-8t.png" alt="Protection With Invisible Frames">
+								</a>
+								<div style="padding:2% 0">Protection With Invisible Frames</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/4-9.png" data-caption="Skill Modifications" style="width:100%">
+									<img class="lazy" data-src="images/ss/4-9t.png" alt="Skill Modifications">
+								</a>
+								<div style="padding:2% 0">Skill Modifications</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/4-10.png" data-caption="Screen Effects" style="width:100%">
+									<img class="lazy" data-src="images/ss/4-10t.png" alt="Screen Effects">
+								</a>
+								<div style="padding:2% 0">Screen Effects</div>
+							</div>
+						</div>
+						<div>
+							<iframe allowfullscreen="allowfullscreen"
+									mozallowfullscreen="mozallowfullscreen"
+									msallowfullscreen="msallowfullscreen"
+									oallowfullscreen="oallowfullscreen"
+									webkitallowfullscreen="webkitallowfullscreen"
+									style="width:100%;aspect-ratio: 16/9;" src="https://www.youtube.com/embed/6z6dTae81_A?rel=0" frameborder="0" "></iframe>
+						</div>
+						<div class="flex" style="padding:2% 0;width:100% !important;text-align:center!important;justify-content:center !important">
+							<span style="display:inline-block!important;width:100%!important">RealTime PvP Tests between mobile and desktop users</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<a name="concept"></a>
+		<div class="card-holder" style="background: url(images/chain.png), url(images/chain.png); background-repeat: repeat-y, repeat-y; background-position: 60% 0, 88% 0">
+			<div class="card">
+				<div class="flex">
+					<div class="card-content" style="width:100%">
+						<div class="card-title">
+							Some Concept Arts
+						</div>
+						<div class="baguetteBoxOne gallery flex" style="border:none !important">
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/d1.png" data-caption="A Character Concept In Progress" style="width:100%">
+									<img class="lazy" data-src="images/ss/d1.png" alt="A Character Concept In Progress">
+								</a>
+								<div style="padding:2% 0">A Character Concept In Progress</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/d2.png" data-caption="A Character Concept After Progress" style="width:100%">
+									<img class="lazy" data-src="images/ss/d2.png" alt="A Character Concept After Progress">
+								</a>
+								<div style="padding:2% 0">A Character Concept After Progress</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/sprite1.png" data-caption="A Sprite Sample Of Berserker" style="width:100%">
+									<img class="lazy" data-src="images/ss/sprite1.png" alt="A Sprite Sample Of Berserker">
+								</a>
+								<div style="padding:2% 0">A Sprite Sample Of Berserker</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/sprite2.png" data-caption="A Sprite Sample Of Bandit" style="width:100%">
+									<img class="lazy" data-src="images/ss/sprite2.png" alt="A Sprite Sample Of Bandit">
+								</a>
+								<div style="padding:2% 0">A Sprite Sample Of Bandit</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/6-1.png" style="width:100%">
+									<img class="lazy" data-src="images/ss/6-1t.png">
+								</a>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/6-2.png" style="width:100%">
+									<img class="lazy" data-src="images/ss/6-2t.png">
+								</a>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/6-3.png" style="width:100%">
+									<img class="lazy" data-src="images/ss/6-3t.png">
+								</a>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/6-4.png" style="width:100%">
+									<img class="lazy" data-src="images/ss/6-4t.png">
+								</a>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/6-5.png" style="width:100%">
+									<img class="lazy" data-src="images/ss/6-5t.png">
+								</a>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/6-6.png" style="width:100%">
+									<img class="lazy" data-src="images/ss/6-6t.png">
+								</a>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/6-7.png" style="width:100%">
+									<img class="lazy" data-src="images/ss/6-7t.png">
+								</a>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/6-8.png" style="width:100%">
+									<img class="lazy" data-src="images/ss/6-8t.png" style="width:100%">
+								</a>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/6-9.png" style="width:100%">
+									<img class="lazy" data-src="images/ss/6-9t.png">
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<a name="content"></a>
+		<div class="flex card-title" style="height:10vh;padding:4vh 0;background: #080808cc;margin-top:4vh; border-radius: 10vh; box-shadow:0px 0px .5vh #1c160a, 0.5vh 0.5vh 2vh #000">
+			FUTURE PLANS
+		</div>
+		<div class="card-holder" style="background: url(images/chain.png), url(images/chain.png); background-repeat: repeat-y, repeat-y; background-position: 60% 0, 88% 0">
+			<div class="card card-reversed">
+				<div class="flex">
+					<div class="card-content" style="width:100%">
+						<div class="card-title">
+							About This Game
+						</div>
+						<p>
+							<span class="cap">F</span>rom Jul 23 until now, 6 months passed and game progress is going on as we expected. We are trying to inprove effects, sounds and storyline. We are planing to release the game in late 2024 for all mobile and desktop platforms and digital platforms like Steam,
+							Kickstarter, etc. We are looking forward to add that contents below meanwhile.
+							<ul>
+								<li>Item System</li>
+								<li>Upgrade/Awake Item</li>
+								<li>Randomize Item Stats</li>
+								<li>Auction System</li>
+								<li>Different Quest Styles</li>
+								<li>More NPC Characters</li>
+								<li>More Coop Dungeons</li>
+								<li>World Bosses</li>
+								<li>Weekly/Monthly events</li>
+								<li>Login Gifts</li>
+								<li>PvP Honor Point System</li>
+								<li>PvP League System</li>
+								<li>Duel Mode</li>
+								<li>Add Player As Friend</li>
+								<li>Chat With Other Players</li>
+								<li>Auction/Trade System</li>
+								<li>Free For All PvP Mode</li>
+								<li>Dps Based Daily Missions (Tower, Time Attacks)</li>
+								<li>Some More Lobby Maps</li>
+								<li>Hard Modes</li>
+								<li>Daily Quests</li>
+								<li>Repeatable Quests (For Grind)</li>
+								<li>Marketplace</li>
+								<li>Time Limited Offers</li>
+								<li>Playtime Gifts</li>
+								<li>More Playable Characters</li>
+								<li>More Boss Fights with character inspiration of Turkish Myth</li>
+								<li>Real-Time PvP and Coop</li>
+								<li>Talent System</li>
+							</ul>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card-holder" style="background: url(images/chain.png), url(images/chain.png); background-repeat: repeat-y, repeat-y; background-position: 60% 0, 88% 0">
+			<div class="card">
+				<div class="flex">
+					<div class="card-content" style="width:100%">
+						<div class="card-title">
+							UPDATES
+						</div>
+						<p><span class="cap">U</span>pdate 1.1</p>
+						<ul>
+							<li>Some maps changed</li>
+							<li>Realtime Co-op Feature Available For Testing</li>
+							<li>Socket Connection Data Transfer Optimized</li>
+							<li>Some bugs which reported by beta users are fixed</li>
+						</ul>
+						<div class="baguetteBoxOne gallery flex" style="border:none !important">
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/7-1.png" data-caption="Old Forest Map" style="width:100%">
+									<img class="lazy" data-src="images/ss/7-1t.png" alt="Old Forest Map">
+								</a>
+								<div style="padding:2% 0">Old Forest Map</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/7-11.png" data-caption="New Forest Map" style="width:100%">
+									<img class="lazy" data-src="images/ss/7-11t.png" alt="New Forest Map">
+								</a>
+								<div style="padding:2% 0">New Forest Map</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/7-2.png" data-caption="Old Swamp Map" style="width:100%">
+									<img class="lazy" data-src="images/ss/7-2t.png" alt="Old Swamp Map">
+								</a>
+								<div style="padding:2% 0">Old Swamp Map</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/7-21.png" data-caption="New Swamp Map" style="width:100%">
+									<img class="lazy" data-src="images/ss/7-21t.png" alt="New Swamp Map">
+								</a>
+								<div style="padding:2% 0">New Swamp Map</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/7-3.png" data-caption="Old Cemetery Map" style="width:100%">
+									<img class="lazy" data-src="images/ss/7-3t.png" alt="Old Cemetery Map">
+								</a>
+								<div style="padding:2% 0">Old Cemetery Map</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/7-31.png" data-caption="New Cemetery Map" style="width:100%">
+									<img class="lazy" data-src="images/ss/7-31t.png" alt="New Cemetery Map">
+								</a>
+								<div style="padding:2% 0">New Cemetery Map</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/7-4.png" data-caption="New Snowy Peaks Map" style="width:100%">
+									<img class="lazy" data-src="images/ss/7-4t.png" alt="New Snowy Peaks Map">
+								</a>
+								<div style="padding:2% 0">New Snowy Peaks Map</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/7-5.png" data-caption="New Dungeon Map" style="width:100%">
+									<img class="lazy" data-src="images/ss/7-5t.png" alt="New Dungeon Map">
+								</a>
+								<div style="padding:2% 0">New Dungeon Map</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/7-6.png" data-caption="New Snowy Peaks Map" style="width:100%">
+									<img class="lazy" data-src="images/ss/7-6t.png" alt="Old Village Map">
+								</a>
+								<div style="padding:2% 0">Old Village Map</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/7-7.png" data-caption="New Dungeon Map" style="width:100%">
+									<img class="lazy" data-src="images/ss/7-7t.png" alt="New Village Map">
+								</a>
+								<div style="padding:2% 0">New Village Map</div>
+							</div>
+						</div>
+						<div class="card-title">
+							NEW CONCEPTS
+						</div>
+						<div class="baguetteBoxOne gallery flex" style="border:none !important">
+							<div style="width:30%;margin:1.66%">
+								<a href="images/ss/8-1.png" data-caption="BERSERKER" style="aspect-ratio: 426/586;width:100%">
+									<img class="lazy" data-src="images/ss/8-1.png" alt="BERSERKER">
+								</a>
+								<div style="padding:2% 0;text-align: center !important;">BERSERKER</div>
+							</div>
+							<div style="width:30%;margin:1.66%">
+								<a href="images/ss/8-2.png" data-caption="RANGER" style="aspect-ratio: 426/586;width:100%">
+									<img class="lazy" data-src="images/ss/8-2.png" alt="GUARDIAN">
+								</a>
+								<div style="padding:2% 0;text-align: center !important">GUARDIAN</div>
+							</div>
+							<div style="width:30%;margin:1.66%">
+								<a href="images/ss/8-3.png" data-caption="ASSASSIN" style="aspect-ratio: 426/586;width:100%">
+									<img class="lazy" data-src="images/ss/8-3.png" alt="ASSASSIN">
+								</a>
+								<div style="padding:2% 0;text-align: center !important">ASSASSIN</div>
+							</div>
+						</div>
+						<div>
+							<iframe allowfullscreen="allowfullscreen"
+									mozallowfullscreen="mozallowfullscreen"
+									msallowfullscreen="msallowfullscreen"
+									oallowfullscreen="oallowfullscreen"
+									webkitallowfullscreen="webkitallowfullscreen"
+									style="width:100%;aspect-ratio: 16/9;" src="https://www.youtube.com/embed/TfB5SqwZxlU?rel=0" frameborder="0" "></iframe>
+						</div>
+						<div class="flex" style="padding:2% 0;width:100% !important;text-align:center!important;justify-content:center !important">
+							<span style="display:inline-block!important;width:100%!important">RealTime Coop Feature Tests between mobile and desktop users</span>
+						</div>
+						<p><span class="cap">U</span>pdate 1.2</p>
+						<ul>
+							<li>New maps</li>
+							<li>New training mission</li>
+							<li>New common skills</li>
+							<li>New ambiance sound effects</li>
+							<li>New blood effects</li>
+							<li>New visual effects</li>
+							<li>New background musics</li>
+							<li>New world map</li>
+							<li>
+								New enemies
+								<ul>
+									<li>Gnoll</li>
+									<li>Goblin</li>
+									<li>Bat</li>
+									<li>Troll</li>
+									<li>Turnip</li>
+									<li>Wolf</li>
+									<li>Werewolf</li>
+									<li>Melee Zombie</li>
+									<li>Ranged Zombie</li>
+									<li>Murlock</li>
+									<li>Rat</li>
+									<li>Training Dummy</li>
+									<li>Crab</li>
+									<li>Slime</li>
+								</ul>
+							</li>
+							<li>New Boss: IT Barak</li>
+							<li>Real-Time Pvp</li>
+							<li>New Quest Lines</li>
+							<li>New Dungeon or Arena Request System</li>
+							<li>Performance Optimization</li>
+						</ul>
+						<div class="baguetteBoxOne gallery flex" style="border:none !important">
+							<div style="width:100%;padding:10px">
+								<a href="images/ss/9-0.png?x=3" data-caption="New Enemies" style="width:100%;aspect-ratio: unset;">
+									<img class="lazy" data-src="images/ss/9-0t.png?x=3" alt="New Enemies">
+								</a>
+								<div style="padding:2% 0">New Enemies & Abilities</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/9-1.png" data-caption="Volcano Map" style="width:100%">
+									<img class="lazy" data-src="images/ss/9-1t.png" alt="Volcano Map">
+								</a>
+								<div style="padding:2% 0">Volcano Map</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/9-2.png" data-caption="Desert Map" style="width:100%">
+									<img class="lazy" data-src="images/ss/9-2t.png" alt="Desert Map">
+								</a>
+								<div style="padding:2% 0">Desert Map</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/9-3.png" data-caption="Grove Map" style="width:100%">
+									<img class="lazy" data-src="images/ss/9-3t.png" alt="Grove Map">
+								</a>
+								<div style="padding:2% 0">Grove Map</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/9-4.png" data-caption="Training Map" style="width:100%">
+									<img class="lazy" data-src="images/ss/9-4t.png" alt="Training Map">
+								</a>
+								<div style="padding:2% 0">Training Map</div>
+							</div>
+							<div style="width:100%;padding:10px">
+								<a href="images/ss/9-5.png?x=3" data-caption="New World Map" style="width:100%;aspect-ratio: unset;">
+									<img class="lazy" data-src="images/ss/9-5t.png?x=3" alt="New World Map">
+								</a>
+								<div style="padding:2% 0">New World Map</div>
+							</div>
+						</div>
+						<div>
+							<iframe allowfullscreen="allowfullscreen"
+									mozallowfullscreen="mozallowfullscreen"
+									msallowfullscreen="msallowfullscreen"
+									oallowfullscreen="oallowfullscreen"
+									webkitallowfullscreen="webkitallowfullscreen"
+									style="width:100%;aspect-ratio: 16/9;" src="https://www.youtube.com/embed/vh-ucz93ldQ?si=uqKuTTpJaCz0l6Ym&rel=0" frameborder="0" "></iframe>
+						</div>
+						<div class="flex" style="padding:2% 0;width:100% !important;text-align:center!important;justify-content:center !important">
+							<span style="display:inline-block!important;width:100%!important">Training Map For Testing Combos</span>
+						</div>
+						<div>
+							<iframe allowfullscreen="allowfullscreen"
+									mozallowfullscreen="mozallowfullscreen"
+									msallowfullscreen="msallowfullscreen"
+									oallowfullscreen="oallowfullscreen"
+									webkitallowfullscreen="webkitallowfullscreen"
+									style="width:100%;aspect-ratio: 16/9;" src="https://www.youtube.com/embed/RReMomhVPdo?rel=0" frameborder="0" "></iframe>
+						</div>
+						<div class="flex" style="padding:2% 0;width:100% !important;text-align:center!important;justify-content:center !important">
+							<span style="display:inline-block!important;width:100%!important">First 10 Minutes Gameplay</span>
+						</div>
+						<p><span class="cap">U</span>pdate 1.3</p>
+						<ul>
+							<li>New human enemies</li>
+							<li>New ultimate skills</li>
+							<li>New inventory system</li>
+							<li>New item system</li>
+							<li>New boss abilities</li>
+							<li>New sound and visual effects</li>
+							<li>New update notification system</li>
+							<li>Updated World Map</li>
+							<li>Updated PvE mechanics</li>
+							<li>Several Bug Fixes</li>
+							<li>Performance Optimization</li>
+						</ul>
+						<div class="baguetteBoxOne gallery flex" style="border:none !important">
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/10-0.png" data-caption="New Human Enemies" style="width:100%;aspect-ratio: unset;">
+									<img class="lazy" data-src="images/ss/10-0t.png" alt="New Human Enemies">
+								</a>
+								<div style="padding:2% 0">New Human And Mounted Enemies</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/10-1.png" data-caption="New Boss Abilities" style="width:100%">
+									<img class="lazy" data-src="images/ss/10-1t.png" alt="New Boss Abilities">
+								</a>
+								<div style="padding:2% 0">New Boss Abilities</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/10-2.png" data-caption="New Inventory System" style="width:100%">
+									<img class="lazy" data-src="images/ss/10-2t.png" alt="New Inventory System">
+								</a>
+								<div style="padding:2% 0">New Inventory System</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/10-3.png" data-caption="New Item System" style="width:100%">
+									<img class="lazy" data-src="images/ss/10-3t.png" alt="New Item System">
+								</a>
+								<div style="padding:2% 0">New Item System</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/10-4.png" data-caption="New Ranged Enemies" style="width:100%">
+									<img class="lazy" data-src="images/ss/10-4t.png" alt="New Ranged Enemies">
+								</a>
+								<div style="padding:2% 0">New Ranged Enemies</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/10-5.png" data-caption="New Visual Effects" style="width:100%">
+									<img class="lazy" data-src="images/ss/10-5t.png" alt="New Visual Effects">
+								</a>
+								<div style="padding:2% 0">New Visual Effects</div>
+							</div>
+							<div style="width:100%;padding:10px">
+								<a href="images/ss/10.png" data-caption="New Rare Enemy: Shaman" style="width: 100%; aspect-ratio: unset;text-align: center">
+									<img style="width:auto" class="lazy" data-src="images/ss/10.png" alt="New Rare Enemy: Shaman">
+								</a>
+								<div style="padding:2% 0">New Rare Enemy: Shaman</div>
+							</div>
+						</div>
+						<div>
+							<iframe allowfullscreen="allowfullscreen"
+									mozallowfullscreen="mozallowfullscreen"
+									msallowfullscreen="msallowfullscreen"
+									oallowfullscreen="oallowfullscreen"
+									webkitallowfullscreen="webkitallowfullscreen"
+									style="width:100%;aspect-ratio: 16/9;" src="https://www.youtube.com/embed/Y9abHPZJD-M?rel=0" frameborder="0" "></iframe>
+						</div>
+						<div class="flex" style="padding:2% 0;width:100% !important;text-align:center!important;justify-content:center !important">
+							<span style="display:inline-block!important;width:100%!important">New Inventory System</span>
+						</div>
+						<div class="flex">
+							<img class="mobile-100" style="max-width:100%" src="./images/ss/mapdetail.gif?v=2" />
+						</div>
+						<div class="flex" style="padding:2% 0;width:100% !important;text-align:center!important;justify-content:center !important">
+							<span style="display:inline-block!important;width:100%!important">New Episode Descriptions</span>
+						</div>
+						<div class="flex">
+							<img class="mobile-100" style="width:100%" src="./images/ss/ultimate.gif" />
+						</div>
+						<div class="flex" style="padding:2% 0;width:100% !important;text-align:center!important;justify-content:center !important">
+							<span style="display:inline-block!important;width:100%!important">New Enemy Ultimate Skills</span>
+						</div>
+
+
+
+
+
+						<p><span class="cap">U</span>pdate 1.4</p>
+						<ul>
+							<li>Multilanguage system</li>
+							<li>Turkish language support</li>
+							<li>Solid object/enemy logic added</li>
+							<li>Mechanics & AI upgraded</li>
+							<li>New NPC</li>
+							<li>New quests</li>
+							<li>New quest types</li>
+							<li>New interactive quests</li>
+							<li>NPC Dialogs changed</li>
+							<li>New font</li>
+							<li>New traps</li>
+							<li>Story updated</li>
+							<li>Daily gift lottery system</li>
+							<li>Daily time limited missions added</li>
+							<li>Daily staged and time limited dungeon added</li>
+							<li>Chest reward system added</li>
+							<li>Auto-play mode added</li>
+							<li>Misc items added</li>
+							<li>Battery save mode</li>
+							<li>Several fatality added</li>
+							<li>Fatality system upgraded</li>
+							<li>New sound effects</li>
+							<li>New skills & crowd-control effects</li>
+							<li>Hitting sensation increased</li>
+							<li>New cutscenes added</li>
+							<li>Several Bug Fixes</li>
+							<li>Performance Optimization</li>
+						</ul>
+						<div class="baguetteBoxOne gallery flex" style="border:none !important">
+							<div style="width:100%;padding:10px">
+								<a href="images/ss/11-0.png" data-caption="New NPC - Vargas" style="width:100%;aspect-ratio: unset;">
+									<img class="lazy" data-src="images/ss/11-0t.png" alt="New NPC">
+								</a>
+								<div style="padding:2% 0">New NPC - Vargas (Druid)</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/11-1.png" data-caption="Multi Language System" style="width:100%">
+									<img class="lazy" data-src="images/ss/11-1t.png" alt="Multi Language System">
+								</a>
+								<div style="padding:2% 0">Multi Language System</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/11-2.png" data-caption="New Dialogs & Expressions" style="width:100%">
+									<img class="lazy" data-src="images/ss/11-2t.png" alt="New Dialogs & Expressions">
+								</a>
+								<div style="padding:2% 0">New Dialogs & Expressions</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/11-3.png" data-caption="New Misc Items" style="width:100%">
+									<img class="lazy" data-src="images/ss/11-3t.png" alt="New Misc Items">
+								</a>
+								<div style="padding:2% 0">New Misc Items</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/11-4.png" data-caption="Battery Save Mode" style="width:100%">
+									<img class="lazy" data-src="images/ss/11-4t.png" alt="Battery Save Mode">
+								</a>
+								<div style="padding:2% 0">Battery Save Mode</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/11-5.png" data-caption="New Cutscenes" style="width:100%">
+									<img class="lazy" data-src="images/ss/11-5t.png" alt="New Cutscenes">
+								</a>
+								<div style="padding:2% 0">New Cutscenes</div>
+							</div>
+							<div style="width:50%;padding:10px">
+								<a href="images/ss/11-6.png" data-caption="New Quest Types" style="width:100%">
+									<img class="lazy" data-src="images/ss/11-6t.png" alt="New Quest Types">
+								</a>
+								<div style="padding:2% 0">New Quest Types (Skinning)</div>
+							</div>
+							<div style="width:100%;padding:10px">
+								<a href="images/ss/11-7.png" data-caption="Time Limited Missions" style="width:100%">
+									<img class="lazy" data-src="images/ss/11-7t.png" alt="Time Limited Missions">
+								</a>
+								<div style="padding:2% 0">Time Limited Missions</div>
+							</div>
+						</div>
+						<div>
+							<iframe allowfullscreen="allowfullscreen"
+									mozallowfullscreen="mozallowfullscreen"
+									msallowfullscreen="msallowfullscreen"
+									oallowfullscreen="oallowfullscreen"
+									webkitallowfullscreen="webkitallowfullscreen"
+									style="width:100%;aspect-ratio: 16/9;" src="https://www.youtube.com/embed/rq7ui4OunG4?si=sttvuyjetUkRru2b" frameborder="0" "></iframe>
+						</div>
+						<div class="flex" style="padding:2% 0;width:100% !important;text-align:center!important;justify-content:center !important">
+							<span style="display:inline-block!important;width:100%!important">New Fatalities & Interactive Quests</span>
+						</div>
+						<div class="flex">
+						<div style="width:50%;padding:12px">
+						<div class="flex">
+							<img class="mobile-100" style="width:100%" src="./images/ss/lottery.gif" title="New Lottery System" />
+						</div>
+						<div class="flex" style="padding:2% 0;width:100% !important;text-align:center!important;justify-content:center !important">
+							<span style="display:inline-block!important;width:100%!important">New Lottery System</span>
+						</div>
+						</div>
+						<div style="width:50%;padding:12px">
+						<div class="flex">
+							<img class="mobile-100" style="width:100%" src="./images/ss/skill.gif" title="New Skills & Crowd Controls" />
+						</div>
+						<div class="flex" style="padding:2% 0;width:100% !important;text-align:center!important;justify-content:center !important">
+							<span style="display:inline-block!important;width:100%!important">New Skills & Crowd Controls</span>
+						</div>
+						</div>
+						</div>
+						<div>
+							<iframe allowfullscreen="allowfullscreen"
+									mozallowfullscreen="mozallowfullscreen"
+									msallowfullscreen="msallowfullscreen"
+									oallowfullscreen="oallowfullscreen"
+									webkitallowfullscreen="webkitallowfullscreen"
+									style="width:100%;aspect-ratio: 16/9;" src="https://www.youtube.com/embed/_egkvbn8FvY?si=6MUOD_THEbRSSkM-" frameborder="0" "></iframe>
+						</div>
+						<div class="flex" style="padding:2% 0;width:100% !important;text-align:center!important;justify-content:center !important">
+							<span style="display:inline-block!important;width:100%!important">New Missions</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card-holder" style="background: url(images/chain.png), url(images/chain.png); background-repeat: repeat-y, repeat-y; background-position: 60% 0, 88% 0">
+			<div class="card card-reversed">
+				<div class="flex">
+					<div class="card-content" style="width:100%">
+						<div class="card-title">
+							About Upcoming Games
+						</div>
+						<p>
+							<span class="cap">O</span>n the other hand we are developing a 2D / 2.5D game maker platform like Unity/Mugen and with this engine it will be easy and powerfull to generate
+							these kind of platform or side-scroller games like Beat-Em Ups, Turn-Based Fights, Card-Games or Tower-Defense games. We also know these kind of games
+							have so much potential and player population. With these ideas we are planing to develop some puzzle and sport games which i experienced before because of my works.
+							By developing and releasing more games we are believing that Bi-Frame company will be more popular within a small time.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="flex card-title" style="height:10vh;padding:4vh 0;background: #080808cc;margin-top:4vh; border-radius: 10vh; box-shadow:0px 0px .5vh #1c160a, 0.5vh 0.5vh 2vh #000">
+			EARLY ACCESS - ANDROID
+		</div>
+		<div class="card-holder" style="background: url(images/chain.png), url(images/chain.png); background-repeat: repeat-y, repeat-y; background-position: 60% 0, 88% 0">
+			<div class="card card-reversed">
+				<div class="flex">
+					<div class="card-content" style="width:100%">
+						<div class="card-title">
+							About Early Access Version
+						</div>
+						<p>
+							<span class="cap">W</span>hat you can do?
+							<ul>
+								<li>Start With Full Grade 1 Items</li>
+								<li>Find Grade 2 & Grade 3 Items</li>
+								<li>Find & Use Common Skills</li>
+								<li>5 NPC</li>
+								<li>17 Quests</li>
+								<li>Daily Gold Hunt Mission</li>
+								<li>Daily Tower Mission</li>
+								<li>Daily Lottery</li>
+								<li>Global Quests & Rewards</li>
+								<li>1 Helper Side Character (Archer)</li>
+								<li>Upgrade Skills</li>
+								<li>Upgrade Items</li>
+								<li>Training Map Location</li>
+								<li>Randomly Change Item Attributes</li>
+								<li>Auto Play Mode</li>
+								<li>Buff/Debuff System</li>
+								<li>Elemental Effects</li>
+								<li>20 Enemies</li>
+								<li>4 Bosses</li>
+								<li>Talisman System</li>
+								<li>2 Languages (English, Turkish)</li>
+								<li>Settings</li>
+								<li>Store</li>
+								<li>How To Play Tips</li>
+								<li>5 Different Style Quest Types</li>
+								<li>World Map</li>
+								<li>1 Lobby And 4 Playable Places</li>
+								<li>7 Fatalities</li>
+								<li>Rage System</li>
+								<li>Battery Save Mode</li>
+								<li>Farming Materials System</li>
+								<li>Gain Experience & Level Up!</li>
+							</ul>
+						</p>
+						<p style="margin-top:40px">
+							<span class="cap">W</span>hat we will do next?
+							<ul>
+								<li>Online Content</li>
+								<li>Message System</li>
+								<li>Social Events</li>
+								<li>Arena (Real-Time PVP)</li>
+								<li>Battleground (Real-Time Group PVP)</li>
+								<li>Dungeon System (Real-Time Coop)</li>
+								<li>World Boss (Real-Time Coop)</li>
+								<li>Gem System</li>
+								<li>Zone Level System (Hard Mode)</li>
+								<li>More Playable Characters</li>
+								<li>More Side Characters</li>
+								<li>Companion System</li>
+								<li>Mount & Winds</li>
+								<li>Limited Offer Store</li>
+								<li>Weekly Quests</li>
+								<li>Side Quests</li>
+								<li>More Boss Fights</li>
+								<li>Grade 4,5,6 Items</li>
+								<li>PVP Honor System</li>
+								<li>Guild System</li>
+							</ul>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="flex card-title" style="padding-left:2vh!important;height:10vh;background: #080808cc;margin-top:4vh; border-radius: 10vh; box-shadow:0px 0px .5vh #1c160a, 0.5vh 0.5vh 2vh #000">
+			<a download title="v1.0 - Early Access APK" href="apk/v1.0/app.apk" style="font-family:WideFont;color:#b21308bb;font-size:5vh">DOWNLOAD APK</a>
+		</div>
+		<!-- <div class="card-holder" style="background: url(images/chain.png), url(images/chain.png); background-repeat: repeat-y, repeat-y; background-position: 60% 0, 88% 0">
+			<div class="card card-reversed">
+				<div class="flex">
+					<div class="card-content" style="width:100%">
+						<div class="card-title">
+							About Android Early Access Version (APK)
+						</div>
+						<p>
+							<span class="cap">A</span>ndroid early access version will be released soon. Keep an eye on our website and prepare your android devices.
+							Since we kept you waiting for a long time, we will add extra content into this version as a surprise. Thank you for understanding.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div> -->
+		<div class="card-holder" style="background: url(images/chain.png), url(images/chain.png); background-repeat: repeat-y, repeat-y; background-position: 12% 0, 40% 0">
+			<div class="card">
+				<div class="flex">
+					<div class="follow-us-title flex navbar-item card-title" style="pointer-events: none;align-items:flex-end;width:100%;color:#b21308bb !important;padding:32px 0 2vh 0;background:transparent;font-weight:600">
+						<span class="flex" style="position:relative">
+							<img src='./images/fire.gif' style="height:64px;border-bottom:8px solid #9B9A96;box-sizing:unset;border-radius:8px" />
+							<div class='glow-1000' style="position:absolute"></div>
+						</span>
+						FOLLOW US
+						<span class="flex" style="position:relative">
+							<img src='./images/fire.gif' style="height:64px;border-bottom:8px solid #9B9A96;box-sizing:unset;border-radius:8px" />
+							<div class='glow-1000' style="position:absolute"></div>
+						</span>
+					</div>
+					<div id="footer-social" style="width:100%;padding:34px 0 44px 0" class="flex">
+						<a title="instagram - warriors of tengri" target="_blank" href="https://www.instagram.com/warriors.of.tengri/"><img style="height:32px" src="./images/icons/insta.png" /></a>
+						<a title="youtube - warriors of tengri" target="_blank" href="https://www.youtube.com/@warriorsoftengri"><img style="height:32px" src="./images/icons/yt.png" /></a>
+						<a title="product hunt - warriors of tengri" target="_blank" href="https://www.producthunt.com/products/wot-warriors-of-tengri"><img style="height:32px" src="./images/icons/p.svg" /></a>
+						<a title="discord - warriors of tengri" target="_blank" href="https://discord.com/invite/N7yTkjjXte"><img style="height:32px" src="./images/icons/discord.png" /></a>
+						<a title="twitter - warriors of tengri" target="_blank" href="https://x.com/warrioroftengri"><img style="height:32px" src="./images/icons/tw.png" /></a>
+					</div>
+					<div style="width:100%;text-align: center !important"><span style="color:#b21308bb">&#128222;</span>&nbsp;+90 546 646 06 35</div>
+					<div style="width:100%;text-align: center !important;padding-bottom:12px"><span style="color:#b21308bb;font-weight:600">@</span>&nbsp;warriorsoftengri@gmail.com</div>
+				</div>
+			</div>
+		</div>
+		<div style="height:5vh">
+
+		</div>
+		<div class="sign">
+			<img src="images/sign.png" />
+		</div>
+	</div>
+	<div id="demo-launch-title" class="flex" style="z-index:2;width:18%;margin:0 .5%;height:8vh;position:fixed;right: 0;top:0;">
+		<div class="flex one-line" style="font-family:WideFont;width:100%;height:100%;font-weight:600;margin:1%;color:#b21308bb;font-size:4vh">EARLY ACCESS</div>
+	</div>
+	<div id="demo-launch-timer" class="flex" style="padding:0 2vh;width:20%;right:0;top:8vh;height:12vh;position:fixed">
+		<<div id="dd" class="flex" style="background:#0d0c14;border-radius:12px;width:96% !important;height:calc(100% - 2vh);padding:.5vh 0;aspect-ratio:1/1;font-weight:600;margin:1vh 2%">
+			<a download title="v1.0 - Early Access APK" href="apk/v1.0/app.apk" style="font-family:WideFont;color:#b21308bb;font-size:5vh">DOWNLOAD APK</a>
+		</div>
+		<!-- <div id="dd" class="flex" style="background:#0d0c14;border-radius:12px;width:21%;height:calc(100% - 2vh);padding:.5vh 0;font-family:WideFont;aspect-ratio:1/1;font-weight:600;margin:1vh 2%;color:#b21308bb;font-size:6vh">99</div>
+		<div id="dh" class="flex" style="background:#0d0c14;border-radius:12px;width:21%;height:calc(100% - 2vh);padding:.5vh 0;font-family:WideFont;aspect-ratio:1/1;font-weight:600;margin:1vh 2%;color:#b21308bb;font-size:6vh">99</div>
+		<div id="dm" class="flex" style="background:#0d0c14;border-radius:12px;width:21%;height:calc(100% - 2vh);padding:.5vh 0;font-family:WideFont;aspect-ratio:1/1;font-weight:600;margin:1vh 2%;color:#b21308bb;font-size:6vh">99</div>
+		<div id="ds" class="flex" style="background:#0d0c14;border-radius:12px;width:21%;height:calc(100% - 2vh);padding:.5vh 0;font-family:WideFont;aspect-ratio:1/1;font-weight:600;margin:1vh 2%;color:#b21308bb;font-size:6vh">99</div> -->
+		<!-- <script>
+			const date1 = new Date('10/01/2024');
+			const date2 = Date.now();
+			const diffTime = Math.abs(date2 - date1);
+			let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));	
+			let _dd = diffDays * 1000 * 60 * 60 * 24;
+			let _sub = diffTime - _dd;
+			let diffHours = Math.floor(_sub / (1000 * 60 * 60));
+			_dd = diffHours * 1000 * 60 * 60;
+			_sub = _sub - _dd;
+			let diffMinutes = Math.floor(_sub / (1000 * 60));
+			_dd = diffMinutes * 1000 * 60;
+			_sub = _sub - _dd;
+			let diffSeconds = Math.floor(_sub / (1000));
+			setInterval(function() {
+				diffSeconds--;
+				if(diffSeconds < 0) {
+					diffSeconds = 59;
+					diffMinutes--;
+					if(diffMinutes < 0) {
+						diffMinutes = 59;
+						diffHours--;
+						if(diffHours < 0) {
+							diffHours = 23;
+							diffDays--;
+						}
+					}
+				}
+				document.getElementById('dd').innerText = diffDays < 10 ? '0' + diffDays.toString() : diffDays.toString();
+				document.getElementById('dh').innerText = diffHours < 10 ? '0' + diffHours.toString() : diffHours.toString();
+				document.getElementById('dm').innerText = diffMinutes < 10 ? '0' + diffMinutes.toString() : diffMinutes.toString();
+				document.getElementById('ds').innerText = diffSeconds < 10 ? '0' + diffSeconds.toString() : diffSeconds.toString();
+			}, 1000);
+		</script> -->
+	</div>
+	<!-- <div id="demo-launch-timer-info" class="flex" style="position: fixed;right: 0;top: 18.5vh;font-size: 1vw;width: 20%;padding: 0 2vh;opacity: .75;">
+    		<span style="text-align:center;display:block;margin:2%;width:21%;color:#f7f7f7">DAY</span>
+		<span style="text-align:center;display:block;margin:2%;width:21%;color:#f7f7f7">HOUR</span>
+		<span style="text-align:center;display:block;margin:2%;width:21%;color:#f7f7f7">MIN</span>
+		<span style="text-align:center;display:block;margin:2%;width:21%;color:#f7f7f7">SEC</span>
+    	</div> -->
+	<script src="highlight.js" async></script>
+	<script src="gallery.js" async></script>
+	<style> 
+		.glow-1000 {
+			opacity: 1 !important;
+			animation: glow 1s infinite alternate;
+    -webkit-box-shadow: 0px 0px 105px 45px rgba(255, 251, 0, .2);
+    -moz-box-shadow: 0px 0px 105px 45px rgba(255, 251, 0, .2);
+    box-shadow: 0px 0px 105px 45px rgba(255, 251, 0, .2);
+		}
+		@keyframes glow {
+			from {
+				filter: drop-shadow(0 0 .5vh #ffffff60);
+			}
+			to {
+				filter: drop-shadow(0 0 .5vh #ffffffaa);
+			}
+		}
+	</style>
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			var lazyloadImages = document.querySelectorAll("img.lazy");
+			var lazyloadThrottleTimeout;
+
+			function lazyload() {
+				if (lazyloadThrottleTimeout)
+					clearTimeout(lazyloadThrottleTimeout);
+				lazyloadThrottleTimeout = setTimeout(function () {
+					var scrollTop = window.pageYOffset;
+					lazyloadImages.forEach(function (img) {
+						if (!img.lazyLoading && img.offsetTop < (window.innerHeight + scrollTop)) {
+							const _loader = document.createElement('div');
+							_loader.className = 'flex load';
+							_loader.innerHTML = '<img src="images/load.gif" style="width:20%" />';
+							img.parentNode.appendChild(_loader);
+							img.src = img.dataset.src;
+							img.onload = function () {
+								img.classList.remove('lazy');
+								img.classList.remove('lazy-loading');
+								img.classList.add('lazy-loaded');
+								_loader.remove();
+							}
+							img.classList.add('lazy-loading');
+							img.lazyLoading = true;
+						}
+					});
+					if (lazyloadImages.length == 0) {
+						document.removeEventListener("scroll", lazyload);
+						window.removeEventListener("resize", lazyload);
+						window.removeEventListener("orientationChange", lazyload);
+					}
+				}, 20);
+			}
+
+			document.addEventListener("scroll", lazyload);
+			window.addEventListener("resize", lazyload);
+			window.addEventListener("orientationChange", lazyload);
+		});
+		window.onload = function () {
+			baguetteBox.run('.baguetteBoxOne');
+			baguetteBox.run('.baguetteBoxTwo');
+			baguetteBox.run('.baguetteBoxThree', {
+				animation: 'fadeIn',
+				noScrollbars: true
+			});
+			baguetteBox.run('.baguetteBoxFour', {
+				buttons: false
+			});
+			baguetteBox.run('.baguetteBoxFive', {
+				captions: function (element) {
+					return element.getElementsByTagName('img')[0].alt;
+				}
+			});
+
+			if (typeof oldIE === 'undefined' && Object.keys) {
+				hljs.initHighlighting();
+			}
+		};
+	</script>
+	<a name="end"></a>
+</body>
+</html>

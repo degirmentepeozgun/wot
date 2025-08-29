@@ -1,0 +1,242 @@
+﻿'use strict';
+function dataOperations() {
+	this.storageKey = 'com-biframe-wrath-of-erlik' + (__deviceId ?? 411116);// + '-' + (_dataId ?? '08');
+	this.localData = {
+		warrior: {
+			hp: undefined,
+			fatique: undefined
+		},
+		archer: {
+			hp: undefined,
+			fatique: undefined
+		},
+		thief: {
+			hp: undefined,
+			fatique: undefined
+		}
+	};
+	this.loadHP = function (_char) {
+		const _hp = this.localData[_char.class]?.hp;
+		if (!_hp)
+			return false;
+		_char.setHealth(_hp);
+		return true;
+	}
+	this.loadFatique = function (_char) {
+		const _fatique = this.localData[_char.class]?.fatique;
+		return _fatique ?? _char.maxFatique;
+	}
+	this.setHP = function (_char) {
+		if (!this.localData[_char.class])
+			this.localData[_char.class] = {};
+		this.localData[_char.class].hp = _char.health;
+	}
+	this.setFatique = function (_char) {
+		if (!this.localData[_char.class])
+			this.localData[_char.class] = {};
+		this.localData[_char.class].fatique = _char.fatique;
+	}
+	this.saveState = function (_force) {
+		if (!_force && episode?.pvp)
+			return;
+		localStorage.setItem(this.storageKey, JSON.stringify(__account));
+	}
+	this.getDefaultData = function () {
+		const _id = MathFloor((Math.random() * 9000) + 1000);
+		return {
+			name: 'Guest ' + _id,
+			difficulty: 3,
+			pvp: {
+				order: 15000,
+				honor: 0,
+				lastDuelTime: 0,
+				duelCount: 10
+			},
+			level: 10, // account level
+			grade: 1, // account grade
+			cs: 0,
+			artifacts: [
+			],
+			buffs: [],
+			missions: [
+				{ 
+					key: 'lottery', 
+					lastActivity: 0, 
+				},
+				{ 
+					key: 'tower', 
+					level: 1, 
+					current: 1,
+					lastActivity: 0, 
+					max: 0
+				},
+				{ 
+					key: 'gold', 
+					lastActivity: 0, 
+					level: 1, 
+					current: 0
+				}
+			],
+			lang: 'en',
+			options: {
+				gore: 1,
+				effect: 1,
+				weather: 1,
+				request: 1,
+				sound: 1,
+				ambiance: 1
+			},
+			id: _id,
+			gold: 0,
+			commonInventory: [],
+			pots: [],
+			globalQuests: installGlobalQuests(),
+			questStatus: {
+				dialogOrder: null,
+				isStaticDialog: null,
+				dialogArr: null,
+				order: 1, //3, //Kaçıncı görevden başlamak istesen
+				side: { }
+			},
+			visitedMaps: [1], //harita idlerini ekle ziyaret etmiş sayıl
+			slots: __startSlotAmount,
+			inventory: getRandomItems(1, 'warrior'), //getRandomItems(2, 'warrior'),
+			misc: [
+				//{ type:'ticket-item-selection', count: 100 },
+				//{ type:'ticket-random', count: 100 },
+				// { type:'ticket-gold', count: 12 },
+				// { type:'ticket-item', count: 13 },
+				// { type:'ticket-exp', count: 10 },
+				// { type:'chest', grade:1, count: 10 },
+			],
+			characters: [
+				{
+					class: 'warrior', experience: 0, level: 10, selected: true /*character level*/, skills: [
+						{ order: 1, level: 1 },
+						{ order: 3, level: 1 },
+						{ order: 4, level: 1 },
+						{ order: 5, level: 1 },
+						{ order: 6, level: 1 },
+						{ order: 8, level: 1 },
+						{ order: 10, level: 1 },
+						{ order: 11, level: 1 },
+						{ order: 12, level: 1 }
+					]
+				},
+				{
+					class: 'archer', experience: 0, level: 1, skills: [
+						{ order: 1, level: 1 },
+						{ order: 3, level: 1 },
+						{ order: 4, level: 1 },
+						{ order: 5, level: 1 },
+						{ order: 6, level: 1 },
+						{ order: 8, level: 1 }
+					]
+				},
+				{
+					class: 'thief', experience: 0, level: 1, skills: [
+						{ order: 1, level: 1 },
+						{ order: 3, level: 1 },
+						{ order: 4, level: 1 },
+						{ order: 5, level: 1 },
+						{ order: 6, level: 1 },
+						{ order: 8, level: 1 }
+					]
+				}
+			]
+		};
+	}
+	this.upgradeQuestStatus = function () {
+		//__account.questStatus = JSON.parse(JSON.stringify(__account.questStatus));
+		this.saveState();
+	}
+	this.upgradeVisitedMaps = function (_id) {
+		__account.visitedMaps.push(_id);
+		this.saveState();
+	}
+	this.upgradeOptions = function (_key) {
+		__account.options[_key] = __account.options[_key] ? 0 : 1;
+		this.saveState();
+	}
+	this.upgradeAccountGrade = function (_grade) {
+		if(_grade > __account.grade)
+			__account.grade = _grade;
+		this.saveState();
+	}
+	this.upgradeExperience = function (_char) {
+		const _c = __account.characters.find(x => x.class === _char.class);
+		_c.experience = _char.experience;
+		_c.level = _char.level;
+		this.upgradeAccountGrade(MathFloor(_c.level / 10) + 1);
+		this.saveState();
+	}
+	this.upgradeSkill = function (_char, _skill) {
+		__account.characters.find(x => x.class === _char.class).skills.
+			find(x => x.order === _skill.order).level = _skill.level;
+		this.saveState();
+	}
+	this.loadState = function () {
+		const _json = JSON.parse(localStorage.getItem(this.storageKey) ?? '{}');
+		if (_json?.name)
+			__account = _json;
+		else {
+			__account = this.getDefaultData();
+			__account.inventory.forEach(x => x.weared = 'warrior');
+			this.saveState(1);
+		}
+	}
+	this.loadItems = function(hasMainCharacter) {
+		applyCharacterStats(hasMainCharacter);
+	}
+	this.loadGold = function () {
+		if (!_goldCount)
+			_goldCount = document.getElementById('main-gold-count');
+		_goldCount.innerText = __account.gold.formatWithDots();
+	}
+	this.loadPots = function () {
+		if (!_potCount)
+			_potCount = document.getElementById('main-pot-count');
+		let _pot = __account.pots?.find(x => x.key === 'pot');
+		_potCount.innerText = _pot?.value ?? 0;
+	}
+	this.setCharacterValues = function (_char, _select) {
+		if (_char)
+			if (_select) {
+				__account.characters.forEach(x => delete x.selected);
+				__account.characters.find(x => x.class === _char.class).selected = true;
+				this.saveState();
+			}
+		const _c = __account.characters.find(x => x.class === (_char ?? mainCharacter).class);
+		(_char ?? mainCharacter).level = _c.level;
+		(_char ?? mainCharacter).experience = _c.experience;
+		const _maxExp = (Math.pow(2, _c.level - 1) * 1000);
+		(_char ?? mainCharacter).maxExperience = _maxExp;
+		const _skills = skill.getSkills(_c);
+		for (let _skill of _c.skills)
+			_skills.find(x => x.order === _skill.order).level = _skill.level;
+		if (_c.selected) {
+			if (!_mainExpBar)
+				_mainExpBar = document.getElementById('main-exp-bar');
+			_mainExpBar.style.width = MathRound((100 * _c.experience) / _maxExp) + '%';
+		}
+	}
+	this.checkResetTime = function() {
+		const _reset = getCurrentResetTime();
+		let _update;
+		for(const _mission of __account.missions)
+			if(_mission.lastActivity) {
+				if(_mission.lastActivity < _reset) {
+					_update = 1;
+					_mission.lastActivity = undefined;
+					if(_mission.current > 1)
+						_mission.current = 1;
+					if(_mission.played > 0)
+						_mission.played = 0;
+				}
+			}
+		if(_update)
+			this.saveState();
+	}
+}
+var _client = new dataOperations();
+_client.loadState();

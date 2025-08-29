@@ -1,0 +1,77 @@
+.mailbox-container * {
+    color:#9d987fcc !important;
+    font-size: 3vh !important;
+}
+.mailbox-container {
+	padding: 4% 8% 12% 7.5% !important;
+}
+.mailbox-container .book-page-bg {
+	background: url(./images/ui/full-border.png) !important;
+    background-repeat: no-repeat !important;
+    background-size: 100% auto !important;
+	width:100% !important
+}
+.mailbox-info {
+    padding-top:4%
+}
+.mailbox-desc {
+    padding:6% 8%;
+    max-height: 100%;
+    overflow-y: auto;
+}
+.mailbox-desc-text {
+    font-size: 3vh !important;
+    text-indent: 7.5%;
+}
+.mailbox-owner {
+    font-size: 2.8vh !important;
+    opacity: .75;
+    font-style: italic;
+    padding:5% 7.5%;
+}
+.mailbox-attachment:not(:empty) {
+    height: 10vh;
+    border-top:1px solid #9d987f50;
+    border-bottom:1px solid #9d987f50;
+    background:linear-gradient(120deg, transparent, #00000080, transparent);
+}
+.mailbox-attachment .item-slot {
+    aspect-ratio: 1 / 1 !important;
+    width:auto !important;
+    height:calc(100% - 2vh) !important;
+    margin:1vh !important;
+}
+.mailbox-attachment .item-slot .item-in-slot span {
+    transform: scale(1.25);
+    -webkit-transform: scale(1.25);
+}
+.mailbox-desc:has(+ .mailbox-attachment:not(:empty)) {
+    height: 80% !important;
+}
+.mailbox-buttons {
+    margin:0 7%;
+    width:86%  !important
+}
+.mailbox-card-ts {
+    color: #f3f4f580 !important
+}
+.mailbox-content-left .skill-card.selected .skill-card-title {
+    color:#f3f4f5cc !important
+}
+.mailbox-content-left .mailbox-card .mailbox-card-icon {
+    background: url(./../images/icons/env-close.png);
+    height: 11.6vh;
+    width:11.6vh;
+    background-size: cover !important;
+    background-repeat: no-repeat !important
+}
+.mailbox-content-left .mailbox-card.read .mailbox-card-icon {
+    background: url(./../images/icons/env-open.png);
+}
+.mailbox-card.looted .mailbox-card-loot-icon,
+.mailbox-card:not(.loot) .mailbox-card-loot-icon {
+    display: none !important
+}
+.mailbox-attachment {
+    pointer-events: none !important
+}

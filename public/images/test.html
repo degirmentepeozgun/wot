@@ -1,0 +1,640 @@
+<html>
+<head>
+	<style>
+		@font-face {
+			font-family: 'uncial-antiqua';
+			font-style: normal;
+			font-weight: normal;
+			src: url("ui/font.ttf") format("truetype");
+			font-display: swap
+		}
+
+		@font-face {
+			font-family: 'Wonderland';
+			font-style: normal;
+			font-weight: normal;
+			src: url("ui/font2.otf") format('opentype');
+			font-display: swap
+		}
+
+		@font-face {
+			font-family: 'BlockBlueprint';
+			font-style: normal;
+			font-weight: normal;
+			src: url("ui/font3.ttf") format('truetype');
+			font-display: swap
+		}
+
+		@font-face {
+			font-family: 'font4';
+			font-style: normal;
+			font-weight: normal;
+			src: url("ui/font4.otf") format('opentype');
+			font-display: swap
+		}
+
+		@font-face {
+			font-family: 'joystix monospace';
+			font-style: normal;
+			font-weight: normal;
+			src: url("ui/font6.otf") format('opentype');
+			font-display: swap
+		}
+
+		* {
+			font-family: 'BlockBlueprint' !important
+		}
+
+		.flex {
+			display: flex;
+			justify-content: space-evenly;
+			align-items: center;
+			flex-wrap: wrap
+		}
+
+		.flex-ai-end {
+			-webkit-align-items: flex-end !important;
+			align-items: flex-end !important
+		}
+
+		.flex-ai-start {
+			-webkit-align-items: flex-start !important;
+			align-items: flex-start !important
+		}
+
+		.flex-jc-end {
+			-webkit-justify-content: flex-end !important;
+			justify-content: flex-end !important;
+		}
+
+		.flex-jc-start {
+			-webkit-justify-content: flex-start !important;
+			justify-content: flex-start !important
+		}
+
+		.bg1 {
+			background: radial-gradient(transparent, transparent, black), url(ui/BG3.jpg);
+			background-position: center !important;
+			background-size: cover !important
+		}
+
+		.filled {
+			display: none !important
+		}
+	</style>
+</head>
+<body>
+	<div style="height:780px;width:100%" class="flex">
+		<div style="border-radius:5vh;box-shadow:inset 0 0 5vh #000;height: 80%; aspect-ratio: 16 / 9; background: linear-gradient(127deg, #322D2899, #322D28ca, #322D2899), url(ui/BG11.jpg); background-size: cover !important; position: relative ">
+			<div style="position:absolute;background:#00000080;height:6.7%;top:0;width:100%"></div>
+
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 0; width: 10%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 10%; width: 10%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 20%; width: 10%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 30%; width: 10%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 40%; width: 10%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 50%; width: 10%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 60%; width: 10%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 70%; width: 10%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 80%; width: 10%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 90%; width: 10%" />
+
+			<img src="ui/border.png" style="transform: scale(1, -1); position: absolute; bottom: 0; left: 0; width: 10%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 10%; width: 10%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 20%; width: 10%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 30%; width: 10%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 40%; width: 10%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 50%; width: 10%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 60%; width: 10%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 70%; width: 10%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 80%; width: 10%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 90%; width: 10%" />
+
+			<img src="ui/border.png" style="transform-origin: top left; transform: rotate(90deg) scale(1,-1);  position: absolute; top: 0%;  left: 0; width: 10%" />
+			<img src="ui/border.png" style="transform-origin: top left; transform: rotate(90deg) scale(1,-1);  position: absolute; top: 16%; left: 0; width: 10%" />
+			<img src="ui/border.png" style="transform-origin: top left; transform: rotate(90deg) scale(1,-1);  position: absolute; top: 32%; left: 0; width: 10%" />
+			<img src="ui/border.png" style="transform-origin: top left; transform: rotate(90deg) scale(1,-1);  position: absolute; top: 48%; left: 0; width: 10%" />
+			<img src="ui/border.png" style="transform-origin: top left; transform: rotate(90deg) scale(1,-1);  position: absolute; top: 64%; left: 0; width: 10%" />
+			<img src="ui/border.png" style="transform-origin: top left; transform: rotate(90deg) scale(1,-1);  position: absolute; top: 80%; left: 0; width: 10%" />
+
+			<img src="ui/border.png" style="transform-origin: top right; transform: rotate(90deg) scale(-1,1); position: absolute; top: 0%;  right: 0; width: 10%" />
+			<img src="ui/border.png" style="transform-origin: top right; transform: rotate(90deg) scale(-1,1); position: absolute; top: 16%; right: 0; width: 10%" />
+			<img src="ui/border.png" style="transform-origin: top right; transform: rotate(90deg) scale(-1,1); position: absolute; top: 32%; right: 0; width: 10%" />
+			<img src="ui/border.png" style="transform-origin: top right; transform: rotate(90deg) scale(-1,1); position: absolute; top: 48%; right: 0; width: 10%" />
+			<img src="ui/border.png" style="transform-origin: top right; transform: rotate(90deg) scale(-1,1); position: absolute; top: 64%; right: 0; width: 10%" />
+			<img src="ui/border.png" style="transform-origin: top right; transform: rotate(90deg) scale(-1,1); position: absolute; top: 80%; right: 0; width: 10%" />
+
+			<img src="ui/button-bg1.png" style="position:absolute;left:1%;top:1.6%;width:11%" />
+			<img src="ui/button-bg1.png" style="position: absolute; left: 12%; top: 1.6%; width: 11%" />
+			<img src="ui/button-bg1.png" style="position:absolute;left:23%;top:1.6%;width:11%" />
+			<img src="ui/button-bg1.png" style="position:absolute;left:34%;top:1.6%;width:11%" />
+			<img src="ui/button-bg1.png" style="position:absolute;left:45%;top:1.6%;width:11%" />
+			<img src="ui/button-bg1.png" style="position:absolute;left:56%;top:1.6%;width:11%" />
+			<img src="ui/button-bg1.png" style="position:absolute;left:67%;top:1.6%;width:11%" />
+			<img src="ui/button-bg1.png" style="position:absolute;left:78%;top:1.6%;width:11%" />
+			<img src="ui/button-bg1.png" style="position:absolute;left:89%;top:1.6%;width:11%" />
+			<div style="box-shadow:0 1vh 2vh #000;background: #615D59cc; position: absolute; height: 3px; width: 100%; top: 6.7%; left: 0 "></div>
+
+			<img src="ui/corner1.png" style="position:absolute;width:10%;left:0;top:0" />
+			<img src="ui/corner1.png" style="transform:scale(1,-1); position:absolute;width:10%;left:0;bottom:0" />
+			<img src="ui/corner1.png" style="transform:scale(-1,1); position:absolute;width:10%;right:0;top:0" />
+			<img src="ui/corner1.png" style="transform:scale(-1,-1); position:absolute;width:10%;right:0;bottom:0" />
+
+			<img src="ui/corner3.png" style="position:absolute;width:8%;left:.2%;top:.3%" />
+			<img src="ui/corner3.png" style="transform: scale(-1,1); position: absolute; width: 8%; right: .2%; top: .3% " />
+
+			<img src="ui/star-off.png" style="width:2.5%;position:absolute;left:33%;top:-1.25%" />
+			<img src="ui/star-off.png" style="width:2.5%;position:absolute;left:66%;top:-1.25%" />
+		</div>
+		<div style="border-bottom-left-radius: 10%; border-bottom-right-radius: 10%; height: 20%; aspect-ratio: 16 / 2.25; position: relative; background: linear-gradient(0deg, #332E29, #332E29cc, #332E2999, #332E29cc, #332E29); box-shadow: inset 0 0 5vh #000">
+			<div style="box-shadow: 0 -2vh 2vh #000; border-top: 5px solid #615D59; bottom: 0; left: 0; height: 8%; width: 100%; position: absolute; background: #fff "></div>
+			<img src="ui/border.png" style="position: absolute; top: -3%; left: 0;   width: 15%" />
+			<img src="ui/border.png" style="position: absolute; top: -3%; left: 14%; width: 15%" />
+			<img src="ui/border.png" style="position: absolute; top: -3%; left: 28%; width: 15%" />
+			<img src="ui/border.png" style="position: absolute; top: -3%; left: 42%; width: 15%" />
+			<img src="ui/border.png" style="position: absolute; top: -3%; left: 56%; width: 15%" />
+			<img src="ui/border.png" style="position: absolute; top: -3%; left: 70%; width: 15%" />
+			<img src="ui/border.png" style="position: absolute; top: -3%; left: 84%; width: 15%" />
+			<img src="ui/border.png" style="transform-origin: top left; transform: rotate(90deg) scale(1,-1);  position: absolute; top: 0%; left: 0; width: 12%" />
+
+			<img src="ui/border.png" style="transform-origin: top right; transform: rotate(90deg) scale(-1,1); position: absolute; top: 0%;  right: 0; width: 12%" />
+			<img src="ui/corner2.png" style="position:absolute;width:8%;left:0;top:0" />
+			<img src="ui/corner2.png" style="transform:scale(-1,1); position:absolute;width:8%;right:0;top:0" />
+
+			<img src="ui/14.png" style="transform:rotate(80deg) ; position:absolute;width:4%;left:-.2%;bottom:-20%" />
+			<img src="ui/14.png" style="transform:rotate(100deg) scale(1, -1); position:absolute;width:4%;right:-.2%;bottom:-20%" />
+
+			<img src="ui/border-y3.png" style="position:absolute;top:78%;width:20%;left:6%" />
+			<img src="ui/border-y3.png" style="position:absolute;top:78%;width:20%;left:15.7%" />
+			<img src="ui/border-y3.png" style="position:absolute;top:78%;width:20%;left:25.4%" />
+			<img src="ui/border-y3.png" style="position:absolute;top:78%;width:20%;left:35.1%" />
+			<img src="ui/border-y3.png" style="position:absolute;top:78%;width:20%;left:44.8%" />
+			<img src="ui/border-y3.png" style="position:absolute;top:78%;width:20%;left:54.5%" />
+			<img src="ui/border-y3.png" style="position:absolute;top:78%;width:20%;left:64.2%" />
+			<img src="ui/border-y3.png" style="position:absolute;top:78%;width:20%;left:73.9%" />
+
+
+			<img src="ui/19.png" style="position:absolute;top:-25%;width:14%;left:-8.4%" />
+			<img src="ui/19.png" style="transform:scale(-1,1); position:absolute;top:-25%;width:14%;right:-8.8%" />
+			<img src="ui/9.png" style="box-shadow:0 0 1vh #000; position:absolute;top:10.5%;width:9%;left:5.8%" />
+			<img class="filled" src="ui/35.png" style="position:absolute;top:17%;width:7%;left:6.8%" />
+			<img src="ui/9.png" style="box-shadow:0 0 1vh #000;position:absolute;top:10.5%;width:9%;left:15.8%" />
+			<img src="ui/9.png" style="box-shadow:0 0 1vh #000;position:absolute;top:10.5%;width:9%;left:25.8%" />
+			<img src="ui/9.png" style="box-shadow:0 0 1vh #000;position:absolute;top:10.5%;width:9%;left:35.8%" />
+			<img src="ui/9.png" style="box-shadow:0 0 1vh #000;position:absolute;top:10.5%;width:9%;left:45.8%" />
+			<img src="ui/9.png" style="box-shadow:0 0 1vh #000;position:absolute;top:10.5%;width:9%;left:55.8%" />
+			<img src="ui/9.png" style="box-shadow:0 0 1vh #000;position:absolute;top:10.5%;width:9%;left:65.8%" />
+			<img src="ui/9.png" style="box-shadow:0 0 1vh #000;position:absolute;top:10.5%;width:9%;left:75.8%" />
+			<img src="ui/9.png" style="box-shadow:0 0 1vh #000;position:absolute;top:10.5%;width:9%;left:85.8%" />
+		</div>
+	</div>
+	<div id="scr" style="position:relative;height:700px" class="flex">
+		<div style="left:400px;width:300px;height:600px;position:relative">
+			<div class="flex flex-ai-end" style="width:300px;height:30px;position:relative">
+				<img src="ui/top-left.png" style="bottom:-5px;height:30px;position:absolute;left:50px;z-index:1" />
+				<img src="ui/top-left.png" style="bottom: -5px; height: 30px; position: absolute; transform: scale(-1,1); left: 150px; z-index: 1" />
+				<img class="filled" src="ui/top-middle1.png" style="filter:drop-shadow(0 12px 2px #00000080);height:30px;position:relative;z-index:2;transform:scale(2.4)" />
+			</div>
+			<div class="bg1" style="width: 300px; height: 540px; position: relative;box-shadow:inset 0 0 25px #000">
+
+				<img src="ui/corner3.png" style="position:absolute;width:142px;left:0;top:0" />
+				<img src="ui/corner3.png" style="position:absolute;width:142px;right:0;top:0;
+transform:rotate(90deg)" />
+				<img src="ui/corner3.png" style="position:absolute;width:142px;right:0;bottom:0;
+transform:rotate(180deg)" />
+				<img src="ui/corner3.png" style="position:absolute;width:142px;left:0;bottom:0;
+transform:rotate(270deg)" />
+
+
+				<img src="ui/border.png" style="position:absolute;height:15px;left:15px;top:0" />
+				<img src="ui/border.png" style="position:absolute;height:15px;left:25%;top:0;" />
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:0" />
+				<img src="ui/border.png" style="transform:rotate(180deg);position:absolute;height:15px;left:25%;bottom:0;" />
+
+
+				<img src="ui/border.png" style="position:absolute;height:15px;left:0;top:220px;
+transform:rotate(-90deg);transform-origin:top left" />
+				<img src="ui/border.png" style="position:absolute;height:15px;left:0;top:300px;
+transform:rotate(-90deg);transform-origin:top left" />
+				<img src="ui/border.png" style="position:absolute;height:15px;left:0;top:400px;
+transform:rotate(-90deg);transform-origin:top left" />
+				<img src="ui/border.png" style="position:absolute;height:15px;left:0;top:500px;
+transform:rotate(-90deg);transform-origin:top left" />
+
+
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:150px;
+transform:rotate(90deg);transform-origin:bottom right" />
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:230px;
+transform:rotate(90deg);transform-origin:bottom right" />
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:330px;
+transform:rotate(90deg);transform-origin:bottom right" />
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:430px;
+transform:rotate(90deg);transform-origin:bottom right" />
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:510px;
+transform:rotate(90deg);transform-origin:bottom right" />
+			</div>
+			<div class="flex flex-ai-start" style="width: 300px; height: 30px; position: relative">
+				<img src="ui/border-y3.png" style="height:30px;z-index:9999;position:relative;top:-2px" />
+			</div>
+		</div>
+		<img src="ui/13.png" style="transform:scale(1,-1);height:68px;position:absolute;left:365px;top:315px" />
+		<img src="ui/19.png" style="height:117px;position:absolute;left:115px;top:155px" />
+		<img src="ui/19.png" style="transform: scale(-1,1);height:117px; position: absolute; left: 475px; top: 155px" />
+		<div style="position:absolute;background:radial-gradient(#36454F,black);border-radius:120px;height:122px;width:215px;
+left:270px;top:195px"></div>
+		<img src="ui/21.png" style="height:117px;position:absolute;left:245px;top:200px" />
+		<img src="ui/21.png" style="height:117px;position:absolute;left:455px;top:200px;transform:scale(-1,1)" />
+		<img src="ui/border-y2.png" style="height:51px;position:absolute;left:285px;top:160px" />
+		<img src="ui/border-y1.png" style="height:19px;position:absolute;left:341px;top:296px" />
+		<img src="ui/border-y3.png" style="height:42px;position:absolute;left:252px;top:300px" />
+		<div style="font-size: 32px; position: absolute; text-shadow: 0 0 1px #4682B4; top: 220px; color: #ffffffab; left: 315px; text-align: center "></div>
+
+
+
+		<img src="ui/button-bg2.png" style="box-shadow:0 4px 12px #000;width:200px;position:absolute;left:50px;top:440px" />
+		<img src="ui/button-fg1.png" style="position:absolute;left:60px;top:448px;width:180px" />
+
+		<img src="ui/button-bg2.png" style="box-shadow:0 4px 12px #000;width:160px;height:50px;position:absolute;left:70px;top:550px" />
+		<img src="ui/button-fg3.png" style="position:absolute;left:78px;top:556px;height:40px" />
+		<div class="flex" style="border-radius:12px;box-shadow:inset 0 0 5vh #000;font-size: 2rem; color: #f3f4f599; position: absolute; left: 500px; width: 400px; height: 100px; background: radial-gradient(#322D28cc,#322D28); top: 380px ">
+			<div class="filled">I AM A TOAST MODAL!</div>
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 0; width: 25%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 25%; width: 25%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 50%; width: 25%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 75%; width: 25%" />
+
+			<img src="ui/border.png" style="transform: scale(1, -1); position: absolute; bottom: 0; left: 0; width: 25%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 25%; width: 25%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 50%; width: 25%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 75%; width: 25%" />
+
+			<img src="ui/border.png" style="transform-origin: top left; transform: rotate(90deg) scale(1,-1);  position: absolute; top: 0%;  left: 0; width: 25%" />
+
+			<img src="ui/border.png" style="transform-origin: top right; transform: rotate(90deg) scale(-1,1); position: absolute; top: 0%;  right: 0; width: 25%" />
+
+		</div>
+		<div class="flex" style="border-radius:12px;box-shadow:inset 0 0 5vh #000;font-size: 2rem; color: #f3f4f599; position: absolute; left: 500px; width: 400px; height: 100px; background: radial-gradient(#322D28cc,#322D28); top: 500px ">
+			<div class="filled">I AM A TOAST MODAL!</div>
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 0; width: 25%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 25%; width: 25%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 50%; width: 25%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 75%; width: 25%" />
+
+			<img src="ui/border.png" style="transform: scale(1, -1); position: absolute; bottom: 0; left: 0; width: 25%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 25%; width: 25%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 50%; width: 25%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 75%; width: 25%" />
+
+			<img src="ui/border.png" style="transform-origin: top left; transform: rotate(90deg) scale(1,-1);  position: absolute; top: 0%;  left: 0; width: 25%" />
+
+			<img src="ui/border.png" style="transform-origin: top right; transform: rotate(90deg) scale(-1,1); position: absolute; top: 0%;  right: 0; width: 25%" />
+
+			<img src="ui/star-off.png" style="position: absolute; top: -8px; right: -8px; width: 24px" />
+			<img src="ui/star-off.png" style="position: absolute; top: -8px; left: -8px; width: 24px" />
+
+			<img src="ui/star-off.png" style="position: absolute; bottom: -8px; right: -8px; width: 24px" />
+			<img src="ui/star-off.png" style="position: absolute; bottom: -7px; left: -8px; width: 24px" />
+
+		</div>
+
+	</div>
+	<div style="height:675px;width:1200px;position:relative" class="flex">
+
+		<img src="ui/button-bg1.png" style="position: absolute; height: 32px; left: 200px; top: 159px" />
+		<img src="ui/button-bg1.png" style="position: absolute; height: 32px; left: 300px; top: 159px" />
+		<img src="ui/button-bg1.png" style="position: absolute; height: 32px; left: 400px; top: 159px" />
+		<img src="ui/button-bg1.png" style="position: absolute; height: 32px; left: 500px; top: 159px" />
+		<img src="ui/button-bg1.png" style="position: absolute; height: 32px; left: 600px; top: 159px; width: 100px" />
+
+
+		<img class="filled" src="ui/shine-purple.png" style="position: absolute; height: 32px; width:90px; left: 200px; top: 157px" />
+		<img class="filled" src="ui/shine-purple.png" style="position: absolute; height: 32px; width: 90px; left: 300px; top: 157px" />
+		<img class="filled" src="ui/shine-purple.png" style="position: absolute; height: 32px; width: 90px; left: 400px; top: 157px" />
+		<img class="filled" src="ui/shine-purple.png" style="position: absolute; height: 32px; width: 90px; left: 500px; top: 157px" />
+		<img class="filled" src="ui/shine-purple.png" style="position: absolute; height: 32px; left: 600px; width: 90px; top: 157px" />
+
+		<img src="ui/border.png" style="position: absolute; height: 10px; left: 190px; top: 155px" />
+		<img src="ui/border.png" style="position: absolute; height: 10px; left: 280px; top: 155px" />
+		<img src="ui/border.png" style="position: absolute; height: 10px; left: 370px; top: 155px" />
+		<img src="ui/border.png" style="position: absolute; height: 10px; left: 460px; top: 155px" />
+		<img src="ui/border.png" style="position: absolute; height: 10px; left: 550px; top: 155px" />
+		<img src="ui/corner-thin2.png" style="transform:scale(-1, 1);position:absolute;height:20px;left:600px;top:155px" />
+
+		<img src="ui/border.png" style="transform: scale(1, -1); position: absolute; height: 10px; left: 190px; top: 181px " />
+		<img src="ui/border.png" style="transform: scale(1, -1); position: absolute; height: 10px; left: 280px; top: 181px" />
+		<img src="ui/border.png" style="transform: scale(1, -1); position: absolute; height: 10px; left: 370px; top: 181px" />
+		<img src="ui/border.png" style="transform: scale(1, -1); position: absolute; height: 10px; left: 460px; top: 181px" />
+		<img src="ui/border.png" style="transform: scale(1, -1); position: absolute; height: 10px; left: 550px; top: 181px" />
+		<img src="ui/corner-thin2.png" style="transform: scale(-1, -1); position: absolute; height: 20px; left: 600px; top: 171px" />
+
+
+		<img src="ui/button-bg1.png" style="position:absolute;height:32px;left:200px;top:200px" />
+		<img src="ui/button-bg1.png" style="position:absolute;height:32px;left:300px;top:200px" />
+		<img src="ui/button-bg1.png" style="position:absolute;height:32px;left:400px;top:200px" />
+		<img src="ui/button-bg1.png" style="position:absolute;height:32px;left:500px;top:200px" />
+		<img src="ui/button-bg1.png" style="position:absolute;height:32px;left:600px;top:200px;width:100px" />
+
+
+		<img class="filled" src="ui/shine.png" style="position:absolute;height:32px;width:90px;left:200px;top:204px" />
+		<img class="filled" src="ui/shine.png" style="position:absolute;height:32px;width:90px;left:300px;top:204px" />
+		<img class="filled" src="ui/shine.png" style="position:absolute;height:32px;width:90px;left:400px;top:204px" />
+		<img class="filled" src="ui/shine.png" style="position:absolute;height:32px;width:90px;left:500px;top:204px" />
+		<img class="filled" src="ui/shine.png" style="position:absolute;height:32px;width:90px;left:600px;top:204px" />
+
+		<img src="ui/border.png" style="position:absolute;height:10px;left:190px;top:200px" />
+		<img src="ui/border.png" style="position:absolute;height:10px;left:280px;top:200px" />
+		<img src="ui/border.png" style="position:absolute;height:10px;left:370px;top:200px" />
+		<img src="ui/border.png" style="position:absolute;height:10px;left:460px;top:200px" />
+		<img src="ui/border.png" style="position:absolute;height:10px;left:550px;top:200px" />
+		<img src="ui/corner-thin2.png" style="transform:scale(-1, 1);position:absolute;height:20px;left:600px;top:200px" />
+
+		<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; height: 10px; left: 190px; top: 229px " />
+		<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; height: 10px; left: 280px; top: 229px" />
+		<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; height: 10px; left: 370px; top: 229px" />
+		<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; height: 10px; left: 460px; top: 229px" />
+		<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; height: 10px; left: 550px; top: 229px" />
+		<img src="ui/corner-thin2.png" style="transform:scale(-1, -1);position:absolute;height:20px;left:600px;top:219px" />
+
+
+
+		<img class="filled" src="ui/wing1.png" style="position:absolute;left:50px;top:85px;width:90px" />
+
+		<img src="ui/black-circle.png" style="position:absolute;left:105px;top:100px;width:140px" />
+		<img class="filled" src="ui/16.png" style="position:absolute;left:155px;top:110px;height:120px;filter:drop-shadow(0, 0, 10px, #fff)" />
+
+		<div class="flex" style="opacity: .65; border-radius: 12px; box-shadow: inset 0 0 5vh #322D28; font-size: 2rem; color: #f3f4f5cc; position: absolute; left: 200px; width: 400px; height: 360px; background: radial-gradient(#322D2880,#322D2899), url(ui/33.png); top: 300px">
+			<div class="filled">
+				I AM A QUEST MODAL!<br />
+				I AM A QUEST MODAL!<br />
+				I AM A QUEST MODAL!<br />
+				I AM A QUEST MODAL!<br />
+				I AM A QUEST MODAL!<br />
+				I AM A QUEST MODAL!<br />
+			</div>
+			<img src="ui/border-brown.png" style="position: absolute; top: 0; left: 0; width: 25%" />
+			<img src="ui/border-brown.png" style="position: absolute; top: 0; left: 25%; width: 25%" />
+			<img src="ui/border-brown.png" style="position: absolute; top: 0; left: 50%; width: 25%" />
+			<img src="ui/border-brown.png" style="position: absolute; top: 0; left: 75%; width: 25%" />
+
+			<img src="ui/border-brown.png" style="transform: scale(1, -1); position: absolute; bottom: 0; left: 0; width: 25%" />
+			<img src="ui/border-brown.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 25%; width: 25%" />
+			<img src="ui/border-brown.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 50%; width: 25%" />
+			<img src="ui/border-brown.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 75%; width: 25%" />
+
+			<img src="ui/border-brown.png" style="transform-origin: top left; transform: rotate(90deg) scale(1,-1);  position: absolute; top: 0%;  left: 0; width: 25%" />
+			<img src="ui/border-brown.png" style="transform-origin: top left; transform: rotate(90deg) scale(1,-1);  position: absolute; top: 25%;  left: 0; width: 25%" />
+			<img src="ui/border-brown.png" style="transform-origin: top left; transform: rotate(90deg) scale(1,-1);  position: absolute; top: 50%;  left: 0; width: 25%" />
+			<img src="ui/border-brown.png" style="transform-origin: top left; transform: rotate(90deg) scale(1,-1);  position: absolute; top: 75%;  left: 0; width: 25%" />
+
+			<img src="ui/border-brown.png" style="transform-origin: top right; transform: rotate(90deg) scale(-1,1); position: absolute; top: 0%;  right: 0; width: 25%" />
+			<img src="ui/border-brown.png" style="transform-origin: top right; transform: rotate(90deg) scale(-1,1); position: absolute; top: 25%;  right: 0; width: 25%" />
+			<img src="ui/border-brown.png" style="transform-origin: top right; transform: rotate(90deg) scale(-1,1); position: absolute; top: 50%;  right: 0; width: 25%" />
+			<img src="ui/border-brown.png" style="transform-origin: top right; transform: rotate(90deg) scale(-1,1); position: absolute; top: 75%;  right: 0; width: 25%" />
+
+			<img src="ui/star-off-brown.png" style="position: absolute; top: -14px; right: -12px; width: 36px" />
+			<img src="ui/star-off-brown.png" style="position: absolute; top: -14px; left: -12px; width: 36px" />
+
+			<img src="ui/star-off-brown.png" style="position: absolute; bottom: -14px; right: -14px; width: 36px" />
+			<img src="ui/star-off-brown.png" style="position: absolute; bottom: -14px; left: -14px; width: 36px" />
+
+		</div>
+
+		<div style="left:400px;width:300px;height:600px;position:relative">
+			<div class="flex flex-ai-end" style="width:300px;height:30px;position:relative">
+				<img src="ui/top-left.png" style="bottom:-5px;height:30px;position:absolute;left:50px;z-index:1" />
+				<img src="ui/top-left.png" style="bottom:-5px;height:30px;position:absolute;transform:scale(-1,1);left:150px;z-index:1" />
+				<img class="filled" src="ui/top-middle1.png" style="filter:drop-shadow(0 12px 2px #00000080);height:30px;position:relative;z-index:2;transform:scale(2.4)" />
+			</div>
+			<div class="bg1" style="width: 300px; height: 540px; position: relative;box-shadow:inset 0 0 25px #000">
+
+				<img src="ui/corner1.png" style="position:absolute;width:142px;left:0;top:0" />
+				<img src="ui/corner1.png" style="position:absolute;width:142px;right:0;top:0;
+transform:rotate(90deg)" />
+				<img src="ui/corner1.png" style="position:absolute;width:142px;right:0;bottom:0;
+transform:rotate(180deg)" />
+				<img src="ui/corner1.png" style="position:absolute;width:142px;left:0;bottom:0;
+transform:rotate(270deg)" />
+
+
+				<img src="ui/border.png" style="position:absolute;height:15px;left:15px;top:0" />
+				<img src="ui/border.png" style="position:absolute;height:15px;left:25%;top:0;" />
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:0" />
+				<img src="ui/border.png" style="transform:rotate(180deg);position:absolute;height:15px;left:25%;bottom:0;" />
+
+
+				<img src="ui/border.png" style="position:absolute;height:15px;left:0;top:220px;
+transform:rotate(-90deg);transform-origin:top left" />
+				<img src="ui/border.png" style="position:absolute;height:15px;left:0;top:300px;
+transform:rotate(-90deg);transform-origin:top left" />
+				<img src="ui/border.png" style="position:absolute;height:15px;left:0;top:400px;
+transform:rotate(-90deg);transform-origin:top left" />
+				<img src="ui/border.png" style="position:absolute;height:15px;left:0;top:500px;
+transform:rotate(-90deg);transform-origin:top left" />
+
+
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:150px;
+transform:rotate(90deg);transform-origin:bottom right" />
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:230px;
+transform:rotate(90deg);transform-origin:bottom right" />
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:330px;
+transform:rotate(90deg);transform-origin:bottom right" />
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:430px;
+transform:rotate(90deg);transform-origin:bottom right" />
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:510px;
+transform:rotate(90deg);transform-origin:bottom right" />
+			</div>
+			<div class="flex flex-ai-start" style="width: 300px; height: 30px; position: relative">
+				<img src="ui/border-y3.png" style="height:30px;z-index:9999;position:relative;top:-2px" />
+			</div>
+		</div>
+	</div>
+	<div style="height:675px;width:1200px;position:relative" class="flex">
+		<div class="bg1" style="left:50px;width:308px;height:327px;position:relative">
+
+
+			<img src="ui/border.png" style="position:absolute;height:15px;left:15px;top:0" />
+			<img src="ui/border.png" style="position:absolute;height:15px;left:25%;top:0;" />
+			<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:0" />
+			<img src="ui/border.png" style="transform:rotate(180deg);position:absolute;height:15px;left:25%;bottom:0;" />
+
+
+			<img src="ui/border.png" style="position:absolute;height:15px;left:0;top:220px;
+transform:rotate(-90deg);transform-origin:top left" />
+			<img src="ui/border.png" style="position:absolute;height:15px;left:0;top:300px;
+transform:rotate(-90deg);transform-origin:top left" />
+
+
+			<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:150px;
+transform:rotate(90deg);transform-origin:bottom right" />
+			<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:230px;
+transform:rotate(90deg);transform-origin:bottom right" />
+
+			<img src="ui/corner1.png" style="position:absolute;width:142px;left:0;top:0" />
+			<img src="ui/corner1.png" style="position:absolute;width:142px;right:0;top:0;
+transform:rotate(90deg)" />
+			<img src="ui/corner1.png" style="position:absolute;width:142px;right:0;bottom:0;
+transform:rotate(180deg)" />
+			<img src="ui/corner1.png" style="position:absolute;width:142px;left:0;bottom:0;
+transform:rotate(270deg)" />
+		</div>
+		<div class="bg1" style="left: 160px; width: 282px; height: 282px; position: relative">
+			<img src="ui/corner1.png" style="position:absolute;width:142px;left:0;top:0" />
+			<img src="ui/corner1.png" style="position:absolute;width:142px;right:0;top:0;
+transform:rotate(90deg)" />
+			<img src="ui/corner1.png" style="position:absolute;width:142px;right:0;bottom:0;
+transform:rotate(180deg)" />
+			<img src="ui/corner1.png" style="position:absolute;width:142px;left:0;bottom:0;
+transform:rotate(270deg)" />
+			<img src="ui/border-y3.png" style="transform:rotate(90deg);z-index:9999;position:absolute;right:-35%;top:43%; width:260px;transform-origin:center" />
+			<img src="ui/border-y3.png" style="transform:rotate(-90deg);z-index:9999;position:absolute;left:-35%;top:43%; width:260px;transform-origin:center" />
+			<!--<img src="ui/border-y3.png" style="z-index:9999;position:absolute;left:5%;top:3%; width:260px;transform-origin:center" />
+			img src="ui/border-y3.png" style="transform: rotate(180deg); z-index: 9999; position: absolute; left: 5%; bottom: 3%; width: 260px; transform-origin: center" />-->
+		</div>
+		<div style="left:300px;width:300px;height:600px;position:relative">
+			<div class="flex flex-ai-end" style="width:300px;height:30px;position:relative">
+				<img src="ui/top-left.png" style="bottom:-5px;height:30px;position:absolute;left:50px;z-index:1" />
+				<img src="ui/top-left.png" style="bottom: -5px; height: 30px; position: absolute; transform: scale(-1,1); left: 150px; z-index: 1" />
+				<img class="filled" src="ui/top-middle1.png" style="filter:drop-shadow(0 12px 2px #00000080);height:30px;position:relative;z-index:2;transform:scale(2.4)" />
+			</div>
+			<div class="bg1" style="width: 300px; height: 540px; position: relative;box-shadow:inset 0 0 25px #000">
+
+				<img src="ui/button-bg1.png" style="position:absolute;left:1%;width:31.3%;top:2.4%" />
+				<img src="ui/button-bg1.png" style="position:absolute;left:33.3%;width:31.3%;top:2.4%" />
+				<img src="ui/button-bg1.png" style="position:absolute;left:65.3%;width:31.3%;top:2.4%" />
+
+
+
+
+				<img src="ui/border.png" style="position:absolute;height:15px;left:15px;top:0" />
+				<img src="ui/border.png" style="position:absolute;height:15px;left:25%;top:0;" />
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:0" />
+				<img src="ui/border.png" style="transform:rotate(180deg);position:absolute;height:15px;left:25%;bottom:0;" />
+
+
+				<img src="ui/border.png" style="position:absolute;height:15px;left:0;top:220px;
+transform:rotate(-90deg);transform-origin:top left" />
+				<img src="ui/border.png" style="position:absolute;height:15px;left:0;top:300px;
+transform:rotate(-90deg);transform-origin:top left" />
+				<img src="ui/border.png" style="position:absolute;height:15px;left:0;top:400px;
+transform:rotate(-90deg);transform-origin:top left" />
+				<img src="ui/border.png" style="position:absolute;height:15px;left:0;top:500px;
+transform:rotate(-90deg);transform-origin:top left" />
+
+
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:150px;
+transform:rotate(90deg);transform-origin:bottom right" />
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:230px;
+transform:rotate(90deg);transform-origin:bottom right" />
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:330px;
+transform:rotate(90deg);transform-origin:bottom right" />
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:430px;
+transform:rotate(90deg);transform-origin:bottom right" />
+				<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:510px;
+transform:rotate(90deg);transform-origin:bottom right" />
+
+				<img src="ui/corner1.png" style="position:absolute;width:142px;left:0;top:0" />
+				<img src="ui/corner1.png" style="position:absolute;width:142px;right:0;top:0;
+transform:rotate(90deg)" />
+				<img src="ui/corner1.png" style="position:absolute;width:142px;right:0;bottom:0;
+transform:rotate(180deg)" />
+				<img src="ui/corner1.png" style="position:absolute;width:142px;left:0;bottom:0;
+transform:rotate(270deg)" />
+				<img src="ui/corner3.png" style="position: absolute; width: 72px; left: 1.2%; top: .6%" />
+				<img src="ui/corner3.png" style="position: absolute; width: 72px; right: 1.2%; top: .6%; transform: rotate(90deg) " />
+				<img src="ui/corner3.png" style="position: absolute; width: 72px; right: 1.2%; bottom: .6%; transform: rotate(180deg) " />
+				<img src="ui/corner3.png" style="position: absolute; width: 72px; left: 1.2%; bottom: .6%; transform: rotate(270deg) " />
+				<div style="box-shadow:0 1vh 2vh #000;background: #615D59cc; position: absolute; height: 3px; width: 95%; top: 6.8%; left: 2.5%"></div>
+
+			</div>
+			<div class="flex flex-ai-start" style="width: 300px; height: 30px; position: relative">
+				<img src="ui/border-y3.png" style="height:30px;z-index:9999;position:relative;top:-2px" />
+			</div>
+		</div>
+	</div>
+	<div style="height:675px;width:1200px;position:relative" class="flex">
+		<div style="left:-250px;width:616px;height:327px;position:relative">
+
+
+			<img src="ui/border.png" style="position:absolute;height:15px;left:15px;top:0" />
+			<img src="ui/border.png" style="position:absolute;height:15px;left:5%;top:0;" />
+			<img src="ui/border.png" style="position:absolute;height:15px;left:25%;top:0;" />
+			<img src="ui/border.png" style="position:absolute;height:15px;left:45%;top:0;" />
+			<img src="ui/border.png" style="position:absolute;height:15px;left:65%;top:0;" />
+			<img src="ui/border.png" style="transform: rotate(180deg); position: absolute; height: 15px; right: 15px; bottom: 0" />
+			<img src="ui/border.png" style="transform: rotate(180deg); position: absolute; height: 15px; right: 5%; bottom: 0;" />
+			<img src="ui/border.png" style="transform: rotate(180deg); position: absolute; height: 15px; right: 25%; bottom: 0;" />
+			<img src="ui/border.png" style="transform: rotate(180deg); position: absolute; height: 15px; right: 45%; bottom: 0;" />
+			<img src="ui/border.png" style="transform: rotate(180deg); position: absolute; height: 15px; right: 65%; bottom: 0;" />
+
+
+			<img src="ui/border.png" style="position:absolute;height:15px;left:0;top:220px;
+transform:rotate(-90deg);transform-origin:top left" />
+			<img src="ui/border.png" style="position:absolute;height:15px;left:0;top:300px;
+transform:rotate(-90deg);transform-origin:top left" />
+
+
+			<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:150px;
+transform:rotate(90deg);transform-origin:bottom right" />
+			<img src="ui/border.png" style="position:absolute;height:15px;right:15px;top:230px;
+transform:rotate(90deg);transform-origin:bottom right" />
+
+			<img src="ui/corner1.png" style="position:absolute;width:142px;left:0;top:0" />
+			<img src="ui/corner1.png" style="position:absolute;width:142px;right:0;top:0;
+transform:rotate(90deg)" />
+			<img src="ui/corner1.png" style="position:absolute;width:142px;right:0;bottom:0;
+transform:rotate(180deg)" />
+			<img src="ui/corner1.png" style="position:absolute;width:142px;left:0;bottom:0;
+transform:rotate(270deg)" />
+		</div>
+		<div class="flex" style="border-radius:12px;box-shadow:inset 0 0 5vh #000;font-size: 2rem; color: #f3f4f599; position: absolute; left: 900px; width: 400px; height: 100px; background: radial-gradient(#322D28cc,#322D28); top: 80px ">
+			<div class="filled">I AM A TOAST MODAL!</div>
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 0; width: 25%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 25%; width: 25%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 50%; width: 25%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 75%; width: 25%" />
+
+			<img src="ui/border.png" style="transform: scale(1, -1); position: absolute; bottom: 0; left: 0; width: 25%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 25%; width: 25%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 50%; width: 25%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 75%; width: 25%" />
+
+			<img src="ui/border.png" style="transform-origin: top left; transform: rotate(90deg) scale(1,-1);  position: absolute; top: 0%;  left: 0; width: 25%" />
+
+			<img src="ui/border.png" style="transform-origin: top right; transform: rotate(90deg) scale(-1,1); position: absolute; top: 0%;  right: 0; width: 25%" />
+
+			<img src="ui/14.png" style="position:absolute;left:0;top:-5px;z-index:999;width:78px;left:-60px;transform:rotate(3deg)" />
+			<img src="ui/14.png" style="position:absolute;right:0;top:-5px;z-index:999;width:78px;right:-60px;transform:rotate(-3deg) scale(-1, 1)" />
+
+		</div>
+		<div class="flex" style="border-radius:12px;box-shadow:inset 0 0 5vh #000;font-size: 2rem; color: #f3f4f599; position: absolute; left: 900px; width: 400px; height: 100px; background: radial-gradient(#322D28cc,#322D28); top: 380px ">
+			<div class="filled">I AM A TOAST MODAL!</div>
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 0; width: 25%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 25%; width: 25%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 50%; width: 25%" />
+			<img src="ui/border.png" style="position: absolute; top: 0; left: 75%; width: 25%" />
+
+			<img src="ui/border.png" style="transform: scale(1, -1); position: absolute; bottom: 0; left: 0; width: 25%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 25%; width: 25%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 50%; width: 25%" />
+			<img src="ui/border.png" style="transform:scale(1, -1);position: absolute; bottom: 0; left: 75%; width: 25%" />
+
+			<img src="ui/border.png" style="transform-origin: top left; transform: rotate(90deg) scale(1,-1);  position: absolute; top: 0%;  left: 0; width: 25%" />
+
+			<img src="ui/border.png" style="transform-origin: top right; transform: rotate(90deg) scale(-1,1); position: absolute; top: 0%;  right: 0; width: 25%" />
+
+			<img src="ui/top-left.png" style="position:absolute;left:0;top:-20px;z-index:999;height:50px" />
+			<img src="ui/top-left.png" style="position:absolute;right:0;top:-20px;z-index:999;height:50px;transform:scale(-1, 1)" />
+			<img src="ui/22.png" style="position:absolute;left:0;top:-15px;z-index:999;width:218px;left:-140px;transform:rotate(3deg)" />
+			<img src="ui/22.png" style="position:absolute;right:0;top:-15px;z-index:999;width:218px;right:-140px;transform:rotate(-3deg) scale(-1, 1)" />
+
+			<img src="ui/wolf-head.png" style="position:absolute;left:148px;top:-48px;z-index:999;height:82px" />
+
+
+		</div>
+	</div>
+	<div style="height:675px;width:1200px;position:relative" class="flex">
+		<img style="position:absolute;left:286px;top:286px;z-index:-1" src="ui/twin2.png" />
+		<img style="position:absolute;left:200px;top:200px;transform:scale(1.15)" src="ui/twin1.png" />
+	</div>
+</body>
+</html>

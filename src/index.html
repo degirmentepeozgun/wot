@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<!--
+	Customize this policy to fit your own app's needs. For more guidance, please refer to the docs:
+		https://cordova.apache.org/docs/en/latest/
+	Some notes:
+	  * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+	  * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+		* Enable inline JS: add 'unsafe-inline' to default-src
+	-->
+	<meta http-equiv="Content-Security-Policy" content="connect-src * wss://webapi.kitap12.com/gamehub/ ws://localhost:5173/ wss://localhost:5173/ ws://webapi.kitap12.com/ wss://webapi.kitap12.com/; worker-src * 'self' blob:; font-src 'self' data:; default-src * data: blob: file:; img-src * data:; media-src * 'self' blob:; style-src * 'self' 'unsafe-inline' 'unsafe-eval' blob: data: file:; script-src-elem * 'self' 'unsafe-inline' 'unsafe-eval' blob: data: file:; style-src-elem * 'self' 'unsafe-inline' 'unsafe-eval' blob: data: file:; script-src * 'self' 'unsafe-inline' 'unsafe-eval'  blob: data: file:">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+
+	<meta name="theme-color" content="#fff">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="msapplication-tap-highlight" content="no">
+	<link rel="preload" as="image" href="./images/ui/book1.png" />
+	<link rel="preload" as="image" href="./images/ui/tag/speed-no-color.gif">
+	<link rel="preload" as="image" href="./images/loading/0.png" />
+	<link rel="preload" as="image" href="./images/loading/1.png" />
+	<link rel="preload" as="image" href="./images/loading/2.png" />
+	<link rel="preload" as="image" href="./images/loading/3.png" />
+	<link rel="preload" as="image" href="./images/loading/4.png" />
+	<link rel="preload" as="image" href="./images/loading/5.png" />
+	<link rel="preload" as="image" href="./images/loading/6.png" />
+	<link rel="preload" as="image" href="./images/loading/7.png" />
+	<title>Warriors Of Tengri</title>
+
+	<!-- built styles file will be auto injected -->
+</head>
+<body oncontextmenu="return false" style="height:100vh;width:100vw;background:#000;overflow:hidden">
+	<button id="play-os" onclick="playOpeningMusic()"></button>
+	<div id="app" style="margin:auto"></div>
+	<% if (TARGET === 'cordova') { %>
+	<script src="cordova.js"></script>
+	<% } %>
+	<script>
+		function getRandomValue(min, max) {
+			return (msNow % ((max - min) + 1)) + min;
+		}
+		function getRandomValue2(min, max) {
+			return MathFloor(Math.random() * (max - min + 1) + min);
+		}
+		function getParameterByName(name, url = window.location.href) {
+			name = name.replace(/[\[\]]/g, '\\$&');
+			var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+				results = regex.exec(url);
+			if (!results) return null;
+			if (!results[2]) return '';
+			return decodeURIComponent(results[2].replace(/\+/g, ' '));
+		}
+		let loadedImages = {}, loadedEpisodeImages = {};
+		const __globalMS = 40, __maxChatMessage = 100, __startSlotAmount = 70, __left = 'left', __right = 'right', __spell = 'spell';
+		function MathRound(x) {
+			 return Math.round(x); //(x + 0.5) | 0;
+		}
+		function MathFloor(x) {
+			return x | 0;
+		}
+		let __scale = 1;
+		var MathCeil = Math.ceil,
+		MathAbs = Math.abs;
+		let  chainSkills, actionButtons, __maxAttackedCount = 5, __batterySaveMode, __account, _css, _cssF, _canvas1, c2, 
+		_canvasB, c5, _canvasR, cc,
+		c3, c50, c85, c90, _canvas3, c6, _canvasS, _cNPC, _canvasAnimated90, _canvas4,
+		_canvasF, c9, _canvas5, c10, cDMG, _canvasDMG,
+		 _canvasSPB, _canvasGore, cGore,
+		_commons, _navbar, _gamePad, _gameUI, _hitCount, _enemyProfile, _gameMenu, _warMatchInProgress,
+		_hitCountValues, _canvas, _mainExpBar, _goldCount, _potCount, dPadTimer, _touchEvent,
+		deadCountdown, addPlayer, rageSkill, useProgress, pvpStatus, pvpResult, pvpCounter, modalEventsSet,
+		_appVersion = 3, counterAttackTolerance = 2, fatiqueDecreasement = 5, __maxRageCount, __weather = {},
+		_cacheCanvas, _cacheCanvasContext, _chargeSpeed = 15, __autoFillHPMS = 10000, __autoFillHPRate = 1,
+		_autoFillFaiqueMS = 5000, __autoFillFatiqueRate = 5,
+		__zoom, __dmgFrameDistance, groundheight, idealground_height, centerMinX, centerMaxX, 
+		minLeft, maxLeft, minPositionY = 0, minMapX = 0,
+		baseCritRate = 10, _finishingMove, __finishingMoveHPPercent = 30, _firstOpening = true,
+		dmgFrames = [], platformX = 0, loadedSounds = [],
+		testMap, testFrames, __globalDistance, unlockAll, _game = {}, __queue = [], _defaultFPS = 24, fps,
+		mainCharacter, episode, _pvp, msPrev, msPrevChars, msPerFrame, msNow = Date.now(), prevPlatformX,
+		_pvpEnemies, _renderDmgFrame = 5, _startAnimate = false, _loadAssetsTimer,_coopMembers = [], _squadMemberKey,
+		_talkBtn, _useBtn, __globalAssets = [], __switchingMap, __deviceId, __inventory;
+	</script>
+	<script type="module" src="./js/app.js"></script>
+	<script src="./js/items.js"></script>
+	<script src="./js/lang.js"></script>
+	<script src="./js/inventory.js"></script>
+	<script src="./js/fragment.js"></script>
+	<script src="./js/lottery.js"></script>
+	<script src="./js/artifact.js"></script>
+	<script src="./js/shop.js"></script>
+	<script src="./js/honor.js"></script>
+	<script src="./js/settings.js"></script>
+	<script src="./js/quest.js"></script>
+	<script src="./js/data.js"></script>
+	<script src="./js/ui.js"></script>
+	<script src="./js/snow.js"></script>
+	<script src="./js/global.js"></script>
+	<script src="./js/animation.js"></script>
+	<script src="./js/dialogs.js"></script>
+	<script src="./js/pvp.js"></script>
+	<script src="./js/enemy.js"></script>
+	<script src="./js/map.js"></script>
+	<script src="./js/keyboard.js"></script>
+	<script src="./js/skill.js"></script>
+	<script src="./js/rival.js"></script>
+	<script src="./js/storegame.js"></script>
+	<script src="./js/buff.js"></script>
+	<script src="./js/socket.js"></script>
+	<script src="./js/index.js"></script>
+	<script src="./js/story.js"></script>
+	<script src="./js/sound.js"></script>
+	<script src="./js/dataoperations.js"></script>
+	<span id="scripts"></span>
+	<script>
+		const _rootPath = 'https://cdn.kitap12.com/document/getgamejs/game';
+		const _rootPathCss = 'https://cdn.kitap12.com/document/getgamecss/game';
+		function resetScript(_name) {
+			var xhrObj = new XMLHttpRequest();
+			xhrObj.open('GET', _rootPath + _name + '/?v=' + Math.random(), false);
+			xhrObj.send('');
+			var se = document.createElement('script');
+			se.type = "text/javascript";
+			se.text = xhrObj.responseText;
+			document.getElementById('scripts').appendChild(se);
+		}
+		function resetScripts(_names) {
+			_names.forEach(x => resetScript(x));
+		}
+
+		function resetStyle(_name) {
+			try	{
+				var _link = document.createElement('link');
+				_link.rel = 'stylesheet';
+				_link.href = _rootPathCss + _name + '/?v=' + Math.random();
+				document.head.appendChild(_link);
+			}
+			catch(ex) {}
+		}
+		function resetStyles(_names) {
+			_names.forEach(x => resetStyle(x));
+		}
+		// resetScripts(['items', 'lang', 'inventory', 'quest', 'data', 'ui', 'snow', 'global', 'animation',
+		// 	'dialogs', 'enemy', 'map', 'keyboard', 'skill', 'rival', 'storegame', 'buff', 
+		// 	'socket', 'index'
+		// ]);
+		resetStyles(['index']);
+		// window.FunctionCallTracker = (function () {
+		// 	let counts = {};
+		// 	const originalFunctions = new WeakMap();
+
+		// 	function wrapFunction(obj, key, prefix = '') {
+		// 		const orig = obj[key];
+		// 		if (typeof orig !== 'function') return;
+
+		// 		const name = prefix + key;
+		// 		if (originalFunctions.has(orig)) return;
+
+		// 		const wrapped = function (...args) {
+		// 		counts[name] = (counts[name] || 0) + 1;
+		// 		return orig.apply(this, args);
+		// 		};
+
+		// 		originalFunctions.set(wrapped, orig);
+		// 		obj[key] = wrapped;
+		// 	}
+
+		// 	function wrapAll(obj, prefix = '') {
+		// 		for (const key in obj) {
+		// 		try {
+		// 			wrapFunction(obj, key, prefix);
+		// 		} catch (e) {}
+		// 		}
+		// 	}
+
+		// 	function getCounts() {
+		// 		return { ...counts };
+		// 	}
+		// 	function resetCounts() {
+		// 		counts = {};
+		// 	}
+
+		// 	return {
+		// 		wrapObject: wrapAll,
+		// 		getCounts,
+		// 		resetCounts
+		// 	};
+		// })();
+		// FunctionCallTracker.wrapObject(window);
+		// setInterval(() => {
+		// 	console.table(FunctionCallTracker.getCounts());
+		// 	FunctionCallTracker.resetCounts();
+		// }, 10000); 
+	</script>
+</body>
+</html>
