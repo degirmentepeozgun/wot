@@ -359,8 +359,13 @@ function map(_m) {
 				if(_m)
 					_enemy.setAutoTarget(_m);
 			}
-			if(_mob.ownerKey)
+			if(_mob.ownerKey){
 				_enemy.owner = this.enemies.find(x => x.key === _mob.ownerKey);
+				if(!_enemy.owner.enemy)
+					_enemy.enemy = false;
+			}
+			if(_mob.pick)
+				_enemy.pickNewTarget();
 			if (_return)
 				return _enemy;
 		}
@@ -646,22 +651,19 @@ function map(_m) {
 			_end = (_enemyCount === 0);
 		if(!_end)
 			return;
+		this.pvpEnded = true;
+		const _missionGain = _fail ? 0 : (!_diff ? 0 : _diff * 100);
 		if(!_fail)
-		{
 			installStoryFinish();
-			return;
-		}
-		// if (!pvpResult)
-		// 	pvpResult = document.getElementById('pvp-result');
-		// if (!pvpStatus)
-		// 	pvpStatus = document.getElementById('pvp-status');
-		// showMyModalPopUp('pvp-result');
+		else
+			installStoryFinish(1, {key:'gold', count:_missionGain + _goldGain});
+		return;
 		this.pauseAmbianceMusic();
 		if(!_fail)
 			this.playSound({ key: 'victory', volume: .2 });
 		else
 			mainCharacter.immobilize = true;
-		const _missionGain = _fail ? 0 : (!_diff ? 0 : _diff * 100);
+		//const _missionGain = _fail ? 0 : (!_diff ? 0 : _diff * 100);
 		let _table = '<div class="flex full pvp-result-table tower-result"><div class="flex" style="width:100%;height:16vh;position:relative"><span style="margin-top:4.7vh;z-index:2;font-size:3.15vh !important;font-weight:600;text-shadow:0px 0px 1vh #000;color:' + (_fail ? 'crimson' : '#F4BB44') + ' !important">' + getLangData('Mission' + (_fail ? ' Failed' : ' Cleared')) + '!</span></div><div style="width:100%;overflow-y:auto;height:calc(100% - 24vh);z-index:2"><div style="width:100%" class="flex"><span>';
 		_table += `</span></div>`;
 		let _reachedMax = false;
@@ -768,8 +770,6 @@ function map(_m) {
 			this.checkGoldResult(_end, _diff);
 			return;
 		}
-		if (mainCharacter.remove)
-			reviveAsGhost();
 		const _enemies = this.enemies?.filter(x => x.enemy && x.class !== __spell && x.class !== 'object' && !x.isDead() && !x.remove);
 		const _teamMates = this.enemies?.filter(x => (x.friendly || x.main || (x.groupId && x.groupId === (mainCharacter.realGroupId ?? mainCharacter.groupId))) && x.class !== __spell && x.class !== 'object' && !x.isDead() && !x.remove);
 		const _deads = this.enemies?.filter(x => x.class !== __spell && x.class !== 'object' && x.killedBy);
@@ -779,6 +779,7 @@ function map(_m) {
 				if(_isMyTeamAlive) {
 					const _isOtherTeamAlive = _enemies?.[0];
 					if(_isOtherTeamAlive) {
+						episode.realClass = mainCharacter.class;
 						const _ghost = summonMob(500, MathRound(mainCharacter.SCREENLEFT / __zoom),
 						mainCharacter.yPosition);
 						_ghost.realGroupId = mainCharacter.groupId;
@@ -842,6 +843,8 @@ function map(_m) {
 		}
 		const _eCount = _enemies?.length ?? 0;
 		const _tCount = _teamMates?.length ?? 0;
+		if(!this.pauseTime && (!_enemies?.filter(x => !x.isDead())?.length || !_teamMates?.filter(x => !x.isDead())?.length))
+			this.pauseTime = Date.now();
 		if(_deads?.length) {
 			if((_deads.filter(x => x.remove)?.length ?? 0) < _deads.length)
 				return;
@@ -1074,6 +1077,391 @@ function map(_m) {
 			this.pvpEnded = true;
 			switchAutoMode(1);
 		}
+	}
+	this.checkPVPResult2 = function () {
+		if (this.pvpEnded || this.pvpResult || _storySceneSwitching || __switchingMap || this.disposing)
+			return;
+		let _end, _diff;
+		if (!this.pvpStarted) {
+			this.pvpStarted = Date.now();
+			this.missionCountDown = 1;
+			pvpCounter = document.createElement('div');
+			pvpCounter.className = 'flex animate-me countdown pop2';
+			pvpCounter.id = 'pvp-counter';
+			pvpCounter.innerHTML = this.tower ? '<span style="font-weight:600;color:crimson!important">FLOOR ' +__account.missions.find(x => x.key === 'tower').current + '</span>' : 3;
+			if(!this.tower)
+				this.playSound({ key: 'beep', volume:.3 });
+			_gameUI.appendChild(pvpCounter);
+		}
+		else {
+			const _baseTime = ((this.tower && (__account.missions.find(x => x.key === 'tower').current % 10) > 0) || this.gold) ? 60 : 120;
+			_diff = (_baseTime + (this.tower ? 4 : 3)) - MathFloor(((this.pauseTime ?? Date.now()) - this.pvpStarted) / 1000);
+			if (_diff < 10)
+				addClass(pvpCounter, 'pvp-end-soon');
+			if (_diff < 0 || (_diff > _baseTime && this.challangeStarted)) {
+				_end = true;
+				delete this.challangeStarted;
+				pvpCounter.innerText = 0;
+			}
+			if (_diff > _baseTime) {
+				if (pvpCounter.innerText !== (_diff - _baseTime).toString()) {
+					if((_diff - _baseTime) <= 3) {
+						this.playSound({ key: 'beep', volume:.3 });
+						pvpCounter.innerHTML = '';
+						pvpCounter.innerText = _diff - _baseTime;
+						removeClass(pvpCounter, 'pop2');
+						removeClass(pvpCounter, 'pop');
+						void pvpCounter.offsetWidth;
+						addClass(pvpCounter, 'pop');
+					}
+				}
+			}
+			else if (_diff === _baseTime) {
+				if (pvpCounter.innerText !== 'START') {
+					this.playSound({ key: 'questaccepted', volume: .3 });
+					pvpCounter.innerText = 'START';
+					removeClass(pvpCounter, 'pop');
+					void pvpCounter.offsetWidth;
+					addClass(pvpCounter, 'pop');
+					delete this.missionCountDown;
+				}
+			}
+			else if (pvpCounter.innerText !== _diff.toString()) {
+				if (_diff === _baseTime || (_diff < _baseTime && hasClass(pvpCounter, 'countdown'))) {
+					removeClass(pvpCounter, 'countdown');
+					episode.enemies?.forEach(x => x.immobilize = false);
+					if(__story) {
+						__story.startTime = _gameTick;
+						this.challangeStarted = 1;
+						__story.endTime = undefined;
+					}
+				}
+				if (_diff >= 0 && pvpCounter.innerText !== _diff.toString())
+					pvpCounter.innerText = _diff;
+			}
+		}
+		if(this.tower) {
+			this.checkTowerResult(_end, _diff);
+			return;
+		}
+		else if(this.gold) {
+			this.checkGoldResult(_end, _diff);
+			return;
+		}
+		const _enemies = this.enemies?.filter(x => x.enemy && x.class !== __spell && x.class !== 'object' && !x.isDead() && !x.remove);
+		const _teamMates = this.enemies?.filter(x => (x.friendly || x.main || (x.groupId && x.groupId === (mainCharacter.realGroupId ?? mainCharacter.groupId))) && x.class !== __spell && x.class !== 'object' && !x.isDead() && !x.remove);
+		const _deads = this.enemies?.filter(x => x.class !== __spell && x.class !== 'object' && x.killedBy);
+		if(this.war){
+			if(mainCharacter.remove && !mainCharacter.ghosted) {
+				const _isMyTeamAlive = _teamMates?.[0];
+				if(_isMyTeamAlive) {
+					const _isOtherTeamAlive = _enemies?.[0];
+					if(_isOtherTeamAlive) {
+						this.realClass = mainCharacter.class;
+						const _ghost = summonMob(500, MathRound(mainCharacter.SCREENLEFT / __zoom),
+						mainCharacter.yPosition);
+						_ghost.killCount = mainCharacter.killCount;
+						_ghost.realGroupId = mainCharacter.groupId;
+						_ghost.noDirection = _ghost.still = _ghost.hasShadow = false;
+						_ghost.stepX = mainCharacter.stepX;
+						_ghost.stepXRate = mainCharacter.oldProps.stepXRate;
+						_ghost.animations.idle.frames.forEach(x => x.objects = undefined);
+						_ghost.animations.run = {
+							key: 'run',
+							type: 'move',
+							imediateBreak: true,
+							hold: true,
+							mobilityY: true,
+							frames: structuredClone2(_ghost.animations.idle.frames)
+						};
+						addClass(_gameUI, 'ghost');
+						mainCharacter.main = false;
+						mainCharacter.keyboard = undefined;
+						mainCharacter.setAutoMode(2);
+						const oldMain = mainCharacter;
+						mainCharacter = _ghost;
+						if (!episode.enemies.includes(oldMain)) {
+							const gidx = episode.enemies.indexOf(_ghost);
+							if (gidx === -1)
+								episode.enemies.push(oldMain);
+							else
+								episode.enemies.splice(gidx, 0, oldMain);
+						}
+						_ghost.main = true;
+						_ghost.enemy = false;
+						setKeyBoard(_ghost);
+						_ghost.dead = _ghost.remove = false;
+						_ghost.ghosted = 1;
+						_ghost.autoMode = undefined;
+						_ghost.unseen = false;
+						_ghost.located = true;
+						warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/ghost.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('You are in ghost mode') + '</span></div>', null, null, 1);
+					}
+				}
+			}
+			_deads?.forEach(x => {
+				if (!x.grayAvatar) {
+					x.grayAvatar = true;
+					const _killer = episode.enemies.find(y => y.key === x.killedBy);
+					_killer.killCount++;
+					let _msg = '';
+					if (_killer.killCount > 1) {
+						this.playSound({ key: _killer.gender + 'laugh', reset: true });
+						_msg = '<div class="flex" style="color:#FD1C03;font-weight:600;font-size:larger !important">' + _killer.killCount + ' x Killing Spree!</div>';
+					}
+					warn('<div class="pvp-kill">' + _msg + (_killer.main ? __account.name : _killer.displayName ?? _killer.name) + '&nbsp;<span style="color:' + (_killer.enemy ? 'red' : 'blue') + ' !important">' + getLangData('killed') + '</span>&nbsp;' + (x.main ? __account.name : x.displayName ?? x.name) + '</div>', 'level-up', null, null, 1);
+				}
+				else
+					return;
+				if (!x.enemy) {
+					const _avatar = document.getElementById('char-' + x.key);
+					if (_avatar)
+						addClass(_avatar, 'gray');
+				}
+			});
+		}
+		const _eCount = _enemies?.length ?? 0;
+		const _tCount = _teamMates?.length ?? 0;
+		if(!this.pauseTime && (!_enemies?.filter(x => !x.isDead())?.length || !_teamMates?.filter(x => !x.isDead())?.length))
+			this.pauseTime = Date.now();
+		if(_deads?.length) {
+			if((_deads.filter(x => x.remove)?.length ?? 0) < _deads.length)
+				return;
+		}
+		if ((_eCount === 0 || _tCount === 0 || _end)) {
+			//this.pauseAmbianceMusic();
+			let _rewards = [];
+			let _status = (_eCount > 0 && _tCount > 0) ? 1 : (_tCount > 0 ? 2 : 0);
+			let _table;
+			if(this.war) {
+				const _team1 = this.enemies.filter(x => x.groupId === 1);
+				const _team2 = this.enemies.filter(x => x.groupId === 2);
+				let _rewardsHtml = '';
+				_rewards.push({key:'honor', title:getLangData('Kill Honor'), count:mainCharacter.killCount ?? 0});
+				if(_status > 1){
+					let _honorCount = (mainCharacter.killCount ?? 0) + (mainCharacter.killCount > 1 ? 1: 0) + (mainCharacter.killCount > 2 ? 1: 0);
+					//__account.pvp.honor+=_honorCount;
+					_client.saveState();
+					_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:1});
+					// _rewardsHtml = `<div class="flex w-100" style="padding:1vh 0;color:#F4BB44 !important; font-size:3.15vh !important; font-weight: 600">
+					// 				${getLangData('Victory Rewards')}
+					// 			</div>
+					// 			<div class="flex w-100">
+					// 				<div class="flex" style="height:4.5vh">
+					// 					<img style="width:4vh" src="./images/icons/honor.png" />
+					// 					<div style="font-size:3vh !important;color:#f7f7f7cc !important;padding-left:2vh">+1 ${getLangData('Win Bonus')}</div>
+					// 				</div>
+					// 			</div>`;
+					// if(mainCharacter.killCount > 0)
+					// 		_rewardsHtml += `<div class="flex w-100">
+					// 				<div class="flex" style="height:4.5vh">
+					// 					<img style="width:4vh" src="./images/icons/honor.png" />
+					// 					<div style="font-size:3vh !important;color:#f7f7f7cc !important;padding-left:2vh">+${mainCharacter.killCount} ${getLangData('Kill Bonus')}</div>
+					// 				</div>
+					// 			</div>`;
+				}
+				else
+					_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:0});
+				_table = `<div class="flex full pvp-result-table arena-result" style="height:68%">
+							<div class="flex d-none" style="width:100%;height:11vh;position:relative">
+								<span style="margin-top:5vh;z-index:2;font-size:3.15vh !important;font-weight:600;text-shadow:0px 0px 1vh #000;color:${(!_status ? 'crimson' : '#F4BB44')} !important">${getLangData(!_status ? 'Defeat' : (_status > 1 ? 'Victory' : 'Draw'))}</span>
+							</div>
+							<div class="flex" style="width:100%;overflow-y:auto;height:100%">
+								<div class="war-final-screen flex w-100">
+									<div class="war-final-screen-row flex team-1-header">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											&nbsp;
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end">
+											<img src="./images/icons/kill.png">
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
+											<img src="./images/icons/dead.png">
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team1[0].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team1[0].main ? __account.name : _team1[0].displayName ?? _team1[0].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
+											${_team1[0].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
+											${_team1[0].isDead() ? 1 : 0}
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team1[1].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team1[1].main ? __account.name : _team1[1].displayName ?? _team1[1].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
+											${_team1[1].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
+											${_team1[1].isDead() ? 1 : 0}
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team1[2].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team1[2].main ? __account.name : _team1[2].displayName ?? _team1[2].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
+											${_team1[2].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
+											${_team1[2].isDead() ? 1 : 0}
+										</div>
+									</div>
+									<div class="war-final-screen-row flex team-2-header">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											&nbsp;
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end">
+											<img src="./images/icons/kill.png">
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
+											<img src="./images/icons/dead.png">
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team2[0].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team2[0].main ? __account.name : _team2[0].displayName ?? _team2[0].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
+											${_team2[0].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
+											${_team2[0].isDead() ? 1 : 0}
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team2[1].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team2[1].main ? __account.name : _team2[1].displayName ?? _team2[1].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
+											${_team2[1].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
+											${_team2[1].isDead() ? 1 : 0}
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team2[2].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team2[2].main ? __account.name : _team2[2].displayName ?? _team2[2].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
+											${_team2[2].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
+											${_team2[2].isDead() ? 1 : 0}
+										</div>
+									</div>
+								</div>
+								<div class="flex flex-ai-start w-100 d-none">`
+									+ _rewardsHtml +
+								`</div>
+							</div>
+							<div class="flex d-none" style="width:100%;height:6vh">
+								<div class="flex w-100" style="overflow:hidden;position:relative;height:100%">
+									<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(null, __storySceneOrder)">${getLangData('QUIT')}</div>
+								</div>
+							</div>
+						</div>`;
+			}
+			else {
+				_table = '<div class="flex full pvp-result-table arena-result"><div class="flex" style="flex-direction:column;justify-content:space-between;width:100%;overflow-y:auto;height:87.5%;padding:0 12.5%"><div class="flex" style="width:80%;margin-bottom:10%">';
+				switch(_status) {
+					case 2: 
+						_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:1});
+						if(__account.pvp.lastDuelWin)
+							__account.pvp.winStreak++;
+						else
+							__account.pvp.winStreak = 1;
+						if(__account.pvp.maxWinCount < __account.pvp.winStreak)
+							__account.pvp.maxWinCount = __account.pvp.winStreak;
+						__account.pvp.winCount++;
+					    __account.pvp.lastDuelWin = true;
+						_table += `<div class="pvp-player-item pvp-winner flex"><div class="pvp-player-item-left flex flex-jc-start">
+							${__account.name}</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>
+							<div class="pvp-player-item pvp-looser flex"><div class="pvp-player-item-left flex flex-jc-start">
+							Player</div><div class="pvp-player-item-right flex"><img src="./images/icons/dead.png" /></div></div>`;
+						break;
+					case 1: 
+						_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:0});
+					    __account.pvp.lastDuelWin = false;
+						__account.pvp.winStreak = 0;
+						_table += `<div class="pvp-player-item pvp-draw flex"><div class="pvp-player-item-left flex flex-jc-start">
+							${__account.name}</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>
+							<div class="pvp-player-item pvp-draw flex"><div class="pvp-player-item-left flex flex-jc-start">
+							Player</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>`;
+						break;
+					case 0: 
+						_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:0});
+					    __account.pvp.lastDuelWin = false;
+						__account.pvp.winStreak = 0;
+						__account.pvp.looseCount++;
+						_table += `<div class="pvp-player-item pvp-winner flex"><div class="pvp-player-item-left flex flex-jc-start">
+							Player</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>
+							<div class="pvp-player-item pvp-looser flex"><div class="pvp-player-item-left flex flex-jc-start">
+							${__account.name}</div><div class="pvp-player-item-right flex"><img src="./images/icons/dead.png" /></div></div>`;
+					break;
+				}
+				_table + `</div>`;
+				if(_status > 1) {
+					//__account.pvp.honor++;
+					updateGlobalQuest('pvp-win');
+					const _oldOrder = __account.pvp.order;
+					__account.pvp.order = this.pvpOrder;
+					const _newOrder = __account.pvp.order;
+					if((_oldOrder > 10000 && _newOrder < 10000) ||
+						(_oldOrder > 5000 && _newOrder < 5000) ||
+						(_oldOrder > 1000 && _newOrder < 1000)) {
+						if(_newOrder > 5000)
+							updateGlobalQuest('pvp-league-silver');
+						else if(_newOrder > 1000)
+							updateGlobalQuest('pvp-league-gold');
+						warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/pvp.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Pvp League Updated') + '</span></div>', null, null, 1);
+					}
+					// _table += `<div class="flex" style="width:100%;padding:4vh 0 1vh 0;color:#F4BB44 !important; font-size:2.6vh !important; font-weight: 600">${getLangData('Duel Rewards')}</div>
+					// 	<div class="flex" style="width:100%"><div class="flex"><img style="width:5vh" src="./images/icons/honor.png" /><div style="font-size:2.4vh !important;color:#f7f7f7cc !important;padding-left:2vh">+1 ${getLangData('Honor Point')}</div></div></div>`;
+				}
+				_client.saveState();
+				_table += `</div><div class="flex d-none w-100" style="height:8vh">
+					<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
+						<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(null, __storySceneOrder)">${getLangData('QUIT')}</div>
+					</div>
+					<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
+						<div class="game-menu-button btn-info full flex animate-me${!__account.pvp.duelCount ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(function() { switchBookPage(5, 1); }, __storySceneOrder)">${getLangData('BACK')}</div>
+					</div>
+				</div>`;
+			}
+			_enemies?.forEach(x => {
+				x.immobilize = true;
+				x.animate('idle', 1);
+				x.upcomingAnimation = 'idle';
+			});
+			_teamMates?.forEach(x => {
+				x.immobilize = !x.main;
+				x.animate('idle', 1);
+				x.upcomingAnimation = 'idle';
+			});
+			this.pvpEnded = true;
+			switchAutoMode(1);
+			installStoryFinish(_status === 2 ? 0 : (_status === 1 ? 2 : 1), _rewards, _table);
+		}
+	}
+	this.focusOnPlayer = function(_key) {
+		if(!mainCharacter.ghosted)
+			return;
+		const char = episode.enemies.find(x => x.key === _key);
+		if(!char || char.main || char.remove)
+			return;
+		const _center = MathRound(this.cWidth / 2);
+		platformX = char.left - _center;
+		mainCharacter.left = _center;
+		mainCharacter.updateVariables();
+		prevPlatformX = undefined;
+		PlaySound({key:'click'});
 	}
 	this.checkRespawn = function() {
 		if(!this.respawners?.[0])
@@ -2962,15 +3350,16 @@ function map(_m) {
 this.w100 = MathRound(this.cWidth / 100);
 this.VH3 = MathRound(window.innerHeight / 33);
 this.drawHealthBar2 = function (_item) {
+	const _isPvp = !this.gold && (this.pvp || this.war);
 	if(__batterySaveMode || _item.char.skipHealthBar || _item.char.health <= 0 || _item.char.dead)
 		return;
 
-	if (_item.char.main || ((this.pvp || this.war) && _item.char.alp)) {
+	if (_item.char.main || (_isPvp && _item.char.alp)) {
 		this.drawBuffs(_item.char, 'big');
-		if(!this.war)
+		if(!_isPvp)
 			return;
 	}
-	if(!this.war) {
+	if(!_isPvp) {
 		if (!_item.char.key || (!_item.char.hpDropped && (_item.char.class !== 'boss' && _item.char.phased == undefined)) || _item.char.MAXHP <= 1 || _item.char.class === __spell || _item.animation === 'respawn')
 			return;
 
@@ -2994,8 +3383,8 @@ this.drawHealthBar2 = function (_item) {
 
 	const _xGap = MathRound((_item.char.WIDTH - _hWidth) / 2);
 	const _hLeft = MathRound(_item.char.EXACTLEFT + _xGap);
-	const isWarPlayer = _item.char.enemy && this.war;
-	const _extraTop = isWarPlayer ? MathRound(-40 * __zoom * __scale) : 0;
+	const isWarPlayer = _item.char.enemy && _isPvp;
+	const _extraTop = isWarPlayer ? MathRound(-40 * __zoom * __scale) : MathRound(-10 * __zoom * __scale);
 	let _hHeight = this.cHeight / 75;
 	if (_item.char.healthBarHeightRate)
 		_hHeight *= _item.char.healthBarHeightRate;
@@ -3017,7 +3406,7 @@ this.drawHealthBar2 = function (_item) {
 		_bg = getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
 	// === Cache'e bak ===
 	_hHeight = MathCeil(_hHeight);
-	const cacheKey = this.war ? `group-${_item.char.groupId}` : `group-${hpGroupRate}-${_hWidth}x${_hHeight}-${_bg}`;
+	const cacheKey = _isPvp ? `group-${_item.char.groupId}` : `group-${hpGroupRate}-${_hWidth}x${_hHeight}-${_bg}`;
 	let cached = this.healthBarCache.get(cacheKey);
 
 	if (!cached) {
@@ -3029,7 +3418,7 @@ this.drawHealthBar2 = function (_item) {
 		// else if (_item.char.autoMode === 2) _border = '#C41E3A';
 
 		const c = document.createElement('canvas');
-		if(this.war) {
+		if(_isPvp) {
 			const _ch = _hHeight * 2;
 			c.width = _hWidth;
 			c.height = _ch;

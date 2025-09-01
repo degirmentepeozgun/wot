@@ -3233,7 +3233,6 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 3;
-							
 						}
 					},
 					{
@@ -3316,7 +3315,7 @@ const __stories = [
 					},
 					{
 						when: function(){
-							return episode.towerDefenseStart && (_gameTick - episode.towerDefenseStart) > 20000;
+							return episode.towerDefenseStart && !episode.end && (_gameTick - episode.towerDefenseStart) > 20000;
 						},
 						do:function(){
 							//removeCoopCharacter(1);
@@ -3349,16 +3348,7 @@ const __stories = [
 							// 	count: 1
 							// }, 1);
 						}
-					},
-					// {
-					// 	when: function() {
-					// 		return episode.bossFightStart && !episode.end && ((episode.enemies.find(x => x.id === 47)?.health??1) <= 0 || (episode.enemies.find(x => x.id === 29)?.health ?? 1) <= 0);
-					// 	},
-					// 	do: function() {
-					// 		episode.end = true;
-					// 		createStoryResultScreen();
-					// 	}
-					// },
+					}
 				],
 				start: function() {
 					// episode.bossFightStart = _gameTick;

@@ -241,8 +241,8 @@ function askFilterSellItems() {
                 + _html +
             `</div>
             <div style="padding:4vh 2vh 6vh 2vh;flex:1" class="w-100 flex flex-ai-end">
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="sellItems()">${getLangData('SELL')}</div>
                 <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('SKIP')}</div>
+                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="sellItems()">${getLangData('SELL')}</div>
             </div>
         </div>
     </div>`;
@@ -504,12 +504,12 @@ function getPowerDiffAgainstWearedOne(_id) {
     var _currentItemPower = !_item ? 0 : getPowerOfItem(_items.find(x => (x.type === _item.type) && (x.weared === mainCharacter.class))?.id);
     return _power - _currentItemPower;
 }
-function switchInventoryTab(_elem, _order) {
+function switchInventoryTab(_elem, _order, _noSound) {
     if(!_elem)
         _elem = document.querySelector('.inventory-tab.selected');
     else if(hasClass(_elem, 'selected'))
         return;
-    else
+    else if(!_noSound)
         episode.playSound({ key: 'switch' });
     const _tabs = document.querySelectorAll('.inventory-tab');
     for(let _tab of _tabs){
@@ -757,7 +757,7 @@ function getItemInfoModalHtml(_id) {
                 <div style="height:50%">
                     Lvl ${_item.level ?? 1} - ${getLangData(_item.type).toLocaleUpperCase(getLang())}
                 </div>
-                <div style="height:50%" class="flex flex-jc-start w-100">`
+                <div style="height:50%" class="flex flex-jc-start w-100 item-socket-container">`
                     + _socketsHtml +
                 `</div>
             </div>
@@ -843,7 +843,7 @@ function openMiscItemInfoModal(_type, _grade) {
                 <div class="game-menu-button animate-me flex" style="width:45%;height:65%;color:#F4BB44 !important;font-size:3vh !important" onexactclick="useMiscItem('${_item.type}', ${_grade})">${getLangData('USE')}</div>
             </div>
             <div class="flex action-button-container ${_item.do ? ' d-none' : ''}" style="width:86%;margin:0 7%;height:14%;justify-content:space-evenly">
-                <div class="game-menu-button animate-me flex" style="width:80%;height:65%;color:#F4BB44 !important;font-size:3vh !important" onexactclick="sellMiscItem('${_item.type}', ${_grade})">${getLangData('SELL')}</div>
+                <div class="game-menu-button animate-me flex" style="width:90%;height:65%;color:#F4BB44 !important;font-size:3vh !important" onexactclick="sellMiscItem('${_item.type}', ${_grade})">${getLangData('SELL')}</div>
             </div>
 		    <div onexactclick="closeItemInfoModal()" class="item-info-modal-close">&times;</div>
         </div>
@@ -1147,9 +1147,9 @@ function openCharacterInfoModal() {
 function openGemMeltModal(_type, _grade) {
     const _meltParent = document.querySelector('.gem-info-container-parent');
     if(!_meltParent)
-        closeCharacterInfoModal();
-    closeItemInfoModal();
-    episode.playSound({ key: 'click' });
+        closeCharacterInfoModal(1);
+    closeItemInfoModal(1);
+    //episode.playSound({ key: 'click' });
     let _html = `<div class="full gem-info-container-parent character-info-container-parent menu-modal-left"><div class="full flex character-info-container">
     <div class="flex" style="width:100%;height:12%">
     <div class="flex flex-jc-end item-info-modal-close" onexactclick="closeGemInfoModal()">&times;</div>
@@ -1240,7 +1240,7 @@ function updateGemMeltPlaces() {
         //removeClass(_btn, 'disabled');
         addClass(_btn, 'glow');
     }
-    switchInventoryTab(null, 2);
+    switchInventoryTab(null, 2, 1);
 }
 function acceptMelt() {
     const _keys = [];
@@ -1276,9 +1276,10 @@ function acceptMelt() {
     switchInventoryTab(null, 2);
 	episode.playSound({ key: 'upgrade', volume: .5, reset: true, force: true });
 }
-function closeItemInfoModal() {
+function closeItemInfoModal(_noSound) {
     removeClass(document.querySelector('#inventory-list'), 'item-info-opened');
-    episode.playSound({ key: 'click' });
+    if(!_noSound)
+        episode.playSound({ key: 'click' });
     const _parent = document.querySelector('.item-info-container-parent');
     if(_parent)
         _parent.remove();
@@ -1580,8 +1581,8 @@ function askAddSlot() {
                 <span style="color:#f3f4f5cc !important;font-size:3vh !important" class="flex">Cost:&nbsp;<span id="slot-cost" style="margin:0 10px;font-size:3vh !important;color:#f3f4f5 !important">${_cost.formatWithDots()}</span>&nbsp;<img src="./images/icons/coin.png" style="height:3vh" /></span>
             </div>
             <div style="padding:4vh" class="flex">
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="acceptInventorySlot()">${getLangData('YES')}</div>
                 <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
+                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="acceptInventorySlot()">${getLangData('YES')}</div>
             </div>
         </div>
     </div>`;
@@ -1761,7 +1762,7 @@ function resetItemsUI() {
 function closeInventoryQuestionModal(_noSound) {
     var _qm = document.querySelector('.inventory-question');
     if(_qm) {
-        if(_noSound)
+        if(!_noSound)
             episode.playSound({ key: 'click' });
         _qm.remove();
     }
@@ -1863,12 +1864,13 @@ function getChestReward(_grade, _rewardKey, _rewardType, _count) {
             }
         case 'ticket':
             {
-                updateTicket(_count ?? 1);
+                const _tixCount = _count ?? (_grade ?? 1);
+                updateTicket(_tixCount);
                 return {
                     title: getLangData('Portal'),
                     type: 'ticket',
                     src: './images/icons/key.png',
-                    count: _count ?? 1
+                    count: _tixCount
                 }
             }
         case 'exp':

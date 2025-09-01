@@ -694,7 +694,7 @@ canvas:not(.parallax canvas), .canvas, .parallax {
 	border: .2vh solid orange !important
 }
 
-#game-ui .skill:hover {
+#game-ui .skill:active {
 	background: #ffffff99
 }
 
@@ -705,7 +705,7 @@ canvas:not(.parallax canvas), .canvas, .parallax {
 	opacity: .85
 }
 
-#game-ui .skill:hover img, #game-ui .arrow:hover {
+#game-ui .skill:active img, #game-ui .arrow:active {
 	opacity: 1
 }
 
@@ -1249,6 +1249,7 @@ svg#use-progress.use-in-progress circle {
 }
 .enemy-profile.pvp {
 	right:1%;
+	width:20.2vw !important;
 	transform:scale(-1, 1) !important;
 	-webkit-transform:scale(-1, 1) !important
 }
@@ -1567,7 +1568,7 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	box-shadow: .4vh .4vh 1vh #000
 }
 
-	.modal-close:hover {
+	.modal-close:active {
 		color: #fff !important
 	}
 
@@ -1653,7 +1654,7 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	background: #967969
 }
 
-.ui-btn:hover {
+.ui-btn:active {
 	opacity: 1
 }
 
@@ -1661,7 +1662,7 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	opacity: .5
 }
 
-	.ui-btn.passive:hover {
+	.ui-btn.passive:active {
 		opacity: .65
 	}
 
@@ -2976,7 +2977,7 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	font-size: xx-large !important
 }
 
-	.my-pop-up-close:hover {
+	.my-pop-up-close:active {
 		color: silver !important;
 		transform: scale(1.2);
 		-webkit-transform: scale(1.2)
@@ -3737,6 +3738,12 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	width:100%;
 	height:100%
 }
+.item-socket-container .item-socket {
+	margin-left: 5%;
+}
+.item-socket-container .item-socket:first-child {
+	margin-left: 0;
+}
 #menu-ui .item-slot {
 	position: relative;
 	background: #262626;
@@ -3765,13 +3772,27 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	background: #00000060;
 	padding: 0 2vh;
 	height: 4.6vh;
-	color: #F4BB44cc !important
+	color: #F4BB44cc !important;	
+	transition: all .3s;
+	-webkit-transition: all .3s
 }
-#menu-ui .game-menu-button:hover {
-	background: #00000040 !important;
+#menu-ui .game-menu-button:active {
+	background:linear-gradient(90deg, #f3f4f520, #f3f4f530, #f3f4f540, #f3f4f540, #f3f4f530, #f3f4f520) !important;
 	color:#F4BB44 !important;
 	cursor: pointer;
 }
+#menu-ui .inventory-question .inventory-modal .game-menu-button:active,
+#menu-ui .item-info-container .game-menu-button:active {
+	background: #f3f4f530 !important;
+	cursor: pointer;
+}
+#menu-ui .inventory-action-btns .game-menu-button:active {
+	background: #00000050 !important;
+	box-shadow: inset 0 0 1px #000 !important;
+	opacity: .75;
+	cursor: pointer;
+}
+
 .d-s {
 	filter:drop-shadow(.2vh .2vh .2vh #00000040);
 	-webkit-filter:drop-shadow(.2vh .2vh .2vh #00000040);
@@ -3793,6 +3814,7 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	background: #00000010;
 	border-top: .2vh solid #ffffff30;
 	border-bottom: .2vh solid #ffffff30;
+	margin-bottom: .5vh
 }
 .inventory-question {
 	position:absolute;
@@ -3823,13 +3845,13 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	top:0;
 	font-size: 4.5vh !important;
 	right:0;
-	padding:1.5vh 3vh 0vh 3vh;
+	padding:5.25% 7%;
 	cursor: pointer;
 }
 .inventory-question.show-info .show-info-title {
 	color:#F4BB44 !important
 }
-.inventory-question.show-info .show-info-close:hover {
+.inventory-question.show-info .show-info-close:active {
 	color:#f3f4f5cc !important
 }
 .inventory-question.show-info .inventory-modal .info-nav-container {
@@ -3850,11 +3872,6 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 .inventory-question.show-info .inventory-modal .info-nav-container .info-nav {
 	font-size:2.8vh !important;
 	color:#f3f4f5ab !important
-}
-.inventory-question .inventory-modal .game-menu-button:hover,
-.item-info-container .game-menu-button:hover {
-	background: #000000DF !important;
-	cursor: pointer;
 }
 .map-description:before {
 	content: "";
@@ -4760,7 +4777,7 @@ body:has(#quest-dialog:not(.d-none)) #skill10 {
 	transition: all .3s ease;
 	-webkit-transition: all .3s ease
 }
-.item-info-modal-close:hover {
+.item-info-modal-close:active {
 	color:#f3f4f5cc !important;
 }
 .item-info-container .game-menu-button.disabled {
@@ -5015,7 +5032,7 @@ body:has(#quest-dialog:not(.d-none)) #skill10 {
 }
 #loading-tip {
 	width:60%;
-	padding:0 5% 0 10%;
+	padding:0 2.5% 0 2.5%;
 	flex:1;
 }
 .game-btn * {
@@ -5077,12 +5094,12 @@ body:has(#quest-dialog:not(.d-none)) #skill10 {
 .loading-logo {
 	height:100%;
 	filter:drop-shadow(0 0 .1vh #F4BB44);
-	margin-right: 4vh !important
 }
 .loading-logo-wrapper {
 	justify-content: flex-end !important;
 	background:#000000bc;
-	box-shadow:0 -2vh 4vh #000000bc
+	box-shadow:0 -2vh 4vh #000000bc;
+	padding:0 7.5% !important
 }
 
 .sell-choice {
@@ -5428,12 +5445,6 @@ body:has(#quest-dialog:not(.d-none)) #skill10 {
 	background: #262626;
 	color: #ffffffcc !important;
 	font-size: 3vh !important
-}
-.loading-logo-wrapper {
-	padding-right: 4vh !important
-}
-.loading-logo { 
-	margin-right: 4vh !important 
 }
 
 video::-webkit-media-controls-start-playback-button {
@@ -6431,6 +6442,7 @@ img.dmmg.toxic-dmmg {
 	align-items: center;
 }
 * {
+  	-webkit-tap-highlight-color: transparent;
 	scrollbar-width: none !important
  }
  /* #css-canvas-foreground.light-radius {
@@ -6718,6 +6730,7 @@ img.dmmg.toxic-dmmg {
 }
 #menu-ui .game-menu-button {
 	border:none !important;
+	background: linear-gradient(90deg, #ffffff10, #ffffff20, #ffffff20, #ffffff20, #ffffff20, #ffffff10) !important;
 	color:#f3f4f5cc
 }
 #menu-ui .menu-bottom {
@@ -6937,10 +6950,10 @@ img.dmmg.toxic-dmmg {
 .skills-content-right .menu-modal-right-container .game-menu-button:not(.disabled) * {
 	color:#F4BB44cc !important
 }
-.skills-content-right .menu-modal-right-container .game-menu-button:not(.disabled):hover {
+.skills-content-right .menu-modal-right-container .game-menu-button:not(.disabled):active {
 	background:linear-gradient(90deg, #00000020, #00000040, #00000080, #00000080, #00000040, #00000020) !important
 }
-.skills-content-right .menu-modal-right-container .game-menu-button:not(.disabled):hover * {
+.skills-content-right .menu-modal-right-container .game-menu-button:not(.disabled):active * {
 	color:#F4BB44 !important
 }
 .main-menu-btn:not(.selected) img, .menu-left .menu-sub-button:not(.selected) img {
@@ -7378,7 +7391,7 @@ img.dmmg.toxic-dmmg {
     -webkit-filter: grayscale(.9);
 	cursor: pointer;
 }
-.top-menu-close:hover {
+.top-menu-close:active {
 	filter: grayscale(.5);
 	-webkit-filter: grayscale(.5);
 }
@@ -8502,19 +8515,24 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	color: #F4BB44 !important
 }
 .war-final-screen .team-1-header {
-	background:linear-gradient(-235deg, #E34234, #880808, transparent);
+	background:linear-gradient(-235deg, transparent, #E34234, #f3f4f520, #f3f4f540, #f3f4f530);
 	border-radius: 1vh;
-	box-shadow: -1vh 0 .5vh #000
+	box-shadow: -1vh 0 .5vh #000;
+	border-bottom-right-radius: 2vh;
+	border-top-right-radius: 2vh;
 }
 .war-final-screen .team-2-header {
-	background:linear-gradient(-235deg, #0F52BA, #000080, transparent);
+	background:linear-gradient(-235deg, transparent, #0F52BA, #f3f4f520, #f3f4f540, #f3f4f530);
 	border-radius: 1vh;
+	border-top-right-radius: 2vh;
+	border-bottom-right-radius: 2vh;
 	box-shadow: -1vh 0 .5vh #000
 }
 .war-final-screen .war-final-screen-row .war-final-screen-cell-50 {
 	border-top-left-radius: 1vh;
 	border-bottom-left-radius: 2vh;
 	width:50%;
+	height:100%;
 	overflow: hidden;
 	padding-left:2vh
 }
@@ -8796,13 +8814,12 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	padding-left:10% !important
 }
 .tips-left-middle {
-	padding: 5%;
-	padding-top:0 !important
+	padding:0 5%;
 }
 .tips-left-middle textarea {
    font-size: 1.7vw !important;
    color:#9d987f !important;
-   padding: 1.5% 5% !important;
+   padding: 2% 4% !important;
    background:#000;
 }
 .tips-left-bottom .game-menu-button {

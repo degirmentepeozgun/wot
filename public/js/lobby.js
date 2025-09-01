@@ -1,87 +1,6 @@
 ﻿'use strict';
-const __holoMenuItems = [
-	{ icon: 'inventory', order:1, subOrder:1, titles: {
-		en: 'Inventory',
-		tr: 'Envanter'
-	}},
-	{ icon: 'skill', order:2, subOrder:1, titles: {
-		en: 'Skill',
-		tr: 'Yetenek'
-	}},
-	{ icon: 'quest', order:3, subOrder:1, titles: {
-		en: 'Story',
-		tr: 'Hikaye'
-	}},
-	{ icon: 'fragment', order:7, subOrder:1, titles: {
-		en: 'Fragment',
-		tr: 'Parçacık'
-	}},
-	{ icon: 'artifact', order:1, subOrder:2, titles: {
-		en: 'Artifact',
-		tr: 'Eser'
-	}},
-	{ icon: 'talent', order:2, subOrder:2, titles: {
-		en: 'Talent',
-		tr: 'Yetenek'
-	}},
-	{ icon: 'achievement',  order:3, subOrder:2, titles: {
-		en: 'Event',
-		tr: 'Etkinlik'
-	}},
-	{ icon: 'gem', order:1, subOrder:1, tabOrder:2, titles: {
-		en: 'Gem',
-		tr: 'Taş'
-	}},
-	{ icon: 'pvp', order:5, subOrder:1, titles: {
-		en: 'PvP',
-		tr: 'PvP'
-	}},
-	{ icon: 'dungeon', order:6, subOrder:1, titles: {
-		en: 'Dungeon',
-		tr: 'Zindan'
-	}},
-	{ icon: 'shop', order:8, subOrder:1, titles: {
-		en: 'Shop',
-		tr: 'Market'
-	}},
-	{ icon: 'mailbox', order:4, subOrder:2, titles: {
-		en: 'Mailbox',
-		tr: 'Posta'
-	}},
-	{ icon: 'forge', order:5, subOrder:2, titles: {
-		en: 'Forge',
-		tr: 'Demirci'
-	}},
-	{ icon: 'lottery', order:8, subOrder:2, titles: {
-		en: 'Lottery',
-		tr: 'Piyango'
-	}},
-	{ icon: 'war', order:5, subOrder:3, titles: {
-		en: 'War',
-		tr: 'Savaş'
-	}},
-	{ icon: 'calendar', order:8, subOrder:3, titles: {
-		en: 'Calendar',
-		tr: 'Takvim'
-	}},
-	{ icon: 'chat', order:4, subOrder:1, titles: {
-		en: 'Chat',
-		tr: 'Sohbet'
-	}},
-	{ icon: 'world', order:3, subOrder:3, titles: {
-		en: 'Map',
-		tr: 'Harita'
-	}},
-	{ icon: 'settings', order:9, subOrder:1, titles: {
-		en: 'Settings',
-		tr: 'Ayarlar'
-	}},
-	{ icon: 'tip', order:9, subOrder:2, titles: {
-		en: 'About Us',
-		tr: 'Hakkımızda'
-	}}
-];
 function hideSideMenu(_func) {
+	document.removeEventListener("click", outsideClick, true);
 	const _ml = document.querySelector('.menu-left-opener');
 	if(_ml) {
 		addClass(_ml, 'slide-to-left');
@@ -95,6 +14,18 @@ function hideSideMenu(_func) {
 		}
 	}
 }
+function outsideClick(e) {
+	const _m = document.querySelector('.menu-left-opener.opened');
+	if(!_m)
+		return;
+	if (_m.contains(e.target))
+		return;
+	closeSideMenu();
+}
+function closeSideMenu() {
+	PlaySound({key:'click'});
+	hideSideMenu();
+}
 function openSideMenu() {
    	episode.playSound({ key: 'click' });
 	const _ml = document.querySelector('.menu-left-opener');
@@ -104,7 +35,7 @@ function openSideMenu() {
 	}
 	let _html = '<div class="menu-left-opener show-ui flex flex-ai-start">';
 	for(let _m of __holoMenuItems)
-		_html += `<div id="lobby-${_m.icon}" class="flex menu-left-opener-item animate-me "onexactclick="hideSideMenu(function() {
+		_html += `<div id="lobby-${_m.icon}" class="flex menu-left-opener-item animate-me "onexactclick="PlaySound({key:'click'});hideSideMenu(function() {
 				switchBookPage(${_m.order},${_m.subOrder},${_m.tabOrder ?? 0});
 			})">
 			<div class="w-100 flex">
@@ -115,7 +46,15 @@ function openSideMenu() {
 	'</div>';
 	const _div = document.createElement('div');
 	_div.innerHTML = _html;
+	_div.firstChild.onanimationend = function(e) {
+		if(e.animationName === 'slide-from-left'){
+			const _ml = document.querySelector('.menu-left-opener');
+			if(_ml)
+				addClass(_ml, 'opened');
+		}
+	}
 	document.querySelector('#game-ui').appendChild(_div.firstChild); 
+	document.addEventListener("click", outsideClick, true);
 }
 function createMenu() {
 	const _upperDiv = document.createElement('div');
@@ -138,11 +77,6 @@ function createMenu() {
 	_div.className = 'flex show-ui stories-screen fade-in';
 	_div.innerHTML = getStoryTemplates();
 	_gameUI.appendChild(_upperDiv);
-	const icons = __holoMenuItems.map(m => `./images/ui/menu-icons/${m.icon}.png`);
-	icons.forEach(src => {
-		const img = new Image();
-		img.src = src;
-	});
 }
 
 function getStoryTemplates() {

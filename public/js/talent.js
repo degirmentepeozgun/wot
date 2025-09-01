@@ -11,7 +11,7 @@ function talent() {
 				<div class="skills-content-left talent-content-left menu-modal-left-container">
 					<div class="w-100 flex talent-tree-top">
 						<div class="w-50 flex flex-jc-start">
-							${getLangData('Points')}:&nbsp;<span id="talent-points-remaining">${_char.talents?.reduce((x, {count}) => x + count, 0) ?? 0}</span>&nbsp;/&nbsp;<span id="talent-points-all">${MathFloor(mainCharacter.level / 2)}</span>
+							<span style="color:#9d987f !important">${getLangData('Points Used')}:</span>&nbsp;&nbsp;<span id="talent-points-remaining">${_char.talents?.reduce((x, {count}) => x + count, 0) ?? 0}</span>&nbsp;/&nbsp;<span id="talent-points-all">${MathFloor(mainCharacter.level / 2)}</span>
 						</div>
 						<div class="w-50 flex flex-jc-end">
 							 <div onexactclick="getRef(\'talent\').askReset()" class="game-menu-button btn-reset flex animate-me"s>${getLangData('RESET')}</div>
@@ -229,6 +229,7 @@ function talent() {
 		addClass(_talentCard,'glow-yellow');
 		removeClass(_talentCard, 'gray');
 		checkUpdateAvailable2(2);
+		_client.saveState();
 		document.querySelector('#talent-points-remaining').innerText = _char.talents?.reduce((x, {count}) => x + count, 0) ?? 0;
 	}
 	return this;

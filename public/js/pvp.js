@@ -159,8 +159,8 @@ function pvp() {
 			const _between = 600000 - (msNow - __account.pvp.lastDuelTime);
 			const _minute = MathFloor(_between / 60000);
 			const _second = MathFloor((_between % 60000) / 1000);
-			const _result = ((_minute > 0 ? (_minute + getLangData('m')) : '') + ' ' +
-			(_second > 0 ? (_second + getLangData('s')) : '')).trim();
+			const _result = (((_minute > 9 ? _minute : '0' + _minute) + getLangData('m')) + ' ' +
+			((_second > 9 ? _second : '0' + _second) + getLangData('s'))).trim();
 			if(this.timeLeft !== _result) {
 				this.timeLeft = _result;
 				if(_minute <= 0 && _second <= 0)

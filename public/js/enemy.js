@@ -1350,7 +1350,8 @@ function enemy(_e) {
 		}
 		if(this.deadDramaStart && ((_gameTick - this.deadDramaStart) > 3000) && !this.deadModalAppeared) {
 			this.deadModalAppeared = 1;
-			createStoryResultScreen();
+			//createStoryResultScreen();
+			installStoryFinish(1);
 			//GAME OVER
 		}
 		if (!this.started)
@@ -1565,6 +1566,8 @@ function enemy(_e) {
 					// else
 					// 	this.autoCommand();
 				}
+				else if(this.owner && !this.autoTarget)
+					this.pickNewTarget();
 				//else //if(this.animationFinished)
 					this.autoCommand();
 				// _anima = this.getCurrentAnimation();
@@ -1742,7 +1745,7 @@ function enemy(_e) {
 			this.direction = this.direction === __left ? __right : __left;
 		if (episode.check) {
 			if(episode.pvp)
-				episode.checkPVPResult();
+				episode.checkPVPResult2();
 			else
 				episode.checkMapName();
 			episode.check = false;
@@ -2547,8 +2550,8 @@ function enemy(_e) {
 		if (!this.lastHpRegenTime)
 			this.lastHpRegenTime = _gameTick;
 		if (_hp > 0) {
-			if (this.buffs?.find(x => x.key === 'hps' && x.level > 1))
-				this.addObject({ key: 'regen', position: 'middle', yGap: 50 });
+			if (this.buffs?.find(x => x.key === 'hps' && x.level > 0))
+				this.addObject({ key: 'regen', position: 'middle', yGap: 10 });
 			if ((_gameTick - this.lastHpRegenTime) > 999) {
 				if(this.health != this.MAXHP) {
 					const _val = MathRound(this.MAXHP / MathAbs(_hp * 100));
@@ -4733,7 +4736,7 @@ function enemy(_e) {
 		// 	return;
 		// }
 		if (_sp) {
-			if(this.lastSpellThrown?.time > (_gameTick - 300) && this.lastSpellThrown.key === _sp.key && this.lastSpellThrown.count >= 2)
+			if(!_sp.reset && this.lastSpellThrown?.time > (_gameTick - 300) && this.lastSpellThrown.key === _sp.key && this.lastSpellThrown.count >= 2)
 				return false;
 			const spl = spells[_sp.key];
 			if (_parent && spl.bounce) {

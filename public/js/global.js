@@ -626,8 +626,28 @@ const __fragments = [
 ];
 const _tips = [
 	{ 
-		en: 'Tap on top-left corner to open game menu',
-		tr: 'Sol üst köşeye basarak oyun menüsünü açabilirsiniz'
+		en: 'You can create sets and gain bonus features by collecting artifacts that may come across in some stories',
+		tr: 'Bazı hikayelerde bulduğunuz eserleri set halinde toplayarak ekstra özellikleri aktif edebilirsiniz'
+	},
+	{ 
+		en: 'With the passive skill points earned every two levels, you can create the talent tree that best suits your combat model',
+		tr: 'Her iki seviyede bir kazanılan puanlama hakkı sayesinde savaş modelinize en uygun pasif yetenek ağacını oluşturabilirsiniz'
+	},
+	{ 
+		en: 'You can forge high-level equipment set pieces using honor points',
+		tr: 'Onur puanlarını kullanarak yüksek seviye ekipman seti parçaları dövdürebilirsiniz'
+	},
+	{ 
+		en: 'You can earn honor points thanks to the PVP content that is active from level 10 onwards',
+		tr: '10. seviye itibarıyle aktif olan pvp içerikleri sayesinde onur puanı kazanabilirsiniz'
+	},
+	{ 
+		en: 'The gem rewards of story missions can be used on equipments with socket slots',
+		tr: 'Bölümleri başarıyla bitirdiğinizde kazanılan mücevherleri soketli ekipmanlara takabilirsiniz'
+	},
+	{ 
+		en: 'Gather and collect character fragments of villains to summon and use them as support skill',
+		tr: 'Bölüm sonu canavarlarının parçacıklarını bulup biriktirdiğinizde onları yatarıp yardımcı yapabilirsiniz'
 	},
 	{ 
 		en: 'Hold Shield(Block) skill to absorb damage taken',
@@ -642,10 +662,6 @@ const _tips = [
 		tr: 'NPC\' lerin üstünde beliren işaretler, yapılacak bir görev olduğu anlamına gelir'
 	},
 	{ 
-		en: 'Some NPCs may join your squad when you talk',
-		tr: 'Bazı NPC\' ler konuştuğunuzda ekibinize katılabilir'
-	},
-	{ 
 		en: 'You can counter-attack when you tap block right before enemy attack',
 		tr: 'Rakip saldırısından hemen önce blok tuşuna bastığınızda karşı-saldırı yaparsınız'
 	},
@@ -656,10 +672,6 @@ const _tips = [
 	{ 
 		en: 'Hold and drag touch-pad on bottom-left of screen lets your character move through that direction',
 		tr: 'Sol-alt tarafta bulunan yuvarlak kısma basılı tutup çektiğinizde karakteriniz o yöne hareket eder'
-	},
-	{ 
-		en: 'You can turn the automatic attack feature on or off from the bottom left corner',
-		tr: 'Sol alt köşeden otomatik saldırı özelliğini açıp kapatabilirsiniz'
 	},
 	{ 
 		en: 'Charge enemies with using normal attack skill from a distance not too far',
@@ -2982,6 +2994,88 @@ function installQuestItem(_npc, _skipMark, _force) {
 	}
 	return _npc.questItem;
 }
+const __holoMenuItems = [
+	{ icon: 'inventory', order:1, subOrder:1, titles: {
+		en: 'Inventory',
+		tr: 'Envanter'
+	}},
+	{ icon: 'skill', order:2, subOrder:1, titles: {
+		en: 'Skill',
+		tr: 'Yetenek'
+	}},
+	{ icon: 'quest', order:3, subOrder:1, titles: {
+		en: 'Story',
+		tr: 'Hikaye'
+	}},
+	{ icon: 'fragment', order:7, subOrder:1, titles: {
+		en: 'Fragment',
+		tr: 'Parçacık'
+	}},
+	{ icon: 'artifact', order:1, subOrder:2, titles: {
+		en: 'Artifact',
+		tr: 'Eser'
+	}},
+	{ icon: 'talent', order:2, subOrder:2, titles: {
+		en: 'Talent',
+		tr: 'Yetenek'
+	}},
+	{ icon: 'achievement',  order:3, subOrder:2, titles: {
+		en: 'Event',
+		tr: 'Etkinlik'
+	}},
+	{ icon: 'gem', order:1, subOrder:1, tabOrder:2, titles: {
+		en: 'Gem',
+		tr: 'Taş'
+	}},
+	{ icon: 'pvp', order:5, subOrder:1, titles: {
+		en: 'PvP',
+		tr: 'PvP'
+	}},
+	{ icon: 'dungeon', order:6, subOrder:1, titles: {
+		en: 'Dungeon',
+		tr: 'Zindan'
+	}},
+	{ icon: 'shop', order:8, subOrder:1, titles: {
+		en: 'Shop',
+		tr: 'Market'
+	}},
+	{ icon: 'mailbox', order:4, subOrder:2, titles: {
+		en: 'Mailbox',
+		tr: 'Posta'
+	}},
+	{ icon: 'forge', order:5, subOrder:2, titles: {
+		en: 'Forge',
+		tr: 'Demirci'
+	}},
+	{ icon: 'lottery', order:8, subOrder:2, titles: {
+		en: 'Lottery',
+		tr: 'Piyango'
+	}},
+	{ icon: 'war', order:5, subOrder:3, titles: {
+		en: 'War',
+		tr: 'Savaş'
+	}},
+	{ icon: 'calendar', order:8, subOrder:3, titles: {
+		en: 'Calendar',
+		tr: 'Takvim'
+	}},
+	{ icon: 'chat', order:4, subOrder:1, titles: {
+		en: 'Chat',
+		tr: 'Sohbet'
+	}},
+	{ icon: 'world', order:3, subOrder:3, titles: {
+		en: 'Map',
+		tr: 'Harita'
+	}},
+	{ icon: 'settings', order:9, subOrder:1, titles: {
+		en: 'Settings',
+		tr: 'Ayarlar'
+	}},
+	{ icon: 'tip', order:9, subOrder:2, titles: {
+		en: 'About Us',
+		tr: 'Hakkımızda'
+	}}
+];
 const mapSprites = [
 	{
 		id: 0, menu: true, still: true, coords: { left: '20%', top: '60%', title: 'Lobby' },
@@ -21246,9 +21340,10 @@ const spells = {
 		zoom: 3,
 		invulnerable: true,
 		push: true,
-		height: 54 * .65,
+		height: 30,
 		class: __spell,
-		src: './images/main/thief/chain.png',
+		pierce: true,
+		src: './images/main/thief/chain2.png',
 		name: 'Chain',
 		animations: {
 			idle: {
@@ -21381,8 +21476,8 @@ const spells = {
 						speed: 3,
 					},
 					{
-						spriteLeft: 150,
-						spriteTop: 48,
+						spriteLeft: 150 + 840,
+						spriteTop: 0,
 						spriteWidth: 270,
 						spriteHeight: 30,
 						spriteOrigin: 135,
@@ -21402,8 +21497,8 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 150,
-						spriteTop: 48,
+						spriteLeft: 150 + 840,
+						spriteTop: 0,
 						spriteWidth: 270,
 						spriteHeight: 30,
 						spriteOrigin: 135,
@@ -21412,8 +21507,8 @@ const spells = {
 						speed: 3
 					},
 					{
-						spriteLeft: 100,
-						spriteTop: 48,
+						spriteLeft: 100 + 840,
+						spriteTop: 0,
 						spriteWidth: 320,
 						spriteHeight: 30,
 						spriteOrigin: 160,
@@ -21433,8 +21528,8 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 100,
-						spriteTop: 48,
+						spriteLeft: 100 + 840,
+						spriteTop: 0,
 						spriteWidth: 320,
 						spriteHeight: 30,
 						spriteOrigin: 160,
@@ -21443,8 +21538,8 @@ const spells = {
 						speed: 3
 					},
 					{
-						spriteLeft: 50,
-						spriteTop: 73,
+						spriteLeft: 50 + 1260,
+						spriteTop: 0,
 						spriteWidth: 370,
 						spriteHeight: 30,
 						spriteOrigin: 185,
@@ -21464,8 +21559,8 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 50,
-						spriteTop: 73,
+						spriteLeft: 50 + 1260,
+						spriteTop: 0,
 						spriteWidth: 370,
 						spriteHeight: 30,
 						spriteOrigin: 185,
@@ -21474,8 +21569,8 @@ const spells = {
 						speed: 3
 					},
 					{
-						spriteLeft: 0,
-						spriteTop: 73,
+						spriteLeft: 0 + 1260,
+						spriteTop: 0,
 						spriteWidth: 420,
 						spriteHeight: 30,
 						spriteOrigin: 210,
@@ -21495,8 +21590,8 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 0,
-						spriteTop: 73,
+						spriteLeft: 0 + 1260,
+						spriteTop: 0,
 						spriteWidth: 420,
 						spriteHeight: 30,
 						spriteOrigin: 210,
@@ -21505,12 +21600,12 @@ const spells = {
 						speed: 3
 					},
 					{
-						spriteLeft: 0,
-						spriteTop: 31,
+						spriteLeft: 0 + 420,
+						spriteTop: 0,
 						spriteWidth: 420,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 210,
-						bottomGap: -44,
+						bottomGap: -40,
 						extraStepXRate: -.5,
 						speed: 1,
 						bleed: 'back',
@@ -21527,22 +21622,23 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 0,
-						spriteTop: 31,
+						spriteLeft: 0 + 420,
+						spriteTop: 0,
 						spriteWidth: 420,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 210,
-						bottomGap: -44,
+						extraStepXRate: -.5,
+						bottomGap: -40,
 						speed: 3,
 						push: 'reversed'
 					},
 					{
-						spriteLeft: 50,
-						spriteTop: 31,
+						spriteLeft: 50 + 420,
+						spriteTop: 0,
 						spriteWidth: 370,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 185,
-						bottomGap: -44,
+						bottomGap: -40,
 						extraStepXRate: -1,
 						speed: 1,
 						bleed: 'back',
@@ -21559,23 +21655,23 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 50,
-						spriteTop: 31,
+						spriteLeft: 50 + 420,
+						spriteTop: 0,
 						spriteWidth: 370,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 185,
-						bottomGap: -44,
+						bottomGap: -40,
 						extraStepXRate: -1,
 						speed: 3,
 						push: 'reversed',
 					},
 					{
-						spriteLeft: 100,
-						spriteTop: 31,
+						spriteLeft: 0 + 420,
+						spriteTop: 0,
 						spriteWidth: 320,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 160,
-						bottomGap: -44,
+						bottomGap: -40,
 						extraStepXRate: -1,
 						speed: 1,
 						bleed: 'back',
@@ -21592,23 +21688,23 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 100,
-						spriteTop: 31,
+						spriteLeft: 100 + 420,
+						spriteTop: 0,
 						spriteWidth: 320,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 160,
-						bottomGap: -44,
+						bottomGap: -40,
 						extraStepXRate: -1,
 						speed: 3,
 						push: 'reversed',
 					},
 					{
-						spriteLeft: 150,
-						spriteTop: 31,
+						spriteLeft: 150 + 420,
+						spriteTop: 0,
 						spriteWidth: 270,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 135,
-						bottomGap: -44,
+						bottomGap: -40,
 						extraStepXRate: -1,
 						speed: 1,
 						bleed: 'back',
@@ -21625,23 +21721,23 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 150,
-						spriteTop: 31,
+						spriteLeft: 150 + 420,
+						spriteTop: 0,
 						spriteWidth: 270,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 135,
-						bottomGap: -44,
+						bottomGap: -40,
 						extraStepXRate: -1,
 						speed: 3,
 						push: 'reversed',
 					},
 					{
-						spriteLeft: 200,
-						spriteTop: 31,
+						spriteLeft: 200 + 420,
+						spriteTop: 0,
 						spriteWidth: 220,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 110,
-						bottomGap: -44,
+						bottomGap: -40,
 						extraStepXRate: -1,
 						speed: 1,
 						bleed: 'back',
@@ -21658,23 +21754,23 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 200,
-						spriteTop: 31,
+						spriteLeft: 200 + 420,
+						spriteTop: 0,
 						spriteWidth: 220,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 110,
-						bottomGap: -44,
+						bottomGap: -40,
 						extraStepXRate: -1,
 						speed: 3,
 						push: 'reversed',
 					},
 					{
-						spriteLeft: 250,
-						spriteTop: 31,
+						spriteLeft: 250 + 420,
+						spriteTop: 0,
 						spriteWidth: 170,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 85,
-						bottomGap: -44,
+						bottomGap: -40,
 						extraStepXRate: -1,
 						speed: 1,
 						bleed: 'back',
@@ -21691,23 +21787,23 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 250,
-						spriteTop: 31,
+						spriteLeft: 250 + 420,
+						spriteTop: 0,
 						spriteWidth: 170,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 85,
-						bottomGap: -44,
+						bottomGap: -40,
 						extraStepXRate: -1,
 						speed: 3,
 						push: 'reversed',
 					},
 					{
-						spriteLeft: 300,
-						spriteTop: 31,
+						spriteLeft: 300 + 420,
+						spriteTop: 0,
 						spriteWidth: 120,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 60,
-						bottomGap: -44,
+						bottomGap: -40,
 						extraStepXRate: -1,
 						speed: 1,
 						bleed: 'back',
@@ -21724,23 +21820,23 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 300,
-						spriteTop: 31,
+						spriteLeft: 300 + 420,
+						spriteTop: 0,
 						spriteWidth: 120,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 60,
-						bottomGap: -44,
+						bottomGap: -40,
 						extraStepXRate: -1,
 						speed: 3,
 						push: 'reversed'
 					},
 					{
-						spriteLeft: 300,
-						spriteTop: 31,
+						spriteLeft: 300 + 420,
+						spriteTop: 0,
 						spriteWidth: 120,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 60,
-						bottomGap: -44,
+						bottomGap: -40,
 						extraStepXRate: -1,
 						speed: 1,
 						bleed: 'back',
@@ -21757,23 +21853,23 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 366,
-						spriteTop: 31,
+						spriteLeft: 366 + 420,
+						spriteTop: 0,
 						spriteWidth: 54,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 27,
-						bottomGap: -44,
+						bottomGap: -40,
 						extraStepXRate: -1,
 						speed: 3,
 						push: 'reversed'
 					},
 					{
-						spriteLeft: 400,
-						spriteTop: 31,
+						spriteLeft: 400 + 420,
+						spriteTop: 0,
 						spriteWidth: 20,
-						spriteHeight: 17,
+						spriteHeight: 30,
 						spriteOrigin: 10,
-						bottomGap: -44,
+						bottomGap: -40,
 						extraStepXRate: -1,
 						speed: 4,
 						push: 'reversed'
@@ -21788,8 +21884,9 @@ const spells = {
 						spriteLeft: 0,
 						spriteTop: 0,
 						spriteWidth: 0,
-						spriteHeight: 0,
+						spriteHeight: 30,
 						spriteOrigin: 0,
+						bottomGap: -40,
 						props: {
 							remove: true
 						},
@@ -27436,7 +27533,10 @@ function copyText(_elem) {
 }
 
 function askExitApp(){
-    askSomething(getLangData('Application will be closed'), "exitApplication()");
+	if(episode?.menu)
+		askSomething(getLangData('Application will be closed'), "exitApplication()", "exit-app-question");
+	else
+		askSomething(getLangData('Exit to lobby'), "killStory()", "exit-app-question");
 }
 
 function exitApplication() {

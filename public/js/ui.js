@@ -4,7 +4,7 @@ const pvpAvatarTemplate = function (char, _name) {
 	if (_oldAvatar)
 		_oldAvatar.remove();
 	const _class = char.main ? ' war-player-profile-me' : ' war-player-profile';
-	return `<div class="flex war-player-card profile${_class}" id="char-${char.key}">
+	return `<div${char.main ? '' : ' onexactclick="episode.focusOnPlayer(\'' + char.key + '\')"'} class="flex war-player-card profile${_class}" id="char-${char.key}">
 				<div class='war-player-card-left flex'>
 					<div class='flex war-player-card-left-content war-player-team-${char.groupId}'><img src="./images/icons/${char.class}.png" /></div>
 				</div>
@@ -566,6 +566,15 @@ function loadUI() {
 			}
 		});
 	}
+	const icons = __holoMenuItems.map(m => `./images/ui/menu-icons/${m.icon}.png`);
+  
+	icons.forEach(src => {
+		const link = document.createElement("link");
+		link.rel = "preload";
+		link.as = "image";
+		link.href = src;
+		document.head.appendChild(link);
+	});
 }
 function openChatPage() {
 	showMyModalPopUp('game-menu');
@@ -1645,21 +1654,28 @@ function renderLockedContent(_requirement) {
 	 	<span style="text-align:center;color:#f7f7f7cc!important;font-size:3vh!important"><span style="color:#ff6c00 !important">[${getLangData('Content Is Locked')}]</span><br/>${getLangData(_requirement)}</span>
 	 </div>`;
 }
-function askSomething(_question, _okFuncString) {
+function askSomething(_question, _okFuncString, _singletonAttr) {
 	try	{
 		event.preventDefault();
 		event.stopPropagation();
 	}
 	catch(ex) {}
 	try {
-		let _modal = `<div class="full fade-me flex inventory-question">
+		if(_storySceneSwitching || __switchingMap)
+			return;
+		if(_singletonAttr) {
+			const _que = document.querySelector('.inventory-question[data-singleton-key="' + _singletonAttr + '"]');
+			if(_que)
+				return;
+		}
+		let _modal = `<div${_singletonAttr ? " data-singleton-key='" + _singletonAttr + "'" : ""} class="full fade-me show-ui flex inventory-question">
 			<div class="inventory-modal">
 				<div style="padding:4vh 2vh" class="flex">
 					<span class="flex" style="color:#f7f7f7dd !important;font-size:3vh !important">` + getLangData(_question) + `?</span>
 				</div>
 				<div style="padding:4vh 2vh" class="flex">
-					<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="${_okFuncString}">${getLangData('YES')}</div>
 					<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
+					<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="${_okFuncString}">${getLangData('YES')}</div>
 				</div>
 			</div>
 		</div>`;

@@ -121,6 +121,10 @@ function createCharacter(_settings) {
 								spriteHeight: 289,
 								spriteOrigin: 131,
 								speed: 8,
+								do: function(e) {
+									const _f = e.getCurrentFrame();
+									_f.buffs[0].level = e.skills?.defense?.level ?? 1;
+								},
 								buffs: [{ key: 'hps', level: 1 }]
 							},
 							{
@@ -366,7 +370,7 @@ function createCharacter(_settings) {
 								speed: 4,
 								spell: {
 									key: 'hurricane2',
-									xGap: 10,
+									xGap: -30,
 									bottomGap: 0,
 									pierce: true
 								},
@@ -384,7 +388,7 @@ function createCharacter(_settings) {
 								sound: { key:'yeah', volume:.5 },
 								spell: {
 									key: 'hurricane2',
-									xGap: 100,
+									xGap: 60,
 									reversed: true,
 									bottomGap: 0,
 									pierce: true
@@ -8785,6 +8789,7 @@ function createCharacter(_settings) {
 								spell: {
 									key: 'gear',
 									xGap: 100,
+									reset: true,
 									bottomGap: 0,
 									pierce: true
 								},
@@ -8802,6 +8807,7 @@ function createCharacter(_settings) {
 								spell: {
 									key: 'gear',
 									xGap: 350,
+									reset: true,
 									bottomGap: 0,
 									pierce: true,
 									reversed: true,
@@ -8831,6 +8837,7 @@ function createCharacter(_settings) {
 								spell: {
 									key: 'gear',
 									xGap: -450,
+									reset: true,
 									bottomGap: 50,
 									pierce: true,
 									scale: .85
@@ -8851,6 +8858,7 @@ function createCharacter(_settings) {
 									xGap: -200,
 									bottomGap: -50,
 									pierce: true,
+									reset: true,
 									reversed: true,
 									scale: 1.15
 								},
@@ -10939,6 +10947,7 @@ function createCharacter(_settings) {
 								spriteOrigin: 65,
 								speed: 4,
 								spell: {
+									reset: true,
 									key: 'archerarrow'
 								},
 								sound: { key: 'arrow', volume: 1 },
@@ -11032,6 +11041,7 @@ function createCharacter(_settings) {
 								spriteOrigin: 65,
 								speed: 4,
 								spell: {
+									reset: true,
 									key: 'archerarrow'
 								},
 								sound: { key: 'arrow', volume: 1 },
@@ -11085,6 +11095,7 @@ function createCharacter(_settings) {
 									type: 'common'
 								},
 								spell: {
+									reset: true,
 									key: 'archerarrow'
 								},
 								def: {
@@ -12142,7 +12153,7 @@ function createCharacter(_settings) {
 								spriteOrigin: 68,
 								speed: 1,
 								buffs: [{
-									level: 2,
+									level: 4,
 									key: 'hps'
 								}]
 							}
@@ -12668,7 +12679,6 @@ function createCharacter(_settings) {
 								sound: { key: 'chain', reset: true },
 								spell: {
 									key: 'chain',
-									pierce: true,
 									xGap: 0
 								},
 								def: {
@@ -12820,6 +12830,7 @@ function createCharacter(_settings) {
 								},
 								spell: {
 									key: 'chain',
+									reset: true,
 									pierce: true,
 									xGap: 150,
 									reversed: true,
@@ -12885,6 +12896,7 @@ function createCharacter(_settings) {
 								spell: {
 									key: 'lightningball2',
 									pierce: true,
+									reset: true,
 									xGap: 450,
 									reversed: true
 								},
@@ -15729,6 +15741,7 @@ function createCharacter(_settings) {
 								speed: 1,
 								spell: {
 									key: 'star',
+									reset: true,
 									xGap: 130,
 									reversed: true,
 									bottomGap: 60
@@ -15746,6 +15759,7 @@ function createCharacter(_settings) {
 								speed: 1,
 								spell: {
 									key: 'star',
+									reset: true,
 									xGap: 10,
 									reversed: true,
 									bottomGap: 120,
@@ -15765,6 +15779,7 @@ function createCharacter(_settings) {
 								spell: {
 									key: 'star',
 									xGap: 10,
+									reset: true,
 									reversed: true,
 									bottomGap: -5,
 									zoomRate: 1.1
@@ -15783,6 +15798,7 @@ function createCharacter(_settings) {
 								spell: {
 									key: 'star',
 									xGap: -20,
+									reset: true,
 									bottomGap: -5,
 									zoomRate: 1.1
 								},
@@ -15800,6 +15816,7 @@ function createCharacter(_settings) {
 								spell: {
 									key: 'star',
 									xGap: 10,
+									reset: true,
 									bottomGap: 120,
 									zoomRate: .85
 								},
@@ -15817,6 +15834,7 @@ function createCharacter(_settings) {
 								spell: {
 									key: 'star',
 									xGap: 180,
+									reset: true,
 									bottomGap: 60
 								},
 								def: {
@@ -41738,6 +41756,7 @@ const _allEnemies = {
 									smash: true,
 									next: 'dashup',
 									spells: [{
+										reset: true,
 										key: 'tnt'
 									}]
 								},
@@ -41776,6 +41795,7 @@ const _allEnemies = {
 									smash: true,
 									next: 'dashup',
 									spells: [{
+										reset: true,
 										key: 'tnt'
 									}]
 								},
@@ -41803,6 +41823,7 @@ const _allEnemies = {
 									smash: true,
 									next: 'dashup',
 									spells: [{
+										reset: true,
 										key: 'tnt'
 									}]
 								},
@@ -41831,6 +41852,7 @@ const _allEnemies = {
 									smash: true,
 									next: 'dashup',
 									spells: [{
+										reset: true,
 										key: 'tnt'
 									}]
 								},
@@ -41859,6 +41881,7 @@ const _allEnemies = {
 									smash: true,
 									next: 'dashup',
 									spells: [{
+										reset: true,
 										key: 'tnt'
 									}]
 								},
@@ -41887,6 +41910,7 @@ const _allEnemies = {
 									smash: true,
 									next: 'dashup',
 									spells: [{
+										reset: true,
 										key: 'tnt'
 									}]
 								},
@@ -41915,6 +41939,7 @@ const _allEnemies = {
 									smash: true,
 									next: 'dashup',
 									spells: [{
+										reset: true,
 										key: 'tnt'
 									}]
 								},
@@ -41943,6 +41968,7 @@ const _allEnemies = {
 									smash: true,
 									next: 'dashup',
 									spells: [{
+										reset: true,
 										key: 'tnt'
 									}]
 								},

@@ -20,6 +20,9 @@ var device = getDevice();
 var myApp = new Framework7({
 	name: 'kitap12mobile', // App name
 	theme: 'auto', // Automatic theme detection
+	touch: {
+		activeState: false, // otomatik .active-state class'ını ekleme
+	},
 	lazy: {
 		threshold: 50,
 		sequential: false,

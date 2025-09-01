@@ -1262,8 +1262,8 @@ function checkIfLotteryAvailable() {
 	if(_lot.lastActivity && ((_lot.lastActivity + (1000 * 60 * 60 * 24)) > Date.now()))
 	{
 		if(_btn) {
-			var _scr = selectMenuContainer();
-			var _block = document.getElementById('lottery-block');
+			let _scr = selectMenuContainer();
+			let _block = document.getElementById('lottery-block');
 			if(!_block){
 				_block = document.createElement('div');
 				_block.id = "lottery-block";
@@ -1305,7 +1305,9 @@ function checkUpdateAvailable2(_order) {
 			continue;
 		if(_skill.level >= mainCharacter.level)
 			continue;
-		if(skill.calculateSkillPrice(_skill.key) <= __account.gold)
+		if(_skill.props[_skill.props.length - 1].level <= _skill.level)
+			continue;
+		if(_skill.list !== false && skill.calculateSkillPrice(_skill.key) <= __account.gold)
 			availables.push({index:1, subIndex:0});
 	}
 	var _items = allPowerDiffOrItemUpgrades();
@@ -1677,12 +1679,12 @@ function howToGetStronger() {
 				closeInventoryQuestionModal();
 				switchBookPage(3, 1);
 			}},
-			{ icon:'world', titles: {
-				en: 'Challange Tower',
-				tr: 'Kule Oynamak'
+			{ icon:'fragment', titles: {
+				en: 'Gather Fragment',
+				tr: 'Parçacık Topla'
 			}, func: function() {
 				closeInventoryQuestionModal();
-				switchBookPage(3, 3);
+				switchBookPage(7, 1);
 			}},
 			{ icon:'skill', titles: {
 				en: 'Upgrade Skill',
@@ -1902,7 +1904,7 @@ function createArena(_opponent) {
 			episode.enemies?.filter(x => x.enemy)?.forEach(x => {
 				applyCharacterStats(1, x);
 				resetSkills(null, null, x);
-				x.alp = 1;
+				x.groupId = x.alp = 1;
 				x.maxHP = x.health = x.MAXHP = x.maxHP * 5;
 				//x.setHealth(x.MAXHP);
 				_enemyProfile.innerHTML = avatarTemplate(x);
@@ -2284,7 +2286,7 @@ function installWarUI() {
 		__latestUIModule[_name] = { data: _arr, ref: x };
 	});
 }
-function installStoryFinish() {
+function installStoryFinish(_failed, _extraGain, _content) {
 	episode.end = true;
 	__storyPlaying = false;
 	addClass(_gameUI, 'disable-ui');
@@ -2294,6 +2296,7 @@ function installStoryFinish() {
 	episode.pauseBgMusic(1);
 	injectModule('storyfinish', function(_arr, _name) {
 		__latestUIModule[_name] = { data: _arr };
+		animateStart(_failed, _extraGain, _content);
 	});
 }
 function installTalents() {

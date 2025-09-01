@@ -9138,19 +9138,20 @@ function quitFromStory() {
 		askExitApp();
 }
 function checkStoryFinish(_success, _retryId, _goldSelected, _expSelected, _itemSelected) {
-	if(!_success)
-		return;
-	new storyBonus(function() {
+	const _after = function() {
 		if(!_retryId)
 			switchStoryScene();
 		else{
-			// playStory(_retryId, null, function() {
-			// 	tryConsumeTickets(_goldSelected, _expSelected, _itemSelected);
-			// });
 			resetQuestLine();
 			tryStartStoryMission(_retryId, _goldSelected, _expSelected, _itemSelected);
 		}
-	});
+	}
+	if(_success)
+		new storyBonus(function() {
+			_after();
+		});
+	else
+		_after();
 }
 
 function loadLastStoryCheckPoint(_func, _goldSelected, _expSelected, _itemSelected) {

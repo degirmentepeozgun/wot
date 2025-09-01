@@ -31,10 +31,14 @@ const _giftOrder = [
 	{ key: 'chest', type: 'misc' },
 	{ key: 'ticket-gold', type: 'misc' },
 ];
+
 function spinLottery() {
+	if(_game.spinned)
+		return;
 	const _lot = __account.missions.find(x => x.key === 'lottery');
 	if(_lot.lastActivity && ((_lot.lastActivity + (1000 * 60 * 60 * 24)) > Date.now()))
 		return;
+	_game.spinned = 1;
 	addClass(document.getElementById('spinner-btn'), 'disabled');
 	var style = getComputedStyle(document.documentElement);
 	var minRate = 45 / 900;
@@ -69,8 +73,6 @@ function spinLottery() {
 				warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/' + _giftOrder[itemOrder2].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, null, 1);
 				getChestReward(__account.grade ?? 1, _giftOrder[itemOrder].type, _giftOrder[itemOrder].key);
 				getChestReward(__account.grade ?? 1, _giftOrder[itemOrder2].type, _giftOrder[itemOrder2].key);
-				_lot.lastActivity = Date.now();
-				_client.saveState();
 				let itemOrder3;
 				if(itemOrder === itemOrder2){
 					episode.playSound({key:'clap', volume:.3});
@@ -78,6 +80,9 @@ function spinLottery() {
 					warn('<div class="flex achievement jackpot important" style="position:relative"><img style="height:12vh" src="./images/icons/' + _giftOrder[itemOrder3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">!!!' + getLangData('JACKPOT') + '!!!</span></div>', null, null, 1);
 					getChestReward(__account.grade ?? 1, _giftOrder[itemOrder3].type, _giftOrder[itemOrder3].key);
 				}
+				_lot.lastActivity = Date.now();
+				delete _game.spinned;
+				_client.saveState();
 				checkUpdateAvailable2(8);
 			}, 500);
 		}, 2500);

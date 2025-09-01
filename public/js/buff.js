@@ -43,12 +43,26 @@ const _allBuffs = {
 			{
 				level: 1,
 				props: {
-					hpRegenRate: .3
+					hpRegenRate: 3
 				},
 				ms: 1000
 			},
 			{
 				level: 2,
+				props: {
+					hpRegenRate: 4
+				},
+				ms: 1000
+			},
+			{
+				level: 3,
+				props: {
+					hpRegenRate: 5
+				},
+				ms: 1000
+			},
+			{
+				level: 4,
 				props: {
 					hpRegenRate: .2
 				},

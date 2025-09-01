@@ -9,6 +9,7 @@ function isMissionFailed(_index) {
 function getLobbyScene() {
 	return {
 			map: 0,
+			startWith: 10001,
 			start: function() {
 				__account.questStatus = firstQuestData();
 				if(episode.bgMusic){
@@ -1204,7 +1205,6 @@ const __stories = [
 							episode.enemies.filter(x => x.alp).forEach(x => x.remove = true);
 							setTimeout(() => {
 								__storyTell = new story(1, function() {
-									__storyPlaying = false;
 									installStoryFinish();
 								}, null, 'Two prisoners waiting for death in the dungeon managed to escape among these ruins');
 							}, 100);
@@ -1606,6 +1606,8 @@ const __stories = [
 					mainCharacter.disableKeyboard = true;
 					mainCharacter.keyboard.holdingKeys = [];
 					mainCharacter.standBy();
+					_p.updateVariables();
+					_a.updateVariables();
 					_a.standBy();
 					cssAnimations.film(null, [
 						{
@@ -1631,7 +1633,6 @@ const __stories = [
 							ms: 4100
 						},
 					], 5200, function() {
-						__storyPlaying = false;
 						installStoryFinish();
 					});
 				},
@@ -1918,7 +1919,7 @@ const __stories = [
 					removeCoopCharacter(1);
 					const _char = addCoopCharacter(null, 'arc');
 					_char.direction = 'right';
-					_char.left = mainCharacter.SCREENLEFT + platformX - MathRound(1.5 * mainCharacter.WIDTH);
+					_char.left = MathRound(mainCharacter.left + platformX - (1.5 * mainCharacter.WIDTH));
 					_char.platformX = platformX;
 					_char.yPosition = MathRound(.5 * groundheight);
 					mainCharacter.immobilize = true;
@@ -2078,7 +2079,7 @@ const __stories = [
 						episode.pauseBgMusic();
 					if(episode && episode.bgSound)
 						episode.pauseAmbianceMusic();
-					const _princess = summonMob(58, MathRound((mainCharacter.SCREENLEFT + mainCharacter.WIDTH + platformX) / __zoom), MathRound(.33 * groundheight), mainCharacter.level);
+					const _princess = summonMob(58, MathRound((mainCharacter.left + mainCharacter.WIDTH + platformX) / __zoom), MathRound(.33 * groundheight), mainCharacter.level);
 					_princess.friendly = _princess.invulnerable = true;
 					_princess.still = _princess.immobilize = false;
 					_princess.direction = 'left';
@@ -2086,9 +2087,10 @@ const __stories = [
 					removeCoopCharacter(1);
 					const _char = addCoopCharacter(null, 'arc');
 					_char.direction = 'left';
-					_char.left = mainCharacter.SCREENLEFT + platformX + mainCharacter.WIDTH;
+					_princess.left = _char.left = mainCharacter.left + platformX - mainCharacter.WIDTH;
 					_char.platformX = platformX;
 					_char.yPosition = MathRound(.66 * groundheight);
+					_char.updateVariables();
 					completeQuest();
 				}
 			},
@@ -2174,7 +2176,6 @@ const __stories = [
 					}, 1);
 				},
 				complete: function() {
-					__storyPlaying = false;
 					installStoryFinish();
 				}
 			}
@@ -2193,7 +2194,7 @@ const __stories = [
 			{
 				map: 106,
 				from: 'left',
-				startWith: 2,
+				startWith: 1,
 				start: function(){
 					takeQuest(0, 1, null, null, 1);
 					removeClass(_gameUI, 'disable-ui');
@@ -2505,7 +2506,6 @@ const __stories = [
 					__account.questStatus.lastStoryFinishTime = _gameTick;
 				},
 				complete: function() {
-					__storyPlaying = false;
 					installStoryFinish();
 				}
 			}
@@ -2798,7 +2798,6 @@ const __stories = [
 				complete: function() {
 					setTimeout(() => {
 						__storyTell = new story(4, function() {
-							__storyPlaying = false;
 							installStoryFinish();
 						}, null, 'Everything needed for the potion recipe was ready. Our heroes hoped it would work');
 					}, 100);
@@ -3154,8 +3153,6 @@ const __stories = [
 								if(_finishes === _l) {
 									stopQuake();
 									cssAnimations.black(null, 3000, getLangData('Village people move to a safe place'), function() {
-										//switchStoryScene();
-										__storyPlaying = false;
 										installStoryFinish();
 									});
 								}
@@ -3522,7 +3519,7 @@ const __stories = [
 									const _boss = summonMobWithJson({
 										id: _b,
 										level: 13,
-										atk: mainCharacter.atk * 2,
+										atk: 60,
 										grade: 4
 									});
 									//_boss.health = _boss.maxHP = 1;
@@ -3607,7 +3604,6 @@ const __stories = [
 				startsWith: 1,
 				save: true,
 				start: function() {
-							// __storyPlaying = false;
 							// installStoryFinish();
 							// return;
 					// clearCanvasCache(loadedImages);
@@ -3647,7 +3643,6 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 101;
-							__storyPlaying = false;
 							installStoryFinish();
 						}
 					}
@@ -3929,10 +3924,11 @@ const __stories = [
 												id: 19,
 												minX: _canvas.width,
 												maxX: _canvas.width,
+												sight: 1000,
 												spawn: 2,
+												pick: true,
 												ownerKey: episode.enemies.find(x => x.id === 47).key,
 												props: {
-													skipHealthBar: true,
 													experience: 0,
 													noLoot: true,
 													skipHealthBar: true,
@@ -3981,9 +3977,10 @@ const __stories = [
 												minX: 0,
 												maxX:  0,
 												spawn: 2,
+												sight: 1000,
+												pick: true,
 												ownerKey: mainCharacter.key,
 												props: {
-													skipHealthBar: true,
 													experience: 0,
 													noLoot: true,
 													skipHealthBar: true,
@@ -4138,8 +4135,7 @@ const __stories = [
 							);
 						},
 						do: function() {
-							episode.end = true;
-							createStoryResultScreen(1);
+							installStoryFinish(1);
 						}
 					},
 					{
@@ -4184,14 +4180,7 @@ const __stories = [
 								if(_winner) {
 									_winner.animate('victory', 1);
 									_winner.animations.idle.after = function() {
-										if(mainCharacter === _winner) {
-											__storyPlaying = false;
-											installStoryFinish();
-										}
-										else {
-											episode.end = true;
-											createStoryResultScreen(1);
-										}
+										installStoryFinish(mainCharacter !== _winner);
 										delete _winner.animations.idle.after;
 									}
 								}
@@ -4796,7 +4785,8 @@ const __stories = [
 							_e.direction = 'left';
 							_e.npc = _e.reversed = _e.invulnerable = _e.friendly = _e.noDirection = true;
 							_e.enemy = _e.still = false;
-							_e.left = mainCharacter.left + MathRound(_canvas.width / 5);
+							_e.left = (mainCharacter.left ?? 0) + MathRound(_canvas.width / 6);
+							_e.updateVariables();
 						},
 						yPosition: function() {
 							return MathRound(getGroundHeight() / 2) - 1;
@@ -4930,6 +4920,7 @@ function switchStoryScene(_func, _newOrder) {
 	const _splash = document.getElementById('splash');
 	removeClass(_splash, 'd-none');
 	hideMyModalPopUp(1);
+	closeInventoryQuestionModal();
 	__storyScene = __story.scenes[__storySceneOrder - 1];
 	__storyPlaying = 1;
 	if(__storyScene?.save && __storyCheckPoint?.sceneOrder !== (__storySceneOrder - 1)) {
@@ -5428,8 +5419,12 @@ function createStoryResultScreen(_failed) {
 		}
 		_game.suspended = true;
 }
+function killStory() {
+	resetQuestLine();
+	quitFromStory();
+}
 function quitFromStory() {
-	if(__account.storyResults.find(x => x.id === 1)?.stars?.[0]) {
+	if(!episode?.menu && __account.storyResults.find(x => x.id === 1)?.stars?.[0]) {
 		const _index = __story.scenes.findIndex(x => x.map === 0);
 		if(_index >= 0)
 			switchStoryScene(null, _index + 1);
@@ -5440,19 +5435,26 @@ function quitFromStory() {
 		askExitApp();
 }
 function checkStoryFinish(_success, _retryId, _goldSelected, _expSelected, _itemSelected) {
-	if(!_success)
-		return;
-	new storyBonus(function() {
-		if(!_retryId)
-			switchStoryScene();
-		else{
-			// playStory(_retryId, null, function() {
-			// 	tryConsumeTickets(_goldSelected, _expSelected, _itemSelected);
-			// });
+	const _after = function() {
+		if(!_retryId){
+			if(!_success) {
+				resetQuestLine();
+				quitFromStory();
+			}
+			else
+				switchStoryScene();
+		}
+		else {
 			resetQuestLine();
 			tryStartStoryMission(_retryId, _goldSelected, _expSelected, _itemSelected);
 		}
-	});
+	}
+	if(_success)
+		new storyBonus(function() {
+			_after();
+		});
+	else
+		_after();
 }
 
 function loadLastStoryCheckPoint(_func, _goldSelected, _expSelected, _itemSelected) {
@@ -5655,7 +5657,7 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 	//_gameUI.appendChild(_div);
 	return _html;
 }
-function getStoryRewardsResultHtml(_story, _bonus, _pass) {
+function getStoryRewardsResultHtml(_story, _bonus, _pass, _looseGain) {
 	let _rewardsHtml = '';
 	if(_bonus){
 		if(_bonus === 'item') {
@@ -5666,7 +5668,8 @@ function getStoryRewardsResultHtml(_story, _bonus, _pass) {
 			_bonus = getChestReward(_bonus.split('*')?.[1] ?
 		parseInt(_bonus.split('*')[1]) : __account.act ?? 1, _bonus.split('*')[0]);
 	}
-	for(let r of _story.rewards)
+	const _arr = _looseGain ? (Array.isArray(_looseGain) ? _looseGain : [_looseGain]) : _story.rewards ?? [];
+	for(let r of _arr)
 	{
 		if(r.chance && getRandomValue2(1, 100) > r.chance)
 			continue;
@@ -5723,6 +5726,12 @@ function getStoryRewardsResultHtml(_story, _bonus, _pass) {
 				_count += _bonus.count;
 			_rewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 50%${episode.expSelected ? ';color:#F4BB44 !important' : ''}">
 				<img style="height: 70%;margin-right: 5%;" src="./images/icons/exp.png"><div><div class="w-100">&nbsp;x&nbsp;${_count.formatWithDots()}</div>` + _lastLevelStatus + `</div>
+			</div>`;
+		}
+		else if(r.key === 'honor'){
+			__account.pvp.honor += _count;
+			_rewardsHtml += `<div class="w-100 flex flex-jc-start" style="padding: 1%; height: 50%">
+				<img style="height: 80%;margin-right: 5%;" src="./images/icons/honor.png"><div><div class="w-100">&nbsp;x&nbsp;${_count.formatWithDots()}&nbsp;${r.title ?? ''}</div></div>
 			</div>`;
 		}
 	}
@@ -5807,8 +5816,8 @@ function askPassStory(_itemSelected, _goldSelected, _expSelected) {
                 </span>
             </div>
             <div style="padding:4vh" class="flex">
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="acceptStoryPass(${_itemSelected ? 1 : 0}, ${_goldSelected ? 1 : 0}, ${_expSelected ? 1 : 0})">${getLangData('YES')}</div>
                 <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
+                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="acceptStoryPass(${_itemSelected ? 1 : 0}, ${_goldSelected ? 1 : 0}, ${_expSelected ? 1 : 0})">${getLangData('YES')}</div>
             </div>
         </div>
     </div>`;

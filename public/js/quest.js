@@ -402,11 +402,17 @@ function getEventReward(_index) {
 	const _chests = document.querySelectorAll('.event-gifts img');
 	const _chest = _chests[_index];
 	if(_chest) {
+		const _order = parseInt(_chest.getAttribute('data-event-id'));
+		if(_order > 1 && !__account.eventsDone.find(x => x === (_order - 1)))
+		{
+			warn('<span>' + getLangData('Get previos reward first') + '</span>', 'warn');
+			return;
+		}
 		if(!hasClass(_chest, 'glow-yellow'))
 			return;
 		removeClass(_chest, 'glow-yellow');
 		addClass(_chest, 'gray');
-		__account.eventsDone.push(parseInt(_chest.getAttribute('data-event-id')));
+		__account.eventsDone.push(_order);
 		const _gold = (_index + 1) * 10000;
 		updateGold(_gold);
 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/coin.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + _gold.formatWithDots() + '</span></div>', null, null, 1);
@@ -415,7 +421,16 @@ function getEventReward(_index) {
 	}
 }
 function renderEvent() {
-	const _diff = Date.now() - __account.onlineStart;
+	let _before = 0;
+	if(__account.eventsDone.indexOf(4) !== -1)
+		_before = 60 * 1000 * 60;
+	else if(__account.eventsDone.indexOf(3) !== -1)
+		_before = 60 * 1000 * 45;
+	else if(__account.eventsDone.indexOf(2) !== -1)
+		_before = 60 * 1000 * 30;
+	else if(__account.eventsDone.indexOf(1) !== -1)
+		_before = 60 * 1000 * 15;
+	const _diff = Date.now() - (__account.onlineStart - _before);
 	return `<div class="full flex event-container">
 		<div class="event-item w-100 flex flex-jc-start${_diff > (15 * 60 * 1000) ? ' completed' : ''}" style="height:15%">
 			<img src="./images/ui/star-on.png" /> Stay online for 15 minutes
