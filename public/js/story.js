@@ -1203,6 +1203,7 @@ const __stories = [
 								episode.pauseBgMusic(1);
 							if(episode && episode.bgSound)
 								episode.pauseAmbianceMusic();
+							removeCoopCharacter();
 							episode.enemies.filter(x => x.alp).forEach(x => x.remove = true);
 							setTimeout(() => {
 								__storyTell = new story(1, function() {
@@ -1267,13 +1268,23 @@ const __stories = [
 									owner: (episode.enemies.find(x => x.class === 'archer')).key,
 									text: "Get off the rats!",
 									onend: function() {
-										focusMe('#skill1', function() {
+										const _charge = function(){
 											mainCharacter.disableKeyboard = mainCharacter.still = mainCharacter.immobilize = false;
 											mainCharacter.enableSkills();
 											mainCharacter.solid = true;
-											mainCharacter.animate('attack', 1);
 											episode.enemies.find(x => x.id === 78).npc = 'bow';
 											episode.NPCS = episode.enemies.filter(x => x.npc);
+										}
+										if(__account.tutorials?.indexOf('charge') >= 0) {
+											_charge();
+											return;
+										}
+										if(!__account.tutorials)
+											__account.tutorials = [];
+										__account.tutorials.push('charge');
+										focusMe('#skill1', function() {
+											_charge();
+											mainCharacter.animate('attack', 1);
 											removeFocus();
 											disposeFocus();
 										}, false, getLangData('Press to single attack, hold to combo attack'));

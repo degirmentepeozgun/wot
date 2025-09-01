@@ -998,6 +998,8 @@ function enemy(_e) {
 		return true;
 	}
 	this.follow = function (_char) {
+		if(!_char)
+			return false;
 		this.attacking = true;
 		const _t = isObjectsInTouch(this, _char, 100);
 		if ((_t.touch || (_t.originDiff < (episode.cWidth / 10))) && _char.main) {
