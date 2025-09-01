@@ -86,10 +86,10 @@ function buyStoreItem(_id) {
 	const _item = __storeItems.find(x => x.id === _id);
 	const _price = _item.price === 'function' ? _item.price() : _item.price;
 	if(__account.gold < _price) {
+		closeInventoryQuestionModal();
 		warn('<span>' + getLangData('Not enough gold') + '</span>', 'warn');
 		return;
 	}
-	episode.playSound({ key: 'reward' });
 	let _title = misc.find(x => x.type === _item.key)?.titles?.[getLang()];
 		if(!_title)
 			switch(_item.key){
@@ -97,6 +97,15 @@ function buyStoreItem(_id) {
 					_title = getLangData('Potion');
 					break;
 			}
+	if(_item.key === 'pot') {
+		let _pot = __account.pots.find(x => x.key === 'pot');
+		if(((_pot?.value ?? 0) + (_item.count ?? 1)) > __maxPotCount) {
+			closeInventoryQuestionModal();
+			warn('<span>' + getLangData('You can not carry more pots') + '</span>', 'warn');
+			return;
+		}
+	}
+	PlaySound({ key: 'reward' });
     updateGold(-_price);
 	if(!__account.storeDates)
 		__account.storeDates = [];

@@ -26455,10 +26455,8 @@ const cssAnimations = {
 	},
 	black: function (_c, _ms, _text, _func, _delay) {
 		if(cssAnimationProps.black) {
-			console.log('Black ms ' + ((cssAnimationProps.black.p2 ?? _ms ?? 4000) + (_delay ?? 0)) + ' ---- ' + (_gameTick - cssAnimationProps.black.start));
 			if((_gameTick - cssAnimationProps.black.start) > ((cssAnimationProps.black.p2 ?? _ms ?? 4000) + (_delay ?? 0))) {
 				const _elem = document.querySelector('#css-canvas-foreground');
-				console.log('Black end');
 				_elem.onanimationend = function(e) {
 					if(e.animationName === 'black-bg') {
 						removeClass(_gameUI, 'd-none');
@@ -26479,7 +26477,6 @@ const cssAnimations = {
 				_elem.style.animation = null;
 				addClass(_elem, 'black-bg');
 				addClass(_elem, 'flex');
-				console.log('Black delay');
 			}
 		}
 		else {
@@ -26495,7 +26492,6 @@ const cssAnimations = {
 			}
 			_elem.innerText = _text ?? '';
 			addClass(_gameUI, 'd-none');
-			console.log('Black Start ms = ' + _ms);
 			cssAnimationProps.black = { start: _gameTick, p1: _c, p2: (_ms ?? 4000) + (_delay ?? 0), p3: _text, p4: _func, p5: _delay };
 		}
 	},

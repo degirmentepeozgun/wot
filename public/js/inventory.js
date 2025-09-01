@@ -1888,7 +1888,10 @@ function getChestReward(_grade, _rewardKey, _rewardType, _count) {
             }
         case 'pot':
             {
-                const _val = _count ?? getRandomValue2(1, _grade);
+                const _gr = _grade ?? 1;
+                let _val = _count ?? _gr;
+                if(_val < _gr)
+                    _val = _gr;
                 updatePot(_val, null, 1);
                 return {
                     type: 'pot',

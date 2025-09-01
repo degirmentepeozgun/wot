@@ -6170,6 +6170,9 @@ function enemy(_e) {
 					npc: this.npcKey
 				};
 				anima.frames[_i - 1].speed = 6000;
+				anima.frames[_i - 1].do = function() {
+					episode.NPCS = episode.enemies.filter(x => x.npc);
+				};
 				anima.frames[_i - 1].border = '#ffbc34';
 				anima.frames[_i].props = {
 					canSkin: false,

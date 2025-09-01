@@ -3,7 +3,7 @@ console.log('story-finish');
 function animateStart(_failed, _extraGain, _content) {
 	_game.suspended = true;
 	const _isPvp = (episode.pvp || episode.war) & !episode.gold;
-	const _isFirstPlay = !__account.tutorials?.[0];
+	const _isFirstPlay = !__account.tutorials?.[1];
 	const _id = __story.id;
 	const _story = __stories.find(x => x.id === _id);
 	const _endTime = __story.endTime ?? _gameTick;
@@ -118,9 +118,9 @@ function animateStart(_failed, _extraGain, _content) {
 		<div class="w-50 container side-right flex flex-ai-start" style="height:90%;width:45%">
 			<div class="full" style="position:relative;z-index:2;margin: 0 15% 0 0;width:85%">
 				<div class="stars flex w-100" style="height: 20%;position:relative;background: url(./images/ui/header.png);background-size: contain;background-repeat: no-repeat;background-position: center;">
-					<img class="ms250 op-none${_isPvp ? ' d-none':''}" src="./images/ui/star-${!_failed ? 'on' : 'off'}.png">
-					<img class="ms500 op-none${_isPvp ? ' d-none':''}" src="./images/ui/star-${_2ndStar ? 'on' : 'off'}.png" style="margin-bottom: -4%;margin-top: -6%;">
-					<img class="ms750 op-none${_isPvp ? ' d-none':''}" src="./images/ui/star-${_3rdStar ? 'on' : 'off'}.png">
+					<img class="ms250 op-none${_isPvp ? ' d-none':''}" src="./images/ui/star-${_totalAchDone > 0 ? 'on' : 'off'}.png">
+					<img class="ms500 op-none${_isPvp ? ' d-none':''}" src="./images/ui/star-${_totalAchDone > 1 ? 'on' : 'off'}.png" style="margin-bottom: -4%;margin-top: -6%;">
+					<img class="ms750 op-none${_isPvp ? ' d-none':''}" src="./images/ui/star-${_totalAchDone > 2 ? 'on' : 'off'}.png">
 					<div class="w-50 flex" style="position: absolute;left: 25%;height: 30%;font-size: 4vh !important;color: #f3f4f580;z-index: 0;text-shadow: 2px 2px 1px #000;padding-top: 1%;">` + _missionTitle + `</div>
 				</div>
 				<div class="flex w-100 ms1000 op-none${_isPvp ? ' d-none' : ''}" style="padding: 1.5% 12.5% 0 12.5%;height: 8%;">
@@ -166,8 +166,8 @@ function animateStart(_failed, _extraGain, _content) {
 					+ _firstFinishRewardsHtml +
 				`</div>
 				<div class="flex w-100 ms2500 op-none${_isPvp ? ' d-none' : ''}" style="height: 10%;padding:0 4%">
-					<div class="w-33 flex" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(${_failed ? 0 : 1}, ${_id}, ${episode.goldSelected ? 1 : 0}, ${episode.expSelected ? 1 : 0}, ${episode.itemSelected ? 1 : 0});detachModule()" style="padding: 1%;height: 100%">
-						<div class="btn animate-me-500 flex">${getLangData('RETRY')}</div>
+					<div class="w-33 flex" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(${_failed ? 0 : 1}, ${_id}, ${episode.goldSelected ? 1 : 0}, ${episode.expSelected ? 1 : 0}, ${episode.itemSelected ? 1 : 0});detachModule()" style="padding: 1%;height: 100%${_isFirstPlay ? ';pointer-events:none!important' : ''}">
+						<div class="btn${_isFirstPlay ? ' inactivated' : ''} animate-me-500 flex">${getLangData('RETRY')}</div>
 					</div>
 					<div class="w-33 flex" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(${_failed ? 0 : 1});detachModule()" style="padding: 1%;height: 100%">
 						<div class="btn animate-me-500 flex">${getLangData('LOBBY')}</div>

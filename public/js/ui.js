@@ -1427,23 +1427,24 @@ function updateMisc(_misc) {
 	checkUpdateAvailable2();
 	_client.saveState();
 }
+const __maxPotCount = 9;
 function updatePot(_value, _update, _turnGold) {
 	_potCount = document.getElementById('main-pot-count');
 	let _warn, _more;
-	if (_value > 9) {
+	if (_value > __maxPotCount) {
 		_warn = 1;
 		//warn('<span>' + getLangData('You can not carry more pots') + '</span>', 'warn');
-		_value = 9;
+		_value = __maxPotCount;
 	}
 	let _pot = __account.pots.find(x => x.key === 'pot');
-	if (((_pot?.value ?? 0) + _value + episodePot) > 9) {
-		_more = ((_pot?.value ?? 0) + _value + episodePot) - 9;
+	if (((_pot?.value ?? 0) + _value + episodePot) > __maxPotCount) {
+		_more = ((_pot?.value ?? 0) + _value + episodePot) - __maxPotCount;
 		_warn = 1;
 		if(_more > 0 && _turnGold) {
 			updateGold(_more * 100);
 			_warn = undefined;
 		}
-		_value = 9 - (_pot?.value ?? 0) - episodePot;
+		_value = __maxPotCount - (_pot?.value ?? 0) - episodePot;
 	}
 	if (_value <= 0)
 		return false;
