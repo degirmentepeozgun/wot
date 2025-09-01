@@ -171,7 +171,7 @@ const __stories = [
 		],
 		ticket: 2,
 		list:true,
-		startScene:1,
+		//startScene:1,
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
@@ -5261,9 +5261,11 @@ function removeFocus(_reUse) {
 	removeClass(_gameUI, 'focus-ui-activated');
 }
 function disposeFocus() {
-	const _elems = document.querySelectorAll('.focus-clicked');
-	if(_elems?.[0])
-		_elems.forEach(x => removeClass(x, 'focus-clicked'));
+	setTimeout(() => {
+		const _elems = document.querySelectorAll('.focus-clicked');
+		if(_elems?.[0])
+			_elems.forEach(x => removeClass(x, 'focus-clicked'));
+	}, 20);
 }
 function portTo(_id) {
 	if(!_id)

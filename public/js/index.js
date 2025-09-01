@@ -808,6 +808,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 								x.setHealth(x.MAXHP);
 							});
 						removeClass(_gameUI, 'ghost');
+						disposeFocus();
 						if(episode.war)
 							_gameUI.setAttribute('data-mapid', 'war');
 						else if(_gameUI.hasAttribute('data-mapid'))

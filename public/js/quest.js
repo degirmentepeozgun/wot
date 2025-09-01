@@ -93,8 +93,8 @@
 	},
 	{
 		id: 13, key: 'gain-gold', names: { 
-			tr: '10000 altın topla (PVE)', 
-			en: 'Gain 10000 golds (PVE)'
+			tr: '100000 altın topla (PVE)', 
+			en: 'Gain 100000 golds (PVE)'
 		},
 		limit: 100000,
 		use: function() {

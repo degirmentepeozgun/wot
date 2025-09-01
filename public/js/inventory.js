@@ -1393,6 +1393,7 @@ function upgradeItem(_id) {
     //closeItemInfoModal();
     closeCharacterInfoModal();
     //openItemInfoModal(_id);
+	updateGlobalQuest('update-item');
     document.querySelector('.item-info-container-inner').innerHTML
     = getItemInfoModalHtml(_id);
     const _wrapper = getItemWrapper(_item);
