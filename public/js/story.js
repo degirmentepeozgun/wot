@@ -171,7 +171,7 @@ const __stories = [
 		],
 		ticket: 2,
 		list:true,
-		//startScene:1,
+		startScene:1,
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
@@ -1119,6 +1119,7 @@ const __stories = [
 										_goblin.enemy = false;
 										_goblin.friendly = true;
 										_goblin.level = _goblin.skipHealthBar = 1;
+										_goblin.atk = 1;
 										_goblin.immunities = [];
 										_goblin.direction = _goblin.moveDirection = 'right';
 										_goblin.action =  {
@@ -5259,7 +5260,7 @@ function removeFocus(_reUse) {
 	_focusMode = undefined;
 	removeClass(_gameUI, 'focus-ui-activated');
 }
-function disposeFocus(_reUse) {
+function disposeFocus() {
 	const _elems = document.querySelectorAll('.focus-clicked');
 	if(_elems?.[0])
 		_elems.forEach(x => removeClass(x, 'focus-clicked'));
