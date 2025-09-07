@@ -1031,6 +1031,71 @@ svg#use-progress.use-in-progress circle {
 		filter: drop-shadow(0 0 .15vh white) drop-shadow(0 0 .3vh #FF7518);
 	}
 }
+.glow-fire {
+	animation: glow-fire .75s infinite alternate;
+	-webkit-animation: glow-fire .75s infinite alternate
+}
+@keyframes glow-fire {
+	from {
+		filter: drop-shadow(0 0 1vh red);
+	}
+
+	to {
+		filter: drop-shadow(0 0 0 red);
+	}
+}
+.glow-lightning {
+	animation: glow-lightning .75s infinite alternate;
+	-webkit-animation: glow-lightning .75s infinite alternate
+}
+@keyframes glow-lightning {
+	from {
+		filter: drop-shadow(0 0 1vh yellow);
+	}
+
+	to {
+		filter: drop-shadow(0 0 0 yellow);
+	}
+}
+.glow-shadow {
+	animation: glow-shadow .75s infinite alternate;
+	-webkit-animation: glow-shadow .75s infinite alternate
+}
+@keyframes glow-shadow {
+	from {
+		filter: drop-shadow(0 0 1vh purple);
+	}
+
+	to {
+		filter: drop-shadow(0 0 0 purple);
+	}
+}
+.glow-toxic {
+	animation: glow-toxic .75s infinite alternate;
+	-webkit-animation: glow-toxic .75s infinite alternate
+}
+@keyframes glow-toxic {
+	from {
+		filter: drop-shadow(0 0 1vh green);
+	}
+
+	to {
+		filter: drop-shadow(0 0 0 green);
+	}
+}
+.glow-ice {
+	animation: glow-ice .75s infinite alternate;
+	-webkit-animation: glow-ice .75s infinite alternate
+}
+@keyframes glow-ice {
+	from {
+		filter: drop-shadow(0 0 1vh blue);
+	}
+
+	to {
+		filter: drop-shadow(0 0 0 blue);
+	}
+}
 @keyframes glow-quest-item {
 	from {
 		filter: drop-shadow(0 0 1px #FFFF33)
@@ -1720,7 +1785,8 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 
 .grade4-item {
 	border: .6vh ridge #D22B2B;
-	border-radius: 1.2vh
+	border-radius: 1.2vh;
+	background:radial-gradient(crimson, #000) !important;
 }
 
 .grade5-item {
@@ -2251,7 +2317,9 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 .fire {
 	color: #FF2400 !important
 }
-
+.toxic {
+	color: #7CFC00 !important
+}
 
 .ice-dmg {
 	color: #368BC1 !important
@@ -3623,7 +3691,9 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	 flex-wrap: wrap;
 	 display:flex;
 }
-
+.online-user-card *{
+	font-size: 2.8vh !important;
+}
 .online-user-item {
 	width: 95%;
 	margin-right: 5%;
@@ -7121,7 +7191,7 @@ img.dmmg.toxic-dmmg {
 	font-size: 3vh !important;
 }
 .shop-container {
-	padding: 4% 0 12% 8% !important;
+	padding: 4% 0 13.5% 8% !important;
 }
 .lottery-container {
 	padding: 4% 8% 12% 7.5% !important;
@@ -7164,7 +7234,7 @@ img.dmmg.toxic-dmmg {
 	padding-bottom:0 !important
 }
 .shop-container .store-item {
-	padding:.5vh
+	padding:.5vh .5vh 0 .5vh
 }
 .store-item-price img {
 	height: 2.6vh !important;
@@ -8860,4 +8930,38 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 }
 .film-skip:active {
 	color:#f3f4f5cc !important;
+}
+.need-action {
+	pointer-events: auto !important
+}
+.selection-char.selected-character {
+	background:radial-gradient(#000, greenyellow) !important;
+	border-radius: .5vh;
+}
+.menu-tutorial-header {
+	color:#f3f4f5cc !important;
+	font-size: 4vh !important;
+	height:13%;
+	align-items: flex-end !important;
+}
+.menu-tutorial-desc {
+	flex:1;
+	margin:4% 0;
+	height:66%;
+	padding: 2% 10%;
+	text-align: center;
+	font-size: 3vh;
+	overflow-y: auto;
+}
+.menu-tutorial-skip {
+	height:13%;
+	align-items: flex-start !important;
+}
+.menu-tutorial-skip * {
+	font-size: 3.2vh !important;
+	line-height: 4vh !important;
+}
+.game-btn2 {
+	font-size:3vh !important;
+	color:#d7b671 !important
 }

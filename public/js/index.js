@@ -251,12 +251,12 @@ function removeCoopCharacter(_force) {
 	}
 }
 function startWithThisCharacter(_id, _level) {
-	removeCoopCharacter();
+	removeCoopCharacter(1);
 	const _clone = _allEnemies['enemy' + _id]();
-	addCoopCharacter(null, _clone.class, 1, _level ?? 1);
+	addCoopCharacter(null, _clone.class, 1, _level ?? 1, 1);
 	_squadMemberKey = _clone.class;
 	switchCharacter(1, 1);
-	removeCoopCharacter();
+	removeCoopCharacter(1);
 	const _friendlyChars = episode.enemies?.filter(x => x.friendly);
 	if(_friendlyChars?.[0])
 		_friendlyChars.forEach(x => {
@@ -340,10 +340,10 @@ function addCharacterAsEnemy(_prefix, _name) {
 	return _enemy;
 }
 
-function addCoopCharacter(_char, _prefix, _append, _level) {
+function addCoopCharacter(_char, _prefix, _append, _level, _nowarn) {
 	if(mainCharacter && mainCharacter.deadTime)
 		return;
-	if (episode?.pvp || episode?.dungeon) {
+	if ((episode?.pvp && !episode.realTime) || episode?.dungeon) {
 		warn('<span>' + getLangData('Unable to use in that zone') + '</span>', 'warn');
 		return;
 	}
@@ -352,7 +352,8 @@ function addCoopCharacter(_char, _prefix, _append, _level) {
 	if (!_char) {
 		_char = getCharacterJSON(_prefix);
 		if (!_char) {
-			warn('<span>' + getLangData('Recruit member first') + '</span>', 'warn');
+			if(!_nowarn)
+				warn('<span>' + getLangData('Recruit member first') + '</span>', 'warn');
 			return;
 		}
 	}
@@ -433,7 +434,7 @@ function reviveAsGhost() {
 function switchCharacter(_force, _nowarn) {
 	if (!_force)
 		return;
-	if (episode.pvp)
+	if (episode.pvp && !episode.realTime)
 		return;
 	//3 sn geçmeden tekrar karakter değiştirilemez,
 	//karakter interactive animasyonda ise
@@ -727,8 +728,6 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 						x.killedBy = undefined;
 						x.grayAvatar = false;
 					});
-				if (!(episode.currentFloor > 1))
-					connectSocket();
 				const _activeCoolDowns = document.querySelectorAll('.skill .counter');
 				if(_activeCoolDowns?.[0])
 					for(let _acd of _activeCoolDowns)
@@ -963,6 +962,8 @@ function openGame() {
 		_client.loadGold();
 		_client.loadPots();
 		__account.onlineStart = Date.now();
+		if(__account.name)
+			connectSocket();
 		_client.saveState();
 		updateQuestArea();
 	}, 2000);
@@ -1183,6 +1184,8 @@ function switchBookPage(_order, _subOrder, _tabOrder) {
 				createStoryUI();
 			else if(_order === 4 && _subOrder === 2)
 				installMailbox();
+			else if(_order === 4 && _subOrder === 3)
+				installOnlineUsers();
 			// else if(_order === 4 && _subOrder === 2)
 			// {
 			// 	//online friends / blacklist / add friend / remove friend / pm
@@ -1425,10 +1428,12 @@ function getLeftMenuTemplate(_index) {
 		//<div class="w-100 menu-sub-button animate-me menu-sub-button-4" data-index="2"><img onexactclick="switchBookPage(4, 2)" src="./images/ui/menu/social2.png"></div>
 		+
 		`<div class="w-100 menu-sub-button animate-me menu-sub-button-4" data-index="2"><img onexactclick="switchBookPage(4, 2)" src="./images/ui/menu/mailbox.png"></div>
+		<div class="w-100 menu-sub-button animate-me menu-sub-button-4" data-index="3"><img onexactclick="switchBookPage(4, 3)" src="./images/ui/menu/social2.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-5" data-index="1"><img onexactclick="switchBookPage(5, 1)" src="./images/ui/menu/pvp-1.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-5" data-index="2"><img onexactclick="switchBookPage(5, 2)" src="./images/ui/menu/craft.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-5" data-index="3"><img onexactclick="switchBookPage(5, 3)" src="./images/ui/menu/war.png"></div>
 
+		<div class="w-100 menu-sub-button animate-me menu-sub-button-7" data-index="1"><img onexactclick="switchBookPage(7, 1)" src="./images/ui/menu/pet.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-8" data-index="1"><img onexactclick="switchBookPage(8, 1)" src="./images/ui/menu/store2.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-8" data-index="2"><img onexactclick="switchBookPage(8, 2)" src="./images/ui/menu/luck.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-8" data-index="3"><img onexactclick="switchBookPage(8, 3)" src="./images/ui/menu/calendar.png"></div>
@@ -1544,6 +1549,11 @@ function unselectStoryTickets(){
 }
 var _uiSelectedStoryId;
 function tryUseStoryTicket(_x, _y, _z, _key) {
+	const _elm = document.querySelector('.skill-card.selected');
+	if(!_elm) {
+		warn('<span>' + getLangData('Select a story first') + '</span>', 'warn');
+		return;
+	}
 	if(_key === 'pass') {
 		const _s = __stories.find(x => x.id === _uiSelectedStoryId);
 		const _ss = __account.storyResults.find(x => x.id === _uiSelectedStoryId);
@@ -1845,8 +1855,17 @@ function createBattleGround(_map) {
 	resetSkills(null);
 	//__account.commonInventory = [];
 }
-
-function createArena(_opponent) {
+function normalizeSkills(_char) {
+	if(_char.animations['attack'])
+		_char.animations['attack'].priority = 4;
+	let i = 2;
+	while(_char.animations['attack' + i]) {
+		_char.animations['attack' + i].priority = 4;
+		i++;
+	}
+	_char.animations['attack' + (i - 1)].priority = 3;
+}
+function createArena(_opponent, _realTime) {
 	resetStoryVariables();
 	const _map = mapSprites.find(x => x.id === 500);
 	const _ms = mapSprites.filter(x => x.pvp);
@@ -1872,16 +1891,15 @@ function createArena(_opponent) {
 	_map.objects = []; //JSON.parse(JSON.stringify(_assetMap.objects ?? []));
 	if(_map.pvp) {
 		_map.mobs = [{
-			id: _opponent.id,
+			id: _opponent.cl ? _selectableChars.find(x => x.class === _opponent.cl).id : _opponent.id,
 			minX: 5800,
 			maxX: 5800,
 			sight: 1000,
 			count: 1,
-			inventory: JSON.parse(JSON.stringify(_opponent.inventory)),
-			minLevel: _opponent.level,
-			maxLevel: _opponent.level,
-			direction: 'left',
-			name: 'Player',
+			inventory: _opponent.inventory ? JSON.parse(JSON.stringify(_opponent.inventory)) : undefined,
+			minLevel: _opponent.l ?? _opponent.level,
+			maxLevel: _opponent.l ?? _opponent.level,
+			name: _opponent.n ?? 'Player',
 			difficulty: 0,
 			props: {
 				alp: true
@@ -1890,27 +1908,69 @@ function createArena(_opponent) {
 		}];
 		hideMyModalPopUp(1);
 		switchMap(500, 1, function() {
+			if(_opponent.pvpOrder)
+				episode.pvpOrder = _opponent.pvpOrder;
+			else {
+				episode.realTime = mainCharacter.realTime = true;
+				episode.roomId = _opponent.e;
+			}
+			if(_realTime) {
+				startWithThisCharacter(_selectableChars.find(x => x.class === __selectedPvPClass).id % 10000);
+				__selectedPvPClass = undefined;
+			}
 			mainCharacter.dead = false;
 			prevPlatformX = undefined;
+			if(_opponent.d >= 0) {
+				if(_opponent.d === 0)//rakip sağa bakıyorsa en soldadır
+					platformX = episode.width - episode.cWidth;
+				else
+					platformX = 0;
+				mainCharacter.direction = _opponent.d === 1 ? __right : __left;
+				mainCharacter.left = _opponent.d === 1 ? MathRound(_canvas.width / 5) : (episode.cWidth - MathRound(episode.cWidth / 5) - mainCharacter.getWidth());
+			}
+			else {
+				platformX = 0;
+				mainCharacter.direction = __right;
+				mainCharacter.left = MathRound(_canvas.width / 5);
+			}
 			mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
-			platformX = 0;
-			mainCharacter.left = MathRound(_canvas.width / 5);
-			mainCharacter.direction = 'right';
-			mainCharacter.maxHP = mainCharacter.health = mainCharacter.MAXHP = mainCharacter.maxHP * 5;
+			applyDefaultCharacterStats(mainCharacter);
+			mainCharacter.maxHP = mainCharacter.health = mainCharacter.MAXHP = mainCharacter.maxHP * 3;
 			resetSkills(null);
-			episode.pvpOrder = _opponent.pvpOrder;
 			hideMyMenu();
 			hideMenu();
 			removeClass(_gameUI, 'disable-ui');
+			normalizeSkills(mainCharacter);
+			mainCharacter.alp = true;
+			mainCharacter.villain = false;
 			episode.enemies?.filter(x => x.enemy)?.forEach(x => {
+				x.level = 10;
 				applyCharacterStats(1, x);
 				resetSkills(null, null, x);
 				x.groupId = x.alp = 1;
-				x.maxHP = x.health = x.MAXHP = x.maxHP * 5;
+				x.villain = false;
+				applyDefaultCharacterStats(x);
+				x.maxHP = x.health = x.MAXHP = x.maxHP * 3;
 				//x.setHealth(x.MAXHP);
 				_enemyProfile.innerHTML = avatarTemplate(x);
+				x.yPosition = mainCharacter.yPosition;
 				//x.hbBars = undefined;
 				addClass(_enemyProfile, 'pvp');
+				if(episode.realTime){
+					x.realTime = true;
+					x.autoMode = undefined;
+					x.socketId = _opponent.s;
+					if(_opponent.d === 1)// bu arkadaş sola bakıyosa
+						x.left = (episode.cWidth - MathRound(episode.cWidth / 5) - x.getWidth()) + (episode.width - episode.cWidth);
+					else
+						x.left = MathRound(episode.cWidth / 5);
+					x.direction = _opponent.d === 1 ? __left : __right;
+				}
+				else {
+					x.left = (episode.cWidth - MathRound(episode.cWidth / 5) - x.getWidth()) + (episode.width - episode.cWidth);
+					x.direction = __left;
+				}
+				normalizeSkills(x);
 			});
 			delete episode.war;
 		});
@@ -2323,6 +2383,15 @@ function installMailbox() {
 		var x = new mailbox();
 		x.render();
 		switchBookPageTabs(4, 2);
+		checkUpdateAvailable2(4);
+		__latestUIModule[_name] = { data: _arr, ref: x };
+	});
+}
+function installOnlineUsers() {
+	injectModule('onlineusers', function(_arr, _name) {
+		var x = new onlineusers();
+		x.render();
+		switchBookPageTabs(4, 3);
 		checkUpdateAvailable2(4);
 		__latestUIModule[_name] = { data: _arr, ref: x };
 	});

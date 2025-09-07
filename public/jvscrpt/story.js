@@ -9012,6 +9012,7 @@ function createStoryResultScreen(_failed) {
 		episode.pauseBgMusic(1);
 		episode.pauseAmbianceMusic();
 		mainCharacter.stopHeartBeatSound();
+		mainCharacter.stopStepSound();
 		// for(let i = 0; i < __story.resultStars.length; i++)
 		// 	if(isMissionFailed(i))
 		// 		__story.resultStars[i].failed = true;

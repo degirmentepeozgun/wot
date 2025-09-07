@@ -49,12 +49,12 @@ function keyboard(_character, _keys) {
 			key: _k,
 			name: _name
 		});
-		if (/*(_type === 'move' || _k === ' ') && */this.character.main) {
-			const _json = { c: 'ak', hk: _k, s: this.character.socketId };
-			if (_k === 'r' || _k === 'f')
-				_json.ch = 1;
-			sendMessage(JSON.stringify(_json));
-		}
+		// if (/*(_type === 'move' || _k === ' ') && */this.character.main) {
+		// 	const _json = { c: 'ak', hk: _k, s: this.character.socketId };
+		// 	if (_k === 'r' || _k === 'f')
+		// 		_json.ch = 1;
+		// 	//sendMessage(JSON.stringify(_json));
+		// }
 		this.character.lastActivity = _gameTick;
 		// if (this.character.disconnected) {
 		// 	console.log("re-connected");
@@ -75,8 +75,8 @@ function keyboard(_character, _keys) {
 			if (_key.key === _k) {
 				if(_release)
 					this.recordKey(_k, _key.name);
-				if (/*(_key.type === 'move' || _key.key === ' ') && */this.character.main)
-					sendMessage(JSON.stringify({ c: 'rk', hk: _k, s: this.character.socketId }));
+				// if (/*(_key.type === 'move' || _key.key === ' ') && */this.character.main)
+				// 	sendMessage(JSON.stringify({ c: 'rk', hk: _k, s: this.character.socketId }));
 				index = i;
 				break;
 			}

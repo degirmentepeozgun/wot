@@ -27,7 +27,7 @@ function war() {
 			_content = `<div id="war-match-opponents" class="full flex"></div>
 				<div class="flex full" style="position:absolute">
 					<img class="d-none war-loading" src="./images/icons/war.png" />
-					<div class="flex game-btn2 animate-me" onexactclick="getRef(\'war\')?.match()">MATCH</div>
+					<div class="flex game-btn2 animate-me" onexactclick="getRef(\'war\')?.match()">${getLangData('MATCH').toLocaleUpperCase(getLang())}</div>
 				</div>`;
 		let _html = 
 		`<div data-module="war" class="book-page-wrapper war-container shop-container${_noAnimation ? '' : ' fade-me'}">

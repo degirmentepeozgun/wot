@@ -43,6 +43,19 @@ const __forges = {
 	}
 }
 function getHonorStoreUI(_type) {
+	let _tutorial = {
+			tr: {
+				title: 'Onur Ödülleri',
+				desc: '1v1 Arena veya 3v3 Savaş içeriklerinden kazandığınız onur puanlarını sol kısımda gördüğünüz ekipmanları seçerek kullanabilirsiniz. Öncelikle dövülmesi gereken bu ekipmanlar ödemeyi yaptıktan belli bir süre sonra aktif olur.'
+			},
+			en: {
+				title: 'Honor Items',
+				desc: 'You can spend the honor points you earn from 1v1 Arena or 3v3 War content by selecting the equipment you see on the left. These equipment must be crafted first, and they become active after a certain amount of time has passed.'
+			}
+		};
+		if(!tryShowMenuTutorial('honor'))
+			_tutorial = undefined;
+	let _content = showMenuTutorial(_tutorial, 'honor');
 	updateMenuBottom(4);
 	const _container = selectMenuContainer();
 	_container.innerHTML = 
@@ -60,7 +73,7 @@ function getHonorStoreUI(_type) {
 							<div class="menu-modal-right menu-modal-right-content">
 						<div class="skills-content-right">
 								<div class="skills-content-detail-wrapper honor-items-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">`
-							+ getHonorItemDetailUI(_type ?? Object.keys(_equips)[0], 1, 1) +
+							+ (_content !== '' ? _content : getHonorItemDetailUI(_type ?? Object.keys(_equips)[0], 1, 1)) +
 						`</div>
 					</div>
 				</div>
@@ -86,9 +99,10 @@ function getHonorItemForgePerc(_type) {
 function getHonorItemsUI(_type) {
 	var _items = getRandomItems(4, mainCharacter.class);
 	let html = '<div class="honor-items-list-wrapper">';
+	const _noSelect = tryShowMenuTutorial('honor');
 	for (var _item of _items) {
 		const _perc = getHonorItemForgePerc(_item.type);
-		html += '<div data-key="' + _item.type + '" onexactclick="selectHonorItem(\'' + _item.type + '\')" class="' + (_perc >= 100 ? 'glow ' : '') + 'honor-item-card flex-jc-start flex' + (_item.type === _type ? ' selected' : '') + '">'
+		html += '<div data-key="' + _item.type + '" onexactclick="selectHonorItem(\'' + _item.type + '\')" class="' + (_perc >= 100 ? 'glow ' : '') + 'honor-item-card flex-jc-start flex' + ((_item.type === _type && !_noSelect) ? ' selected' : '') + '">'
 				+ getHonorItemIcon(_item, 1) +
 				'<div style="flex:1"><span class="honor-item-list-title one-line">' + 
 				getItemGradeLetter(4) + ' ' + getLangData('Grade') + ' ' + 

@@ -627,7 +627,7 @@ const __fragments = [
 const _tips = [
 	{ 
 		en: 'You can create sets and gain bonus features by collecting artifacts that may come across in some stories',
-		tr: 'Bazı hikayelerde bulduğunuz eserleri set halinde toplayarak ekstra özellikleri aktif edebilirsiniz'
+		tr: 'Bazı hikayelerde bulduğunuz tılsımlar set halinde toplayarak ekstra özellikleri aktif edebilirsiniz'
 	},
 	{ 
 		en: 'With the passive skill points earned every two levels, you can create the talent tree that best suits your combat model',
@@ -721,7 +721,7 @@ const _sideQuests = [
 ];
 const __storeItems = [
 	{ id: 1, key: 'pot', count: 1, price: 600 },
-	{ id: 2, key: 'pot', count: 5, price: 2500 },
+	{ id: 2, key: 'ticket-pass', count: 1, price: 10000 },
 	{ id: 3, key: 'ticket-item-selection', count: 1, price: 10000 },
 	{ id: 4, key: 'ticket-random', count: 1, price: 10000 },
 	{ id: 5, key: 'chest', count: 1, price: function() {
@@ -2536,6 +2536,7 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	duelrequest: './images/sounds/duel-request.mp3',
 	warselect: './images/sounds/war-select.mp3',
 	warstart: './images/sounds/war-start.mp3',
 	cyclopstag: './images/sounds/cyclops-tag2.mp3',
@@ -3013,11 +3014,11 @@ const __holoMenuItems = [
 	}},
 	{ icon: 'artifact', order:1, subOrder:2, titles: {
 		en: 'Artifact',
-		tr: 'Eser'
+		tr: 'Tılsım'
 	}},
 	{ icon: 'talent', order:2, subOrder:2, titles: {
 		en: 'Talent',
-		tr: 'Yetenek'
+		tr: 'Beceri'
 	}},
 	{ icon: 'achievement',  order:3, subOrder:2, titles: {
 		en: 'Event',
@@ -3031,9 +3032,9 @@ const __holoMenuItems = [
 		en: 'PvP',
 		tr: 'PvP'
 	}},
-	{ icon: 'dungeon', order:6, subOrder:1, titles: {
-		en: 'Dungeon',
-		tr: 'Zindan'
+	{ icon: 'social', order:4, subOrder:3, titles: {
+		en: 'Friend',
+		tr: 'Arkadaş'
 	}},
 	{ icon: 'shop', order:8, subOrder:1, titles: {
 		en: 'Shop',
@@ -13174,7 +13175,7 @@ const spells = {
 							},
 							type: 'fire'
 						},
-						sound: { key: 'minebomb',volume: .5, reset: true },
+						sound: { key: 'minebomb',volume: 1, reset: true },
 					},
 					{
 						spriteLeft: 300,
@@ -26453,7 +26454,7 @@ const cssAnimations = {
 		_container.appendChild(_finger);
 		addClass(_gameUI, 'focus-ui-activated');
 	},
-	black: function (_c, _ms, _text, _func, _delay) {
+	black: function (_c, _ms, _text, _func, _delay, _after) {
 		if(cssAnimationProps.black) {
 			if((_gameTick - cssAnimationProps.black.start) > ((cssAnimationProps.black.p2 ?? _ms ?? 4000) + (_delay ?? 0))) {
 				const _elem = document.querySelector('#css-canvas-foreground');
@@ -26462,6 +26463,8 @@ const cssAnimations = {
 						removeClass(_gameUI, 'd-none');
 						removeClass(_elem, 'black-bg');
 						removeClass(_elem, 'flex');
+						if(_after)
+							_after();
 					}
 				}
 				_elem.innerText = '';
@@ -26492,7 +26495,7 @@ const cssAnimations = {
 			}
 			_elem.innerText = _text ?? '';
 			addClass(_gameUI, 'd-none');
-			cssAnimationProps.black = { start: _gameTick, p1: _c, p2: (_ms ?? 4000) + (_delay ?? 0), p3: _text, p4: _func, p5: _delay };
+			cssAnimationProps.black = { start: _gameTick, p1: _c, p2: (_ms ?? 4000) + (_delay ?? 0), p3: _text, p4: _func, p5: _delay, p6:_after };
 		}
 	},
 	vs: function (_c, _json, _func) {
@@ -27115,7 +27118,7 @@ function ligthenGradientColored(x, y, radius, ctx, _color) {
     ctx.fill();
     ctx.restore();
 }
-function PlaySound(_s, _alternateKeys, _volumeRate) {
+async function PlaySound(_s, _alternateKeys, _volumeRate) {
 	const _hidden = !__account.options.sound || episodeVisibilityHidden || __batterySaveMode;
 	const _hasEnd = _s.end;
 	if((_hidden && !_hasEnd) || (_s?.force ? false : __switchingMap))
@@ -27152,7 +27155,7 @@ function PlaySound(_s, _alternateKeys, _volumeRate) {
 	catch(cex) {
 		console.log(_alternateKeys);
 	}
-	window.SoundManager.play(_soundKey, _s.path, (_hasEnd && _hidden) ? 0 : (_s.volume ?? .1), _s.loop, _s.rate, _s.reset, _s.force, _s.end);
+	return await window.SoundManager.play(_soundKey, _s.path, (_hasEnd && _hidden) ? 0 : (_s.volume ?? .1), _s.loop, _s.rate, _s.reset, _s.force, _s.end, _s.bind);
 }
 function flash(_count, _elem) {
 	setTimeout(function () {
@@ -27418,6 +27421,29 @@ function randRange( minNum, maxNum) {
   return (Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum);
 }
 
+function tryShowMenuTutorial(_key) {
+	if(!__account.menuTutorials)
+		__account.menuTutorials = [];
+	return __account.menuTutorials.indexOf(_key) === -1;
+}
+function showMenuTutorial(_arr, _key) {
+	if(!_arr)
+		return '';
+	const _data = _arr[getLang()];
+	return `<div class="full flex menu-tutorial-content" style="flex-direction:column">
+				<div class="menu-tutorial-header w-100 flex">${_data.title}</div>
+				<div class="menu-tutorial-desc w-100 flex flex-ai-start"><div class="w-100 flex">${_data.desc}</div></div>
+				<div class="menu-tutorial-skip w-100 flex"><div class="flex game-btn2 animate-me" onexactclick="skipMenuTutorial('${_key}')">${getLangData('UNDERSTOOD')}</div></div>
+	</div>`;
+}
+function skipMenuTutorial(_key) {
+	__account.menuTutorials.push(_key);
+	_client.saveState();
+	PlaySound({key:'click'});
+	const _elm = document.querySelector('.menu-sub-button.active.selected');
+	if(_elm)
+		_elm.querySelector('img').onexactclick();
+}
 // function to generate drops
 function createRain(_container) {
 	const _rain = document.createElement('section');
@@ -27623,7 +27649,17 @@ function checkChanceIfOk(_chance) {
 		return true;
 	return getRandomValue2(1, 100) <= _chance;
 }
-
+function getEnemyIdByClass(_class) {
+	switch (_class) {
+		case 'warrior':
+			return '01';
+		case 'archer':
+			return '02';
+		case 'thief':
+			return '03';
+	}
+	return null;
+}
 function clearCanvasCache(_images) {
   for (const key in _images) {
     const canvas = _images[key];

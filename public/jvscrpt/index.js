@@ -1556,8 +1556,7 @@ function createArena(_opponent) {
 			maxLevel: _opponent.level,
 			direction: 'left',
 			name: 'Player',
-			difficulty: 0,
-			yPosition: MathRound(getGroundHeight() / 2)
+			difficulty: 0
 		}];
 		hideMyModalPopUp(1);
 		switchMap(500, 1, function() {
@@ -1574,6 +1573,7 @@ function createArena(_opponent) {
 				resetSkills(null, null, x);
 				x.alp = 1;
 				x.setHealth(x.getMaxHP());
+				x.yPosition = MathRound(getGroundHeight() / 2);
 				_enemyProfile.innerHTML = avatarTemplate(x);
 			});
 		});

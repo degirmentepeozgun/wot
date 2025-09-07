@@ -317,7 +317,13 @@ const __langData = [
 	{ key: 'Add Friend', tr: 'Arkadaş Ekle'},
 	{ key: 'Remove Friend', tr: 'Arkadaşlıktan Kaldır'},
 	{ key: 'Event', tr: 'Etkinlik'},
+	{ key: 'Online', tr: 'Çevrimiçi'},
+	{ key: 'Available', tr: 'Müsait'},
+	{ key: 'Busy', tr: 'Meşgul'},
+	{ key: 'Duel', tr: 'Düello'},
 	{ key: 'Done', tr: 'Anladım' },
+	{ key: 'UNDERSTOOD', tr: 'ANLADIM' },
+	{ key: 'REFRESH', tr: 'YENİLE' },
 	{ key: 'Battery Save Mode', tr: 'Pil Tasarrufu Modu' },
 	{ key: 'Name can\'t be empty', tr: 'İsim boş geçilemez' },
 	{ key: 'grade talisman, adds bonus attributes when you combine with other set pieces', tr: 'seviye tılsım, diğer set parçaları ile kombinlendiğinde size ekstra güç verir' }

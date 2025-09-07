@@ -874,8 +874,8 @@ function openGemItemInfoModal(_type, _grade) {
     var _html = `<div class="full flex item-info-container-parent menu-modal-right">
         <div class="full flex item-info-container">
             <div style="height:22%;width:100%;padding:6% 10% 2% 10%" class="flex">
-                <div style="height:80%;aspect-ratio:1/1;position:relative">
-                    <img src="./images/gems/${_type}${_grade}.png" class="full" />
+                <div style="height:90%;aspect-ratio:1/1;position:relative">
+                    <img src="./images/gems/${_type}${_grade}.png" class="full glow-${_type}" />
                 </div>
                 <div style="height:80%;flex:1" class="flex flex-jc-start">
                     <div class="one-line" style="padding-left:6%;font-size:3vh !important;font-weight:600;color:#F4BB44 !important">${_grade > 0 ? getLangData('Grade').toLocaleUpperCase(getLang()) + ' ' + _grade + ' ' : ''}${_item.titles[getLang()].toLocaleUpperCase(getLang())}</div>
@@ -1080,6 +1080,31 @@ function applyCharacterStats(hasMainCharacter, _char) {
         _c.setHealth(_c.MAXHP, 0, 0, 13);
     else
         _c.setHealth(_c.health, 0, 0, 14);
+}
+function applyDefaultCharacterStats(_c) {
+    _c.atk = 50;
+    _c.critRate = 5;
+    _c.critDmgRate = 0;
+    _c.stealRate = 0;
+    _c.fireDmg = 0;
+    _c.lightningDmg = 0;
+    _c.toxicDmg = 0;
+    _c.iceDmg = 0;
+    _c.shadowDmg = 0;
+    _c.def = 50;
+    _c.critResistRate = 0;
+    _c.critDmgResistRate = 0;
+    _c.fireResistRate = 0;
+    _c.lightningResistRate = 0;
+    _c.toxicResistRate = 0;
+    _c.iceResistRate = 0;
+    _c.shadowResistRate = 0;
+    _c.health = _c.hp = _c.maxHP = 2000;
+    _c.luckRate = 0;
+    _c.goldGainRate = 0;
+    _c.pierceRate = 0;
+    _c.resilienceRate = 0;
+    _c.fatique = _c.maxFatique = 100;
 }
 function getItemGradeLetter(_grade) {
     switch(_grade) {
@@ -1764,7 +1789,7 @@ function closeInventoryQuestionModal(_noSound) {
     var _qm = document.querySelector('.inventory-question');
     if(_qm) {
         if(!_noSound)
-            episode.playSound({ key: 'click' });
+            PlaySound({ key: 'click' });
         _qm.remove();
     }
 }

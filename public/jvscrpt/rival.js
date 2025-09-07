@@ -42154,58 +42154,7 @@ const _allEnemies = {
 						bottomGap: -5
 					}
 				, { key: 'werewolfhurt', volume: .3, reset: true }
-			),
-				
-				// {
-				// 	key: 'hurtground1',
-				// 	type: 'skill',
-				// 	hurt: 'ground',
-				// 	frames: [
-				// 		{
-				// 			spriteLeft: 3316 * 1.5,
-				// 			spriteTop: 1020 * 1.5,
-				// 			spriteWidth: 142 * 1.5,
-				// 			spriteHeight: 122 * 1.5,
-				// 			spriteOrigin: 70 * 1.5,
-				// 			speed: 1
-				// 		},
-				// 		{
-				// 			spriteLeft: 3316 * 1.5,
-				// 			spriteTop: 1020 * 1.5,
-				// 			spriteWidth: 142 * 1.5,
-				// 			spriteHeight: 122 * 1.5,
-				// 			spriteOrigin: 70 * 1.5,
-				// 			sound: { key: 'werewolfhurt', volume: .3, reset: true },
-				// 			speed: 1
-				// 		},
-				// 		{
-				// 			spriteLeft: 3316 * 1.5,
-				// 			spriteTop: 1020 * 1.5,
-				// 			spriteWidth: 142 * 1.5,
-				// 			spriteHeight: 122 * 1.5,
-				// 			spriteOrigin: 70 * 1.5,
-				// 			speed: 18
-				// 		},
-				// 		{
-				// 			spriteLeft: 1381,
-				// 			spriteTop: 1567,
-				// 			spriteWidth: 219,
-				// 			spriteHeight: 153,
-				// 			spriteOrigin: 110,
-				// 			speed: 20,
-				// 			bottomGap: -5
-				// 		},
-				// 		{
-				// 			spriteLeft: 778,
-				// 			spriteTop: 1567,
-				// 			spriteWidth: 223,
-				// 			spriteHeight: 153,
-				// 			spriteOrigin: 113,
-				// 			speed: 20,
-				// 			bottomGap: -5
-				// 		}
-				// 	]
-				// },
+				),
 				block: {
 					key: 'block',
 					type: 'skill',

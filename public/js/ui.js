@@ -501,10 +501,12 @@ function loadUI() {
 					if(episode && episode.bgSound)
 						episode.pauseAmbianceMusic();
 					mainCharacter.stopHeartBeatSound();
+					mainCharacter.stopStepSound();
 					if(episode.hasGoSound)
 						episode.stopGoSound();	
 					episodeVisibilityHidden = true;
 				} else {
+					reconnectSocket();
 					if(_lastGameTick){
 						const _diff = (Date.now() - _lastGameTick);
 						_extraTick += _diff;
@@ -535,6 +537,7 @@ function loadUI() {
 				if(episode && episode.bgSound)
 					episode.pauseAmbianceMusic();
 				mainCharacter.stopHeartBeatSound();
+				mainCharacter.stopStepSound();
 				if(episode.hasGoSound)
 					episode.stopGoSound();
 				episodeVisibilityHidden = true;
@@ -547,6 +550,7 @@ function loadUI() {
 		});
 		document.addEventListener("resume", () => {
 			try{ 
+				reconnectSocket();
 				if(_lastGameTick){
 					const _diff = (Date.now() - _lastGameTick);
 					_extraTick += _diff;
@@ -769,6 +773,7 @@ function activateTouchPad() {
 
 let _toastWrappers = [], _lastToastHtml;
 function warn(_html, _class, _ms, _new, _buttons, _important) {
+	const _hasButton = _buttons?.[0]?.text;
 	let _toast, _toastWrapper;
 	if(_toastWrappers?.find(x => x.isImportant))
 		return;
@@ -795,7 +800,7 @@ function warn(_html, _class, _ms, _new, _buttons, _important) {
 		const _rand = Math.random();
 		_toastWrapper = document.createElement('div');
 		_toastWrapper.id = 'toast-wrapper-'+ _rand;
-		_toastWrapper.className = 'toast-wrapper show-ui flex fade-start' + _extraClassW;
+		_toastWrapper.className = 'toast-wrapper' + (_hasButton ? ' need-action' : '') + ' show-ui flex fade-start' + _extraClassW;
 		_toast = document.createElement('div');
 		_toast.id = 'toast';
 		_toast.className = 'fade-start flex my-toast' + _extraClass;
@@ -808,7 +813,7 @@ function warn(_html, _class, _ms, _new, _buttons, _important) {
 	}
 	else {
 		_toastWrapper = _toastWrappers[_toastWrappers.length - 1];
-		_toastWrapper.className = 'toast-wrapper show-ui flex' + _extraClassW;
+		_toastWrapper.className = 'toast-wrapper' + (_hasButton ? ' need-action' : '') + ' show-ui flex' + _extraClassW;
 		_toast = _toastWrapper.firstElementChild;
 		_toast.className = 'my-toast flex' + _extraClass;
 		if (_class)
@@ -819,7 +824,22 @@ function warn(_html, _class, _ms, _new, _buttons, _important) {
 		}
 	}
 	_toast.innerHTML = _lastToastHtml = _html;
-	if(_buttons?.[0]?.text) {
+	let _t = _toastWrapper, _HTML = _html;
+	const _tid = _t.id;
+	const closeToast = function() {
+		try {
+			if(_HTML === _lastToastHtml)
+				_lastToastHtml = undefined;
+			if(_t) {
+				_t.remove();
+				_t = null;
+			}
+			_toastWrappers.find(x => x?.id === _tid).remove();
+			_toastWrappers = _toastWrappers.filter(x => x && x.id !== _tid) ?? [];
+		}
+		catch (twex) { }
+	}
+	if(_hasButton) {
 		const _btnsWrapper = document.createElement('div');
 		_btnsWrapper.style.width = '100%';
 		_btnsWrapper.className = 'flex';
@@ -827,29 +847,22 @@ function warn(_html, _class, _ms, _new, _buttons, _important) {
 			const _b = document.createElement('div');
 			_b.className = 'game-btn flex';
 			_b.innerText = _btn.text;
-			_b.onexactclick = _btn.func;
+			_b.onclick = function() {
+				_btn.func();
+				closeToast();
+			}
 			_btnsWrapper.appendChild(_b);
 		}
 		_toast.appendChild(_btnsWrapper);
 	}
 	if (!_toastWrapper.timer) {
-		let _t = _toastWrapper, _HTML = _html;
 		_toastWrapper.timer = setTimeout(function () {
+			if(!_t)
+				return;
 			addClass(_toast, 'fade-end');
 			addClass(_t, 'fade-end');
-			const _tid = _t.id;
 			_t.addEventListener('animationend', function() {
-				try {
-					if(_HTML === _lastToastHtml)
-						_lastToastHtml = undefined;
-					if(_t) {
-						_t.remove();
-						_t = null;
-					}
-					_toastWrappers.find(x => x?.id === _tid).remove();
-					_toastWrappers = _toastWrappers.filter(x => x && x.id !== _tid) ?? [];
-				}
-				catch (twex) { }
+				closeToast();
 			}, false);
 		}, (_ms ?? 1800) + 500);
 	}
@@ -892,6 +905,8 @@ function resetSkills(_ultimate, _keepCD, _char, _k) {
 	const _keys = _k ? [_k] : Object.keys(_animations);
 	for (var _key of _keys) {
 		const _skill = _animations[_key];
+		if(_c.ultimateUsed && _skill.delay)
+			continue;
 		if (_skill.next)
 			_skill.next = _skill.realNext;
 		const _characterSkill = _c.skills[_skill.key];
@@ -992,7 +1007,7 @@ function resetSkills(_ultimate, _keepCD, _char, _k) {
 			else
 				addClass(document.getElementById('skill12'), 'v-none');
 		}
-		else
+		else if(!_ultimate)
 			_c.startCooldown(_c.animations.tag, null, 1);
 	}
 }

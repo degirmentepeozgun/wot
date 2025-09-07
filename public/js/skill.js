@@ -737,6 +737,19 @@ function characterSkill() {
 			this.getPassiveSkillUI(1);
 	}
 	this.getSkillUI = function (_class) {
+		let _tutorial = {
+			tr: {
+				title: 'Yetenekler',
+				desc: 'Seçilen karaktere göre değişen yetenekler karakterinizin seviyesine göre aktif olur. Yine karakterinizin seviyesine oranla geliştirilen yetenekler belli bir altın bedeli karşılığında güçlendirilir. Soldaki listeden seçtiğiniz yeteneğin açıklamasında etkisinin ne kadar güçlü olduğu ve hasar puanları ile sonraki seviyede oluşturacağı hasar puanını takip edebilir geliştirme stratejinizi bu bilgiler üstüne kurabilirsiniz.'
+			},
+			en: {
+				title: 'Skills',
+				desc: 'Abilities vary depending on the character you choose, and are activated based on your character\'s level. Abilities that are developed based on your character\'s level are also enhanced for a certain gold cost. You can track the strength of the ability you select from the list on the left, its damage rating, and the damage it will inflict at the next level. You can build your development strategy based on this information.'
+			}
+		};
+		if(!tryShowMenuTutorial('skill'))
+			_tutorial = undefined;
+		let _content = showMenuTutorial(_tutorial, 'skill');
 		updateMenuBottom(1);
 		const _container = selectMenuContainer();
 		_container.innerHTML = 
@@ -753,7 +766,7 @@ function characterSkill() {
 						'<div class="menu-modal-right menu-modal-right-content">' +
 							'<div class="skills-content-right">' +
 								'<div class="skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">' +
-									this.getSkillDetailUI(_class, 1, 1) +
+									(_content !== '' ? _content : this.getSkillDetailUI(_class, 1, 1)) +
 								'<div id="shine"></div>' +
 							'</div>' +
 						'</div>' +
@@ -763,12 +776,13 @@ function characterSkill() {
 	this.getSkillsUI = function (_class, _order) {
 		const _skills = this.allSkills.filter(x => x.class === _class && x.list !== false)?.sort((a, b) => a.order - b.order);
 		let html = '';
+		const _noSelect = tryShowMenuTutorial('skill');
 		if (_skills) {
 			let _i = 0;
 			for (var _skill of _skills) {
 				const _active = _skill.unlockLevel <= mainCharacter.level;
 				let _level = !_active ? 0 : _skill.level ?? 1;
-				html += '<div data-key="'+_skill.key+'" onexactclick="skill.selectSkill(\'' + _skill.key + '\', ' + _i + ')" class="skill-card animate-me flex' + ((_i + 1) === _order ? ' selected' : '') + '">' +
+				html += '<div data-key="'+_skill.key+'" onexactclick="skill.selectSkill(\'' + _skill.key + '\', ' + _i + ')" class="skill-card animate-me flex' + (((_i + 1) === _order && !_noSelect) ? ' selected' : '') + '">' +
 					'<div class="skill-icon-wrapper flex"><img src="./images/main/skill-icons/' + _class + '/' + _skill.key + '.png" /></div>' +
 					'<div style="flex:1;height:100%">' +
 					'<div class="flex flex-jc-start skill-card-title" style="height:50%;width:100%">' + _skill.names[getLang()] + '</div>' +

@@ -1,8 +1,22 @@
 ﻿'use strict';
 console.log('talent')
 function talent() {
+	this.key = 'talent';
+	this.tutorial = {
+		tr: {
+			title: 'Pasif Beceriler',
+			desc: 'Solda görmekte olduğunuz beceri ağacı üzerinde her 2 seviye atladığınızda bir kazandığınız beceri puanlarını kullanabilirsiniz. Her yaptığınız puanlama, puanladığınız daldan çıkan yol veya yolların ulaştığı becerileri aktif eder. Bazı beceriler defalarca puanlanabilir. Oyun stilinize göre kombine edip istediğinizde sıfırlayabilirsiniz.'
+		},
+		en: {
+			title: 'Passive Talents',
+			desc: 'You can use the skill points you earn every two levels you gain on the skill tree shown on the left. Each point you earn activates the skills accessed by the path(s) leading from that branch. Some skills can be scored multiple times. You can combine them to suit your play style and reset them whenever you like.'
+		}
+	};
+	if(!tryShowMenuTutorial(this.key))
+		this.tutorial = undefined;
 	this.render = function(_noAnimation, _id) {
 		updateMenuBottom(1);
+		let _content = showMenuTutorial(this.tutorial, this.key);
 		const _container = selectMenuContainer();
 		const _char = __account.characters.find(x => x.class === mainCharacter.class);
 		_container.innerHTML = 
@@ -26,12 +40,14 @@ function talent() {
 		<div data-module='talent' class="menu-ui-right${_noAnimation ? '' : ' fade-me'}">
 			<div class="menu-modal-right menu-modal-right-content">
 				<div class="skills-content-right talent-content-right">
-					<div class="skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">
-					</div>
+					<div class="skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">`
+					+ _content +
+					`</div>
 				</div>
 			</div>
 		</div>`;
-		this.selectTalent(_id, null, _noAnimation);
+		if(_content === '')
+			this.selectTalent(_id, null, _noAnimation);
 	}
 	this.getTalents = function() {
 		let html = '', i = 0;

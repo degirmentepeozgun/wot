@@ -82,6 +82,7 @@ function getLobbyScene() {
 					mainCharacter.disableKeyboard = mainCharacter.immobilize = true;
 					mainCharacter.animate('idlelobby',1);
 				}
+				resetOnlineDetection();
 			},
 			afterInit: function() {
 				mainCharacter.yPosition = MathRound(getGroundHeight() * 1.3);
@@ -1206,9 +1207,9 @@ const __stories = [
 							removeCoopCharacter();
 							episode.enemies.filter(x => x.alp).forEach(x => x.remove = true);
 							setTimeout(() => {
-								__storyTell = new story(1, function() {
+								__storyTell = new story(1, null, null, 'Two prisoners waiting for death in the dungeon managed to escape among these ruins', function() {
 									installStoryFinish();
-								}, null, 'Two prisoners waiting for death in the dungeon managed to escape among these ruins');
+								});
 							}, 100);
 						}
 					},
@@ -2809,9 +2810,9 @@ const __stories = [
 				maps: [36],
 				complete: function() {
 					setTimeout(() => {
-						__storyTell = new story(4, function() {
+						__storyTell = new story(4, null, null, 'Everything needed for the potion recipe was ready. Our heroes hoped it would work', function() {
 							installStoryFinish();
-						}, null, 'Everything needed for the potion recipe was ready. Our heroes hoped it would work');
+						});
 					}, 100);
 				},
 				done: function() {
@@ -3164,7 +3165,7 @@ const __stories = [
 								_finishes++;
 								if(_finishes === _l) {
 									stopQuake();
-									cssAnimations.black(null, 3000, getLangData('Village people move to a safe place'), function() {
+									cssAnimations.black(null, 3000, getLangData('Village people move to a safe place'), null, null, function() {
 										installStoryFinish();
 									});
 								}
@@ -4736,7 +4737,7 @@ const __stories = [
 						}
 						const _rider = summonMob(35, getRandomValue2(2000, 5000));
 						_rider.experience = 0;
-						const _flower = summonMob(46, getRandomValue2(2000, 5000));
+						const _flower = summonMob(46, getRandomValue2(4000, 4500));
 						_flower.experience = 0;
 						_flower.direction = 'left';
 						_flower.yPosition = MathRound(getGroundHeight() / 2);
@@ -4999,7 +5000,7 @@ function installStory(_order, _func, _isFirstStart,  _goldSelected, _expSelected
 	// }
 }
 var __storyTell;
-function story(_id, _func, _noBlack, _desc) {
+function story(_id, _func, _noBlack, _desc, _after) {
 	this.data = {
 		st1: [
 			{ text: '', ms: 0, w: '37%' },
@@ -5057,7 +5058,7 @@ function story(_id, _func, _noBlack, _desc) {
 		this.container = _inner;
 		this.wrapper = _wrapper;
 		if(!_noBlack)
-			cssAnimations.black(null, this.data['st' + this.id].find(x => x.finish).ms - 400, '', _func);
+			cssAnimations.black(null, this.data['st' + this.id].find(x => x.finish).ms - 400, '', _func, null, _after);
 	}
 	this.render = function() {
 		const i = this.order;
@@ -5310,6 +5311,7 @@ function createStoryResultScreen(_failed) {
 		episode.pauseBgMusic(1);
 		episode.pauseAmbianceMusic();
 		mainCharacter.stopHeartBeatSound();
+		mainCharacter.stopStepSound();
 		// for(let i = 0; i < __story.resultStars.length; i++)
 		// 	if(isMissionFailed(i))
 		// 		__story.resultStars[i].failed = true;
@@ -5489,8 +5491,21 @@ function createStoryUI(_id) {
 			renderMainQuests();
 			return;
 		}
+		let _tutorial = {
+			tr: {
+				title: 'Hikaye Modu',
+				desc: 'Kahramanlarımız, 4 perdeden ve her perde 10 görevden oluşan bir hikayeyi deneyimler. Görevler sırasında başarıya ulaştıkça ödüller kazanılır ve biletler kullanılarak bu ödüller ikiye katlanabilir. Bazı düşmanlar parçacık, bazı bölümler ise ekipman güçlendirmeye yarayan mücevherler sunar. Bölümler tekrar oynanabilir veya hızlı geçiş için otomatik tamamlama biletleri kullanılabilir. Her görev “Geçit” malzemesi gerektirir; oyun başlangıçta 100 adet verir ve stok azaldığında sistem düzenli olarak yeniler.'
+			},
+			en: {
+				title: 'Story Mode',
+				desc: 'Our heroes navigate a sequential storyline consisting of quests. This story consists of four acts, each with 10 quests. You can double your rewards by completing the required achievements and using tickets. Some enemies encountered during the quests reward you with fragments, while others reward you with gems that you can use to enhance your equipment. You can replay the quests or speed through them using auto-complete tickets. Each quest requires a certain amount of "Pass" materials. The game initially gives you 100 of these materials, but if you fall below 100, the system periodically rewards you with them.'
+			}
+		};
+		if(!tryShowMenuTutorial('story'))
+			_tutorial = undefined;
 		updateMenuBottom(2);
 		const _container = selectMenuContainer();
+		let _content = showMenuTutorial(_tutorial, 'story');
 		if(!_id)
 			_id = __stories.find(x => x.list).id;
 		_container.innerHTML =
@@ -5507,7 +5522,7 @@ function createStoryUI(_id) {
 						'<div class="menu-modal-right menu-modal-right-content">' +
 							'<div class="stories-content-right skills-content-right">' +
 								'<div class="skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">' +
-									createStoryDetailUI(_id ?? 1, 1, 1) +
+									(_content !== '' ? _content : createStoryDetailUI(_id ?? 1, 1, 1)) +
 								'<div id="shine"></div>' +
 							'</div>' +
 						'</div>' +
@@ -5519,6 +5534,8 @@ function createStoriesUI(_id) {
 	if(!_id)
 		_id = 1;
 	_uiSelectedStoryId = _id;
+	unselectStoryTickets();
+	const _noSelect = tryShowMenuTutorial('story');
 	for (var _s of __stories) {
 		if(!_s.list)
 			continue;
@@ -5532,7 +5549,7 @@ function createStoriesUI(_id) {
 		// 				'<div class="flex flex-jc-start skill-card-state">' + getLangData('Unlock') + ':&nbsp;<span style="color:#ff6c00 !important">' + getLangData('Level') + ' ' + _skill.unlockLevel + '</span></div>') +
 		// 			'</div>' +
 		// 			'</div>';
-		_html += `<div id="story-${_s.id}" onexactclick="selectStoryUI(${_s.id})" class="skill-card flex animate-me${_s.id === _id ? ' selected' : ''}">
+		_html += `<div id="story-${_s.id}" onexactclick="selectStoryUI(${_s.id})" class="skill-card flex animate-me${(_s.id === _id && !_noSelect) ? ' selected' : ''}">
 			<div class="skill-icon-wrapper flex">
 				<img src="./images/main/${_s.boss}/concept.png" />
 			</div>

@@ -943,6 +943,7 @@ function declareAccountName() {
 	_navbar.innerHTML = avatarTemplate(mainCharacter);
 	episode.drawSpriteObjects();
 	episode.playAmbianceMusic();
+	connectSocket();
 }
 function playCutScene(_id, _order, _func) {
 	const _first = _order === undefined;

@@ -17,6 +17,11 @@ function pvp() {
 				_client.saveState();
 				this.getPlayStatus();
 				createArena(_opponent);
+				const _noSelect = tryShowMenuTutorial('duel');
+				if(_noSelect) {
+					__account.menuTutorials.push('duel');
+					_client.saveState(1);
+				}
 			}
 			else {
 				warn('<span>' + getLangData('Duel limit reached') + '</span>', 'warn');
@@ -78,6 +83,19 @@ function pvp() {
 		_container.innerHTML = _html + '</div></div>';
 	}
 	this.render = function() {
+		let _tutorial = {
+			tr: {
+				title: 'PVP Duello',
+				desc: 'Seviye 10 ve sonrasında kullanabileceğiniz bu içerikte düşmanları yapay zeka yönlendirir. Belli bir sıralamanın olduğu bu serüvene başlarken alt ligde ve sıralarda başlarsınız ve kazandıkça galip geldiğiniz rakibiniz ile sıralamanız değiştirilir. Bulunduğunuz sıraya göre lig değişir. Lig kalitesi arttıkça o ligde karşılaşacağınız rakiplerin de gücü artar. Her galibiyet başına onur puanı kazanırsınız.'
+			},
+			en: {
+				title: 'PVP Duel',
+				desc: 'Available at level 10 and above, this content features AI-guided enemies. You\'ll begin this quest with a specific ranking, starting in a lower league and ranked position. As you win, your ranking is adjusted based on your victories. The league changes based on your current rank. As the league\'s quality increases, so too do the opponents you face within it. You earn honor points for each victory.'
+			}
+		};
+		if(!tryShowMenuTutorial('duel'))
+			_tutorial = undefined;
+		let _content = showMenuTutorial(_tutorial, 'duel');
  		updateMenuBottom(4);
 		let _league = 'Bronze';
 		if(__account.pvp.order === undefined)
@@ -89,7 +107,9 @@ function pvp() {
 		_container.innerHTML =
     	`<div class="pvp-content-left menu-ui-left fade-me"><div class="pvp-content-left-content menu-modal-left menu-modal-left-content"></div></div>
 			<div class="pvp-content-right menu-ui-right fade-me"><div class="pvp-content-right-content menu-modal-right menu-modal-right-content"><div class="skills-content-right">
-			<div class="honor-content-detail-wrapper menu-modal-right-container"><div style="justify-content:center" class="me-container flex">
+			<div class="honor-content-detail-wrapper menu-modal-right-container">`
+			+ (_content !== '' ? _content :
+			`<div style="justify-content:center" class="me-container flex">
 				<div style="height:100%;aspect-ratio:110/365;position:relative;z-index:10">
 					<img loading="lazy" src="./images/ui/border-left.png" style="max-width:120%;max-height:120%;position:relative;right:-20%;top:-10%;z-index:10" />
 				</div>
@@ -116,8 +136,9 @@ function pvp() {
 				<div class="w-50 flex flex-jc-start">${getLangData('Total Power')}</div>
 				<div class="flex w-50 flex-jc-end">${getTotalPower()?.total?.formatWithDots()}</div>
 			</div>
-			<div class="flex pvp-info-4 w-100"></div>
-			</div>
+			<div class="flex pvp-info-4 w-100"></div>`)
+			+
+			`</div>
 			</div>
 		</div></div></div>`;
 
@@ -129,6 +150,8 @@ function pvp() {
 	this.getPlayStatus = function() {
 		const _container = document.querySelector('.pvp-info-2');
 		const _container4 = document.querySelector('.pvp-info-4');
+		if(!_container4)
+			return;
 		if(mainCharacter.level < this.unlockLevel) {
 			_container.innerHTML = '<div class="w-50 flex flex-jc-start">' + getLangData('Active Duel') + '</div><div class="flex flex-jc-end w-50">-</div>';
 			return;

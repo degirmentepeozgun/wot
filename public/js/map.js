@@ -340,12 +340,12 @@ function map(_m) {
 			this.enemies.push(_enemy);
 			if (_func)
 				_func(_enemy);
-			if((this.dungeon || this.pvp) && mainCharacter.leader) 
-			{
-				_enemy.socketId = (this.enemies.filter(x => x.socketId < 1000).map(x => x.socketId).sort().slice(-1)[0] ?? 0) + 1;
-				_enemy.station = mainCharacter.socketId;
-				//_enemy.getNewStatus(1, 1);
-			}
+			// if((this.dungeon || this.pvp) && mainCharacter.leader) 
+			// {
+			// 	_enemy.socketId = (this.enemies.filter(x => x.socketId < 1000).map(x => x.socketId).sort().slice(-1)[0] ?? 0) + 1;
+			// 	_enemy.station = mainCharacter.socketId;
+			// 	//_enemy.getNewStatus(1, 1);
+			// }
 			if(_mob.do)
 				_mob.do(_enemy);
 			if(_mob.targetKey) {
@@ -1043,7 +1043,7 @@ function map(_m) {
 						<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(null, __storySceneOrder)">${getLangData('QUIT')}</div>
 					</div>
 					<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
-						<div class="game-menu-button btn-info full flex animate-me${!__account.pvp.duelCount ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(function() { switchBookPage(5, 1); }, __storySceneOrder)">${getLangData('BACK')}</div>
+						<div class="game-menu-button btn-info full flex animate-me${!__account.pvp.duelCount ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(function() { switchBookPage(` + (this.realTime ? '4,3' : '5,1') + `); }, __storySceneOrder)">${getLangData('BACK')}</div>
 					</div>
 				</div>`;
 			}
@@ -1411,7 +1411,8 @@ function map(_m) {
 					//__account.pvp.honor++;
 					updateGlobalQuest('pvp-win');
 					const _oldOrder = __account.pvp.order;
-					__account.pvp.order = this.pvpOrder;
+					if(this.pvpOrder)
+						__account.pvp.order = this.pvpOrder;
 					const _newOrder = __account.pvp.order;
 					if((_oldOrder > 10000 && _newOrder < 10000) ||
 						(_oldOrder > 5000 && _newOrder < 5000) ||
@@ -1431,7 +1432,7 @@ function map(_m) {
 						<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(null, __storySceneOrder)">${getLangData('QUIT')}</div>
 					</div>
 					<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
-						<div class="game-menu-button btn-info full flex animate-me${!__account.pvp.duelCount ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(function() { switchBookPage(5, 1); }, __storySceneOrder)">${getLangData('BACK')}</div>
+						<div class="game-menu-button btn-info full flex animate-me${!__account.pvp.duelCount ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(function() { switchBookPage(` + (this.realTime ? '4,3' : '5,1') + `); }, __storySceneOrder)">${getLangData('BACK')}</div>
 					</div>
 				</div>`;
 			}
@@ -1447,6 +1448,8 @@ function map(_m) {
 			});
 			this.pvpEnded = true;
 			switchAutoMode(1);
+			if(this.realTime)
+				_rewards = [];
 			installStoryFinish(_status === 2 ? 0 : (_status === 1 ? 2 : 1), _rewards, _table);
 		}
 	}
@@ -1590,6 +1593,11 @@ function map(_m) {
 					if (_bubble)
 						removeBubble(_bubble, sprite);
 					if(!this.war || sprite.owner || sprite.class === __spell) {
+						const spriteAnima = sprite.getCurrentAnimation();
+						if(spriteAnima.sound?.stop){
+							spriteAnima.sound.stop();
+							delete spriteAnima.sound;
+						}
 						this.enemies.splice(i, 1);
 						i--;
 						_len--;
@@ -1613,9 +1621,24 @@ function map(_m) {
 				if (!sprite.located && sprite.animations.run)
 					sprite.located = true;
 				if (!episode.end || (episode.end && sprite.class !== __spell))
-					if (!sprite.unseen || sprite.started || sprite.station || (this.pvp || this.dungeon))
+					if (!sprite.unseen || sprite.started || sprite.socketId || (this.pvp || this.dungeon))
 						sprite.draw(_queue);
 			}
+		if(this.realTime && !this.pvpEnded && !__switchingMap)
+		{
+			let _dataItem;
+			if(!mainCharacter.firstTransferDone){
+				_dataItem = mainCharacter.getNewStatus2(1);
+				mainCharacter.firstTransferDone = 1;
+			}
+			else
+				_dataItem = mainCharacter.getNewStatus2(0, (msNow - mainCharacter.lastSyncDate) > 999);
+			if(!_dataItem)
+				return;
+			//_dataItem.e = this.roomId;
+			_dataItem.s = __socketId;
+			setTransferMessage([_dataItem]);
+		}
 	}
 	this.drawBGAnimations = function () {
 		return;
@@ -2124,7 +2147,7 @@ function map(_m) {
 		}
 	}
 	this.playSound = function (_s, _alternateKeys, _volumeRate) {
-		PlaySound(_s, _alternateKeys, _volumeRate);
+		return PlaySound(_s, _alternateKeys, _volumeRate);
 		return undefined;
 		let _sound = getSound(null, _soundKey);
 		let _play = _s?.reset;
@@ -2509,25 +2532,7 @@ function map(_m) {
 		}
 	}
 	this.hurtSprites = {}, this.hurtRelSprites = {};
-	const alphaLevels = [1]; // [.35, .65, 1];
-
-	this.snapAlpha = function(value) {
-		return 1;
-		let closest = alphaLevels[0];
-		let minDiff = MathAbs(value - closest), minDiffFound;
-		for (let i = 1; i < alphaLevels.length; i++) {
-			const diff = MathAbs(value - alphaLevels[i]);
-			if (diff < minDiff) {
-				minDiff = diff;
-				closest = alphaLevels[i];
-				minDiffFound = 1;
-			}
-			else if(minDiffFound)
-				return closest;
-		}
-		return closest;
-	}
-	this.colorizeSprite4 = function (_item, _col) {
+	this.colorizeSprite4 = function (_item, _col, _force) {
 		let _opc = .01;
 		// switch (_item?.char?.hurting?.count) {
 		// 	case 5: case 4: case 3:
@@ -2542,7 +2547,7 @@ function map(_m) {
 		let _color;
 		if (_item?.char?.hurting?.hit) {
 			delete _item.char.hurting.hit;
-			_color = `rgba(255,255,255,${this.snapAlpha(_opc)})`;
+			_color = `rgba(255,255,255,${_force ? _opc : 1})`;
 		} else {
 			const base = _col ?? _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
 			if (base.startsWith('#') && base.length >= 7) {
@@ -2551,7 +2556,7 @@ function map(_m) {
 				let b = parseInt(base.slice(5, 7), 16);
 				if(base.length === 9)
 					_opc = parseInt(base.slice(7, 9), 16) / 255;
-				_color = `rgba(${r},${g},${b},${this.snapAlpha(_opc)})`;
+				_color = `rgba(${r},${g},${b},${_force ? _opc : 1})`;
 			} else
 				_color = base;
 		}
@@ -2613,7 +2618,7 @@ function map(_m) {
 			let b = parseInt(base.slice(5, 7), 16);
 			if(base.length === 9)
 				_opc = parseInt(base.slice(7, 9), 16) / 255;
-			_color = `rgba(${r},${g},${b},${this.snapAlpha(_opc)})`;
+			_color = `rgba(${r},${g},${b},1)`;
 		} 
 		else
 			_color = base;
@@ -2767,7 +2772,7 @@ function map(_m) {
 			cGore.clearRect(0, 0, this.cWidth, this.cHeight);
 			offGoreCtx.clearRect(0, 0, this.cWidth, this.cHeight);
 		}
-		let _hasShadow, _hasDmg, _hasLeftEnemy, _hasRightEnemy;
+		let _hasDmg, _hasLeftEnemy, _hasRightEnemy, _shadowItems;
 		for (var _item of _queue) {
 			if(_item.char.autoTarget && !_item.char.invulnerable && !_item.char.friendly && !_item.char.puppetMode && (_item.unseen || _item.char.unseen) && _item.char.enemy && _item.char.class !== __spell && _item.char.class !== 'object' && !_item.char.isDead() && 
 		_item.char.autoTarget === mainCharacter)
@@ -2782,8 +2787,6 @@ function map(_m) {
 			}
 			if(_item.unseen || _item.char.unseen)
 				continue;
-		 	if (!_hasShadow && _item.shadow)
-		 		_hasShadow = true;
 			if(!_hasDmg && (_item.char.hurting?.count > 0 || _item.skinColor))
 				_hasDmg = true;
 			if (!_item.unseen && _item.char?.shadow && !_item.char.unseen) {
@@ -2837,7 +2840,7 @@ function map(_m) {
 				_item.char.hurting.count = 0;
 			}
 			_flash = _hurt; // && (!_item.char.lastHurtTime || ((_gameTick - _item.char.lastHurtTime) > 200));
-			//_shadowItems = [];
+			_shadowItems = [];
 			// if(_flash || _item.skinColor)
 			// {
 			// }
@@ -2850,6 +2853,14 @@ function map(_m) {
 			// 		_shadowItems.push(_item.char.shadowData?.[shadowindex] ?? _item);
 			// 	}
 			// }
+			if (__account.options.effect && _item.char.shadowData?.length > 0 && 
+			!_item.char.unseen && !_hurt) {
+				for (var shadowindex = 0; shadowindex < (_item.char.shadowData?.length ?? 1); shadowindex++) {
+					if ((shadowindex % (_item.char.shadowIndex ?? 2)) > 0)
+						continue;
+					_shadowItems.push(_item.char.shadowData?.[shadowindex] ?? _item);
+				}
+			}
 			if (_hurt){
 				_item.char.hurting.count--;
 				if(_item.char.hurting.count <= 0)
@@ -2869,22 +2880,22 @@ function map(_m) {
 					_hDiff = (_item.height - (_item.height * (_item.zoom ?? 1)));
 					if(!__batterySaveMode) {
 						_hurted = ((_hurt && _flash) || _item.skinColor);// && (_item.char.frame + _item.char.start) > 0;
-						// if(!_hurted && !_item.char.dead) {
-						// 	let _shadowItemOrder = 95;
-						// 	for(let _shadowItem of _shadowItems) {
-						// 		if(_shadowItemOrder > 255)
-						// 			break;
-						// 		const _shadowSprite = this.colorizeSprite4(_item, '#000000' + _shadowItemOrder.toString(16));
-						// 		if(_shadowSprite?.width > 0)
-						// 			offCtx.drawImage(_shadowSprite,
-						// 				MathRound(_shadowItem.reversed ? (-1 * _shadowItem.left) + (platformX - (_shadowItem.platformX ?? platformX))
-						// 					: _shadowItem.left - (platformX - (_shadowItem.platformX ?? platformX))), 
-						// 					MathRound(_shadowItem.top), 
-						// 					_shadowItem.width,
-						// 				_shadowItem.height);
-						// 		_shadowItemOrder += 40;
-						// 	}
-						// }
+						if(!_hurted && !_item.char.dead && _shadowItems?.[0]) {
+							let _shadowItemOrder = 55;
+							for(let _shadowItem of _shadowItems) {
+								if(_shadowItemOrder > 255)
+									break;
+								const _shadowSprite = this.colorizeSprite4(_item, _item.shadow + _shadowItemOrder.toString(16), 1);
+								if(_shadowSprite?.width > 0)
+									offCtx.drawImage(_shadowSprite,
+										MathRound(_shadowItem.reversed ? (-1 * _shadowItem.left) + (platformX - (_shadowItem.platformX ?? platformX))
+											: _shadowItem.left - (platformX - (_shadowItem.platformX ?? platformX))), 
+											MathRound(_shadowItem.top), 
+											_shadowItem.width,
+										_shadowItem.height);
+								_shadowItemOrder += 50;
+							}
+						}
 						_rotate = _item.char.animations ? _anim?.rotate : null;
 						if(_rotate) {
 							offCtx.translate(MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff - (_item.width / 2)) : (_item.left + _wDiff + (_item.width / 2))), 
@@ -2986,20 +2997,22 @@ function map(_m) {
 			if (!_item.char.friendly && !_anim?.skipHealthBar)
 				this.drawHealthBar2(_item);
 			this.checkBubbleText(_item.char);
-			// if (_item.char.hasShadowBehind || (_item.char.chargeProperties && 
-			// 	(_item.char.main || _item.char.class === 'boss' || _item.char.alp))) {
-			// 	if (!_item.char.shadowData)
-			// 		_item.char.shadowData = [];
-			// 	else if (_item.char.shadowData.length > ((_item.char.chargeProperties || _item.char.hasShadowBehind) ? 5 : (_item.char.class === 'boss' ? 3 : 1)))
-			// 	_item.char.shadowData.splice(0, _item.char.shadowIndex ?? 2);
-			// 	_item.platformX = platformX;
-			// 	_item.char.shadowData.push(_item);
-			// }
-			// else if(_item.char.shadowData?.length > 0) {
-			// 	_item.char.shadowData.splice(0, _item.char.shadowIndex ?? 2);
-			// 	if(_item.char.shadowData?.length === 0)
-			// 		_item.char.shadowData = undefined;
-			// }
+			if (_item.shadow 
+				// || (_item.char.chargeProperties && 
+				// (_item.char.main || _item.char.class === 'boss' || _item.char.alp))
+			) {
+				if (!_item.char.shadowData)
+					_item.char.shadowData = [];
+				else if (_item.char.shadowData.length > (_item.char.class === 'boss' ? 3 : 1))
+				_item.char.shadowData.splice(0, _item.char.shadowIndex ?? 2);
+				_item.platformX = platformX;
+				_item.char.shadowData.push(_item);
+			}
+			else if(_item.char.shadowData?.length > 0) {
+				_item.char.shadowData.splice(0, _item.char.shadowIndex ?? 2);
+				if(_item.char.shadowData?.length === 0)
+					_item.char.shadowData = undefined;
+			}
 			this.drawRelatedObjects(_item, function (x) { return !x.background });
 			if(_item.char.canvasObjects?.[0])
 				for(let _cobj of _item.char.canvasObjects)
@@ -3876,8 +3889,6 @@ this.drawHealthBar2 = function (_item) {
 		if(episode.boss)
 			delete episode.boss;
 		this.removeLocationHand();
-		if (!this.dungeon)
-			disconnect();
 		for(let _elem of document.querySelectorAll('.dmg'))
 			_elem.remove();
 		if(this.offCanvas)
@@ -3908,4 +3919,5 @@ this.drawHealthBar2 = function (_item) {
 	}
 	// if(!this.lobby && !this.pvp)
 	// 	this.createBgMusic();
+	setBusyState(!(this.menu || this.lobby));
 }

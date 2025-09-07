@@ -40,7 +40,7 @@
       preloaded.add(id);
     },
 
-    async play(id, url = null, volume = 1, loop = false, rate = 1, reset = false, force = false, end = null) {
+    async play(id, url = null, volume = 1, loop = false, rate = 1, reset = false, force = false, end = null, bind = false) {
       if (!id || !soundBuffers[id]) {
         if (!url) url = soundFiles?.[id];
         if (!url) return;
@@ -102,6 +102,8 @@
       }; 
 
       source.onended = cleanup;
+
+      return bind ? Promise.resolve(source) : undefined;
     },
 
     stop(id) {

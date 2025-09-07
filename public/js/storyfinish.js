@@ -23,6 +23,7 @@ function animateStart(_failed, _extraGain, _content) {
 		mainCharacter.setProps(mainCharacter.storyVariables);
 	delete mainCharacter.storyVariables;
 	mainCharacter.stopHeartBeatSound();
+	mainCharacter.stopStepSound();
 	mainCharacter.removeBuffs();
 	const _currentLevel = mainCharacter.level;
 	
@@ -99,6 +100,8 @@ function animateStart(_failed, _extraGain, _content) {
 						`</div>
 					</div>`;
 	let _missionTitle = '';
+	if(episode.roomId)
+		leaveRoom(episode.roomId);
 	const _draw = _failed === 2;
 	const _isDuel = _isPvp && !episode.war;
 	if(episode.war)
@@ -180,7 +183,7 @@ function animateStart(_failed, _extraGain, _content) {
 					<div class="w-50 flex" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);detachModule();switchStoryScene(null, __storySceneOrder)" style="padding: 1%;height: 100%">
 						<div class="btn animate-me-500 flex">${getLangData('QUIT')}</div>
 					</div>
-					<div class="w-50 flex" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);detachModule();switchStoryScene(function() { switchBookPage(5, ${episode.war ? 3 : 1}); }, __storySceneOrder)" style="padding: 1%;height: 100%">
+					<div class="w-50 flex" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);detachModule();switchStoryScene(function() { switchBookPage(${episode.realTime ? 4 : 5}, ${episode.war ? 3 : (episode.realTime ? 3 : 1)}); }, __storySceneOrder)" style="padding: 1%;height: 100%">
 						<div class="btn animate-me-500 flex">${getLangData('BACK')}</div>
 					</div>
 				</div>

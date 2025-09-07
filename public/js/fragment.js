@@ -1,5 +1,18 @@
 ﻿'use strict';
 function getFragmentUI(_id) {
+	let _tutorial = {
+		tr: {
+			title: 'Karakter Parçacıkları',
+			desc: 'Hikaye modunda bölüm sonlarında karşılaştığınız bazı düşmanlar belli oranda ve adette parçacık ile sizi ödüllendirebilir. Bu parçacıkları soldaki listeden oyun boyunca takip edebilirsiniz. Bu listeden seçtiğiniz bir karakter açıklamasında size hangi seviyede hangi yeteneği ile aktif olacağını size söyleyecek. Aktif karakterlerden birini seçerek savaş esnasında belli aralıklarla desteğe çağırabileceksiniz.'
+		},
+		en: {
+			title: 'Character Fragments',
+			desc: 'In story mode, some enemies you encounter at the end of levels may reward you with a certain number of shards. You can track these shards throughout the game in the list on the left. A character you select from this list will be shown in the description, which level and ability will be active. By selecting one of the active characters, you can call in support at regular intervals during battle.'
+		}
+	};
+	if(!tryShowMenuTutorial('fragment'))
+		_tutorial = undefined;
+	let _content = showMenuTutorial(_tutorial, 'fragment');
 	updateMenuBottom(6);
 	if(!_id)
 		_id = 1;
@@ -18,7 +31,7 @@ function getFragmentUI(_id) {
 					'<div class="menu-modal-right menu-modal-right-content">' +
 						'<div class="skills-content-right fragments-content-right">' +
 							'<div class="skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">' +
-								getFragmentDetailUI(_id, 1, 1) +
+								(_content !== '' ? _content : getFragmentDetailUI(_id, 1, 1)) +
 							'<div id="shine"></div>' +
 						'</div>' +
 					'</div>' +
@@ -33,9 +46,10 @@ function getFragmentsUI(_id) {
 		const _count = _myfr?.count ?? 0;
 		let _limit = _f.limits.find(x => x.grade > (_myfr?.grade ?? 0))?.limit;
 		const _hasTag = _char?.tag?.id === _f.id;
+		const _noSelect = tryShowMenuTutorial('fragment');
 		if(!_limit)
 			_limit = _f.limits.find(x => x.grade === (_myfr?.grade ?? 0))?.limit;
-		html += '<div data-key="'+_f.key+'" onexactclick="selectFragment(' + _f.id + ')" class="skill-card fragment-card animate-me flex' + (_f.id === _id ? ' selected' : '') + (_hasTag ? ' activated' : '') + '">' +
+		html += '<div data-key="'+_f.key+'" onexactclick="selectFragment(' + _f.id + ')" class="skill-card fragment-card animate-me flex' + ((_f.id === _id && !_noSelect) ? ' selected' : '') + (_hasTag ? ' activated' : '') + '">' +
 			'<div class="skill-icon-wrapper flex"><img src="./images/main/' + _f.key + '/concept.png" /></div>' +
 			'<div style="flex:1;height:100%">' +
 			'<div class="flex flex-jc-start skill-card-title" style="height:50%;width:100%">' + getLangData(_f.name) + '</div>' +

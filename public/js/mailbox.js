@@ -1,6 +1,20 @@
 ﻿'use strict';
 function mailbox() {
+	this.key = 'mailbox';
+	this.tutorial = {
+		tr: {
+			title: 'Posta Kutusu',
+			desc: 'Oyun sistemi tarafından bilgilendirme, duyuru metinleri veya içinde hediyeler bulunan ödül mesajları belli aralıklarla gönderilir. Bu mesajları ve daha fazlasını soldaki listeden mektup seçerek okuyabilir ve içindeki ödül varsa alabilirsiniz. Listenizdeki mektup zarfı resimleri eğer açıksa bu onları okuduğunuz anlamına gelir. Okuduğunuz mesajları sonrasında silebilirsiniz.'
+		},
+		en: {
+			title: 'Mailbox',
+			desc: 'The game system periodically sends messages containing information, announcements, or rewards. You can read these messages and more by selecting a letter from the list on the left and claiming any rewards. If the letter envelope images in your list are visible, this means you\'ve read them. You can delete messages you\'ve read afterward.'
+		}
+	};
+	if(!tryShowMenuTutorial(this.key))
+		this.tutorial = undefined;
 	this.render = function(_noAnimation, _id) {
+		let _content = showMenuTutorial(this.tutorial, this.key);
 		updateMenuBottom(3);
 		const _container = selectMenuContainer();
 		if(!_mails?.length) {
@@ -28,12 +42,13 @@ function mailbox() {
 			<div class="menu-modal-right menu-modal-right-content">
 				<div class="skills-content-right mailbox-content-right">
 					<div class="skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">`
-						+ //this.openMailDetail(_id) +
+						+ _content +
 					`</div>
 				</div>
 			</div>
 		</div>`;
-		this.selectMail(_id);
+		if(_content === '')
+			this.selectMail(_id);
 	}
 	this.getMails = function() {
 		let html = '';
@@ -62,7 +77,7 @@ function mailbox() {
 		if(!_id)
 			_id = _arr?.length > 0 ? _arr[0].id : undefined;
 		else
-   			episode.playSound({ key: 'click' });
+   			PlaySound({ key: 'click' });
 		if(!_id)
 			return;
 		const _cards = document.querySelectorAll('.mailbox-content-left .mailbox-card');

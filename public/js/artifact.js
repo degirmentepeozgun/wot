@@ -1,8 +1,22 @@
 ﻿'use strict';
 console.log('art');
 function createArtifactsUI(_id) {
+	let _tutorial = {
+		tr: {
+			title: 'Tılsımlar',
+			desc: 'Hikaye bölümlerinde çok ender görebileceğin talismanlar olabilir. Bu özel parçaları toplayıp biriktirdiğinde ve set olarak tüm parçaları tamamladığında setin bonus özelliğini pasif olarak kazanabiliyorsun. O yüzden hikaye modunda oynarken etrafı da dikkatlice kolaçan etmeyi unutma.'
+		},
+		en: {
+			title: 'Talismans',
+			desc: 'There may be rare talismans you\'ll encounter during the story stages. Collecting and accumulating these special pieces and completing all the pieces in a set will passively grant you the set\'s bonus feature. So, be sure to scout your surroundings carefully while playing the story mode.'
+		}
+	};
+	if(!tryShowMenuTutorial('artifact'))
+		_tutorial = undefined;
+	let _content = showMenuTutorial(_tutorial, 'artifact');
     updateMenuBottom(0);
 	const _container = selectMenuContainer();
+	const _noSelect = tryShowMenuTutorial('artifact');
 	let _html = '<div class="menu-ui-left fade-me">' +
 						'<div class="menu-modal-left menu-modal-left-content">' +
 							'<div class="skills-content-left menu-modal-left-container">' +
@@ -11,7 +25,7 @@ function createArtifactsUI(_id) {
 		if(!_id)
 			_id = _i.id;
 		let _ok = __account.artifacts.find(x => x.id === _i.id);
-		_html += `<div data-artifact-key="${_i.id}" onexactclick="openArtifactDetailModal(${_i.id}, 'artifact-detail')" class="skill-card animate-me flex${((_i.id === _id) ? ' selected' : '')}">
+		_html += `<div data-artifact-key="${_i.id}" onexactclick="openArtifactDetailModal(${_i.id}, 'artifact-detail')" class="skill-card animate-me flex${(((_i.id === _id) && !_noSelect) ? ' selected' : '')}">
 				<div style="opacity:.75" class="skill-icon-wrapper flex"><img src="./images/artifacts/${_i.id}.png" /></div>
 				<div style="flex:1;height:100%;position:relative">
 					<div class="flex flex-jc-start skill-card-title" style="height:50%;width:100%">${_i.titles[getLang()]}</div>
@@ -24,7 +38,7 @@ function createArtifactsUI(_id) {
 			<div class="menu-modal-right menu-modal-right-content">
 		<div class="skills-content-right">
 				<div id="artifact-detail" class="skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">` +
-						openArtifactDetailModal(__artifacts[0].id) +
+						(_content !== '' ? _content : openArtifactDetailModal(__artifacts[0].id)) +
 	`</div></div></div></div>`;
 	_container.innerHTML = _html;
 }

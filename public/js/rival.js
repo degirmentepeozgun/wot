@@ -41593,8 +41593,8 @@ const _allEnemies = {
 					key: 'roll',
 					type: 'skill',
 					priority: 1,
-					maxCharge: 2,
-					cooldown: 6000,
+					maxCharge: 3,
+					cooldown: 4000,
 					order: 7,
 					useExtraStepXRate: true,
 					frames: [
@@ -42306,9 +42306,17 @@ const _allEnemies = {
 								const _mob2 = summonMob(27, MathRound((_e.SCREENLEFT + platformX) / __zoom),
 								MathRound(getGroundHeight() * .33), _e.level, _e.autoTarget);
 								episode.playSound({key:'summon', volume:.5});
-								_mob1.enemy = _mob2.enemy = false;
+								_mob1.enemy = _mob2.enemy = _e.enemy;
 								//_mob1.friendly = _mob2.friendly = true;
 								_mob1.owner = _mob2.owner = _e;
+								if(episode.pvp)
+								{
+									_mob1.difficulty = _mob2.difficulty = 1;
+									_mob1.setAutoMode(2);
+									_mob1.pickNewTarget();
+									_mob2.setAutoMode(2);
+									_mob2.pickNewTarget();
+								}
 							},
 							def: {
 								iframe: true
@@ -43198,7 +43206,7 @@ const _allEnemies = {
 					priority: 2,
 					next: 'attack2',
 					imediateBreak: true,
-					chargeDistance: { value: 40, untilFrame: 4 },
+					chargeDistance: { value: 35, untilFrame: 4 },
 					frames: [
 						{
 							spriteLeft: 2128 * 1.5,
@@ -55803,7 +55811,6 @@ const _allEnemies = {
 					type: 'skill',
 					hold: true,
 					bleed: true,
-					move: true,
 					attack: true,
 					priority: 2,
 					imediateBreak: true,
@@ -56714,6 +56721,11 @@ const _allEnemies = {
 							key: 'smoke',
 							position: 'middle'
 						});
+						if(episode.pvp){
+							_mob.difficulty = 1;
+							_mob.setAutoMode(2);
+							_mob.pickNewTarget();
+						}
 					}
 				}
 				else if(_e.lastBombSpawnTime)
@@ -62132,11 +62144,7 @@ const _allEnemies = {
 							spriteWidth: 166,
 							spriteHeight: 171,
 							spriteOrigin: 59,
-							speed: 1,
-							do: function(_e) {
-								_e.hasShadowBehind = 1;
-								_e.shadowIndex = 3;
-							}
+							speed: 1
 						},
 						{
 							spriteLeft: 1698,
@@ -63200,7 +63208,7 @@ const _allEnemies = {
 					attack: true,
 					move: true,
 					//cooldown: 10000,
-					chargeDistance: { value: 40, untilFrame: 3 },
+					chargeDistance: { value: 35, untilFrame: 3 },
 					priority: 3,
 					frames: [
 						{
@@ -69293,7 +69301,7 @@ const _allEnemies = {
 							spriteHeight: 394,
 							spriteOrigin: 158,
 							speed: 1,
-							shadow: 'red',
+							hasShadowBehind: true,
 							def: {
 								iframe: true
 							}
@@ -69304,9 +69312,9 @@ const _allEnemies = {
 							spriteWidth: 316,
 							spriteHeight: 394,
 							spriteOrigin: 158,
+							hasShadowBehind: true,
 							sound: { key: 'allaugh', reset: true },
 							speed: 5,
-							shadow: 'red',
 							def: {
 								iframe: true
 							}
@@ -69317,7 +69325,7 @@ const _allEnemies = {
 							spriteWidth: 306,
 							spriteHeight: 495,
 							spriteOrigin: 153,
-							shadow: 'red',
+							hasShadowBehind: true,
 							props: {
 								healtbarGap: 80
 							},
@@ -69334,7 +69342,7 @@ const _allEnemies = {
 							spriteHeight: 394,
 							spriteOrigin: 158,
 							speed: 6,
-							shadow: 'red',
+							hasShadowBehind: true,
 							props: {
 								healtbarGap: 25
 							},
@@ -71390,9 +71398,9 @@ function summonShadowClone(_char, _force) {
 	_shadowClone.addBuff({ key: 'rage', level: 3 });
 	if(episode.dungeon || episode.pvp)
 	{
-		_shadowClone.socketId = (episode.enemies.filter(x => x.socketId < 1000).map(x => x.socketId).sort().slice(-1)[0] ?? 0) + 1;
+		//_shadowClone.socketId = (episode.enemies.filter(x => x.socketId < 1000).map(x => x.socketId).sort().slice(-1)[0] ?? 0) + 1;
 		_shadowClone.station = mainCharacter.socketId;
-		_shadowClone.getNewStatus(1, 2);
+		//_shadowClone.getNewStatus(1, 2);
 	}
 }
 
