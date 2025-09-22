@@ -1388,6 +1388,8 @@ function createCharacter(_settings) {
 								extraStepXRate: .25,
 								bottomGap: -10,
 								do: function(_c, _a) {
+									if(episode?.realTime)
+										return;
 									_a.frames.forEach(f => { 
 										if(f.speed !== f.oldSpeed) 
 											f.speed = f.oldSpeed; 
@@ -1464,6 +1466,8 @@ function createCharacter(_settings) {
 									aoe: 100,
 									hurt: {
 										do: function(_f, _c, _e) {
+											if(episode?.realTime)
+												return;
 											if(_f.speed === _f.oldSpeed) {
 												_f.speed *= 3;
 												_f.extraStepXRate *= .33;
@@ -1540,6 +1544,8 @@ function createCharacter(_settings) {
 									aoe: 100,
 									hurt: {
 										do: function(_f, _c, _e) {
+											if(episode?.realTime)
+												return;
 											if(_f.speed === _f.oldSpeed) {
 												_f.speed *= 3;
 												_f.extraStepXRate *= .33;
@@ -1616,6 +1622,8 @@ function createCharacter(_settings) {
 									aoe: 100,
 									hurt: {
 										do: function(_f, _c, _e) {
+											if(episode?.realTime)
+												return;
 											if(_f.speed === _f.oldSpeed) {
 												_f.speed *= 3;
 												_f.extraStepXRate *= .33;
@@ -1722,6 +1730,8 @@ function createCharacter(_settings) {
 									aoe: 100,
 									hurt: {
 										do: function(_f, _c, _e) {
+											if(episode?.realTime)
+												return;
 											if(_f.speed === _f.oldSpeed) {
 												_f.speed *= 3;
 												_f.extraStepXRate *= .33;
@@ -12864,7 +12874,7 @@ function createCharacter(_settings) {
 								spriteWidth: 263,
 								spriteHeight: 202,
 								spriteOrigin: 132,
-								speed: 61,
+								speed: 57,
 								def: {
 									iframe: true
 								}
@@ -12879,8 +12889,7 @@ function createCharacter(_settings) {
 								sound: { key: 'tesla', volume: .5 },
 								spell: {
 									key: 'lightningball2',
-									xGap: 250,
-									pierce: true
+									xGap: 250
 								},
 								def: {
 									iframe: true
@@ -12895,7 +12904,6 @@ function createCharacter(_settings) {
 								speed: 1,
 								spell: {
 									key: 'lightningball2',
-									pierce: true,
 									reset: true,
 									xGap: 450,
 									reversed: true
@@ -36764,13 +36772,8 @@ const _allEnemies = {
 							spriteWidth: 125,
 							spriteHeight: 176,
 							spriteOrigin: 42,
-							speed: 2,
-							objects: [{
-								key: 'shieldactive',
-								position: 'middle-front',
-								yGap: 50,
-								xGap: 5
-							}]
+							speed: 1,
+							directionChangeEnabled: true
 						},
 						{
 							spriteLeft: 3651,
@@ -36778,8 +36781,23 @@ const _allEnemies = {
 							spriteWidth: 125,
 							spriteHeight: 176,
 							spriteOrigin: 42,
-							sound: {key:'shield'},
-							speed: 58
+							speed: 1,
+							objects: [{
+								key: 'shieldactive',
+								position: 'middle-front',
+								yGap: 50,
+								xGap: 5
+							}],
+							directionChangeEnabled: true
+						},
+						{
+							spriteLeft: 3651,
+							spriteTop: 776,
+							spriteWidth: 125,
+							spriteHeight: 176,
+							spriteOrigin: 42,
+							speed: 2,
+							directionChangeEnabled: true
 						}
 					]
 				},
@@ -36936,8 +36954,8 @@ const _allEnemies = {
 			zoom: 1.75,
 			height: 150,
 			width: 150,
-			maxHP: 500,
-			atk: 100,
+			maxHP: 2500,
+			atk: 250,
 			def: 100,
 			stepX: 10,
 			weight: 1000,
@@ -39511,19 +39529,19 @@ const _allEnemies = {
 					imediateBreak: true,
 					frames: [
 						{
-							spriteLeft: 2684,
+							spriteLeft: 2659,
 							spriteTop: 105,
-							spriteWidth: 174,
+							spriteWidth: 200,
 							spriteHeight: 102,
-							spriteOrigin: 73,
+							spriteOrigin: 98,
 							speed: 12
 						},
 						{
-							spriteLeft: 2349,
+							spriteLeft: 2334,
 							spriteTop: 105,
-							spriteWidth: 185,
+							spriteWidth: 200,
 							spriteHeight: 102,
-							spriteOrigin: 83,
+							spriteOrigin: 98,
 							speed: 12
 						},
 						{
@@ -39541,7 +39559,7 @@ const _allEnemies = {
 							spriteHeight: 102,
 							spriteOrigin: 83,
 							speed: 12
-						},
+						}
 					]
 				},
 				attack: {
@@ -41746,6 +41764,7 @@ const _allEnemies = {
 							extraStepXRate: 1.5,
 							speed: 4,
 							bottomGap: -20,
+							sound:{key:'werewolfspin', volume:.3, bind:true},
 							atk: {
 								rate: 2,
 								yRange:10,
@@ -42221,7 +42240,7 @@ const _allEnemies = {
 					order: 5,
 					type: 'skill',
 					attack: true,
-					cooldown: 5000,
+					cooldown: 10000,
 					move: true,
 					priority: 3,
 					frames: [
@@ -42265,7 +42284,12 @@ const _allEnemies = {
 							spriteWidth: 215,
 							spriteHeight: 201,
 							spriteOrigin: 102,
-							speed: 15,
+							speed: 1,
+							spell: { 
+								key:'wolf',
+								xGap: -150,
+								bottomGap: -40,
+							},
 							def: {
 								iframe: true
 							}
@@ -42277,51 +42301,90 @@ const _allEnemies = {
 							spriteHeight: 201,
 							spriteOrigin: 102,
 							speed: 1,
-							do: function(_e) {
-								const _wolves = episode.enemies.filter(x => x.id === 27 && x.health > 0)?.sort((a, b) => a.health - b.health);
-								let len = _wolves?.length ?? 0;
-								const _max = 20;
-								const _limit = _max - 2;
-								if(len > _limit) {
-									for(let _wolf of _wolves) {
-										if(_wolf.autoTarget?.health > 0)
-											continue;
-										_wolf.remove = true;
-										len--;
-										if(len === _limit)
-											break;
-									}
-									if(len > _limit)
-										for(let _wolf of _wolves) {
-											if(_wolf.remove)
-												continue;
-											_wolf.remove = true;
-											len--;
-											if(len === _limit)
-												break;
-										}
-								}
-								const _mob1 = summonMob(27, MathRound((_e.SCREENLEFT + platformX) / __zoom),
-								MathRound(getGroundHeight() * .66), _e.level, _e.autoTarget);
-								const _mob2 = summonMob(27, MathRound((_e.SCREENLEFT + platformX) / __zoom),
-								MathRound(getGroundHeight() * .33), _e.level, _e.autoTarget);
-								episode.playSound({key:'summon', volume:.5});
-								_mob1.enemy = _mob2.enemy = _e.enemy;
-								//_mob1.friendly = _mob2.friendly = true;
-								_mob1.owner = _mob2.owner = _e;
-								if(episode.pvp)
-								{
-									_mob1.difficulty = _mob2.difficulty = 1;
-									_mob1.setAutoMode(2);
-									_mob1.pickNewTarget();
-									_mob2.setAutoMode(2);
-									_mob2.pickNewTarget();
-								}
+							spell: { 
+								key:'wolf2',
+								xGap: -150,
+								bottomGap: 40,
 							},
 							def: {
 								iframe: true
 							}
-						}
+						},
+						{
+							spriteLeft: 2017,
+							spriteTop: 1513,
+							spriteWidth: 215,
+							spriteHeight: 201,
+							spriteOrigin: 102,
+							speed: 6,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 2017,
+							spriteTop: 1513,
+							spriteWidth: 215,
+							spriteHeight: 201,
+							spriteOrigin: 102,
+							sound: { key: 'wolves', volume: .5 },
+							speed: 8,
+							def: {
+								iframe: true
+							}
+						},
+						// {
+						// 	spriteLeft: 2017,
+						// 	spriteTop: 1513,
+						// 	spriteWidth: 215,
+						// 	spriteHeight: 201,
+						// 	spriteOrigin: 102,
+						// 	speed: 1,
+						// 	do: function(_e) {
+						// 		const _wolves = episode.enemies.filter(x => x.id === 27 && x.health > 0)?.sort((a, b) => a.health - b.health);
+						// 		let len = _wolves?.length ?? 0;
+						// 		const _max = 20;
+						// 		const _limit = _max - 2;
+						// 		if(len > _limit) {
+						// 			for(let _wolf of _wolves) {
+						// 				if(_wolf.autoTarget?.health > 0)
+						// 					continue;
+						// 				_wolf.remove = true;
+						// 				len--;
+						// 				if(len === _limit)
+						// 					break;
+						// 			}
+						// 			if(len > _limit)
+						// 				for(let _wolf of _wolves) {
+						// 					if(_wolf.remove)
+						// 						continue;
+						// 					_wolf.remove = true;
+						// 					len--;
+						// 					if(len === _limit)
+						// 						break;
+						// 				}
+						// 		}
+						// 		const _mob1 = summonMob(27, MathRound((_e.SCREENLEFT + platformX) / __zoom),
+						// 		MathRound(getGroundHeight() * .66), _e.level, _e.autoTarget);
+						// 		const _mob2 = summonMob(27, MathRound((_e.SCREENLEFT + platformX) / __zoom),
+						// 		MathRound(getGroundHeight() * .33), _e.level, _e.autoTarget);
+						// 		episode.playSound({key:'summon', volume:.5});
+						// 		_mob1.enemy = _mob2.enemy = _e.enemy;
+						// 		//_mob1.friendly = _mob2.friendly = true;
+						// 		_mob1.owner = _mob2.owner = _e;
+						// 		if(episode.pvp)
+						// 		{
+						// 			_mob1.difficulty = _mob2.difficulty = 1;
+						// 			_mob1.setAutoMode(2);
+						// 			_mob1.pickNewTarget();
+						// 			_mob2.setAutoMode(2);
+						// 			_mob2.pickNewTarget();
+						// 		}
+						// 	},
+						// 	def: {
+						// 		iframe: true
+						// 	}
+						// }
 					]
 				},
 				victory: {
@@ -43538,7 +43601,16 @@ const _allEnemies = {
 							spriteWidth: 222,
 							spriteHeight: 216,
 							spriteOrigin: 108,
-							speed: 12
+							speed: 10
+						},
+						{
+							spriteLeft: 3159,
+							spriteTop: 459,
+							spriteWidth: 222,
+							spriteHeight: 216,
+							spriteOrigin: 108,
+							sound: { key: 'werewolfattack', volume: .2 },
+							speed: 2
 						},
 						{
 							spriteLeft: 2619,
@@ -43546,7 +43618,6 @@ const _allEnemies = {
 							spriteWidth: 310,
 							spriteHeight: 216,
 							spriteOrigin: 96,
-							sound: { key: 'werewolfattack', volume: .2 },
 							atk: {
 								yRange: 15,
 								rate: 3,
@@ -52444,7 +52515,7 @@ const _allEnemies = {
 									position: 'middle'
 								});
 								_mob.enemy = false;
-								_mob.friendly = true;
+								_mob.friendly = _mob.invulnerable = true;
 								_mob.animation = 'idle';
 								_mob.pickRandomAttack();
 								_mob.animation = 'before';
@@ -52482,31 +52553,39 @@ const _allEnemies = {
 					imediateBreak: true,
 					frames: [
 						{
-							spriteLeft: 2684,
+							spriteLeft: 2659,
 							spriteTop: 105,
-							spriteWidth: 174,
+							spriteWidth: 200,
 							spriteHeight: 102,
-							spriteOrigin: 73,
+							spriteOrigin: 100,
+							speed: 1
+						},
+							{
+							spriteLeft: 2659,
+							spriteTop: 105,
+							spriteWidth: 200,
+							spriteHeight: 102,
+							spriteOrigin: 100,
 							objects: [
-								{ position: 'middle', key: 'cagebg' },
-								{ position: 'middle', key: 'cagefg' },
+								{ position: 'middle', key: 'cagebg2' },
+								{ position: 'middle', key: 'cagefg2' },
 							],
+							speed: 11
+						},
+						{
+							spriteLeft: 2334,
+							spriteTop: 105,
+							spriteWidth: 200,
+							spriteHeight: 102,
+							spriteOrigin: 100,
 							speed: 12
 						},
 						{
 							spriteLeft: 2349,
 							spriteTop: 105,
-							spriteWidth: 185,
-							spriteHeight: 102,
-							spriteOrigin: 83,
-							speed: 12
-						},
-						{
-							spriteLeft: 2010,
-							spriteTop: 105,
 							spriteWidth: 200,
 							spriteHeight: 102,
-							spriteOrigin: 98,
+							spriteOrigin: 85,
 							speed: 12
 						}
 					]
@@ -52535,7 +52614,8 @@ const _allEnemies = {
 			still: true,
 			noLoot: true,
 			experience: 0,
-			noDirection: true,
+			invulnerable: true,
+			immobilize: true,
 			src: './images/sprites/ep27/',
 			buffs: []
 		};
@@ -53570,7 +53650,7 @@ const _allEnemies = {
 			defaultDirection: 'right',
 			defaultAnimationKey: 'idle',
 			randomStartFrame: false,
-			zoom: 1.15,
+			zoom: 1.25,
 			width: 96,
 			height: 102,
 			maxHP: 200,
@@ -63609,7 +63689,7 @@ const _allEnemies = {
 			},
 			key: 'vrgs-' + Math.random().toString().replace(/[.]/g, ''),
 			yGap: 10,
-			still: true,
+			immobilize: true,
 			id: 67,
 			healtbarGap: 40,
 			name: 'Vargas Slave',
@@ -66419,6 +66499,16 @@ const _allEnemies = {
 							spriteWidth: 300,
 							spriteHeight: 140,
 							spriteOrigin: 200,
+							objects: [
+								{ 	
+									key: 'questshine',
+									position: 'middle', 
+									xGap: -126,
+									yGap: 62,
+									scale:1.4,
+									bind: true
+								}
+							],
 							speed: 999
 						}
 					]
@@ -66450,7 +66540,7 @@ const _allEnemies = {
 			direction: 'left',
 			defaultDirection: 'right',
 			defaultAnimationKey: 'idle',
-			zoom: 1,
+			zoom: 1.1,
 			width: 300,
 			maxHP: 1,
 			height: 140,
@@ -67779,6 +67869,60 @@ const _allEnemies = {
 			noLoot: true,
 			experience: 0,
 			src: './images/sprites/ep43/',
+			buffs: []
+		};
+	},
+	enemy91: function () {
+		return {
+			animations: {
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 14,
+							spriteTop: 8,
+							spriteWidth: 113,
+							spriteHeight: 190,
+							spriteOrigin: 56,
+							speed: 72
+						},
+						{
+							spriteLeft: 161,
+							spriteTop: 8,
+							spriteWidth: 113,
+							spriteHeight: 190,
+							spriteOrigin: 56,
+							speed: 116
+						}
+					]
+				}
+			},
+			key: 'wrrstnd-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 10,
+			id: 91,
+			npc: true,
+			healtbarGap: 40,
+			name: 'Dede Korkut Play',
+			class: 'warrior',
+			level: 1,
+			direction: 'right',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1.3,
+			height: 190,
+			width: 112,
+			stepX: 0,
+			maxHP: 1000,
+			weight: 1000,
+			stepXRate: 0,
+			invulnerable: true,
+			immobilize: true,
+			friend: true,
+			noDirection: true,
+			noLoot: true,
+			skipHealthBar: true,
+			src: './images/sprites/ep91/',
 			buffs: []
 		};
 	},
@@ -72849,7 +72993,7 @@ function createWoodObjectDead(_key, _sound, _zoom, _summons) {
 				spriteWidth: 361,
 				spriteHeight: 423,
 				spriteOrigin: 189,
-				objects:[{key:'dust', yGap: -230, position:'middle', scale:3, pushObject: true}],
+				objects:[{key:'dust', position:'middle', scale:3, pushObject: true}],
 				sound: _sound ?? { key: 'wagonhurt1,wagonhurt2,wagonhurt3,wagonhurt4,wagonhurt5,wagonhurt6', volume: .3 },
 				speed: 3
 			},

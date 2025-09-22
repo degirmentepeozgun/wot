@@ -2,6 +2,15 @@
 console.log('story-finish');
 function animateStart(_failed, _extraGain, _content) {
 	_game.suspended = true;
+	if(episode.mainClass && mainCharacter.class !== episode.mainClass) {
+		delete __account.characters.find(x => x.selected).selected;
+		__account.characters.find(x => x.class === episode.mainClass).selected = true;
+		initMainCharacter();
+		_client.setCharacterValues();
+		setCharacterDefaults(mainCharacter);
+		console.log(mainCharacter.class);
+		//startWithThisCharacter(episode.mainClass);
+	}
 	const _isPvp = (episode.pvp || episode.war) & !episode.gold;
 	const _isFirstPlay = !__account.tutorials?.[1];
 	const _id = __story.id;
@@ -34,7 +43,8 @@ function animateStart(_failed, _extraGain, _content) {
 	const _isBeforePerfect = _oldResult?.perfect;
 	if(_totalStar === 7)
 		_isPerfect = _oldResult.perfect = true;
-	_client.saveState();
+	if(!episode.realTime)
+		_client.saveState();
 	if(_isPerfect)
 		updateGlobalQuest('complete-act-perfect');
 	if(!_failed && !_isPvp)
@@ -112,7 +122,7 @@ function animateStart(_failed, _extraGain, _content) {
 		_missionTitle = getLangData('Story') + '&nbsp;' + __account.act + '-' + _story.order;
 	let _hasNext = _failed ? false : !_isFirstPlay;
 	if(_hasNext)
-		_hasNext = __stories.find(x => x.order > __story.order && !x.passive && x.minLevel <= mainCharacter.level && x.list);
+		_hasNext = __stories.find(x => x.order > __story.order && !x.passive && x.list);
 	const _template = `<div data-module='storyfinish' id="story-finish" class="finish flex d-none">
 		<div class="w-50 side-left flex flex-jc-start" style="height:100% !important;width:55%;flex-direction:column">
 			<div class="${_draw ? 'gray ' : ''}w-100 flex op-none ${_failed ? 'defeat' : 'victory'}-header ms250">${getLangData(_failed ? (_draw ? 'DRAW' : 'DEFEAT') : 'VICTORY')}</div>

@@ -4,10 +4,12 @@ function chat() {
 	this.render = function(_noAnimation) {
 		let _html = 
 		`<div data-module="chat" class="book-page-wrapper chat-container shop-container${_noAnimation ? '' : ' fade-me'}">
-			<div class="flex book-page-bg">
-				<div class="chat-screen w-100 flex flex-jc-end">`
+			<div class="flex flex-ai-end book-page-bg">
+				<div class="chat-screen w-100 flex flex-jc-end flex-ai-end">
+					<div class="chat-screen-inner w-100 flex flex-ai-end">`
 					+ this.renderChatMessages() +
 				`</div>
+				</div>
 				<div class="chat-send-wrapper flex w-100">
 					<div class="flex chat-send-text flex-jc-start">
 						<input onkeydown="getRef(\'chat\')?.trySendMessage(event)" autocomplete="off" placeholder="Type your message" type="text" onpaste="return false" ondrop="return false" id="chat-message-owner-text" maxlength="200" />
@@ -66,10 +68,11 @@ function chat() {
 			});
 		}, 20);
 		this.scrollChatToBottom();
+		__lastChatCheck = msNow;
 	}
 	this.renderChatMessages = function(){
 		let _html = '';
-		for(let _m of __account.chat)
+		for(let _m of __chatMessages)
 			_html += this.getMessageText(_m);
 		return _html;
 	}
@@ -80,20 +83,59 @@ function chat() {
 		}
 	}
 	this.getMessageText = function(_msg) {
-		return "<div class='chat-message flex-ai-start" + (_msg.id === __account.name ? ' your-chat-message' : '') + (_msg.system ? ' system-chat-message' : '') + (_msg.whisper ? ' whisper-chat-message' : '') + " w-100 flex flex-jc-start'><div class='chat-message-inner flex flex-ai-start'><span class='message-owner'>" + (_msg.system ? '[SYSTEM]' : (_msg.whisper ? '&gt;&gt;[' + _msg.id + ']' : '#' + _msg.id)) + ':</span>&nbsp;<span class="chat-message-text">' + _msg.text + '</span></div></div>';
+		return "<div class='chat-message flex-ai-start" + (_msg.me ? ' your-chat-message' : '') + (_msg.system ? ' system-chat-message' : '') + (_msg.whisper ? ' whisper-chat-message' : '') + " w-100 flex flex-jc-start'><div class='chat-message-inner flex flex-ai-start'><span class='message-owner'>" + (_msg.system ? '[SYSTEM]' : (_msg.whisper ? '&gt;&gt;[' + _msg.id + ']' : '#' + _msg.id)) + ':</span>&nbsp;<span class="chat-message-text">' + _msg.text + '</span></div></div>';
+	}
+	this.writeRemoteMessage = function(_msg) {
+		const cscr = document.querySelector('.chat-screen-inner');
+		const div = document.createElement('div');
+		div.innerHTML = this.getMessageText({text:_msg.m, id:_msg.n});
+		//cscr.insertBefore(div, cscr.firstChild);
+		cscr.appendChild(div.firstChild);
+    	PlaySound({ key: 'notify' });
+		__lastChatCheck = msNow;
+		this.removeUnnecessaryMessages();
+		this.scrollChatToBottom();
+	}
+	this.removeUnnecessaryMessages = function() {
+		if(__chatMessages.length > 100){
+			const _diff = __chatMessages.length - 100;
+			__chatMessages.splice(0, _diff);
+			const _messages = document.querySelectorAll('.chat-screen-inner .chat-message');
+			if(_messages?.[0])
+				for(let i = 0; i < _diff; i++)
+					try{
+						_messages[0].remove();
+					}
+					catch(e){}
+		}
 	}
 	this.sendMessage = function() {
 		const _text = document.getElementById('chat-message-owner-text');
 		if(_text.value?.trim()?.length === 0)
 			return;
-    	episode.playSound({ key: 'click' });
-		const cscr = document.querySelector('.chat-screen');
+		const _myMessages = __chatMessages.filter(x => x.me)?.sort((a,b) => b.time - a.time);
+		if(_myMessages?.length > 2) {
+			let _diff = msNow - _myMessages[2].time;
+			if(_diff < 15000) {
+				warn('<span>' + getLangData('You text too often') + '</span>', 'warn');
+				return;
+			}
+		}
+    	PlaySound({ key: 'click' });
+		const cscr = document.querySelector('.chat-screen-inner');
 		const div = document.createElement('div');
-		div.innerHTML = this.getMessageText({text:_text.value, id:__account.name});
+		const _data = {text:_text.value, me: 1, id:__account.name};
+		div.innerHTML = this.getMessageText(_data);
 		//cscr.insertBefore(div, cscr.firstChild);
 		cscr.appendChild(div.firstChild);
+		_data.time = msNow;
+		__chatMessages.push(_data);
+		sendChatMessage({n:__account.name, s:__socketId, m:_text.value});
 		_text.value = '';
 		_text.blur();
+		__account.lastMessageSent = msNow;
+		_client.saveState();
+		this.removeUnnecessaryMessages();
 		this.scrollChatToBottom();
 	}
 	this.scrollChatToBottom = function() {

@@ -25,14 +25,23 @@ function getLobbyScene() {
 				//updateExperience(__story.rewards.find(x => x.key === 'exp').count);
 				removeCoopCharacter();
 				addClass(_gameUI, 'disable-ui');
-				injectModule('lobby', function() {
+				if(mainCharacter){
+					mainCharacter.left = MathRound(1735 * __zoom);
+					mainCharacter.direction = 'right';
+					mainCharacter.skipHealthBar = true;
+					mainCharacter.noDirection = true;
+					mainCharacter.keyboard.holdingKeys = [];
+					mainCharacter.disableKeyboard = mainCharacter.immobilize = true;
+					mainCharacter.animate('idlelobby',1);
+				}
+				resetOnlineDetection();
+				//injectModule('lobby', function() {
 					__storyPlaying = false;
 					createMenu();
 					__account.lastLobbyUsage = {
 						storyId: __story.id,
 						sceneOrder: __storySceneOrder
 					}
-					__account.commonInventory = [];
 					_client.saveState();
 					if(__account.tutorials?.indexOf('invento-item-equip') >= 0)
 						return;
@@ -72,17 +81,7 @@ function getLobbyScene() {
 							}, 320);
 						});
 					}, 100);
-				});
-				if(mainCharacter){
-					mainCharacter.left = MathRound(1735 * __zoom);
-					mainCharacter.direction = 'right';
-					mainCharacter.skipHealthBar = true;
-					mainCharacter.noDirection = true;
-					mainCharacter.keyboard.holdingKeys = [];
-					mainCharacter.disableKeyboard = mainCharacter.immobilize = true;
-					mainCharacter.animate('idlelobby',1);
-				}
-				resetOnlineDetection();
+				//});
 			},
 			afterInit: function() {
 				mainCharacter.yPosition = MathRound(getGroundHeight() * 1.3);
@@ -161,7 +160,7 @@ const __stories = [
 			{ id: 1, title: 'Clear story', when: function() {
 				return !mainCharacter.isDead();
 			}},
-			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
+			{ id: 2, key: 'time', value: 20 * 60000, title: 'Finish in time',
 				when: function(_item) {
 					//return !isMissionFailed(0) && !isMissionFailed(2) &&
 					return (_gameTick - (__story.startTime ?? _gameTick)) <= (_item.value);
@@ -171,15 +170,15 @@ const __stories = [
 			}}
 		],
 		ticket: 2,
+		act:1,
 		list:true,
-		//startScene:1,
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
 			{ key: 'item', grade: 2, type: 'belt', count:1 },
 			{ key: 'fragment', name: 'king', minCount:1, maxCount:5, chance:50 },
 			{ key: 'gold', count: 5000 },
-			{ key: 'exp', count: 1000 }
+			{ key: 'exp', count: 1200 }
 		],
 		quests: [
 			{
@@ -195,7 +194,7 @@ const __stories = [
 				},
 				owner: 'system',
 				minLevel: 1,
-				kills: [{ enemy: [51,52], limit: 24, key: 'Guard' }],
+				kills: [{ enemy: [51,52], limit: 48, key: 'Guard' }],
 				maps: [105],
 				after: function() {
 					episode.enemies.forEach(x => x.spawnAsGroup = x.respawnAfterSeconds = x.spawn = undefined);
@@ -340,6 +339,245 @@ const __stories = [
 						}
 					}
 				}
+			},
+			{
+				id: 4,
+				names: {
+					en: 'Clear Goblins',
+					tr: 'Goblinleri Temizle'
+				},
+				owner: 'system',
+				minLevel: 1,
+				kills: [{
+					enemy: [19],
+					limit: 5,
+					descriptions: {
+						en: 'Goblin Cleared',
+						tr: 'Goblin Temizlendi'
+					}
+				},
+				{ enemy: [49], limit: 1, descriptions: {
+					en: 'Rogue Cleared',
+					tr: 'Haydut Temizlendi'
+				} },
+				{ enemy: [66], limit: 1, descriptions: {
+					en: 'Rider Cleared',
+					tr: 'Binici Temizlendi'
+				} }],
+				maps: [3],
+				after: function() {
+					takeNextQuest();
+					episode.enemies.find(x => x.npc === 'druid').disabled = false;
+					episode.NPCS = episode.enemies.filter(x => x.npc && !x.disabled);
+					episode.pauseBgMusic(1);
+				}
+			},
+			{
+				id: 5,
+				names: {
+					en: 'Save Princess',
+					tr: 'Prensesi Kurtar'
+				},
+				descriptions: {
+					en: 'Princess Saved',
+					tr: 'Prenses Kurtarıldı'
+				},
+				owner: 'system',
+				minLevel: 1,
+				loots: [
+					{
+						object: ['druid'],
+						limit: 1,
+						noInfo: true,
+						key: 'druid',
+						type: 'quest-item',
+						chanceRate: 100,
+						command:'Save'
+					}
+				],
+				after: function() {
+					episode.pauseBgMusic(1);
+					const _druid = episode.enemies.find(x => x.id === 67);
+					_druid.remove = true;
+					getQuestRewards(__account.questStatus.quest);
+					episode.playSound({ key: 'questdone', volume: .8 });
+					takeNextQuest();
+					const _princess = summonMob(58, MathRound(mainCharacter.SCREENLEFT / __zoom), mainCharacter.yPosition, mainCharacter.level);
+					_princess.friendly = _princess.invulnerable = true;
+					_princess.still = _princess.immobilize = false;
+					if(mainCharacter.direction === 'left') {
+						_princess.direction = 'right';
+						_princess.left = MathRound(mainCharacter.SCREENLEFT - mainCharacter.WIDTH);
+					}
+					else {
+						_princess.direction = 'left';
+						_princess.left = MathRound(mainCharacter.SCREENLEFT + mainCharacter.WIDTH + mainCharacter.WIDTH);
+					}
+					_princess.updateVariables();
+					mainCharacter.keyboard.holdingKeys = [];
+					mainCharacter.animate('idle', 1);
+					mainCharacter.immobilize = mainCharacter.disableKeyboard = true;
+					cssAnimations.film(null, [
+						{
+							do: function() {
+								createBubbleText({
+									id: 2,
+									location: { map: episode.id }, ms: 2000,
+									owner: _princess.key,
+									text: "Thank you my hero"
+								});
+							},
+							ms: 0
+						},
+						{
+							do: function() {
+								createBubbleText({
+									id: 3,
+									location: { map: episode.id }, ms: 2100,
+									owner: mainCharacter.key,
+									text: "We need somewhere to hide!"
+								});
+							},
+							ms: 2200
+						},
+						{
+							do: function() {
+								createBubbleText({
+									id: 4,
+									location: { map: episode.id }, ms: 2100,
+									owner: _princess.key,
+									text: "I know a place, lets go..."
+								});
+							},
+							ms: 4500
+						}
+					], 6800, function() {
+						episode.showLocationHand('left');
+						episode.phase = 1;
+						mainCharacter.immobilize = false;
+						delete mainCharacter.disableKeyboard;
+					});
+				},
+				maps: [3]
+			},
+			{
+				id: 6,
+				names: {
+					en: 'Find Safe Place',
+					tr: 'Güvenli Yer Bul'
+				},
+				descriptions: {
+					en: 'Place Found',
+					tr: 'Yer Bulundu'
+				},
+				owner: 'system',
+				minLevel: 1,
+				loots: [
+					{
+						object: ['wizard'],
+						limit: 1,
+						noInfo: true,
+						key: 'wizard',
+						type: 'quest-item',
+						chanceRate: 100,
+						command:'Find'
+					}
+				],
+				after: function() {
+					takeNextQuest();
+					__account.questStatus.state = 'begin';
+					updateQuestArea();
+					const _dk = episode.enemies.find(x => x.id === 72);
+					_dk.npc = true;
+					episode.resetMainQuest();
+					episode.endTime = _gameTick;
+				},
+				maps: [1]
+			},
+			{
+				id: 7,
+				names: {
+					en: 'Talk With Elder',
+					tr: 'Bilge İle Konuş'
+				},
+				descriptions: {
+					en: 'Elder Talked',
+					tr: 'Bilge Konuştu'
+				},
+				dialogId:6,
+				loots: [
+					{
+						object: ['wizard'],
+						limit: 1,
+						noInfo: true,
+						key: 'wizard',
+						type: 'quest-item',
+						chanceRate: 100,
+						command:'Talk'
+					}
+				],
+				statusChanged: function(_status) {
+					if(_status !== 'progress')
+						return;
+					completeQuest();
+					const _p = episode.enemies.find(x => x.class === 'druid');
+					if(!_p)
+						return;
+					const _a = episode.enemies.find(x => x.class === 'archer');
+					if(!_a)
+						return;
+					episode.drawSpriteObjects2('wizard', 1);
+					const _dk = episode.enemies.find(x => x.id === 72);
+					_dk.npc = true;
+					removeNPCQuestMarks();
+					_p.yPosition = groundheight;
+					_p.still = _p.immobilize = true;
+					_p.left = MathRound(1900 * __zoom);
+					_p.npc = true;
+					_p.platformX = platformX;
+					_p.friendly = true;
+					_p.enemy = false;
+					_p.animate('idle', 1);
+					_p.direction = 'left';
+					mainCharacter.direction = 'right';
+					_a.left = mainCharacter.SCREENLEFT + platformX + MathRound(1.5 * mainCharacter.WIDTH);
+					_a.yPosition = mainCharacter.yPosition;
+					mainCharacter.disableKeyboard = true;
+					mainCharacter.keyboard.holdingKeys = [];
+					mainCharacter.standBy();
+					_p.updateVariables();
+					_a.updateVariables();
+					_a.standBy();
+					cssAnimations.film(null, [
+						{
+							do: function() {
+								createBubbleText({
+									id: 991,
+									location: { map: episode.id }, ms: 2000,
+									owner: _a.key,
+									text: "I'll try to find support for us"
+								});
+							},
+							ms: 2000
+						},
+						{
+							do: function() {
+								createBubbleText({
+									id: 992,
+									location: { map: episode.id }, ms: 2000,
+									owner: mainCharacter.key,
+									text: "Ok, but be careful"
+								});
+							},
+							ms: 4100
+						},
+					], 5200, function() {
+						installStoryFinish();
+					});
+				},
+				owner: 'wizard',
+				minLevel: 1,
+				maps: [1]
 			}
 		],
 		title: {
@@ -693,7 +931,7 @@ const __stories = [
 									mainCharacter.enableSkill('defense');
 									focusMe('#skill8', function() {
 										mainCharacter.animate('defense', 1);
-									});
+									},null, null, null, null, 1);
 									mainCharacter.enableSkill('defense');
 									mainCharacter.animations.defense.after = function() {
 										mainCharacter.animations.release.frames.forEach(x => x.buffs = undefined);
@@ -708,9 +946,13 @@ const __stories = [
 											owner: mainCharacter.key,
 											text: "Damn! Machine in my head!",
 											onend: function() {
-												cssAnimations.black(null, 3000, getLangData('Meanwhile, deep in the sewers...'), function() {
+												__storyTell = new story(6, null, null, 'Meanwhile, the quakes created by the monster caused a prisoner in dungeon to be freed from his chains', function() {
+													//installStoryFinish();
 													switchStoryScene();
 												});
+												// cssAnimations.black(null, 3000, getLangData('Meanwhile, deep in the sewers...'), function() {
+												// 	switchStoryScene();
+												// });
 											}
 										});
 									}
@@ -729,7 +971,7 @@ const __stories = [
 						minLevel: 20,
 						groupId: 1,
 						spawnAsGroup: 1,
-						spawnTime: 1,
+						spawnTime: 3,
 						spawnDirection: 'right',
 						spawn:1,
 						maxLevel: 20,
@@ -772,7 +1014,7 @@ const __stories = [
 						groupId: 1,
 						spawnDirection: 'right',
 						spawnAsGroup: 1,
-						spawnTime: 1,
+						spawnTime: 3,
 						spawn:1,
 						minLevel: 20,
 						maxLevel: 20,
@@ -795,7 +1037,7 @@ const __stories = [
 						groupId: 1,
 						spawnDirection: 'right',
 						spawnAsGroup: 1,
-						spawnTime: 1,
+						spawnTime: 3,
 						spawn:1,
 						minLevel: 20,
 						maxLevel: 20,
@@ -818,7 +1060,7 @@ const __stories = [
 						groupId: 1,
 						spawnDirection: 'right',
 						spawnAsGroup: 1,
-						spawnTime: 1,
+						spawnTime: 3,
 						spawn:1,
 						minLevel: 20,
 						maxLevel: 20,
@@ -840,7 +1082,7 @@ const __stories = [
 						groupId: 1,
 						spawnDirection: 'right',
 						spawnAsGroup: 1,
-						spawnTime: 1,
+						spawnTime: 3,
 						spawn:1,
 						sight:1000,
 						minLevel: 20,
@@ -863,7 +1105,7 @@ const __stories = [
 						groupId: 1,
 						spawnDirection: 'right',
 						spawnAsGroup: 1,
-						spawnTime: 1,
+						spawnTime: 3,
 						spawn:1,
 						sight:1000,
 						minLevel: 20,
@@ -886,7 +1128,7 @@ const __stories = [
 						groupId: 1,
 						spawnDirection: 'right',
 						spawnAsGroup: 1,
-						spawnTime: 1,
+						spawnTime: 3,
 						spawn:1,
 						sight:1000,
 						minLevel: 20,
@@ -909,7 +1151,7 @@ const __stories = [
 						groupId: 1,
 						spawnDirection: 'right',
 						spawnAsGroup: 1,
-						spawnTime: 1,
+						spawnTime: 3,
 						spawn:1,
 						sight:1000,
 						minLevel: 20,
@@ -932,7 +1174,7 @@ const __stories = [
 						groupId: 1,
 						spawnDirection: 'right',
 						spawnAsGroup: 1,
-						spawnTime: 1,
+						spawnTime: 3,
 						spawn:1,
 						sight:1000,
 						minLevel: 20,
@@ -955,7 +1197,7 @@ const __stories = [
 						groupId: 2,
 						spawnDirection: 'left',
 						spawnAsGroup: 1,
-						spawnTime: 1,
+						spawnTime: 3,
 						spawn:1,
 						sight:1000,
 						minLevel: 20,
@@ -978,7 +1220,7 @@ const __stories = [
 						groupId: 2,
 						spawnDirection: 'left',
 						spawnAsGroup: 1,
-						spawnTime: 1,
+						spawnTime: 3,
 						spawn:1,
 						sight:1000,
 						minLevel: 20,
@@ -1001,7 +1243,7 @@ const __stories = [
 						groupId: 2,
 						spawnDirection: 'left',
 						spawnAsGroup: 1,
-						spawnTime: 1,
+						spawnTime: 3,
 						spawn:1,
 						sight:1000,
 						minLevel: 20,
@@ -1171,8 +1413,14 @@ const __stories = [
 							episode.enemies.forEach(x => x.immobilize = x.invulnerable = false);
 							__storyCutScenePlaying = 0;
 							delete mainCharacter.disableKeyboard;
-							takeQuest(0, 1);
-							episode.enemies.filter(x => x.enemy && x.class !== 'object')?.forEach(x => x.invulnerable = false);
+							takeQuest(0, 1, null, null, 1);
+							delete mainCharacter.animations.roll.cooldown;
+							delete mainCharacter.animations.roll.coolDownLeft;
+							episode.enemies.filter(x => x.enemy && x.class !== 'object')?.forEach(x => {
+								x.invulnerable = false;
+								if(x.deadFirst && !x.remove)
+									x.remove = true;
+							});
 						}, function() {
 							if(!_goblinsInstalled)
 								for(let i = 0; i < 10; i++) {
@@ -1208,7 +1456,8 @@ const __stories = [
 							episode.enemies.filter(x => x.alp).forEach(x => x.remove = true);
 							setTimeout(() => {
 								__storyTell = new story(1, null, null, 'Two prisoners waiting for death in the dungeon managed to escape among these ruins', function() {
-									installStoryFinish();
+									//installStoryFinish();
+									switchStoryScene();
 								});
 							}, 100);
 						}
@@ -1260,14 +1509,16 @@ const __stories = [
 								mainCharacter.keyboard.holdingKeys = [];
 								mainCharacter.left = MathRound(_canvas.width * .35);
 								mainCharacter.idle();
-								mainCharacter.enableSkills();
+								mainCharacter.animations.attack.chargeDistance.value = 80;
 								episode.removeLocationHand();
+								if(mainCharacter.level === 1)
+									mainCharacter.enableSkills();
 								mainCharacter.still = mainCharacter.immobilize = true;
 								createBubbleText({
 									id: 1,
 									location: { map: episode.id }, ms: 2000,
 									owner: (episode.enemies.find(x => x.class === 'archer')).key,
-									text: "Get off the rats!",
+									text: "Get off the rat!",
 									onend: function() {
 										const _charge = function(){
 											mainCharacter.disableKeyboard = mainCharacter.still = mainCharacter.immobilize = false;
@@ -1278,6 +1529,12 @@ const __stories = [
 										}
 										if(__account.tutorials?.indexOf('charge') >= 0) {
 											_charge();
+											if(mainCharacter.level > 1){
+												const _e = episode.enemies.find(x => x.id === 28);
+												_e.still = _e.reversed = _e.immobilize = _e.noDirection = false;
+												_e.direction = 'left';
+												_e.setAutoMode(2);
+											}
 											return;
 										}
 										if(!__account.tutorials)
@@ -1288,7 +1545,7 @@ const __stories = [
 											mainCharacter.animate('attack', 1);
 											removeFocus();
 											disposeFocus();
-										}, false, getLangData('Press to single attack, hold to combo attack'));
+										}, false, getLangData('Press to single attack, hold to combo attack'), null, null, 1);
 									}
 								});
 							});
@@ -1386,285 +1643,6 @@ const __stories = [
 					}, 500);
 				}
 			},
-			getLobbyScene()
-		]
-	},
-	{
-		id: 2,
-		order: 2,
-		disableWorldMap: true,
-		loadingCharacterIds: [2],
-		resultStars: [
-			{ id: 1, title: 'Clear story', when: function() {
-				return !mainCharacter.isDead();
-			}},
-			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
-				when: function(_item) {
-					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return (_gameTick - (__story.startTime ?? _gameTick)) <= (_item.value);
-			}},
-			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return mainCharacter.health >= MathFloor(mainCharacter.maxHP * _item.value);
-			}}
-		],
-		ticket: 2,
-		list:true,
-		firstFinishRewards: [{ key: 'chest', grade: 1 }],
-		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
-		rewards: [
-			{ key: 'item', grade: 2, type: 'ring', count:1 },
-			{ key: 'gem', grade: 1, type: 'random', count:1, chance:50 },
-			{ key: 'gold', count: 5500 },
-			{ key: 'exp', count: 1100 }
-		],
-		quests: [
-			{
-				id: 1,
-				names: {
-					en: 'Clear Goblins',
-					tr: 'Goblinleri Temizle'
-				},
-				owner: 'system',
-				minLevel: 1,
-				kills: [{
-					enemy: [19],
-					limit: 5,
-					descriptions: {
-						en: 'Goblin Cleared',
-						tr: 'Goblin Temizlendi'
-					}
-				},
-				{ enemy: [49], limit: 1, descriptions: {
-					en: 'Rogue Cleared',
-					tr: 'Haydut Temizlendi'
-				} },
-				{ enemy: [66], limit: 1, descriptions: {
-					en: 'Rider Cleared',
-					tr: 'Binici Temizlendi'
-				} }],
-				maps: [3],
-				after: function() {
-					takeNextQuest();
-					episode.enemies.find(x => x.npc === 'druid').disabled = false;
-					episode.NPCS = episode.enemies.filter(x => x.npc && !x.disabled);
-					episode.pauseBgMusic(1);
-				}
-			},
-			{
-				id: 2,
-				names: {
-					en: 'Save Princess',
-					tr: 'Prensesi Kurtar'
-				},
-				descriptions: {
-					en: 'Princess Saved',
-					tr: 'Prenses Kurtarıldı'
-				},
-				owner: 'system',
-				minLevel: 1,
-				loots: [
-					{
-						object: ['druid'],
-						limit: 1,
-						noInfo: true,
-						key: 'druid',
-						type: 'quest-item',
-						chanceRate: 100,
-						command:'Save'
-					}
-				],
-				after: function() {
-					episode.pauseBgMusic(1);
-					const _druid = episode.enemies.find(x => x.id === 67);
-					_druid.remove = true;
-					getQuestRewards(__account.questStatus.quest);
-					episode.playSound({ key: 'questdone', volume: .8 });
-					takeNextQuest();
-					const _princess = summonMob(58, MathRound(mainCharacter.SCREENLEFT / __zoom), mainCharacter.yPosition, mainCharacter.level);
-					_princess.friendly = _princess.invulnerable = true;
-					_princess.still = _princess.immobilize = false;
-					if(mainCharacter.direction === 'left') {
-						_princess.direction = 'right';
-						_princess.left = MathRound(mainCharacter.SCREENLEFT - mainCharacter.WIDTH);
-					}
-					else {
-						_princess.direction = 'left';
-						_princess.left = MathRound(mainCharacter.SCREENLEFT + mainCharacter.WIDTH + mainCharacter.WIDTH);
-					}
-					_princess.updateVariables();
-					mainCharacter.keyboard.holdingKeys = [];
-					mainCharacter.animate('idle', 1);
-					mainCharacter.immobilize = mainCharacter.disableKeyboard = true;
-					cssAnimations.film(null, [
-						{
-							do: function() {
-								createBubbleText({
-									id: 2,
-									location: { map: episode.id }, ms: 2000,
-									owner: _princess.key,
-									text: "Thank you my hero"
-								});
-							},
-							ms: 0
-						},
-						{
-							do: function() {
-								createBubbleText({
-									id: 3,
-									location: { map: episode.id }, ms: 2100,
-									owner: mainCharacter.key,
-									text: "We need somewhere to hide!"
-								});
-							},
-							ms: 2200
-						},
-						{
-							do: function() {
-								createBubbleText({
-									id: 4,
-									location: { map: episode.id }, ms: 2100,
-									owner: _princess.key,
-									text: "I know a place, lets go..."
-								});
-							},
-							ms: 4500
-						}
-					], 6800, function() {
-						episode.showLocationHand('left');
-						episode.phase = 1;
-						mainCharacter.immobilize = false;
-						delete mainCharacter.disableKeyboard;
-					});
-				},
-				maps: [3]
-			},
-			{
-				id: 3,
-				names: {
-					en: 'Find Safe Place',
-					tr: 'Güvenli Yer Bul'
-				},
-				descriptions: {
-					en: 'Place Found',
-					tr: 'Yer Bulundu'
-				},
-				owner: 'system',
-				minLevel: 1,
-				loots: [
-					{
-						object: ['wizard'],
-						limit: 1,
-						noInfo: true,
-						key: 'wizard',
-						type: 'quest-item',
-						chanceRate: 100,
-						command:'Find'
-					}
-				],
-				after: function() {
-					takeNextQuest();
-					__account.questStatus.state = 'begin';
-					updateQuestArea();
-					const _dk = episode.enemies.find(x => x.id === 72);
-					_dk.npc = true;
-					episode.resetMainQuest();
-					episode.endTime = _gameTick;
-				},
-				maps: [1]
-			},
-			{
-				id: 4,
-				names: {
-					en: 'Talk With Elder',
-					tr: 'Bilge İle Konuş'
-				},
-				descriptions: {
-					en: 'Elder Talked',
-					tr: 'Bilge Konuştu'
-				},
-				dialogId:6,
-				loots: [
-					{
-						object: ['wizard'],
-						limit: 1,
-						noInfo: true,
-						key: 'wizard',
-						type: 'quest-item',
-						chanceRate: 100,
-						command:'Talk'
-					}
-				],
-				statusChanged: function(_status) {
-					if(_status !== 'progress')
-						return;
-					completeQuest();
-					const _p = episode.enemies.find(x => x.class === 'druid');
-					if(!_p)
-						return;
-					const _a = episode.enemies.find(x => x.class === 'archer');
-					if(!_a)
-						return;
-					_p.yPosition = groundheight;
-					_p.still = _p.immobilize = true;
-					_p.left = MathRound(1900 * __zoom);
-					_p.npc = true;
-					_p.platformX = platformX;
-					_p.friendly = true;
-					_p.enemy = false;
-					_p.animate('idle', 1);
-					_p.direction = 'left';
-					mainCharacter.direction = 'right';
-					_a.left = mainCharacter.SCREENLEFT + platformX + MathRound(1.5 * mainCharacter.WIDTH);
-					_a.yPosition = mainCharacter.yPosition;
-					mainCharacter.disableKeyboard = true;
-					mainCharacter.keyboard.holdingKeys = [];
-					mainCharacter.standBy();
-					_p.updateVariables();
-					_a.updateVariables();
-					_a.standBy();
-					cssAnimations.film(null, [
-						{
-							do: function() {
-								createBubbleText({
-									id: 991,
-									location: { map: episode.id }, ms: 2000,
-									owner: mainCharacter.key,
-									text: "You should stay with them"
-								});
-							},
-							ms: 2000
-						},
-						{
-							do: function() {
-								createBubbleText({
-									id: 992,
-									location: { map: episode.id }, ms: 2000,
-									owner: _a.key,
-									text: "Ok, but be careful"
-								});
-							},
-							ms: 4100
-						},
-					], 5200, function() {
-						installStoryFinish();
-					});
-				},
-				owner: 'wizard',
-				minLevel: 1,
-				maps: [1]
-			}
-		],
-		title: {
-			en: "A Place to Refuge",
-			tr: "Sığınılacak Bir Yer"
-		},
-		description: {
-			en: "Our heroes are searching for a place to hide but goblins are all around",
-			tr: "Kahramanlarımız saklanacakları bir yer ararken goblinler ortalıkta cirit atmaktadır"
-		},
-		boss: "tent",
-		minLevel: 2,
-		scenes: [
 			{
 				map: 3,
 				from: 'right',
@@ -1709,7 +1687,7 @@ const __stories = [
 								mainCharacter.animate(mainCharacter.chains[1].key, 1);
 								mainCharacter.counterLearned = 1;
 								disposeFocus();
-							}, null, getLangData('Hold block before attack or press here after attack to make counterattack'))
+							}, null, getLangData('Hold block before attack or press here after attack to make counterattack'), null, null, 1);
 						}
 					},
 					{
@@ -1755,9 +1733,11 @@ const __stories = [
 						do: function() {
 							delete episode.phase;
 							episode.removeLocationHand();
-							__storyTell = new story(2, function() {
+							__storyTell = new story(2, null, null, 
+							'Our heroes take shelter in a camp, unaware that they are being followed',
+							function() {
 								switchStoryScene();
-							}, null, 'Our heroes take shelter in a camp, unaware that they are being followed');
+							});
 						}
 					}
 				],
@@ -1978,11 +1958,16 @@ const __stories = [
 					], 5600, function() {
 						mainCharacter.immobilize = false;
 						delete mainCharacter.disableKeyboard;
-						takeQuest(0, 1, null, null, 1);
+						takeQuest(3, 1, null, null, 1);
 						episode.showLocationHand('left');
 						mainCharacter.solid = true;
 						episode.enemies.filter(x => x.class === 'object' && x.id !== 5).forEach(x => x.solid = true);
 						episode.hasSolid = true;
+						const _level = mainCharacter.level;
+						if(_level === 1) {
+							setCharacterLevel(2, mainCharacter);
+							_client.saveState();
+						}
 					});
 				}
 			},
@@ -2110,9 +2095,730 @@ const __stories = [
 			getLobbyScene()
 		]
 	},
+	// {
+	// 	id: 2,
+	// 	order: 2,
+	// 	disableWorldMap: true,
+	// 	loadingCharacterIds: [2],
+	// 	resultStars: [
+	// 		{ id: 1, title: 'Clear story', when: function() {
+	// 			return !mainCharacter.isDead();
+	// 		}},
+	// 		{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
+	// 			when: function(_item) {
+	// 				//return !isMissionFailed(0) && !isMissionFailed(2) &&
+	// 				return (_gameTick - (__story.startTime ?? _gameTick)) <= (_item.value);
+	// 		}},
+	// 		{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
+	// 			return mainCharacter.health >= MathFloor(mainCharacter.maxHP * _item.value);
+	// 		}}
+	// 	],
+	// 	ticket: 2,
+	// 	list:true,
+	// 	firstFinishRewards: [{ key: 'chest', grade: 1 }],
+	// 	perfectFinishRewards: [{ key: 'chest', grade: 1 }],
+	// 	rewards: [
+	// 		{ key: 'item', grade: 2, type: 'ring', count:1 },
+	// 		{ key: 'gem', grade: 1, type: 'random', count:1, chance:50 },
+	// 		{ key: 'gold', count: 5500 },
+	// 		{ key: 'exp', count: 1100 }
+	// 	],
+	// 	quests: [
+	// 		{
+	// 			id: 1,
+	// 			names: {
+	// 				en: 'Clear Goblins',
+	// 				tr: 'Goblinleri Temizle'
+	// 			},
+	// 			owner: 'system',
+	// 			minLevel: 1,
+	// 			kills: [{
+	// 				enemy: [19],
+	// 				limit: 5,
+	// 				descriptions: {
+	// 					en: 'Goblin Cleared',
+	// 					tr: 'Goblin Temizlendi'
+	// 				}
+	// 			},
+	// 			{ enemy: [49], limit: 1, descriptions: {
+	// 				en: 'Rogue Cleared',
+	// 				tr: 'Haydut Temizlendi'
+	// 			} },
+	// 			{ enemy: [66], limit: 1, descriptions: {
+	// 				en: 'Rider Cleared',
+	// 				tr: 'Binici Temizlendi'
+	// 			} }],
+	// 			maps: [3],
+	// 			after: function() {
+	// 				takeNextQuest();
+	// 				episode.enemies.find(x => x.npc === 'druid').disabled = false;
+	// 				episode.NPCS = episode.enemies.filter(x => x.npc && !x.disabled);
+	// 				episode.pauseBgMusic(1);
+	// 			}
+	// 		},
+	// 		{
+	// 			id: 2,
+	// 			names: {
+	// 				en: 'Save Princess',
+	// 				tr: 'Prensesi Kurtar'
+	// 			},
+	// 			descriptions: {
+	// 				en: 'Princess Saved',
+	// 				tr: 'Prenses Kurtarıldı'
+	// 			},
+	// 			owner: 'system',
+	// 			minLevel: 1,
+	// 			loots: [
+	// 				{
+	// 					object: ['druid'],
+	// 					limit: 1,
+	// 					noInfo: true,
+	// 					key: 'druid',
+	// 					type: 'quest-item',
+	// 					chanceRate: 100,
+	// 					command:'Save'
+	// 				}
+	// 			],
+	// 			after: function() {
+	// 				episode.pauseBgMusic(1);
+	// 				const _druid = episode.enemies.find(x => x.id === 67);
+	// 				_druid.remove = true;
+	// 				getQuestRewards(__account.questStatus.quest);
+	// 				episode.playSound({ key: 'questdone', volume: .8 });
+	// 				takeNextQuest();
+	// 				const _princess = summonMob(58, MathRound(mainCharacter.SCREENLEFT / __zoom), mainCharacter.yPosition, mainCharacter.level);
+	// 				_princess.friendly = _princess.invulnerable = true;
+	// 				_princess.still = _princess.immobilize = false;
+	// 				if(mainCharacter.direction === 'left') {
+	// 					_princess.direction = 'right';
+	// 					_princess.left = MathRound(mainCharacter.SCREENLEFT - mainCharacter.WIDTH);
+	// 				}
+	// 				else {
+	// 					_princess.direction = 'left';
+	// 					_princess.left = MathRound(mainCharacter.SCREENLEFT + mainCharacter.WIDTH + mainCharacter.WIDTH);
+	// 				}
+	// 				_princess.updateVariables();
+	// 				mainCharacter.keyboard.holdingKeys = [];
+	// 				mainCharacter.animate('idle', 1);
+	// 				mainCharacter.immobilize = mainCharacter.disableKeyboard = true;
+	// 				cssAnimations.film(null, [
+	// 					{
+	// 						do: function() {
+	// 							createBubbleText({
+	// 								id: 2,
+	// 								location: { map: episode.id }, ms: 2000,
+	// 								owner: _princess.key,
+	// 								text: "Thank you my hero"
+	// 							});
+	// 						},
+	// 						ms: 0
+	// 					},
+	// 					{
+	// 						do: function() {
+	// 							createBubbleText({
+	// 								id: 3,
+	// 								location: { map: episode.id }, ms: 2100,
+	// 								owner: mainCharacter.key,
+	// 								text: "We need somewhere to hide!"
+	// 							});
+	// 						},
+	// 						ms: 2200
+	// 					},
+	// 					{
+	// 						do: function() {
+	// 							createBubbleText({
+	// 								id: 4,
+	// 								location: { map: episode.id }, ms: 2100,
+	// 								owner: _princess.key,
+	// 								text: "I know a place, lets go..."
+	// 							});
+	// 						},
+	// 						ms: 4500
+	// 					}
+	// 				], 6800, function() {
+	// 					episode.showLocationHand('left');
+	// 					episode.phase = 1;
+	// 					mainCharacter.immobilize = false;
+	// 					delete mainCharacter.disableKeyboard;
+	// 				});
+	// 			},
+	// 			maps: [3]
+	// 		},
+	// 		{
+	// 			id: 3,
+	// 			names: {
+	// 				en: 'Find Safe Place',
+	// 				tr: 'Güvenli Yer Bul'
+	// 			},
+	// 			descriptions: {
+	// 				en: 'Place Found',
+	// 				tr: 'Yer Bulundu'
+	// 			},
+	// 			owner: 'system',
+	// 			minLevel: 1,
+	// 			loots: [
+	// 				{
+	// 					object: ['wizard'],
+	// 					limit: 1,
+	// 					noInfo: true,
+	// 					key: 'wizard',
+	// 					type: 'quest-item',
+	// 					chanceRate: 100,
+	// 					command:'Find'
+	// 				}
+	// 			],
+	// 			after: function() {
+	// 				takeNextQuest();
+	// 				__account.questStatus.state = 'begin';
+	// 				updateQuestArea();
+	// 				const _dk = episode.enemies.find(x => x.id === 72);
+	// 				_dk.npc = true;
+	// 				episode.resetMainQuest();
+	// 				episode.endTime = _gameTick;
+	// 			},
+	// 			maps: [1]
+	// 		},
+	// 		{
+	// 			id: 4,
+	// 			names: {
+	// 				en: 'Talk With Elder',
+	// 				tr: 'Bilge İle Konuş'
+	// 			},
+	// 			descriptions: {
+	// 				en: 'Elder Talked',
+	// 				tr: 'Bilge Konuştu'
+	// 			},
+	// 			dialogId:6,
+	// 			loots: [
+	// 				{
+	// 					object: ['wizard'],
+	// 					limit: 1,
+	// 					noInfo: true,
+	// 					key: 'wizard',
+	// 					type: 'quest-item',
+	// 					chanceRate: 100,
+	// 					command:'Talk'
+	// 				}
+	// 			],
+	// 			statusChanged: function(_status) {
+	// 				if(_status !== 'progress')
+	// 					return;
+	// 				completeQuest();
+	// 				const _p = episode.enemies.find(x => x.class === 'druid');
+	// 				if(!_p)
+	// 					return;
+	// 				const _a = episode.enemies.find(x => x.class === 'archer');
+	// 				if(!_a)
+	// 					return;
+	// 				_p.yPosition = groundheight;
+	// 				_p.still = _p.immobilize = true;
+	// 				_p.left = MathRound(1900 * __zoom);
+	// 				_p.npc = true;
+	// 				_p.platformX = platformX;
+	// 				_p.friendly = true;
+	// 				_p.enemy = false;
+	// 				_p.animate('idle', 1);
+	// 				_p.direction = 'left';
+	// 				mainCharacter.direction = 'right';
+	// 				_a.left = mainCharacter.SCREENLEFT + platformX + MathRound(1.5 * mainCharacter.WIDTH);
+	// 				_a.yPosition = mainCharacter.yPosition;
+	// 				mainCharacter.disableKeyboard = true;
+	// 				mainCharacter.keyboard.holdingKeys = [];
+	// 				mainCharacter.standBy();
+	// 				_p.updateVariables();
+	// 				_a.updateVariables();
+	// 				_a.standBy();
+	// 				cssAnimations.film(null, [
+	// 					{
+	// 						do: function() {
+	// 							createBubbleText({
+	// 								id: 991,
+	// 								location: { map: episode.id }, ms: 2000,
+	// 								owner: mainCharacter.key,
+	// 								text: "You should stay with them"
+	// 							});
+	// 						},
+	// 						ms: 2000
+	// 					},
+	// 					{
+	// 						do: function() {
+	// 							createBubbleText({
+	// 								id: 992,
+	// 								location: { map: episode.id }, ms: 2000,
+	// 								owner: _a.key,
+	// 								text: "Ok, but be careful"
+	// 							});
+	// 						},
+	// 						ms: 4100
+	// 					},
+	// 				], 5200, function() {
+	// 					installStoryFinish();
+	// 				});
+	// 			},
+	// 			owner: 'wizard',
+	// 			minLevel: 1,
+	// 			maps: [1]
+	// 		}
+	// 	],
+	// 	title: {
+	// 		en: "A Place to Refuge",
+	// 		tr: "Sığınılacak Bir Yer"
+	// 	},
+	// 	description: {
+	// 		en: "Our heroes are searching for a place to hide but goblins are all around",
+	// 		tr: "Kahramanlarımız saklanacakları bir yer ararken goblinler ortalıkta cirit atmaktadır"
+	// 	},
+	// 	boss: "tent",
+	// 	minLevel: 2,
+	// 	scenes: [
+	// 		{
+	// 			map: 3,
+	// 			from: 'right',
+	// 			startWith: 1,
+	// 			save: true,
+	// 			actions: [
+	// 				{
+	// 					when: function() {
+	// 						if(mainCharacter.attacked && !episode.firstFly){
+	// 							const _mob = episode.enemies.find(x => x.animations.deadfly && x.animation !== 'deadfly' && x.health < x.MAXHP)
+	// 							if(_mob){
+	// 								_mob.health = 0;
+	// 								_mob.animate('deadfly', 1);
+	// 								episode.firstFly = 1;
+	// 								return true;
+	// 							}
+	// 						}
+	// 						return false;
+	// 					}
+	// 				},
+	// 				{
+	// 					when: function() {
+	// 						return !_game.suspended && mainCharacter.chains && !mainCharacter.attackedByObject && !mainCharacter.counterLearned;
+	// 					},
+	// 					do: function() {
+	// 						if(__account.tutorials?.indexOf('hold-block') >= 0)
+	// 							return;
+	// 						if(!__account.tutorials)
+	// 							__account.tutorials = [];
+	// 						__account.tutorials.push('hold-block');
+	// 						let _id = 'chain-skill-2';
+	// 						const _cs = document.getElementById(_id);
+	// 						if(hasClass(_cs, 'v-none'))
+	// 							_id = 'chain-skill-4';
+	// 						_game.suspended = 1;
+	// 						focusMe('#' + _id, function() {
+	// 							removeFocus();
+	// 							delete _game.suspended;
+	// 							delete mainCharacter.disableKeyboard;
+	// 							mainCharacter.still = mainCharacter.immobilize = false;
+	// 							mainCharacter.enableSkills();
+	// 							mainCharacter.animate(mainCharacter.chains[1].key, 1);
+	// 							mainCharacter.counterLearned = 1;
+	// 							disposeFocus();
+	// 						}, null, getLangData('Hold block before attack or press here after attack to make counterattack'))
+	// 					}
+	// 				},
+	// 				{
+	// 					when: function() {
+	// 						return !mainCharacter.curious && !_game.suspended && (mainCharacter.LEFT + platformX) < (episode.width - _canvas.width)
+	// 					},
+	// 					do: function() {
+	// 						mainCharacter.curious = 1;
+	// 						createBubbleText({
+	// 							id: 998,
+	// 							location: { map: episode.id }, ms: 2500,
+	// 							owner: mainCharacter.key,
+	// 							text: "What's going on there?",
+	// 						});
+	// 					}
+	// 				},
+	// 				{
+	// 					when: function() {
+	// 						return episode.phase === undefined && mainCharacter.targetedBy;
+	// 					},
+	// 					do: function() {
+	// 						episode.phase = 0;
+	// 						const _rider = episode.enemies.find(x => x.enemy && x.grade > 1);
+	// 						if(_rider) {
+	// 							createBubbleText({
+	// 								id: 999,
+	// 								location: { map: episode.id }, ms: 2000,
+	// 								owner: _rider.key,
+	// 								text: "Intruder!",
+	// 							});
+	// 							_rider.setAutoTarget(mainCharacter);
+	// 							episode.removeLocationHand();
+	// 							episode.pauseBgMusic(1);
+	// 							episode.createBgMusic(null, null, null, 'story1-forest', .5);
+	// 							episode.playBgMusic();
+	// 						}
+	// 					}
+	// 				},
+	// 				{
+	// 					when: function() {
+	// 						return episode.phase === 1 && mainCharacter.left <= 0 && platformX <= 0;
+	// 					},
+	// 					do: function() {
+	// 						delete episode.phase;
+	// 						episode.removeLocationHand();
+	// 						__storyTell = new story(2, function() {
+	// 							switchStoryScene();
+	// 						}, null, 'Our heroes take shelter in a camp, unaware that they are being followed');
+	// 					}
+	// 				}
+	// 			],
+	// 			mobs: [
+	// 				{
+	// 					id: 5,
+	// 					minX: 1760,
+	// 					maxX: 1760,
+	// 					sight: 0,
+	// 					count: 1,
+	// 					yPosition: function() {
+	// 						return MathRound(groundheight * .7);
+	// 					},
+	// 					minLevel: 1,
+	// 					maxLevel: 1
+	// 				},
+	// 				{
+	// 					id: 50,
+	// 					minX: 1900,
+	// 					maxX: 1900,
+	// 					sight: 1,
+	// 					count: 1,
+	// 					yPosition: function() {
+	// 						return MathRound(groundheight * .82);
+	// 					},
+	// 					minLevel: 1,
+	// 					maxLevel: 1
+	// 				},
+	// 				{
+	// 					id: 66,
+	// 					minX: 1500,
+	// 					maxX: 1500,
+	// 					sight: 25,
+	// 					count: 1,
+	// 					grade:2,
+	// 					groupId: 5,
+	// 					yPosition: function() {
+	// 						return MathRound(groundheight * (getRandomValue2(10,  70) /  100));
+	// 					}
+	// 				},
+	// 				{
+	// 					id: 49,
+	// 					minX: 1200,
+	// 					maxX: 1200,
+	// 					sight: 15,
+	// 					count: 1,
+	// 					minLevel: 1,
+	// 					experience: 0,
+	// 					yPosition: function() {
+	// 						return MathRound(groundheight * (getRandomValue2(10,  70) /  100));
+	// 					},
+	// 					maxLevel: 1,
+	// 					groupId: 5,
+	// 					hp: 100
+	// 				},
+	// 				{
+	// 					id: 19,
+	// 					minX: 1800,
+	// 					maxX: 1800,
+	// 					sight: 15,
+	// 					count: 1,
+	// 					minLevel: 1,
+	// 					maxLevel: 1,
+	// 					groupId: 5,
+	// 					experience: 0,
+	// 					yPosition: function() {
+	// 						return MathRound(groundheight * (getRandomValue2(10,  70) /  100));
+	// 					},
+	// 					hp: 100
+	// 				},
+	// 				{
+	// 					id: 61,
+	// 					minX: 1050,
+	// 					maxX: 1050,
+	// 					count: 1,
+	// 					experience: 0,
+	// 					yPosition: function() {
+	// 						return MathRound(groundheight * .96);
+	// 					}
+	// 				},
+	// 				{
+	// 					id: 64,
+	// 					minX: 1130,
+	// 					maxX: 1130,
+	// 					count: 1,
+	// 					yPosition: function() {
+	// 						return MathRound(groundheight * .95);
+	// 					}
+	// 				},
+	// 				{
+	// 					id: 63,
+	// 					minX: 860,
+	// 					maxX: 860,
+	// 					yPosition: function() {
+	// 						return MathRound(groundheight * .8);
+	// 					},
+	// 					count: 1
+	// 				},
+	// 				{
+	// 					id: 62,
+	// 					minX: 1375,
+	// 					maxX: 1375,
+	// 					yPosition: function() {
+	// 						return MathRound(groundheight * .92);
+	// 					},
+	// 					count: 1
+	// 				},
+	// 				{
+	// 					id: 63,
+	// 					minX: 2280,
+	// 					maxX: 2280,
+	// 					count: 1,
+	// 					yPosition: function() {
+	// 						return MathRound(groundheight * .71);
+	// 					},
+	// 					props: {
+	// 						noLoot: true,
+	// 						experience: 0,
+	// 						reversed: true,
+	// 						immobilize: true,
+	// 						direction: 'left'
+	// 					}
+	// 				},
+	// 				{
+	// 					id: 67,
+	// 					minX: 550,
+	// 					maxX: 550,
+	// 					count: 1,
+	// 					direction:'right',
+	// 					yPosition: function() {
+	// 						return MathRound(groundheight * .5);
+	// 					},
+	// 					props: {
+	// 						npc: 'druid',
+	// 						noLoot: true,
+	// 						experience: 0,
+	// 						disabled: true,
+	// 						solid: true,
+	// 						noDirection: true
+	// 					}
+	// 				},
+	// 				{
+	// 					id: 60,
+	// 					minX: 2445,
+	// 					maxX: 2445,
+	// 					count: 1,
+	// 					yPosition: function() {
+	// 						return MathRound(groundheight * .7);
+	// 					},
+	// 				},
+	// 				{
+	// 					id: 65,
+	// 					minX: 1900,
+	// 					maxX: 1900,
+	// 					count: 1,
+	// 					yPosition: function() {
+	// 						return MathRound(groundheight * .7);
+	// 					}
+	// 				}
+	// 			],
+	// 			// mobs: [
+	// 			// 	{
+	// 			// 		id: 3,
+	// 			// 		minX: 900,
+	// 			// 		maxX: 5900,
+	// 			// 		count: 10,
+	// 			// 		attackAfterHit: true
+	// 			// 	}
+	// 			// ],
+	// 			start: function() {
+	// 				//setCharacterLevel(3);
+	// 				removeCoopCharacter(1);
+	// 				const _char = addCoopCharacter(null, 'arc');
+	// 				_char.direction = 'right';
+	// 				_char.left = MathRound(mainCharacter.left + platformX - (1.5 * mainCharacter.WIDTH));
+	// 				_char.platformX = platformX;
+	// 				_char.yPosition = MathRound(.5 * groundheight);
+	// 				mainCharacter.immobilize = true;
+	// 				mainCharacter.keyboard.holdingKeys = [];
+	// 				mainCharacter.disableKeyboard = true;
+	// 				cssAnimations.film(null, [
+	// 					{
+	// 						do: function() {
+	// 							createBubbleText({
+	// 								id: 991,
+	// 								location: { map: episode.id }, ms: 1000,
+	// 								owner: mainCharacter.key,
+	// 								text: "Are you ok?"
+	// 							});
+	// 						},
+	// 						ms: 1100
+	// 					},
+	// 					{
+	// 						do: function() {
+	// 							createBubbleText({
+	// 								id: 992,
+	// 								location: { map: episode.id }, ms: 2000,
+	// 								owner: _char.key,
+	// 								text: "I'm still in one piece"
+	// 							});
+	// 						},
+	// 						ms: 2300
+	// 					},
+	// 					{
+	// 						do: function() {
+	// 							episode.playSound({key:'femalepain', end: function() {
+	// 								_char.direction = 'left';
+	// 								createBubbleText({
+	// 									id: 993,
+	// 									location: { map: episode.id }, ms: 1600,
+	// 									owner: _char.key,
+	// 									text: "Someone need help"
+	// 								});
+	// 							}});
+	// 						},
+	// 						ms: 4600
+	// 					},
+	// 				], 5600, function() {
+	// 					mainCharacter.immobilize = false;
+	// 					delete mainCharacter.disableKeyboard;
+	// 					takeQuest(0, 1, null, null, 1);
+	// 					episode.showLocationHand('left');
+	// 					mainCharacter.solid = true;
+	// 					episode.enemies.filter(x => x.class === 'object' && x.id !== 5).forEach(x => x.solid = true);
+	// 					episode.hasSolid = true;
+	// 				});
+	// 			}
+	// 		},
+	// 		{
+	// 			map: 1,
+	// 			save: true,
+	// 			from: 'right',
+	// 			startWith: 1,
+	// 			// actions: [
+	// 			// 	{
+	// 			// 		when: function(){
+	// 			// 			return (episode.phase === 1) && document.querySelector('#map-location-106');
+	// 			// 		},
+	// 			// 		do: function() {
+	// 			// 			episode.phase = 2;
+	// 			// 			if(__account.tutorials?.indexOf('map-location') >= 0)
+	// 			// 				return;
+	// 			// 			if(!__account.tutorials)
+	// 			// 				__account.tutorials = [];
+	// 			// 			__account.tutorials.push('map-location');
+	// 			// 			mainCharacter.still = true;
+	// 			// 			removeFocus();
+	// 			// 			focusMe('#map-location-106' , function() {
+	// 			// 				removeFocus();
+	// 			// 				switchStoryScene();
+	// 			// 				hideMyMenu();
+	// 			// 			});
+	// 			// 		}
+	// 			// 	}
+	// 			// ],
+	// 			mobs: [
+	// 				{
+	// 					id: 69,
+	// 					minX: 3340,
+	// 					maxX: 3340,
+	// 					count: 1,
+	// 					yPosition: function() {
+	// 						return groundheight;
+	// 					}
+	// 				},
+	// 				{
+	// 					id: 70,
+	// 					minX: 4340,
+	// 					maxX: 4340,
+	// 					count: 1,
+	// 					yPosition: function() {
+	// 						return groundheight;
+	// 					}
+	// 				},
+	// 				{
+	// 					id: 73,
+	// 					minX: 2400,
+	// 					maxX: 2400,
+	// 					count: 1,
+	// 					// do: function(_e) {
+	// 					// 	_e.npc = true;
+	// 					// 	_e.dialogs = createTrainingDialog('tank');
+	// 					// },
+	// 					yPosition: function() {
+	// 						return groundheight;
+	// 					}
+	// 				},
+	// 				{
+	// 					id: 71,
+	// 					minX: 4550,
+	// 					maxX: 4550,
+	// 					count: 1,
+	// 					yPosition: function() {
+	// 						return groundheight;
+	// 					}
+	// 				},
+	// 				{
+	// 					id: 72,
+	// 					minX: 1235,
+	// 					maxX: 1235,
+	// 					count: 1,
+	// 					do: function(_e) {
+	// 						if(episode.msNow < 501){
+	// 							_e.reversed = true;
+	// 							_e.direction = 'left';
+	// 							_e.swapAnimation('idle');
+	// 						}
+	// 					},
+	// 					yPosition: function() {
+	// 						return groundheight;
+	// 					}
+	// 				},
+	// 				// {
+	// 				// 	id: 58,
+	// 				// 	minX: 1900,
+	// 				// 	maxX: 1900,
+	// 				// 	count: 1,
+	// 				// 	do: function(_e) {
+	// 				// 		_e.npc = true;
+	// 				// 		_e.friendly = true;
+	// 				// 		_e.enemy = false;
+	// 				// 		_e.reversed = true;
+	// 				// 		_e.direction = 'left';
+	// 				// 	},
+	// 				// 	yPosition: function() {
+	// 				// 		return groundheight;
+	// 				// 	}
+	// 				// }
+	// 			],
+	// 			start: function() {
+	// 				if(episode && episode.bgMusic)
+	// 					episode.pauseBgMusic();
+	// 				if(episode && episode.bgSound)
+	// 					episode.pauseAmbianceMusic();
+	// 				const _princess = summonMob(58, MathRound((mainCharacter.left + mainCharacter.WIDTH + platformX) / __zoom), MathRound(.33 * groundheight), mainCharacter.level);
+	// 				_princess.friendly = _princess.invulnerable = true;
+	// 				_princess.still = _princess.immobilize = false;
+	// 				_princess.direction = 'left';
+	// 				//goToQuest(6);
+	// 				removeCoopCharacter(1);
+	// 				const _char = addCoopCharacter(null, 'arc');
+	// 				_char.direction = 'left';
+	// 				_princess.left = _char.left = mainCharacter.left + platformX - mainCharacter.WIDTH;
+	// 				_char.platformX = platformX;
+	// 				_char.yPosition = MathRound(.66 * groundheight);
+	// 				_char.updateVariables();
+	// 				completeQuest();
+	// 			}
+	// 		},
+	// 		getLobbyScene()
+	// 	]
+	// },
 	{
-		id: 3,
-		order: 3,
+		id: 2,
+		order: 2,
 		resultStars: [
 			{ id: 1, title: 'Clear story', when: function() {
 				return !mainCharacter.isDead();
@@ -2128,13 +2834,15 @@ const __stories = [
 		],
 		ticket: 2,
 		list:true,
+		minLevel: 2,
+		act:1,
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
-			{ key: 'item', grade: 2, type: 'necklace', count:1 },
+			{ key: 'item', grade: 2, type: 'ring', count:1 },
 			{ key: 'gem', grade: 1, type: 'random', count:1, chance:50 },
-			{ key: 'gold', count: 6000 },
-			{ key: 'exp', count: 1200 }
+			{ key: 'gold', count: 5500 },
+			{ key: 'exp', count: 1300 }
 		],
 		quests: [
 			{
@@ -2179,14 +2887,17 @@ const __stories = [
 						return;
 					if(!__account.tutorials)
 						__account.tutorials = [];
+					episode.disableWorldMap = 1;
 					__account.tutorials.push('quest-world-map');
+					episode.enemies.forEach(x => x.standBy());
 					focusMe('#world-mini-map-area', function() {
 						episode.phase = 1;
 						addClass(_gameUI, 'disable-ui');
 						removeFocus();
 						switchBookPage(3, 3);
 						episode.enemies.filter(x => x.standBy());
-					}, 1);
+						delete episode.disableWorldMap
+					}, null, getLangData('Great! You completed a quest. Time to get back to Village'), null, null, 1);
 				},
 				complete: function() {
 					installStoryFinish();
@@ -2202,7 +2913,6 @@ const __stories = [
 			tr: "Gerekli malzemelerden birini bulabilmek için kahramanlarımız yıkılan kale enkazına tekrar ziyarette bulunur"
 		},
 		boss: "wizard",
-		minLevel: 3,
 		scenes: [
 			{
 				map: 106,
@@ -2305,24 +3015,24 @@ const __stories = [
 							return groundheight;
 						}
 					},
-					{
-						id: '10002',
-						minX: 2740,
-						maxX: 2740,
-						count: 1,
-						do: function(_e) {
-							_e.npc = true;
-							_e.friendly = true;
-							_e.enemy = false;
-							_e.zoom *= .9;
-							_e.still = _e.noDirection = true;
-							_e.stepXRate = _e.stepX = 0;
-							_e.dialogs = createPotDialog('archer');
-						},
-						yPosition: function() {
-							return MathRound(groundheight * 1.1);
-						}
-					},
+					// {
+					// 	id: '10002',
+					// 	minX: 2740,
+					// 	maxX: 2740,
+					// 	count: 1,
+					// 	do: function(_e) {
+					// 		_e.npc = true;
+					// 		_e.friendly = true;
+					// 		_e.enemy = false;
+					// 		_e.zoom *= .9;
+					// 		_e.still = _e.noDirection = true;
+					// 		_e.stepXRate = _e.stepX = 0;
+					// 		_e.dialogs = createPotDialog('archer');
+					// 	},
+					// 	yPosition: function() {
+					// 		return MathRound(groundheight * 1.1);
+					// 	}
+					// },
 					{
 						id: 70,
 						minX: 4340,
@@ -2337,10 +3047,11 @@ const __stories = [
 						minX: 2400,
 						maxX: 2400,
 						count: 1,
-						// do: function(_e) {
-						// 	_e.npc = true;
-						// 	_e.dialogs = createTrainingDialog('tank');
-						// },
+						do: function(_e) {
+							_e.npc = true;
+							_e.dialogs = createPotDialog('tank');
+							//_e.dialogs = createTrainingDialog('tank');
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -2391,82 +3102,8 @@ const __stories = [
 		]
 	},
 	{
-		id:4,
-		order:4,
-		ticket:4,
-		disableWorldMap: true,
-		minLevel: 4,
-		list: true,
-		bonus: true,
-		boss:'wan',
-		resultStars: [
-			{ id: 1, title: 'Clear story', when: function() {
-				return !mainCharacter.isDead();
-			}},
-			{ id: 2, key: 'time', value: 60000, title: 'Finish in time',
-				when: function(_item) {
-					 /*!isMissionFailed(0) && !isMissionFailed(2) &&*/
-					return ((__story.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
-			}},
-			{ id: 3, key: 'combo', value: 50, title: 'Make 50x combo', when: function(_item) {
-				return episode.hitCount >= _item.value;
-			}}
-		],
-		title: {
-			en: 'Gold Mine',
-			tr: 'Altın Madeni'
-		},
-		description: {
-			en: "Destroy the wan in time and gather treasure in the end. Each damage will add bonus gold reward.",
-			tr: "Aracı zamanında parçala ve hazineye sahip ol. Her verdiğin hasar bonus altın kazandıracak."
-		},
-		rewards: [
-			{ key: 'item', grade: 2, type: 'helmet', count:1 },
-			{ key: 'gem', grade: 1, type: 'random', count:1, chance:50 },
-			{ key: 'gold', count: 13000 },
-			{ key: 'exp', count: 1300 }
-		],
-		scenes: [
-			{
-				map: 9999,
-				startsWith: 1,
-				save: true,
-				start: function() {
-					const _wagon = episode.enemies.find(x => x.id === 2000);
-					_wagon.maxHP = _wagon.MAXHP = 300 + ((6 - __account.difficulty) * 300);
-
-					//_wagon.health = _wagon.maxHP = _wagon.MAXHP = 1;
-
-					_wagon.setHealth(_wagon.maxHP);
-					_wagon.noDirection = _wagon.harmless = true;
-					_wagon.experience = 0;
-					mainCharacter.solid = true;
-				}
-			},
-			getLobbyScene()
-		],
-		quests: [
-			{
-				id: 1,
-				key: '',
-				names: {
-					en: 'Destroy the wan',
-					tr: 'Aracı parçala'
-				},
-				descriptions: {
-					en: 'Wan destroyed',
-					tr: 'Araç parçalandı'
-				},
-				owner: 'system',
-				minLevel: 1,
-				kills: [{ enemy: [2000], limit: 1, key: 'Wan' }],
-				maps: [9999]
-			},
-		]
-	},
-	{
-		id: 5,
-		order: 5,
+		id: 3,
+		order: 3,
 		resultStars: [
 			{ id: 1, title: 'Clear story', when: function() {
 				return !mainCharacter.isDead();
@@ -2482,12 +3119,14 @@ const __stories = [
 		],
 		ticket: 2,
 		list:true,
+		minLevel: 4,
+		act:1,
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
-			{ key: 'item', grade: 2, type: 'leggings', count:1 },
+			{ key: 'item', grade: 2, type: 'necklace', count:1 },
 			{ key: 'gem', grade: 1, type: 'random', count:1, chance:50 },
-			{ key: 'gold', count: 7000 },
+			{ key: 'gold', count: 6000 },
 			{ key: 'exp', count: 1400 }
 		],
 		quests: [
@@ -2532,7 +3171,6 @@ const __stories = [
 			tr: "Kahramanlarımızın, Tepegöz' ün saldırısı öncesinde daha fazla güce kavuşmaları gerekmektedir. Bu güce ulaşmak için tek bir tarif vardır. Ve bu tarifte yazılı olan malzemelerden bir sonrakini bulmaktadır sıra. Bataklık iblisleri bu görevde ızdırapları olacaktır"
 		},
 		boss: "druid",
-		minLevel: 6,
 		scenes: [
 			{
 				map: 11,
@@ -2687,32 +3325,33 @@ const __stories = [
 						minX: 2400,
 						maxX: 2400,
 						count: 1,
-						// do: function(_e) {
-						// 	_e.npc = true;
-						// 	_e.dialogs = createTrainingDialog('tank');
-						// },
+					do: function(_e) {
+							_e.npc = true;
+							_e.dialogs = createPotDialog('tank');
+							//_e.dialogs = createTrainingDialog('tank');
+						},
 						yPosition: function() {
 							return groundheight;
 						}
 					},
-					{
-						id: '10002',
-						minX: 2740,
-						maxX: 2740,
-						count: 1,
-						do: function(_e) {
-							_e.npc = true;
-							_e.friendly = true;
-							_e.enemy = false;
-							_e.zoom *= .9;
-							_e.still = _e.noDirection = true;
-							_e.stepXRate = _e.stepX = 0;
-							_e.dialogs = createPotDialog('archer');
-						},
-						yPosition: function() {
-							return MathRound(groundheight * 1.1);
-						}
-					},
+					// {
+					// 	id: '10002',
+					// 	minX: 2740,
+					// 	maxX: 2740,
+					// 	count: 1,
+					// 	do: function(_e) {
+					// 		_e.npc = true;
+					// 		_e.friendly = true;
+					// 		_e.enemy = false;
+					// 		_e.zoom *= .9;
+					// 		_e.still = _e.noDirection = true;
+					// 		_e.stepXRate = _e.stepX = 0;
+					// 		_e.dialogs = createPotDialog('archer');
+					// 	},
+					// 	yPosition: function() {
+					// 		return MathRound(groundheight * 1.1);
+					// 	}
+					// },
 					{
 						id: 71,
 						minX: 4550,
@@ -2759,8 +3398,83 @@ const __stories = [
 		]
 	},
 	{
-		id: 6,
-		order: 6,
+		id:4,
+		order:4,
+		ticket:4,
+		disableWorldMap: true,
+		minLevel: 5,
+		list: true,
+		act:1,
+		bonus: true,
+		boss:'wan',
+		resultStars: [
+			{ id: 1, title: 'Clear story', when: function() {
+				return !mainCharacter.isDead();
+			}},
+			{ id: 2, key: 'time', value: 60000, title: 'Finish in time',
+				when: function(_item) {
+					 /*!isMissionFailed(0) && !isMissionFailed(2) &&*/
+					return ((__story.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
+			}},
+			{ id: 3, key: 'combo', value: 50, title: 'Make 50x combo', when: function(_item) {
+				return episode.hitCount >= _item.value;
+			}}
+		],
+		title: {
+			en: 'Gold Mine',
+			tr: 'Altın Madeni'
+		},
+		description: {
+			en: "Destroy the wan in time and gather treasure in the end. Each damage will add bonus gold reward.",
+			tr: "Aracı zamanında parçala ve hazineye sahip ol. Her verdiğin hasar bonus altın kazandıracak."
+		},
+		rewards: [
+			{ key: 'item', grade: 2, type: 'helmet', count:1 },
+			{ key: 'gem', grade: 1, type: 'random', count:1, chance:50 },
+			{ key: 'gold', count: 13000 },
+			{ key: 'exp', count: 1500 }
+		],
+		scenes: [
+			{
+				map: 9999,
+				startsWith: 1,
+				save: true,
+				start: function() {
+					const _wagon = episode.enemies.find(x => x.id === 2000);
+					_wagon.maxHP = _wagon.MAXHP = 300 + ((6 - __account.difficulty) * 300);
+
+					//_wagon.health = _wagon.maxHP = _wagon.MAXHP = 1;
+
+					_wagon.setHealth(_wagon.maxHP);
+					_wagon.noDirection = _wagon.harmless = true;
+					_wagon.experience = 0;
+					mainCharacter.solid = true;
+				}
+			},
+			getLobbyScene()
+		],
+		quests: [
+			{
+				id: 1,
+				key: '',
+				names: {
+					en: 'Destroy the wan',
+					tr: 'Aracı parçala'
+				},
+				descriptions: {
+					en: 'Wan destroyed',
+					tr: 'Araç parçalandı'
+				},
+				owner: 'system',
+				minLevel: 1,
+				kills: [{ enemy: [2000], limit: 1, key: 'Wan' }],
+				maps: [9999]
+			},
+		]
+	},
+	{
+		id: 5,
+		order: 5,
 		resultStars: [
 			{ id: 1, title: 'Clear story', when: function() {
 				return !mainCharacter.isDead();
@@ -2776,13 +3490,15 @@ const __stories = [
 		],
 		ticket: 2,
 		list:true,
+		act:1,
+		minLevel: 6,
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
-			{ key: 'item', grade: 2, type: 'bracers', count:1 },
+			{ key: 'item', grade: 2, type: 'leggings', count:1 },
 			{ key: 'gem', grade: 1, type: 'random', count:1, chance:50 },
-			{ key: 'gold', count: 7500 },
-			{ key: 'exp', count: 1500 }
+			{ key: 'gold', count: 7000 },
+			{ key: 'exp', count: 1600 }
 		],
 		quests: [
 			{
@@ -2835,7 +3551,6 @@ const __stories = [
 			tr: "Kahramanlarımız ışıktan yoksun bir mağarada yarasa avına çıkar, Yarasaların kanatlarında bulunan bir malzeme sayesinde güç iksiri etkisini arttıracaktır. Bakalım kahramanlarımız bu mağaradan istediklerini elde ederek canlı çıkabilecek mi"
 		},
 		boss: "blacksmith",
-		minLevel: 8,
 		scenes: [
 			{
 				map: 36,
@@ -2961,7 +3676,6 @@ const __stories = [
 							delete mainCharacter.disableKeyboard;
 						}
 					});
-					__account.commonInventory = [];
 					_client.saveState();
 					episode.phase = 1;
 					cssAnimations.lightradius2(mainCharacter, 3);
@@ -3007,32 +3721,33 @@ const __stories = [
 						minX: 2400,
 						maxX: 2400,
 						count: 1,
-						// do: function(_e) {
-						// 	_e.npc = true;
-						// 	_e.dialogs = createTrainingDialog('tank');
-						// },
+						do: function(_e) {
+							_e.npc = true;
+							_e.dialogs = createPotDialog('tank');
+							//_e.dialogs = createTrainingDialog('tank');
+						},
 						yPosition: function() {
 							return groundheight;
 						}
 					},
-					{
-						id: '10002',
-						minX: 2740,
-						maxX: 2740,
-						count: 1,
-						do: function(_e) {
-							_e.npc = true;
-							_e.friendly = true;
-							_e.enemy = false;
-							_e.zoom *= .9;
-							_e.still = _e.noDirection = true;
-							_e.stepXRate = _e.stepX = 0;
-							_e.dialogs = createPotDialog('archer');
-						},
-						yPosition: function() {
-							return MathRound(groundheight * 1.1);
-						}
-					},
+					// {
+					// 	id: '10002',
+					// 	minX: 2740,
+					// 	maxX: 2740,
+					// 	count: 1,
+					// 	do: function(_e) {
+					// 		_e.npc = true;
+					// 		_e.friendly = true;
+					// 		_e.enemy = false;
+					// 		_e.zoom *= .9;
+					// 		_e.still = _e.noDirection = true;
+					// 		_e.stepXRate = _e.stepX = 0;
+					// 		_e.dialogs = createPotDialog('archer');
+					// 	},
+					// 	yPosition: function() {
+					// 		return MathRound(groundheight * 1.1);
+					// 	}
+					// },
 					{
 						id: 71,
 						minX: 4550,
@@ -3079,8 +3794,8 @@ const __stories = [
 		]
 	},
 	{
-		id: 7,
-		order: 7,
+		id: 6,
+		order: 6,
 		resultStars: [
 			{ id: 1, title: 'Clear story', when: function() {
 				return !mainCharacter.isDead();
@@ -3096,13 +3811,15 @@ const __stories = [
 		],
 		ticket: 2,
 		list:true,
+		act:1,
+		minLevel: 7,
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
-			{ key: 'item', grade: 2, type: 'boots', count:1 },
+			{ key: 'item', grade: 2, type: 'bracers', count:1 },
 			{ key: 'fragment', name: 'bomber', minCount:1, maxCount:5, chance:50 },
-			{ key: 'gold', count: 8000 },
-			{ key: 'exp', count: 1600 }
+			{ key: 'gold', count: 7500 },
+			{ key: 'exp', count: 1700 }
 		],
 		quests: [
 			{
@@ -3230,7 +3947,6 @@ const __stories = [
 			tr: "Kahramanlarımızın Tepegöz' e ölümcül vuruşu yapabilmesi için biraz mühendisliğe ihtiyaçları var ve bunun tek yolu yüksek hasar veren patlayıcılar kullanmak. Dahi mağara yaratığının elindeki planları bulup getirebilirlerse belki Temir Han' ın yardımı dokunabilir"
 		},
 		boss: "bomber",
-		minLevel: 9,
 		scenes: [
 			{
 				map: 41,
@@ -3394,32 +4110,33 @@ const __stories = [
 						minX: 2400,
 						maxX: 2400,
 						count: 1,
-						// do: function(_e) {
-						// 	_e.npc = true;
-						// 	_e.dialogs = createTrainingDialog('tank');
-						// },
+						do: function(_e) {
+							_e.npc = true;
+							_e.dialogs = createPotDialog('tank');
+							//_e.dialogs = createTrainingDialog('tank');
+						},
 						yPosition: function() {
 							return groundheight;
 						}
 					},
-					{
-						id: '10002',
-						minX: 2740,
-						maxX: 2740,
-						count: 1,
-						do: function(_e) {
-							_e.npc = true;
-							_e.friendly = true;
-							_e.enemy = false;
-							_e.zoom *= .9;
-							_e.still = _e.noDirection = true;
-							_e.stepXRate = _e.stepX = 0;
-							_e.dialogs = createPotDialog('archer');
-						},
-						yPosition: function() {
-							return MathRound(groundheight * 1.1);
-						}
-					},
+					// {
+					// 	id: '10002',
+					// 	minX: 2740,
+					// 	maxX: 2740,
+					// 	count: 1,
+					// 	do: function(_e) {
+					// 		_e.npc = true;
+					// 		_e.friendly = true;
+					// 		_e.enemy = false;
+					// 		_e.zoom *= .9;
+					// 		_e.still = _e.noDirection = true;
+					// 		_e.stepXRate = _e.stepX = 0;
+					// 		_e.dialogs = createPotDialog('archer');
+					// 	},
+					// 	yPosition: function() {
+					// 		return MathRound(groundheight * 1.1);
+					// 	}
+					// },
 					{
 						id: 71,
 						minX: 4550,
@@ -3460,6 +4177,330 @@ const __stories = [
 		]
 	},
 	{
+		id:7,
+		order:7,
+		boss:'archer',
+		minLevel:8,
+		list: true,
+		act:1,
+		ticket:2,
+		title: {
+			en: 'Finding Support',
+			tr: 'Destek Bulmak'
+		},
+		description: {
+			en: "Alkin, one of our heroes, goes to Toygar and the people of the village to rescue the wolves enslaved by the giant trolls living in the Ice Land and ask for their support so that they can support them in a possible war.",
+			tr: "Kahramanlarımızdan Alkin, Toygar' a ve Köy halkına, olası savaşta destek olabilmeleri adına Buz Diyarında yaşayan dev trollerin köleleştirdiği kurtları kurtarmaya ve onların desteğini istemeye gider."
+		},
+		resultStars: [
+			{ id: 1, title: 'Clear story', when: function() {
+				return !mainCharacter.isDead();
+			}},
+			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
+				when: function(_item) {
+					//return !isMissionFailed(0) && !isMissionFailed(2) &&
+					return ((__story.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
+			}},
+			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
+				return mainCharacter.health >= MathFloor(mainCharacter.maxHP * _item.value);
+			}}
+		],
+		rewards: [
+			{ key: 'item', grade: 2, type: 'boots' },
+			{ key: 'gem', grade: 1, type: 'random', count:1, chance:50 },
+			{ key: 'gold', count: 8000 },
+			{ key: 'exp', count: 1800 }
+		],
+		quests: [
+			{
+				id: 1,
+				key: 'wolf',
+				dialogId:13,
+				names: {
+					en: 'Save Wolves',
+					tr: 'Kurtları Kurtar'
+				},
+				descriptions: {
+					en: 'Wolf Saved',
+					tr: 'Kurt Özgür'
+				},
+				owner: 'stables',
+				minLevel: 1,
+				loots: [
+					{
+						object: ['wolf'],
+						limit: 5,
+						key: 'wolf',
+						type: 'quest-item',
+						chanceRate: 100
+					}
+				],
+				maps: [93],
+				done: function() {
+					if(__account.questStatus.lastStoryFinishTime)
+						return;
+					__account.questStatus.lastStoryFinishTime = _gameTick;
+				},
+				complete: function() {
+					installStoryFinish();
+				}
+			}
+		],
+		scenes: [
+			{
+				map: 93,
+				startWith: 10002,
+				from: 'left',
+				loadingCharacterIds: [22],
+				save: true,
+				start: function() {
+					takeQuest(0, 1, null, null, 1);
+					mainCharacter.left = MathRound(_canvas.width / 5);
+					setCharacterLevel(10, mainCharacter, 1);
+					applyDefaultCharacterStats(mainCharacter);
+					mainCharacter.solid = true;
+					episode.realClass = mainCharacter.class;
+					const _cages = episode.enemies.filter(x => x.id === 42);
+					for(let i = 0; i < _cages.length; i++)
+					{
+						_cages[i].noLoot = false;
+						_cages[i].checkLoot({loot:{
+							key: 'firespray',
+							type: 'common'
+						}});
+						_cages[i].noLoot = true;
+					}
+					episode.enemies.forEach(e => e.standBy());
+					createBubbleText({
+						id: 1,
+						location: { map: episode.id }, ms: 3000,
+						owner: mainCharacter.key,
+						text: "This place has never been so quiet",
+						onend: function() {
+							episode.enemies.forEach(e => {
+								e.immobilize = false;
+								if(e.main)
+									delete e.disableKeyboard;
+							});
+						}
+					});
+				},
+				actions: [
+				
+				],
+				mobs: [
+					{
+						id: 22,
+						minX: 2200,
+						maxX: 6000,
+						count: 10,
+						sight:50,
+						do: function(_e) {
+							_e.experience = 0;
+						}
+					},
+					{
+						id: 42,
+						minX: 2100,
+						maxX: 2600,
+						count: 1,
+						do: function(_e) {
+							_e.noDirection = true;
+							_e.solid = true;
+							_e.npc = 'wolf';
+							_e.actionSound = {key:'unlock', volume:.7};
+							if(getRandomValue2(1,2) < 2)
+								_e.reversed = 1;
+						}
+					},
+					{
+						id: 42,
+						minX: 3000,
+						maxX: 3500,
+						count: 1,
+						do: function(_e) {
+							_e.noDirection = true;
+							_e.solid = true;
+							_e.npc = 'wolf';
+							_e.actionSound = {key:'unlock', volume:.7};
+							if(getRandomValue2(1,2) < 2)
+								_e.reversed = 1;
+						}
+					},
+					{
+						id: 42,
+						minX: 3900,
+						maxX: 4400,
+						count: 1,
+						do: function(_e) {
+							_e.noDirection = true;
+							_e.solid = true;
+							_e.npc = 'wolf';
+							_e.actionSound = {key:'unlock', volume:.7};
+							if(getRandomValue2(1,2) < 2)
+								_e.reversed = 1;
+						}
+					},
+					{
+						id: 42,
+						minX: 4800,
+						maxX: 5300,
+						count: 1,
+						do: function(_e) {
+							_e.noDirection = true;
+							_e.solid = true;
+							_e.npc = 'wolf';
+							_e.actionSound = {key:'unlock', volume:.7};
+							if(getRandomValue2(1,2) < 2)
+								_e.reversed = 1;
+						}
+					},
+					{
+						id: 42,
+						minX: 5700,
+						maxX: 6200,
+						count: 1,
+						do: function(_e) {
+							_e.noDirection = true;
+							_e.solid = true;
+							_e.npc = 'wolf';
+							_e.actionSound = {key:'unlock', volume:.7};
+							if(getRandomValue2(1,2) < 2)
+								_e.reversed = 1;
+						}
+					}
+				]
+			},
+			{
+				map: 1,
+				from: 'right',
+				startWith: 10002,
+				start: function() {
+					removeClass(_gameUI, 'disable-ui');
+					takeQuest(0, 1, null, 'end', 1);
+					episode.drawSpriteObjects2('stables', 1);
+					episode.mainClass = 'warrior';
+					episode.realClass = 'archer';
+					episode.endTime = __account.questStatus.lastStoryFinishTime ?? _gameTick;
+					if(__account.questStatus.lastStoryFinishTime)
+						delete __account.questStatus.lastStoryFinishTime;		
+					platformX = episode.width - _canvas.width;
+					episode.phase = 1;
+					mainCharacter.left = _canvas.width - MathRound(_canvas.width / 5) - mainCharacter.getWidth();
+				},
+				actions: [
+					{
+						when: function(){
+							return episode.phase === 1 && (platformX < ((4435 * episode.zoom) - (episode.cWidth / 2)));
+						},
+						do: function(){
+							episode.phase = 2;
+							createBubbleText({
+								id: 1,
+								location: { map: episode.id }, ms: 2000,
+								owner: episode.enemies.find(x => x.class === 'warrior').key,
+								text: "You are back!"
+							});
+						}
+					}
+				],
+				mobs: [
+					{
+						id: 27,
+						minX: 5600,
+						maxX: 6200,
+						count: 5,
+						do: function(_e) {
+							_e.friendly = _e.invulnerable = true;
+							_e.enemy = false;
+						}
+					},
+					{
+						id: 69,
+						minX: 3340,
+						maxX: 3340,
+						count: 1,
+						yPosition: function() {
+							return groundheight;
+						}
+					},
+					{
+						id: 70,
+						minX: 4340,
+						maxX: 4340,
+						count: 1,
+						yPosition: function() {
+							return groundheight;
+						}
+					},
+					{
+						id: 73,
+						minX: 2400,
+						maxX: 2400,
+						count: 1,
+						do: function(_e) {
+							_e.npc = true;
+							_e.dialogs = createPotDialog('tank');
+							//_e.dialogs = createTrainingDialog('tank');
+						},
+						yPosition: function() {
+							return groundheight;
+						}
+					},
+					{
+						id: 71,
+						minX: 4550,
+						maxX: 4550,
+						count: 1,
+						yPosition: function() {
+							return groundheight;
+						}
+					},
+					{
+						id: 72,
+						minX: 1245,
+						maxX: 1245,
+						count: 1,
+						yPosition: function() {
+							return groundheight;
+						}
+					},
+					{
+						id: 58,
+						minX: 1900,
+						maxX: 1900,
+						count: 1,
+						do: function(_e) {
+							_e.npc = true;
+							_e.friendly = true;
+							_e.enemy = false;
+							_e.reversed = true;
+							_e.direction = 'left';
+						},
+						yPosition: function() {
+							return groundheight;
+						}
+					},
+					{
+						id: 91,
+						minX: 4150,
+						maxX: 4150,
+						count: 1,
+						do: function(_e) {
+							_e.npc = true;
+							_e.enemy = false;
+							_e.direction = 'right';
+						},
+						yPosition: function() {
+							return MathRound(groundheight * .85);
+						}
+					}
+				]
+			},
+			getLobbyScene()
+		]
+	},
+	{
 		id: 8,
 		order: 8,
 		disableWorldMap: true,
@@ -3480,13 +4521,15 @@ const __stories = [
 		ticket: 4,
 		bonus: 'exp',
 		list:true,
+		minLevel: 10,
+		act:1,
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
 			{ key: 'item', grade: 2, type: 'chest', count:1 },
 			{ key: 'fragment', name: 'sisters', minCount:1, maxCount:5, chance:50 },
 			{ key: 'gold', count: 8500 },
-			{ key: 'exp', count: 3400 }
+			{ key: 'exp', count: 3800 }
 		],
 		quests: [
 			{
@@ -3606,7 +4649,6 @@ const __stories = [
 			tr: "Kahramanlarımızın daha fazla güçlenmesi için bu aşama tecrübelerini boostlayacak. Kalabalık düşman topluluğuna karşı kendilerini sınayacaklar ve bir yandan da zamana karşı yarışıyor olacaklar"
 		},
 		boss: "sisters",
-		minLevel: 10,
 		scenes: [
 			{
 				map: 201,
@@ -3749,13 +4791,14 @@ const __stories = [
 		],
 		ticket: 4,
 		list:true,
+		act:1,
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
 			{ key: 'item', grade: 2, type: 'gloves', count:1 },
 			{ key: 'fragment', name: 'cyclops,werewolf', minCount:1, maxCount:5 },
 			{ key: 'gold', count: 9000 },
-			{ key: 'exp', count: 1800 }
+			{ key: 'exp', count: 2000 }
 		],
 		quests: [
 			{
@@ -4541,7 +5584,8 @@ const __stories = [
 		disableWorldMap: true,
 		order:10,
 		boss:'al',
-		minLevel:11,
+		act:1,
+		minLevel:10,
 		list: true,
 		ticket:2,
 		title: {
@@ -4567,9 +5611,9 @@ const __stories = [
 		],
 		rewards: [
 			{ key: 'item', grade: 2, type: 'weapon' },
+			{ key: 'fragment', name: 'al', minCount:1, maxCount:5, chance: 50 },
 			{ key: 'gold', count: 9500 },
-			{ key: 'exp', count: 1900 },
-			{ key: 'fragment', name: 'al', minCount:1, maxCount:5, chance: 50 }
+			{ key: 'exp', count: 2100 }
 		],
 		scenes: [
 			// {
@@ -4867,7 +5911,7 @@ const __stories = [
 				maps: [11]
 			},
 		]
-	},
+	},	
 	{
 		id:11,
 		order:11,
@@ -4891,16 +5935,34 @@ function resetStoryVariables() {
 	__storySceneOrder = 0;
 	__storyScene = __storyCutScenePlaying = __storyPlaying = undefined;
 }
-var __storyBonusItemCount = 0;
-function playStory(_id, _step, _func, _isFirstStart){
+function continueStoryAnyway() {
+	PlaySound({key:'click'});
+	playStory(
+		__storyLastUsedSettings.id, 
+		__storyLastUsedSettings.step, 
+		__storyLastUsedSettings.func,
+		__storyLastUsedSettings.first, 
+		1
+	);
+	__storyLastUsedSettings = undefined;
+}
+var __storyBonusItemCount = 0, __storyLastUsedSettings;
+function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 	resetQuestLine();
 	const _s = __stories.find(x => x.id === _id);
 	if(_s.passive) {
 		warn('<span>' + getLangData('Story is passive for now') + '</span>', 'warn');
 		return;
 	}
-	if(mainCharacter?.level && _s.minLevel > mainCharacter.level) {
-		warn('<span>' + getLangData('Character level is too low') + '</span>', 'warn');
+	if(!_continueAnyway && mainCharacter?.level && _s.minLevel > mainCharacter.level) {
+		//warn('<span>' + getLangData('Character level is too low') + '</span>', 'warn');
+		__storyLastUsedSettings = {
+			id:_id,
+			step:_step,
+			func:_func,
+			first:_isFirstStart
+		};
+    	askSomething(`<div class="w-100 flex" style="padding-top:2vh;color:#f3f4f5cc"><span>${getLangData('Minium adviced level is')}:&nbsp;<b>${_s.minLevel}</b></span></div><div class="w-100 flex p-2" style="color:#ff6c00">${'It might be hard for you'}</div><div style="color:#f3f4f5cc" class="w-100 flex">${'Continue Anyway'}?</div>`, `continueStoryAnyway()`, 1);
 		return;
 	}
 	hideMyMenu();
@@ -4909,8 +5971,11 @@ function playStory(_id, _step, _func, _isFirstStart){
 	__story = _s;
 	if(!_isFirstStart)
 		__storySceneOrder = __story.startScene ?? _step ?? 0;
-	else
+	else {
+		if(__storySceneOrder === undefined)
+			__storySceneOrder = 1;
 		__storySceneOrder--;
+	}
 	episodeGold = episodePot = 0;
 	__storyBonusItemCount = 0;
 	switchStoryScene(function() {
@@ -4967,6 +6032,7 @@ function switchStoryScene(_func, _newOrder) {
 						delete __storyCheckPoint.warn;
 					}
 					removeFocus();
+					__account.commonInventory = [];
 					if(__storyScene.start)
 						__storyScene.start();
 					_storySceneSwitching = false;
@@ -5004,15 +6070,15 @@ function story(_id, _func, _noBlack, _desc, _after) {
 	this.data = {
 		st1: [
 			{ text: '', ms: 0, w: '37%' },
-			{ text: 'SPLASH!', ms: 400, marginLeft:'2%', class: 'talk', order: 3, w: '34.5%', position: 'top center' },
-			{ text: '', ms: 800, imgSize: '117%', order: 4, marginLeft:'2%', w: '31%', position: 'top center' },
-			{ finish: 1, ms: 4000 }
+			{ text: 'SPLASH!', ms: 600, marginLeft:'2%', class: 'talk', order: 3, w: '34.5%', position: 'top center' },
+			{ text: '', ms: 1200, imgSize: '117%', order: 4, marginLeft:'2%', w: '31%', position: 'top center' },
+			{ finish: 1, ms: 5000 }
 		],
 		st2: [
 			{ text: '', ms: 0, w: '40%', position: 'center left' },
-			{ text: 'Over there!', ms: 400, marginLeft:'2%', class: 'talk', order: 3, w: '34.5%', position: 'top center' },
-			{ text: '', ms: 800, imgSize: '125%', order: 4, marginLeft:'2%', w: '28%', position: 'top center' },
-			{ finish: 1, ms: 4000 }
+			{ text: 'Over there!', ms: 600, marginLeft:'2%', class: 'talk', order: 3, w: '34.5%', position: 'top center' },
+			{ text: '', ms: 1200, imgSize: '125%', order: 4, marginLeft:'2%', w: '28%', position: 'top center' },
+			{ finish: 1, ms: 5000 }
 		],
 		st3: [
 			{ text: 'MEANWHILE...', ms: 0, class: 'desc', w: '26%' },
@@ -5023,23 +6089,50 @@ function story(_id, _func, _noBlack, _desc, _after) {
 		],
 		st4: [
 			{ text: '', ms: 0, w: '36%', position: 'bottom center' },
-			{ text: '', ms: 400, order: 3, w: '40%', position: 'top right' },
-			{ text: '', ms: 800, imgSize: '117%', order: 4, w: '30.5%' },
-			{ finish: 1, ms: 4000 }
+			{ text: '', ms: 600, order: 3, w: '40%', position: 'top right' },
+			{ text: '', ms: 1200, imgSize: '117%', order: 4, w: '30.5%' },
+			{ finish: 1, ms: 5000 }
 		],
 		st5: [
 			{ text: '', ms: 0, w: '44%', position: 'top center' },
-			{ text: '', ms: 400, order: 35, w: '34.5%', position: 'center left' },
-			{ text: '', ms: 800, order: 4, w: '28%', position: 'top center' },
-			{ finish: 1, ms: 4000 }
+			{ text: '', ms: 600, order: 35, w: '34.5%', position: 'center left' },
+			{ text: '', ms: 1200, order: 4, w: '28%', position: 'top center' },
+			{ finish: 1, ms: 5000 }
+		],
+		st6: [
+			{ text: '', ms: 0, w: '44%', position: 'top center' },
+			{ text: '', ms: 600, order: 35, w: '34.5%', position: 'top center' },
+			{ text: '', ms: 1200, imgSize: '125%', order: 4, marginLeft:'2%', w: '28%', position: 'center center' },
+			{ finish: 1, ms: 5000 }
 		]
 	}
 	this.id = _id;
 	this.order = 1;
 	const _s = this;
+	this.skip = function() {
+		PlaySound({key:'click'});
+		delete this.firstSeen;
+		this.skipped = 1;
+		this.order = this.data['st' + this.id].length;
+		this.render(this.order);
+		if(_after)
+			_after();
+	}
 	this.init = function() {
 		const _wrapper = document.createElement('div');
 		_wrapper.className = 'story-wrapper fade-in' + (_desc ? ' story-with-description' : '');
+		const _skp = document.createElement('div');
+		_skp.className = 'story-skip w-100 flex flex-jc-end';
+		if(!_noBlack){
+			if(!__account.storyTell)
+				__account.storyTell = [];
+			if(__account.storyTell.indexOf(this.id) === -1) {
+				__account.storyTell.push(this.id);
+				this.firstSeen = 1;
+				_skp.innerHTML = `<div onexactclick="__storyTell.skip()" class="flex">${getLangData('SKIP')}&gt;</div>`;
+			}
+		}
+		_wrapper.appendChild(_skp);
 		const _sin = document.createElement('div');
 		_sin.className = 'full story-inner';
 		const _inner = document.createElement('div');
@@ -5058,14 +6151,16 @@ function story(_id, _func, _noBlack, _desc, _after) {
 		this.container = _inner;
 		this.wrapper = _wrapper;
 		if(!_noBlack)
-			cssAnimations.black(null, this.data['st' + this.id].find(x => x.finish).ms - 400, '', _func, null, _after);
+			cssAnimations.black(null, (this.data['st' + this.id].find(x => x.finish).ms - 400) , '', _func, null, this.firstSeen ? null : _after);
 	}
-	this.render = function() {
-		const i = this.order;
+	this.render = function(_realOrder) {
+		const i = _realOrder ?? this.order;
 		if(i > _s.data.length)
 			return;
 		const item = _s.data['st' + this.id][i - 1];
-		if((_gameTick - this.start) > item?.ms)
+		if(!item)
+			return;
+		if(this.skipped || ((_gameTick - this.start) > item?.ms))
 		{
 			if(this.order === 1) {
 				episode.playSound({key:'story', volume: .5});
@@ -5091,9 +6186,12 @@ function story(_id, _func, _noBlack, _desc, _after) {
 				_box.appendChild(_boxInner);
 				_boxInner.innerHTML = `<div class="${item.class ?? 'full'}">${item.text ?? ''}</div>`;
 			}
-			else{
+			else {
+				if(this.firstSeen)
+					return;
 				removeClass(this.wrapper, 'fade-in');
 				addClass(this.wrapper, 'fade-out');
+				this.closing = 1;
 				this.wrapper.onanimationend = function(event) {
 					if(event.animationName === 'fade-out-me'){
 						this.remove();
@@ -5250,8 +6348,8 @@ function storyBonus(_func, _instant) {
 // 	});
 // }, 2000);
 
-function focusMe(_selector, _func, _transparent, _text, _doneBtn, _fingerFade) {
-	cssAnimations.focusui(_selector, _func, _transparent, _text, _doneBtn, null, _fingerFade);
+function focusMe(_selector, _func, _transparent, _text, _doneBtn, _fingerFade, _circle) {
+	cssAnimations.focusui(_selector, _func, _transparent, _text, _doneBtn, null, _fingerFade, _circle);
 	if(!_transparent) {
 		mainCharacter.disableSkills(1);
 		mainCharacter.immobilize = mainCharacter.still = true;
@@ -5788,8 +6886,7 @@ function tryStartStoryMission(_id, _golds, _exps, _items, _func, _isFirstStart) 
 	else{
 		if(!_isFirstStart && _s.ticket > 0){
 			if(__account.storyTicket >= _s.ticket){
-				__account.storyTicket -= _s.ticket;
-				_client.saveState(1);
+				//_client.saveState(1);
 			}
 			else {
 				warn('<span>' + getLangData('Not enough story portal') + '</span>', 'warn');
@@ -5797,13 +6894,14 @@ function tryStartStoryMission(_id, _golds, _exps, _items, _func, _isFirstStart) 
 			}
 		}
 		playStory(_id, null, function() {
-			tryConsumeTickets(_goldSelected, _expSelected, _itemSelected);
+			tryConsumeTickets(_goldSelected, _expSelected, _itemSelected, _s.ticket);
 			if(_func)
 				_func();
 		},_isFirstStart);
 	}
 }
-function tryConsumeTickets(_goldSelected, _expSelected, _itemSelected) {
+function tryConsumeTickets(_goldSelected, _expSelected, _itemSelected, _portal) {
+	__account.storyTicket -= _portal;
 	if(_itemSelected)
 	{
 		const _tix = __account.misc.find(x => x.type === 'ticket-item');

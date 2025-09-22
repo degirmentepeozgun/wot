@@ -130,7 +130,7 @@ function onlineusers() {
 				<div style="padding:6vh 4vh 4vh 4vh" class="flex">
 					<span style="color:#f7f7f7dd !important;font-size:3vh !important">${getLangData('Select A Character')}</span>
 				</div>
-				<div class="flex" style="padding:2vh">`
+				<div class="flex" style="padding:2vh 4%">`
 				+ _choices +
 				`</div>
 				<div style="padding:4vh 2vh 6vh 2vh" class="flex">
@@ -150,7 +150,7 @@ function onlineusers() {
 		 	n: __account.name, 
 			s: __socketId,
 			cl: _class,
-			to: _id
+			t: _id
 		});
 		closeInventoryQuestionModal();
 		warn('<div class="flex important achievement" style="position:relative"><span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Duel request sent') + '!</span></div>', null, null, 1);

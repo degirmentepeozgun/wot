@@ -390,7 +390,7 @@ function renderGlobalQuestList() {
 					'<div class="menu-ui-right fade-me">' + 
 						'<div class="menu-modal-right menu-modal-right-content">' +
 							'<div class="skills-content-right">' +
-								'<div class="skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">' +
+								'<div class="event-content-wrapper skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">' +
 									renderEvent() +
 								'<div id="shine"></div>' +
 							'</div>' +
@@ -405,7 +405,7 @@ function getEventReward(_index) {
 		const _order = parseInt(_chest.getAttribute('data-event-id'));
 		if(_order > 1 && !__account.eventsDone.find(x => x === (_order - 1)))
 		{
-			warn('<span>' + getLangData('Get previos reward first') + '</span>', 'warn');
+			warn('<span>' + getLangData('Get previous reward first') + '</span>', 'warn');
 			return;
 		}
 		if(!hasClass(_chest, 'glow-yellow'))
@@ -421,60 +421,78 @@ function getEventReward(_index) {
 	}
 }
 function renderEvent() {
-	let _before = 0;
+	const _mm = 15;
+	let _before = ((__account.eventsDone?.length ?? 0) * _mm * 60 * 1000);
 	if(__account.eventsDone.indexOf(4) !== -1)
-		_before = 60 * 1000 * 60;
+		_before = 60 * 1000 * (4 * _mm);
 	else if(__account.eventsDone.indexOf(3) !== -1)
-		_before = 60 * 1000 * 45;
+		_before = 60 * 1000 * (3 * _mm);
 	else if(__account.eventsDone.indexOf(2) !== -1)
-		_before = 60 * 1000 * 30;
+		_before = 60 * 1000 * (2 * _mm);
 	else if(__account.eventsDone.indexOf(1) !== -1)
-		_before = 60 * 1000 * 15;
+		_before = 60 * 1000 * (1 * _mm);
 	const _diff = Date.now() - (__account.onlineStart - _before);
 	return `<div class="full flex event-container">
-		<div class="event-item w-100 flex flex-jc-start${_diff > (15 * 60 * 1000) ? ' completed' : ''}" style="height:15%">
-			<img src="./images/ui/star-on.png" /> Stay online for 15 minutes
+		<div class="event-item w-100 flex flex-jc-start${_diff > ((1 * _mm) * 60 * 1000) ? ' completed' : ''}">
+			<div class="flex" style="padding:0 2vh">
+				<img src="./images/ui/star-on.png" />
+			</div>
+			<div style="flex:1;overflow:hidden">
+				<div class="one-line">Stay online for ${_mm * 1} minutes</div>
+			</div>
+			<div class="flex event-tick" style="padding:0 2vh">
+				<img src="./images/icons/tick-orange.png" />
+			</div>
 		</div>	
-		<div class="event-item w-100 flex flex-jc-start${_diff > (30 * 60 * 1000) ? ' completed' : ''}" style="height:15%">
-			<img src="./images/ui/star-on.png" /> Stay online for 30 minutes
+		<div class="event-item w-100 flex flex-jc-start${_diff > ((2 * _mm) * 60 * 1000) ? ' completed' : ''}">
+			<div class="flex" style="padding:0 2vh"><img src="./images/ui/star-on.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">Stay online for ${_mm * 2} minutes</div></div>
+			<div class="flex event-tick" style="padding:0 2vh">
+				<img src="./images/icons/tick-orange.png" />
+			</div>
 		</div>	
-		<div class="event-item w-100 flex flex-jc-start${_diff > (45 * 60 * 1000) ? ' completed' : ''}" style="height:15%">
-			<img src="./images/ui/star-on.png" /> Stay online for 45 minutes
+		<div class="event-item w-100 flex flex-jc-start${_diff > ((3 * _mm) * 60 * 1000) ? ' completed' : ''}">
+			<div class="flex" style="padding:0 2vh"><img src="./images/ui/star-on.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">Stay online for ${_mm * 3} minutes</div></div>
+			<div class="flex event-tick" style="padding:0 2vh">
+				<img src="./images/icons/tick-orange.png" />
+			</div>
 		</div>
-		<div class="event-item w-100 flex flex-jc-start${_diff > (60 * 60 * 1000) ? ' completed' : ''}" style="height:15%">
-			<img src="./images/ui/star-on.png" /> Stay online for 60 minutes
+		<div class="event-item w-100 flex flex-jc-start${_diff > ((4 * _mm) * 60 * 1000) ? ' completed' : ''}">
+			<div class="flex" style="padding:0 2vh"><img src="./images/ui/star-on.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">Stay online for ${_mm * 4} minutes</div></div>
+			<div class="flex event-tick" style="padding:0 2vh">
+				<img src="./images/icons/tick-orange.png" />
+			</div>
 		</div>
 		<div class="w-100 flex flex-ai-end event-gifts" style="height:20%">
 			<div style="width:18%" class="flex flex-jc-start">
-				<img${__account.eventsDone.indexOf(1) === -1 ? (_diff > (15 * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="1" onexactclick="getEventReward(0)" src="./images/icons/reward${_diff > (15 * 60 * 1000) ? '2' : '1'}.png" style="height:5vh" />
+				<img${__account.eventsDone.indexOf(1) === -1 ? (_diff > ((1 * _mm) * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="1" onexactclick="getEventReward(0)" src="./images/icons/reward${_diff > ((1 * _mm) * 60 * 1000) ? '2' : '1'}.png" style="height:5vh" />
 			</div>
 			<div style="width:32%" class="flex">
-				<img${__account.eventsDone.indexOf(2) === -1 ? (_diff > (30 * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="2" onexactclick="getEventReward(1)" src="./images/icons/reward${_diff > (30 * 60 * 1000) ? '2' : '1'}.png" style="height:5vh" />
+				<img${__account.eventsDone.indexOf(2) === -1 ? (_diff > ((2 * _mm) * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="2" onexactclick="getEventReward(1)" src="./images/icons/reward${_diff > ((2 * _mm) * 60 * 1000) ? '2' : '1'}.png" style="height:5vh" />
 			</div>
 			<div style="width:32%" class="flex">
-				<img${__account.eventsDone.indexOf(3) === -1 ? (_diff > (45 * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="3" onexactclick="getEventReward(2)" src="./images/icons/reward${_diff > (45 * 60 * 1000) ? '2' : '1'}.png" style="height:5vh" />
+				<img${__account.eventsDone.indexOf(3) === -1 ? (_diff > ((3 * _mm) * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="3" onexactclick="getEventReward(2)" src="./images/icons/reward${_diff > ((3 * _mm) * 60 * 1000) ? '2' : '1'}.png" style="height:5vh" />
 			</div>
 			<div style="width:18%" class="flex flex-jc-end">
-				<img${__account.eventsDone.indexOf(4) === -1 ? (_diff > (60 * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="4" onexactclick="getEventReward(3)" src="./images/icons/reward${_diff > (60 * 60 * 1000) ? '2' : '1'}.png" style="height:5vh" />
+				<img${__account.eventsDone.indexOf(4) === -1 ? (_diff > ((4 * _mm) * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="4" onexactclick="getEventReward(3)" src="./images/icons/reward${_diff > ((4 * _mm) * 60 * 1000) ? '2' : '1'}.png" style="height:5vh" />
 			</div>
 		</div>
 		<div class="event-path w-100 flex">
 			<div class="w-100 flex" style="padding:0 2vh">
-				<img${_diff > (30 * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
-				<img${_diff > (30 * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
-				<img${_diff > (30 * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
-				<img${_diff > (45 * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
-				<img${_diff > (45 * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
-				<img${_diff > (45 * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
-				<img${_diff > (60 * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
-				<img${_diff > (60 * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
-				<img${_diff > (60 * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
+				<img${_diff > ((2 * _mm) * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
+				<img${_diff > ((2 * _mm) * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
+				<img${_diff > ((2 * _mm) * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
+				<img${_diff > ((3 * _mm) * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
+				<img${_diff > ((3 * _mm) * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
+				<img${_diff > ((3 * _mm) * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
+				<img${_diff > ((4 * _mm) * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
+				<img${_diff > ((4 * _mm) * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
+				<img${_diff > ((4 * _mm) * 60 * 1000) ? '' : ' class="gray"'} src="./images/ui/shine.png" style="width:11.1%" />
 			</div>
 			<div class="w-100 flex event-dots">
-				<img src="./images/ui/star-${_diff > (15 * 60 * 1000) ? 'on' : 'off'}.png" />
-				<img src="./images/ui/star-${_diff > (30 * 60 * 1000) ? 'on' : 'off'}.png" />
-				<img src="./images/ui/star-${_diff > (45 * 60 * 1000) ? 'on' : 'off'}.png" />
-				<img src="./images/ui/star-${_diff > (60 * 60 * 1000) ? 'on' : 'off'}.png" />
+				<img style="margin-left:1vh" src="./images/ui/star-${_diff > ((1 * _mm) * 60 * 1000) ? 'on' : 'off'}.png" />
+				<img src="./images/ui/star-${_diff > ((2 * _mm) * 60 * 1000) ? 'on' : 'off'}.png" />
+				<img src="./images/ui/star-${_diff > ((3 * _mm) * 60 * 1000) ? 'on' : 'off'}.png" />
+				<img style="margin-right:1vh" src="./images/ui/star-${_diff > ((4 * _mm) * 60 * 1000) ? 'on' : 'off'}.png" />
 			</div>
 		</div>
 	</div>`;

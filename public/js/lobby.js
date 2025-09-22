@@ -57,6 +57,8 @@ function openSideMenu() {
 	document.addEventListener("click", outsideClick, true);
 }
 function createMenu() {
+	 if (document.querySelector('.lobby-navbar'))
+        return;
 	const _upperDiv = document.createElement('div');
 	_upperDiv.className = 'flex flex-jc-end show-ui lobby-navbar fade-in';
 	const _div = document.createElement('div');

@@ -96,21 +96,24 @@ function getHonorItemForgePerc(_type) {
 	}
 	return -1;
 }
+function getHonorItemUI(_item) {
+	const _perc = getHonorItemForgePerc(_item.type);
+	return  getHonorItemIcon(_item, 1) +
+	'<div style="flex:1"><span class="honor-item-list-title one-line">' + 
+	getItemGradeLetter(4) + ' ' + getLangData('Grade') + ' ' + 
+	getLangData(_item.type).toProperCase() + '</span>' + 
+	'<div class="honor-item-list-cost flex flex-jc-end">' + 
+	(_perc >= 0 ? '<div class="honor-item-progress-wrapper"><div style="width:' + _perc + '%" class="honor-item-progress"></div></div>' : __forges[_item.type].cost + '<img src="./images/icons/honor.png"/>') + 
+	'</div></div>';
+}
 function getHonorItemsUI(_type) {
 	var _items = getRandomItems(4, mainCharacter.class);
 	let html = '<div class="honor-items-list-wrapper">';
 	const _noSelect = tryShowMenuTutorial('honor');
-	for (var _item of _items) {
+	for (var _item of _items){
 		const _perc = getHonorItemForgePerc(_item.type);
-		html += '<div data-key="' + _item.type + '" onexactclick="selectHonorItem(\'' + _item.type + '\')" class="' + (_perc >= 100 ? 'glow ' : '') + 'honor-item-card flex-jc-start flex' + ((_item.type === _type && !_noSelect) ? ' selected' : '') + '">'
-				+ getHonorItemIcon(_item, 1) +
-				'<div style="flex:1"><span class="honor-item-list-title one-line">' + 
-				getItemGradeLetter(4) + ' ' + getLangData('Grade') + ' ' + 
-				getLangData(_item.type).toProperCase() + '</span>' + 
-				'<div class="honor-item-list-cost flex flex-jc-end">' + 
-				(_perc >= 0 ? '<div class="honor-item-progress-wrapper"><div style="width:' + _perc + '%" class="honor-item-progress"></div></div>' : __forges[_item.type].cost + '<img src="./images/icons/honor.png"/>') + 
-				'</div></div>' +
-			'</div>';
+		html += '<div data-key="' + _item.type + '" onexactclick="selectHonorItem(\'' + _item.type + '\')" class="' + (_perc >= 100 ? 'glow ' : '') + 'honor-item-card flex-jc-start flex' + (((_item.type === _type) && !_noSelect) ? ' selected' : '') + '">' +
+		 getHonorItemUI(_item) + '</div>';
 	}
 	return html + '</div>';
 }
@@ -139,34 +142,52 @@ function getHonorItemDetailUI(_type, _noSound, _noAnimation) {
 	_item.time = __forges[_type].time;
 	const _forgeStart = __account.forges?.find(x => x.type === _type)?.start;
 	const _date = ((_forgeStart ?? 0) + (_item.time * 60 * 60 * 1000));
-	const _enabled = _date < _gameTick && _forgeStart;
+	const _enabled = (_date < _gameTick && _forgeStart) || !_forgeStart;
+	let _status, _started = _forgeStart;
+	if(_forgeStart && (_date < _gameTick))
+		_status = getLangData('Ready');
+	else if(_forgeStart)
+		_status = '(' + getLangData('last') + ' ' + getTimeDiffUntilDate(new Date(_date)) + ')';
 	const _perc = getHonorItemForgePerc(_type);
-	let html = '<div' + (_noAnimation ? '' : ' class="fade-me"') + ' style="height:86%;overflow-y:auto;padding-top:1.5vh">' +
+	let html = '<div' + (_noAnimation ? '' : ' class="fade-me"') + ' style="height:86%;overflow-y:auto;padding-top:1.5vh"><div class="full" style="padding:5% 7%">' +
 	'<div class="forge-item-desc">' + getLangData('Redeem your honor points, own an item with 4 random attributes after forge time') + '</div>' +
 		'<div class="flex w-100"><div class="honor-items-content-title flex flex-jc-start w-50">' + getLangData('Forge Time') + '</div>' +
 		'<div class="flex w-50 flex-jc-end honor-items-content-value">'  + _item.time + ' ' + getLangData('hours') + '</div></div>' +
 		'<div class="flex w-100"><div class="honor-items-content-title flex flex-jc-start w-50">' + getLangData('Cost') + '</div>' +
 		'<div class="flex w-50 flex-jc-end honor-items-content-value">' + _item.cost + '&nbsp;/&nbsp;<span' + ((__account.pvp.honor < _item.cost) ? ' style="color:#FD1C03 !important"' : '') + '>' + __account.pvp.honor + '</span>&nbsp;<img class="honor-item-cost-icon" src="./images/icons/honor.png" /></div></div>' +
 		'<div class="flex w-100"><div class="honor-items-content-title flex w-50 flex-jc-start">' + getLangData('Progress') + '</div>' +
-		'<div class="flex w-50 flex-jc-end honor-items-content-value">'  + (!_enabled ? getLangData('Not started') : '<span class="forge-time-left" style="opacity:.75;color:#ff6c00 !important">(' + getLangData('last') + ' ' + getTimeDiffUntilDate(new Date(_date)) + ')</span>') + '</div></div>' +
+		'<div class="flex w-50 flex-jc-end honor-items-content-value">'  + (!_started ? getLangData('Not started') : '<span class="forge-time-left" style="opacity:.75;color:#ff6c00 !important">' + _status + '</span>') + '</div></div>' +
 		'<div class="flex w-100"><div class="honor-items-content-title flex-jc-start flex w-50">' + getLangData('Min Level') + '</div>' +
 		'<div class="w-50 flex flex-jc-end honor-items-content-value">' + _item.minLevelRequired + '</div></div>' +
 		'<div class="flex w-100"><div class="honor-items-content-title flex-jc-start flex w-50">' + getLangData('Max Upgrade Level') + '</div>' +
 		'<div class="flex flex-jc-end w-50 honor-items-content-value">' + _item.maxLevel + '</div></div>' +
 		'<div class="flex w-100"><div class="honor-items-content-title bold-title flex-jc-start flex w-100">' + getLangData('Attribute Possibilities') + '</div>' +
 		'<div class="w-100 flex flex-jc-end honor-items-content-value">' + renderItemProps(_item, '#ffffffcc') + '</div></div>' +
-		'</div>' +
-		'<div style="height:14%" class="flex action-button-container">' +
+		'</div></div>' +
+		'<div style="height:14%;margin:0 7%;width:86%" class="flex action-button-container">' +
 			'<div class="game-menu-button animate-me flex' + (_perc < 0 ? '' : ' d-none') + ((__account.pvp.honor < _item.cost || !_enabled) ? ' gray disabled' : '') + '" onexactclick="askStartForge(\'' + _type + '\')" style="height:65%"><div class="flex">' + getLangData('CREATE') + '</div></div>' + 
 			'<div class="game-menu-button animate-me flex' + (_perc >= 100 ? ' glow' : (_perc < 0 ? ' d-none' : ' gray disabled')) + '" onexactclick="takeForgedItem(\'' + _type + '\')" style="height:65%"><div class="flex">' + getLangData('READY') + '</div></div>' + 
-			'</div>';
+		'</div>';
 	return html;
+}
+function updateForgeItemUI(_key) {
+	const _card = document.querySelector('.honor-item-card[data-key="' + _key + '"]');
+	_card.innerHTML = getHonorItemUI(getRandomItem(4, _key, mainCharacter.class));
+	const _html = getHonorItemDetailUI(_key, null, 1);
+	const _cont = document.querySelector('.honor-items-content-detail-wrapper');
+	_cont.innerHTML = _html;
+	removeClass(_card, 'fade-me');
+	addClass(_card, 'fade-me');
+	removeClass(_cont, 'fade-me');
+	addClass(_cont, 'fade-me');
 }
 function takeForgedItem(_type) {
 	if(pushItemIntoInventory(getSpecificItem(_type, 4, mainCharacter.class))) {
+		PlaySound({key:'forgestart', volume:.5});
 		__account.forges = __account.forges?.filter(x => x.type !== _type);
 		_client.saveState();
-		getHonorStoreUI(_type);
+		//getHonorStoreUI(_type);
+		updateForgeItemUI(_type);
 	}
 }
 function askStartForge(_type) {
@@ -178,15 +199,17 @@ function startForge(_type) {
 	if(!__account.forges)
 		__account.forges = [];
 	const _cost = __forges[_type].cost;
+	PlaySound({key:'forgeready', volume:.5});
 	if(_cost > __account.pvp.honor) {
 		warn('<span>' + getLangData('Not enough honor points') + '</span>', 'warn');
 		return;
 	}
-	closeInventoryQuestionModal();
+	closeInventoryQuestionModal(1);
 	__account.forges.push({start:_gameTick, type: _type});
 	__account.pvp.honor -= _cost;
 	_client.saveState();
-	getHonorStoreUI(_type);
+	//getHonorStoreUI(_type);
+	updateForgeItemUI(_type);
 }
 function getHonorItemIcon(_item) {
     return '<span class="full grade' + _item.grade + '-item" style="display:inline-block;position:relative"><img style="background:#010101" class="item-img" src="./images/items/icons/' + (_item.for ? (_item.for + '/') : '') + _item.type + _item.grade + '.png"/></span>';

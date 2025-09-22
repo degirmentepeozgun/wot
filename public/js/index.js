@@ -256,6 +256,8 @@ function startWithThisCharacter(_id, _level) {
 	addCoopCharacter(null, _clone.class, 1, _level ?? 1, 1);
 	_squadMemberKey = _clone.class;
 	switchCharacter(1, 1);
+	if(_level && mainCharacter.level !== _level)
+		mainCharacter.level = _level;
 	removeCoopCharacter(1);
 	const _friendlyChars = episode.enemies?.filter(x => x.friendly);
 	if(_friendlyChars?.[0])
@@ -532,10 +534,26 @@ function createTipsUI(_tipOrder, _showCurrent) {
 	}, 20);
 	return _html;
 }
+function initMainCharacter() {
+	const _mh = mainCharacter?.health;
+	const _me = mainCharacter?.experience;
+	const _mme = mainCharacter?.maxExperience;
+	mainCharacter = _store.getMainCharacter();
+	if(_mh) {
+		mainCharacter.health = _mh;
+		mainCharacter.experience = _me;
+		mainCharacter.maxExperience = _mme;
+	}
+	_store.setCharacterStats();
+	if (!mainCharacter.keyboard)
+		setKeyBoard(mainCharacter);
+	else
+		mainCharacter.keyboard.holdingKeys = [];
+	return _mh;
+}
 function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 	if(__switchingMap)
 		return;
-	//try{
 	_game.suspended = 1;
 	if(mainCharacter) {
 		const _maph = mapSprites.find(x => x.id === _x);
@@ -545,16 +563,6 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 		}
 	}
 	const _map = mapSprites.find(x => x.id === _x);
-	// if(_map.gold) {
-	// 	const _gm = __account.missions.find(x => x.key === 'gold');
-	// 	const _limit = _missions.find(x => x.key === 'gold').limit;
-	// 	const _lastReset = getCurrentResetTime();
-	// 	if(_gm.lastActivity > _lastReset && _gm.current >= _limit) {
-	// 		warn('<span>' + getLangData('Daily limit reached') + '</span>', 'warn');
-	// 		return;
-	// 	}
-	// }
-	let _setFullHP = _map.id > 99 || episode?.id > 99;
 	if(episode)
 		episode.dispose();
 	__switchingMap = true;
@@ -566,10 +574,6 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 	if (_splash) {
 		_splash.style.display = 'flex';
 		_splash.style.opacity = '.99';
-		//_splash.style.background = 'url(./images/loading/' + getRandomValue(1, 8) + '.png), linear-gradient(0deg, #000, #000)';
-		//_splash.style.backgroundSize = 'contain';
-		//_splash.style.backgroundPosition = 'center center';
-		//_splash.style.backgroundRepeat = 'no-repeat';
 		let _tipOrder;
 		while(true) {
 			_tipOrder = getRandomValue2(0, _tips.length - 1);
@@ -587,17 +591,13 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 	frames = 0;
 	const _am = document.getElementById('auto-mode-on-off');
 	removeClass(_am, 'selected');
-	//if(__story)
-		addClass(_am, 'd-none');
-	//else
-		//removeClass(_am, 'd-none');
+	addClass(_am, 'd-none');
 	if (episode?.bgSound) {
 		episode.bgSound.pause();
 		episode.bgSound.currentTime = 0;
 	}
 	const _dungeonFloor = episode?.currentFloor;
 	const _oldSeason = episode?.season ?? 0;
-	const _fromLobby = episode?.lobby;
 	const _eps = new map({
 		loadObjects: true,
 		key: 'map' + _x + '-' + 1,
@@ -615,35 +615,9 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 	episode.msNow = getRandomValue(1, 1000);
 	const _hasLead = mainCharacter?.leader;
 	const _unarmed = mainCharacter?.unarmed;
-	const _mh = mainCharacter?.health;
-	const _me = mainCharacter?.experience;
-	const _mme = mainCharacter?.maxExperience;
-	
-	mainCharacter = _store.getMainCharacter();
-	let hasMainCharacter;
-	if(_mh && !_setFullHP) {
-		hasMainCharacter = 1;
-		mainCharacter.health = _mh;
-		mainCharacter.experience = _me;
-		mainCharacter.maxExperience = _mme;
-	}
-	_store.setCharacterStats();
-	if (!mainCharacter.keyboard)
-		setKeyBoard(mainCharacter);
-	else
-		mainCharacter.keyboard.holdingKeys = [];
+	let hasMainCharacter = initMainCharacter();
 	_store.minPosX = -1 * MathRound((mainCharacter.width / 2) * __zoom);
 	_store.maxPosX = _canvas.width - MathRound((mainCharacter.width / 2) * __zoom);
-	// if(episode.pvp || episode.dungeon) {
-	// 	episode.roomId = _newId ?? getRandomValue(10000, 99999);
-	// 	createBattleGround();
-	// 	addClass(document.getElementById('quest-status'), 'd-none');
-	// }
-	// if(episode.id === 500) {
-	// 	episode.roomId = _newId ?? getRandomValue(10000, 99999);
-	// 	createArena();
-	// 	addClass(document.getElementById('quest-status'), 'd-none');
-	// }
 	if (_dungeonFloor && episode.dungeon && episode.floors > _dungeonFloor)
 		episode.currentFloor = _dungeonFloor + 1;
 	const _isBattleGround = _map?.battleGround || _map?.pvp;
@@ -652,183 +626,144 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 	const _f = _force;
 	getMapAssets(episode, function () {
 		startGame(function (_connectingToGame) {
-			//try	{
-				loadUI();
-				//const _oldMapCoords = parseInt(mapSprites.find(x => x.id === _oldSeason)?.coords?.left?.replace('%','') ?? 0);
-				//const _newMapCoords = parseInt(mapSprites.find(x => x.id === episode.season).coords.left.replace('%',''));
-				
-				// if ((episode.lobby && MathAbs(_oldSeason - episode.season) > 2) || _oldSeason == episode.season || ((_oldSeason > episode.season) && ((episode.season % 2) === 1) &&
-				// 	(((_oldSeason % 2) === 1) || _fromLobby)) ||
-				// 	((_oldSeason < episode.season) && ((episode.season % 2) === 0))) {
-
-				if(episode.still) {
-					mainCharacter.left = MathRound(_canvas.width / (_map.enterDirection === 'left' ? 5 : 2));
-					mainCharacter.direction = 'right';
-					mainCharacter.platformX = platformX = MathRound(episode.width / 2) - mainCharacter.left - (_map.enterDirection === 'left' ? MathRound((_canvas.width / 2) - (_canvas.width / 5)) : 0);
-				}
-				else if((_oldSeason > episode.season || _ss?.from === 'right') && _ss?.from !== 'left') {
-					mainCharacter.left = MathRound((_canvas.width * .8) - mainCharacter.getWidth());
-					mainCharacter.direction = 'left';
-					mainCharacter.platformX = platformX = MathRound(episode.width - _canvas.width);
-				}
-				else
-				// if ((episode.lobby && MathAbs(_oldSeason - episode.season) > 2) || _oldSeason == episode.season || ((_oldSeason > episode.season) && ((episode.season % 2) === 1) &&
-				// 	(((_oldSeason % 2) === 1) || _fromLobby)) ||
-				// 	((_oldSeason < episode.season) && ((episode.season % 2) === 0))) {
-				{
-					mainCharacter.left = MathRound(_canvas.width / 5);
-					mainCharacter.direction = 'right';
-					mainCharacter.platformX = platformX = 0;
-				}
-				// }
-				// else {
-				// 	mainCharacter.left = MathRound((_canvas.width * .8) - mainCharacter.getWidth());
-				// 	mainCharacter.direction = 'left';
-				// 	mainCharacter.platformX = platformX = MathRound(episode.width - _canvas.width);
-				// }
-				_client.setCharacterValues();
-				setCharacterDefaults(mainCharacter);
-				if (_hasLead && (episode.dungeon ||episode.pvp))
-					mainCharacter.leader = 1;
-				if (_isBattleGround) {
-					createBattleGround(_map);
-				} else {
-					removeClass(document.getElementById('quest-status'), 'd-none');
-					episode.drawQuestNavIcon();
-					if (_coopMembers?.[0])
-						for (let cm of _coopMembers){
-							const _ua = cm.unarmed;
-							let cc = addCoopCharacter({ key: cm.key, name: cm.name, class: cm.class, width: cm.width, height: cm.height }, null, 1);
-							if(cc && _ua)
-								cc.unarm();
-						}
-				}
-				episode.enemies.push(mainCharacter);
-				//eskiden liderliği burada veriyorduk
-				episode.installMobs();
-				episode.status = 'loaded';
-				//animate();
-				mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
-				mainCharacter.immobilize = false;
-				mainCharacter.animate('idle', 1);
-				mainCharacter.lastActivity = _gameTick;
-				episode.playAmbianceMusic();
-				let _mapDiscovered;
-				if (!_isBattleGround && !episode.dungeon && !_isMission && __account.visitedMaps.indexOf(episode.subMap ?? episode.id) === -1) {
-					_client.upgradeVisitedMaps(episode.id);
-					_mapDiscovered = 1;
-				}
-				if (_func)
-					_func();
-				if (_isBattleGround)
-					episode.enemies?.forEach(x => {
-						x.immobilize = true;
-						x.killCount = 0;
-						x.setHealth(x.MAXHP, null, null, 8);
-						x.killedBy = undefined;
-						x.grayAvatar = false;
-					});
-				const _activeCoolDowns = document.querySelectorAll('.skill .counter');
-				if(_activeCoolDowns?.[0])
-					for(let _acd of _activeCoolDowns)
-						_acd.remove();
-				let _startWith = _ss?.startWith;
-				if(_startWith)
-					startWithThisCharacter(_startWith);
-				setTimeout(function() {
-					if(_onEnd)
-						_onEnd();
-					else {
-					//try {
-						//if(__account.cs || _startWith) {
-						addClass(_splash, 'd-none');
-						document.getElementById('tip-screen').remove();
-						//}
+			loadUI();
+			if(episode.still) {
+				mainCharacter.left = MathRound(_canvas.width / (_map.enterDirection === 'left' ? 5 : 2));
+				mainCharacter.direction = 'right';
+				mainCharacter.platformX = platformX = MathRound(episode.width / 2) - mainCharacter.left - (_map.enterDirection === 'left' ? MathRound((_canvas.width / 2) - (_canvas.width / 5)) : 0);
+			}
+			else if((_oldSeason > episode.season || _ss?.from === 'right') && _ss?.from !== 'left') {
+				mainCharacter.left = MathRound((_canvas.width * .8) - mainCharacter.getWidth());
+				mainCharacter.direction = 'left';
+				mainCharacter.platformX = platformX = MathRound(episode.width - _canvas.width);
+			}
+			else
+			{
+				mainCharacter.left = MathRound(_canvas.width / 5);
+				mainCharacter.direction = 'right';
+				mainCharacter.platformX = platformX = 0;
+			}
+			_client.setCharacterValues();
+			setCharacterDefaults(mainCharacter);
+			if (_hasLead && (episode.dungeon ||episode.pvp))
+				mainCharacter.leader = 1;
+			if (_isBattleGround) {
+				createBattleGround(_map);
+			} else {
+				removeClass(document.getElementById('quest-status'), 'd-none');
+				episode.drawQuestNavIcon();
+				if (_coopMembers?.[0])
+					for (let cm of _coopMembers){
+						const _ua = cm.unarmed;
+						let cc = addCoopCharacter({ key: cm.key, name: cm.name, class: cm.class, width: cm.width, height: cm.height }, null, 1);
+						if(cc && _ua)
+							cc.unarm();
 					}
-						const _loading = document.getElementById('game-start-loading');
-						episode.drawSpriteObjects2();
-						_client.loadItems(hasMainCharacter);
-						updateQuestArea();
-						__account.questStatus.dialogOrder = __account.questStatus.dialogArr = undefined;
-						__switchingMap = false;
-						if(!episode.pvp)
-							episode.pvp = _isMission;
-						if(episode.pvp){
-							addClass(document.getElementById('pot-btn'), 'not-allowed');
-							if(!episode.gold)
-								addClass(document.getElementById('world-mini-map'), 'd-none');
-						}
-						else {
-							removeClass(document.getElementById('pot-btn'), 'not-allowed');
-							removeClass(document.getElementById('world-mini-map'), 'd-none');
-						}
-						closeUserActionsModal();
-						if(_isTower)
-							setTowerMobsByLevel();
-						else if(_isMission) {
-							episode.enemies?.forEach(x => x.immobilize = true);
-							if(episode.gold) {
-								const _e = episode.enemies.find(x => x.enemy);
-								if(_e)
-									mainCharacter.yPosition = _e.yPosition;
-								removeCoopCharacter(1);
-								const _gm = __account.missions.find(x => x.key === 'gold');
-								_gm.current++;
-								_gm.lastActivity = _gameTick;
-								_client.saveState(1);
-								//mainCharacter.chargeSpeedRate *= .7;
-							}
-						}
-						// if(episode.characterZoom) {
-						// 	mainCharacter.zoom *= episode.characterZoom;
-						// 	mainCharacter.stepXRate *= episode.characterZoom;
-						// }
-						if(_mapDiscovered) {
-							//warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/scroll.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('New Map Discovered') + '</span></div>');
-							//episode.playSound({ key: 'page', volume: .5 });
-						}
-						if(_unarmed)
-							mainCharacter.unarm();
-						if(_startWith)
-							mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
-						else if(_startWith === 0)
-							mainCharacter = undefined;
-						if(__storyScene?.afterInit)
-							__storyScene.afterInit();
-						if(!_storySceneSwitching)
-							_game.suspended = false;
-						if(!episode?.menu && mainCharacter?.yPosition > getGroundHeight() && !episode?.pvp)
-							mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
-						if(episode && !episode.menu)
-							episode.enemies?.forEach(x => {
-								resetSkills(null, null, x);
-								x.hbBars = undefined;
-								x.maxHP = x.MAXHP = x.health;
-								x.setHealth(x.MAXHP);
-							});
-						removeClass(_gameUI, 'ghost');
-						disposeFocus();
-						if(episode.war)
-							_gameUI.setAttribute('data-mapid', 'war');
-						else if(_gameUI.hasAttribute('data-mapid'))
-							_gameUI.removeAttribute('data-mapid');
-					}, 2000);
-				// if (!(!window.Keyboard || !window.Keyboard.shrinkView))
-				// 	window.Keyboard.disableScrollingInShrinkView(false);
-				// if(!__account.cs && !_startWith)
-				//  	requestVideo(1);
-				// mainCharacter.addCommonSkill({key:'poisonpuff'});
-				// mainCharacter.addCommonSkill({key:'poisonpuff'});
-				// mainCharacter.addCommonSkill({key:'poisonpuff'});
-				// mainCharacter.addCommonSkill({key:'poisonpuff'});
-			// }
-			// catch(_ex) {
-			// 	alert('index 937' + _ex.message);
-			// }
+			}
+			episode.enemies.push(mainCharacter);
+			//eskiden liderliği burada veriyorduk
+			episode.installMobs();
+			episode.status = 'loaded';
+			mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
+			mainCharacter.immobilize = false;
+			mainCharacter.animate('idle', 1);
+			mainCharacter.lastActivity = _gameTick;
+			episode.playAmbianceMusic();
+			let _mapDiscovered;
+			if (!_isBattleGround && !episode.dungeon && !_isMission && __account.visitedMaps.indexOf(episode.subMap ?? episode.id) === -1) {
+				_client.upgradeVisitedMaps(episode.id);
+				_mapDiscovered = 1;
+			}
+			if (_func)
+				_func();
+			if (_isBattleGround)
+				episode.enemies?.forEach(x => {
+					x.immobilize = true;
+					x.killCount = 0;
+					x.setHealth(x.MAXHP, null, null, 8);
+					x.killedBy = undefined;
+					x.grayAvatar = false;
+				});
+			const _activeCoolDowns = document.querySelectorAll('.skill .counter');
+			if(_activeCoolDowns?.[0])
+				for(let _acd of _activeCoolDowns)
+					_acd.remove();
+			let _startWith = _ss?.startWith;
+			if(_startWith)
+				startWithThisCharacter(_startWith);
+			setTimeout(function() {
+				if(_onEnd)
+					_onEnd();
+				else {
+					addClass(_splash, 'd-none');
+					document.getElementById('tip-screen').remove();
+				}
+				const _loading = document.getElementById('game-start-loading');
+				episode.drawSpriteObjects2();
+				if(!episode.realTime)
+					_client.loadItems(hasMainCharacter);
+				updateQuestArea();
+				__account.questStatus.dialogOrder = __account.questStatus.dialogArr = undefined;
+				__switchingMap = false;
+				if(!episode.pvp)
+					episode.pvp = _isMission;
+				if(episode.pvp){
+					addClass(document.getElementById('pot-btn'), 'not-allowed');
+					if(!episode.gold)
+						addClass(document.getElementById('world-mini-map'), 'd-none');
+				}
+				else {
+					removeClass(document.getElementById('pot-btn'), 'not-allowed');
+					removeClass(document.getElementById('world-mini-map'), 'd-none');
+				}
+				closeUserActionsModal();
+				if(_isTower)
+					setTowerMobsByLevel();
+				else if(_isMission) {
+					episode.enemies?.forEach(x => x.immobilize = true);
+					if(episode.gold) {
+						const _e = episode.enemies.find(x => x.enemy);
+						if(_e)
+							mainCharacter.yPosition = _e.yPosition;
+						removeCoopCharacter(1);
+						const _gm = __account.missions.find(x => x.key === 'gold');
+						_gm.current++;
+						_gm.lastActivity = _gameTick;
+						_client.saveState(1);
+					}
+				}
+				if(_unarmed)
+					mainCharacter.unarm();
+				if(_startWith)
+					mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
+				else if(_startWith === 0)
+					mainCharacter = undefined;
+				if(__storyScene?.afterInit)
+					__storyScene.afterInit();
+				if(!_storySceneSwitching)
+					_game.suspended = false;
+				if(!episode?.menu && mainCharacter?.yPosition > getGroundHeight() && !episode?.pvp)
+					mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
+				if(episode && !episode.menu)
+					episode.enemies?.forEach(x => {
+						resetSkills(null, null, x);
+						x.hbBars = undefined;
+						x.maxHP = x.MAXHP = x.health;
+						x.setHealth(x.MAXHP);
+					});
+				removeClass(_gameUI, 'ghost');
+				disposeFocus();
+				if(episode.war)
+					_gameUI.setAttribute('data-mapid', 'war');
+				else if(_gameUI.hasAttribute('data-mapid'))
+					_gameUI.removeAttribute('data-mapid');
+				for(let i = 1; i < 5; i++) {
+					const cfc = chainSkills['skill' + i].firstChild;
+					cfc.removeAttribute("src");
+				}
+			}, 2000);
 		});
 	});
-// }
-// catch(_tex) { alert('index 942' + _tex.message);}
  }
 _allEnemies.enemy10001 = function () { return createCharacter(getCharacterJSON('wrr')); };
 _allEnemies.enemy10002 = function () { return createCharacter(getCharacterJSON('arc')); };
@@ -956,8 +891,8 @@ function openGame() {
 		if(!__account.lastLobbyUsage)
 			startStory(1);
 		else {
-			__storySceneOrder = __account.lastLobbyUsage.sceneOrder;
-			startStory(__account.lastLobbyUsage.storyId, null, 1);
+			//__storySceneOrder = __account.lastLobbyUsage.sceneOrder;
+			startStory(__stories.find(x => x.act === __account.act && x.lobby).id, null, 1);
 		}
 		_client.loadGold();
 		_client.loadPots();
@@ -1327,6 +1262,8 @@ function checkUpdateAvailable2(_order) {
 			availables.push({index:6, subIndex:0});
 	if(checkIfStoreFreeItemAvailable())
 			availables.push({index:7, subIndex:0});
+	if(__lastChatCheck < __lastChatAppend || (!__lastChatCheck && __lastChatAppend))
+			availables.push({index:3, subIndex:0});
 	if(checkIfMailItemAvailable())
 			availables.push({index:3, subIndex:1});
 	if(checkIfLotteryAvailable())
@@ -1856,6 +1793,7 @@ function createBattleGround(_map) {
 	//__account.commonInventory = [];
 }
 function normalizeSkills(_char) {
+	//_char.skills?.forEach(x => delete x.locked);
 	if(_char.animations['attack'])
 		_char.animations['attack'].priority = 4;
 	let i = 2;
@@ -1915,7 +1853,7 @@ function createArena(_opponent, _realTime) {
 				episode.roomId = _opponent.e;
 			}
 			if(_realTime) {
-				startWithThisCharacter(_selectableChars.find(x => x.class === __selectedPvPClass).id % 10000);
+				startWithThisCharacter(_selectableChars.find(x => x.class === __selectedPvPClass).id, 10);
 				__selectedPvPClass = undefined;
 			}
 			mainCharacter.dead = false;
@@ -1934,23 +1872,20 @@ function createArena(_opponent, _realTime) {
 				mainCharacter.left = MathRound(_canvas.width / 5);
 			}
 			mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
-			applyDefaultCharacterStats(mainCharacter);
-			mainCharacter.maxHP = mainCharacter.health = mainCharacter.MAXHP = mainCharacter.maxHP * 3;
-			resetSkills(null);
 			hideMyMenu();
 			hideMenu();
 			removeClass(_gameUI, 'disable-ui');
 			normalizeSkills(mainCharacter);
+			resetSkills();
 			mainCharacter.alp = true;
 			mainCharacter.villain = false;
+			applyDefaultCharacterStats(mainCharacter);
 			episode.enemies?.filter(x => x.enemy)?.forEach(x => {
 				x.level = 10;
-				applyCharacterStats(1, x);
+				//applyCharacterStats(1, x);
 				resetSkills(null, null, x);
 				x.groupId = x.alp = 1;
 				x.villain = false;
-				applyDefaultCharacterStats(x);
-				x.maxHP = x.health = x.MAXHP = x.maxHP * 3;
 				//x.setHealth(x.MAXHP);
 				_enemyProfile.innerHTML = avatarTemplate(x);
 				x.yPosition = mainCharacter.yPosition;
@@ -1971,6 +1906,7 @@ function createArena(_opponent, _realTime) {
 					x.direction = __left;
 				}
 				normalizeSkills(x);
+				applyDefaultCharacterStats(x);
 			});
 			delete episode.war;
 		});

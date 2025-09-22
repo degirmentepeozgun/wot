@@ -59,6 +59,14 @@ const __locations = [
 			}, left: '77%', top: '65%'
 		},
 		{
+			mapId: 93,
+			act:1,
+			titles: {
+				en: 'City of Snowshield',
+				tr: 'Karkalkanı Şehri'
+			}, left: '79%', top: '11%'
+		},
+		{
 			act:1,
 			titles: {
 				en: 'Turguoise Lake',
@@ -460,7 +468,23 @@ const _mails = [
 				{ type:'ticket-pass', count: 5 }
 			]
 		}
-	]
+	];
+const __chatMessages = [
+	// { id: 'BladeX8X', text: 'Guys? How can i gain more tickets?' },
+	// { id: 'Divorc€', text: 'Check your mailbox, may be you can find some in store / roulette' },
+	// { id: 'dtmn', text: 'any pvp around? pls invite meee tooo!' },
+	// { id: 'Guest', text: 'join bro' },
+	// { id: 'Kuruvasan', text: 'Abi alma şu adamı yaa, ben onun takımında olmam' },
+	// { id: 'Guest', text: 'Niye ki?' },
+	// { id: 'Kuruvasan', text: 'Kafasına göre dalıyo takım elemanı değil' },
+	// { id: 'Guest', text: ':) o zaman senin takıma atacam' },
+	// { id: 'Kuruvasan', text: 'Hasss X.x' },
+	// { id: 'See3P0', text: 'Stop speaking non-english ffs!' },
+	// { id: 'TheEnd', text: 'When EU Servers will be available? 2o49?' },
+	// { id: 'Divorc€', text: 'RofL! Just enjoy. No lag here, just lower the graphics settings and everything will be fine' },
+	// { system: true, text: 'World boss will be summoned in 10 minutes...' },
+	// { id: 'FBli', whisper: true, text: 'Abi salla maçı, boss\'u kaçırmayalım' },
+];
 const __gems = [
 	{ 
 		key: 'fire', 
@@ -1492,7 +1516,8 @@ const relatedObjects = [
 	},
 	{
 		id: 'questshine', key: 'questshine', width: 256, height: 256, zoom: 2, col: 8,
-		totalFrames: 72, skip: 2, speed: 8, repeat: true, singleton: true
+		totalFrames: 72, skip: 2, speed: 8, repeat: true, 
+		singleton: true, preDraw: true, still: true, bind: true
 	},
 	{
 		id: 'hpgift', key: 'hpgift', width: 64, height: 48, zoom: 2,
@@ -1862,12 +1887,24 @@ const relatedObjects = [
 		zoom: 1.65, totalFrames: 5, speed: 4, singleton: true, repeat: true
 	},
 	{
-		id: 'cagebg', key: 'cagebg', width: 380, height: 244, ground: true,
-		zoom: .9, totalFrames: 1, speed: 2100000000, singleton: true, repeat: true, still: true
+		id: 'cagebg', key: 'cagebg', width: 380, height: 244,
+		zoom: .9, totalFrames: 1, speed: 2100000000, 
+		singleton: true, preDraw: true, still: true, bind: true, repeat: true
 	},
 	{
 		id: 'cagefg', key: 'cagefg', width: 379, height: 233, 
-		zoom: .95, totalFrames: 1, speed: 2100000000, singleton: true, repeat: true, still: true
+		zoom: .95, totalFrames: 1, speed: 2100000000, singleton: true, repeat: true, 
+		still: true, bind: true
+	},
+	{
+		id: 'cagebg2', key: 'cagebg2', width: 256, height: 242,
+		zoom: 1.4, totalFrames: 1, speed: 2100000000, 
+		singleton: true, preDraw: true, still: true, bind: true, repeat: true
+	},
+	{
+		id: 'cagefg2', key: 'cagefg2', width: 256, height: 242, 
+		zoom: 1.4, totalFrames: 1, speed: 2100000000, singleton: true, repeat: true, 
+		still: true, bind: true
 	},
 	{
 		id: 'swarm', key: 'swarm', width: 266, height: 95, 
@@ -2113,6 +2150,12 @@ const relatedObjectImages = {
 	},
 	cagefg: function () {
 		return getImage('./images/related/cage-fg.png')
+	},
+	cagebg2: function () {
+		return getImage('./images/related/cage2bg.png')
+	},
+	cagefg2: function () {
+		return getImage('./images/related/cage2fg.png?x=2')
 	},
 	cold: function () {
 		return getImage('./images/related/cold.png')
@@ -2541,12 +2584,15 @@ const soundFiles = {
 	warstart: './images/sounds/war-start.mp3',
 	cyclopstag: './images/sounds/cyclops-tag2.mp3',
 	werewolftag: './images/sounds/werewolf-tag.mp3',
+	werewolfspin: './images/sounds/werewolf-spin.mp3?x=2',
 	bombertag: './images/sounds/bomber-tag.mp3',
 	knighttag: './images/sounds/knight-tag.mp3',
 	altag: './images/sounds/al-tag.mp3',
 	tagimpact: './images/sounds/tag-impact.mp3',
 	geminsert: './images/sounds/gem-insert.mp3',
 	autopass: './images/sounds/auto-pass.mp3',
+	unlock: './images/sounds/unlock.mp3',
+	wolves: './images/sounds/wolves.mp3',
 	enter: './images/sounds/enter.mp3',
 	gem: './images/sounds/gem.mp3',
 	boss: './images/sounds/boss.mp3',
@@ -2645,6 +2691,7 @@ const soundFiles = {
 	cyclopshurt1: './images/sounds/cyclops-hurt1.mp3',
 	cyclopshurt2: './images/sounds/cyclops-hurt2.mp3',
 	cyclopsattack3: './images/sounds/cyclops-attack3.mp3',
+	forgestart: './images/sounds/forge-start.mp3?x=1',
 	forgeready: './images/sounds/forge-ready.mp3',
 	vomitterattack: './images/sounds/vomitter-attack.mp3',
 	vomitterdead: './images/sounds/vomitter-dead.mp3',
@@ -2749,6 +2796,7 @@ const soundFiles = {
 	howl: './images/sounds/howl.mp3',
 	shield: './images/sounds/shield.mp3',
 	reflect: './images/sounds/reflect.mp3',
+	notify: './images/sounds/notify.mp3',
 	snow: './images/sounds/snow.mp3',
 	grove: './images/sounds/grove.mp3',
 	release: './images/sounds/release.mp3',
@@ -3618,8 +3666,8 @@ const mapSprites = [
 		tiles: [
 			{ name: 'bg', count: 1, height: 1080, zoom: 1.6, rate: .85, width: 3357, bottom: -700 },
 			{ name: 'back', count: 1, height: 1080, zoom: 1.25, rate: .9, width: 4238, bottom: -700 },
-			{ name: 'flare', marginTop: '2%', marginLeft: 2944, count: 1, height: 90, zoom: 1, rate: .9, width: 99, bottom: 0 },
-			{ name: 'flare2', marginTop: '4%', marginLeft: 1060, count: 1, height: 90, zoom: .8, rate: .9, width: 99, bottom: 0 },
+			{ name: 'flare', marginTop: 20, marginLeft: 2944, count: 1, height: 90, zoom: 1, rate: .9, width: 99, bottom: 0 },
+			{ name: 'flare2', marginTop: 40, marginLeft: 1060, count: 1, height: 90, zoom: .8, rate: .9, width: 99, bottom: 0 },
 			{ name: 'ground', count: 1, height: 1080, zoom: 1.065, rate: 1, width: 5888, bottom: -700 },
 			//{ name: 'foreground', count: 1, foreground: true, height: 1080, rate:1.29, zoom: 1.065, width: 5888, bottom: -700 }
 		],
@@ -5034,7 +5082,7 @@ const mapSprites = [
 		id: 93, disabled: true, ambianceVolume: .2, do: startSnow, after: endSnow, 
 		coords: { left: '70%', top: '12%', title: 'Snowy Peaks' }, 
 		theme: 'snow', distance: 1, width: MathFloor(6144 * 1.065),
-		minLevel: 12, itemGrade: 3,
+		minLevel: 1, itemGrade: 3,
 		equipmentDropRates: [
 
 		],
@@ -5048,35 +5096,35 @@ const mapSprites = [
 			// 	minLevel: 10,
 			// 	maxLevel: 12
 			// },
-			{
-				id: 22,
-				minX: 5000,
-				maxX: 5000,
-				sight: 500,
-				count: 1,
-				minLevel: 10,
-				maxLevel: 12,
-				attackAfterHit: true
-			}
+			// {
+			// 	id: 22,
+			// 	minX: 5000,
+			// 	maxX: 5000,
+			// 	sight: 500,
+			// 	count: 1,
+			// 	minLevel: 10,
+			// 	maxLevel: 12,
+			// 	attackAfterHit: true
+			// }
 		],
 		objects: [
-			{
-				id: 'dropx1', key: 'snowdrop', npc: true, when: function (_npc) {
-					return installQuestItem(_npc);
-				}, width: 128, height: 157, locate: { left: 1040, bottom: -6 }, zoom: 1, rate: 1
-			},
-			{
-				id: 'dropx2', key: 'snowdrop', npc: true, rotate: true, when: function (_npc) {
-					return installQuestItem(_npc);
-				}, width: 128, height: 157, locate: { left: 2940, bottom: -6 }, zoom: 1, rate: 1
-			},
-			{
-				id: 'dropx3', key: 'snowdrop', npc: true, when: function (_npc) {
-					return installQuestItem(_npc);
-				}, width: 128, height: 157, locate: { left: 4540, bottom: -6 }, zoom: 1, rate: 1
-			},
-			{ id: 'portal1', src:'./images/texture/portal.gif', alpha: .75, to: 'desert', key: 'portal', npc: true, totalFrames: 7, width: 192, height: 87, zoom: 1, locate: { left: 5850, bottom: -235 } },
-			{ id: 'sign-cemetery', text: 'Desert', key: 'sign', totalFrames: 2, width: 100, height: 40, zoom: 1, locate: { left: 5885, bottom: -150 } }
+			//{
+			// 	id: 'dropx1', key: 'snowdrop', npc: true, when: function (_npc) {
+			// 		return installQuestItem(_npc);
+			// 	}, width: 128, height: 157, locate: { left: 1040, bottom: -6 }, zoom: 1, rate: 1
+			// },
+			// {
+			// 	id: 'dropx2', key: 'snowdrop', npc: true, rotate: true, when: function (_npc) {
+			// 		return installQuestItem(_npc);
+			// 	}, width: 128, height: 157, locate: { left: 2940, bottom: -6 }, zoom: 1, rate: 1
+			// },
+			// {
+			// 	id: 'dropx3', key: 'snowdrop', npc: true, when: function (_npc) {
+			// 		return installQuestItem(_npc);
+			// 	}, width: 128, height: 157, locate: { left: 4540, bottom: -6 }, zoom: 1, rate: 1
+			// },
+			// { id: 'portal1', src:'./images/texture/portal.gif', alpha: .75, to: 'desert', key: 'portal', npc: true, totalFrames: 7, width: 192, height: 87, zoom: 1, locate: { left: 5850, bottom: -235 } },
+			// { id: 'sign-cemetery', text: 'Desert', key: 'sign', totalFrames: 2, width: 100, height: 40, zoom: 1, locate: { left: 5885, bottom: -150 } }
 		],
 		tiles: [
 			{ name: 'bg', width: 6144, height: 1080, zoom: 1.065, rate: .85, bottom: -400, count:1 },
@@ -5405,7 +5453,7 @@ const mapSprites = [
 		id: 103, subMap: 104, repeat:1000, ambianceVolume:.5, do: startQuake, after: stopQuake,
 		ambiancePath: './images/sounds/quake.mp3', 
 		still: true, minLevel : 1, theme: 'chamber',
-		coords: { title: 'Sewers' },
+		coords: { title: 'Secret Room' },
 		distance: 1, width: MathFloor(1920 * 1.067), characterZoom: 1.4,
 		// objects: [
 		// 	{
@@ -5475,7 +5523,7 @@ const mapSprites = [
 		id: 102, repeat:1000, subMap: 104,
 		do: startQuake, after: stopQuake, repeat:1000,
 		ambianceVolume:.5, ambiancePath: './images/sounds/quake.mp3', still: true, minLevel : 1, theme: 'room1',
-		coords: { title: 'Sewers' },
+		coords: { title: 'Seewers' },
 		distance: 1, width: MathFloor(1920 * 1.067), characterZoom: 1.4,
 		// objects: [
 		// 	{
@@ -5525,8 +5573,8 @@ const mapSprites = [
 			// },
 			{
 				id: 78,
-				minX: 1200,
-				maxX: 1200,
+				minX: 1100,
+				maxX: 1100,
 				zoom: 1.4,
 				direction: __left,
 				yPosition: function() {
@@ -5537,29 +5585,30 @@ const mapSprites = [
 				},
 				count: 1
 			},
+			// {
+			// 	id: 28,
+			// 	minX: 1250,
+			// 	maxX: 1250,
+			// 	yPosition: function() {
+			// 		return MathRound(groundheight * .5);
+			// 	},
+			// 	hp: 1,
+			// 	attackAfterHit: true,
+			// 	direction: __right,
+			// 	props: {
+			// 		still: true,
+			// 		immobilize: true,
+			// 		noLoot: true,
+			// 		experience: 250,
+			// 		noDirection: true
+			// 	},
+			// 	count: 1
+			// },
 			{
 				id: 28,
-				minX: 1250,
-				maxX: 1250,
-				yPosition: function() {
-					return MathRound(groundheight * .5);
-				},
-				hp: 1,
-				attackAfterHit: true,
-				direction: __right,
-				props: {
-					still: true,
-					immobilize: true,
-					noLoot: true,
-					experience: 250,
-					noDirection: true
-				},
-				count: 1
-			},
-			{
-				id: 28,
-				minX: 1550,
-				maxX: 1550,
+				minX: 1500,
+				maxX: 1500,
+				sight: 100,
 				attackAfterHit: true,
 				yPosition: function() {
 					return MathRound(groundheight * .5);
@@ -5570,7 +5619,6 @@ const mapSprites = [
 					still: true,
 					noLoot: true,
 					reversed: true,
-					experience: 250,
 					immobilize: true,
 					noDirection: true
 				},
@@ -5587,7 +5635,7 @@ const mapSprites = [
 	{
 		id: 104, repeat:1000, do: startQuake, after: stopQuake,
 		ambianceVolume:.5, ambiancePath: './images/sounds/quake.mp3', still: true, minLevel : 1, theme: 'seewers', /*runToSwitch: true,*/
-		coords: { title: 'Seewers' }, distance: 1, width: MathFloor(1920 * 1.067), characterZoom: 1.4,
+		coords: { title: 'Dungeon' }, distance: 1, width: MathFloor(1920 * 1.067), characterZoom: 1.4,
 		mobs: [
 			{
 				id: 500,
@@ -12827,6 +12875,175 @@ const spells = {
 						spriteHeight: 180,
 						bottomGap: 20,
 						spriteOrigin: 128,
+						speed: 4
+					}
+				]
+			}
+		}
+	},
+	darkbolt: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'run',
+		zoom: 4,
+		width: 64,
+		invulnerable: true,
+		autoAim: 50,
+		pierce: true,
+		class: __spell,
+		src: './images/sprites/ep29/darkbolt.png',
+		name: 'Dark Bolt',
+		animations: {
+			dead: {
+				key: 'dead',
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				priority: 2,
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 64,
+						spriteHeight: 88,
+						spriteOrigin: 32,
+						bottomGap: -20,
+						speed: 4,
+						sound: { key: 'icespike' }
+					},
+					{
+						spriteLeft: 64,
+						spriteTop: 0,
+						spriteWidth: 64,
+						spriteHeight: 88,
+						spriteOrigin: 32,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 64 * 2,
+						spriteTop: 0,
+						spriteWidth: 64,
+						spriteHeight: 88,
+						spriteOrigin: 32,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 64 * 3,
+						spriteTop: 0,
+						spriteWidth: 64,
+						spriteHeight: 88,
+						spriteOrigin: 32,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 64 * 4,
+						spriteTop: 0,
+						spriteWidth: 64,
+						spriteHeight: 88,
+						spriteOrigin: 32,
+						bottomGap: -20,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .66,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'lightning'
+						}
+					},
+					{
+						spriteLeft: 64 * 5,
+						spriteTop: 0,
+						spriteWidth: 64,
+						spriteHeight: 88,
+						spriteOrigin: 32,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 64 * 6,
+						spriteTop: 0,
+						spriteWidth: 64,
+						spriteHeight: 88,
+						spriteOrigin: 32,
+						bottomGap: -20,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .66,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'lightning'
+						}
+					},
+					{
+						spriteLeft: 64 * 7,
+						spriteTop: 0,
+						spriteWidth: 64,
+						spriteHeight: 88,
+						spriteOrigin: 32,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 64 * 8,
+						spriteTop: 0,
+						spriteWidth: 64,
+						spriteHeight: 88,
+						spriteOrigin: 32,
+						bottomGap: -20,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .66,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'lightning'
+						}
+					},
+					{
+						spriteLeft: 64 * 9,
+						spriteTop: 0,
+						spriteWidth: 64,
+						spriteHeight: 88,
+						spriteOrigin: 32,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 64 * 10,
+						spriteTop: 0,
+						spriteWidth: 64,
+						spriteHeight: 88,
+						spriteOrigin: 32,
+						bottomGap: -20,
 						speed: 4
 					}
 				]
@@ -21608,45 +21825,12 @@ const spells = {
 						spriteOrigin: 210,
 						bottomGap: -40,
 						extraStepXRate: -.5,
-						speed: 1,
-						bleed: 'back',
+						speed: 4,
 						push: 'reversed',
 						atk: {
 							yRange: 10,
-							rate: .5,
-							hurt: {
-								objects: [{ key: 'bloodhit', position: 'middle' }],
-								key: 'hurtground2',
-								type: 'ground'
-							},
-							type: 'common'
-						}
-					},
-					{
-						spriteLeft: 0 + 420,
-						spriteTop: 0,
-						spriteWidth: 420,
-						spriteHeight: 30,
-						spriteOrigin: 210,
-						extraStepXRate: -.5,
-						bottomGap: -40,
-						speed: 3,
-						push: 'reversed'
-					},
-					{
-						spriteLeft: 50 + 420,
-						spriteTop: 0,
-						spriteWidth: 370,
-						spriteHeight: 30,
-						spriteOrigin: 185,
-						bottomGap: -40,
-						extraStepXRate: -1,
-						speed: 1,
-						bleed: 'back',
-						push: 'reversed',
-						atk: {
-							yRange: 10,
-							rate: .5,
+							rate: .25,
+							reset: true,
 							hurt: {
 								objects: [{ key: 'bloodhit', position: 'middle' }],
 								key: 'hurtground2',
@@ -21663,8 +21847,19 @@ const spells = {
 						spriteOrigin: 185,
 						bottomGap: -40,
 						extraStepXRate: -1,
-						speed: 3,
+						speed: 4,
 						push: 'reversed',
+						atk: {
+							yRange: 10,
+							rate: .25,
+							reset: true,
+							hurt: {
+								objects: [{ key: 'bloodhit', position: 'middle' }],
+								key: 'hurtground2',
+								type: 'ground'
+							},
+							type: 'common'
+						}
 					},
 					{
 						spriteLeft: 0 + 420,
@@ -21674,45 +21869,12 @@ const spells = {
 						spriteOrigin: 160,
 						bottomGap: -40,
 						extraStepXRate: -1,
-						speed: 1,
-						bleed: 'back',
+						speed: 4,
 						push: 'reversed',
 						atk: {
 							yRange: 10,
-							rate: .5,
-							hurt: {
-								objects: [{ key: 'bloodhit', position: 'middle' }],
-								key: 'hurtground2',
-								type: 'ground'
-							},
-							type: 'common'
-						}
-					},
-					{
-						spriteLeft: 100 + 420,
-						spriteTop: 0,
-						spriteWidth: 320,
-						spriteHeight: 30,
-						spriteOrigin: 160,
-						bottomGap: -40,
-						extraStepXRate: -1,
-						speed: 3,
-						push: 'reversed',
-					},
-					{
-						spriteLeft: 150 + 420,
-						spriteTop: 0,
-						spriteWidth: 270,
-						spriteHeight: 30,
-						spriteOrigin: 135,
-						bottomGap: -40,
-						extraStepXRate: -1,
-						speed: 1,
-						bleed: 'back',
-						push: 'reversed',
-						atk: {
-							yRange: 10,
-							rate: .5,
+							rate: .25,
+							reset: true,
 							hurt: {
 								objects: [{ key: 'bloodhit', position: 'middle' }],
 								key: 'hurtground2',
@@ -21729,23 +21891,12 @@ const spells = {
 						spriteOrigin: 135,
 						bottomGap: -40,
 						extraStepXRate: -1,
-						speed: 3,
-						push: 'reversed',
-					},
-					{
-						spriteLeft: 200 + 420,
-						spriteTop: 0,
-						spriteWidth: 220,
-						spriteHeight: 30,
-						spriteOrigin: 110,
-						bottomGap: -40,
-						extraStepXRate: -1,
-						speed: 1,
-						bleed: 'back',
+						speed: 4,
 						push: 'reversed',
 						atk: {
 							yRange: 10,
-							rate: .5,
+							rate: .25,
+							reset: true,
 							hurt: {
 								objects: [{ key: 'bloodhit', position: 'middle' }],
 								key: 'hurtground2',
@@ -21762,23 +21913,12 @@ const spells = {
 						spriteOrigin: 110,
 						bottomGap: -40,
 						extraStepXRate: -1,
-						speed: 3,
-						push: 'reversed',
-					},
-					{
-						spriteLeft: 250 + 420,
-						spriteTop: 0,
-						spriteWidth: 170,
-						spriteHeight: 30,
-						spriteOrigin: 85,
-						bottomGap: -40,
-						extraStepXRate: -1,
-						speed: 1,
-						bleed: 'back',
+						speed: 4,
 						push: 'reversed',
 						atk: {
 							yRange: 10,
-							rate: .5,
+							rate: .25,
+							reset: true,
 							hurt: {
 								objects: [{ key: 'bloodhit', position: 'middle' }],
 								key: 'hurtground2',
@@ -21795,23 +21935,12 @@ const spells = {
 						spriteOrigin: 85,
 						bottomGap: -40,
 						extraStepXRate: -1,
-						speed: 3,
-						push: 'reversed',
-					},
-					{
-						spriteLeft: 300 + 420,
-						spriteTop: 0,
-						spriteWidth: 120,
-						spriteHeight: 30,
-						spriteOrigin: 60,
-						bottomGap: -40,
-						extraStepXRate: -1,
-						speed: 1,
-						bleed: 'back',
+						speed: 4,
 						push: 'reversed',
 						atk: {
 							yRange: 10,
-							rate: .5,
+							rate: .25,
+							reset: true,
 							hurt: {
 								objects: [{ key: 'bloodhit', position: 'middle' }],
 								key: 'hurtground2',
@@ -21828,23 +21957,12 @@ const spells = {
 						spriteOrigin: 60,
 						bottomGap: -40,
 						extraStepXRate: -1,
-						speed: 3,
-						push: 'reversed'
-					},
-					{
-						spriteLeft: 300 + 420,
-						spriteTop: 0,
-						spriteWidth: 120,
-						spriteHeight: 30,
-						spriteOrigin: 60,
-						bottomGap: -40,
-						extraStepXRate: -1,
-						speed: 1,
-						bleed: 'back',
+						speed: 4,
 						push: 'reversed',
 						atk: {
 							yRange: 10,
-							rate: .5,
+							rate: .25,
+							reset: true,
 							hurt: {
 								objects: [{ key: 'bloodhit', position: 'middle' }],
 								key: 'hurtground2',
@@ -21854,15 +21972,26 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 366 + 420,
+						spriteLeft: 300 + 420,
 						spriteTop: 0,
-						spriteWidth: 54,
+						spriteWidth: 120,
 						spriteHeight: 30,
-						spriteOrigin: 27,
+						spriteOrigin: 60,
 						bottomGap: -40,
 						extraStepXRate: -1,
-						speed: 3,
-						push: 'reversed'
+						speed: 4,
+						push: 'reversed',
+						atk: {
+							yRange: 10,
+							rate: .25,
+							reset: true,
+							hurt: {
+								objects: [{ key: 'bloodhit', position: 'middle' }],
+								key: 'hurtground2',
+								type: 'ground'
+							},
+							type: 'common'
+						}
 					},
 					{
 						spriteLeft: 400 + 420,
@@ -21872,8 +22001,7 @@ const spells = {
 						spriteOrigin: 10,
 						bottomGap: -40,
 						extraStepXRate: -1,
-						speed: 4,
-						push: 'reversed'
+						speed: 4
 					}
 				]
 			},
@@ -22249,6 +22377,7 @@ const spells = {
 		invulnerable: true,
 		height: 600 * 1.35,
 		class: __spell,
+		pierce: true,
 		src: './images/main/thief/lightning-ball2.png',
 		name: 'Tesla Ball',
 		animations: {
@@ -22267,6 +22396,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: .5,
+							reset: true,
 							aoe: 300,
 							hurt: {
 								key: 'hurtair',
@@ -22285,6 +22415,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: .5,
+							reset: true,
 							aoe: 300,
 							hurt: {
 								key: 'hurtair',
@@ -22304,6 +22435,7 @@ const spells = {
 							yRange: 10,
 							rate: .5,
 							aoe: 300,
+							reset: true,
 							hurt: {
 								key: 'hurtair',
 								type: 'air'
@@ -22322,6 +22454,7 @@ const spells = {
 							yRange: 10,
 							rate: .5,
 							aoe: 300,
+							reset: true,
 							hurt: {
 								key: 'hurtair',
 								type: 'air'
@@ -22340,6 +22473,7 @@ const spells = {
 							yRange: 10,
 							rate: .5,
 							aoe: 300,
+							reset: true,
 							hurt: {
 								key: 'hurtair',
 								type: 'air'
@@ -22358,6 +22492,7 @@ const spells = {
 							yRange: 10,
 							rate: .5,
 							aoe: 300,
+							reset: true,
 							hurt: {
 								key: 'hurtair',
 								type: 'air'
@@ -22375,6 +22510,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: .5,
+							reset: true,
 							aoe: 300,
 							hurt: {
 								key: 'hurtair',
@@ -22393,6 +22529,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: .5,
+							reset: true,
 							aoe: 300,
 							hurt: {
 								key: 'hurtair',
@@ -22411,6 +22548,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: .5,
+							reset: true,
 							aoe: 300,
 							hurt: {
 								key: 'hurtair',
@@ -22430,6 +22568,7 @@ const spells = {
 							yRange: 10,
 							rate: .5,
 							aoe: 300,
+							reset: true,
 							hurt: {
 								key: 'hurtair',
 								type: 'air'
@@ -22448,6 +22587,7 @@ const spells = {
 							yRange: 10,
 							rate: .5,
 							aoe: 300,
+							reset: true,
 							hurt: {
 								key: 'hurtair',
 								type: 'air'
@@ -22466,6 +22606,7 @@ const spells = {
 							yRange: 10,
 							rate: .5,
 							aoe: 300,
+							reset: true,
 							hurt: {
 								key: 'hurtair',
 								type: 'air'
@@ -22484,6 +22625,7 @@ const spells = {
 							yRange: 10,
 							rate: .5,
 							aoe: 300,
+							reset: true,
 							hurt: {
 								key: 'hurtair',
 								type: 'air'
@@ -22502,6 +22644,7 @@ const spells = {
 							yRange: 10,
 							rate: .5,
 							aoe: 300,
+							reset: true,
 							hurt: {
 								key: 'hurtair',
 								type: 'air'
@@ -22520,6 +22663,7 @@ const spells = {
 							yRange: 10,
 							rate: .5,
 							aoe: 300,
+							reset: true,
 							hurt: {
 								key: 'hurtair',
 								type: 'air'
@@ -22537,6 +22681,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: .5,
+							reset: true,
 							aoe: 300,
 							hurt: {
 								key: 'hurtair',
@@ -22555,6 +22700,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: .5,
+							reset: true,
 							aoe: 300,
 							hurt: {
 								key: 'hurtair',
@@ -22573,6 +22719,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: .5,
+							reset: true,
 							aoe: 300,
 							hurt: {
 								key: 'hurtair',
@@ -22591,6 +22738,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: .5,
+							reset: true,
 							aoe: 300,
 							hurt: {
 								key: 'hurtair',
@@ -22609,6 +22757,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: .5,
+							reset: true,
 							aoe: 300,
 							hurt: {
 								key: 'hurtair',
@@ -22628,6 +22777,7 @@ const spells = {
 							yRange: 10,
 							rate: .5,
 							aoe: 300,
+							reset: true,
 							hurt: {
 								key: 'hurtair',
 								type: 'air'
@@ -22645,6 +22795,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: .5,
+							reset: true,
 							aoe: 300,
 							hurt: {
 								key: 'hurtair',
@@ -22664,6 +22815,7 @@ const spells = {
 							yRange: 10,
 							rate: .5,
 							aoe: 300,
+							reset: true,
 							hurt: {
 								key: 'hurtair',
 								type: 'air'
@@ -22681,6 +22833,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: .5,
+							reset: true,
 							aoe: 300,
 							hurt: {
 								key: 'hurtair',
@@ -22699,6 +22852,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: .5,
+							reset: true,
 							aoe: 300,
 							hurt: {
 								key: 'hurtair',
@@ -22717,6 +22871,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: .5,
+							reset: true,
 							aoe: 300,
 							hurt: {
 								key: 'hurtair',
@@ -22736,6 +22891,7 @@ const spells = {
 							yRange: 10,
 							rate: .5,
 							aoe: 300,
+							reset: true,
 							hurt: {
 								key: 'hurtair',
 								type: 'air'
@@ -22754,6 +22910,7 @@ const spells = {
 							yRange: 10,
 							rate: .5,
 							aoe: 300,
+							reset: true,
 							hurt: {
 								key: 'hurtair',
 								type: 'air'
@@ -22771,6 +22928,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: .5,
+							reset: true,
 							aoe: 300,
 							hurt: {
 								key: 'hurtair',
@@ -22789,6 +22947,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: .5,
+							reset: true,
 							aoe: 300,
 							hurt: {
 								key: 'hurtair',
@@ -23632,6 +23791,1011 @@ const spells = {
 						spriteHeight: 269,
 						spriteOrigin: 133,
 						bottomGap: -40,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			}
+		}
+	},
+	horse: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'run',
+		zoom: 1.25,
+		invulnerable: true,
+		class: __spell,
+		name: 'Horse',
+		src: './images/sprites/ep29/horse.png',
+		animations: {
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 380,
+						spriteHeight: 291,
+						spriteOrigin: 190,
+						bottomGap: 16,
+						extraStepXRate: 1,
+						speed: 1
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 380,
+						spriteHeight: 291,
+						spriteOrigin: 190,
+						bottomGap: 16,
+						extraStepXRate: 1,
+						sound:{key:'neigh', reset:true, bind:true, volume:.3},
+						speed: 3,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 380,
+						spriteTop: 0,
+						spriteWidth: 380,
+						spriteHeight: 291,
+						spriteOrigin: 190,
+						bottomGap: 16,
+						extraStepXRate: 1,
+						speed: 4,
+						objects: [
+							{
+								key: 'cloudground',
+								position: 'behind-feet',
+								xGap: 150
+							}
+						],
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 760,
+						spriteTop: 0,
+						spriteWidth: 380,
+						spriteHeight: 291,
+						spriteOrigin: 190,
+						bottomGap: 16,
+						extraStepXRate: 1,
+						sound:{key:'horse', bind:true, volume:.3},
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+
+					{
+						spriteLeft: 0,
+						spriteTop: 291,
+						spriteWidth: 380,
+						spriteHeight: 291,
+						spriteOrigin: 190,
+						bottomGap: 16,
+						extraStepXRate: 1,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 380,
+						spriteTop: 291,
+						spriteWidth: 380,
+						spriteHeight: 291,
+						spriteOrigin: 190,
+						bottomGap: 16,
+						extraStepXRate: 1,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 760,
+						spriteTop: 291,
+						spriteWidth: 380,
+						spriteHeight: 291,
+						spriteOrigin: 190,
+						bottomGap: 16,
+						extraStepXRate: 1,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+
+					{
+						spriteLeft: 0,
+						spriteTop: 291 * 2,
+						spriteWidth: 380,
+						spriteHeight: 291,
+						spriteOrigin: 190,
+						bottomGap: 16,
+						extraStepXRate: 1,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 380,
+						spriteTop: 291 * 2,
+						spriteWidth: 380,
+						spriteHeight: 291,
+						spriteOrigin: 190,
+						bottomGap: 16,
+						extraStepXRate: 1,
+						speed: 4,
+						objects: [
+							{
+								key: 'cloudground',
+								position: 'behind-feet',
+								xGap: 150
+							}
+						],
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 760,
+						spriteTop: 291 * 2,
+						spriteWidth: 380,
+						spriteHeight: 291,
+						spriteOrigin: 190,
+						bottomGap: 16,
+						extraStepXRate: 1,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+
+					{
+						spriteLeft: 0,
+						spriteTop: 291 * 3,
+						spriteWidth: 380,
+						spriteHeight: 291,
+						spriteOrigin: 190,
+						bottomGap: 16,
+						extraStepXRate: 1,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 380,
+						spriteTop: 291 * 3,
+						spriteWidth: 380,
+						spriteHeight: 291,
+						spriteOrigin: 190,
+						bottomGap: 16,
+						extraStepXRate: 1,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 760,
+						spriteTop: 291 * 3,
+						spriteWidth: 380,
+						spriteHeight: 291,
+						spriteOrigin: 190,
+						bottomGap: 16,
+						extraStepXRate: 1,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+
+					{
+						spriteLeft: 0,
+						spriteTop: 291 * 4,
+						spriteWidth: 380,
+						spriteHeight: 291,
+						spriteOrigin: 190,
+						bottomGap: 16,
+						extraStepXRate: 1,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 380,
+						spriteTop: 291 * 4,
+						spriteWidth: 380,
+						spriteHeight: 291,
+						spriteOrigin: 190,
+						bottomGap: 16,
+						extraStepXRate: 1,
+						speed: 4,
+						objects: [
+							{
+								key: 'cloudground',
+								position: 'behind-feet',
+								xGap: 150
+							}
+						],
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 760,
+						spriteTop: 291 * 4,
+						spriteWidth: 380,
+						spriteHeight: 291,
+						spriteOrigin: 190,
+						bottomGap: 16,
+						extraStepXRate: 1,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					}
+				]
+			},
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 291,
+						spriteOrigin: 0,
+						bottomGap: 16,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			}
+		}
+	},
+	wolf: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'run',
+		zoom: 1.33,
+		invulnerable: true,
+		class: __spell,
+		name: 'Wolf',
+		pierce: true,
+		src: './images/sprites/ep29/wolf.png',
+		animations: {
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				maxRepeat: 2,
+				frames: [
+					{
+						spriteLeft: 300,
+						spriteTop: 0,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 600,
+						spriteTop: 0,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						objects: [
+							{
+								key: 'cloudground',
+								position: 'behind-feet',
+								xGap: 150
+							}
+						],
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 240,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+
+					{
+						spriteLeft: 300,
+						spriteTop: 240,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 600,
+						spriteTop: 240,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 480,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+
+					{
+						spriteLeft: 300,
+						spriteTop: 480,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 600,
+						spriteTop: 480,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						objects: [
+							{
+								key: 'cloudground',
+								position: 'behind-feet',
+								xGap: 150
+							}
+						],
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 720,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+
+					{
+						spriteLeft: 300,
+						spriteTop: 720,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 600,
+						spriteTop: 720,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 960,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+
+					{
+						spriteLeft: 300,
+						spriteTop: 960,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					}
+				]
+			},
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 291,
+						spriteOrigin: 0,
+						bottomGap: 16,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			}
+		}
+	},
+	wolf2: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'run',
+		zoom: 1.33,
+		invulnerable: true,
+		class: __spell,
+		name: 'Wolf 2',
+		pierce: true,
+		src: './images/sprites/ep29/wolf.png',
+		animations: {
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				maxRepeat: 2,
+				frames: [
+					{
+						spriteLeft: 600,
+						spriteTop: 240,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 480,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+
+					{
+						spriteLeft: 300,
+						spriteTop: 480,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 600,
+						spriteTop: 480,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						objects: [
+							{
+								key: 'cloudground',
+								position: 'behind-feet',
+								xGap: 150
+							}
+						],
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 720,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+
+					{
+						spriteLeft: 300,
+						spriteTop: 720,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 600,
+						spriteTop: 720,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 960,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+
+					{
+						spriteLeft: 300,
+						spriteTop: 960,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 300,
+						spriteTop: 0,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 600,
+						spriteTop: 0,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						objects: [
+							{
+								key: 'cloudground',
+								position: 'behind-feet',
+								xGap: 150
+							}
+						],
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 240,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+
+					{
+						spriteLeft: 300,
+						spriteTop: 240,
+						spriteWidth: 300,
+						spriteHeight: 240,
+						spriteOrigin: 150,
+						bottomGap: 39,
+						extraStepXRate: .8,
+						speed: 4,
+						atk: {
+							yRange: 15,
+							rate: 1,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					}
+				]
+			},
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 291,
+						spriteOrigin: 0,
+						bottomGap: 16,
 						props: {
 							remove: true
 						},
@@ -26362,7 +27526,7 @@ const cssAnimations = {
 			cssAnimationProps.crack = { start: _gameTick };
 		}
 	},
-	focusui: function (_selector, _func, _transparent, _text, _doneBtn, _blackBG, _fingerFade) {
+	focusui: function (_selector, _func, _transparent, _text, _doneBtn, _blackBG, _fingerFade, _circle) {
 		_focusMode = 1;
 		let _curt = document.createElement('div');
 		_curt.id = 'focus-ui';
@@ -26447,7 +27611,7 @@ const cssAnimations = {
 		<div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:${(_rect.width)}px;left:${(_rect.left - _extraX)}px;top:0;height:${(_rect.top - _extraY)}px"></div>
 		<div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:calc(100% - ${((_rect.left - _extraX) + _rect.width)}px);left:${((_rect.left - _extraX) + _rect.width)}px;top:0;height:100%"></div>
 		<div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:${(_rect.width)}px;left:${(_rect.left - _extraX)}px;top:${((_rect.top - _extraY) + _rect.height)}px;height:calc(100% - ${((_rect.top - _extraY) + _rect.height)}px)"></div>
-		<div class='focus-shield show-ui' style="background:#FFFFFF01;position:absolute;width:${_rect.width}px;left:${(_rect.left - _extraX)}px;top:${(_rect.top - _extraY)}px;height:${_rect.height}px"></div>`;
+		<div class='focus-shield${_circle ? ' circle' : ''} show-ui focus-shield-circle' style="background:#FFFFFF01;position:absolute;width:${_rect.width}px;left:${(_rect.left - _extraX)}px;top:${(_rect.top - _extraY)}px;height:${_rect.height}px"></div>`;
 		_finger.style.left = (_rect.left - _extraX) + 'px';
 		_finger.style.top = ((_rect.top - _extraY) + MathRound(.5 * _elem.offsetHeight)) + 'px';
 		_finger.src = './images/icons/push-me.gif';
@@ -27431,18 +28595,37 @@ function showMenuTutorial(_arr, _key) {
 		return '';
 	const _data = _arr[getLang()];
 	return `<div class="full flex menu-tutorial-content" style="flex-direction:column">
+				<img style="position:absolute;top: 2.5%;left: 3%;width: 13%;" src="./images/ui/corner-small.png" />
+				<img style="position:absolute;top: 2.5%;right: 3%;width: 13%;transform: scaleX(-1);" src="./images/ui/corner-small.png" />
+				<img style="position:absolute;bottom: 2.8%;left: 3%;width: 13%;transform: scaleY(-1);" src="./images/ui/corner-small.png" />
+				<img style="position:absolute;bottom: 2.8%;right: 3%;width: 13%;transform: scale(-1,-1);" src="./images/ui/corner-small.png" />
 				<div class="menu-tutorial-header w-100 flex">${_data.title}</div>
 				<div class="menu-tutorial-desc w-100 flex flex-ai-start"><div class="w-100 flex">${_data.desc}</div></div>
-				<div class="menu-tutorial-skip w-100 flex"><div class="flex game-btn2 animate-me" onexactclick="skipMenuTutorial('${_key}')">${getLangData('UNDERSTOOD')}</div></div>
+				<div class="menu-tutorial-skip w-100 flex"><div class="flex game-btn3 animate-me" onexactclick="skipMenuTutorial('${_key}')">${getLangData('UNDERSTOOD')}</div></div>
 	</div>`;
 }
 function skipMenuTutorial(_key) {
+	const _clicked = document.querySelector('.menu-tutorial-content');
+	if(!_clicked)
+		return;
+	const _menuContainer = document.getElementById('menu-ui');
+	const _splscr = document.createElement('div');
+	 _splscr.className = "full flex menu-ui-splash";
+	 _menuContainer.appendChild(_splscr);
 	__account.menuTutorials.push(_key);
 	_client.saveState();
 	PlaySound({key:'click'});
+	addClass(_splscr, 'fade-out-400');
 	const _elm = document.querySelector('.menu-sub-button.active.selected');
 	if(_elm)
 		_elm.querySelector('img').onexactclick();
+	_splscr.onanimationend = function(event) {
+		if(event.animationName === 'fade-out-me'){
+			const _menuSplash = document.querySelector('.menu-ui-splash');
+			if(_menuSplash)
+				_menuSplash.remove();
+		}
+	}
 }
 // function to generate drops
 function createRain(_container) {
@@ -27671,7 +28854,12 @@ function clearCanvasCache(_images) {
     delete _images[key]; // JS referansını da sil
   }
 }
-
+function to4Decimals(num) {
+  return MathRound(num * 10000) / 10000;
+}
+function to3Decimals(num) {
+  return MathRound(num * 1000) / 1000;
+}
 function clearAudioCache(_sounds) {
   for (let i = 0; i < _sounds.length; i++) {
     const sound = _sounds[i].sound;

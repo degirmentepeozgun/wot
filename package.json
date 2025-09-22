@@ -6,7 +6,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "minify-html": "html-minifier-terser --input-dir ./www --output-dir ./www --collapse-whitespace --remove-comments --minify-js true --file-ext html",
-    "obfuscate-js": "javascript-obfuscator www/js --output www/js --compact true --string-array true",
+    "obfuscate-js": "node --max-old-space-size=8192 ./node_modules/javascript-obfuscator/bin/javascript-obfuscator www/js --output www/js --compact true --string-array true --target browser",
     "prepare-www": "npm run obfuscate-js",
     "start": "npm run dev",
     "dev": "cross-env NODE_ENV=development vite",
@@ -25,7 +25,7 @@
     "last 5 Firefox versions"
   ],
   "dependencies": {
-    "cordova": "^6.1.1",
+    "cordova": "^12.0.0",
     "dom7": "^4.0.6",
     "framework7": "^8.3.0",
     "framework7-icons": "^5.0.5",

@@ -6,9 +6,9 @@ function getOptionsUI() {
 			<div class="skills-content-left settings-content-left menu-modal-left-container">
 				<div style="padding:1% 5%;overflow-y:auto" class="full">
 		<div style="width:100%;height:10%;padding:4vh 2vh 5vh 2vh" class="flex flex-jc-start">${getLangData('Language Choice')}</div>
-		<div class="flex flex-jc-start" style="width:100%;padding:1vh;height:10vh">
+		<div onexactclick="langSelect('en')" class="flex flex-jc-start" style="width:100%;padding:1vh;height:10vh">
 			<div style="aspect-ratio:1/1;padding:1vh">
-				<div onexactclick="langSelect('en')" class="my-radio${(getLang()) === 'en' ? ' selected' : ''} flex">
+				<div class="my-radio${(getLang()) === 'en' ? ' selected' : ''} flex">
 					<div></div>
 				</div>
 			</div>
@@ -16,9 +16,9 @@ function getOptionsUI() {
 				${getLangData('English')}
 			</div>
 		</div>
-		<div class="flex flex-jc-start" style="width:100%;padding:1vh;height:10vh">
+		<div onexactclick="langSelect('tr')" class="flex flex-jc-start" style="width:100%;padding:1vh;height:10vh">
 			<div style="aspect-ratio:1/1;padding:1vh">
-				<div onexactclick="langSelect('tr')" class="my-radio${(getLang()) === 'tr' ? ' selected' : ''} flex">
+				<div class="my-radio${(getLang()) === 'tr' ? ' selected' : ''} flex">
 					<div></div>
 				</div>
 			</div>
@@ -59,9 +59,10 @@ function getOptionsUI() {
 	let _i = 0;
 	for(let _key of Object.keys(__account.options)) {
 		const _opt = __account.options[_key];
-		_html += '<div class="flex flex-jc-start" style="width:100%;padding:0 2%;height:15%">' +
+		const _disabled = _optionActions.find(x => x.key === _key)?.disabled;
+		_html += '<div onexactclick="optionSelect(this.querySelector(\'.my-check\'), \'' + _key + '\')" class="flex flex-jc-start' + (_disabled ? ' disabled' : '') + '" style="width:100%;padding:0 2%;height:15%">' +
 					'<div style="aspect-ratio:1/1;padding:2%">' +
-						'<div onexactclick="optionSelect(this, \'' + _key + '\')" class="my-check' + (_opt ? ' selected' : '') + ' flex">' +
+						'<div class="my-check' + (_opt ? ' selected' : '') + ' flex">' +
 							'<div></div>' +
 						'</div>' +
 					'</div>' +
@@ -76,6 +77,7 @@ function getOptionsUI() {
 	_container.innerHTML = _html + '</div></div></div></div>';
 }
 function langSelect(_lang) {
+	PlaySound({key:'click'});
 	__account.lang = _lang;
 	_client.saveState();
 	getOptionsUI();
@@ -88,6 +90,7 @@ function langSelect(_lang) {
 	}
 }
 const _optionActions = [
+		{ key: 'gore', disabled: true },
 		{ key: 'ambiance', do: function(_status) {
 			if (!_status) {
 				if(episode && episode.bgMusic)
@@ -104,6 +107,7 @@ const _optionActions = [
 		}}
 	];
 function optionSelect(_elem, _key) {
+	PlaySound({key:'click'});
 	const _lastStatus = _client.upgradeOptions(_key);
 	if(__account.options[_key])
 		addClass(_elem, 'selected');

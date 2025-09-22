@@ -1099,7 +1099,7 @@ function applyDefaultCharacterStats(_c) {
     _c.toxicResistRate = 0;
     _c.iceResistRate = 0;
     _c.shadowResistRate = 0;
-    _c.health = _c.hp = _c.maxHP = 2000;
+    _c.health = _c.hp = _c.maxHP = _c.MAXHP = 10000;
     _c.luckRate = 0;
     _c.goldGainRate = 0;
     _c.pierceRate = 0;

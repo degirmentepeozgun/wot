@@ -6,7 +6,8 @@ const _conceptArts = {
 	archer: { direction: 'right', title: 'Alkin' },
 	thief: { direction: 'right', title: 'Karayel' },
 	warrior: { direction: 'right', title: 'Toygar' },
-	tank: { direction: 'right', title: 'Deli Dumrul' }
+	tank: { direction: 'right', title: 'Deli Dumrul' },
+	stables: { direction: 'right', title: 'Stable Master' }
 };
 let _dialogAppeared;
 function updateQuestArea(_skipIfNoUI, _qq, _force) {
@@ -33,7 +34,7 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 		if(!_qq)
 			_elm.onexactclick = function() {
 				//showMyModalPopUp('game-menu');
-				if(__story?.disableWorldMap)
+				if(__story?.disableWorldMap || episode.disableWorldMap)
 					return;
 				if((__account.questStatus.state === 'end' || __account.questStatus.quest?.navLocation === 'end') && episode.id !== 1)
 					switchBookPage(3,3);
@@ -318,6 +319,23 @@ function skipDialog() {
 				bgImg.src = './images/cutscenes/' + _customConcept.bg + '.png';
 				bgImg.className = 'dialog-concept-bg-img fade-start';
 				_dialogScreen.appendChild(bgImg);
+				const _ccKey = 'custom-concept-' + _customConcept.bg;
+				if(__account.tutorials?.indexOf(_ccKey) !== -1) {
+					let _bgSkip = document.createElement('div');
+					_bgSkip.innerHTML = `<div class="flex cs-skip">${getLangData("SKIP")}</div>`;
+					_bgSkip.onexactclick = function() {
+						PlaySound({key:'click'});
+						__account.questStatus.dialogOrder = __account.questStatus.dialogArr.length;
+						this.remove();
+						skipDialog();
+					}
+					_dialogScreen.appendChild(_bgSkip);
+				}
+				else {
+					if(!__account.tutorials)
+						__account.tutorials = [];
+					__account.tutorials.push(_ccKey);
+				}
 			}
 			_dialogScreen.style.position = 'relative';
 			for (var _img of _customConcept?.images ?? [])
@@ -698,6 +716,8 @@ function createDialogScreen(_arr, _quest) {
 		_dialogScreen.className = 'animate-me flex show-ui';
 		_dialogScreen.id = 'quest-dialog';
 		_gameUI.appendChild(_dialogScreen);
+		if(episode)
+			episode.removeBubbles();
 	}
 	mainCharacter.animate('idle', true);
 	_dialogAppeared = true;
@@ -781,14 +801,14 @@ function createDialog(_questId) {
 		return;
 	}
 	let _status = __account.questStatus.state;
-	if(__account.questStatus.dialogId)
-		__account.questStatus.order = __account.questStatus.dialogId;
+	// if(__account.questStatus.dialogId)
+	// 	__account.questStatus.order = __account.questStatus.dialogId;
 	let _quest = __story.quests.find(x => x.id === __account.questStatus.order);
 	if(!_quest)
 		_quest = __account.questStatus.quest;
 	if (!_status || _status === 'incapable')
 		_status = __account.questStatus.state = mainCharacter.level < _quest.minLevel ? 'incapable' : 'begin';
-	__account.questStatus.dialogArr = __dialogs[getLang()]["quest" + __account.questStatus.order]?.[_status] ?? [{
+	__account.questStatus.dialogArr = __dialogs[getLang()]["quest" + (__account.questStatus.dialogId ?? __account.questStatus.order)]?.[_status] ?? [{
 		owner: _quest.owner,
 		text: _defaultDialogs[getLang()][_status] + ((!_status || _status === 'incapable') ? '<br/><span class="min-level-required">(' + getLangData('Level') + ' ' + _quest.minLevel + ' ' + getLangData('required') + ')</span>' : '')
 	}];
@@ -1613,12 +1633,12 @@ const __dialogs = {
 				{ 
 					owner: 'owner', 
 					expression: 'with a grateful and appreciative voice', 
-					text: '${getMainName()}, you have proven once again what a brave and strong hero you are. Thank you for clearing the swamp.' 
+					text: 'Very well done ${getMainName()}. With the support you\'ve provided, you\'ve given our villagers some hope that we can win this war. As the villagers, we are grateful to you.' 
 				},
 				{ 
 					owner: 'main', 
 					expression: 'smiling',
-					text: 'I am always ready to protect our village.' 
+					text: 'I always do my best for the people of this place.' 
 				}
 			]
 		},
@@ -2183,12 +2203,12 @@ const __dialogs = {
 				{ 
 					owner: 'owner', 
 					expression: 'minnettar ve takdir dolu bir sesle', 
-					text: '${getMainName()}, ne kadar cesur ve güçlü bir savaşçı olduğunu bir kez daha kanıtladın. Bataklığı temizlediğin için sana minnettarım.' 
+					text: 'Çok iyi iş çıkardın ${getMainName()}. Sağladığın destekle köylülerimize bu savaşı kazanabileceğimize dair umut verdin. Hepimiz sana minnettarız.' 
 				},
 				{ 
 					owner: 'main', 
 					expression: 'gülümseyerek',
-					text: 'Her zaman köyümüzü korumak için hazırım.' 
+					text: 'Buranın halkı için elimden geleni her zaman yaparım.' 
 				}
 			]
 		},

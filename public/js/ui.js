@@ -224,16 +224,11 @@ function getDmgFrameNumbers2(_frame) {
 			_type = 'dmg';
 			break;
 		case 'toxic':
-			_type = 'toxic';
-			break;
 		case 'fire': 
-			_type = 'fire';
-			break;
 		case 'ice': 
-			_type = 'ice';
-			break;
+		case 'shadow': 
 		case 'lightning': 
-			_type = 'lightning';
+			_type = _frame.atkType;
 			break;
 		case 'hurt': 
 			_type = 'hit';
@@ -1684,10 +1679,11 @@ function askSomething(_question, _okFuncString, _singletonAttr) {
 			if(_que)
 				return;
 		}
+		const _addQuestionMark = !(_question.endsWith('>') || _question.endsWith('?'));
 		let _modal = `<div${_singletonAttr ? " data-singleton-key='" + _singletonAttr + "'" : ""} class="full fade-me show-ui flex inventory-question">
 			<div class="inventory-modal">
 				<div style="padding:4vh 2vh" class="flex">
-					<span class="flex" style="color:#f7f7f7dd !important;font-size:3vh !important">` + getLangData(_question) + `?</span>
+					<span class="flex" style="color:#f7f7f7dd !important;font-size:3vh !important">` + getLangData(_question) + `${_addQuestionMark ? '?' : ''}</span>
 				</div>
 				<div style="padding:4vh 2vh" class="flex">
 					<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>

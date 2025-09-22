@@ -56,7 +56,7 @@ function dataOperations() {
 		const _id = this.createQuestID(10);
 		return {
 			act: 1,
-			version:31,//max 31
+			version:35,//max 35
 			fragments: [],
 			gems: [
 			],
@@ -64,22 +64,6 @@ function dataOperations() {
 			eventsDone: [],
 			storyTicket: 100,
 			monthlyLogins: [1,2,3],
-			chat: [
-				{ id: 'BladeX8X', text: 'Guys? How can i gain more tickets?' },
-				{ id: 'Divorc€', text: 'Check your mailbox, may be you can find some in store / roulette' },
-				{ id: 'dtmn', text: 'any pvp around? pls invite meee tooo!' },
-				{ id: 'Guest', text: 'join bro' },
-				{ id: 'Kuruvasan', text: 'Abi alma şu adamı yaa, ben onun takımında olmam' },
-				{ id: 'Guest', text: 'Niye ki?' },
-				{ id: 'Kuruvasan', text: 'Kafasına göre dalıyo takım elemanı değil' },
-				{ id: 'Guest', text: ':) o zaman senin takıma atacam' },
-				{ id: 'Kuruvasan', text: 'Hasss X.x' },
-				{ id: 'See3P0', text: 'Stop speaking non-english ffs!' },
-				{ id: 'TheEnd', text: 'When EU Servers will be available? 2o49?' },
-				{ id: 'Divorc€', text: 'RofL! Just enjoy. No lag here, just lower the graphics settings and everything will be fine' },
-				{ system: true, text: 'World boss will be summoned in 10 minutes...' },
-				{ id: 'FBli', whisper: true, text: 'Abi salla maçı, boss\'u kaçırmayalım' },
-			],
 			storyResults: [
 			// 	{ 
 			// 		id: 1, 

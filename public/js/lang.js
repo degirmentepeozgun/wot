@@ -135,6 +135,8 @@ const __langData = [
 	{ key: 'Gold Hunt', tr: 'Altın Avı'},
 	{ key: 'Tower', tr: 'Kule'},
 	{ key: 'Crypt', tr: 'Mahsen'},
+	{ key: 'Seewers', tr: 'Mahsen'},
+	{ key: 'Secret Room', tr: 'Gizli Oda'},
 	{ key: 'West', tr: 'Batı'},
 	{ key: 'North', tr: 'Kuzey'},
 	{ key: 'South', tr: 'Güney'},

@@ -617,7 +617,7 @@ function map(_m) {
 			pvpCounter = document.createElement('div');
 			pvpCounter.className = 'flex animate-me-600 map-name countdown';
 			pvpCounter.id = 'pvp-counter';
-			pvpCounter.innerText = getLangData(_mapSprite.coords.title.split(' ')[0]);
+			pvpCounter.innerText = __locations.find(x => x.mapId === _mapSprite.id)?.titles?.[getLang()] ?? getLangData( _mapSprite.coords.title);
 			_gameUI.appendChild(pvpCounter);
 		}
 		else if((_gameTick - this.nameWriten) > 2399) {
@@ -1630,12 +1630,18 @@ function map(_m) {
 			if(!mainCharacter.firstTransferDone){
 				_dataItem = mainCharacter.getNewStatus2(1);
 				mainCharacter.firstTransferDone = 1;
+				mainCharacter.synced = true;
 			}
-			else
-				_dataItem = mainCharacter.getNewStatus2(0, (msNow - mainCharacter.lastSyncDate) > 999);
+			else {
+				_dataItem = mainCharacter.getNewStatus2(0, !mainCharacter.synced);
+				mainCharacter.synced = !mainCharacter.synced;
+			}
 			if(!_dataItem)
 				return;
-			//_dataItem.e = this.roomId;
+			const _last = JSON.stringify(_dataItem);
+			if(mainCharacter.lastRealTimePack === _last)
+				return;
+			mainCharacter.lastRealTimePack = _last;
 			_dataItem.s = __socketId;
 			setTransferMessage([_dataItem]);
 		}
@@ -1790,11 +1796,14 @@ function map(_m) {
 				if(!_img)
 					return;
 				if(_lay.marginTop)
-					_img.style.top = MathFloor(_lay.marginTop * __zoom * _lay.zoom) + 'px';
+					_img.style.top = MathFloor(_lay.marginTop * __scale * __zoom * _lay.zoom) + 'px';
 				if(_lay.marginLeft)
-					_img.style.left = MathFloor(_lay.marginLeft * __zoom * _lay.zoom) + 'px';
-				if(_lay.marginTop || _lay.marginLeft)
+					_img.style.left = MathFloor(_lay.marginLeft * __scale * __zoom * _lay.zoom) + 'px';
+				if(_lay.marginTop || _lay.marginLeft) {
 					_img.style.position = 'absolute';
+					_img.style.setProperty('width', MathRound(_img.width * __scale) + 'px', 'important');
+					_img.style.setProperty('height', MathRound(_img.height * __scale) + 'px', 'important');
+				}
 				_c.appendChild(_img);
 			}	
 			_c.style.transform = 'translateX(-' + p + 'px)';
@@ -1813,7 +1822,7 @@ function map(_m) {
 			for (var _node of _nodes)
 				_node.remove();
 		}
-		if(!(this.lastNPCCheckTime > (_gameTick - 1000))){
+		if(_forceId || !(this.lastNPCCheckTime > (_gameTick - 1000))){
 			this.NPCS = this.enemies?.filter(x => x.npc);
 			this.lastNPCCheckTime = _gameTick;
 		}
@@ -2390,7 +2399,8 @@ function map(_m) {
 						position:'middle',
 						yGap: MathRound(sprite.animations.idle.frames[1].spriteHeight / 2) + 100
 					});
-				sprite.frame = sprite.start = 0;
+				sprite.frame = 1;
+				sprite.start = 0;
 				continue;
 				const _id =sprite.class+ '-quest-mark';
 				let _imgQuest = document.getElementById(_id);
@@ -2803,7 +2813,8 @@ function map(_m) {
 		let i = 0;
 		offCtx.reversed = c10.reversed = offGoreCtx.reversed = false;// = _cNPC.cleared = false;
 		//let _zoomRate, _zoomedWidth, _zoomedHeight, _zoomedLeft, _zoomedTop, 
-		let _hurt, _flash, _hurted, _rotate, _wDiff, _hDiff, _hurtedCount = 0, _bounceCount = 0;
+		let _hurt, _hurted, _rotate, _wDiff, _hDiff, _hurtedCount = 0, _bounceCount = 0;
+		let _preDraws = [], _backgrounds = [], _relateds = [];
 		for (var _item of _queue) {
 			if (_item.unseen || _item.char.remove || _item.char.unseen)
 				continue;
@@ -2812,7 +2823,15 @@ function map(_m) {
 					continue;
 				_bounceCount++;
 			}
-			this.drawRelatedObjects(_item, function (x) { return x.background }, 1);
+			_backgrounds.length = _preDraws.length = _relateds.length = 0;
+			for(let ob of _item.objects)
+				if(ob.background)
+					_backgrounds.push(ob);
+				else if(ob.preDraw)
+					_preDraws.push(ob);
+				else
+					_relateds.push(ob);
+			this.drawRelatedObjects(_item, _backgrounds);
 			this.drawGoreObjects(_item);
 			if (!_item.alpha) {
 				if (_item.reversed) {
@@ -2835,11 +2854,11 @@ function map(_m) {
 				_item.left -= platformX;
 			_hurt = _item.char.hurting?.count > 0;
 			const _anim = _item.char.animations?.[_item.animation];
-			if(_hurt && !_anim?.hurt) {
+			if(_hurt && !_item.char.getCurrentAnimation()?.hurt) {
 				_hurt = false;
 				_item.char.hurting.count = 0;
 			}
-			_flash = _hurt; // && (!_item.char.lastHurtTime || ((_gameTick - _item.char.lastHurtTime) > 200));
+			// && (!_item.char.lastHurtTime || ((_gameTick - _item.char.lastHurtTime) > 200));
 			_shadowItems = [];
 			// if(_flash || _item.skinColor)
 			// {
@@ -2879,7 +2898,7 @@ function map(_m) {
 					_wDiff = (offCtx.reversed ? -1 : 1) * ((_item.width - (_item.width * (_item.zoom ?? 1))) / 2);
 					_hDiff = (_item.height - (_item.height * (_item.zoom ?? 1)));
 					if(!__batterySaveMode) {
-						_hurted = ((_hurt && _flash) || _item.skinColor);// && (_item.char.frame + _item.char.start) > 0;
+						_hurted = (_hurt || _item.skinColor);// && (_item.char.frame + _item.char.start) > 0;
 						if(!_hurted && !_item.char.dead && _shadowItems?.[0]) {
 							let _shadowItemOrder = 55;
 							for(let _shadowItem of _shadowItems) {
@@ -2950,6 +2969,7 @@ function map(_m) {
 							}
 							else if(_item.char.borderIndex >= 0)
 								delete _item.char.borderIndex;
+							this.drawRelatedObjects(_item, _preDraws);
 							const _cropped = this.getCroppedSprite(_item.spriteX, _item.spriteY, _item.spriteWidth, _item.spriteHeight, 
 								_item.char, _item.sprite.relativeSrc, _item.frameKey);
 							if(!_cropped)
@@ -3013,7 +3033,7 @@ function map(_m) {
 				if(_item.char.shadowData?.length === 0)
 					_item.char.shadowData = undefined;
 			}
-			this.drawRelatedObjects(_item, function (x) { return !x.background });
+			this.drawRelatedObjects(_item, _relateds);
 			if(_item.char.canvasObjects?.[0])
 				for(let _cobj of _item.char.canvasObjects)
 					canvasAnimations[_cobj.key](_item.char, _cobj.params, offCtx);
@@ -3494,13 +3514,11 @@ this.drawHealthBar2 = function (_item) {
 		offCtx.scale(-1, 1);
 	}
 };
-	this.drawRelatedObjects = function (_item, _func, _bg) {
-		if(!_item.objects?.[0] || this.disposing || __batterySaveMode || _item.alpha)
+	this.drawRelatedObjects = function (_item, _arr) {
+		if(!_arr?.[0] || this.disposing || __batterySaveMode || _item.alpha)
 			return;
 		let shouldRemove, _draw, removeIds = [];
-		for (let _rel of _item.objects) {
-			if(_func && !_func(_rel))
-				continue;
+		for (let _rel of _arr) {
 			if(_rel.ground)
 				continue;
 			if(!_rel.background && !__account.options.effect)
