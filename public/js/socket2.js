@@ -68,7 +68,7 @@ async function connectSocket() {
 			if(_copy){
 				_copy.remove = true;
 				setTimeout(function() {
-					warn('<span>' + cmd[0].n + ' ' + getLangData(' left the room') + '</span>', 'warn');	
+					warn('<span>' + cmd[0].n + ' ' + getLangData('left the room') + '</span>', 'warn');	
 				}, 250);
 			}
 		}
@@ -124,7 +124,7 @@ async function connectSocket() {
 						__selectedPvPClass = _selectableChars[0].class;
 						for(let _item of _selectableChars){
 							_choices += `<div data-class="${_item.class}" class="selection-item selection-char${_selected ? ' selected-character' : ''} flex" onexactclick="selectDuelCharacter('${_item.class}')" style="width:21%;aspect-ratio:1/1;position:relative;cursor:pointer">
-								<img src="./images/icons/${_item.class}.png" style="padding:2%;height:84%" class="grade${_item.grade}-item" />
+								<img src="./images/main/avatars/${_item.class}.png" style="padding:2%;height:84%" class="grade${_item.grade}-item" />
 							</div>`;
 							if(_selected)
 								_selected = 0;
@@ -135,7 +135,7 @@ async function connectSocket() {
 							<div class="inventory-modal">`
 								+ 
 								`<div class="flex w-100" style="padding:4vh 0 0 0"><div class="selection-item selection-char flex" style="width:17%;aspect-ratio:1/1;position:relative">
-									<img src="./images/icons/${_json.cl}.png" style="padding:2%;height:80%" class="grade${_opponentGrade}-item" />
+									<img src="./images/main/avatars/${_json.cl}.png" style="padding:2%;height:80%" class="grade${_opponentGrade}-item" />
 								</div></div>`
 								+
 								`<div class="flex w-100" style="padding:2vh">
@@ -147,13 +147,13 @@ async function connectSocket() {
 								</div>`
 								+
 								`<div style="padding:0 4vh 4vh 4vh" class="flex">
-									<span style="color:#f7f7f7dd !important;font-size:3.2vh !important">${getLangData('Lets Duel')}!</span>
+									<span style="color:#f7f7f7dd !important;font-size:3.2vh !important">${getLangData("Let's Duel")}!</span>
 								</div>
 								<div class="flex" style="padding:2vh 4%">`
 								+ _choices +
 								`</div>
 								<div class="w-100 flex" style="padding:2vh 4%">
-									<div style="color:#ff6c00cc"><span id="duel-counter" style="color:#F4BB44cc">20</span>&nbsp;${getLangData('seconds to give decision')}</div>
+									<div style="color:#ff6c00cc;font-size:3vh !important"><span id="duel-counter" style="color:#F4BB44cc">20</span>&nbsp;${getLangData('seconds to give decision')}</div>
 								</div>
 								<div style="padding:4vh 2vh 6vh 2vh" class="flex">
 									<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="rejectDuelRequest('${_json.s}')">${getLangData('REJECT')}</div>

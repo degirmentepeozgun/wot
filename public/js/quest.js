@@ -193,6 +193,17 @@
 			for(let i = 0; i < __fragments.length; i++)
 				warnChestReward(getChestReward(1, 'fragment', __fragments[i], 20));
 		}
+	},
+	{
+		id: 22, key: 'complete-dungeon', names: { 
+			tr: '10 Zindan Bitir', 
+			en: 'Complete 10 Dungeons'
+		},
+		limit:10,
+		reward: { type: 'misc', key: 'ticket-pass', value:10 },
+		use: function() {
+			warnChestReward(getChestReward(1, this.reward.type, this.reward.key, this.reward.value));
+		}
 	}
 ];
 function warnHonorReward(_val) {
@@ -438,26 +449,26 @@ function renderEvent() {
 				<img src="./images/ui/star-on.png" />
 			</div>
 			<div style="flex:1;overflow:hidden">
-				<div class="one-line">Stay online for ${_mm * 1} minutes</div>
+				<div class="one-line">${getLangData('Stay online for')}&nbsp;${_mm * 1}&nbsp;${getLangData('minutes')}</div>
 			</div>
 			<div class="flex event-tick" style="padding:0 2vh">
 				<img src="./images/icons/tick-orange.png" />
 			</div>
 		</div>	
 		<div class="event-item w-100 flex flex-jc-start${_diff > ((2 * _mm) * 60 * 1000) ? ' completed' : ''}">
-			<div class="flex" style="padding:0 2vh"><img src="./images/ui/star-on.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">Stay online for ${_mm * 2} minutes</div></div>
+			<div class="flex" style="padding:0 2vh"><img src="./images/ui/star-on.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">${getLangData('Stay online for')}&nbsp;${_mm * 2}&nbsp;${getLangData('minutes')}</div></div>
 			<div class="flex event-tick" style="padding:0 2vh">
 				<img src="./images/icons/tick-orange.png" />
 			</div>
 		</div>	
 		<div class="event-item w-100 flex flex-jc-start${_diff > ((3 * _mm) * 60 * 1000) ? ' completed' : ''}">
-			<div class="flex" style="padding:0 2vh"><img src="./images/ui/star-on.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">Stay online for ${_mm * 3} minutes</div></div>
+			<div class="flex" style="padding:0 2vh"><img src="./images/ui/star-on.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">${getLangData('Stay online for')}&nbsp;${_mm * 3}&nbsp;${getLangData('minutes')}</div></div>
 			<div class="flex event-tick" style="padding:0 2vh">
 				<img src="./images/icons/tick-orange.png" />
 			</div>
 		</div>
 		<div class="event-item w-100 flex flex-jc-start${_diff > ((4 * _mm) * 60 * 1000) ? ' completed' : ''}">
-			<div class="flex" style="padding:0 2vh"><img src="./images/ui/star-on.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">Stay online for ${_mm * 4} minutes</div></div>
+			<div class="flex" style="padding:0 2vh"><img src="./images/ui/star-on.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">${getLangData('Stay online for')}&nbsp;${_mm * 4}&nbsp;${getLangData('minutes')}</div></div>
 			<div class="flex event-tick" style="padding:0 2vh">
 				<img src="./images/icons/tick-orange.png" />
 			</div>

@@ -42,7 +42,7 @@ function pvp() {
 		const _container = document.querySelector('.pvp-content-left-content');
 		if(mainCharacter.level < this.unlockLevel) {
 			_container.innerHTML = `<div class="skills-content-left menu-modal-left-container full"><div style="padding:1% 5%;overflow-y:auto" class="full">` +
-				renderLockedContent('Level ' + this.unlockLevel + ' required') + `</div></div>`;
+				renderLockedContent(getLangData('Lvl') + ' ' + this.unlockLevel + ' ' + getLangData('required')) + `</div></div>`;
 			return;
 		}
 		this.opponents = [];
@@ -65,14 +65,14 @@ function pvp() {
 		let _html = '<div class="skills-content-left menu-modal-left-container full"><div style="padding:1% 5%;overflow-y:auto" class="full">';
 		for(let _opponent of this.opponents)
 			_html += `<div onexactclick="__pvp.selectOpponent(this,'${_opponent.key}')" class="skill-card animate-me flex">
-						<div class="skill-icon-wrapper flex">
-							<img src="./images/icons/${_opponent.class}.png" />
+						<div class="skill-icon-wrapper flex" style="padding-right:.5vh">
+							<img src="./images/main/avatars/${_opponent.class}.png" style="width:9vh" />
 						</div>
 						<div style="flex:1;height:100%" class="flex flex-jc-start">
 							<div class="flex flex-jc-start skill-card-title w-100" style="height:50%">${getLangData('Lvl')}&nbsp;${_opponent.level}&nbsp;${getLangData(_opponent.class)}</div>
 							<div class="flex skill-card-title w-100" style="height:50%">
 								<div class="flex flex-jc-start w-50 pvp-opponent-power" style="height:100%">
-									${getLangData('Power')}:&nbsp;${_opponent.totalPower.formatWithDots()}
+									<span style="opacity:.7">${getLangData('Power')}:</span>&nbsp;${_opponent.totalPower.formatWithDots()}
 								</div>
 								<div class="flex flex-jc-end w-50 pvp-opponent-order" style="height:100%">
 									${_opponent.pvpOrder.formatWithDots()}

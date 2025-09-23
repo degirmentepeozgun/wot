@@ -533,7 +533,7 @@ const __gems = [
 				cost: 200,
 				props: [
 					{ key:'ice-dmg', value:10, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
-					{ key:'ice-resist-rate', ravaluete:10, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
+					{ key:'ice-resist-rate', value:10, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
 				]
 			}
 		] 
@@ -698,6 +698,10 @@ const _tips = [
 		tr: 'Sol-alt tarafta bulunan yuvarlak kısma basılı tutup çektiğinizde karakteriniz o yöne hareket eder'
 	},
 	{ 
+		en: 'Ticket materials are for boosting story missions to auto-pass or double specific rewards',
+		tr: 'Bilet malzemeleri, hikaye görevlerini otomatik geçmenizi veya belirli ödülleri artırmanızı sağlar'
+	},
+	{ 
 		en: 'Charge enemies with using normal attack skill from a distance not too far',
 		tr: 'Normal saldırı, belli bir mesafeden kullanıldığında şarj saldırısına dönüşür'
 	},
@@ -756,7 +760,119 @@ const __storeItems = [
 	{ id: 8, key: 'ticket-item', count: 1, price: 10000 },
 ];
 const __dailyResetHour = 12;
+let __ctfSupport;
+function decreaseDummyCount() {
+	const _dcc = document.getElementById('dummy-count');
+	let _dc = parseInt(_dcc.innerText);
+	if(_dc < 2)
+		return;
+	PlaySound({key:'click'});
+	_dc--;
+	_dcc.innerText = _dc;
+}
+function increaseDummyCount() {
+	const _dcc = document.getElementById('dummy-count');
+	let _dc = parseInt(_dcc.innerText);
+	if(_dc > 98)
+		return;
+	PlaySound({key:'click'});
+	_dc++;
+	_dcc.innerText = _dc;
+}
+function selectCTFCharacter(_class) {
+	PlaySound({key:'click'});
+	const _si = document.querySelectorAll('.ctf-supporters .selection-item');
+	for(let _sitem of _si) 
+	{
+		removeClass(_sitem, 'selected-character');
+		const _c = _sitem.getAttribute('data-class');
+		if(_c === _class){
+			addClass(_sitem, 'selected-character');
+			__ctfSupport = _c;
+		}
+	}
+}
+function approveCTFSelection(_id) {
+	const _si = document.querySelector('.ctf-supporters .selection-item.selected-character');
+	if(_si)
+		getRef('dungeon')?.approve?.(_id);
+	else 
+		warn('<span>' + getLangData('Select a supporter first') + '</span>', 'warn');
+}
 const _missions = [
+	{
+		key: 'ad',
+		storyId: 113,
+		titles: {
+			en: 'Area Defense',
+			tr: 'Alan Savunması'
+		},
+		before: function(_id) {
+			// const _si = document.querySelector('.ctf-supporters .selection-item.selected-character');
+			// if(!_si) {
+			// 	warn('<span>' + getLangData('Select supporter first') + '</span>', 'warn');
+			// 	return false;
+			// }
+			// return true;
+			let _choices = '';
+			for(let _item of _selectableChars)
+				if(_item.class !== mainCharacter.class)
+					_choices += `<div data-class="${_item.class}" class="selection-item selection-char flex" onexactclick="selectCTFCharacter('${_item.class}')" style="width:21% !important;aspect-ratio:1/1;position:relative;cursor:pointer">
+						<img src="./images/main/avatars/${_item.class}.png" style="padding:2%;height:84%" class="grade${_item.grade}-item" />
+					</div>`;
+			let _modal = `<div class="full fade-me show-ui flex inventory-question">
+							<div class="inventory-modal">`
+								+
+								`<div style="padding:6vh 4vh 4vh 4vh" class="flex">
+									<span style="color:#f7f7f7dd !important;font-size:3.2vh !important">${getLangData('CHOOSE YOUR SUPPORTER')}</span>
+								</div>
+								<div class="flex ctf-supporters" style="padding:2vh 4%">`
+								+ _choices +
+								`</div>
+								<div style="padding:4vh 2vh 6vh 2vh" class="flex">
+									<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('BACK')}</div>
+									<div id="item-selection-approve-btn" class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="approveCTFSelection(${_id})">${getLangData('APPROVE')}</div>
+								</div>
+							</div>
+						</div>`;
+						const _div = document.createElement('div');
+						_div.innerHTML = _modal;
+						const parentEl = document.querySelector('#menu-ui');
+						(parentEl ?? _gameUI).appendChild(_div.firstChild);
+		},
+		descriptions: {
+			en: "Defend the flag with your chosen supporter and try not to let it fall to the enemy. If they grab it, you must retrieve immediately. You can switch roles with your supporter with tapping on its portrait.",
+			tr: "Seçtiğiniz destekçi ile bayrağı savunun ve düşmanın almasına izin vermeyin. Eğer biri kaparsa hemen geri kazanmalısınız. Dilerseniz bu etkinlikte destekçinizin portresine basarak onu da yönetebilirsiniz."
+		}
+	},
+	{
+		key: 'training',
+		storyId: 112,
+		titles: {
+			en: 'Training Ground',
+			tr: 'İdman Alanı'
+		},
+		before: function() {
+			const _dcc = document.getElementById('dummy-count');
+			const _dc = parseInt(_dcc.innerText);
+			__stories.find(x => x.id === 112).scenes[0].mobs[0].count = _dc;
+			return true;
+		},
+		html: function() { 
+			return `<div class="w-100 flex" style="padding:4vh 0 2vh 0">
+				<div class="w-50 flex flex-jc-start" style="padding-left:1vh">${getLangData('Dummy Count')}</div>
+				<div class="w-50 flex flex-jc-end" style="padding-right:1vh">
+					<div style="aspect-ratio:1/1;font-size:3vh !important" onexactclick="decreaseDummyCount()" class="game-menu-button flex">-</div>
+					<div style="width:6vh" class="flex" id='dummy-count'>10</div>
+					<div style="aspect-ratio:1/1;font-size:3vh !important" onexactclick="increaseDummyCount()" class="game-menu-button flex">+</div>
+				</div>
+			</div>`;
+		},
+		descriptions: {
+			en: "You can visit this location anytime so you can test your character's combos and improve your technique.",
+			tr: "Karakterinizin kombolarını test edebilmeniz ve tekniğinizi geliştirebilmeniz için bu konumu istediğiniz zaman ziyaret edebilirsiniz."
+		}
+	},
 	{
 		key: 'lottery',
 		daily: 1
@@ -2004,6 +2120,42 @@ const relatedObjects = [
 	{
 		id: 'questprogressgray', key: 'questprogressgray', reversable: false, width: 80, height: 78, zoom: 1,
 		totalFrames: 1, speed: 999, repeat: true, singleton: true, yGap: 50, still: true, background: true
+	},
+	{
+		id: 'hit1', key: 'hit1', width: 192, height: 192, zoom: 2,
+		totalFrames: 10, speed: 4, singleton: true, still: true
+	},
+	{
+		id: 'hit2', key: 'hit2', width: 192, height: 192, zoom: 2,
+		totalFrames: 20, speed: 4, singleton: true, still: true
+	},
+	{
+		id: 'hit3', key: 'hit3', width: 192, height: 192, zoom: 2,
+		totalFrames: 20, speed: 4, singleton: true, still: true
+	},
+	{
+		id: 'hit4', key: 'hit4', width: 192, height: 192, zoom: 2,
+		totalFrames: 20, speed: 4, singleton: true, still: true
+	},
+	{
+		id: 'hit5', key: 'hit5', width: 192, height: 192, zoom: 2,
+		totalFrames: 20, speed: 4, singleton: true, still: true
+	},
+	{
+		id: 'hurtvfx', key: 'hurtvfx', width: 192, height: 192, zoom: 2,
+		totalFrames: 20, speed: 4, singleton: true, type: 'hurt'
+	},
+	{
+		id: 'hurtsteal1', key: 'hurtsteal1', width: 192, col:5, height: 192, zoom: 2,
+		totalFrames: 25, speed: 4, singleton: true, type: 'hurt'
+	},
+	{
+		id: 'hurtsteal2', key: 'hurtsteal2', width: 192, col:5, height: 192, zoom: 2,
+		totalFrames: 8, speed: 4, singleton: true, type: 'hurt'
+	},
+	{
+		id: 'aura3', key: 'aura3', width: 192, height: 192, col:5, zoom: 2,
+		totalFrames: 25, speed: 4, singleton: true, repeat:true, stillOnChar: true
 	}
 ];
 function setRelatedObjectSpeed() {
@@ -2013,6 +2165,30 @@ function setRelatedObjectSpeed() {
 }
 setRelatedObjectSpeed();
 const relatedObjectImages = {
+	hurtsteal1: function () {
+		return getImage('./images/related/steal1.png')
+	},
+	hurtsteal2: function () {
+		return getImage('./images/related/steal2.png')
+	},
+	hurtvfx: function () {
+		return getImage('./images/related/hurt-vfx.png')
+	},
+	hit1: function () {
+		return getImage('./images/related/hit_1.png')
+	},
+	hit2: function () {
+		return getImage('./images/related/hit_2.png')
+	},
+	hit3: function () {
+		return getImage('./images/related/hit_3.png')
+	},
+	hit4: function () {
+		return getImage('./images/related/hit_4.png')
+	},
+	hit5: function () {
+		return getImage('./images/related/hit_5.png')
+	},
 	weakness: function () {
 		return getImage('./images/related/weakness.png')
 	},
@@ -2054,6 +2230,9 @@ const relatedObjectImages = {
 	},
 	aura2: function () {
 		return getImage('./images/related/aura2.png')
+	},
+	aura3: function () {
+		return getImage('./images/related/aura3.png')
 	},
 	dust: function () {
 		return getImage('./images/related/dust.png')
@@ -2579,8 +2758,12 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	flaghurt1: './images/sounds/flaghurt1.mp3',
+	flaghurt2: './images/sounds/flaghurt2.mp3',
+	flaghurt3: './images/sounds/flaghurt3.mp3',
 	duelrequest: './images/sounds/duel-request.mp3',
 	warselect: './images/sounds/war-select.mp3',
+	cartoonfall: './images/sounds/fall-cartoon.mp3',
 	warstart: './images/sounds/war-start.mp3',
 	cyclopstag: './images/sounds/cyclops-tag2.mp3',
 	werewolftag: './images/sounds/werewolf-tag.mp3',
@@ -2859,6 +3042,7 @@ const soundFiles = {
 	//cave: './images/sounds/cave.mp3',
 	eat: './images/sounds/eat.mp3',
 	curse: './images/sounds/curse.mp3',
+	alhand: './images/sounds/al-hand.mp3',
 	alhit: './images/sounds/al-hit.mp3',
 	alhurt1: './images/sounds/alhurt1.mp3',
 	alhurt2: './images/sounds/alhurt2.mp3',
@@ -2876,6 +3060,7 @@ const soundFiles = {
 	coin: './images/sounds/coin.wav',
 	smokebomb: './images/sounds/smoke-bomb.mp3?x=2',
 	page: './images/sounds/page.mp3',
+	flag: './images/sounds/flag.mp3',
 	cemetery: './images/sounds/cemetery.mp3',
 	// insectdead: './images/sounds/insect-dead.mp3',
 	// insectground1: './images/sounds/insect-ground1.wav',
@@ -2902,6 +3087,10 @@ const soundFiles = {
 	archerselect2: './images/sounds/archer-select2.mp3?V=2',
 	thiefselect1: './images/sounds/thief-select1.wav',
 	thiefselect2: './images/sounds/thief-select2.wav',
+	werewolfselect1: './images/sounds/werewolf-select1.mp3?x=2',
+	werewolfselect2: './images/sounds/werewolf-select2.mp3?x=2',
+	cyclopsselect1: './images/sounds/cyclops-select1.mp3',
+	cyclopsselect2: './images/sounds/cyclops-select2.mp3',
 	thiefslash1: './images/sounds/thief-slash1.mp3',
 	thiefslash2: './images/sounds/thief-slash2.mp3',
 	thiefslash3: './images/sounds/thief-slash3.mp3',
@@ -2933,6 +3122,7 @@ const soundFiles = {
 	lestathowl: './images/sounds/lestat-howl.mp3?v=2',
 	lestattransform: './images/sounds/lestat-transform.mp3?v=2',
 	warriorblock: './images/sounds/warrior-block.mp3',
+	warriorhurtair: './images/sounds/warrior-hurt-air.mp3',
 	warriorcounter: './images/sounds/warrior-counter.mp3?v=2',
 	lestatbreath: './images/sounds/lestat-breath.mp3?v=2',
 	finish3: './images/sounds/finish3.mp3?v=3',
@@ -3072,9 +3262,9 @@ const __holoMenuItems = [
 		en: 'Event',
 		tr: 'Etkinlik'
 	}},
-	{ icon: 'gem', order:1, subOrder:1, tabOrder:2, titles: {
-		en: 'Gem',
-		tr: 'Taş'
+	{ icon: 'dungeon', order:6, subOrder:1/*, tabOrder:2*/, titles: {
+		en: 'Dungeon',
+		tr: 'Zindan'
 	}},
 	{ icon: 'pvp', order:5, subOrder:1, titles: {
 		en: 'PvP',
@@ -3122,7 +3312,7 @@ const __holoMenuItems = [
 	}},
 	{ icon: 'tip', order:9, subOrder:2, titles: {
 		en: 'About Us',
-		tr: 'Hakkımızda'
+		tr: 'Bize Dair'
 	}}
 ];
 const mapSprites = [
@@ -4282,7 +4472,7 @@ const mapSprites = [
 		ground: { width: 5888, height: 1080, zoom: 1.065, yRate: 3 }
 	},
 	{
-		id: 7, coords: { left: '15%', top: '47%', title: 'Crypt' }, 
+		id: 7, coords: { left: '15%', top: '47%', title: 'Crypt', key: 'ad' }, 
 		theme: 'cemetery', distance: 1, width: MathFloor(6144 * 1.065),
 		minLevel: 5, itemGrade: 2,
 		equipmentDropRates: [
@@ -4292,100 +4482,100 @@ const mapSprites = [
 			{ key:'leggings', rate: 8 }
 		],
 		mobs: [
-			{
-				id: 100,
-				minX: 5800 + 256,
-				maxX: 5800 + 256,
-				count: 1,
-				yPosition: function() {
-					return MathRound((groundheight / 2) * 1.1);
-				}
-			},
-			{
-				id: 100,
-				minX: 240,
-				maxX: 240,
-				count: 1,
-				props: {
-					reversed: 1
-				},
-				yPosition: function() {
-					return MathRound((groundheight / 2) * 1.1);
-				}
-			},
-			{
-				id: 10,
-				minX: 4300,
-				maxX: 5300,
-				sight: 50,
-				count: 4,
-				minLevel: 6,
-				maxLevel: 8,
-				spawn: 30,
-				groupId: 1
-			},
-			{
-				id: 39,
-				minX: 4000,
-				maxX: 4000,
-				sight: 99,
-				count: 1,
-				yPosition: function () { return MathRound(groundheight * .25) },
-				minLevel: 6,
-				maxLevel: 8
-			},
-			{
-				id: 39,
-				minX: 2000,
-				maxX: 2000,
-				sight: 99,
-				count: 1,
-				yPosition: function () { return MathRound(groundheight * .75) },
-				minLevel: 6,
-				maxLevel: 8
-			},
-			{
-				id: 24,
-				minX: 1000,
-				maxX: 5000,
-				sight: 500,
-				count: 10,
-				minLevel: 6,
-				maxLevel: 8,
-				spawn: 30,
-				attackAfterHit: true
-			}
+			// {
+			// 	id: 100,
+			// 	minX: 5800 + 256,
+			// 	maxX: 5800 + 256,
+			// 	count: 1,
+			// 	yPosition: function() {
+			// 		return MathRound((groundheight / 2) * 1.1);
+			// 	}
+			// },
+			// {
+			// 	id: 100,
+			// 	minX: 240,
+			// 	maxX: 240,
+			// 	count: 1,
+			// 	props: {
+			// 		reversed: 1
+			// 	},
+			// 	yPosition: function() {
+			// 		return MathRound((groundheight / 2) * 1.1);
+			// 	}
+			// },
+			// {
+			// 	id: 10,
+			// 	minX: 4300,
+			// 	maxX: 5300,
+			// 	sight: 50,
+			// 	count: 4,
+			// 	minLevel: 6,
+			// 	maxLevel: 8,
+			// 	spawn: 30,
+			// 	groupId: 1
+			// },
+			// {
+			// 	id: 39,
+			// 	minX: 4000,
+			// 	maxX: 4000,
+			// 	sight: 99,
+			// 	count: 1,
+			// 	yPosition: function () { return MathRound(groundheight * .25) },
+			// 	minLevel: 6,
+			// 	maxLevel: 8
+			// },
+			// {
+			// 	id: 39,
+			// 	minX: 2000,
+			// 	maxX: 2000,
+			// 	sight: 99,
+			// 	count: 1,
+			// 	yPosition: function () { return MathRound(groundheight * .75) },
+			// 	minLevel: 6,
+			// 	maxLevel: 8
+			// },
+			// {
+			// 	id: 24,
+			// 	minX: 1000,
+			// 	maxX: 5000,
+			// 	sight: 500,
+			// 	count: 10,
+			// 	minLevel: 6,
+			// 	maxLevel: 8,
+			// 	spawn: 30,
+			// 	attackAfterHit: true
+			// }
 		],
 		objects: [
-			{
-				id: 'bush4x1', key: 'bush4', npc: true, when: function (_npc) {
-					return installQuestItem(_npc);
-				}, width: 91, height: 93, locate: { left: 440, bottom: -6 }, zoom: 1, rate: 1
-			},
-			{
-				id: 'bush3x1', key: 'bush3', npc: true, when: function (_npc) {
-					return installQuestItem(_npc);
-				}, width: 101, height: 100, locate: { left: 940, bottom: -6 }, zoom: 1, rate: 1
-			},
-			{
-				id: 'bush2x1', key: 'bush7', npc: true, when: function (_npc) {
-					return installQuestItem(_npc);
-				}, width: 102, height: 112, locate: { left: 2000, bottom: -6 }, zoom: 1, rate: 1
-			},
-			{
-				id: 'bush1x1', key: 'bush6', npc: true, when: function (_npc) {
-					return installQuestItem(_npc);
-				}, width: 106, height: 114, locate: { left: 3000, bottom: -6 }, zoom: 1, rate: 1
-			},
-			{
-				id: 'bush5x1', key: 'bush5', npc: true, when: function (_npc) {
-					return installQuestItem(_npc);
-				}, width: 66, height: 91, locate: { left: 4080, bottom: -6 }, zoom: 1.1, rate: 1
-			},
-			{ id: 'portal1', src:'./images/texture/portal.gif', alpha: .75, to: 5, key: 'portal', npc: true, totalFrames: 7, width: 420, height: 0, zoom: 1, locate: { left: -80, bottom: -235 } },
-			//{ id: 'signforestwest', text: 'Desert', key: 'sign', totalFrames: 2, width: 100, height: 40, zoom: 1, locate: { left: 250, bottom: -150 } },
-			{ id: 'portal2', src:'./images/texture/portal.gif', alpha: .75, to: 9, key: 'portal', npc: true, totalFrames: 7, width: 850, height: 0, zoom: 1, locate: { left: 5950, bottom: -200 } },
-			//{ id: 'signsnowypeaks', text: 'Forest West', key: 'sign', totalFrames: 2, width: 100, height: 40, zoom: 1, locate: { left: 5860, bottom: -115 } }
+			// {
+			// 	id: 'bush4x1', key: 'bush4', npc: true, when: function (_npc) {
+			// 		return installQuestItem(_npc);
+			// 	}, width: 91, height: 93, locate: { left: 440, bottom: -6 }, zoom: 1, rate: 1
+			// },
+			// {
+			// 	id: 'bush3x1', key: 'bush3', npc: true, when: function (_npc) {
+			// 		return installQuestItem(_npc);
+			// 	}, width: 101, height: 100, locate: { left: 940, bottom: -6 }, zoom: 1, rate: 1
+			// },
+			// {
+			// 	id: 'bush2x1', key: 'bush7', npc: true, when: function (_npc) {
+			// 		return installQuestItem(_npc);
+			// 	}, width: 102, height: 112, locate: { left: 2000, bottom: -6 }, zoom: 1, rate: 1
+			// },
+			// {
+			// 	id: 'bush1x1', key: 'bush6', npc: true, when: function (_npc) {
+			// 		return installQuestItem(_npc);
+			// 	}, width: 106, height: 114, locate: { left: 3000, bottom: -6 }, zoom: 1, rate: 1
+			// },
+			// {
+			// 	id: 'bush5x1', key: 'bush5', npc: true, when: function (_npc) {
+			// 		return installQuestItem(_npc);
+			// 	}, width: 66, height: 91, locate: { left: 4080, bottom: -6 }, zoom: 1.1, rate: 1
+			// },
+			// { id: 'portal1', src:'./images/texture/portal.gif', alpha: .75, to: 5, key: 'portal', npc: true, totalFrames: 7, width: 420, height: 0, zoom: 1, locate: { left: -80, bottom: -235 } },
+			// //{ id: 'signforestwest', text: 'Desert', key: 'sign', totalFrames: 2, width: 100, height: 40, zoom: 1, locate: { left: 250, bottom: -150 } },
+			// { id: 'portal2', src:'./images/texture/portal.gif', alpha: .75, to: 9, key: 'portal', npc: true, totalFrames: 7, width: 850, height: 0, zoom: 1, locate: { left: 5950, bottom: -200 } },
+			// //{ id: 'signsnowypeaks', text: 'Forest West', key: 'sign', totalFrames: 2, width: 100, height: 40, zoom: 1, locate: { left: 5860, bottom: -115 } }
 		],
 		tiles: [
 			{ name: 'bg', width: 6144, height: 1080, zoom: 1.065, rate: .85, bottom: -400, count:1 },
@@ -5711,7 +5901,7 @@ const mapSprites = [
 	},	
 	{
 		id: 201, minLevel: 1, public: 1,
-		coords: { left: '33%', top: '52%', title: 'Training' }, 
+		coords: { left: '33%', top: '52%', title: 'Training', key:'training' }, 
 		theme: __scale >= 2 ? 'plainsmobile' : 'plains', distance: 1, width: MathFloor(6144 * 1.06),
 		mobs: [
 			// {
@@ -7002,6 +7192,272 @@ const spells = {
 						spriteHeight: 46,
 						spriteOrigin: 0,
 						speed: 25
+					}
+				]
+			}
+		}
+	},
+	dynamite: {
+		src: './images/sprites/ep92/tnt.png',
+		defaultDirection: __right,
+		defaultAnimationKey: 'run',
+		zoom: 1.5,
+		invulnerable: true,
+		class: __spell,
+		name: 'Dynamite',
+		pierce: true,
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				useExtraStepXRate: true,
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -100,
+						extraStepXRate: .35,
+						sound: {key:'cartoonfall', reset: true},
+						speed: 8
+					},
+					{
+						spriteLeft: 50,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -120,
+						extraStepXRate: .4,
+						speed: 8
+					},	{
+						spriteLeft: 100,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -150,
+						extraStepXRate: .45,
+						speed: 8
+					},	{
+						spriteLeft: 150,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -160,
+						extraStepXRate: .5,
+						speed: 8
+					},
+						{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -140,
+						extraStepXRate: .5,
+						speed: 8
+					},	{
+						spriteLeft: 50,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -120,
+						extraStepXRate: .4,
+						speed: 8
+					},	{
+						spriteLeft: 100,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -90,
+						extraStepXRate: .3,
+						speed: 8
+					},	{
+						spriteLeft: 150,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -60,
+						extraStepXRate: .2,
+						speed: 8
+					},	{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -30,
+						extraStepXRate: .1,
+						speed: 8
+					},	{
+						spriteLeft: 50,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: 0,
+						speed: 4,
+						spell: {
+							key: 'groundexplosion'
+						}
+					}
+				]
+			}
+		}
+	},
+	dynamiteshort: {
+		src: './images/sprites/ep92/tnt.png',
+		defaultDirection: __right,
+		defaultAnimationKey: 'run',
+		zoom: 1.5,
+		invulnerable: true,
+		class: __spell,
+		name: 'Dynamite Short',
+		pierce: true,
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				useExtraStepXRate: true,
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -100,
+						extraStepXRate: .05,
+						sound: {key:'cartoonfall', reset: true},
+						speed: 8
+					},
+					{
+						spriteLeft: 50,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -120,
+						extraStepXRate: .075,
+						speed: 8
+					},	{
+						spriteLeft: 100,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -150,
+						extraStepXRate: .1,
+						speed: 8
+					},	{
+						spriteLeft: 150,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -160,
+						extraStepXRate: .15,
+						speed: 8
+					},
+						{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -140,
+						extraStepXRate: .15,
+						speed: 8
+					},	{
+						spriteLeft: 50,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -120,
+						extraStepXRate: .1,
+						speed: 8
+					},	{
+						spriteLeft: 100,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -90,
+						extraStepXRate: .075,
+						speed: 8
+					},	{
+						spriteLeft: 150,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -60,
+						extraStepXRate: .05,
+						speed: 8
+					},	{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: -30,
+						extraStepXRate: .025,
+						speed: 8
+					},	{
+						spriteLeft: 50,
+						spriteTop: 0,
+						spriteWidth: 50,
+						spriteHeight: 45,
+						spriteOrigin: 25,
+						bottomGap: 0,
+						speed: 4,
+						spell: {
+							key: 'groundexplosion'
+						}
 					}
 				]
 			}
@@ -14908,7 +15364,7 @@ const spells = {
 								key: 'hurtair',
 								type: 'air'
 							},
-							type: 'common'
+							type: 'fire'
 						}
 					},
 					{
@@ -14927,7 +15383,7 @@ const spells = {
 								key: 'hurtair',
 								type: 'air'
 							},
-							type: 'common'
+							type: 'fire'
 						}
 					},
 					{
@@ -14946,7 +15402,7 @@ const spells = {
 								key: 'hurtair',
 								type: 'air'
 							},
-							type: 'common'
+							type: 'fire'
 						}
 					},
 					{
@@ -14965,7 +15421,7 @@ const spells = {
 								key: 'hurtair',
 								type: 'air'
 							},
-							type: 'common'
+							type: 'fire'
 						}
 					},
 					{
@@ -14984,7 +15440,7 @@ const spells = {
 								key: 'hurtair',
 								type: 'air'
 							},
-							type: 'common'
+							type: 'fire'
 						}
 					},
 					{
@@ -15003,7 +15459,7 @@ const spells = {
 								key: 'hurtair',
 								type: 'air'
 							},
-							type: 'common'
+							type: 'fire'
 						}
 					}
 				]
@@ -27859,7 +28315,7 @@ const cssAnimations = {
 		}
 	},
 	fatality: function (_char, _l, _ms) {
-		if(_char.frame === 0 && _char.start === 1 && cssAnimations.dark(_char, _ms ?? 2000))
+		if(_char.frame === 0 && _char.start === 1 && cssAnimations.dark(_char, _ms ?? 2800))
 			episode.playSound({ key: mainCharacter.gender + 'laugh', reset: true, volume: .3 });
 	},
 	darkout: function(_ctx, _opacity, _cnvs) {
@@ -28465,7 +28921,7 @@ function rain(_container, _noSound, _force) {
 	//_rain.className = 'rain';
 	//(_container ?? document.getElementById('game-pad')).appendChild(_rain);
 	dancingInTheRain(_container);
-	if(__account.options.ambiance && !_noSound) {
+	if(!_noSound) {
 		__weather.sound = getSound(null, 'rain');
 		__weather.sound.volume = 1;
 		__weather.sound.loop = true;
@@ -28484,6 +28940,7 @@ function stopRain() {
 		const _rain = document.querySelector('.rain');
 		if(_rain)
 			_rain.remove();
+		stopTheRain();
 	}
 }
 function isAudioPlaying(_audio) {
@@ -28534,6 +28991,23 @@ function getCurrentResetTime() {
 	_now.setMinutes(0);
 	return _now;
 }
+function getTodayResetTimestamp() {
+  const now = new Date();
+
+  // Türkiye sabit UTC+3
+  const tzOffsetHours = 3;
+
+  // Bugünün UTC tarihini al
+  const year = now.getUTCFullYear();
+  const month = now.getUTCMonth();
+  const day = now.getUTCDate();
+
+  // Türkiye saati 12:00 = UTC 09:00
+  const resetUTC = Date.UTC(year, month, day, 12 - tzOffsetHours, 0, 0, 0);
+
+  return resetUTC; // milisaniye epoch
+}
+
 function getTimeDiffUntilReset() {
 	const _date = new Date();
     const _now = new Date();
@@ -28877,7 +29351,11 @@ function clearAudioCache(_sounds) {
   }
   _sounds.length = 0; // diziyi boşalt
 }
+
 (function () {
+  // cooldown süresi (ms)
+  const EXACTCLICK_COOLDOWN = 250;
+
   // Ortak helper -> gerçek listener
   function attachExactClick(el, handler) {
     if (!el._onexactclickAttached) {
@@ -28899,7 +29377,16 @@ function clearAudioCache(_sounds) {
 
         const upListener = (upEvent) => {
           if (!moved && el._onexactclickHandler) {
-            el._onexactclickHandler.call(el, upEvent);
+            const now = _gameTick;
+
+            // cooldown kontrolü
+            if (
+              !el._lastExactClick ||
+              now - el._lastExactClick > EXACTCLICK_COOLDOWN
+            ) {
+              el._lastExactClick = now;
+              el._onexactclickHandler.call(el, upEvent);
+            }
           }
           document.removeEventListener("pointermove", moveListener);
           document.removeEventListener("pointerup", upListener);

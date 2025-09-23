@@ -317,7 +317,7 @@ function askUpgradeFragmentCharacter(_id, _summon) {
 	const _myfr = __account.fragments.find(x => x.key === _item.key);
 	const _limit = _item.limits[_myfr?.grade ?? 0];
 	const _cost = _limit.cost;
-    askSomething(`${getLangData((_summon ? 'Summon' : 'Upgrade') + ' this fragment for')} <b style="margin-left:1vh;color:#F3f4f5 !important">${_cost.formatWithDots()}</b> <img style="height:2vh" src="./images/icons/coin.png" />`, `acceptAndUpgradeFragment(${_id}, ${_cost})`);
+    askSomething(`${getLangData((_summon ? 'Summon' : 'Upgrade') + ' this character for')} <b style="margin-left:1vh;color:#F3f4f5 !important">${_cost.formatWithDots()}</b> <img style="height:2vh" src="./images/icons/coin.png" />`, `acceptAndUpgradeFragment(${_id}, ${_cost})`);
 }
 function acceptAndUpgradeFragment(_id, _cost) {
 	const _item = __fragments.find(x => x.id === _id);

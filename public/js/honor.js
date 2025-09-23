@@ -165,7 +165,7 @@ function getHonorItemDetailUI(_type, _noSound, _noAnimation) {
 		'<div class="w-100 flex flex-jc-end honor-items-content-value">' + renderItemProps(_item, '#ffffffcc') + '</div></div>' +
 		'</div></div>' +
 		'<div style="height:14%;margin:0 7%;width:86%" class="flex action-button-container">' +
-			'<div class="game-menu-button animate-me flex' + (_perc < 0 ? '' : ' d-none') + ((__account.pvp.honor < _item.cost || !_enabled) ? ' gray disabled' : '') + '" onexactclick="askStartForge(\'' + _type + '\')" style="height:65%"><div class="flex">' + getLangData('CREATE') + '</div></div>' + 
+			'<div class="game-menu-button animate-me flex' + (_perc < 0 ? '' : ' d-none') + '" onexactclick="askStartForge(\'' + _type + '\')" style="height:65%"><div class="flex">' + getLangData('CREATE') + '</div></div>' + 
 			'<div class="game-menu-button animate-me flex' + (_perc >= 100 ? ' glow' : (_perc < 0 ? ' d-none' : ' gray disabled')) + '" onexactclick="takeForgedItem(\'' + _type + '\')" style="height:65%"><div class="flex">' + getLangData('READY') + '</div></div>' + 
 		'</div>';
 	return html;
@@ -193,6 +193,10 @@ function takeForgedItem(_type) {
 function askStartForge(_type) {
 	var _item = JSON.parse(JSON.stringify(_equips[_type].grade4));
 	_item.cost = __forges[_type].cost;
+	if(__account.pvp.honor < _item.cost) {
+		warn('<span>' + getLangData('Not enough honor points') + '</span>', 'warn');
+		return;
+	}
 	askSomething(`${getLangData('Redeem honor points')} <b style="margin:0 1vh;color:#F4BB44 !important">${_item.cost.formatWithDots()}</b> <img style="height:4vh" src="./images/icons/honor.png" />`, "startForge('" + _type + "')");
 }
 function startForge(_type) {

@@ -15,12 +15,6 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 	if(!_elm && !_qq && !_force)
 		return;
 	removeClass(_elm, 'mission-done');
-	if(__storyScene?.back) {
-		removeClass(_elm, 'd-none');
-		if(_elm)
-			_elm.innerHTML = '<div style="cursor:pointer" onexactclick="event.stopPropagation();event.preventDefault();loadLastStoryCheckPoint();" class="full flex">Back To Lobby</div>';
-		return;
-	}
 	if (!_qq && (episode.pvp || episode.id > 201)){
 		if(_elm)
 			addClass(_elm, 'd-none');
@@ -43,6 +37,12 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 	}
 	else
 		removeClass(_elm, 'd-none');
+	if(__storyScene?.back) {
+		removeClass(_elm, 'd-none');
+		if(_elm)
+			_elm.innerHTML = '<div style="cursor:pointer;font-size:3vh !important" onexactclick="event.stopPropagation();event.preventDefault();askQuitFromStory()" class="full flex">' + getLangData('Back To Lobby') + '</div>';
+		return;
+	}
 	let _html = '<div class="full" style="overflow-y:auto">';
 	let _state = _qq?.state ?? __account.questStatus.state;
 	const _q = _qq ?? __account.questStatus.quest;
@@ -172,11 +172,11 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 }
 function pauseQuestTimer() {
 	if(__account?.questStatus?.quest?.timer)
-		__account.questStatus.quest.timer.suspended = _gameTick;
+		__account.questStatus.quest.timer.suspended = Date.now();
 }
 function resumeQuestTimer() {
 	if(__account?.questStatus?.quest?.timer?.startTime && __account.questStatus.quest.timer.suspended) {
-		__account.questStatus.quest.timer.startTime += (_gameTick - __account.questStatus.quest.timer.suspended);
+		__account.questStatus.quest.timer.startTime += (Date.now() - __account.questStatus.quest.timer.suspended);
 		delete __account.questStatus.quest.timer.suspended;
 	}
 }
@@ -192,20 +192,24 @@ function checkTimedQuest() {
 		if(!episode.timedQuestElem.dataRate)
 			episode.timedQuestElem.dataRate = 100;
 		const _rate = MathCeil(((__account.questStatus.quest.timer.ms - _time) / __account.questStatus.quest.timer.ms) * 100);
-		if(_rate !== episode.timedQuestElem.dataRate){
-			episode.timedQuestElem.style.width = _rate + '%';
-			episode.timedQuestElem.dataRate = _rate;
+		const _r = MathCeil(100 / MathRound(__account.questStatus.quest.timer.ms / 1000));
+		const RATE = MathCeil(_rate / _r) * _r;
+		if(RATE !== episode.timedQuestElem.dataRate){
+			episode.timedQuestElem.style.width = RATE + '%';
+			episode.timedQuestElem.dataRate = RATE;
 		}
 		let _ms = __account.questStatus.quest.timer.ms - _time;
 		_ms = MathFloor(_ms / 1000);
-		if(_ms !== episode.timedQuestCounter.ms) {
+		if(_ms >= 0 && _ms !== episode.timedQuestCounter.ms) {
 			const _s = (_ms % 60);
 			const _m = parseInt(_ms / 60);
 			episode.timedQuestCounter.ms = _ms;
 			episode.timedQuestCounter.innerText = (_m > 9 ? _m : '0' + _m.toString()) + ':' 
 			+ (_s > 9 ? _s : '0' + _s.toString());
 		}
-		if(_ms <= 0) {
+		if(_ms < 0) {
+			episode.timedQuestCounter.ms = 0;
+			episode.timedQuestCounter.innerText = '00:00';
 			delete __account.questStatus.quest.timer.startTime;
 			if(__account.questStatus.quest.timer.after){
 				__account.questStatus.quest.timer.after();
@@ -303,7 +307,8 @@ function skipDialog() {
 		}
 		document.getElementById('dialog-owner').innerHTML = '<span style="color:#f7f7f7cc !important;font-size:3vh !important">[' + (_conceptArts[_class]?.title ?? _class) + ']</span>' +
 			(__account.questStatus.dialogArr[__account.questStatus.dialogOrder].expression ?
-				'&nbsp;&nbsp;<span style="font-size:2.8vh!important" class="dialog-owner-expression">(' + __account.questStatus.dialogArr[__account.questStatus.dialogOrder].expression + ')</span>' : '');
+				''//'&nbsp;&nbsp;<span style="font-size:2.8vh!important" class="dialog-owner-expression">(' + __account.questStatus.dialogArr[__account.questStatus.dialogOrder].expression + ')</span>'
+				 : '');
 		const _customConcept = __account.questStatus.dialogArr[__account.questStatus.dialogOrder].concept;
 		if(_customConcept) {
 			for (var _item of document.querySelectorAll('.concept-image'))
@@ -650,7 +655,7 @@ function createBubbleText(_dialog) {
 			_top = MathRound(_c.TOP - (_canvas.height / 7) - (__zoom * (_dialog.bottomGap ?? 0)));
 			//_left = MathRound(_c.EXACTLEFT -
 			//	(((_gamePad.clientWidth * .15) - _c.WIDTH) / 2));
-			_left = MathRound(_c.EXACTLEFT + (__zoom * (_dialog.leftGap ?? 0)));  //MathRound((_c.SCREENLEFT - 
+			_left = MathRound((_c.SCREENLEFT - ((_c.width / 2) * _c.ZOOM)) + (__zoom * (_dialog.leftGap ?? 0)));  //MathRound((_c.SCREENLEFT - 
 			//(_d.clientWidth / 2)) + (_c.direction === 'left' ? 0 : _c.WIDTH));
 		//}
 		// _d.style.top = _top + 'px';
@@ -759,7 +764,9 @@ function createDialogScreen(_arr, _quest) {
 			+ "</div>";
 		_order++;
 	}
-	_html += '</div><div class="dialog-scr-left"></div><div onexactclick="skipDialog()" id="game-dialogs" style="border-top-left-radius:3vh;border-top-right-radius:3vh;overflow:hidden;width:70%;left:15%;top:65%;height:35%;background:#121212;position:absolute;z-index:99999 !important"><div style="height:20%;background:#00000080;border-bottom:2px solid #856b2c;color:#856b2c;padding-left:5%" id="dialog-owner" class="flex flex-jc-start"><span style="color:#f7f7f7cc!important;font-size:3vh !important">[' + _conceptArts[_people[0]].title + ']</span>' + (__account.questStatus.dialogArr[0].expression ? '&nbsp;&nbsp;<span style="font-size:2.8vh!important" class="dialog-owner-expression">(' + __account.questStatus.dialogArr[0].expression + ')</span>' : '') + '</div><div style="height:60%;padding:2% 5% 1% 5%"><div class="full" style="overflow-y:auto;color:#F4BB44 !important" id="dialog-text">' + replaceDialogText(__account.questStatus.dialogArr[0].texts?.[getLang()] ?? __account.questStatus.dialogArr[0].text) + '</div></div><div style="height:20%;padding:1% 5%"><span id="quest-skip" style="font-size:2.8vh!important;cursor:pointer;color:#fff !important">' + getLangData('NEXT') + ' &gt;&gt;</span></div></div><div class="dialog-scr-right"></div>';
+	_html += '</div><div class="dialog-scr-left"></div><div onexactclick="skipDialog()" id="game-dialogs" style="border-top-left-radius:3vh;border-top-right-radius:3vh;overflow:hidden;width:70%;left:15%;top:65%;height:35%;background:#121212;position:absolute;z-index:99999 !important"><div style="height:20%;background:#00000080;border-bottom:2px solid #856b2c;color:#856b2c;padding-left:5%" id="dialog-owner" class="flex flex-jc-start"><span style="color:#f7f7f7cc!important;font-size:3vh !important">[' + _conceptArts[_people[0]].title + ']</span>' + (__account.questStatus.dialogArr[0].expression ? 
+		'' //'&nbsp;&nbsp;<span style="font-size:2.8vh!important" class="dialog-owner-expression">(' + __account.questStatus.dialogArr[0].expression + ')</span>' 
+		: '') + '</div><div style="height:60%;padding:2% 5% 1% 5%"><div class="full" style="overflow-y:auto;color:#F4BB44 !important" id="dialog-text">' + replaceDialogText(__account.questStatus.dialogArr[0].texts?.[getLang()] ?? __account.questStatus.dialogArr[0].text) + '</div></div><div style="height:20%;padding:1% 5%"><span id="quest-skip" style="font-size:2.8vh!important;cursor:pointer;color:#fff !important">' + getLangData('NEXT') + ' &gt;&gt;</span></div></div><div class="dialog-scr-right"></div>';
 	_dialogScreen.innerHTML = _html;
 	setTimeout(function () {
 		removeClass(document.querySelectorAll('.concept-image')[0], 'gray-concept');
@@ -1062,22 +1069,23 @@ const __dialogs = {
 				{ owner: 'main', text: 'He was so brave to survive like his mom' }
 			]
 		},
-		// quest3: {
-		// 	begin: [
-		// 		{ owner: 'owner', expression: 'with a strong and determined voice', text: '${getMainName()}, recently our village has been plagued by swarms of rats. They have ravaged our food stores and the diseases they spread are deadly. We must act quickly.' },
-		// 		{ owner: 'main', expression: 'curiously', text: "Where are the rats coming from, Deli Dumrul?" },
-		// 		{ owner: 'owner', expression: 'seriously', text: 'Our village has been under the influence of some kind of dark magic for a long time. We have been struggling to breake this curse. To find the source of the rats, you must go to the forest path. You can track them from there.' },
-		// 		{ owner: 'main', expression: 'determinedly', text: "I understand, Dumrul. I will track the rats and rid our village of this plague." },
-		// 		{ owner: 'owner', expression: 'gratefully and with a hopeful voice', text: 'May the Tengri protect you, ${getMainName()}. Our village is counting on you. Return successfully.' }
-		// 	],
-		// 	progress: [
-		// 		{ owner: 'owner', text: 'Go to the forest and let me smell the bloods of rats' }
-		// 	],
-		// 	end: [
-		// 		{ owner: 'owner', expression: 'with a mockingly happy face', text: 'Thank you Ratman!' },
-		// 		{ owner: 'main', text: 'Not at all Chief' }
-		// 	]
-		// },
+		quest3: {
+			begin: [
+				{ owner: 'owner', expression: 'with a strong and determined voice', text: '${getMainName()}, recently our village has been plagued by swarms of rats. They have ravaged our food stores and the diseases they spread are deadly. We must act quickly.' },
+				{ owner: 'main', expression: 'curiously', text: "Where are the rats coming from, Deli Dumrul?" },
+				{ owner: 'owner', expression: 'seriously', text: 'Our village has been under the influence of some kind of dark magic for a long time. We have been struggling to breake this curse. To find the source of the rats, you must go to the forest path. You can track them from there.' },
+				{ owner: 'main', expression: 'determinedly', text: "I understand, Dumrul. I will track the rats and rid our village of this plague." },
+				{ owner: 'owner', expression: 'gratefully and with a hopeful voice', text: 'May the Tengri protect you, ${getMainName()}. Our village is counting on you. Return successfully.' }
+			],
+			progress: [
+				{ owner: 'owner', text: 'Go to the forest and let me smell the bloods of rats' }
+			],
+			end: [
+				{ owner: 'owner', expression: 'with a mockingly happy face', text: 'It seemed the giant creature had already done its job. But were there any signs of life?' },
+				{ owner: 'main', text: 'There were only ruins. I quickly gathered what we need and walked away' },
+				{ owner: 'owner', text: 'Poor people, they lost their homes. Anyway, that\'s fine, let\'s see what comes next'}
+			]
+		},
 		// quest4: {
 		// 	incapable: [
 		// 		{ owner: 'owner', text: 'Better to get stronger first' },
@@ -1188,7 +1196,7 @@ const __dialogs = {
 				},
 				{ 
 					owner: 'main', 
-					text: 'We are in a big trouble. The castle was destroyed and a goblin army attacked us.' 
+					text: 'We are in a big trouble. The castle was destroyed and a goblin army attacked us' 
 				},
 				{ 
 					owner: 'owner', 
@@ -1888,8 +1896,9 @@ const __dialogs = {
 				{ owner: 'owner', text: 'Bir an önce ormanda onları bul ve yok et. Artık kanlarının kokusunu almak istiyorum' }
 			],
 			end: [
-				{ owner: 'owner', expression: 'alaycı ve mutlu bir ifadeyle', text: 'Aferin fareadam!' },
-				{ owner: 'main', expression: 'gülümseyerek', text: 'Bir şey değil Şef' }
+				{ owner: 'owner', expression: 'alaycı ve mutlu bir ifadeyle', text: 'Anlaşılan dev yaratık çoktan yapacağını yapmış. Peki herhangi bir hayat belirtisi var mıydı?' },
+				{ owner: 'main', expression: 'gülümseyerek', text: 'Sadece harabeler vardı. İhtiyacımız olanları hızlıca toplayıp uzaklaştım' },
+				{ owner: 'owner', text: 'Zavallı halk, evlerinden oldular. Neyse biz işimize bakalım... Bunlar tamam bakalım sırada ne var'}
 			]
 		},
 		quest4: {
@@ -1947,28 +1956,73 @@ const __dialogs = {
 			begin: [
 				{ 
 					owner: 'owner', 
-					expression: 'bilge ve nazik bir sesle', 
-					text: '${getMainName()}, ormanın birçok farklı ve güzel lezzeti bir arada sunduğunu biliyor muydun? Bu akşamki yemek için ormanın batısındaki bölgeden mantarları, özellikle mavi mantarları toplamamız gerekiyor. Yardımına ihtiyacımız var.' 
+					text: 'Size nasıl yardımcı olabilirim?' 
 				},
 				{ 
 					owner: 'main', 
-					expression: 'merakla',
-					text: 'Mavi mantarlar mı, Dede Korkut? Neden onlar bu kadar önemli?' 
+					text: 'Başımız büyük belada. Kalemiz yıkıldı ve Goblin ordusu ormanda bize saldırdı' 
 				},
 				{ 
 					owner: 'owner', 
-					expression: 'açıklayıcı bir şekilde',
-					text: 'Mavi mantarlar nadir bulunur ve çok lezzetlidirler. Ayrıca, köydeki herkesin morale ihtiyacı var ve bu mantarlar yemeğimizi özel kılacak.' 
+					faceExpression: 'angry',
+					text: 'Gelin bana tüm olayları çadırımda anlatın'
 				},
 				{ 
-					owner: 'main', 
-					expression: 'kararlılıkla',
-					text: 'Anladım, bilge Dede Korkut. Hemen ormanın batısına gidip mantarları toplayacağım.' 
+					concept: {
+						bg: 'cs2-1',
+						images: [
+							{ key: 'cs2-c1', class: 'druid', height: 50, width: 25, coords: { left: 15, top: 25 }},
+							{ key: 'cs2-c2', class: 'wizard', height: 50, width: 25, coords: { left: 40, top: 20 }},
+							{ key: 'cs2-c3', class: 'blacksmith', height: 50, width: 25, coords: { left: 65, top: 25 }}
+						]
+					},
+					owner: 'wizard',
+					text: 'Temir Han, yeni misafirlerimiz yorgun ve yaralı bir şekilde geldiler ve söylediklerini duyduğumda ürperdim. Söyleyeceklerini dinlemeliyiz'
+				},
+				{
+					owner: 'blacksmith',
+					text: 'Umarım kısa zamanda toparlarsınız. İsimlerinizi sorabilir miyim?' 
 				},
 				{ 
-					owner: 'owner', 
-					expression: 'teşekkürle ve umut dolu bir sesle',
-					text: 'Teşekkür ederim, ${getMainName()}. Tengri seni korusun. Güvenle dön.' 
+					owner: 'druid',
+					text: 'Ben Vargas, Kalenin prensesiyim. Bizi kabul ettiğiniz için teşekkür ederiz' 
+				},
+				{ 
+					owner: 'main',
+					text: 'Ve ben de ${getMainName()}, .... prensesi ormanda bir ağaca bağlı şekilde buldum' 
+				},
+				{ 
+					owner: 'blacksmith',
+					text: 'Sizin başınıza ne geldi leydim?' 
+				},
+				{ 
+					owner: 'druid',
+					text: 'Siyah bir devle birlikte bir goblin ordusu kalemize saldırdı, dev o kadar güçlüydü ki Kralımız bile karşı koyamadı' 
+				},
+				{ 
+					owner: 'blacksmith',
+					text: 'Çok üzücü. Kaybınız için çok üzgünüz. Bu devi daha detaylı anlatabilir misiniz?'
+				},
+				{ 
+					owner: 'druid',
+					text: 'Bir tane kırmızı gözü var, kırmızı ışın ve alansal saldırıları kullanıyor. Çok korkutucuydu' 
+				},
+				{ 
+					owner: 'main',
+					text: 'Ben sadece sesler duydum, devi görmedim' 
+				},
+				{ 
+					owner: 'wizard',
+					text: 'O Tepegöz! Buraya da gelebilir, hazırlıklı olmalıyız, ama nasıl?' 
+				},
+				{ 
+					owner: 'main',
+					text: 'Eğer yardım elebileceğim bir husus olursa, seve seve yardımcı olurum' 
+				},
+				{ 
+					owner: 'druid',
+					text: '${getMainName()}, Onunla savaşmak için elimizde dayanıklılık iksiri olmalı. Bunu senin için yapabilirim, ama bunun için bana fare kuyrukları getirmelisin. Yıkılan kalenin etrafında bulabilirsin'
+					//text: '${getMainName()}, You are our only hope, you must go to the trolls\' cave and bring explosives to resist that creature. Remember that it will not be easy to take these away from them.' 
 				}
 			],
 			progress: [
@@ -2017,9 +2071,8 @@ const __dialogs = {
 				{ owner: 'owner', text: 'Lestat durdurulmalı!' }
 			],
 			end: [
-				{ owner: 'owner', text: 'Seni görmek ne güzel ${getMainName()}. Açıkçası görevi bu kadar çabuk yapacağını tahmin etmiyordum.' },
-				{ owner: 'main', expression: 'heyecanlı bir şekilde', text: 'Temir Han, Lestat\'ı buldum ve savaştım. Ancak, çok garip şeyler oldu. Lestat dev bir kurtadama dönüştü ve ardından kaçtı. İşte, onun dişini getirdim.' },
-				{ owner: 'owner', expression: 'şaşkın ve meraklı bir ifadeyle', text: 'Bu inanılmaz! Kurtadam hikayesinin ardındaki gerçeği öğrenmemiz gerekiyor. Bu dişi alıp Dede Korkut\'a göstereceğim ve bilgi almaya çalışacağım. Tengri seni korusun, ${getMainName()}. Harika bir iş çıkardın.' },
+				{ owner: 'owner', text: 'Ah, işte bitkilerle dolusun, şimdi onları Dede Korkut\'a ver ve son adıma hazır ol' },
+				{ owner: 'main', text: 'Her şeyi birleştirmeye yakın olduğumuzu duymak güzel. Görüşürüz' }
 			]
 		},
 		quest8: {
@@ -2054,9 +2107,10 @@ const __dialogs = {
 				{ owner: 'owner', text: 'Ormanı aşarak mezarlığa doğru ilerle. O bölgeyi bir süre takibe alıp neler döndüğünü öğrenmeliyiz.' }
 			],
 			end: [
-				{ owner: 'owner', text: 'Hoşgeldin ${getMainName()}, Umarım iyi haberler ile dönmüşsündür.' },
-				{ owner: 'main', text: 'Tam tahmin ettiğin gibi. Mahsende iskelet savaşçıları buldum ve tüm kemiklerini kırdım.' },
-				{ owner: 'owner', text: 'İskelet savaşçılar çetin cevizdir. Ama sen her zamanki gibi iyi iş başardın, ${getMainName()}' },
+				{ owner: 'owner', text: 'Seni ilk gördüğümde gözlerinde korkusuz olduğunu görebiliyordum' },
+				{ owner: 'main', text: 'Bu son trajik olaylardan sonra birimizin güçlü durması gerekiyor' },
+				{ owner: 'owner', text: 'Bir daha böyle bir şey olmasını önlemek için o iksiri alıp Temir Han\'la konuş. Kaçırmamamız gereken bir önerisi var' },
+				{ owner: 'main', text: 'Çabanız için teşekkür ederim' }
 			]
 		},
 		quest9: {
@@ -2086,8 +2140,8 @@ const __dialogs = {
 				{ owner: 'owner', text: 'Örümcekler yapışkan tükürükleriyle seni hapsetmeye çalışabilirler. Çok dikkatli olmalısın.' }
 			],
 			end: [
-				{ owner: 'owner', expression: 'minnettar bir şekilde', text: 'Örümcek ağlarını getirdiğin için sana minnettarım, Kurt Oğlu. Artık Kutsal Yol Gösterici Sigun İksirini yapabiliriz. Bu iksir, karanlıkta yolunu kaybedenler için büyük bir umut olacak. Yardımın köyümüz için çok değerli.' },
-				{ owner: 'main', expression: 'gülümseyerek', text: 'Her zaman yardıma hazırım, Vargas. Kutsal iksirin gücünü görmek için sabırsızlanıyorum.' },
+				{ owner: 'owner', text: 'Bu patlayıcıları alın ${getMainName()}. Dikkatlice hedef alın. Iskalarsanız, sorun çıkabilir' },
+				{ owner: 'main', text: 'Elimden gelenin en iyisini yapacağım. Teşekkürler' }
 			]
 		},
 		quest10: {

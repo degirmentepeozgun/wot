@@ -412,10 +412,12 @@ function reviveAsGhost() {
 	mainCharacter.deadTime = mainCharacter.remove = mainCharacter.immobilize = undefined;
 }
 function switchCharacter(_force, _nowarn) {
-	if (!_force)
-		return;
-	if (episode.pvp)
-		return;
+	if(!episode?.entertainment){
+		if (!_force)
+			return;
+		if (episode.pvp)
+			return;
+	}
 	//3 sn geçmeden tekrar karakter değiştirilemez,
 	//karakter interactive animasyonda ise
 	let _x = _coopMembers?.[0];

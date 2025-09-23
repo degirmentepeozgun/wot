@@ -55,7 +55,7 @@ const avatarTemplate = function (char, _name) {
 	if (_oldAvatar)
 		_oldAvatar.remove();
 	const _class = char.main ? '' : (episode?.pvp ? ' war-player-profile' : ' friendly-profile');
-	let _html = `<div style="margin-top:0 !important;cursor:pointer;position:relative;width:20.2vw;aspect-ratio:101/59;height:auto!important" ${char.main ? 'onexactclick="if(episode.id > 99 || __story) { return; } showMyModalPopUp(\'game-menu\');switchBookPage(1)" ' : 'onexactclick="switchCharacter()"'}class="profile${_class}" id="char-${char.key}">
+	let _html = `<div style="margin-top:0 !important;cursor:pointer;position:relative;width:20.2vw;aspect-ratio:101/59;height:auto!important" ${char.main ? 'onexactclick="if(episode.id > 99 || __story) { return; } showMyModalPopUp(\'game-menu\');switchBookPage(1)" ' : 'onexactclick="switchCharacter(null,null,null,1)"'}class="profile${_class}" id="char-${char.key}">
 			<img src='./images/icons/hp-frame.png' class='full' style='left: 0; top: 0; position: absolute; z-index: 2; filter:drop-shadow(0 0 .8vh #000) drop-shadow(0 0 .8vh #000)' />
 			<div class="full flex">
 				<div style="color:white;width:34%;height:100%">
@@ -495,12 +495,16 @@ function loadUI() {
 						episode.pauseBgMusic();
 					if(episode && episode.bgSound)
 						episode.pauseAmbianceMusic();
+					if(__weather?.sound)
+						__weather.sound.pause();
 					mainCharacter.stopHeartBeatSound();
 					mainCharacter.stopStepSound();
+					pauseQuestTimer();
 					if(episode.hasGoSound)
 						episode.stopGoSound();	
 					episodeVisibilityHidden = true;
 				} else {
+					_gameTick = Date.now();
 					reconnectSocket();
 					if(_lastGameTick){
 						const _diff = (Date.now() - _lastGameTick);
@@ -511,8 +515,12 @@ function loadUI() {
 						episode.playBgMusic();
 					if(episode && episode.bgSound)
 						episode.resumeAmbianceMusic();
+					if(__weather?.sound)
+						__weather.sound.play();
 					if(episode.hasGoSound)
 						episode.playSound({key:'go', force: true, loop:true, volume:.5});
+					resumeQuestTimer();
+					window.SoundManager.warmAudio();
 				}
 			}
 			catch(e) {
@@ -531,10 +539,13 @@ function loadUI() {
 					episode.pauseBgMusic();
 				if(episode && episode.bgSound)
 					episode.pauseAmbianceMusic();
+				if(__weather?.sound)
+					__weather.sound.pause();
 				mainCharacter.stopHeartBeatSound();
 				mainCharacter.stopStepSound();
 				if(episode.hasGoSound)
 					episode.stopGoSound();
+				pauseQuestTimer();
 				episodeVisibilityHidden = true;
 				if (window.plugins && window.plugins.insomnia)
 					window.plugins.insomnia.allowSleepAgain();
@@ -545,6 +556,7 @@ function loadUI() {
 		});
 		document.addEventListener("resume", () => {
 			try{ 
+				_gameTick = Date.now();
 				reconnectSocket();
 				if(_lastGameTick){
 					const _diff = (Date.now() - _lastGameTick);
@@ -555,10 +567,14 @@ function loadUI() {
 					episode.playBgMusic();
 				if(episode && episode.bgSound)
 					episode.resumeAmbianceMusic();
+				if(__weather?.sound)
+					__weather.sound.play();
 				if(episode.hasGoSound)
 					episode.playSound({key:'go', force: true, loop:true, volume:.5});
 				if (window.plugins && window.plugins.insomnia)
 					window.plugins.insomnia.keepAwake();
+				resumeQuestTimer();
+				window.SoundManager.warmAudio();
 			}
 			catch(ex) {
 
@@ -1695,7 +1711,7 @@ function askSomething(_question, _okFuncString, _singletonAttr) {
 		_div.innerHTML = _modal;
 		const _mu = document.querySelector('#menu-ui');
 		(_mu ?? _gameUI).appendChild(_div.querySelector('.inventory-question'));
-		episode.playSound({ key: 'click' });
+		PlaySound({ key: 'click' });
 	}
 	catch(qex) {
 		alert(qex.message);
@@ -1787,6 +1803,7 @@ function injectModule(_name, _func) {
 		_installedCount++;
 		const styleEl = document.createElement('style');
 		styleEl.textContent = cssText;
+		styleEl.dataset.name = _name;
 		document.head.appendChild(styleEl);
 		if(_installedCount > 1 &&_func)
 			setTimeout(function(){_func([scriptEle, styleEle], _name);}, 10);
@@ -1816,8 +1833,4 @@ function removeModule(_name) {
 		delete _module.ref;
 		window.installedModules.splice(window.installedModules.findIndex(x => x.name === _name),1);
 	}
-	return;
-	const _insts = document.head.querySelectorAll('script[data-name=' + _name + '],link[data-name=' + _name + ']');
-	if(_insts?.[0])
-		_insts.forEach(x => x.remove());
 }

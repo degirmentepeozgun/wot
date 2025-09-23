@@ -226,7 +226,7 @@ function keyboard(_character, _keys) {
 				}
 				break;
 			case 'tab':
-				switchCharacter();
+				switchCharacter(null,null,null,1);
 				break;
 			default:
 				break;

@@ -215,11 +215,12 @@
 .menu-left-opener {
 	width:40%;
 	left:0;
-	top:6vh;
-	height:calc(100% - 6vh);
+	top:0;
+	height:100%;
 	position: absolute;
-	background:#00000080;
+	background:linear-gradient(180deg, #000 6%, #00000080 100%);
 	padding: .5%;
+    z-index: 1;
 	box-shadow: 2vh 0 2vh #00000080;
 	animation: slide-from-left .3s ease;
 	-webkit-animation: slide-from-left .3s ease;
@@ -230,7 +231,7 @@
 }
 @keyframes slide-from-left {
 	from {
-		left:-50%
+		transform:translateX(50%)
 	}
 	to {
 		left:0
@@ -241,7 +242,7 @@
 		left:0
 	}
 	to {
-		left:-50%
+		transform:translateX(-50%)
 	}
 }
 .menu-left-opener-item {

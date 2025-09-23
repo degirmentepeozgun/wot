@@ -65,21 +65,11 @@ function askBuyStoreItem(_id, _ok) {
     //     warn('<span>' + getLangData('Not enough gold') + '</span>', 'warn');
     //     return;
 	// }
-    let _modal = document.createElement('div');
-	_modal.className = "full flex inventory-question";
-	_modal.style.zIndex = 9999;
-    _modal.innerHTML = `<div class="inventory-modal">
-            <div class="flex store-item-purchase">
-				<div class="w-100 flex p-2"><img src='./images/icons/${_item.key}.png' /></div>
+	askSomething(`<div class="flex store-item-purchase">
+				<div class="w-100 flex p-02"><img style="height:12vh !important" src='./images/icons/${_item.key}.png' /></div>
                 <div class="w-100 flex p-02">${getLangData('Confirm purchase')}?</div>
-                <div class="w-100 flex p-02"><div class="flex">${getLangData('Price')}:&nbsp;${_price.formatWithDots()}&nbsp;<img src='./images/icons/coin.png' /></div></div>
-			</div>
-            <div style="padding:4vh 2vh" class="flex">
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;min-width:10vw;color:#F4BB44 !important;font-size:3vh !important" onexactclick="buyStoreItem(${_id})">${getLangData('YES')}</div>
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;min-width:10vw;color:#F4BB44 !important;font-size:3vh !important" onexactclick="episode.playSound({ key: 'click' });closeInventoryQuestionModal()">${getLangData('NO')}</div>
-            </div>
-        </div>`;
-    document.body.appendChild(_modal);
+                <div class="w-100 flex" style="padding:0 2vh"><div class="flex">${getLangData('Price')}:&nbsp;${_price.formatWithDots()}&nbsp;<img src='./images/icons/coin.png' /></div></div>
+			</div>`, 'buyStoreItem(' + _id + ')');
 }
 
 function buyStoreItem(_id) {

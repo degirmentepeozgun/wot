@@ -5224,6 +5224,10 @@ body:has(#quest-dialog:not(.d-none)) #skill10 {
 .my-toast.level-up span{
 	color: #F4BB44 !important
 }
+.concept-image:not(.custom-concept) {
+	width:100%;
+	object-fit: contain
+}
 .concept-image.custom-concept#concept-druid {
 	left: 19% !important;
 	top: 29% !important
@@ -6585,7 +6589,7 @@ img.dmmg.toxic-dmmg {
 	height: 2.4vh;
 	overflow: hidden;
 	border:.2vh solid #ffffff99;
-	background: #ff6c0080;
+	background: #FF2020;
   }
   .timedquest-progress {
 	border-radius: 1vh;
@@ -6593,7 +6597,7 @@ img.dmmg.toxic-dmmg {
 	width: 100%;
 	height: 100%;
 	border-right:.2vh solid #ffffff99;
-	background:#DAA52080;
+	background:#FFCC00;
   }
 
   .black-screen-information {
@@ -6701,13 +6705,17 @@ img.dmmg.toxic-dmmg {
 .story-gift .match-card {
     width: 100%;
 	height: 100%;
-    perspective: 50vh;
+    perspective: 75vh;
 }
 
 .story-gift .match-img {
-	width: 100%;
+	max-width: 100%;
+	max-height: 100%;
+  	width: 100%
 }
-
+.story-gift .card-back .match-img {
+	width: 11vw;
+}
 .story-gift .flip-card .flip-card-inner {
     transform: rotateY(180deg);
 }
@@ -6730,9 +6738,12 @@ img.dmmg.toxic-dmmg {
 
 .story-gift .card-front {
     cursor: pointer;
-	width: 80%;
-	margin: 0 10%;
-	height: 45vh !important
+	max-width: 80%;
+	margin: 0 auto;
+	width:auto;
+	aspect-ratio: 125 / 187;
+	height:auto !important;
+	max-height: 100% !important
 }
 
 .story-gift .card-back {
@@ -6744,10 +6755,13 @@ img.dmmg.toxic-dmmg {
 	background-size: cover;
 	background-repeat: no-repeat;
 	box-shadow: inset 0 0 1vh darkgoldenrod;
-	width: 80%;
-	margin: 0 10%;
-	padding: 15%;
-	height: 45vh !important;
+	max-width: 80%;
+	width:auto;
+	margin: 0 auto;
+	aspect-ratio: 125 / 187;
+	padding:12% 15%;
+	max-height: 100% !important;
+	height:auto !important;
 	position: relative;
 }
 .story-gift .card-back img {
@@ -6757,9 +6771,9 @@ img.dmmg.toxic-dmmg {
 .story-gift .card-back .bonus-title {
 	font-size: 6vh !important;
 	color: #f3f4f5 !important;
-	padding-top:110%;
 	text-shadow: 0 0 1vh #000;
-	position: absolute;
+	height:auto !important;
+	flex:1;
 	z-index: 2;
 }
 .story-gift .selected .card-back {
@@ -6825,6 +6839,8 @@ img.dmmg.toxic-dmmg {
 }
 #menu-ui .menu-ui-left{
 	padding:4.25% 0 12.5% 8.25%;
+	width:50%;
+	height:100%;
 }
 #menu-ui .menu-ui-right {
 	padding:4.25% 8.5% 12.5% 0;
@@ -7157,7 +7173,7 @@ img.dmmg.toxic-dmmg {
 	top:0 !important;
 	left:0 !important;
 	border:none !important;
-	background:none !important;
+	background:none !important
 }
 .skill-card[data-artifact-key] img {
 	background:#00000099 !important;
@@ -7514,6 +7530,9 @@ img.dmmg.toxic-dmmg {
 	height:11vh !important;
 	width:11vh !important;
 	background: radial-gradient(#ff6c00, #000);
+}
+.stories-content-left .dungeon-card .skill-icon-wrapper img {
+	background: radial-gradient(#DA70D6, #000);
 }
 .stories-content-left * {
 	font-size: 3vh !important;
@@ -8212,9 +8231,12 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	border-bottom-left-radius: 1vh;
 	box-shadow: -.5vh .5vh 1vh #000;
 }
+.dungeon-daily-mark {
+	background-color:#b80b0b !important
+}
 .story-side-bonus-mark {
 	padding:0 2vh;
-	background-color:#0F52BA !important;
+	background-color:#0F52BA !important
 }
 .melt-path {
 	width: 1vh;
@@ -8976,7 +8998,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	pointer-events: auto !important
 }
 .selection-char.selected-character {
-	background:radial-gradient(#000, greenyellow) !important;
+	background:radial-gradient(#000, #F4BB44) !important;
 	border-radius: .5vh;
 }
 .menu-tutorial-header {
@@ -9098,9 +9120,20 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 .lobby-navbar-left {
      touch-action: manipulation;
 }
-.lobby-navbar-left, .lobby-navbar-right{
+.lobby-navbar-left{
+    height: 100%;
+}
+.lobby-navbar-right{
     width: 25%;
     height: 100%;
+}
+.lobby-navbar-left::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50vh;
+  height: 50vh
 }
 .lobby-navbar-center {
     height: 100%;
@@ -9232,11 +9265,12 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 .menu-left-opener {
 	width:40%;
 	left:0;
-	top:6vh;
-	height:calc(100% - 6vh);
+	top:0;
+	height:100%;
 	position: absolute;
-	background:#00000080;
-	padding: .5%;
+	background:linear-gradient(135deg, #000 6%, #00000040 100%);
+	z-index: 2;
+	padding: 1% .5%;
 	box-shadow: 2vh 0 2vh #00000080;
 	animation: slide-from-left .3s ease;
 	-webkit-animation: slide-from-left .3s ease;
@@ -9245,20 +9279,22 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	animation: slide-to-left .3s ease;
 	-webkit-animation: slide-to-left .3s ease;
 }
+
 @keyframes slide-from-left {
 	from {
-		left:-50%
+		transform: translateX(-100%);
 	}
 	to {
-		left:0
+		transform: translateX(0);
 	}
 }
+
 @keyframes slide-to-left {
 	from {
-		left:0
+		transform: translateX(0);
 	}
 	to {
-		left:-50%
+		transform: translateX(-100%);
 	}
 }
 .menu-left-opener-item {
@@ -9273,7 +9309,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	background:#ffffff50;
 }
 .menu-left-opener-item img{
-	height: 7.5vh !important;
+	height: 8vh !important;
 	margin-bottom: 12%;
 }
 .menu-left-opener-item *{
@@ -9329,4 +9365,11 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 }
 .menu-tutorial-content img {
 	opacity: .85 !important;
+}
+.gem-possibilities .gem-possibility {
+	width:12vh !important
+}
+.gem-possibilities .item-in-slot {
+	height: 12vh !important;
+	width:12vh !important
 }

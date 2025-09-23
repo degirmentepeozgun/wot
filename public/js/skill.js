@@ -897,7 +897,7 @@ function characterSkill() {
 	this.getSkillCooldown = function (_cd) {
 		if (!_cd)
 			return getLangData('No Cooldown');
-		return (_cd / 1000).toFixed(1) + ' seconds';
+		return (_cd / 1000).toFixed(1) + ' ' + getLangData('seconds');
 	}
 	this.playSkillVideo = function (_skillKey) {
 		const _video = document.querySelector('#menu-ui video');

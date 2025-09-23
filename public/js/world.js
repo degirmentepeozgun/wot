@@ -94,8 +94,10 @@ function world() {
 	this.tryPort = function(_id, _canPort) {
 		if(_canPort)
 			portTo(_id);
-		else
+		else if(!episode?.menu)
 			warn('<span>' + getLangData('Cannot port while a quest is in progress') + '</span>', 'warn');
+		else
+			this.openMapDetailModal(_id);
 	}
  	this.closeMapInfoModal = function(_nosound) {
 		if(!_nosound)
@@ -112,12 +114,27 @@ function world() {
 			}
 		}
 	}
-	this.openMapDetailModal = function(_id) {
+	this.startPort = function(_id) {
+		PlaySound({key:'click'});
 		const _map = mapSprites.find(x => x.id === _id);
 		let _mission;
 		if(_map.coords.key)
 			_mission = _missions.find(x => x.key === _map.coords.key);
-		episode.playSound({ key: 'click' });
+		if(_mission?.storyId) {
+			if(_mission.before)
+				if(!_mission.before())
+					return;
+			playStory(_mission.storyId);
+		}
+	}
+	this.openMapDetailModal = function(_id) {
+		const _map = mapSprites.find(x => x.id === _id);
+		let _mission;
+		if(_map?.coords?.key)
+			_mission = _missions.find(x => x.key === _map.coords.key);
+		if(!_mission)
+			return;
+		PlaySound({ key: 'click' });
 		let _container = document.getElementById('map-detail-modal');
 		if(_container)
 			_container.remove();
@@ -126,19 +143,21 @@ function world() {
 		_container.className = 'flex animate-me fade-me';
 		_container.style = "background:url(./images/ui/square.png)";
 		_container.innerHTML = `<div class="full map-detail-modal-inner">
-			<div class="w-100 flex flex-jc-start map-detail-modal-title">${getLangData(_map.coords.title).toUpperCase()}</div>
-			<div class="full flex flex-ai-start map-detail-modal-content">
-				<div class="w-100 flex flex-jc-start map-detail-modal-desc">${_mission.description()}</div>
+			<div class="w-100 flex flex-jc-start map-detail-modal-title">${_mission?.titles?.[getLang()]?.toLocaleUpperCase(getLang())}</div>
+			<div class="full flex flex-ai-start flex-jc-start map-detail-modal-content">
+				<div class="w-100 flex flex-jc-start map-detail-modal-desc">${_mission?.descriptions?.[getLang()] ?? ''}`
+				+ (_mission.html?.() ?? '') +
+			`</div>
 			</div>
 			<div class="flex map-detail-modal-btn">
-				<div class="w-50 flex">
+				<div class="w-50 flex d-none">
 					<div class="game-menu-button animate-me flex" onexactclick="" style="height:65%">
 						<div class="flex">${getLangData('UPGRADE')}</div>
 					</div>
 				</div>
-				<div class="w-50 flex">
-					<div class="game-menu-button animate-me flex" onexactclick="" style="height:65%">
-						<div class="flex" style="color:#ff6c00 !important">${getLangData('PLAY')}</div>
+				<div class="w-100 flex" style="height:100%">
+					<div class="game-menu-button animate-me flex" onexactclick="getRef(\'world\')?.startPort(${_id})" style="height:65%">
+						<div class="flex" style="height:100%;color:#ff6c00 !important">${getLangData('START')}</div>
 					</div>
 				</div>
 			</div>

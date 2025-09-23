@@ -4,6 +4,7 @@ function hideSideMenu(_func) {
 	const _ml = document.querySelector('.menu-left-opener');
 	if(_ml) {
 		addClass(_ml, 'slide-to-left');
+		addClass(_ml, 'closing');
 		_ml.onanimationend = function(e) {
 			if(e.animationName === 'slide-to-left'){
 				if(_ml)
@@ -27,17 +28,13 @@ function closeSideMenu() {
 	hideSideMenu();
 }
 function openSideMenu() {
-   	episode.playSound({ key: 'click' });
+   	PlaySound({ key: 'click' });
 	const _ml = document.querySelector('.menu-left-opener');
-	if(_ml){
-		hideSideMenu();
+	if(_ml)
 		return;
-	}
 	let _html = '<div class="menu-left-opener show-ui flex flex-ai-start">';
 	for(let _m of __holoMenuItems)
-		_html += `<div id="lobby-${_m.icon}" class="flex menu-left-opener-item animate-me "onexactclick="PlaySound({key:'click'});hideSideMenu(function() {
-				switchBookPage(${_m.order},${_m.subOrder},${_m.tabOrder ?? 0});
-			})">
+		_html += `<div id="lobby-${_m.icon}" class="flex menu-left-opener-item animate-me" onexactclick="openSectionFromMenu(${_m.order},${_m.subOrder},${_m.tabOrder ?? 0})">
 			<div class="w-100 flex">
 				<div class="w-100 flex"><img src="./images/ui/menu-icons/${_m.icon}.png" /></div>
 				<div class="w-100 flex">${_m.titles[getLang()]}</div>
@@ -80,7 +77,15 @@ function createMenu() {
 	_div.innerHTML = getStoryTemplates();
 	_gameUI.appendChild(_upperDiv);
 }
-
+function openSectionFromMenu(_order, _subOrder, _tabOrder) {
+	const _ml = document.querySelector('.menu-left-opener');
+	if(!_ml || !hasClass(_ml, 'opened') || hasClass(_ml, 'closing'))
+		return;
+	PlaySound({key:'click'});
+	hideSideMenu(function() {
+		switchBookPage(_order, _subOrder, _tabOrder);
+	})
+}
 function getStoryTemplates() {
 	let _html = '<div class="stories-wrapper">';
 	for(let _s of __stories)

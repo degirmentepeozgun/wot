@@ -28,7 +28,7 @@ function tips() {
 						</div>
 					</div>
 					<div class="w-100 tips-left-middle" style="height:72%">
-						<textarea id="wot-feedback-input" onpaste="return false" ondrop="return false" autocomplete="off" maxlength="500" class="full" placeholder="${getLangData('Write your feedback (Optional)')}"></textarea>
+						<textarea id="wot-feedback-input" onpaste="return false" ondrop="return false" autocomplete="off" maxlength="500" class="full" placeholder="${getLangData('Write your feedback')} (${getLangData('Optional')})"></textarea>
 					</div>
 					<div style="height:14%" class="flex tips-left-bottom action-button-container">
 						<div onexactclick="getRef('tips')?.sendRate(this)" class="game-menu-button animate-me flex" onexactclick="" style="height:65%">
@@ -45,7 +45,7 @@ function tips() {
 						<div class="full">
 							<div class="w-100 flex tips-right-top" style="height:14%;padding:2vh">
 								<div class="flex" style="flex:1;height:100%">
-									<input onpaste="return false" ondrop="return false" autocomplete="off" id="wot-subscribe-input" maxlength="100" type="text" placeholder="${getLangData('Join Whishlist')}" />
+									<input onpaste="return false" ondrop="return false" autocomplete="off" id="wot-subscribe-input" maxlength="100" type="text" placeholder="${getLangData('Join Community With Email')}" />
 								</div>
 								<div onexactclick="getRef('tips')?.addToWishList(this)" class="flex" style="height:100%">
 									<div class="game-menu-button animate-me flex">
@@ -153,7 +153,7 @@ function tips() {
 		}
 		addClass(_clicked, 'disabled');
 		webClient.post('subscription/edit', { "id": _txt}, function() {
-			warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/tick.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Welcome To Our Wishlist') + '</span></div>', null, null, 1);
+			warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/tick.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Welcome To Our Community') + '</span></div>', null, null, 1);
 			if(_elem)
 				_elem.value = '';
 			removeClass(_clicked, 'disabled');

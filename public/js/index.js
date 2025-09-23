@@ -250,12 +250,12 @@ function removeCoopCharacter(_force) {
 		//removeClass(addPlayer, 'd-none');
 	}
 }
-function startWithThisCharacter(_id, _level) {
+function startWithThisCharacter(_id, _level, _select, _noSound) {
 	removeCoopCharacter(1);
 	const _clone = _allEnemies['enemy' + _id]();
-	addCoopCharacter(null, _clone.class, 1, _level ?? 1, 1);
+	addCoopCharacter(null, _clone.class, 1, _level, 1, _select);
 	_squadMemberKey = _clone.class;
-	switchCharacter(1, 1);
+	switchCharacter(1, 1, _noSound);
 	if(_level && mainCharacter.level !== _level)
 		mainCharacter.level = _level;
 	removeCoopCharacter(1);
@@ -342,7 +342,7 @@ function addCharacterAsEnemy(_prefix, _name) {
 	return _enemy;
 }
 
-function addCoopCharacter(_char, _prefix, _append, _level, _nowarn) {
+function addCoopCharacter(_char, _prefix, _append, _level, _nowarn, _select) {
 	if(mainCharacter && mainCharacter.deadTime)
 		return;
 	if ((episode?.pvp && !episode.realTime) || episode?.dungeon) {
@@ -382,12 +382,12 @@ function addCoopCharacter(_char, _prefix, _append, _level, _nowarn) {
 	_coopMember.coopWith = mainCharacter;
 	_coopMember.autoTarget = undefined;
 	_coopMember.animate('idle', 1);
-	_client.setCharacterValues(_coopMember);
+	if(_level)
+		_coopMember.level = _level;
+	_client.setCharacterValues(_coopMember, _select, _level);
 	setCharacterDefaults(_coopMember);
 	_coopMember.yPosition = getRandomValue(MathRound(getGroundHeight() * .1), MathRound(getGroundHeight() * .9));
 	episode.enemies.push(_coopMember);
-	if(_level)
-		_coopMember.level = _level;
 	_navbar.innerHTML += avatarTemplate(_coopMember);
 	addClass(addPlayer, 'd-none');
 	_coopMember.left = mainCharacter.SCREENLEFT + (platformX ?? 0);
@@ -433,11 +433,13 @@ function reviveAsGhost() {
 	mainCharacter.idle();
 	mainCharacter.deadTime = mainCharacter.remove = mainCharacter.immobilize = undefined;
 }
-function switchCharacter(_force, _nowarn) {
-	if (!_force)
-		return;
-	if (episode.pvp && !episode.realTime)
-		return;
+function switchCharacter(_force, _nowarn, _noSound, _checkCooldown) {
+	if(!episode?.entertainment) {
+		if (!_force)
+			return;
+		if (episode.pvp && !episode.realTime)
+			return;
+	}
 	//3 sn geçmeden tekrar karakter değiştirilemez,
 	//karakter interactive animasyonda ise
 	let _x = _coopMembers?.[0];
@@ -448,16 +450,15 @@ function switchCharacter(_force, _nowarn) {
 	const _xAnima = _x.animation;
 	const _mainAnima = mainCharacter.animation;
 	const _availableAnimations = ['walk', 'run', 'idle'];
-	if (_availableAnimations.indexOf(_xAnima) === -1 || _availableAnimations.indexOf(_mainAnima) === -1 ||
-		(mainCharacter.switchTime && ((_gameTick - mainCharacter.switchTime) < 3000))) {
+	if (_checkCooldown && (mainCharacter.switchTime && ((_gameTick - mainCharacter.switchTime) < 3000))) {
 		warn('<span>' + getLangData('Can not switch right now') + '</span>', 'warn');
 		return;
 	}
-	else {
-		mainCharacter.animate('idle', 1);
-		_x.animate('idle', 1);
+	// else {
+		// mainCharacter.animate('idle', 1);
+		// _x.animate('idle', 1);
 		_startAnimate = false;
-	}
+	//}
 	const _coopLeft = MathRound(_x.left);
 	setKeyBoard(_x);
 	_x.main = true;
@@ -475,24 +476,31 @@ function switchCharacter(_force, _nowarn) {
 	_navbar.innerHTML += avatarTemplate(_coopMembers[0]);
 	mainCharacter.main = true;
 	mainCharacter.friendly = false;
-	const _scrLeft = _coopLeft - platformX;
-	const _scrDiff = MathRound(_scrLeft - (_canvas.width / 2));
-	//platformX += _scrDiff;
-	const _centerOfScreen = MathRound(_canvas.width / 2);
-	_coopMembers[0].left += platformX;
-	platformX = _coopLeft - _centerOfScreen;
-	mainCharacter.left = _centerOfScreen;
-	if(platformX < 0)
-	{
-		mainCharacter.left += platformX;
-		platformX = 0;
+	if(!episode.still) {
+		const _scrLeft = _coopLeft - platformX;
+		const _scrDiff = MathRound(_scrLeft - (_canvas.width / 2));
+		//platformX += _scrDiff;
+		const _centerOfScreen = MathRound(_canvas.width / 2);
+		_coopMembers[0].left += platformX;
+		if(!episode.still)
+			platformX = _coopLeft - _centerOfScreen;
+		mainCharacter.left = _centerOfScreen;
+		if(platformX < 0)
+		{
+			mainCharacter.left += platformX;
+			platformX = 0;
+		}
+		else if(platformX > (episode.width - _canvas.width)){
+			mainCharacter.left += (platformX - (episode.width - _canvas.width));
+			platformX = (episode.width - _canvas.width);
+		}
+		prevPlatformX = undefined;
 	}
-	else if(platformX > (episode.width - _canvas.width)){
-		mainCharacter.left += (platformX - (episode.width - _canvas.width));
-		platformX = (episode.width - _canvas.width);
+	else {
+		_coopMembers[0].left += platformX;
+		mainCharacter.left -= platformX;
 	}
 	mainCharacter.unseen = false;
-	prevPlatformX = undefined;
 	_coopMembers[0].setAutoMode(2);
 	// mainCharacter.main = true;
 	// mainCharacter.friendly = false;
@@ -502,11 +510,13 @@ function switchCharacter(_force, _nowarn) {
 	// platformX += MathRound(_leftDiff);
 	// _coopMembers[0].left += _oldPlatformX;
 	// mainCharacter.left -= platformX;
-	_client.setCharacterValues(mainCharacter, 1);
+	_client.setCharacterValues(mainCharacter, null);
 	_squadMemberKey = _coopMembers[0].class;
-	episode.playSound({ key: mainCharacter.class + 'select' + getRandomValue(1, 2), volume: .5 });
+	if(!_noSound)
+		PlaySound({ key: mainCharacter.class + 'select' + getRandomValue(1, 2), volume: .5 });
 	_startAnimate = true;
 	_client.loadItems();
+	clearChainSkills();
 }
 const _tipChoices = [];
 function createTipsUI(_tipOrder, _showCurrent) {
@@ -643,7 +653,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 				mainCharacter.direction = 'right';
 				mainCharacter.platformX = platformX = 0;
 			}
-			_client.setCharacterValues();
+			_client.setCharacterValues(mainCharacter, 1);
 			setCharacterDefaults(mainCharacter);
 			if (_hasLead && (episode.dungeon ||episode.pvp))
 				mainCharacter.leader = 1;
@@ -689,8 +699,8 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 				for(let _acd of _activeCoolDowns)
 					_acd.remove();
 			let _startWith = _ss?.startWith;
-			if(_startWith)
-				startWithThisCharacter(_startWith);
+			if(_startWith && mainCharacter?.id !== _startWith)
+				startWithThisCharacter(_startWith, null, null, 1);
 			setTimeout(function() {
 				if(_onEnd)
 					_onEnd();
@@ -1094,10 +1104,6 @@ function switchBookPage(_order, _subOrder, _tabOrder) {
 	// 	warn('<span>' + getLangData('No quest for now') + '</span>', 'warn');
 	// 	return false;
 	// }
-	else if (_order === 6){
-		warn('<span>' + getLangData('Co-op is not available in demo') + '</span>', 'warn');
-		return;
-	}
 	_game.suspended = true;
 	const _removals = document.querySelectorAll('#game-menu .remove-me');
 	for(let _r of _removals ?? [])
@@ -1163,6 +1169,8 @@ function switchBookPage(_order, _subOrder, _tabOrder) {
 				installWarUI();
 			else if (_order === 5)
 				__pvp.render();
+			else if (_order === 6)
+				installDungeonUI();
 			else if (_order === 12)
 				getOnlineUsersUI();
 			else if(_order === 1) {
@@ -1231,6 +1239,22 @@ function checkTalentPointsAvailable() {
 	const _currentTalentsLimit = MathFloor(mainCharacter.level / 2);
 	return _currentTalentsLimit > _currentTotalTalents;
 }
+function checkIfDungeonUpdate() {
+	const _stories = __stories.filter(x => x.mission);
+	const _resetTime = getTodayResetTimestamp();
+	for(let item of _stories) {
+		const _mission = __account.missions?.find(x => x.key === item.mission);
+		if((_mission?.current ?? 0) < item.daily)
+			return true;
+		if(item.daily && _mission?.current === item.daily) {
+			if((_gameTick > _resetTime || ((_resetTime - _mission.lastActivity) > (24 * 60 * 60 * 1000))) 
+				&& _resetTime > _mission.lastActivity){
+				return true;
+			}
+		}
+	}
+	return false;
+}
 function checkUpdateAvailable2(_order) {
 	if(!episode?.menu)
 		return;
@@ -1258,6 +1282,8 @@ function checkUpdateAvailable2(_order) {
 			availables.push({index:2, subIndex:1});
 	if(__account.storyTicket > 1)
 			availables.push({index:2, subIndex:0});
+	if(checkIfDungeonUpdate())
+			availables.push({index:5, subIndex:0});
 	if(checkIfFragmentUpdate())
 			availables.push({index:6, subIndex:0});
 	if(checkIfStoreFreeItemAvailable())
@@ -1370,6 +1396,7 @@ function getLeftMenuTemplate(_index) {
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-5" data-index="2"><img onexactclick="switchBookPage(5, 2)" src="./images/ui/menu/craft.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-5" data-index="3"><img onexactclick="switchBookPage(5, 3)" src="./images/ui/menu/war.png"></div>
 
+		<div class="w-100 menu-sub-button animate-me menu-sub-button-6" data-index="1"><img onexactclick="switchBookPage(6, 1)" src="./images/ui/menu/exit.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-7" data-index="1"><img onexactclick="switchBookPage(7, 1)" src="./images/ui/menu/pet.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-8" data-index="1"><img onexactclick="switchBookPage(8, 1)" src="./images/ui/menu/store2.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-8" data-index="2"><img onexactclick="switchBookPage(8, 2)" src="./images/ui/menu/luck.png"></div>
@@ -1404,6 +1431,7 @@ function zoomInWorldMap(_act) {
 		removeClass(_zo, 'disabled');
 		removeClass(_zo, 'gray');
 	}
+	PlaySound({key:'click'});
 }
 function zoomOutWorldMap() {
 	if(!episode?.menu)
@@ -1422,6 +1450,7 @@ function zoomOutWorldMap() {
 		removeClass(_zi, 'disabled');
 		removeClass(_zi, 'gray');
 	}
+	PlaySound({key:'click'});
 }
 function updateRightMenuTemplate(_index) {
 	const _ec = __account.misc?.find(x => x.type === 'ticket-exp')?.count ?? 0;
@@ -2146,7 +2175,7 @@ function changeDifficulty(_step){
 		removeClass(document.getElementById('game-difficulty-up'), 'disabled');
 	else
 		addClass(document.getElementById('game-difficulty-up'), 'disabled');
-	_val.innerText = __difficulties[__account.difficulty - 1].text.en;
+	_val.innerText = __difficulties[__account.difficulty - 1].text[getLang()];
 }
 function installOpeningScreen() {
 	const _current = parseInt(localStorage.getItem(__difficultyKey) ?? 3);
@@ -2159,9 +2188,9 @@ function installOpeningScreen() {
 				<div class="game-difficulty-wrapper flex w-100">
 					<div class="game-difficulty-content flex">
 						<div class="flex">
-							<div class="game-difficulty-title">Difficulty:</div>
+							<div class="game-difficulty-title">${getLangData('Difficulty')}:</div>
 							<img${_current <= 1 ? ' class="disabled"':''} id="game-difficulty-down" onexactclick="changeDifficulty(-1)" style="margin:2vh;height:4vh;transform:rotate(-90deg)" src="./images/ui/arrow-up.png" />
-							<div class="game-difficulty-value one-line">${__difficulties[_current-1].text.en}</div>
+							<div class="game-difficulty-value one-line">${__difficulties[_current-1].text[getLang()]}</div>
 							<img${_current >= 5 ? ' class="disabled"':''} id="game-difficulty-up" onexactclick="changeDifficulty(1)" style="margin:2vh;height:4vh;transform:rotate(90deg) scale(-1,1)" src="./images/ui/arrow-up.png" />
 						</div>
 					</div>
@@ -2283,6 +2312,15 @@ function installWarUI() {
 		__latestUIModule[_name] = { data: _arr, ref: x };
 	});
 }
+function installDungeonUI() {
+	injectModule('dungeon', function(_arr, _name) {
+		var x = new dungeon();
+		x.render();
+		switchBookPageTabs(6, 1);
+		checkUpdateAvailable2(6);
+		__latestUIModule[_name] = { data: _arr, ref: x };
+	});
+}
 function installStoryFinish(_failed, _extraGain, _content) {
 	episode.end = true;
 	__storyPlaying = false;
@@ -2328,15 +2366,6 @@ function installOnlineUsers() {
 		var x = new onlineusers();
 		x.render();
 		switchBookPageTabs(4, 3);
-		checkUpdateAvailable2(4);
-		__latestUIModule[_name] = { data: _arr, ref: x };
-	});
-}
-function installChat() {
-	injectModule('chat', function(_arr, _name) {
-		var x = new chat();
-		x.render();
-		switchBookPageTabs(4);
 		checkUpdateAvailable2(4);
 		__latestUIModule[_name] = { data: _arr, ref: x };
 	});

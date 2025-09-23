@@ -56,7 +56,7 @@ function dataOperations() {
 		const _id = this.createQuestID(10);
 		return {
 			act: 1,
-			version:35,//max 35
+			version:40,//max 40
 			fragments: [],
 			gems: [
 			],
@@ -108,6 +108,12 @@ function dataOperations() {
 				},
 				{ 
 					key: 'gold', 
+					lastActivity: 0, 
+					level: 1, 
+					current: 0
+				},
+				{ 
+					key: 'ad', 
 					lastActivity: 0, 
 					level: 1, 
 					current: 0
@@ -246,37 +252,38 @@ function dataOperations() {
 		let _pot = __account.pots?.find(x => x.key === 'pot');
 		_potCount.innerText = _pot?.value ?? 0;
 	}
-	this.setCharacterValues = function (_char, _select) {
+	this.setCharacterValues = function (_char, _select, _tempLevel) {
+		let _c;
 		if (_char)
 			if (_select) {
 				__account.characters.forEach(x => delete x.selected);
 				try {
-					__account.characters.find(x => x.class === _char.class).selected = true;
+					_c = __account.characters.find(x => x.class === _char.class);
+					_c.selected = true;
 					this.saveState();
 				}
 				catch(selex) { }
 			}
-		const _c = __account.characters.find(x => x.class === (_char ?? mainCharacter).class);
+		const _ch = _char ?? mainCharacter;
+		//const _c = __account.characters.find(x => x.class === _ch.class);
+		if(!_c)
+			_c = _ch;
 		if(_c) {
-			(_char ?? mainCharacter).level = _c.level;
-			(_char ?? mainCharacter).experience = _c.experience;
+			_ch.level = _tempLevel ?? _c.level ?? 1;
+			_ch.experience = _c.experience;
 			let _maxExp = 1000;
-			for(var i = 1; i < _c.level; i++)
+			for(var i = 1; i < _ch.level; i++)
 				_maxExp = MathRound(_maxExp * 1.2);
-			(_char ?? mainCharacter).maxExperience = _maxExp;
+			_ch.maxExperience = _maxExp;
 			const _skills = skill.getSkills(_c);
-			for (let _skill of _c.skills)
-				_skills.find(x => x.order === _skill.order).level = _skill.level;
-			if (_c.selected) {
-				if (!_mainExpBar)
-					_mainExpBar = document.getElementById('main-exp-bar');
-				_mainExpBar.style.width = MathRound((100 * _c.experience) / _maxExp) + '%';
-			}
-		}
-		else {
-			if (!_mainExpBar)
-				_mainExpBar = document.getElementById('main-exp-bar');
-			_mainExpBar.style.width = '0%';
+			if(!_c.skills?.length)
+				for (let _sk in _c.skills){
+					const _skill = _c.skills[_sk];
+					_skills.find(x => x.order === _skill.order).level = _skill.level ?? 1;
+				}
+			else
+				for (let _skill of _c.skills)
+					_skills.find(x => x.order === _skill.order).level = _skill.level;
 		}
 	}
 	this.checkResetTime = function() {

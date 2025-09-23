@@ -27,8 +27,9 @@
 	aspect-ratio: 1 / 1;
 }
 .war-container .war-player-card .war-player-card-medium-content img{
-	height: 70%;
+	height: 80%;
 	aspect-ratio: 1 / 1;
+	background-color:#000;
 	margin:0 2.5vh 0 2vh
 }
 .war-container .war-player-card .war-player-card-right {

@@ -21,7 +21,7 @@ function getLobbyScene() {
 				// mainCharacter.experience = 0;
 				//__account.gold = 0;
 				__storyPlaying = false;
-
+				stopWeatherEffect();
 				//updateExperience(__story.rewards.find(x => x.key === 'exp').count);
 				removeCoopCharacter();
 				addClass(_gameUI, 'disable-ui');
@@ -163,10 +163,10 @@ const __stories = [
 			{ id: 2, key: 'time', value: 20 * 60000, title: 'Finish in time',
 				when: function(_item) {
 					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return (_gameTick - (__story.startTime ?? _gameTick)) <= (_item.value);
+					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
 			}},
 			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return mainCharacter.health >= MathFloor(mainCharacter.maxHP * _item.value);
+				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
 			}}
 		],
 		ticket: 2,
@@ -396,6 +396,7 @@ const __stories = [
 					}
 				],
 				after: function() {
+					finishStory();
 					episode.pauseBgMusic(1);
 					const _druid = episode.enemies.find(x => x.id === 67);
 					_druid.remove = true;
@@ -446,7 +447,7 @@ const __stories = [
 									id: 4,
 									location: { map: episode.id }, ms: 2100,
 									owner: _princess.key,
-									text: "I know a place, lets go..."
+									text: "I know a place. Let's go..."
 								});
 							},
 							ms: 4500
@@ -490,7 +491,7 @@ const __stories = [
 					const _dk = episode.enemies.find(x => x.id === 72);
 					_dk.npc = true;
 					episode.resetMainQuest();
-					episode.endTime = _gameTick;
+					episode.endTime = __account.questStatus.lastStoryFinishTime ?? _gameTick;
 				},
 				maps: [1]
 			},
@@ -603,6 +604,9 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 3;
+							episode.enemies.filter(x => x !== mainCharacter)?.forEach(x => {
+								x.remove = true;
+							});
 							const _king = summonMob(59, MathRound((episode.width - (episode.cWidth * .4)) / __zoom), MathRound(groundheight * .5), mainCharacter.level);
 							const _princess = summonMob(58, MathRound((episode.width - (episode.cWidth * .49)) / __zoom), MathRound(groundheight * .75), mainCharacter.level);
 							//const _king = summonMob(59, MathRound((_canvas.width - (_canvas.width * .25)) / __zoom), MathRound(groundheight * .5), mainCharacter.level);
@@ -844,6 +848,7 @@ const __stories = [
 											mainCharacter.moveDirection = 'right';
 											delete mainCharacter.disableKeyboard;
 											episode.showLocationHand('right');
+											episode.enemies.filter(x => x !== mainCharacter)?.forEach(x => x.remove = true);
 											//mainCharacter.enableSkills();
 											episode.phase = 3;
 										}, function() {
@@ -859,6 +864,11 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 4;
+							episode.enemies.filter(x => x !== mainCharacter)?.forEach(x => x.remove = true);
+							if(mainCharacter.ultimate) {
+								mainCharacter.rageCount = 0;
+								mainCharacter.ultimate = false;
+							}
 							mainCharacter.yPosition = MathRound(groundheight * .5);
 							mainCharacter.standBy();
 							mainCharacter.still = true;
@@ -919,7 +929,7 @@ const __stories = [
 								//delay: 1500,
 								ms: 3000,
 								owner: mainCharacter.key,
-								text: "Come and get me!",
+								text: "You got me trapped",
 								onend: function() {
 									mainCharacter.direction = 'left';
 									mainCharacter.enableSkills();
@@ -2090,6 +2100,9 @@ const __stories = [
 					_char.yPosition = MathRound(.66 * groundheight);
 					_char.updateVariables();
 					completeQuest();
+					episode.endTime = __account.questStatus.lastStoryFinishTime ?? _gameTick;
+					if(__account.questStatus.lastStoryFinishTime)
+						delete __account.questStatus.lastStoryFinishTime;	
 				}
 			},
 			getLobbyScene()
@@ -2826,10 +2839,10 @@ const __stories = [
 			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
 				when: function(_item) {
 					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return (_gameTick - (__story.startTime ?? _gameTick)) <= (_item.value);
+					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
 			}},
 			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return mainCharacter.health >= MathFloor(mainCharacter.maxHP * _item.value);
+				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
 			}}
 		],
 		ticket: 2,
@@ -2851,7 +2864,7 @@ const __stories = [
 					en: 'Gather Tails',
 					tr: 'Kuyruk Topla'
 				},
-				dialogId: 6,
+				dialogId: 3,
 				descriptions: {
 					en: 'Tails Gathered',
 					tr: 'Kuyruk Toplandı'
@@ -2882,7 +2895,7 @@ const __stories = [
 					// 	removeFocus();
 					// 	switchBookPage(3,1);
 					// }, 1);
-					__account.questStatus.lastStoryFinishTime = _gameTick;
+					finishStory();
 					if(__account.tutorials?.indexOf('quest-world-map') >= 0)
 						return;
 					if(!__account.tutorials)
@@ -3111,10 +3124,10 @@ const __stories = [
 			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
 				when: function(_item) {
 					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return (_gameTick - (__story.startTime ?? _gameTick)) <= (_item.value);
+					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
 			}},
 			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return mainCharacter.health >= MathFloor(mainCharacter.maxHP * _item.value);
+				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
 			}}
 		],
 		ticket: 2,
@@ -3155,7 +3168,9 @@ const __stories = [
 				],
 				maps: [11],
 				done: function() {
-					__account.questStatus.lastStoryFinishTime = _gameTick;
+					if(__account.questStatus.lastStoryFinishTime)
+						return;
+					finishStory();
 				},
 				complete: function() {
 					installStoryFinish();
@@ -3407,6 +3422,8 @@ const __stories = [
 		act:1,
 		bonus: true,
 		boss:'wan',
+		firstFinishRewards: [{ key: 'chest', grade: 1 }],
+		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		resultStars: [
 			{ id: 1, title: 'Clear story', when: function() {
 				return !mainCharacter.isDead();
@@ -3482,10 +3499,10 @@ const __stories = [
 			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
 				when: function(_item) {
 					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return (_gameTick - (__story.startTime ?? _gameTick)) <= (_item.value);
+					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
 			}},
 			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return mainCharacter.health >= MathFloor(mainCharacter.maxHP * _item.value);
+				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
 			}}
 		],
 		ticket: 2,
@@ -3532,7 +3549,9 @@ const __stories = [
 					}, 100);
 				},
 				done: function() {
-					__account.questStatus.lastStoryFinishTime = _gameTick;
+					if(__account.questStatus.lastStoryFinishTime)
+						return;
+					finishStory();
 					episode.enemies.forEach(x => {
 						if(!x.main && x.stopSpawn)
 							x.stopSpawn();
@@ -3803,10 +3822,10 @@ const __stories = [
 			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
 				when: function(_item) {
 					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return (_gameTick - (__story.startTime ?? _gameTick)) <= (_item.value);
+					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
 			}},
 			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return mainCharacter.health >= MathFloor(mainCharacter.maxHP * _item.value);
+				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
 			}}
 		],
 		ticket: 2,
@@ -3847,7 +3866,9 @@ const __stories = [
 				],
 				maps: [41],
 				done: function() {
-					__account.questStatus.lastStoryFinishTime = _gameTick;
+					if(__account.questStatus.lastStoryFinishTime)
+						return;
+					finishStory();
 				},
 				after:function() {
 					const _bs = episode.enemies.find(x => x.class === 'blacksmith');
@@ -3882,9 +3903,12 @@ const __stories = [
 								_finishes++;
 								if(_finishes === _l) {
 									stopQuake();
-									cssAnimations.black(null, 3000, getLangData('Village people move to a safe place'), null, null, function() {
+									__storyTell = new story(7, null, null, 'As the enemy approached, villagers fled with their carts, leaving behind a silent hero carrying only a small handmade toy', function() {
 										installStoryFinish();
 									});
+									// cssAnimations.black(null, 3000, getLangData('Village people move to a safe place'), function() {
+									// 	installStoryFinish();
+									// });
 								}
 							}
 							for(let i = 0; i < 6; i++) {
@@ -4184,6 +4208,8 @@ const __stories = [
 		list: true,
 		act:1,
 		ticket:2,
+		firstFinishRewards: [{ key: 'chest', grade: 1 }],
+		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		title: {
 			en: 'Finding Support',
 			tr: 'Destek Bulmak'
@@ -4199,10 +4225,10 @@ const __stories = [
 			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
 				when: function(_item) {
 					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return ((__story.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
+					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
 			}},
 			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return mainCharacter.health >= MathFloor(mainCharacter.maxHP * _item.value);
+				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
 			}}
 		],
 		rewards: [
@@ -4239,7 +4265,7 @@ const __stories = [
 				done: function() {
 					if(__account.questStatus.lastStoryFinishTime)
 						return;
-					__account.questStatus.lastStoryFinishTime = _gameTick;
+					finishStory();
 				},
 				complete: function() {
 					installStoryFinish();
@@ -4379,7 +4405,7 @@ const __stories = [
 					removeClass(_gameUI, 'disable-ui');
 					takeQuest(0, 1, null, 'end', 1);
 					episode.drawSpriteObjects2('stables', 1);
-					episode.mainClass = 'warrior';
+					episode.mainClass = 10001;
 					episode.realClass = 'archer';
 					episode.endTime = __account.questStatus.lastStoryFinishTime ?? _gameTick;
 					if(__account.questStatus.lastStoryFinishTime)
@@ -4512,7 +4538,7 @@ const __stories = [
 			{ id: 2, key: 'time', value: 20 * 60000, title: 'Finish in time',
 				when: function(_item) {
 					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return (_gameTick - (__story.startTime ?? _gameTick)) <= (_item.value);
+					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
 			}},
 			{ id: 3, key: 'heart', value: 1, title: 'Stay above 1 heart', when: function(_item) {
 				return mainCharacter.heartCount > _item.value;
@@ -4783,10 +4809,10 @@ const __stories = [
 			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
 				when: function(_item) {
 					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return (_gameTick - (__story.startTime ?? _gameTick)) <= (_item.value);
+					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
 			}},
 			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return mainCharacter.health >= MathFloor(mainCharacter.maxHP * _item.value);
+				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
 			}}
 		],
 		ticket: 4,
@@ -5133,7 +5159,7 @@ const __stories = [
 											_another.experience = 0;
 											episode.chosenFragment = mainCharacter.class;
 											delete episode.storyVariables;
-										});
+										}, getLangData('Choose Your Side'));
 									});
 								}
 							);
@@ -5201,7 +5227,7 @@ const __stories = [
 						},
 						do: function() {
 							episode.fatalityAvailable = true;
-							__account.questStatus.lastStoryFinishTime = _gameTick;
+							finishStory();
 							const _b1 = episode.enemies.find(x => x.id === 47);
 							const _b2 = episode.enemies.find(x => x.id === 29);
 							if((_b1?.health ?? 1) <= 0 && _b2?.main){
@@ -5472,7 +5498,7 @@ const __stories = [
 									_char.releaseAfter = 5;
 									episode.towerDefenseStart = _gameTick;
 									disposeFocus();
-								}, false, getLangData('Defend the huts,<br/>keep your friends alive<br/>until that period of time'), 1);
+								}, false, getLangData('Defend the huts') + ',<br/>' + getLangData('keep your friends alive') + '<br/>' + getLangData('until that period of time'), 1);
 								createBubbleText({
 									id: 6,
 									location: { map: episode.id }, ms: 2000,
@@ -5588,6 +5614,8 @@ const __stories = [
 		minLevel:10,
 		list: true,
 		ticket:2,
+		firstFinishRewards: [{ key: 'chest', grade: 1 }],
+		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		title: {
 			en: 'Witch Grave',
 			tr: 'Cadı Mezarı'
@@ -5603,10 +5631,10 @@ const __stories = [
 			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
 				when: function(_item) {
 					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return ((__story.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
+					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
 			}},
 			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return mainCharacter.health >= MathFloor(mainCharacter.maxHP * _item.value);
+				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
 			}}
 		],
 		rewards: [
@@ -5616,95 +5644,6 @@ const __stories = [
 			{ key: 'exp', count: 2100 }
 		],
 		scenes: [
-			// {
-			// 	map: 1,
-			// 	startWith: 1,
-			// 	start: function() {
-			// 		takeQuest(0, 1, null, 'begin');
-			// 		episode.drawSpriteObjects2('druid', 1);
-			// 	},
-			// 	mobs: [
-			// 		{
-			// 			id: 69,
-			// 			minX: 3340,
-			// 			maxX: 3340,
-			// 			count: 1,
-			// 			yPosition: function() {
-			// 				return groundheight;
-			// 			}
-			// 		},
-			// 		{
-			// 			id: 70,
-			// 			minX: 4340,
-			// 			maxX: 4340,
-			// 			count: 1,
-			// 			yPosition: function() {
-			// 				return groundheight;
-			// 			}
-			// 		},
-			// 		{
-			// 			id: 73,
-			// 			minX: 2400,
-			// 			maxX: 2400,
-			// 			count: 1,
-			// 			yPosition: function() {
-			// 				return groundheight;
-			// 			}
-			// 		},
-			// 		{
-			// 			id: '10002',
-			// 			minX: 2740,
-			// 			maxX: 2740,
-			// 			count: 1,
-			// 			do: function(_e) {
-			// 				_e.npc = true;
-			// 				_e.friendly = true;
-			// 				_e.enemy = false;
-			// 				_e.zoom *= .9;
-			// 				_e.still = _e.noDirection = true;
-			// 				_e.stepXRate = _e.stepX = 0;
-			// 				_e.dialogs = createPotDialog('archer');
-			// 			},
-			// 			yPosition: function() {
-			// 				return MathRound(groundheight * 1.1);
-			// 			}
-			// 		},
-			// 		{
-			// 			id: 71,
-			// 			minX: 4550,
-			// 			maxX: 4550,
-			// 			count: 1,
-			// 			yPosition: function() {
-			// 				return groundheight;
-			// 			}
-			// 		},
-			// 		{
-			// 			id: 72,
-			// 			minX: 1245,
-			// 			maxX: 1245,
-			// 			count: 1,
-			// 			yPosition: function() {
-			// 				return groundheight;
-			// 			}
-			// 		},
-			// 		{
-			// 			id: 58,
-			// 			minX: 1900,
-			// 			maxX: 1900,
-			// 			count: 1,
-			// 			do: function(_e) {
-			// 				_e.npc = true;
-			// 				_e.friendly = true;
-			// 				_e.enemy = false;
-			// 				_e.reversed = true;
-			// 				_e.direction = 'left';
-			// 			},
-			// 			yPosition: function() {
-			// 				return groundheight;
-			// 			}
-			// 		}
-			// 	]
-			// },
 			{
 				map: 11,
 				startsWith: 1,
@@ -5712,16 +5651,6 @@ const __stories = [
 				loadingCharacterIds: [33, 35, 2, 1000, 46],
 				save: true,
 				start: function() {
-					//takeQuest(0, 1, null, null, 1);
-					//const _princess = summonMob(58, MathRound((mainCharacter.SCREENLEFT * 1.5) / __zoom), mainCharacter.yPosition, mainCharacter.level);
-					//_princess.friendly = _princess.invulnerable = true;
-					//_princess.still = _princess.immobilize = false;
-					//_princess.direction = 'left';
-
-					// mainCharacter.left = MathRound(_canvas.width / 5);
-					// mainCharacter.direction = 'right';
-					// mainCharacter.platformX = platformX = 0;
-
 					mainCharacter.unarm();
 					const _princess = episode.enemies.find(x => x.npc);
 					mainCharacter.keyboard.holdingKeys = [];
@@ -5813,6 +5742,80 @@ const __stories = [
 					},
 					{
 						when: function() {
+							return (episode.phase === 2 && !episode.enemies.find(x => x.class === 'boss')?.isDead?.());
+						},
+						do: function() {
+							if(mainCharacter.animation !== 'idle')
+								mainCharacter.idleStarted = undefined;
+							else if(!mainCharacter.idleStarted)
+								mainCharacter.idleStarted = _gameTick;
+							if(mainCharacter.idleStarted && ((_gameTick - mainCharacter.idleStarted) > 2999)) {
+								mainCharacter.idleStarted = undefined;
+								const _hand = episode.enemies.find(x => x.id === 39);
+								if(_hand?.animation === 'idle')
+									_hand.animations.idle.next = 'dead';
+								else if(_hand)
+									return;
+								const _mob = episode.installMob({
+									id: 39,
+									minX: MathRound((mainCharacter.LEFT + platformX) / __zoom),
+									maxX: MathRound((mainCharacter.LEFT + platformX) / __zoom),
+									sight: 1000,
+									count: 1,
+									yPosition : mainCharacter.yPosition - 1,
+									minLevel: 10,
+									maxLevel: 10
+								}, null, 1);
+								const _owner = episode.enemies.find(x => x.class === 'boss');
+								_mob.related = _mob.owner = _owner;
+								if(_owner.unseen)
+									PlaySound({key: 'alhand', volume: .2});
+								_mob.experience = 0;
+								_mob.class = 'minion';
+								_mob.left = mainCharacter.left + platformX;
+								_mob.LEFT = mainCharacter.LEFT + platformX;
+								_mob.EXACTLEFT = mainCharacter.EXACTLEFT;
+								_mob.updateVariables();
+								_mob.difficulty = 1;
+								_mob.setAutoMode(2);
+								_mob.pickNewTarget();
+								_mob.animations.dead = {
+									key: 'dead',
+									type: 'skill',
+									interactive: true,
+									frames: [
+										{
+											spriteLeft: 0,
+											spriteTop: 0,
+											spriteWidth: 0,
+											spriteHeight: 0,
+											spriteOrigin: 0,
+											speed: 1,
+											props: {
+												killingBy: undefined,
+												finishTarget: undefined,
+												dead: true
+											}
+										},
+										{
+											spriteLeft: 0,
+											spriteTop: 0,
+											spriteWidth: 0,
+											spriteHeight: 0,
+											spriteOrigin: 0,
+											props: {
+												remove: true
+											},
+											speed: 1
+										}
+									]
+								};
+								_mob.animations.ground1.next = 'dead';
+							}
+						}
+					},
+					{
+						when: function() {
 							return episode.phase === 2 && episode.enemies.find(x => x.class === 'boss')?.remove;
 						},
 						do: function() {
@@ -5822,6 +5825,7 @@ const __stories = [
 							episode.phase = 3;
 							const _boss = episode.enemies.find(x => x.class === 'boss');
 							summonMob(90, MathRound((_boss.SCREENLEFT + platformX) / __zoom), _boss.yPosition,1);
+							finishStory();
 						}
 					},
 					{
@@ -5927,8 +5931,327 @@ const __stories = [
 		scenes: [
 			getLobbyScene()
 		]
+	},
+	{
+		id:112,
+		disableWorldMap: true,
+		order:112,
+		act:1,
+		minLevel:1,
+		list: false,
+		ticket: 0,
+		title: {
+			en: 'Training Ground',
+			tr: 'İdman Alanı'
+		},
+		resultStars: [
+		],
+		rewards: [
+		],
+		scenes: [
+			{
+				map: 201,
+				startsWith: 1,
+				from: 'left',
+				loadingCharacterIds: [31],
+				back: true,
+				start: function() {
+					updateQuestArea(null, null, 1);
+				},
+				actions: [
+					
+				],
+				mobs: [
+					{
+						id: 31,
+						minX: 2380,
+						maxX: 4500,
+						count: 10,
+						spawn:1,
+						hp:1999999999,
+						do: function(_e) {
+							_e.experience = 0;
+							_e.skipHealthBar = true;
+						}
+					}
+				]
+			},
+			getLobbyScene()
+		]
+	},
+	{
+		id:113,
+		disableWorldMap: true,
+		order:113,
+		act:1,
+		mission: 'ad',
+		daily:2,
+		minLevel:10,
+		list: false,
+		ticket: 0,
+		perfectFinishRewards: [{ key: 'chest', grade: 2 }],
+		title: {
+			en: 'Area Defense',
+			tr: 'Alan Savunması'
+		},
+		description: {
+			en: "Defend the flag with your chosen supporter and try not to let it fall to the enemy. If they grab it, you must retrieve immediately. You can switch roles with your supporter with tapping on its portrait.",
+			tr: "Seçtiğiniz destekçi ile bayrağı savunun ve düşmanın almasına izin vermeyin. Eğer biri kaparsa hemen geri kazanmalısınız. Dilerseniz bu etkinlikte destekçinizin portresine basarak onu da yönetebilirsiniz."
+		},
+		resultStars: [
+			{ id: 1, title: 'Clear mission', when: function() {
+				return !mainCharacter.isDead();
+			}},
+			{ id: 2, key: 'time', value: 3 * 60000, title: 'Finish in time',
+				when: function(_item) {
+					//return !isMissionFailed(0) && !isMissionFailed(2) &&
+					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
+			}},
+			{ id: 3, key: 'heart', value: 1, title: 'Supporter must be alive', when: function(_item) {
+				return episode.isSupporterAlive;
+			}}
+		],
+		rewards: [
+			{ key: 'misc', type: 'ticket-random', count:1 },
+			{ key: 'gem', grade: 1, type: 'random', count:1 },
+			{ key: 'gold', count: 10000 },
+			{ key: 'exp', count: 2200 }
+		],
+		quests: [
+			{
+				id: 1,
+				descriptions: {
+					en: 'Keep The Flag Up',
+					tr: 'Bayrağı Ayakta Tut'
+				},
+				names: {
+					en: 'Cover The Flag',
+					tr: 'Bayrağı Koru'
+				},
+				owner: 'system',
+				timer: {
+					ms: 120000,
+					after: function() {
+						episode.enemies.filter(x => !x.main && !x.friendly).forEach(x => {
+							x.stopSpawn();
+							x.health = x.experience = 0;
+							x.dead = x.dying = true;
+							x.animate('dead', 1);
+						});
+						episode.mobs = episode.respawners = [];
+						episode.phase = 2;
+						stopRain();
+						episode.isSupporterAlive = _coopMembers?.[0] && !_coopMembers[0].isDead();
+						installStoryFinish();
+					}
+				},
+				maps: [7]
+			}
+		],
+		scenes: [
+			{
+				map: 7,
+				startsWith: 1,
+				from: 'left',
+				loadingCharacterIds: [92,93,66,49,19],
+				start: function() {
+					removeCoopCharacter();
+					episode.realClass = mainCharacter.class;
+					episode.mainClass = 10001;
+					episode.still = true;
+					rain();
+					episode.entertainment = true;
+					const _flag = episode.enemies.find(x => x.id === 93);
+					_flag.enemy = false;
+					_flag.friendly = true;
+					_flag.yPosition = MathRound(getGroundHeight() / 2);
+					platformX = episode.cWidth;
+					_flag.left = _flag.LEFT = MathRound(platformX + (episode.cWidth / 2));
+					prevPlatformX = undefined;
+					mainCharacter.direction = 'right';
+					mainCharacter.left = mainCharacter.LEFT = MathRound((.5 * platformX) + _flag.getWidth());
+					mainCharacter.yPosition = MathRound(getGroundHeight() / 2.5);
+					mainCharacter.updateVariables();
+					_flag.updateVariables();
+					addCoopCharacter(null, __ctfSupport, null, mainCharacter.level);
+					const _support = episode.enemies.find(x => x.class === __ctfSupport);
+					_support.left = _support.LEFT = MathRound((1.5 * platformX));
+					_support.yPosition = MathRound(getGroundHeight() / 1.8);
+					setCharacterLevel(mainCharacter.level, _support, 1);
+					resetSkills(null, 1, _support);
+					_support.maxHP = _support.health = _support.MAXHP = mainCharacter.health * 2;
+					_support.setHealth(_support.MAXHP);
+					_support.def = mainCharacter.def * 4;
+					_support.atk = mainCharacter.atk * 4;
+					_support.updateVariables();
+					takeQuest(0, 1, null, null, 1);
+					episode.flagInCenter = true;
+					for(let i = 0; i < 2; i ++){
+						const _json = {
+							id: 92,
+							minX: i < 1 ? 4000 : 800,
+							maxX: i < 1 ? 5000 : 1800,
+							count: 1,
+							sight:1000,
+							groupId: 'd' + i,
+							minLevel: 10,
+							spawnDirection: i < 1 ? __right : __left,
+							spawn:5,
+							targetKey: 'flag',
+							props: {
+								noLoot: true,
+								experience: 0
+							}
+						};
+						episode.mobs.push(_json);
+						episode.installMob(_json);
+					}
+					for(let i = 0; i < 20; i ++){
+						const _json = {
+							id: 66,
+							minX: i < 10 ? 4000 : 800,
+							maxX: i < 10 ? 5000 : 1800,
+							count: 1,
+							sight:1000,
+							groupId: 'r' + i,
+							minLevel: 10,
+							spawnDirection: i < 10 ? __right : __left,
+							spawn:5,
+							targetKey: 'flag',
+							props: {
+								noLoot: true,
+								experience: 0
+							}
+						};
+						episode.mobs.push(_json);
+						episode.installMob(_json);
+					}
+					for(let i = 0; i < 40; i ++){
+						const _json = {
+							id: 19,
+							minX: i < 20 ? 4000 : 800,
+							maxX: i < 20 ? 5000 : 1800,
+							count: 1,
+							sight:1000,
+							minLevel: 10,
+							groupId: 'g' + i,
+							spawnDirection: i < 20 ? __right : __left,
+							spawn:3,
+							targetKey: 'flag',
+							props: {
+								noLoot: true,
+								experience: 0
+							}
+						};
+						episode.mobs.push(_json);
+						episode.installMob(_json);
+					}
+				},
+				actions: [
+					{ 
+						when: function() {
+							const _char = mainCharacter.class === episode.realClass ? mainCharacter : _coopMembers?.[0];
+							return _char?.isDead?.();
+						},
+						do: function() {
+							episode.phase = 2;
+							stopRain();
+							installStoryFinish(1);
+						}
+					},
+					{ 
+						when: function() {
+							return !episode.end && episode.phase !== 5
+							 && episode.timedQuestCounter?.ms > 0 
+							 && episode.timedQuestCounter?.ms < (__account.questStatus.quest.timer.ms / 2000);
+						},
+						do: function() {
+							episode.phase = 5;
+							const _spawners = episode.mobs.filter(x => x.id === 66);
+							let i = 1;
+							for(let _s of _spawners)
+							{
+								const _json = structuredClone2(_s);
+								_json.id = 49;
+								_json.groupId = 'as' + i;
+								i++;
+								episode.mobs.push(_json);
+								episode.installMob(_json);
+							}
+						}
+					},
+					{
+						when: function() {
+							if(episode.flagInCenter)
+								return false;
+							const _capturer = episode.enemies.find(x => x.flagCapturer);
+							if(_capturer && _capturer.isDead()) {
+								_capturer.remove = true;
+								return true;
+							}
+							return false;
+						},
+						do: function() {
+							let _flag = summonMobWithJson({
+								id: 93,
+								minX: 3000,
+								maxX: 3000,
+								count: 1,
+								hp:2000,
+								props: {
+									key: 'flag',
+									harmless: true,
+									invulnerable: false
+								}
+							});
+							_flag.left = _flag.LEFT = MathRound(platformX + (episode.cWidth / 2));
+							_flag.updateVariables();
+							_flag.yPosition = MathRound(getGroundHeight() / 2);
+							episode.flagInCenter = true;
+							PlaySound({key:'flag', volume:1});
+							_flag.enemy = false;
+							_flag.friendly = true;
+						}
+					},
+					{
+						when: function() {
+							if(episode.flagInCenter || episode.phase === 2)
+								return false; 
+							const _capturer = episode.enemies.find(x => x.flagCapturer);
+							if(_capturer?.unseen && _capturer.animation === 'run' && !_capturer.isDead())
+								return true;
+							return false;
+						},
+						do: function() {
+							episode.phase = 2;
+							stopRain();
+							installStoryFinish(1);
+						}
+					}
+				],
+				mobs: [
+					{
+						id: 93,
+						minX: 3000,
+						maxX: 3000,
+						count: 1,
+						hp:2000,
+						props: {
+							key: 'flag',
+							invulnerable: false,
+							harmless: true
+						}
+					}
+				]
+			},
+			getLobbyScene()
+		]
 	}
 ];
+function finishStory() {
+	__account.questStatus.lastStoryFinishTime = _gameTick;
+	__account.questStatus.lastStoryFinishHP = mainCharacter.health;
+}
 let __story, __storySceneOrder, __storyScene, __storyCutScenePlaying, __storyPlaying;
 function resetStoryVariables() {
 	__story = __stories.find(x => x.lobby);
@@ -5962,7 +6285,7 @@ function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 			func:_func,
 			first:_isFirstStart
 		};
-    	askSomething(`<div class="w-100 flex" style="padding-top:2vh;color:#f3f4f5cc"><span>${getLangData('Minium adviced level is')}:&nbsp;<b>${_s.minLevel}</b></span></div><div class="w-100 flex p-2" style="color:#ff6c00">${'It might be hard for you'}</div><div style="color:#f3f4f5cc" class="w-100 flex">${'Continue Anyway'}?</div>`, `continueStoryAnyway()`, 1);
+    	askSomething(`<div class="w-100 flex" style="padding-top:2vh;color:#f3f4f5cc"><span>${getLangData('Minium adviced level is')}:&nbsp;<b>${_s.minLevel}</b></span></div><div class="w-100 flex p-2" style="color:#ff6c00">${'It might be hard for you'}</div><div style="color:#f3f4f5cc" class="w-100 flex">${getLangData('Continue Anyway')}?</div>`, `continueStoryAnyway()`, 1);
 		return;
 	}
 	hideMyMenu();
@@ -5999,6 +6322,7 @@ function switchStoryScene(_func, _newOrder) {
 	removeClass(_splash, 'd-none');
 	hideMyModalPopUp(1);
 	closeInventoryQuestionModal();
+	detachModule();
 	__storyScene = __story.scenes[__storySceneOrder - 1];
 	__storyPlaying = 1;
 	if(__storyScene?.save && __storyCheckPoint?.sceneOrder !== (__storySceneOrder - 1)) {
@@ -6046,10 +6370,15 @@ function switchStoryScene(_func, _newOrder) {
 		});
 	//}
 }
+function clearChainSkills(){
+	for (var i = 1; i <= Object.keys(chainSkills).length; i++){
+		addClass(chainSkills['skill' + i], 'v-none');
+		chainSkills['skill' + i].firstChild.removeAttribute('src');
+	}
+}
 function startStory(_order, _func, _isFirstStart,  _goldSelected, _expSelected, _itemSelected) {
 	installStory(_order, function () {
-		for (var i = 1; i <= Object.keys(chainSkills).length; i++)
-			addClass(chainSkills['skill' + i], 'v-none');
+		clearChainSkills();
 		addClass(document.getElementById('first-splash'), 'v-none');
 		removeClass(document.getElementById('game-start-loading-wrapper'), 'd-none');
 		if(_func)
@@ -6104,6 +6433,12 @@ function story(_id, _func, _noBlack, _desc, _after) {
 			{ text: '', ms: 600, order: 35, w: '34.5%', position: 'top center' },
 			{ text: '', ms: 1200, imgSize: '125%', order: 4, marginLeft:'2%', w: '28%', position: 'center center' },
 			{ finish: 1, ms: 5000 }
+		],
+		st7: [
+			{ text: '', ms: 0, w: '41%', position: 'bottom center' },
+			{ text: '', ms: 600, order: 35, w: '34.5%', position: 'center center' },
+			{ text: '', ms: 1200, imgSize: '120%', order: 4, w: '31%', position: 'bottom right' },
+			{ finish: 1, ms: 5000 }
 		]
 	}
 	this.id = _id;
@@ -6115,8 +6450,8 @@ function story(_id, _func, _noBlack, _desc, _after) {
 		this.skipped = 1;
 		this.order = this.data['st' + this.id].length;
 		this.render(this.order);
-		if(_after)
-			_after();
+		// if(_after)
+		// 	_after();
 	}
 	this.init = function() {
 		const _wrapper = document.createElement('div');
@@ -6143,7 +6478,7 @@ function story(_id, _func, _noBlack, _desc, _after) {
 		{
 			const _descDiv = document.createElement('div');
 			_descDiv.className = 'story-inner-description flex';
-			_descDiv.innerHTML = _desc;
+			_descDiv.innerHTML = getLangData(_desc);
 			_wrapper.appendChild(_descDiv);
 		}
 		_sin.appendChild(_inner);
@@ -6151,7 +6486,7 @@ function story(_id, _func, _noBlack, _desc, _after) {
 		this.container = _inner;
 		this.wrapper = _wrapper;
 		if(!_noBlack)
-			cssAnimations.black(null, (this.data['st' + this.id].find(x => x.finish).ms - 400) , '', _func, null, this.firstSeen ? null : _after);
+			cssAnimations.black(null, (this.data['st' + this.id].find(x => x.finish).ms - 400) , '', _func);
 	}
 	this.render = function(_realOrder) {
 		const i = _realOrder ?? this.order;
@@ -6192,6 +6527,8 @@ function story(_id, _func, _noBlack, _desc, _after) {
 				removeClass(this.wrapper, 'fade-in');
 				addClass(this.wrapper, 'fade-out');
 				this.closing = 1;
+				if(_after)
+					_after();
 				this.wrapper.onanimationend = function(event) {
 					if(event.animationName === 'fade-out-me'){
 						this.remove();
@@ -6210,6 +6547,13 @@ function story(_id, _func, _noBlack, _desc, _after) {
 
 function storyBonus(_func, _instant) {
 	const _s = this;
+	if(!_instant && episode.cardFlipped) {
+		if(_func)
+			_func();
+		return;
+	}
+	else
+		episode.cardFlipped = 1;
 	this.init = function() {
 		const _sgw = document.querySelector('.story-gift-wrapper');
 		if(_sgw)
@@ -6223,12 +6567,12 @@ function storyBonus(_func, _instant) {
 		_inner.className = 'inner-wrapper story-gift flex flex-jc-start';
 		const _title = document.createElement('div');
 		_title.className = 'w-100 flex story-gift-title';
-		_title.innerText = 'Pick A Card';
+		_title.innerText = getLangData('Pick A Card');
 		const _btnW = document.createElement('div');
 		_btnW.className = 'w-100 flex story-gift-btn';
 		const _btn = document.createElement('div');
 		_btn.className = 'flex game-btn2 disabled';
-		_btn.innerText = 'CONTINUE';
+		_btn.innerText = getLangData('CONTINUE');
 		_btn.onexactclick = function(){
 			_s.close();
 			if(_func)
@@ -6288,6 +6632,7 @@ function storyBonus(_func, _instant) {
 			_wrapper.className = 'match-card flex glow-jump';
 			_img.src = './images/icons/story-gift-card.png';
 			_title.className = 'bonus-title full flex';
+			_title.innerHTML = '&nbsp;';
 			_s.container.appendChild(_item);
 			_front.setAttribute('data-key', _possibilities[i]);
 			_front.onexactclick = function () {
@@ -6305,6 +6650,7 @@ function storyBonus(_func, _instant) {
 					_cardTitle = _reward.count.formatWithDots();
 					warnChestReward(_reward);
 				}
+				_title.innerHTML = '';
 				_title.innerText = _cardTitle;
 				removeClass(_s.btn, 'disabled');
 				episode.playSound({key:'select2', volume:.5});
@@ -6537,6 +6883,9 @@ function killStory() {
 	resetQuestLine();
 	quitFromStory();
 }
+function askQuitFromStory() {
+	askSomething(getLangData('Proceed To Lobby'), "quitFromStory()");
+}
 function quitFromStory() {
 	if(!episode?.menu && __account.storyResults.find(x => x.id === 1)?.stars?.[0]) {
 		const _index = __story.scenes.findIndex(x => x.map === 0);
@@ -6563,7 +6912,7 @@ function checkStoryFinish(_success, _retryId, _goldSelected, _expSelected, _item
 			tryStartStoryMission(_retryId, _goldSelected, _expSelected, _itemSelected);
 		}
 	}
-	if(_success)
+	if(_success && !__story?.mission)
 		new storyBonus(function() {
 			_after();
 		});
@@ -6653,7 +7002,7 @@ function createStoriesUI(_id) {
 			</div>
 			<div class="flex" style="flex:1;height:100%;padding:1vh 0">
 				<div class="flex flex-jc-start skill-card-title w-100" style="height:40%">${_s.title[getLang()]}</div>
-				<div class="story-level flex flex-jc-start w-100" style="height:30%">Level ${_s.minLevel} required</div>
+				<div class="story-level flex flex-jc-start w-100" style="height:30%">${getLangData('Lvl')}&nbsp;${_s.minLevel}&nbsp;${getLangData('required')}</div>
 				<div class="story-consume flex flex-jc-start w-50" style="height:30%">${_s.ticket}&nbsp;<img src="./images/icons/key.png" style="height:2.8vh" /></div>
 				<div class="story-stars flex flex-jc-end w-50" style="height:30%">
 					<img src="./images/ui/star-${(!_s.locked && _ss?.stars) ? 'on' : 'off'}.png"  />
@@ -6662,7 +7011,7 @@ function createStoriesUI(_id) {
 				</div>
 			</div>`
 			+ (_s.bonus ?
-				`<div class="story-bonus-mark">BONUS</div>` : (_s.side ? `<div class="story-bonus-mark story-side-bonus-mark">SIDE QUEST</div>` :'')) +
+				`<div class="story-bonus-mark">BONUS</div>` : (_s.side ? `<div class="story-bonus-mark story-side-bonus-mark">${getLangData('SIDE QUEST')}</div>` :'')) +
 		`</div>`;
 	}
 	return _html;
@@ -6707,7 +7056,7 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 					<img src="./images/ui/${_done ? '36' : 'lock'}.png" />
 				</div>
 				<div class="flex flex-jc-start story-goal-title"${_done ? ' style="color:#F3F4F5 !important"' : ''}>
-					${_rs.title}
+					${getLangData(_rs.title)}
 				</div>
 			</div>`;
 			_goali++;
@@ -6836,6 +7185,17 @@ function getStoryRewardsResultHtml(_story, _bonus, _pass, _looseGain) {
 				<img style="filter:drop-shadow(0 0 1px #f3f4f5);height: 70%;margin-right: 5%;" src="./images/gems/${_gem.type}${_gem.grade}.png"> x ${_count}
 			</div>`;
 		}
+		else if(r.key === 'misc'){
+			const _misc = misc.find(x => x.type === r.type);
+			const _val = _count ?? 1;
+			if(_misc.graded)
+				updateMisc({ type: _misc.type, count: _val, grade: r.grade ?? 1 });
+			else
+				updateMisc({ type: _misc.type, count: _val });
+			_rewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 50%">
+				<img style="filter:drop-shadow(0 0 1px #f3f4f5);height: 70%;margin-right: 5%;" src="./images/icons/${r.type}.png"> x ${_count}
+			</div>`;
+		}
 		else if(r.key === 'gold'){
 			updateGold(_count);
 			if(_bonus?.type === 'gold')
@@ -6872,7 +7232,7 @@ function tryStartStoryMission(_id, _golds, _exps, _items, _func, _isFirstStart) 
 		warn('<span>' + getLangData('Story is passive for now') + '</span>', 'warn');
 		return;
 	}
-	if(!_s.lobby && _s.order > 1 && !__account.storyResults.find(x => x.id ===
+	if(!_s.lobby && !_s.mission && _s.order > 1 && !__account.storyResults.find(x => x.id ===
 		__stories.find(y => y.order === (_s.order - 1)).id)){
 		warn('<span>' + getLangData('Complete previous story first') + '</span>', 'warn');
 		return;
@@ -6884,7 +7244,14 @@ function tryStartStoryMission(_id, _golds, _exps, _items, _func, _isFirstStart) 
 	if(_passSelected)
 		askPassStory(_itemSelected, _goldSelected, _expSelected);
 	else{
-		if(!_isFirstStart && _s.ticket > 0){
+		if(_s.mission){
+			let _am = __account.missions.find(x => x.key === _s.mission);
+			if(_am?.current >= _s.daily){
+				warn('<span>' + getLangData('Daily limit reached') + '</span>', 'warn');
+				return;
+			}
+		}
+		else if(!_isFirstStart && _s.ticket > 0){
 			if(__account.storyTicket >= _s.ticket){
 				//_client.saveState(1);
 			}
@@ -6894,7 +7261,14 @@ function tryStartStoryMission(_id, _golds, _exps, _items, _func, _isFirstStart) 
 			}
 		}
 		playStory(_id, null, function() {
-			tryConsumeTickets(_goldSelected, _expSelected, _itemSelected, _s.ticket);
+			if(_s.mission) {
+				let _am = __account.missions.find(x => x.key === _s.mission);
+				_am.current++;
+				_am.lastActivity = _gameTick;
+				_client.saveState(1);
+			}
+			else
+				tryConsumeTickets(_goldSelected, _expSelected, _itemSelected, _s.ticket);
 			if(_func)
 				_func();
 		},_isFirstStart);
@@ -6926,7 +7300,7 @@ function tryConsumeTickets(_goldSelected, _expSelected, _itemSelected, _portal) 
 			episode.expSelected = true;
 		}
 	}
-	_client.saveState();
+	_client.saveState(1);
 }
 function askPassStory(_itemSelected, _goldSelected, _expSelected) {
     episode.playSound({ key: 'click' });
@@ -7036,7 +7410,7 @@ async function createStoryPassScreen(_amount) {
 	const _oldLevel = mainCharacter.level;
 	for (let i = 0; i < _amount; i++) {
 		if (_allTickets < _s.ticket) {
-			warn('<span>' + getLangData('Out of story portals') + '</span>', 'warn');
+			warn('<span>' + getLangData('Not enough story portals') + '</span>', 'warn');
 			break;
 		}
 		_allTickets -= _s.ticket;

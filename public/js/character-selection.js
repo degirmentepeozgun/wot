@@ -55,10 +55,10 @@ function characterSelection(){
 		}
 	]
 	let __characterSelectFuncs;
-	this.getCharacterInformation = function(_class, _elem, _dir, _another) {
+	this.getCharacterInformation = function(_class, _elem, _dir, _another, _newTitle) {
 		addClass(_gameUI, 'disable-ui');
 		if(!_class)
-			return `<div class="flex c-i-choose">${getLangData('Choose Your Character')}</div>`;
+			return `<div class="flex c-i-choose">${_newTitle ?? getLangData('Choose Your Character')}</div>`;
 		const _info = __characterInfos.find(x => x.class === _class);
 		if(_info) {
 			document.querySelectorAll('.char-selection').forEach(x => removeClass(x, 'no-dark'));
@@ -227,7 +227,7 @@ function characterSelection(){
 				acceptCharacter();
 			});
 	}
-	this.createCharacterSelectionUI = function(_key1, _key2, _start, _end) {
+	this.createCharacterSelectionUI = function(_key1, _key2, _start, _end, _newTitle) {
 		__characterSelectFuncs = { start: _start, end: _end };
 		if(!_key1)
 			_key1 = 'archer';
@@ -240,7 +240,7 @@ function characterSelection(){
 		`<div onexactclick="window.installedModules.find(x => x.name === 'character-selection').ref.getCharacterInformation('${_key1}', this, 'left', '${_key2}')" class="char-selection char-selection-left no-dark">
 		</div>
 		<div class="flex char-selection-center">`
-			+ this.getCharacterInformation() +
+			+ this.getCharacterInformation(null, null, null, null, _newTitle) +
 		`</div>
 		<div onexactclick="window.installedModules.find(x => x.name === 'character-selection').ref.getCharacterInformation('${_key2}', this, 'right', '${_key1}')" class="char-selection char-selection-right no-dark">
 		</div>`;

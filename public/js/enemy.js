@@ -9,6 +9,7 @@ function enemy(_e) {
 	this.frame = 0;
 	this.start = 0;
 	this.npc = _e.npc;
+	this.class = _e.class;
 	this.noSmash = _e.noSmash;
 	this.villain = _e.villain;
 	this.divider = getRandomValue2(1000, 9999);
@@ -88,7 +89,6 @@ function enemy(_e) {
 	this.enemy = _e.enemy;
 	this.friendly = _e.friendly;
 	this.friendlyFire = _e.friendlyFire;
-	this.class = _e.class;
 	this.skillClass = _e.skillClass;
 	this.name = _e.name ?? _e.class;
 	this.level = episode?.pvp ? 10 : (_e.level ?? 1);
@@ -488,11 +488,12 @@ function enemy(_e) {
 		if (this.maxRunRange !== undefined)
 			return this.maxRunRange;
 		try{
-			const _arr = (this.still ? this.animations.idle : this.animations.run).frames.map(x => x.spriteWidth - x.spriteOrigin);
+			const _arr = (this.still ? this.animations.idle : this.animations.run ?? this.animations.idle).frames.map(x => x.spriteWidth - x.spriteOrigin);
 			_arr.sort();
 			this.maxRunRange = _arr[_arr.length - 1] * this.getZoom();
 		}
 		catch(e) {
+			console.log(e.message);
 			alert(this.key + ' getmaxrange: ' + e.message);
 		}
 		return this.maxRunRange;
@@ -979,7 +980,7 @@ function enemy(_e) {
 			this.lastAttackTime = _gameTick;
 		else if(!_newAnima.attack)
 			this.lastAttackTime = undefined;
-		if(!shouldContinue) {
+		if(!shouldContinue && _c?.class !== 'object') {
 			if (monsterAttack && this.lastAttackTime && ((this.lastAttackTime + ((this.friendly ? 0 : this.difficulty) * 500)) > _gameTick))
 				return false;
 			else if(_c.main && monsterAttack && _overwhelmed)
@@ -989,7 +990,7 @@ function enemy(_e) {
 		this.autoAttacking = _newAnima.attack;
 		if (this.autoAttacking){
 			this.lastAttack = this.upcomingAnimation;
-			if(_c && !episode.pvp){
+			if(_c && !episode.pvp && _c.class !== 'object'){
 				if(!_c.attackerCount)
 					_c.attackerCount = 1;
 				else
@@ -1260,7 +1261,7 @@ function enemy(_e) {
 			return;
 		if (this.class === __spell || this.enemy)
 			return;
-		if(episode.pvp)
+		if(episode.pvp || episode.lobby)
 			return;
 		const _maxHP = this.MAXHP;
 		if (this.health < _maxHP && this.health > 0) {
@@ -1327,6 +1328,9 @@ function enemy(_e) {
 	this.getRandom = function(_pos) {
 		return ((_gameTick % this.divider) % _pos);
 	}
+	this.hasXMove = function() {
+		return this.rivalMove ?? this.keyboard?.getXMove()?.name;
+	}
 	this.standUp = function() {
 		this.heartCount--;
 			addClass(document.getElementById('heartcount' + (this.heartCount + 1)), 'gray');
@@ -1349,6 +1353,10 @@ function enemy(_e) {
 		}
 	}
 	this.setSound = async function(_sf,_anima) {
+		if(_sf.skipUnseen && this.unseen) {
+			this.soundPlaying = undefined;
+			return;
+		}
 		let _sound = await PlaySound({
 			reset: _sf.reset,
 			key: (!this.main ? this.name.toLowerCase() : this.class) + 
@@ -1426,7 +1434,7 @@ function enemy(_e) {
 		if (!_anima.move)
 			_anima.useExtraStepXRate = true;
 		else if ((this.start === 1) && this.frame === 0)
-			_anima.useExtraStepXRate = ((this.autoMode || this.push) && this.getCurrentAnimation().useExtraStepXRate) ? true : this.isXMove(_move);
+			_anima.useExtraStepXRate = ((this.autoMode || this.push) && this.getCurrentAnimation().useExtraStepXRate) ? true : (this.isXMove(_move) || this.hasXMove());
 		let _frame = this.getCurrentFrame();
 		if(!_frame)
 			console.log('HATA: ' + this.key + ' - ' + this.animation + ' - ' + this.frame);
@@ -1437,6 +1445,7 @@ function enemy(_e) {
 		if (_frame.target && this.target)
 			this.target.setProps(_frame.target);
 		let _removeEnemy = false;
+		this.updateVariables();
 		this.render(_frame, _queue);
 		if (this.start > 0 && ((this.start % MathCeil((_frame.speed * ((_anima.hurt || _anima.key.startsWith('dead')) ? 1 : (this.getFps() ?? 1))) / (_anima.attack ? this.getSpeedRate() : 1))) === 0)) {
 			const _hasNext = _anima.next || _frame.next || _frame.nextAndRemove;
@@ -1646,7 +1655,6 @@ function enemy(_e) {
 		}
 		_anima = this.getCurrentAnimation();
 		_frame = this.getCurrentFrame();
-		this.updateVariables();
 		this.checkPush(_frame);
 		this.checkHPRegen();
 		this.charge2(_anima, _frame);
@@ -1764,7 +1772,7 @@ function enemy(_e) {
 		this.checkDialog(_currentFrame);
 		if (_removeEnemy && !episode.pvp)
 			this.remove = true;
-		if (this.friendly && this.remove && !this.related)
+		if (this.friendly && this.remove && !this.related && _coopMembers?.find(x => x == this))
 			removeCoopCharacter();
 		if (_frame.changeDirection)
 			this.direction = this.direction === __left ? __right : __left;
@@ -2886,7 +2894,7 @@ function enemy(_e) {
 				: offset - originPx + leftGapPx
 		);
 		if(_l !== this.LEFT)
-			this.LEFT  = _l;
+			this.LEFT = _l;
 		const _sl = this.left - (this.main ? 0 : platformX);
 		if(_sl !== this.SCREENLEFT)
 			this.SCREENLEFT = _sl;
@@ -3265,7 +3273,7 @@ function enemy(_e) {
 						episode.playSound({key: 'impact'});
 						this.chargeProperties = {
 							enemy: _result.enemy,
-							dir: this.direction,
+							dir: this.getKeyboardXMove() ?? this.direction,
 							stepX: MathFloor((_result.range - (_result.enemy.WIDTH / 2)) / (_speed < 2 ? _speed : _speed - 1))//(_speed - this.start))
 						};
 					}
@@ -4289,6 +4297,7 @@ function enemy(_e) {
 													k: _dmg
 												}]);
 											_e.decreaseHealth(_dmg, _t.related ?? _t);
+											//_e.addObject({key:'hit' + getRandomValue2(1,5), position: 'middle'});
 											//successfull hit
 											_e.lastHitSkill = (_t.related ?? _t).animation;
 											if(_e.isDead() && (_f.knockback || (_f.push && typeof _f.push === 'number')))
@@ -6361,7 +6370,7 @@ function enemy(_e) {
 	this.updateLeftAfterRun = function (_oldAnima, _newAnima) {
 		if (!this.main || this.autoMode !== 2 || this.still)
 			return;
-		if (oldAnima.key === 'run' || oldAnima.key === 'walk') {
+		if (_oldAnima.key === 'run' || _oldAnima.key === 'walk') {
 			if (newAnima.attack) {
 				const _oldW = this.getCurrentFrame().spriteWidth;
 				const _newW = this.animations.idle.frames[0].spriteWidth;
@@ -6525,6 +6534,10 @@ function enemy(_e) {
 			}
 		}
 		if(this.animation === 'deadfly') {
+			if(this.pushingBy || this.attacker)
+				this.direction = (this.pushingBy ?? this.attacker).direction === __left ? __right: __left;
+			else if(this.pushDirection)
+				this.direction = this.pushDirection === __left ? __right: __left;
 			this.pushDirection = this.pushingBy = this.pushback = this.knockbacking = this.pushRate = undefined;
 			const _frames = anima.frames;
 			const _rand = getRandomValue2(35, 85) / 100;
@@ -6827,8 +6840,8 @@ function enemy(_e) {
 			this.health = _realHP;
 			// if(this.main && this.health <= 0 && this.heartCount > 0)
 			// 	this.standUp();
-			if (_attacker && this.health <= 0 && (this.enemy || episode.pvp))
-				this.killedBy = (_attacker.owner ?? _attacker).key;
+			if (_attacker && this.health <= 0)
+				this.killedBy = (_attacker.owner ?? _attacker)?.key;
 			if (this.friendly && !episode.pvp) {
 				const _aidBtn = document.getElementById('aid-' + this.key);
 				if (_aidBtn) {

@@ -203,8 +203,16 @@ function talent() {
 			return;
 		}
 		const _current = _char.talents?.find(x => x.id === _m.id);
-		if(!_current)
+		if(!_current) {
+			if(_m.parent?.[0]) {
+				const _preChoices = _char.talents?.filter(x => _m.parent.indexOf(x.id) >= 0);
+				if(!_preChoices?.[0]) {
+					warn('<span>' + getLangData('At least one previos node must be active') + '</span>', 'warn');
+					return;
+				}
+			}
 			_char.talents.push({id:_id, count:1});
+		}
 		else if(_current.count < _m.props.length)
 			_current.count++;
 		else {

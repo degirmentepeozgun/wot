@@ -260,3 +260,10 @@
 	cursor: pointer;
 	z-index: 3
 }
+
+.map-detail-modal-desc {
+	text-align: left;
+	color:#f3f4f5ab !important;
+	font-size: 2.8vh !important;
+	justify-content: flex-start !important;
+}

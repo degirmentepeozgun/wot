@@ -120,7 +120,7 @@ function onlineusers() {
 		__selectedPvPClass = _selectableChars[0].class;
 		for(let _item of _selectableChars){
 			_choices += `<div data-class="${_item.class}" class="selection-item selection-char${_selected ? ' selected-character' : ''} flex" onexactclick="getRef(\'onlineusers\').selectCharacter(\'${_item.class}\')" style="width:21%;aspect-ratio:1/1;position:relative;cursor:pointer">
-				<img src="./images/icons/${_item.class}.png" style="padding:2%;height:80%" class="grade${_item.grade}-item" />
+				<img src="./images/main/avatars/${_item.class}.png" style="padding:2%;height:80%" class="grade${_item.grade}-item" />
 			</div>`;
 			if(_selected)
 				_selected = 0;

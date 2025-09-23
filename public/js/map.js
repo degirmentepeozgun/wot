@@ -106,7 +106,7 @@ function map(_m) {
 	// setTimeout(function() {
 	// 	initDmgFrames();
 	// }, 100);
-	if(this.id < 107 && !this.lobby && !_mapSprite.menu)
+	if(this.id < 107 && !this.lobby && !_mapSprite.menu && !this.entertainment)
 	{
 		//artifact ekleyelim
 		const _minArtifactGrade = __artifacts.map(x => x.group).sort()[0];
@@ -319,7 +319,7 @@ function map(_m) {
 			_enemy.maxHP = MathRound(_enemy.maxHP *_levelRate);
 			_enemy.def = MathRound(_enemy.def *_levelRate);
 			if (_mob.hp)
-				_enemy.maxHP = _enemy.MAXHP = _mob.hp;
+				_enemy.maxHP = _enemy.MAXHP = _enemy.health = _mob.hp;
 			_enemy.setHealth(_enemy.MAXHP);
 			_enemy.sight = _mob.sight;
 			if(_mob.zoom)
@@ -716,7 +716,7 @@ function map(_m) {
 			_gameUI.appendChild(pvpCounter);
 		}
 		else {
-			const _baseTime = ((this.tower && (__account.missions.find(x => x.key === 'tower').current % 10) > 0) || this.gold) ? 60 : 120;
+			const _baseTime = ((this.tower && (__account.missions.find(x => x.key === 'tower').current % 10) > 0) || this.gold) ? 60 : 180;
 			_diff = (_baseTime + (this.tower ? 4 : 3)) - MathFloor(((this.pauseTime ?? Date.now()) - this.pvpStarted) / 1000);
 			if (_diff < 10)
 				addClass(pvpCounter, 'pvp-end-soon');
@@ -1094,7 +1094,7 @@ function map(_m) {
 			_gameUI.appendChild(pvpCounter);
 		}
 		else {
-			const _baseTime = ((this.tower && (__account.missions.find(x => x.key === 'tower').current % 10) > 0) || this.gold) ? 60 : 120;
+			const _baseTime = ((this.tower && (__account.missions.find(x => x.key === 'tower').current % 10) > 0) || this.gold) ? 60 : 180;
 			_diff = (_baseTime + (this.tower ? 4 : 3)) - MathFloor(((this.pauseTime ?? Date.now()) - this.pvpStarted) / 1000);
 			if (_diff < 10)
 				addClass(pvpCounter, 'pvp-end-soon');
@@ -1498,7 +1498,7 @@ function map(_m) {
 									scale: (_respawner.zoom * _respawner.height) / 100
 								}
 								],
-								sound: _mob.spawnDirection ? undefined : { key: 'puff', volume: .3, range: 50 },
+								sound: _mob.spawnDirection ? undefined : { skipUnseen: true, key: 'puff', volume: .3, range: 50 },
 								speed: 20,
 								def: { iframe: true }
 							}
@@ -3383,7 +3383,7 @@ function map(_m) {
 this.w100 = MathRound(this.cWidth / 100);
 this.VH3 = MathRound(window.innerHeight / 33);
 this.drawHealthBar2 = function (_item) {
-	const _isPvp = !this.gold && (this.pvp || this.war);
+	const _isPvp = !this.gold && ((this.pvp || this.war) || _item.char.flagCapturer);
 	if(__batterySaveMode || _item.char.skipHealthBar || _item.char.health <= 0 || _item.char.dead)
 		return;
 
@@ -3524,6 +3524,11 @@ this.drawHealthBar2 = function (_item) {
 			if(!_rel.background && !__account.options.effect)
 				continue;
 			var _can = _rel.background ? _cNPC : offCtx;
+			let _left = _item.left;
+			if(this.still && _rel.background){
+				delete _rel.background;
+				_left = _item.char.LEFT;
+			}
 			_draw = _item.char.main;
 			if (_rel.bind === _item.animation)
 				_draw = true;
@@ -3602,19 +3607,19 @@ this.drawHealthBar2 = function (_item) {
 					if (_rel.reversable != false)
 						_rel.stillReversed = _reversed;
 				} else if(_rel.stillOnChar) {
-					if(_rel.stillLeft !== _item.left){
+					if(_rel.stillLeft !== _left){
 						if(!_rel.still)
 							_rel.still = true;
 						_rel.stillPlatformX = platformX;
-						_rel.stillXGap = _rel.xGap + ((_item.reversed ? 1 : -1) * (_rel.stillLeft === undefined ? 0 : _rel.stillLeft - _item.left));
+						_rel.stillXGap = _rel.xGap + ((_item.reversed ? 1 : -1) * (_rel.stillLeft === undefined ? 0 : _rel.stillLeft - _left));
 						_rel.stillReversed = _reversed;
-						_rel.stillLeft = _item.left;
+						_rel.stillLeft = _left;
 					}
 					if(_rel.stillTop !== _rel.top)
 						_rel.stillTop = _rel.top;
 				}
 				let _relLeft = (_rel.stillLeft !== undefined ? _rel.stillLeft + (_rel.stillPlatformX - platformX) :
-					_item.left);
+					_left);
 				let _restored;
 				if (_reversed) {
 					if (_rel.reversable != false) {
@@ -3783,7 +3788,7 @@ this.drawHealthBar2 = function (_item) {
 		if(!_force && (_char.lastAvailableEnemyPickDate > (_gameTick - 100)))
 			return  _char.lastAvailableEnemies;
 		_char.lastAvailableEnemyPickDate = _gameTick;
-		const _ff = _char.friendlyFire;
+		const _ff = _char.friendlyFire && (_char.enemy !== mainCharacter.enemy);
 		if(_char.onlyTarget){
 			const _en = this.enemies.find(x => x.key === _char.onlyTarget);
 			if(_en){
@@ -3810,10 +3815,9 @@ this.drawHealthBar2 = function (_item) {
 
 			if (!_ff && (
 				x.enemy === _char.enemy ||
-				x.owner === (_char.coopWith ?? _char) ||
-				_char.owner === (x.coopWith ?? x)
+				(x.owner === (_char.coopWith ?? _char)) ||
+				(_char.owner === (x.coopWith ?? x))
 			)) return false;
-
 			if (x.knockbacking && x.dying && (!_func || !_func(x))) 
 				return false;
 

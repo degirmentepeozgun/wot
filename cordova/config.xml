@@ -33,7 +33,7 @@
       <access origin="*" /> 
       <allow-navigation href="*" />
       <preference name="android-minSdkVersion" value="21" />
-      <preference name="android-targetSdkVersion" value="28" />
+      <preference name="android-targetSdkVersion" value="36" />
       <preference name="android-compileSdkVersion" value="36" />
       <preference name="android-buildToolsVersion" value="36.0.0" />
       <preference name="SplashMaintainAspectRatio" value="true" />

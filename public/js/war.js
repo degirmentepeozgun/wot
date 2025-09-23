@@ -22,7 +22,7 @@ function war() {
 	this.render = function(_noAnimation) {
 		let _content;
 		if(mainCharacter.level < this.unlockLevel)
-			_content = renderLockedContent('Level ' + this.unlockLevel + ' required');
+			_content = renderLockedContent(getLangData('Lvl') + ' ' + this.unlockLevel + ' ' + getLangData('required'));
 		else
 			_content = `<div id="war-match-opponents" class="full flex"></div>
 				<div class="flex full" style="position:absolute">
@@ -66,11 +66,11 @@ function war() {
 				<div class='flex war-player-card-left-content war-player-team-${_team}'>${i}</div>
 			</div>
 			<div class='war-player-card-medium flex'>
-				<div class='war-player-card-medium-content flex'><img src="./images/icons/${_op.class}.png" /></div>
+				<div class='war-player-card-medium-content flex'><img src="./images/main/avatars/${_op.class}.png" /></div>
 			</div>
 			<div class='war-player-card-right flex flex-jc-start'>
-				<div class='war-player-card-right-top flex flex-jc-start w-100 one-line'>${_op.class}</div>
-				<div class='war-player-card-right-bottom flex w-100 flex-jc-start one-line'>Power:&nbsp;${_op.totalPower.formatWithDots()}</div>
+				<div class='war-player-card-right-top flex flex-jc-start w-100 one-line'>${getLangData(_op.class)}</div>
+				<div class='war-player-card-right-bottom flex w-100 flex-jc-start one-line'>${getLangData('Power')}:&nbsp;<span style="color:#f3f4f5">${_op.totalPower.formatWithDots()}</span></div>
 			</div>`;
 			_container.appendChild(row);
 			await delay(1000);

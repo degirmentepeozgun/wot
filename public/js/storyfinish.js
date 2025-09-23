@@ -2,19 +2,18 @@
 console.log('story-finish');
 function animateStart(_failed, _extraGain, _content) {
 	_game.suspended = true;
-	if(episode.mainClass && mainCharacter.class !== episode.mainClass) {
-		delete __account.characters.find(x => x.selected).selected;
-		__account.characters.find(x => x.class === episode.mainClass).selected = true;
-		initMainCharacter();
-		_client.setCharacterValues();
-		setCharacterDefaults(mainCharacter);
-		console.log(mainCharacter.class);
-		//startWithThisCharacter(episode.mainClass);
+	if(episode.mainClass && mainCharacter.id !== episode.mainClass) {
+		// delete __account.characters.find(x => x.selected).selected;
+		// const _ch = __account.characters.find(x => x.class === episode.mainClass);
+		// initMainCharacter(_ch, 1);
+		// _client.setCharacterValues();
+		// setCharacterDefaults(mainCharacter);
+		startWithThisCharacter(episode.mainClass, null, 1, 1);
 	}
 	const _isPvp = (episode.pvp || episode.war) & !episode.gold;
-	const _isFirstPlay = !__account.tutorials?.[1];
 	const _id = __story.id;
 	const _story = __stories.find(x => x.id === _id);
+	const _isFirstPlay = !_story.mission && !__account.storyResults.find(x => x.id === 1);//  !__account.tutorials?.[1];
 	const _endTime = __story.endTime ?? _gameTick;
 	const _passedTime = _endTime - __story.startTime;
 	const _2ndStar = _failed ? false : _story.resultStars?.[1]?.when( _story.resultStars?.[1]);
@@ -22,7 +21,7 @@ function animateStart(_failed, _extraGain, _content) {
 	const _totalStar = _failed ? 0 : 1 + (_2ndStar ? 2 : 0) + (_3rdStar ? 4 : 0);
 	const _totalAchDone = _failed ? 0 : 1 + (_2ndStar ? 1: 0) + (_3rdStar ? 1 : 0);
 	let _oldResult = __account.storyResults.find(x => x.id === _id);
-	if(!_oldResult && !_failed) {
+	if(!_oldResult && !_failed && !_story.mission) {
 		__account.storyResults.push({id:_id, stars:[1]});
 		_oldResult = __account.storyResults.find(x => x.id === _id);
 	}
@@ -36,18 +35,22 @@ function animateStart(_failed, _extraGain, _content) {
 	mainCharacter.removeBuffs();
 	const _currentLevel = mainCharacter.level;
 	
-	if(_2ndStar && _stars.indexOf(2) === -1)
+	if(_2ndStar && _stars?.indexOf?.(2) === -1)
 		_stars.push(2);
-	if(_3rdStar && _stars.indexOf(4) === -1)
+	if(_3rdStar && _stars?.indexOf?.(4) === -1)
 		_stars.push(4);
 	const _isBeforePerfect = _oldResult?.perfect;
 	if(_totalStar === 7)
-		_isPerfect = _oldResult.perfect = true;
+		_isPerfect = true;
+	if(_oldResult && _isPerfect)
+		_oldResult.perfect = true;
 	if(!episode.realTime)
 		_client.saveState();
-	if(_isPerfect)
+	if(_isPerfect && !_story.mission)
 		updateGlobalQuest('complete-act-perfect');
-	if(!_failed && !_isPvp)
+	if(!_failed && _story.mission)
+		updateGlobalQuest('complete-dungeon');
+	if(!_failed && !_isPvp && !_story.mission)
 		updateGlobalQuest('complete-act');
 	else if(__story?.bonus === 'exp') {
 		if(episode?.killCount > 0)
@@ -77,25 +80,25 @@ function animateStart(_failed, _extraGain, _content) {
 							</div>`;
 		}
 	let _rewardsHtml = (_failed && !_extraGain) ? '' : getStoryRewardsResultHtml(_story, null, null, _extraGain);
-	if(_isPerfect && !_isBeforePerfect)
-        updateMisc({ type: 'chest', count: 1, grade: 1 });
-	if(_isFirstFinish)
-        updateMisc({ type: 'chest', count: 1, grade: 1 });
+	if(_isPerfect && !_isBeforePerfect && _story.perfectFinishRewards)
+        updateMisc(structuredClone2(_story.perfectFinishRewards));
+	if(_isFirstFinish && _story.firstFinishRewards)
+        updateMisc(structuredClone2(_story.firstFinishRewards));
 	if(episodePot > 0) {
 		const _value = episodePot;
 		episodePot = 0;
 		updatePot(_value);
 	}
-	if((_isPerfect && !_isBeforePerfect) && _isFirstFinish)
+	if((_isPerfect && _story.perfectFinishRewards && !_isBeforePerfect) && (_isFirstFinish && _story.firstFinishRewards))
 		_firstFinishRewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 100%">
 							<img style="/* filter: drop-shadow(0 0 1px #f3f4f5); */height: 100%;margin-right: 5%;filter: drop-shadow(0 0 .15vh orange) drop-shadow(0 0 .3vh #FF7518);" src="./images/icons/chest2.png">x 2
 						</div>`;
 	else {
-		if(_isPerfect && !_isBeforePerfect)
+		if(_isPerfect && _story.perfectFinishRewards && !_isBeforePerfect)
 			_firstFinishRewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 100%">
 								<img style="/* filter: drop-shadow(0 0 1px #f3f4f5); */height: 100%;margin-right: 5%;filter: drop-shadow(0 0 .15vh orange) drop-shadow(0 0 .3vh #FF7518);" src="./images/icons/chest2.png">x 1
 							</div>`;
-		if(_isFirstFinish)
+		if(_isFirstFinish && _story.firstFinishRewards)
 			_firstFinishRewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 100%">
 								<img style="/* filter: drop-shadow(0 0 1px #f3f4f5); */height: 100%;margin-right: 5%;filter: drop-shadow(0 0 .15vh orange) drop-shadow(0 0 .3vh #FF7518);" src="./images/icons/chest2.png">x 1
 							</div>`;
@@ -103,7 +106,7 @@ function animateStart(_failed, _extraGain, _content) {
 	if(_firstFinishRewardsHtml !== '')
 		_firstFinishRewardsHtml = `<div class="w-100 flex header flex-jc-start ms2000 op-none" style="height: 14%;">
 						<div class="header-inner">
-							First Finish Rewards
+							${getLangData('First Finish Rewards')}
 						</div>
 						<div style="flex:1;height:100%" class="flex flex-jc-end">`
 							+ _firstFinishRewardsHtml +
@@ -118,9 +121,18 @@ function animateStart(_failed, _extraGain, _content) {
 		_missionTitle = getLangData('War');
 	else if(_isDuel)
 		_missionTitle = getLangData('Duel');
+	else if(_story.mission)
+		_missionTitle = _story.title[getLang()];
 	else
 		_missionTitle = getLangData('Story') + '&nbsp;' + __account.act + '-' + _story.order;
 	let _hasNext = _failed ? false : !_isFirstPlay;
+	let _hasRetry = true;
+	if(_story.mission)
+	{
+		const _dm = __account.missions?.find(x => x.key === _story.mission);
+		if(_dm?.current >= _story.daily)
+			_hasRetry = false;
+	}
 	if(_hasNext)
 		_hasNext = __stories.find(x => x.order > __story.order && !x.passive && x.list);
 	const _template = `<div data-module='storyfinish' id="story-finish" class="finish flex d-none">
@@ -134,7 +146,7 @@ function animateStart(_failed, _extraGain, _content) {
 					<img class="ms250 op-none${_isPvp ? ' d-none':''}" src="./images/ui/star-${_totalAchDone > 0 ? 'on' : 'off'}.png">
 					<img class="ms500 op-none${_isPvp ? ' d-none':''}" src="./images/ui/star-${_totalAchDone > 1 ? 'on' : 'off'}.png" style="margin-bottom: -4%;margin-top: -6%;">
 					<img class="ms750 op-none${_isPvp ? ' d-none':''}" src="./images/ui/star-${_totalAchDone > 2 ? 'on' : 'off'}.png">
-					<div class="w-50 flex" style="position: absolute;left: 25%;height: 30%;font-size: 4vh !important;color: #f3f4f580;z-index: 0;text-shadow: 2px 2px 1px #000;padding-top: 1%;">` + _missionTitle + `</div>
+					<div class="w-50 flex one-line" style="position: absolute;left: 25%;height: 30%;font-size: 4vh !important;color: #f3f4f580;z-index: 0;text-shadow: 2px 2px 1px #000;padding-top: 1%;">` + _missionTitle + `</div>
 				</div>
 				<div class="flex w-100 ms1000 op-none${_isPvp ? ' d-none' : ''}" style="padding: 1.5% 12.5% 0 12.5%;height: 8%;">
 					<div id="level" class="flex" style="padding:0 3%">Lvl ${_currentLevel}</div>
@@ -179,13 +191,13 @@ function animateStart(_failed, _extraGain, _content) {
 					+ _firstFinishRewardsHtml +
 				`</div>
 				<div class="flex w-100 ms2500 op-none${_isPvp ? ' d-none' : ''}" style="height: 10%;padding:0 4%">
-					<div class="w-33 flex" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(${_failed ? 0 : 1}, ${_id}, ${episode.goldSelected ? 1 : 0}, ${episode.expSelected ? 1 : 0}, ${episode.itemSelected ? 1 : 0});detachModule()" style="padding: 1%;height: 100%${_isFirstPlay ? ';pointer-events:none!important' : ''}">
-						<div class="btn${_isFirstPlay ? ' inactivated' : ''} animate-me-500 flex">${getLangData('RETRY')}</div>
+					<div class="w-33 flex" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(${_failed ? 0 : 1}, ${_id}, ${episode.goldSelected ? 1 : 0}, ${episode.expSelected ? 1 : 0}, ${episode.itemSelected ? 1 : 0})" style="padding: 1%;height: 100%${_isFirstPlay ? ';pointer-events:none!important' : ''}">
+						<div class="btn${((_isFirstPlay && !_failed) || !_hasRetry) ? ' inactivated' : ''} animate-me-500 flex">${getLangData('RETRY')}</div>
 					</div>
-					<div class="w-33 flex" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(${_failed ? 0 : 1});detachModule()" style="padding: 1%;height: 100%">
+					<div class="w-33 flex" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(${_failed ? 0 : 1})" style="padding: 1%;height: 100%">
 						<div class="btn animate-me-500 flex">${getLangData('LOBBY')}</div>
 					</div>
-					<div class="w-33 flex" style="padding: 1%;height: 100%${!_hasNext ? ';pointer-events:none!important' : ''}" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(1, ${__stories.find(x => !x.passive && x.order > __story.order)?.id}, null, null, null, 1);detachModule()">
+					<div class="w-33 flex" style="padding: 1%;height: 100%${!_hasNext ? ';pointer-events:none!important' : ''}" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(1, ${__stories.find(x => !x.passive && x.order > __story.order)?.id}, null, null, null, 1)">
 						<div class="btn${!_hasNext ? ' inactivated' : ''} animate-me-500 flex">${getLangData('NEXT')}</div>
 					</div>
 				</div>
@@ -234,7 +246,7 @@ function animateStart(_failed, _extraGain, _content) {
 				_seb.innerText = 'LEVEL UP!';
 				addClass(_seb,'level-up');
 				PlaySound({key:'levelup', volume:.2});
-				_sl.innerText = 'Lvl ' + mainCharacter.level;
+				_sl.innerText = getLangData('Lvl') + ' ' + mainCharacter.level;
 				_sl.style.color = '#fff';
 				setTimeout(function () {
 					addClass(_sl,'animate-me-1500');
@@ -248,6 +260,8 @@ function animateStart(_failed, _extraGain, _content) {
 		}, 2500);
 		episode.pauseAmbianceMusic();
 		PlaySound({key:'storyfinish', volume:1});
+		if(!_failed && (_isPvp || _story.mission))
+			PlaySound({key:'victory', volume:1});
 		if(!_failed && !_isPvp)
 			setTimeout(function () {
 				PlaySound({key:'ironx1', volume:1, reset: true, end: function() {
@@ -260,8 +274,6 @@ function animateStart(_failed, _extraGain, _content) {
 			}, 500);
 		else if(_failed)
 			PlaySound({key:'defeat', volume:1});
-		else if(_isPvp)
-			PlaySound({key:'victory', volume:1});
 		const fade = function(_selector, _ms) {
 			setTimeout(function () {
 				const _elems = document.querySelectorAll(_selector);

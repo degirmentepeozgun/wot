@@ -34,6 +34,19 @@
   }
 
   return {
+    
+    warmAudio() {
+      ctx.resume().then(() => {
+        // çok kısa, sessiz bir ses üret → motoru ısıt
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        gain.gain.value = 0; // sessiz
+        osc.connect(gain).connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.01);
+      });
+    },
+
     async preload(id, url) {
       if (preloaded.has(id)) return;
       await loadBuffer(id, url);

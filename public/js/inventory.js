@@ -118,7 +118,7 @@ function renderInventory(_noAnimation, _activeTab) {
                 <div id="avarage-stats-screen" class="flex" style="border-top:.4vh solid #ffffff40;position:absolute;bottom:0;left:0;width:100%;height:10%;background:var(--ui-light)">`
                  + getAvarageStatsScreenUI(_power) +  
                `</div>
-                <div class="main-level-count-wrapper flex flex-jc-start">${getLangData('Lvl')}&nbsp;<span id="main-level-count">${mainCharacter.level}</span><div id="main-class" class="w-100 flex flex-jc-start">${mainCharacter.class}</div></div>
+                <div class="main-level-count-wrapper flex flex-jc-start">${getLangData('Lvl')}&nbsp;<span id="main-level-count">${mainCharacter.level}</span><div id="main-class" class="w-100 flex flex-jc-start">${getLangData(mainCharacter.class)}</div></div>
                 <div class="game-menu-button btn-info flex animate-me" onexactclick="openCharacterInfoModal()">${getLangData('INFO')}</div>
                 <div style="cursor:pointer" class="item item-helmet">${getItemIcon(_wearedItems.find(x => x.type === 'helmet'))}</div>
                 <div style="cursor:pointer" class="item item-necklace"> ${getItemIcon(_wearedItems.find(x => x.type === 'necklace'))}</div>
@@ -747,7 +747,7 @@ function getItemInfoModalHtml(_id) {
         _props += '<div class="item-prop flex" style="font-size:3vh!important;width:100%;padding:1vh 7%;color:#9d987f !important">' + getLangData(_item.for).toProperCase() + ' item</div>';
     _props += renderItemProps(_item);
     _props += _socketProps;
-    _props += '<div class="item-prop flex" style="padding:1vh 7%;font-size:3vh!important;width:100%"><div class="flex flex-jc-start" style="width:50%;color:#9d987f !important">Cost:</div><div style="color:#f3f4f5cc !important;width:50%" class="flex flex-jc-end">' + sellCost.formatWithDots() + '<img style="height:2vh;margin-left:.5vh" src="./images/icons/coin.png" /></div></div>';
+    _props += '<div class="item-prop flex" style="padding:1vh 7%;font-size:3vh!important;width:100%"><div class="flex flex-jc-start" style="width:50%;color:#9d987f !important">' + getLangData('Cost') + ':</div><div style="color:#f3f4f5cc !important;width:50%" class="flex flex-jc-end">' + sellCost.formatWithDots() + '<img style="height:2vh;margin-left:.5vh" src="./images/icons/coin.png" /></div></div>';
     let _html = `<div style="height:30%;width:100%;padding:0 7%" class="flex flex-jc-start">
             <div class="item-modal-icon-container">
                 <img src="./images/items/icons/${(_item.for ? (_item.for + '/') : '')}${_item.type}${_item.grade}.png" class="full grade${_item.grade}-item${_item.grade > 5 ? ' glow' : ''}" />
@@ -755,7 +755,7 @@ function getItemInfoModalHtml(_id) {
             </div>
             <div style="color:#9d987f !important;flex:1;height: 60%;color: #f3f4f599;font-size: 3vh !important;padding: 0 4%">
                 <div style="height:50%">
-                    Lvl ${_item.level ?? 1} - ${getLangData(_item.type).toLocaleUpperCase(getLang())}
+                    ${getLangData('Lvl')}&nbsp;${_item.level ?? 1} - ${getLangData(_item.type).toLocaleUpperCase(getLang())}
                 </div>
                 <div style="height:50%" class="flex flex-jc-start w-100 item-socket-container">`
                     + _socketsHtml +
@@ -835,7 +835,7 @@ function openMiscItemInfoModal(_type, _grade) {
                     ${_item.descriptions[getLang()]}
                 </div>
                 <div style="width:100%;text-align:center;color:#f7f7f7 !important; font-size:2.6vh !important; padding:3vh">
-                    Cost:&nbsp;${(_item.cost * (_grade ?? 1)).formatWithDots()}&nbsp;<img src="./images/icons/coin.png" style="height:2vh" />
+                    ${getLangData('Cost')}:&nbsp;${(_item.cost * (_grade ?? 1)).formatWithDots()}&nbsp;<img src="./images/icons/coin.png" style="height:2vh" />
                 </div>
             </div>
             <div class="flex action-button-container ${_item.do ? '' : ' d-none'}" style="width:86%;margin:0 7%;height:14%;justify-content:space-around">
@@ -1158,11 +1158,11 @@ function openCharacterInfoModal() {
         <div class="flex flex-jc-start flex-ai-start" style="padding-bottom:2vh">`
             + _props +
             `<div style="margin-top:1vh;color:#f3f4f599 !important" class="stats-group-title">${getLangData('General')}</div>
-            <div class="stats-group-item w-100 flex"><div class="w-50 flex flex-jc-start" style="color:#9d987f !important">${getLangData('Title')}:</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${mainCharacter.title}</div></div>
+            <div class="stats-group-item w-100 flex"><div class="w-50 flex flex-jc-start" style="color:#9d987f !important">${getLangData('Title:')}</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${getLangData(mainCharacter.title)}</div></div>
             <div class="stats-group-item w-100 flex"><div class="w-50 flex flex-jc-start" style="color:#9d987f !important">${getLangData('Experience')}:</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${mainCharacter.experience.formatWithDots()} / ${mainCharacter.maxExperience.formatWithDots()}</div></div>
             <div class="stats-group-item w-100 flex"><div class="w-50 flex flex-jc-start" style="color:#9d987f !important">${getLangData('Fatique')}:</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${mainCharacter.maxFatique.formatWithDots()}</div></div>
             <div class="stats-group-item w-100 flex"><div class="w-50 flex flex-jc-start" style="color:#9d987f !important">${getLangData('Total Power')}:</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${getTotalPower().total.formatWithDots()}</div></div>
-            <div class="stats-group-item w-100 flex"><div class="w-50 flex flex-jc-start" style="color:#9d987f !important">${getLangData('Progress')}:</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${__account.questStatus.order} / ${_npcQuests.length}</div></div>
+            <div class="stats-group-item w-100 flex d-none"><div class="w-50 flex flex-jc-start" style="color:#9d987f !important">${getLangData('Progress')}:</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${__account.questStatus.order} / ${_npcQuests.length}</div></div>
         </div>
     </div>
     </div>
@@ -1267,21 +1267,28 @@ function updateGemMeltPlaces() {
     }
     switchInventoryTab(null, 2, 1);
 }
-function acceptMelt() {
+function acceptMelt(_force) {
     const _keys = [];
     let _grade;
+    let _possibilities = [];
     for(let i = 1; i <= 5; i++) {
         const _place = document.getElementById('melt-' + i);
         const _img = _place.querySelector('img');
         if(_img) {
-            _keys.push(_img.getAttribute('data-key'));
+            const _key = _img.getAttribute('data-key');
+            _keys.push(_key);
+            const _possibility = _possibilities.find(x => x.key === _key);
+            if(_possibility)
+                _possibility.value += 20;
+            else
+                _possibilities.push({key:_key, value:20});
             _grade = parseInt(_img.getAttribute('data-grade'));
         }
         else
             break;
     }
     if(_keys.length < 5) {
-        episode.playSound({ key: 'click' });
+        PlaySound({ key: 'click' });
         warn('<span>' + getLangData('Need more gem to melt') + '</span>', 'warn');
         return;
     }
@@ -1289,17 +1296,40 @@ function acceptMelt() {
     const _g = __gems.find(x => x.key === _key);
     const _hasGrade = _g.grades.find(x=> x.grade === (_grade + 1));
     if(!_hasGrade) {
-        episode.playSound({ key: 'click' });
+        PlaySound({ key: 'click' });
         warn('<span>' + getLangData('You can not melt more') + '</span>', 'warn');
         return;
     }
+    if(!_force && _possibilities.length > 1) {
+        let _choices = '';
+        for(let _p of _possibilities.sort((a,b) => b.value - a.value))
+            _choices += '<div class="flex gem-possibility">' + 
+        getGemItemIcon({key:_p.key,count:1,grade:_grade + 1}) +
+        '<div class="w-100 flex p-2" style="padding-top:1vh">%' + _p.value + '</div></div>';
+        askSomething(
+            `<div class="flex w-100 p-2">
+                <span style="color:#F4BB44 !important;font-size:3.2vh !important">${getLangData('Different Gems Selected')}</span>
+            </div>
+            <div class="flex w-100 p-2" style="padding-top:1vh">
+                <span style="color:#f3f4f5ab !important;font-size:3vh !important">${getLangData('New gem possibilities')}</span>
+            </div>
+            <div class="flex gem-possibilities w-100" style="padding:2vh 4%">`
+            + _choices +
+            `</div>
+            <div class="flex w-100" style="padding-top:2vh">
+                <span style="color:#f3f4f5cc !important;line-height:2vh !important;font-size:3vh !important">${getLangData('Continue Anyway')}?</span>
+            </div>`, 'acceptMelt(1)');
+        return;
+    }
+    else if(_force)
+        closeInventoryQuestionModal();
     for(let _k of _keys)
         __account.gems.find(x => x.key === _k && x.grade === _grade).count--;
     updateGem(_key, _grade + 1, 1);
 	updateGlobalQuest('melt-gem');
     closeGemInfoModal();
     switchInventoryTab(null, 2);
-	episode.playSound({ key: 'upgrade', volume: .5, reset: true, force: true });
+    PlaySound({ key: 'upgrade', volume: .5, reset: true, force: true });
 }
 function closeItemInfoModal(_noSound) {
     removeClass(document.querySelector('#inventory-list'), 'item-info-opened');
@@ -1884,6 +1914,7 @@ function getChestReward(_grade, _rewardKey, _rewardType, _count) {
                 updateGold(_val);
                 return {
                     type: 'gold',
+                    title: 'Gold',
                     src: './images/icons/gold.png',
                     count: _val
                 }
@@ -1920,6 +1951,7 @@ function getChestReward(_grade, _rewardKey, _rewardType, _count) {
                 updatePot(_val, null, 1);
                 return {
                     type: 'pot',
+                    title: getLangData('Potion'),
                     src: './images/icons/pot.png',
                     count: _val
                 }

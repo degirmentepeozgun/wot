@@ -221,7 +221,7 @@ function createCharacter(_settings) {
 								sound: { volume: .1 },
 								spell: {
 									key: 'warriorspell',
-									xGap: -200
+									xGap: -50
 								},
 								def: {
 									rate: .8
@@ -289,7 +289,7 @@ function createCharacter(_settings) {
 								speed: 7,
 								spell: {
 									key: 'beyblade',
-									xGap: -200,
+									xGap: -50,
 									pierce: true
 								},
 								atk: {
@@ -4043,6 +4043,7 @@ function createCharacter(_settings) {
 										xGap:-50
 									}
 								],
+								sound: {key:'warriorhurtair', volume:.2, reset: true },
 								chain: [
 									{ key: 'escape', num: 1 },
 								]
@@ -4336,6 +4337,7 @@ function createCharacter(_settings) {
 								spriteHeight: 167,
 								spriteOrigin: 90,
 								speed: 6,
+								sound: {key:'warriorhurtair', volume:.3, reset: true },
 								bottomGap: -30
 							},
 							{
@@ -8784,7 +8786,7 @@ function createCharacter(_settings) {
 								spriteWidth: 135,
 								spriteHeight: 200,
 								spriteOrigin: 68,
-								speed: 30,
+								speed: 12,
 								def: {
 									iframe: true
 								}
@@ -20697,7 +20699,7 @@ const _allEnemies = {
 					key: 'attack',
 					type: 'skill',
 					order: 1,
-					totalRange: .1,
+					totalRange: 5,
 					attack: true,
 					priority:1,
 					next: 'dead',
@@ -20884,7 +20886,7 @@ const _allEnemies = {
 					_e.canvasObjects = undefined;
 			},
 			key: 'grf-' + Math.random().toString().replace(/[.]/g, ''),
-			yGap: 15,
+			yGap: 35,
 			id: 5,
 			name: 'Ground Fire',
 			class: 'object',
@@ -20910,6 +20912,7 @@ const _allEnemies = {
 			noDirection: true,
 			fireDmgRate: 5,
 			noLoot: true,
+			difficulty:1,
 			experience: 0,
 			buffs: []
 		};
@@ -40560,7 +40563,7 @@ const _allEnemies = {
 						spriteWidth: 102,
 						spriteHeight: 57,
 						spriteOrigin: 53,
-					}, { key: 'rathurt', volume: .2, reset: true }
+					}, { key: 'rathurt', volume: .3, reset: true }
 				),
 				hurtfeet: createHurtFeet(),
 				hurthip: createHurtHip(),
@@ -40632,7 +40635,7 @@ const _allEnemies = {
 							spriteHeight: 64,
 							spriteOrigin: 88
 						},
-						{ key: 'rathurt', reset: true }
+						{ key: 'rathurt', reset: true, volume:.5 }
 						//, null, null,
 						// {
 						// 	spriteLeft: 3,
@@ -40665,7 +40668,7 @@ const _allEnemies = {
 							spriteHeight: 76,
 							spriteOrigin: 67
 						},
-						{ key: 'rathurt', reset: true }
+						{ key: 'rathurt', reset: true, volume:.6 }
 						// , null, null,
 						// {
 						// 	spriteLeft: 3,
@@ -51450,7 +51453,7 @@ const _allEnemies = {
 							spriteWidth: 240,
 							spriteHeight: 40,
 							spriteOrigin: 120,
-							speed: 12
+							speed: 6
 						}	
 					]
 				},
@@ -51588,6 +51591,15 @@ const _allEnemies = {
 								iframe: true
 							},
 							directionChangeEnabled: true,
+							speed: 6
+						},
+						{
+							spriteLeft: 3,
+							spriteTop: 13,
+							spriteWidth: 240,
+							spriteHeight: 40,
+							spriteOrigin: 120,
+							src: './images/sprites/ep39/idle.png',
 							speed: 6
 						}
 					]
@@ -56719,6 +56731,11 @@ const _allEnemies = {
 								_e.yPosition);
 								const _mob2 = summonMob(47002, MathRound((_e.SCREENLEFT + platformX) / __zoom),
 								_e.yPosition);
+								_mob1.left = _mob2.left = _e.left;
+								_mob1.LEFT = _mob2.LEFT = _e.LEFT;
+								_mob1.EXACTLEFT = _mob2.EXACTLEFT = _e.EXACTLEFT;
+								_mob1.updateVariables();
+								_mob2.updateVariables();
 								_mob1.animate('start', 1);
 								_mob2.animate('start', 1);
 								_mob1.enemy = _mob2.enemy = false;
@@ -56772,9 +56789,9 @@ const _allEnemies = {
 			do: function(_e) {
 				if(_e.ultimate) {
 					if(!_e.finishBombs)
-						_e.finishBombs = function() {
+						_e.finishBombs = function(_instant) {
 							delete _e.lastBombSpawnTime;
-							const _minions = episode.enemies.filter(x => x.owner === _e && x.id === 48);
+							const _minions = episode.enemies.filter(x => x.owner === _e && x.id === 48 && !x.remove);
 							if(_minions?.[0])
 								_minions.forEach(x => x.animate('ground1', 1));
 						}
@@ -62994,98 +63011,98 @@ const _allEnemies = {
 						}
 					]
 				},
-				// attack: {
-				// 	key: 'attack',
-				// 	order: 1,
-				// 	type: 'skill',
-				// 	attack: true,
-				// 	cooldown: 7000,
-				// 	priority: 4,
-				// 	frames: [
-				// 		{
-				// 			spriteLeft: 2830,
-				// 			spriteTop: 87,
-				// 			spriteWidth: 119,
-				// 			spriteHeight: 179,
-				// 			spriteOrigin: 60,
-				// 			speed: 12
-				// 		},
-				// 		{
-				// 			spriteLeft: 2489,
-				// 			spriteTop: 91,
-				// 			spriteWidth: 120,
-				// 			spriteHeight: 175,
-				// 			spriteOrigin: 61,
-				// 			speed: 12
-				// 		},
-				// 		{
-				// 			spriteLeft: 2148,
-				// 			spriteTop: 95,
-				// 			spriteWidth: 121,
-				// 			spriteHeight: 171,
-				// 			spriteOrigin: 62,
-				// 			speed: 12
-				// 		},
-				// 		{
-				// 			spriteLeft: 1804,
-				// 			spriteTop: 105,
-				// 			spriteWidth: 126,
-				// 			spriteHeight: 161,
-				// 			spriteOrigin: 66,
-				// 			speed: 8
-				// 		},
-				// 		{
-				// 			spriteLeft: 1492,
-				// 			spriteTop: 108,
-				// 			spriteWidth: 191,
-				// 			spriteHeight: 158,
-				// 			spriteOrigin: 38,
-				// 			sound: { key: 'riderground1', sound: .2 },
-				// 			atk: {
-				// 				yRange: 15,
-				// 				rate: 2,
-				// 				type: 'common',
-				// 				hurt: {
-				// 					key: 'hurtground1',
-				// 					type: 'ground'
-				// 				}
-				// 			},
-				// 			speed: 8
-				// 		},
-				// 		{
-				// 			spriteLeft: 1152,
-				// 			spriteTop: 108,
-				// 			spriteWidth: 187,
-				// 			spriteHeight: 158,
-				// 			spriteOrigin: 38,
-				// 			speed: 8
-				// 		},
-				// 		{
-				// 			spriteLeft: 2830,
-				// 			spriteTop: 87,
-				// 			spriteWidth: 119,
-				// 			spriteHeight: 179,
-				// 			spriteOrigin: 60,
-				// 			speed: 12
-				// 		},
-				// 		{
-				// 			spriteLeft: 2489,
-				// 			spriteTop: 91,
-				// 			spriteWidth: 120,
-				// 			spriteHeight: 175,
-				// 			spriteOrigin: 61,
-				// 			speed: 12
-				// 		},
-				// 		{
-				// 			spriteLeft: 2148,
-				// 			spriteTop: 95,
-				// 			spriteWidth: 121,
-				// 			spriteHeight: 171,
-				// 			spriteOrigin: 62,
-				// 			speed: 12
-				// 		}
-				// 	]
-				// },
+				attack: {
+					key: 'attack',
+					order: 1,
+					type: 'skill',
+					attack: true,
+					//cooldown: 7000,
+					priority: 4,
+					frames: [
+						{
+							spriteLeft: 2830,
+							spriteTop: 87,
+							spriteWidth: 191,
+							spriteHeight: 179,
+							spriteOrigin: 60,
+							speed: 12
+						},
+						{
+							spriteLeft: 2489,
+							spriteTop: 91,
+							spriteWidth: 191,
+							spriteHeight: 175,
+							spriteOrigin: 61,
+							speed: 12
+						},
+						{
+							spriteLeft: 2148,
+							spriteTop: 95,
+							spriteWidth: 191,
+							spriteHeight: 171,
+							spriteOrigin: 62,
+							speed: 12
+						},
+						{
+							spriteLeft: 1804,
+							spriteTop: 105,
+							spriteWidth: 191,
+							spriteHeight: 161,
+							spriteOrigin: 66,
+							speed: 8
+						},
+						{
+							spriteLeft: 1492,
+							spriteTop: 108,
+							spriteWidth: 191,
+							spriteHeight: 158,
+							spriteOrigin: 38,
+							sound: { key: 'riderground1', sound: .2 },
+							atk: {
+								yRange: 15,
+								rate: 2,
+								type: 'common',
+								hurt: {
+									key: 'hurtground1',
+									type: 'ground'
+								}
+							},
+							speed: 8
+						},
+						{
+							spriteLeft: 1152,
+							spriteTop: 108,
+							spriteWidth: 191,
+							spriteHeight: 158,
+							spriteOrigin: 38,
+							speed: 8
+						},
+						{
+							spriteLeft: 2830,
+							spriteTop: 87,
+							spriteWidth: 191,
+							spriteHeight: 179,
+							spriteOrigin: 60,
+							speed: 12
+						},
+						{
+							spriteLeft: 2489,
+							spriteTop: 91,
+							spriteWidth: 191,
+							spriteHeight: 175,
+							spriteOrigin: 61,
+							speed: 12
+						},
+						{
+							spriteLeft: 2148,
+							spriteTop: 95,
+							spriteWidth: 191,
+							spriteHeight: 171,
+							spriteOrigin: 62,
+							speed: 12
+						}
+					]
+				},
 				// ground2: {
 				// 	key: 'ground2',
 				// 	order: 4,
@@ -63456,13 +63473,12 @@ const _allEnemies = {
 					interactive: true,
 					frames: [
 						{
-							spriteLeft: 1107,
-							spriteTop: 1425,
-							spriteWidth: 141,
-							spriteHeight: 181,
-							spriteOrigin: 83,
-							bottomGap: -100,
-							speed: 4,
+							spriteLeft: 788,
+							spriteTop: 1523,
+							spriteWidth: 119,
+							spriteHeight: 103,
+							spriteOrigin: 62,
+							speed: 1,
 							props: {
 								killingBy: undefined,
 								finishTarget: undefined,
@@ -63470,62 +63486,13 @@ const _allEnemies = {
 							}
 						},
 						{
-							spriteLeft: 1107,
-							spriteTop: 1425,
-							spriteWidth: 141,
-							spriteHeight: 181,
-							spriteOrigin: 83,
-							extraStepXRate: -1,
-							bottomGap: -80,
-							sound: { key: 'riderdead' },
-							speed: 4
-						},
-						{
-							spriteLeft: 1107,
-							spriteTop: 1425,
-							spriteWidth: 141,
-							spriteHeight: 181,
-							spriteOrigin: 83,
-							extraStepXRate: -1,
-							bottomGap: -60,
-							speed: 4
-						},
-						{
-							spriteLeft: 1107,
-							spriteTop: 1425,
-							spriteWidth: 141,
-							spriteHeight: 181,
-							spriteOrigin: 83,
-							extraStepXRate: -1,
-							bottomGap: -40,
-							speed: 4
-						},
-						{
-							spriteLeft: 1107,
-							spriteTop: 1425,
-							spriteWidth: 141,
-							spriteHeight: 181,
-							spriteOrigin: 83,
-							extraStepXRate: -.8,
-							bottomGap: -20,
-							speed: 4
-						},
-						{
-							spriteLeft: 1107,
-							spriteTop: 1425,
-							spriteWidth: 141,
-							spriteHeight: 181,
-							spriteOrigin: 83,
-							extraStepXRate: -.5,
-							speed: 4
-						},
-						{
 							spriteLeft: 788,
 							spriteTop: 1523,
 							spriteWidth: 119,
 							spriteHeight: 103,
 							spriteOrigin: 62,
-							speed: 8
+							speed: 7,
+							sound:{key:'riderdead'}
 						},
 						{
 							spriteLeft: 788,
@@ -67926,6 +67893,746 @@ const _allEnemies = {
 			buffs: []
 		};
 	},
+	enemy92: function () {
+		return {
+			animations: {
+				walk: {
+					key: 'walk',
+					type: 'move',
+					imediateBreak: true,
+					hold: true,
+					mobilityY: true,
+					priority: 5,
+					src: './images/sprites/ep92/run.png',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed:8
+						},
+						{
+							spriteLeft: 300,
+							spriteTop: 0,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed:8
+						},
+						{
+							spriteLeft: 600,
+							spriteTop: 0,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed:8
+						}
+					]
+				},
+				run: {
+					key: 'run',
+					type: 'move',
+					imediateBreak: true,
+					hold: true,
+					mobilityY: true,
+					priority: 5,
+					src: './images/sprites/ep92/run.png',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed:8
+						},
+						{
+							spriteLeft: 300,
+							spriteTop: 0,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed:8
+						},
+						{
+							spriteLeft: 600,
+							spriteTop: 0,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed:8
+						}
+					]
+				},
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					imediateBreak: true,
+					alternateFrames: [
+						{ rate: .1, frames: [
+							{
+								spriteLeft: 2400,
+								spriteTop: 300,
+								spriteWidth: 300,
+								spriteHeight: 150,
+								spriteOrigin: 150,
+								speed: 12
+							},
+							{
+								spriteLeft: 2100,
+								spriteTop: 300,
+								spriteWidth: 300,
+								spriteHeight: 150,
+								spriteOrigin: 150,
+								speed: 12
+							},
+							{
+								spriteLeft: 1800,
+								spriteTop: 300,
+								spriteWidth: 300,
+								spriteHeight: 150,
+								spriteOrigin: 150,
+								speed: 12
+							},
+							{
+								spriteLeft: 2100,
+								spriteTop: 300,
+								spriteWidth: 300,
+								spriteHeight: 150,
+								spriteOrigin: 150,
+								speed: 12
+							}
+						]}
+					],
+					frames: [
+						{
+							spriteLeft: 2400,
+							spriteTop: 0,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 2100,
+							spriteTop: 0,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 1800,
+							spriteTop: 0,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 2100,
+							spriteTop: 0,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 12
+						}
+					]
+				},
+				attack: {
+					key: 'attack',
+					order: 1,
+					type: 'skill',
+					attack: true,
+					cooldown:3000,
+					totalRange: 50,
+					priority: 4,
+					frames: [
+						{
+							spriteLeft: 2400,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 2100,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 1800,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 1500,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 1200,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							spell: {
+								key: 'dynamite'
+							},
+							speed: 6
+						},
+							{
+							spriteLeft: 1200,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							spell: {
+								key: 'dynamiteshort'
+							},
+							speed: 6
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 2400,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 2100,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 1800,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 12
+						},
+							{
+							spriteLeft: 2100,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 12
+						}
+					]
+				},
+				hurtground1: createHurtGround(
+					{
+						spriteLeft: 2400,
+						spriteTop: 150 * 4,
+						spriteWidth: 300,
+						spriteHeight: 150,
+						spriteOrigin: 150
+					}, {
+						spriteLeft: 2100,
+						spriteTop: 150 * 4,
+						spriteWidth: 300,
+						spriteHeight: 150,
+						spriteOrigin: 150
+					}, {
+						spriteLeft: 1800,
+						spriteTop: 150 * 4,
+						spriteWidth: 300,
+						spriteHeight: 150,
+						spriteOrigin: 150
+					}, { key: 'goblinhurt', volume: .5, reset: true }
+				),
+				knockbackground: createKnockBackGround(
+					{
+						spriteLeft: 2400,
+						spriteTop: 150 * 4,
+						spriteWidth: 300,
+						spriteHeight: 150,
+						spriteOrigin: 150
+					}, {
+						spriteLeft: 0,
+						spriteTop: 150 * 5,
+						spriteWidth: 300,
+						spriteHeight: 150,
+						spriteOrigin: 150
+					}
+				),
+				hurtair: createHurtAir(
+					{
+						spriteLeft: 300 * 8,
+						spriteTop: 150 * 5,
+						spriteWidth: 300,
+						spriteHeight: 150,
+						spriteOrigin: 150
+					}, {
+						spriteLeft: 0,
+						spriteTop: 150 * 5,
+						spriteWidth: 300,
+						spriteHeight: 150,
+						spriteOrigin: 150
+					}, { key: 'goblinhurt', volume: .5, reset: true }
+				),
+				knockbackair: createKnockBackAir(
+					{
+						spriteLeft: 300 * 8,
+						spriteTop: 150 * 5,
+						spriteWidth: 300,
+						spriteHeight: 150,
+						spriteOrigin: 150
+					}, {
+						spriteLeft: 0,
+						spriteTop: 150 * 5,
+						spriteWidth: 300,
+						spriteHeight: 150,
+						spriteOrigin: 150
+					}
+				),
+				release: createRelease(
+					{
+						spriteLeft: 300 * 8,
+						spriteTop: 150 * 5,
+						spriteWidth: 300,
+						spriteHeight: 150,
+						spriteOrigin: 150
+					}, {
+						spriteLeft: 0,
+						spriteTop: 150 * 5,
+						spriteWidth: 300,
+						spriteHeight: 150,
+						spriteOrigin: 150
+					}
+				),
+				dead: {
+					key: 'dead',
+					type: 'skill',
+					interactive: true,
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 150 * 5,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 1,
+							props: {
+								killingBy: undefined,
+								finishTarget: undefined,
+								dead: true
+							}
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 150 * 5,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 11
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 150 * 5,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							alpha: true,
+							speed: 8
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 150 * 5,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 8
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 150 * 5,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							alpha: true,
+							speed: 8
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 150 * 5,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 8
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 150 * 5,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							alpha: true,
+							speed: 8
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 150 * 5,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							speed: 7
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 150 * 5,
+							spriteWidth: 300,
+							spriteHeight: 150,
+							spriteOrigin: 150,
+							props: {
+								remove: true
+							},
+							speed: 1
+						}
+					]
+				}
+			},
+			key: 'gben-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 10,
+			id: 92,
+			healtbarGap: 0,
+			name: 'Goblin Engineer',
+			class: 'engineer',
+			releaseAfter: 20,
+			ranged: true,
+			level: 1,
+			direction: 'left',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1.6,
+			height: 150,
+			width: 300,
+			maxHP: 500,
+			atk: 30,
+			def: 100,
+			stepX: 8,
+			weight: 1000,
+			stepXRate: .3,
+			bloodColor: 'green',
+			src: './images/sprites/ep92/',
+			buffs: []
+		};
+	},
+	enemy93: function () {
+		return {
+			animations: {
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 170,
+							spriteHeight: 519,
+							spriteOrigin: 85,
+							speed: 12,
+							objects: [
+								{ 	
+									key: 'questshadow',
+									position: 'middle',
+									scale:2,
+									xGap:-20,
+									yGap:-145,
+									background:true,
+									bind: true  
+								}
+							]
+						},
+						{
+							spriteLeft: 170,
+							spriteTop: 0,
+							spriteWidth: 170,
+							spriteHeight: 519,
+							spriteOrigin: 85,
+							speed: 12,
+							objects: [
+								{ 	
+									key: 'questshadow',
+									position: 'middle',
+									scale:2,
+									xGap:-20,
+									yGap:-145,
+									background:true,
+									bind: true  
+								}
+							]
+						},
+						{
+							spriteLeft: 340,
+							spriteTop: 0,
+							spriteWidth: 170,
+							spriteHeight: 519,
+							spriteOrigin: 85,
+							speed: 12,
+							objects: [
+								{ 	
+									key: 'questshadow',
+									position: 'middle',
+									scale:2,
+									xGap:-20,
+									yGap:-145,
+									background:true,
+									bind: true  
+								}
+							]
+						},
+						{
+							spriteLeft: 510,
+							spriteTop: 0,
+							spriteWidth: 170,
+							spriteHeight: 519,
+							spriteOrigin: 85,
+							speed: 12,
+							objects: [
+								{ 	
+									key: 'questshadow',
+									position: 'middle',
+									scale:2,
+									xGap:-20,
+									yGap:-145,
+									background:true,
+									bind: true  
+								}
+							]
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 519,
+							spriteWidth: 170,
+							spriteHeight: 519,
+							spriteOrigin: 85,
+							speed: 12,
+							objects: [
+								{ 	
+									key: 'questshadow',
+									position: 'middle',
+									scale:2,
+									xGap:-20,
+									yGap:-145,
+									background:true,
+									bind: true  
+								}
+							]
+						},
+						{
+							spriteLeft: 170,
+							spriteTop: 519,
+							spriteWidth: 170,
+							spriteHeight: 519,
+							spriteOrigin: 85,
+							speed: 12,
+							objects: [
+								{ 	
+									key: 'questshadow',
+									position: 'middle',
+									scale:2,
+									xGap:-20,
+									yGap:-145,
+									background:true,
+									bind: true  
+								}
+							]
+						},
+						{
+							spriteLeft: 340,
+							spriteTop: 519,
+							spriteWidth: 170,
+							spriteHeight: 519,
+							spriteOrigin: 85,
+							speed: 12,
+							objects: [
+								{ 	
+									key: 'questshadow',
+									position: 'middle',
+									scale:2,
+									xGap:-20,
+									yGap:-145,
+									background:true,
+									bind: true  
+								}
+							]
+						},
+						{
+							spriteLeft: 510,
+							spriteTop: 519,
+							spriteWidth: 170,
+							spriteHeight: 519,
+							spriteOrigin: 85,
+							speed: 12,
+							objects: [
+								{ 	
+									key: 'questshadow',
+									position: 'middle',
+									scale:2,
+									xGap:-20,
+									yGap:-150,
+									background:true,
+									bind: true  
+								}
+							]
+						}
+					]
+				},
+				hurtground1: createHurtGround(
+					{
+						spriteLeft: 340,
+						spriteTop: 519,
+						spriteWidth: 170,
+						spriteHeight: 519,
+						spriteOrigin: 85,
+						objects: [
+							{ 	
+								key: 'questshadow',
+								position: 'middle',
+								scale:2,
+								xGap:-20,
+								yGap:-145,
+								background:true,
+								bind: true  
+							}
+						]
+					},
+					{
+						spriteLeft: 510,
+						spriteTop: 519,
+						spriteWidth: 170,
+						spriteHeight: 519,
+						spriteOrigin: 85,
+						objects: [
+							{ 	
+								key: 'questshadow',
+								position: 'middle',
+								scale:2,
+								xGap:-20,
+								yGap:-145,
+								background:true,
+								bind: true  
+							}
+						]
+					},
+					null, 'flaghurt1,flaghurt2,flaghurt3'
+				),
+				dead: {
+					key:'dead',
+					type: 'skill',
+					frames: [
+						{
+							spriteWidth:0,
+							spriteHeight:0,
+							spriteOrigin:0,
+							spriteLeft:0,
+							spriteTop:0,
+							speed: 1,
+							props: {
+								killingBy: undefined,
+								finishTarget: undefined,
+								dead: true
+							},
+							do: function(_e) {
+								const _killer = episode.enemies.find(x => x.key === _e.killedBy);
+								//warn('<div class="flex heading achievement-red" style="position:relative;width:auto"><img style="height:15vh;z-index:-1" src="./images/icons/txtbg.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Flag Captured') + '</div></div>');
+								warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/flag.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Flag Captured') + '!</span></div>', null, null, 1);
+								PlaySound({ key: 'curse', volume: .75 });
+								_killer.flagCapturer = true;
+								episode.flagInCenter = false;
+								_killer.fps *= 1.5;
+								_killer.noCC = true;
+								_killer.puppetMode = true;
+								_killer.zoom *= 1.5;
+								_killer.healthBarHeightRate = _killer.healthBarWidthRate = 1.5;
+								//yakın tarafı bul
+								if(_killer.SCREENLEFT < (episode.cWidth / 2)) {
+									//sola yakın
+									_killer.direction = __left;
+									_killer.action = {
+										command: 'move',
+										to: -1000
+									};
+								}
+								else {
+									//sağa yakın
+									_killer.direction = __right;
+									_killer.action = {
+										command: 'move',
+										to: episode.width * 3 * __zoom
+									};
+								}
+							}
+						},
+						{
+							spriteWidth:0,
+							spriteHeight:0,
+							spriteOrigin:0,
+							spriteLeft:0,
+							spriteTop:0,
+							speed: 1,
+							props: {
+								remove: true
+							}
+						}
+					]
+				}
+			},
+			key: 'bnnr-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 10,
+			id: 93,
+			healtbarGap: 40,
+			name: 'Flag',
+			class: 'object',
+			level: 1,
+			direction: 'right',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1,
+			height: 519,
+			width: 170,
+			stepX: 0,
+			maxHP: 1000,
+			weight: 1000,
+			stepXRate: 0,
+			invulnerable: true,
+			immobilize: true,
+			noDirection: true,
+			noLoot: true,
+			skipHealthBar: true,
+			still: true,
+			immunities: [ 'fire' ],
+			src: './images/sprites/ep93/',
+			buffs: []
+		};
+	},
 	enemy2001: function () {
 		return {
 			animations: {
@@ -71574,7 +72281,8 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				src: (_redSprite ?? _sprite1).src,
 				bottomGap: ((_redSprite ?? _sprite1).bottomGap ?? 0) + 2,
 				sound: _sound,
-				do: _sprite1.do,
+				do: (_redSprite ?? _sprite1).do,
+				objects: (_redSprite ?? _sprite1).objects,
 				chain: [
 					{ key: 'escape', num: 1 },
 					{ key: 'counterstun', num: 4 },
@@ -71589,6 +72297,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteOrigin: _sprite1.spriteOrigin - 1,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + 3,
+				objects: _sprite1.objects,
 				chain: [
 					{ key: 'escape', num: 1 },
 					{ key: 'counterstun', num: 4 },
@@ -71603,6 +72312,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteOrigin: _sprite1.spriteOrigin + 2,
 				bottomGap: (_sprite1.bottomGap ?? 0) + 1,
 				src: _sprite1.src,
+				objects: _sprite1.objects,
 				chain: [
 					{ key: 'escape', num: 1 },
 					{ key: 'counterstun', num: 4 },
@@ -71617,6 +72327,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteOrigin: _sprite1.spriteOrigin - 1,
 				bottomGap: (_sprite1.bottomGap ?? 0),
 				src: _sprite1.src,
+				objects: _sprite1.objects,
 				chain: [
 					{ key: 'escape', num: 1 },
 					{ key: 'counterstun', num: 4 },
@@ -71631,6 +72342,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteOrigin: _sprite1.spriteOrigin + 2,
 				bottomGap: _sprite1.bottomGap,
 				src: _sprite1.src,
+				objects: _sprite1.objects,
 				chain: [
 					{ key: 'escape', num: 1 },
 					{ key: 'counterstun', num: 4 },
@@ -71645,6 +72357,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteOrigin: _sprite1.spriteOrigin - 1,
 				bottomGap: _sprite1.bottomGap,
 				src: _sprite1.src,
+				objects: _sprite1.objects,
 				chain: [
 					{ key: 'escape', num: 1 },
 					{ key: 'counterstun', num: 4 },
@@ -71659,6 +72372,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteOrigin: _sprite1.spriteOrigin,
 				bottomGap: _sprite1.bottomGap,
 				src: _sprite1.src,
+				objects: _sprite1.objects,
 				chain: [
 					{ key: 'escape', num: 1 },
 					{ key: 'counterstun', num: 4 },
@@ -71671,6 +72385,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteWidth: (_sprite2 ?? _sprite1).spriteWidth,
 				spriteHeight: (_sprite2 ?? _sprite1).spriteHeight,
 				spriteOrigin: (_sprite2 ?? _sprite1).spriteOrigin,
+				objects: (_sprite2 ?? _sprite1).objects,
 				bottomGap: (_sprite2 ?? _sprite1).bottomGap,
 				src: (_sprite2 ?? _sprite1).src,
 				chain: [
@@ -71685,6 +72400,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteWidth: (_sprite3 ?? _sprite1).spriteWidth,
 				spriteHeight: (_sprite3 ?? _sprite1).spriteHeight,
 				spriteOrigin: (_sprite3 ?? _sprite1).spriteOrigin,
+				objects: (_sprite3 ?? _sprite1).objects,
 				bottomGap: (_sprite3 ?? _sprite1).bottomGap,
 				src: (_sprite3 ?? _sprite1).src,
 				chain: [
