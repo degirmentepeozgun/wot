@@ -32,8 +32,6 @@ var myApp = new Framework7({
 	// App routes
 	routes: routes,
 
-
-
 	// Input settings
 	input: {
 		scrollIntoViewOnFocus: device.cordova,
@@ -47,10 +45,13 @@ var myApp = new Framework7({
 	on: {
 		init: function () {
 			var f7 = this;
-			if (f7.device.cordova) {
-				// Init cordova APIs (see cordova-app.js)
+			if (f7.device.cordova)
 				cordovaApp.init(f7);
-			}
+			const _exit = window._cdvElectronIpc?.exitApp;
+			if (typeof _exit === "function")
+				globalThis.__APP_EXIT_HANDLER__ = _exit;
+			else if (navigator.app?.exitApp)
+				globalThis.__APP_EXIT_HANDLER__ = () => navigator.app.exitApp();
 		},
 	},
 });

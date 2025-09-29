@@ -1147,6 +1147,32 @@ const _missions = [
 		]
 	}
 ];
+const __quickTips = [
+	{ id:1, desc: {
+		en: 'Hold to absorb damage, press right before an attack to make counter',
+		tr: 'Hasarı emmek için basılı tutun, saldırı anında basıp rakibinize omuz atın'
+	}, skills: ['block'], descDir: 'bottom'},
+	{ id:2, desc: {
+		en: 'Your skills will change when you activate rage mode',
+		tr: 'Öfke modunu başlattığında yeteneklerin değişiklik gösterecek'
+	}, skills: ['air2', 'ground1modified'], descDir: 'bottom'},
+	{ id:3, desc: {
+		en: 'This skill is chained to other skills so you can continue your combo',
+		tr: 'Bu yetenek başka yeteneğe zincirlidir, kombonuza devam edebilirsiniz'
+	}, skills: ['ground1', 'ground3'], descDir: 'bottom'},
+	{ id:4, desc: {
+		en: 'You can dodge all attacks with rolling, but you can\'t do it all the time',
+		tr: 'Takla atarak tüm saldırılardan kaçabilirsiniz ama sürekli yapamazsınız'
+	}, skills: ['roll'], descDir: 'bottom'},
+	{ id:5, desc: {
+		en: 'Performs a charge attack when in range, hold for making a combo attack',
+		tr: 'Belli mesafeden ilk basışta şarj, basılı tutunca kombo saldırısı yapar'
+	}, skills: ['attack'], descDir: 'bottom'},
+	{ id:7, desc: {
+		en: 'Leap attack knocks the opponent into the air, severely breaks skill',
+		tr: 'Sersemleten saldırı rakibin yeteneğini yüksek oranda kırarak onu havaya atar'
+	}, skills: ['ground2'], descDir: 'bottom'}
+]
 const _npcQuests = [
 	{
 		id: 1, 
@@ -2758,6 +2784,7 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	conquer: './images/sounds/conquer.mp3',
 	flaghurt1: './images/sounds/flaghurt1.mp3',
 	flaghurt2: './images/sounds/flaghurt2.mp3',
 	flaghurt3: './images/sounds/flaghurt3.mp3',
@@ -3154,6 +3181,7 @@ const soundFiles = {
 	itbarakyell: './images/sounds/itbyell.mp3',
 	hyenaground2: './images/sounds/hyena-ground2.mp3',
 	hyenahurt: './images/sounds/hyena-hurt.mp3',
+	hyenahurt2: './images/sounds/hyena-hurt5.mp3',
 	hyenadead: './images/sounds/hyena-dead.mp3',
 	hyenadead2: './images/sounds/hyena-dead2.mp3?v=3',
 	teberhurt: './images/sounds/teber-hurt.mp3?v=2',
@@ -28315,7 +28343,7 @@ const cssAnimations = {
 		}
 	},
 	fatality: function (_char, _l, _ms) {
-		if(_char.frame === 0 && _char.start === 1 && cssAnimations.dark(_char, _ms ?? 2800))
+		if(_char.frame === 0 && _char.start === 1 && cssAnimations.dark(_char, _ms ?? 3000))
 			episode.playSound({ key: mainCharacter.gender + 'laugh', reset: true, volume: .3 });
 	},
 	darkout: function(_ctx, _opacity, _cnvs) {
@@ -29212,25 +29240,34 @@ function copyText(_elem) {
 }
 
 function askExitApp(){
-	if(episode?.menu)
-		askSomething(getLangData('Application will be closed'), "exitApplication()", "exit-app-question");
+	if(closeInventoryQuestionModal())
+		return;
+	if(__switchingMap || _storySceneSwitching){
+		PlaySound({key:'disabled'});
+		return;
+	}
+	const _fs = document.getElementById('first-splash');
+	const _isActive = _fs && !hasClass(_fs, 'v-none');
+	if(episode?.menu || !__story || __story.mission === 'qp')
+		askSomething(getLangData('Application will be closed'), "exitApplication()", "exit-app-question", _isActive ? _fs : undefined);
 	else
-		askSomething(getLangData('Exit to lobby'), "killStory()", "exit-app-question");
+		askSomething(getLangData('Exit to lobby'), "killStory()", "exit-app-question", _isActive ? _fs : undefined);
 }
 
 function exitApplication() {
 	closeInventoryQuestionModal();
 	try{
-		navigator.app.exitApp();
+		if (typeof globalThis.__APP_EXIT_HANDLER__ === "function") {
+			globalThis.__APP_EXIT_HANDLER__();
+		}
 	}
 	catch(ex) {
 
 	}
 }
 
-var extractDigit = function( a, bitMask, shiftRightAmount ) {
-    var digit = (a & bitMask) >>> shiftRightAmount;	// extract the digit we are sorting based on
-    return digit;
+var extractDigit = function(a, bitMask, shiftRightAmount) {
+    return (a & bitMask) >>> shiftRightAmount;
 }
 function radixSortLSD(_input_array, getKey) {
     var numberOfBins = 256;

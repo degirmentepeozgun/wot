@@ -783,7 +783,9 @@ function activateTouchPad() {
 }
 
 let _toastWrappers = [], _lastToastHtml;
-function warn(_html, _class, _ms, _new, _buttons, _important) {
+function warn(_html, _class, _ms, _new, _buttons, _important, _container) {
+	if(mainCharacter?.tagContainer)
+		return;
 	const _hasButton = _buttons?.[0]?.text;
 	let _toast, _toastWrapper;
 	if(_toastWrappers?.find(x => x.isImportant))
@@ -818,7 +820,7 @@ function warn(_html, _class, _ms, _new, _buttons, _important) {
 		if (_class)
 			_toast.className += (' ' + _class);
 		_toastWrapper.appendChild(_toast);
-		_gameUI.appendChild(_toastWrapper);
+		(_container ?? _gameUI).appendChild(_toastWrapper);
 		_toastWrapper.isImportant = _important;
 		_toastWrappers.push(_toastWrapper);
 	}
@@ -905,12 +907,12 @@ function hasActiveActions() {
 }
 function resetSkill(_key, _char, _num) {
 	const _c = _char ?? mainCharacter;
-	if(_c.skills[_key].locked)
+	if(_c.skills?.[_key]?.locked)
 		return false;
 	resetSkills(_c?.ultimate, 1, _char, _key);
 	return true;
 }
-function resetSkills(_ultimate, _keepCD, _char, _k) {
+function resetSkills(_ultimate, _keepCD, _char, _k, _endOfRage) {
 	const _c = _char ?? mainCharacter;
 	const _animations = _c.animations;
 	const _keys = _k ? [_k] : Object.keys(_animations);
@@ -926,6 +928,8 @@ function resetSkills(_ultimate, _keepCD, _char, _k) {
 		if (!_skill.ultimate) {
 			if (_skill.finishingMove && !_c.hasFinishingMove)
 				_c.hasFinishingMove = true;
+			if(_endOfRage && _skill.key === 'tag')
+				continue;
 			if (!_keepCD && !_k && !_skill.chain && !_skill.maxCharge) {
 				if (_skill.maxCharge)
 					_skill.charge = _skill.maxCharge;
@@ -1012,13 +1016,16 @@ function resetSkills(_ultimate, _keepCD, _char, _k) {
 				createTagSkill(_c, _tag);
 				const preload = new Image();
 				preload.src = "./images/main/" + _myFr.key + "/concept.png";
-				_c.startCooldown(_tag, null, 1);
-				document.getElementById('skill12').style = 'background-image:url(./images/main/skill-icons/' + _myFr.key + '/' + _chosenSkill + '.png?x=2);background-size:contain;background-position:center';
+				if(!_client.quickPlay)
+					_c.startCooldown(_tag, null, 1);
+				const _ts = document.getElementById('skill12');
+				_ts.style = 'background-image:url(./images/main/skill-icons/' + _myFr.key + '/' + _chosenSkill + '.png?x=2);background-size:contain;background-position:center';
+				removeClass(_ts, 'v-none');
 			}
 			else
 				addClass(document.getElementById('skill12'), 'v-none');
 		}
-		else if(!_ultimate)
+		else if(!_ultimate && _c.animations.tag.delay)
 			_c.startCooldown(_c.animations.tag, null, 1);
 	}
 }
@@ -1032,16 +1039,34 @@ function createTagSkill(_char, _tag) {
 	if(!_tag)
 		return;
 	const _fr = __fragments.find(x => x.id === _tag.id);
+	_c.tagLeft = getTagSkillNode(_fr, __left);
+	_c.tagRight = getTagSkillNode(_fr, __right);
+	PlaySound({key:'tagimpact', volume:.001, force: true});
+	if(_fr.sound)
+		PlaySound({key:_fr.sound.key, volume:.001, force: true});
 	const _arr = Array.isArray(_fr.charId) ? _fr.charId : [_fr.charId];
 	const _limit = _fr.limits.find(x => x.grade === _tag.grade);
 	const _skill = _limit.skill;
-	if(episode)
-		episode.loadCharacterSprites(function() {}, _arr, ['idle', _skill]);
+	if(episode){
+		episode.loadCharacterSprites(function() {}, _arr, ['idle', _skill], 1);
+	  	const _src = './images/main/' + _fr.key + '/concept.png';
+		if(!episode.tagUrls)
+			episode.tagUrls = [];
+		if(episode.tagUrls.indexOf(_fr.key) === -1) {
+			episode.tagUrls.push(_fr.key);
+			const link = document.createElement("link");
+			link.rel = "preload";
+			link.as = "image";
+			link.href = _src;
+			document.head.appendChild(link);
+		}
+	}
 	_c.animations.tag = new animation({
 		order:12,
 		type:'skill',
 		key:'tag',
-		delay: true,
+		delay: !_client.quickPlay,
+		useInCC: true,
 		cooldown:30000,
 		frames: [{
 			spriteWidth:0,
@@ -1050,86 +1075,79 @@ function createTagSkill(_char, _tag) {
 			spriteTop:0,
 			speed:1,
 			do: function(_e){
+				_c.immobilize = _c.still = false;
 				_c.tagSkillUsed = _gameTick;
 				createTagSkillEffect(_fr, _c);
 				const _ck = _e.animations.dash.chargeKey;
 				delete _e.animations.dash.chargeKey;
 				_e.animate('dash', 1);
 				_e.animations.dash.chargeKey = _ck;
-				let _i = 0, _soundPlayed;
-				for(let _id of _arr) {
-					const _mob = episode.installMob({
-						id: _id,
-						minX: MathRound((_e.LEFT + platformX) / __zoom),
-						maxX: MathRound((_e.LEFT + platformX) / __zoom),
-						sight: 1000,
-						count: 1,
-						yPosition : _e.yPosition + (1 + (_i * 10)),
-						minLevel: _e.level,
-						maxLevel: _e.level
-					}, null, 1);
-					_mob.enemy = _mob.still = false;
-					_mob.friendly = true;
-					_mob.invulnerable = true;
-					_mob.related = _mob.owner = _e;
-					_mob.experience = 0;
-					_mob.class = 'minion';
-					_mob.direction = _e.direction;
-					if(!_soundPlayed)
-						PlaySound({ key: 'puff', volume: .3 });
-					_mob.addObject({
-						key: 'smoke',
-						position: 'middle'
-					});
-					if(_limit.do)
-						_limit.do(_mob.animations[_skill]);
-					_mob.animations[_skill].after = function(){
-						if(!_mob)
-							return;
-						episode.enemies?.filter(x => (x.owner ?? x.related) === _mob)?.
-						forEach(x => {
-							if(x.related)
-								x.related = _c;
-							if(x.owner)
-								x.owner = _c;
+				const _dir = _e.direction;
+				requestAnimationFrame(() => {
+					let _i = 0;
+					for(let _id of _arr) {
+						const _mob = episode.installMob({
+							id: _id,
+							minX: MathRound((_e.LEFT + platformX) / __zoom),
+							maxX: MathRound((_e.LEFT + platformX) / __zoom),
+							sight: 1000,
+							count: 1,
+							yPosition : _e.yPosition + (1 + (_i * 10)),
+							minLevel: _e.level,
+							maxLevel: _e.level
+						}, null, 1);
+						_mob.updateVariables();
+						if(!episode.tagWarmed) {
+							episode.tagWarmed = 1;
+							_mob.warm = 1;
+						}
+						_mob.enemy = _mob.still = false;
+						_mob.friendly = _mob.invulnerable = _mob.puppetMode = _mob.alp = true;
+						_mob.related = _mob.owner = _e;
+						_mob.experience = 0;
+						_mob.class = 'minion';
+						_mob.direction = _dir;
+						if(_c.animations.tag.modify)
+							_c.animations.tag.modify(_mob);
+						_mob.addObject({
+							key: 'smoke',
+							position: 'middle'
 						});
-						_mob.atk = MathRound(_c.atk * (_limit.atk / (100 * _arr.length)));
-						_mob.standBy();
-						_mob.still = true;
-						_mob.animations.idle.imediateBreak = false;
-						_mob.animations.idle.after = function() {
-							if((_gameTick - _c.tagSkillUsed) > 2000) {
-								const _wrappers = document.querySelectorAll('.wrapper-3d');
-								_wrappers?.forEach(x => {
-									addClass(x, 'fade-out');
-									x.onanimationend = function(ev) {
-										if(ev.animationName === 'fade-out-me')
-											x.remove();
-									}
-								});
-							}
+						if(_limit.do)
+							_limit.do(_mob.animations[_skill]);
+						_mob.animations[_skill].after = function(){
 							if(!_mob)
 								return;
-							_mob.animate('idle', 1);
-							_mob.release = true;
+							episode.enemies?.filter(x => (x.owner ?? x.related) === _mob)?.
+							forEach(x => {
+								if(x.related)
+									x.related = _c;
+								if(x.owner)
+									x.owner = _c;
+							});
+							_mob.atk = MathRound(_c.atk * (_limit.atk / (100 * _arr.length)));
+							_mob.standBy();
+							_mob.still = true;
+							_mob.animations.idle.imediateBreak = false;
 							_mob.animations.idle.after = function() {
-								if(_mob)
-									_mob.remove = true;
-								const _wrappers = document.querySelectorAll('.wrapper-3d');
-								_wrappers?.forEach(x => {
-									addClass(x, 'fade-out');
-									x.onanimationend = function(ev) {
-										if(ev.animationName === 'fade-out-me')
-											x.remove();
-									}
-								});
+								if(!_mob)
+									return;
+								_mob.animate('idle', 1);
+								_mob.release = true;
+								_mob.animations.idle.after = function() {
+									if(_mob)
+										_mob.remove = true;
+								}
 							}
-						}
-					},
-					_mob.animate(_skill, 1);
-					_i++;
-					_soundPlayed = 1;
-				}
+						},
+						//_mob.setAutoMode(0, 1);
+						_mob.autoMode = 0;
+						_mob.animation = _skill;
+						_mob.frame = _mob.start = 0;
+						//_mob.animate(_skill, 1);
+						_i++;
+					}
+				});
 			},
 			def: {
 				iframe: true
@@ -1138,11 +1156,11 @@ function createTagSkill(_char, _tag) {
 	});
 }
 
-function createTagSkillEffect(_fr, _c) {
+function getTagSkillNode(_fr, _dir) {
 	const _key = _fr.key;
 	const _tag = document.createElement('div');
-	_tag.className = `wrapper-3d fade-me-slide-${_c?.direction === 'left' ? 'left' : 'right'}`;
-	_tag.innerHTML = `<div class="tag-char-area-wrapper-outer${_c?.direction === 'left' ? ' rtl' : ''}">
+	_tag.className = `wrapper-3d fade-me-slide-${_dir === __left ? __left : __right}`;
+	_tag.innerHTML = `<div class="tag-char-area-wrapper-outer${_dir === __left ? ' rtl' : ''}">
 				<div class="tag-char-area-wrapper" style="margin-top:5vh;top:0!important">
 					<div class="page-tear-bg full">
 						<div class="tag-char-area">
@@ -1157,15 +1175,22 @@ function createTagSkillEffect(_fr, _c) {
 					<div class="closer"></div>
 				</div>
 			</div>`;
+	return _tag;
+}
+
+function createTagSkillEffect(_fr, _c) {
+	const _tag = (_c.direction === __left ? _c.tagLeft : _c.tagRight).cloneNode(true);
 	_gameUI.appendChild(_tag);
-	setTimeout(() => {
-		PlaySound({key:'tagimpact', volume:1});
-		const _outer = document.querySelector('.tag-char-area-wrapper-outer');
-		if(_outer)
-			addClass(_outer, 'animate');
-	}, 20);
+	if(_c.tagContainer)
+		_c.tagContainer.remove();
+	_c.tagContainer = _tag;
+	PlaySound({key:'tagimpact', volume:1, reset: true});
+	const _outer = _tag?.firstChild;
+	if(_outer)
+		addClass(_outer, 'animate');
 	if(_fr.sound)
 		setTimeout(() => {
+			_fr.sound.reset = true;
 			PlaySound(_fr.sound);
 		}, 300);
 }
@@ -1349,13 +1374,13 @@ function updateExperience(_value, _levelup, _char, _noWarn) {
 				_lvl.innerText = _c.level;
 		}
 		if (_c.main) {
-			if(!_noWarn && (_c.level === __pvp.unlockLevel)) {
-				warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/pvp.png" />&nbsp;<span style="flex:1">' + getLangData('Pvp Content Unlocked') + '</span></div>', null, null, 1);
-				warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/pvp.png" />&nbsp;<span style="flex:1">' + getLangData('Rage Mode Activated') + '</span></div>', null, null, 1);
+			if(!_noWarn && !_client.quickPlay && (_c.level === __pvp.unlockLevel)) {
+				warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/duel.png" />&nbsp;<span style="flex:1">' + getLangData('Pvp Content Unlocked') + '</span></div>', null, null, 1);
+				warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/rage.png" />&nbsp;<span style="flex:1">' + getLangData('Rage Mode Activated') + '</span></div>', null, null, 1);
 			}
 			if(!_noWarn && !episode?.menu){
-				warn('<div class="flex leveling"><img style="height:14vh" src="./images/icons/level-up.png" /></div>', 'level-up');
-				episode.playSound({ key: 'levelup', volume: .5 });
+				//warn('<div class="flex leveling"><img style="height:14vh" src="./images/icons/level-up.png" /></div>', 'level-up');
+				PlaySound({ key: 'levelup', volume: .5 });
 			}
 			updateGlobalQuest('level-up');
 			if(!_noWarn && !episode?.menu)
@@ -1375,7 +1400,7 @@ function updateExperience(_value, _levelup, _char, _noWarn) {
 			if (_c.skills[_key].unlockLevel === _c.level) {
 				_c.skills[_key].locked = false;
 				if(!_noWarn)
-					warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/spell.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('New skill unlocked') + '!</span></div>', null, null, 1);
+					warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/skill.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('New skill unlocked') + '!</span></div>', null, null, 1);
 				break;
 			}
 		resetSkills(_c?.ultimate, null, _c);
@@ -1681,7 +1706,7 @@ function renderLockedContent(_requirement) {
 	 	<span style="text-align:center;color:#f7f7f7cc!important;font-size:3vh!important"><span style="color:#ff6c00 !important">[${getLangData('Content Is Locked')}]</span><br/>${getLangData(_requirement)}</span>
 	 </div>`;
 }
-function askSomething(_question, _okFuncString, _singletonAttr) {
+function askSomething(_question, _okFuncString, _singletonAttr, _container) {
 	try	{
 		event.preventDefault();
 		event.stopPropagation();
@@ -1709,7 +1734,7 @@ function askSomething(_question, _okFuncString, _singletonAttr) {
 		</div>`;
 		const _div = document.createElement('div');
 		_div.innerHTML = _modal;
-		const _mu = document.querySelector('#menu-ui');
+		const _mu = _container ?? document.querySelector('#menu-ui');
 		(_mu ?? _gameUI).appendChild(_div.querySelector('.inventory-question'));
 		PlaySound({ key: 'click' });
 	}

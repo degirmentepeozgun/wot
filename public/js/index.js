@@ -206,10 +206,7 @@ function launchIntoFullscreen(element) {
 		element.msRequestFullscreen();
 }
 function startGame(_callback) {
-	if ('ontouchstart' in window ||
-		(window.DocumentTouch && document instanceof window.DocumentTouch) ||
-		navigator.maxTouchPoints > 0 ||
-		window.navigator.msMaxTouchPoints > 0)
+	if (!__isPC)
 		setTimeout(function () {
 			activateTouchPad();
 		}, 500);
@@ -561,6 +558,26 @@ function initMainCharacter() {
 		mainCharacter.keyboard.holdingKeys = [];
 	return _mh;
 }
+function setTip() {
+	const _splash = document.getElementById('splash');
+	if (_splash) {
+		_splash.style.display = 'flex';
+		_splash.style.opacity = '.99';
+		let _tipOrder;
+		while(true) {
+			_tipOrder = getRandomValue2(0, _tips.length - 1);
+			if(_tipChoices.length === _tips.length)
+				break;
+			else if(_tipChoices.indexOf(_tipOrder + 1) === -1) {
+				_tipChoices.push(_tipOrder + 1);
+				break;
+			}
+		}
+		_splash.innerHTML += createTipsUI(_tipOrder);
+		removeClass(_splash, 'd-none');
+	}
+	return _splash;
+}
 function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 	if(__switchingMap)
 		return;
@@ -580,23 +597,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 	removeClass(_gamePad, 'ghost-mode');
 	__queue.length = 0;
 	_startAnimate = false;
-	const _splash = document.getElementById('splash');
-	if (_splash) {
-		_splash.style.display = 'flex';
-		_splash.style.opacity = '.99';
-		let _tipOrder;
-		while(true) {
-			_tipOrder = getRandomValue2(0, _tips.length - 1);
-			if(_tipChoices.length === _tips.length)
-				break;
-			else if(_tipChoices.indexOf(_tipOrder + 1) === -1) {
-				_tipChoices.push(_tipOrder + 1);
-				break;
-			}
-		}
-		_splash.innerHTML += createTipsUI(_tipOrder);
-		removeClass(_splash, 'd-none');
-	}
+	const _splash = setTip();
 	prevPlatformX = undefined;
 	frames = 0;
 	const _am = document.getElementById('auto-mode-on-off');
@@ -608,6 +609,9 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 	}
 	const _dungeonFloor = episode?.currentFloor;
 	const _oldSeason = episode?.season ?? 0;
+	if(mainCharacter)
+		mainCharacter.platformX;
+	platformX = 0;
 	const _eps = new map({
 		loadObjects: true,
 		key: 'map' + _x + '-' + 1,
@@ -638,19 +642,19 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 		startGame(function (_connectingToGame) {
 			loadUI();
 			if(episode.still) {
-				mainCharacter.left = MathRound(_canvas.width / (_map.enterDirection === 'left' ? 5 : 2));
-				mainCharacter.direction = 'right';
+				mainCharacter.left = MathRound(_canvas.width / (_map.enterDirection === __left ? 5 : 2));
+				mainCharacter.direction = __right;
 				mainCharacter.platformX = platformX = MathRound(episode.width / 2) - mainCharacter.left - (_map.enterDirection === 'left' ? MathRound((_canvas.width / 2) - (_canvas.width / 5)) : 0);
 			}
-			else if((_oldSeason > episode.season || _ss?.from === 'right') && _ss?.from !== 'left') {
+			else if(_ss?.from === __right && _ss?.from !== __left) {
 				mainCharacter.left = MathRound((_canvas.width * .8) - mainCharacter.getWidth());
-				mainCharacter.direction = 'left';
+				mainCharacter.direction = __left;
 				mainCharacter.platformX = platformX = MathRound(episode.width - _canvas.width);
 			}
 			else
 			{
 				mainCharacter.left = MathRound(_canvas.width / 5);
-				mainCharacter.direction = 'right';
+				mainCharacter.direction = __right;
 				mainCharacter.platformX = platformX = 0;
 			}
 			_client.setCharacterValues(mainCharacter, 1);
@@ -2130,13 +2134,32 @@ function playOpeningMusic() {
 	}
 }
 
-function activateGameStart(e) {
+function activateGameStart(_quickPlay, _force) {
+	__story = undefined;
+	if(_quickPlay){
+		if(!_force) {
+			askSomething(`<div class="question-area">${getLangData('This section is designed solely to provide a quick overview of our game mechanics and gameplay. It doesn\'t award any rewards or impact your demo progress. Still want to play?')}</div>`, 
+				'activateGameStart(1, 1)', null, document.getElementById('first-splash'));
+			return;
+		}
+		closeInventoryQuestionModal(1);
+		_client = new dataOperations(1);
+		_client.loadState();
+	}
+	else
+	{
+		_client = new dataOperations();
+		_client.loadState();
+	}
 	PlaySound({key:'enter', volume:.5});
+	addClass(document.querySelector('.opening-controls-icon'), 'd-none');
+	addClass(document.querySelector('.opening-lang-icon'), 'd-none');
 	addClass(document.getElementById('game-difficulty-down'), 'disabled');
 	addClass(document.getElementById('game-difficulty-up'), 'disabled');
 	localStorage.setItem(__difficultyKey, __account.difficulty);
 	__account.difficulty = 6 - __account.difficulty;
-	addClass(e.target, 'disabled2'); 
+	addClass(document.getElementById('connect-btn'), 'disabled2'); 
+	addClass(document.getElementById('qp-btn'), 'disabled2'); 
 	document.getElementById('mini-menu').innerHTML = '<div onexactclick="activatePowerSaveMode()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/power-save.png);background-size: cover"></div>';
 	openGame();
 }
@@ -2177,13 +2200,119 @@ function changeDifficulty(_step){
 		addClass(document.getElementById('game-difficulty-up'), 'disabled');
 	_val.innerText = __difficulties[__account.difficulty - 1].text[getLang()];
 }
-function installOpeningScreen() {
+function resetOpeningScreen() {
+	gameopening = false;
+	setTip();
+	installOpeningScreen(null, 1);
+}
+function approveSelectedLanguage() {
+	const _lang = document.querySelector('.opening-lang-item.selected').getAttribute('data-lang');
+	__account.lang = _lang;
+	_client.saveState();
+	closeInventoryQuestionModal();
+	installOpeningScreen(1);
+}
+function getOpeningLanguages(_selected) {
+	_selected = _selected ?? getLang();
+	return `<div data-lang="en" onexactclick="selectOpeningLanguage('en')" class="opening-lang-item w-100 flex flex-jc-start${_selected === 'en' ? ' selected' : ''}" style="padding:2vh 0 1vh 0">
+		<img style="height:4.5vh" src="./images/ui/circle-${_selected === 'en' ? 'on' : 'off'}.png" />
+		<div style="margin-left:2vh;font-size:3vh;color:#f3f4f5${_selected === 'en' ? '' : 'cc'}">${getLangData("English")}</div>
+	</div>
+	<div data-lang="tr" onexactclick="selectOpeningLanguage('tr')" class="opening-lang-item w-100 flex flex-jc-start${_selected === 'tr' ? ' selected' : ''}" style="padding:1vh 0 2vh 0">
+		<img style="height:4.5vh" src="./images/ui/circle-${_selected === 'tr' ? 'on' : 'off'}.png" />
+		<div style="margin-left:2vh;font-size:3vh;color:#f3f4f5${_selected === 'tr' ? '' : 'cc'}">${getLangData("Turkish")}</div>
+	</div>`;
+}
+function selectOpeningLanguage(_key) {
+	PlaySound({key:'click'});
+	document.getElementById('opening-languages').innerHTML = getOpeningLanguages(_key);
+}
+function askChangeLanguage() {
+	PlaySound({key:'click'});
+	let _modal = `<div class="full fade-me show-ui flex inventory-question">
+		<div class="inventory-modal flex" style="width:50vh;aspect-ratio:1/1;flex-direction:column">`
+			+
+			`<div style="padding:6vh 4vh 2vh 4vh" class="flex w-100">
+				<span style="color:#F4BB44 !important;font-size:3.2vh !important">${getLangData('CHOOSE LANGUAGE')}</span>
+			</div>
+			<div id="opening-languages" class="flex w-50" style="padding:0 4%;flex:1">`
+				+ getOpeningLanguages() +
+			`</div>
+			<div style="padding:2vh 2vh 6vh 2vh" class="flex w-100">
+				<div class="game-menu-button flex animate-me" style="font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('IGNORE')}</div>
+				<div id="item-selection-approve-btn" class="game-menu-button flex animate-me" style="font-size:3vh !important" onexactclick="approveSelectedLanguage()">${getLangData('APPROVE')}</div>
+			</div>
+		</div>
+	</div>`;
+	const _div = document.createElement('div');
+	_div.innerHTML = _modal;
+	document.getElementById('first-splash').appendChild(_div.firstChild);
+}
+function approveKeyboardPromo() {
+	const _container = document.querySelector('.keyboard-promo-container');
+	if(hasClass(_container, 'fade-out'))
+		return;
+	PlaySound({key:'click'});
+	const _elem = document.getElementById('key-promo-skip');
+	if(hasClass(_elem, 'selected'))
+		localStorage.setItem('keyboard-promo-skip', 1);
+	addClass(_container, 'fade-out');
+	_container.onanimationend = function(_e) {
+		if(_e.animationName === 'fade-out-me')
+			_container?.remove?.();
+	}
+}
+function skipKeyboardPromo() {
+	const _elem = document.getElementById('key-promo-skip');
+	const _img = _elem.querySelector('img');
+	PlaySound({key:'click'});
+	if(hasClass(_elem, 'selected')) {
+		removeClass(_elem, 'selected');
+		_img.src = './images/ui/star-off.png';
+	}
+	else {
+		addClass(_elem, 'selected');
+		_img.src = './images/ui/star-on.png';
+	}
+}
+function getKeyboardPromo(_force) {
+	const _seenBefore = localStorage.getItem('keyboard-promo-skip');
+	if(_seenBefore && !_force)
+		return;
+	if(_force)
+		PlaySound({key:'click'});
+	const _desc = document.createElement('div');
+	_desc.className = 'flex show-ui full keyboard-promo-container quick-play-desc-container fade-me animate-me';
+	_desc.style = 'position:absolute;top:0;left:0;overflow:hidden';
+	let _html = '<div style="height:calc(100% - 9vh);position:relative" class="w-100 flex"><img src="./images/icons/keys.png" style="border:.2vh solid #F3F4F599;border-top:0;position:absolute;object-fit:cover;max-width:100%;max-height:100%" /></div>';
+	_desc.innerHTML = _html +
+			`<div class="quick-play-desc-skip flex" style="padding:0 5vh;width:91% !important">
+				<div id="key-promo-skip" onexactclick="skipKeyboardPromo()" class="flex flex-jc-start w-50${_seenBefore ? ' v-none' : ''}" style="height:100%">
+					<div class="flex" style="height:100%">
+						<img src="./images/ui/star-off.png" style="height:5vh;transform:rotate(44deg);-webkit-transform:rotate(44deg)" />
+						<div class="flex" style="margin:0 2vh">${getLangData("Don't show again")}</div>
+					</div>
+				</div>
+				<div onexactclick="approveKeyboardPromo()" class="flex flex-jc-end w-50" style="height:100%">
+					${getLangData('UNDERSTOOD')}
+				</div>
+			</div>`;
+	document.getElementById('first-splash').appendChild(_desc);
+}
+let __isPC = undefined;
+function installOpeningScreen(_instant, _lateOpening) {
 	const _current = parseInt(localStorage.getItem(__difficultyKey) ?? 3);
 	__account.difficulty = _current;
 	var _img = new Image();
 	var _bg = document.getElementById('splash');
 	var _opening = document.getElementById('first-splash');
-	_opening.innerHTML = `
+	if(_opening)
+		_opening.innerHTML = `<div onexactclick="getKeyboardPromo(1)" class="opening-controls-icon flex flex-jc-start${__isPC ? '' : ' d-none'}">
+				<img src="./images/icons/controls.png" />
+			</div>
+			<div onexactclick="askChangeLanguage()" class="opening-lang-icon flex flex-jc-end">
+				<img src="./images/icons/lang.png" /><span>${getLang().toUpperCase()}</span>
+			</div>
 			<div style="height:20%;width:100%;padding-bottom:30vh" class="flex">
 				<div class="game-difficulty-wrapper flex w-100">
 					<div class="game-difficulty-content flex">
@@ -2195,8 +2324,11 @@ function installOpeningScreen() {
 						</div>
 					</div>
 				</div>
-				<div id="connect-btn" class="framed-btn flex" onexactclick="activateGameStart(event)">CONNECT</div>
-				<div style="padding-top:1vh;width:100%;color:#f8f8f880 !important" class="flex" id="assets-progress"></div>
+				<div class="flex">
+					<div id="qp-btn" class="framed-btn flex" onexactclick="activateGameStart(1)">${getLangData('QUICK PLAY')}</div>
+					<div id="connect-btn" class="framed-btn flex" onexactclick="activateGameStart()">${getLangData('DEMO PLAY')}</div>
+				</div>
+				<div style="padding-top:1vh;width:100%;color:#f8f8f880 !important;font-size:2.8vh!important" class="flex" id="assets-progress"></div>
 			</div>`;
 	if(!_opening) {
 		setTimeout(() => {
@@ -2204,6 +2336,8 @@ function installOpeningScreen() {
 		}, 1000);
 		return;
 	}
+	else if(_instant)
+		return;
 	document.getElementById('play-os').click();
 	var _wrapper = document.getElementById('wrapper');
 	_opening.style.width = MathRound(_wrapper.clientWidth * 1.02) + 'px';
@@ -2215,8 +2349,10 @@ function installOpeningScreen() {
 	_img.onload = function() {
 		setTimeout(() => {
 			_opening.style.opacity = 0;
-			document.getElementById('connect-btn').innerText = getLangData('CONNECT');
+			document.getElementById('connect-btn').innerText = getLangData('DEMO PLAY');
+			document.getElementById('qp-btn').innerText = getLangData('QUICK PLAY');
 			removeClass(_opening, 'd-none');
+			removeClass(_opening, 'v-none');
 			_opening.style.background = 'url(./images/loading/0.png), linear-gradient(0deg, #000, #000)'
 			_opening.style.backgroundSize = 'contain, cover';
 			_opening.style.backgroundRepeat = 'no-repeat, repeat';
@@ -2229,10 +2365,27 @@ function installOpeningScreen() {
 		}, 1000);
 	}
 	_img.src = './images/loading/0.png';
+	if(__isPC && !_lateOpening)
+		setTimeout(() => {
+			getKeyboardPromo();
+		}, 100);
 }
 setTimeout(function() {
 	installOpeningScreen();
+	document.addEventListener('keyup', function(e) {
+		if (e.key === "Escape" && __isPC !== undefined)
+			askExitApp();
+	}, false);
+	if ('ontouchstart' in window ||
+		(window.DocumentTouch && document instanceof window.DocumentTouch) ||
+		navigator.maxTouchPoints > 0 ||
+		window.navigator.msMaxTouchPoints > 0)
+		__isPC = false;
+	else
+		__isPC = true;
 }, 2000);
+
+
 
 const hideModal = function() {
 	episode.playSound({ key: 'page', volume:.3 });

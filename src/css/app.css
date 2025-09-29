@@ -2430,7 +2430,7 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	font-size: 3vh !important;
 	line-height: .2vh !important;
 	border: none !important;
-	color: #E2DFD2cc !important;
+	color: #dfe8f3 !important;
 	border-radius: 0 !important;
 	width: auto !important;
 	background: none !important;
@@ -6693,7 +6693,12 @@ img.dmmg.toxic-dmmg {
 .weapon-skill.bgless, .rage-sf.bgless {
 	display: none !important;
 }
-
+.tag-sf.bgless {
+	background-image:url(./../images/ui/menu-icons/fragment.png) !important;
+	background-size:contain !important;
+	background-position: center !important;
+	opacity: .5;
+}
 .story-gift {
 	justify-content: center !important;
 }
@@ -8059,6 +8064,28 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
   animation: glowPulse 1.2s linear 1;
 }
 
+.glow-pulse {
+  border-radius: 50%;
+  background: #ff4040; /* istediğin renk */
+  box-shadow: 0 0 10px rgba(255, 64, 64, 0.8);
+  animation: glow-pulse 1.5s infinite ease-in-out;
+  -webkit-animation: glow-pulse 1.5s infinite ease-in-out
+}
+
+/* Parlama animasyonu */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 64, 64, 0.8),
+                0 0 20px rgba(255, 64, 64, 0.6);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 64, 64, 1),
+                0 0 40px rgba(255, 64, 64, 0.9);
+    transform: scale(1.1); /* hafif büyüyüp geri küçülüyor */
+  }
+}
+
 @keyframes softShine {
   0% {
     background-position: -150% 0;
@@ -8169,8 +8196,14 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 .game-difficulty-wrapper img {
 	height: 2.8vh !important
 }
-#connect-btn {
+#connect-btn, #qp-btn {
 	font-size: 2.8vh !important;
+}
+#connect-btn {
+	margin-left: 2.5vh;
+}
+#qp-btn {
+	margin-right: 2.5vh;
 }
 .auto-pass-results {
 	height: 38vh !important;
@@ -8397,33 +8430,33 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	width:100%;
 }
 .tag-char-area-wrapper-outer {
-   -webkit-mask-image: linear-gradient(60deg, transparent 0%, transparent 30%, black 50%, black 100%);
+  position: absolute;
+  height: 100%;
+  width: 120%;
+  left: 0; /* sabit bırak, artık translate ile oynayacağız */
+  transform: translateX(-130%) rotateY(-10deg);
+  transition: transform 0.5s ease-out;
+  overflow: hidden;
+
+  /* Mask ayarların aynen kalıyor */
+  -webkit-mask-image: linear-gradient(60deg, transparent 0%, transparent 30%, black 50%, black 100%);
   -webkit-mask-repeat: no-repeat;
   -webkit-mask-size: 100% 100%;
   -webkit-mask-position: left top;
-
   mask-image: linear-gradient(60deg, transparent 0%, transparent 30%, black 50%, black 100%);
   mask-repeat: no-repeat;
   mask-size: 100% 100%;
   mask-position: left top;
   will-change: transform, opacity;
 }
-.tag-char-area-wrapper-outer {
-	width: 120%;
-	left: -130%;
-	transform: rotateY(-10deg) !important;
-	position: absolute;
-	height: 100%;
-	overflow: hidden;
-}
+
 .tag-char-area-wrapper {
 	position: relative;
 	height: 33vh !important
 }
 
 .tag-char-area-wrapper-outer.rtl {
-	left: 130%;
-	transform: rotateY(10deg) !important;
+	transform: translateX(130%) rotateY(10deg);
 	-webkit-mask-image: linear-gradient(-60deg, transparent 0%, transparent 30%, black 50%, black 100%);
 	-webkit-mask-repeat: no-repeat;
 	-webkit-mask-size: 100% 100%;
@@ -8463,7 +8496,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 }
 
 .tag-char-area-wrapper-outer.animate {
-	left: -10%
+  transform: translateX(-10%) rotateY(-10deg);
 }
 
 .tag-char-area .tag-char-area-inner {
@@ -9372,4 +9405,174 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 .gem-possibilities .item-in-slot {
 	height: 12vh !important;
 	width:12vh !important
+}
+.opening-lang-icon {
+	position: absolute;
+	top:0;
+	height:7vh;
+	width:20vh;
+	right:0;
+	border-bottom-left-radius: 4vh;
+	background-color: #171311;
+	box-shadow: 0 0 .5vh 1vh #00000080;
+}
+.opening-controls-icon {
+	position: absolute;
+	top:0;
+	height:7vh;
+	width:14vh;
+	left:0;
+	border-bottom-right-radius: 4vh;
+	background-color: #171311;
+	box-shadow: 0 0 .5vh 1vh #00000080;
+}
+.opening-controls-icon img {
+	height:5vh;
+	margin: 0 5vh;
+	margin-top:.75vh
+}
+.opening-lang-icon span {
+	margin-right: 6vh;
+	margin-top:.5vh;
+	font-size: 3.6vh !important;
+	color:#d7b671cc !important
+}
+.opening-lang-icon img {
+	height:3.8vh;
+	margin-right: 1.6vh;
+	margin-top:.75vh
+}
+.quick-play-desc-container {
+	background:#000
+}
+.quick-play-desc-item {
+	width:30.5%;
+	height:42%;
+	margin-top:1.6%;
+	background:#212121 !important;
+	border-radius: 1vh;
+	position: relative;
+}
+.quick-play-desc-item1 {
+	background-image: url(./../images/ui/full-border-vert.png), url(./../images/quicktips/1.png) !important;
+	background-size: 100% auto !important;
+	background-repeat: no-repeat !important;
+}
+.quick-play-desc-item2 {
+	background-image: url(./../images/ui/full-border-vert.png), url(./../images/quicktips/2.png) !important;
+	background-size: 100% auto !important;
+	background-repeat: no-repeat !important;
+}
+.quick-play-desc-item3 {
+	background-image: url(./../images/ui/full-border-vert.png), url(./../images/quicktips/3.png) !important;
+	background-size: 100% auto !important;
+	background-repeat: no-repeat !important;
+}
+.quick-play-desc-item4 {
+	background-image: url(./../images/ui/full-border-vert.png), url(./../images/quicktips/4.png) !important;
+	background-size: 100% auto !important;
+	background-repeat: no-repeat !important;
+}
+.quick-play-desc-item5 {
+	background-image: url(./../images/ui/full-border-vert.png), url(./../images/quicktips/5.png) !important;
+	background-size: 100% auto !important;
+	background-repeat: no-repeat !important;
+}
+.quick-play-desc-item6 {
+	background-image: url(./../images/ui/full-border-vert.png), url(./../images/quicktips/6.png) !important;
+	background-size: 100% auto !important;
+	background-repeat: no-repeat !important;
+}
+.quick-play-desc-item7 {
+	background-image: url(./../images/ui/full-border-vert.png), url(./../images/quicktips/7.png) !important;
+	background-size: 100% auto !important;
+	background-repeat: no-repeat !important;
+}
+.quick-play-desc-skip {
+	width:100%;
+	text-align: center;
+	padding:0 2vh;
+	color:#f3f4f5cc !important;
+	font-size: 3.8vh !important;
+	padding: 2vh;
+	height:9%
+}
+.quick-play-desc-bottom, .quick-play-desc-top {
+	position: absolute;
+	left:0;
+	width:100%;
+	padding: 1vh;
+	line-height: 3vh !important;
+	background-color:#00000099;
+	color:#F4BB44 !important;
+	font-size: 3vh !important;
+	text-align: center;
+}
+.quick-play-desc-item-title {
+	background-color:#000;
+	line-height: 3vh !important;
+	color:#F4BB44 !important;
+	font-size: 3vh !important;
+	text-align: center
+}
+.quick-play-desc-skill-icons {
+	position: absolute;
+	left:0;
+  	right:0;
+  	margin-left: auto;
+  	margin-right: auto;
+	width: 24vh
+}
+.quick-play-desc-bottom {
+	bottom:-1vh
+}
+
+.quick-play-desc-top {
+	top:-1vh
+}
+.quick-play-desc-skill-icon {
+	height:8vh;
+	width:8vh;
+	border-radius: 100%;
+	background:crimson;
+	position: relative;
+}
+.quick-play-desc-skill-icon::after {
+	width: 10vh;
+	content: "";
+	background-image: url('./../images/ui/skill.png?v=3');
+	background-repeat: no-repeat;
+	background-size: cover;
+	position: absolute;
+	left: -1vh;
+	top: -1vh;
+	height: 10vh;
+}
+.quick-play-desc-skill-swap {
+	margin:1vh;
+	height:4vh
+}
+.quick-play-desc-skill-icons div {
+	box-shadow: 0 0 2vh 1vh #000;
+}
+.question-area {
+	padding:4vh 4vh 2vh 4vh;
+	color:#9d987f !important;
+	width:100%;
+	text-align: center;
+}
+.quick-play-desc-content-item { 
+	font-size:3vh !important;
+	line-height: 3vh !important;
+	padding:1vh 2vh;
+	color:#f3f4f5ab !important;
+	height:5vh
+}
+.quick-play-desc-content-item img {
+	height:90%;
+	margin-right:1vh;
+	opacity: .9;
+}
+.quick-play-desc-item-title.flex-jc-start {
+	padding-left:2vh
 }

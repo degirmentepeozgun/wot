@@ -1381,7 +1381,7 @@ function enemy(_e) {
 			this.soundPlaying = undefined;
 	}
 	this.draw = function (_queue) {
-		if(this.remove || _game.suspended)
+		if(this.remove || (_game.suspended && !this.warm))
 			return;
 		// if(!this.harmless && this.autoMode > 0 && this.animation === this.lastFinishedAttack)
 		// {
@@ -1875,7 +1875,8 @@ function enemy(_e) {
 			(this.dead || this.finishing) && !this.expGained) {
 			this.expGained = true;
 			updateGlobalQuest('kill-enemy');
-			//updateExperience(MathCeil((this.experience * (this.expEnabled ? 2 : 1)) * (this.level / mainCharacter.level)));
+			if(_client.quickPlay)
+				updateExperience(MathCeil((this.experience * (this.expEnabled ? 2 : 1)) * (this.level / mainCharacter.level)));
 			// if (_coopMembers?.[0])
 			// 	for (let _cm of _coopMembers)
 			// 		updateExperience(MathCeil((this.experience * (this.expEnabled ? 2 : 1)) * (this.level / _cm.level)), null, _cm);
@@ -4364,7 +4365,7 @@ function enemy(_e) {
 				let _enemyPriority = _enemyFrame.priority ?? _enemyAnima.priority, _thisPriority = _frame.priority ?? _anima.priority;
 				if (_enemyFrame?.atk) {
 					if (_enemyPriority === _thisPriority) {
-						if (this.class !== __spell && _enemy.class !== __spell && _enemy.direction !== this.direction && getRandomValue(1, 10) === 1) {
+						if (this.class !== __spell && _enemy.class !== __spell && _enemy.direction !== this.direction && !this.friendly && !_enemy.friendly && getRandomValue(1, 10) === 1) {
 							_enemy.animate('dash');
 							this.animate('dash');
 							this.addObject({
@@ -4727,9 +4728,10 @@ function enemy(_e) {
 				_bar.style.width = MathRound(this.rageCount * (100 / this.getMaxRageCount())) + '%';
 		}
 		if (this.rageCount === 0) {
+			const _endOfRage = this.ultimate;
 			this.rage = this.ultimate = this.shadowData = undefined;
 			if(this.alp || episode.pvp)
-				resetSkills(null, _doNotResetSkills, this);
+				resetSkills(null, _doNotResetSkills, this, null, _endOfRage);
 			if (this.main) {
 				removeUltimateCircle();
 				//removeClass(rageSkill, 'glow');
@@ -6291,10 +6293,10 @@ function enemy(_e) {
 				}
 				else {
 					let _newAnima = this.animations[_skill];
-					if (!_newAnima.chain && this.immobilize) {
+					if (!_newAnima.chain && this.immobilize && !_newAnima.useInCC) {
 
 					}
-					if (_newAnima.chain || _frame.imediateBreak || (_anima.imediateBreak && !this.charging) || this.animationFinished || _anima.channeling)
+					if (_newAnima.chain || _frame.imediateBreak || (_anima.imediateBreak && !this.charging) || this.animationFinished || _anima.channeling || (_newAnima.useInCC && _anima.hurt))
 						if (!this.animate(_skill))
 							this.idle(7);
 				}

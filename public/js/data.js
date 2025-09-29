@@ -1,5 +1,6 @@
 ﻿'use strict';
-function dataOperations() {
+function dataOperations(_quickPlay) {
+	this.quickPlay = _quickPlay;
 	this.storageKey = 'com-bi-frame-wot-wrath-of-erlik'; //(__deviceId ?? 411191);// + '-' + (_dataId ?? '08');
 	this.localData = {
 		warrior: {
@@ -37,6 +38,8 @@ function dataOperations() {
 		this.localData[_char.class].fatique = _char.fatique;
 	}
 	this.saveState = function (_force) {
+		if(this.quickPlay)
+			return;
 		if (!_force && (episode?.pvp || __storyPlaying))
 			return;
 		localStorage.setItem(this.storageKey, JSON.stringify(__account));
@@ -119,7 +122,7 @@ function dataOperations() {
 					current: 0
 				}
 			],
-			lang: 'en',
+			lang: __account?.lang ? __account.lang : 'en',
 			options: {
 				gore: 0,
 				effect: 1,
@@ -222,7 +225,7 @@ function dataOperations() {
 		this.saveState();
 	}
 	this.loadState = function () {
-		let _reset;
+		let _reset = this.quickPlay;
 		let _json = JSON.parse(localStorage.getItem(this.storageKey) ?? '{}');
 		if(_json?.version !== this.getDefaultData().version){
 			localStorage.removeItem(this.storageKey);

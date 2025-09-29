@@ -155,6 +155,7 @@ const __stories = [
 		id: 1,
 		order: 1,
 		disableWorldMap: true,
+		startScene:1,
 		loadingCharacterIds: [1, 2, 28],
 		resultStars: [
 			{ id: 1, title: 'Clear story', when: function() {
@@ -1349,7 +1350,7 @@ const __stories = [
 							{
 								do: function() {
 									episode.enemies.filter(x => x !== mainCharacter && !x.isDead())
-									.forEach(x => x.direction = 'left');
+									.forEach(x => x.direction = __left);
 								},
 								ms: 2100
 							},
@@ -4530,7 +4531,7 @@ const __stories = [
 		id: 8,
 		order: 8,
 		disableWorldMap: true,
-		loadingCharacterIds: [47],
+		loadingCharacterIds: [37,38],
 		resultStars: [
 			{ id: 1, title: 'Clear story', when: function() {
 				return !mainCharacter.isDead();
@@ -4573,7 +4574,7 @@ const __stories = [
 					ms: 60000,
 					after: function() {
 						episode.phase = 99;
-						episode.enemies.filter(x => !x.main).forEach(x => {
+						episode.enemies.filter(x => !x.main && !x.friendly).forEach(x => {
 							x.stopSpawn();
 							x.health = x.experience = 0;
 							x.dead = x.dying = true;
@@ -4595,25 +4596,28 @@ const __stories = [
 							setTimeout(() => {
 								if(episode?.id !== 201)
 									return;
-								const _bs = [37, 38];
 								episode.phase = 100;
-								for(let _b of _bs){
+								const installBoss = function(_b) {
 									const _boss = summonMobWithJson({
 										id: _b,
 										level: 13,
-										atk: 60,
+										atk: mainCharacter.atk,
 										grade: 4
 									});
 									//_boss.health = _boss.maxHP = 1;
 									_boss.class = 'boss';
 									_boss.experience = 0;
-									mainCharacter.maxHP = mainCharacter.MAXHP =
-									mainCharacter.maxHP * 1;
-									mainCharacter.setHealth(mainCharacter.MAXHP);
 									_boss.setDifficulty(__account.difficulty - 1);
 									_boss.acceptChanges();
 									_boss.pickNewTarget();
 								}
+								installBoss(37);
+								requestAnimationFrame(() => {
+									installBoss(38);
+								});
+								mainCharacter.maxHP = mainCharacter.MAXHP =
+								mainCharacter.maxHP * 1;
+								mainCharacter.setHealth(mainCharacter.MAXHP);
 								episode.pauseAmbianceMusic();
 								episode.pauseBgMusic(1);
 								episode.createBgMusic(null, null, null, 'cyclops-battle', .5);
@@ -5014,7 +5018,7 @@ const __stories = [
 													experience: 0,
 													noLoot: true,
 													skipHealthBar: true,
-													direction: 'left'
+													direction: __left
 												},
 												count: 6
 											}, 1);
@@ -5029,7 +5033,7 @@ const __stories = [
 												_archer.level = mainCharacter.level;
 												resetSkills(null, 1, _archer);
 												_archer.skipHealthBar = true;
-												_archer.direction = 'right';
+												_archer.direction = __right;
 												_archer.left = MathRound(.05 * _canvas.width);
 												_archer.platformX = 0;
 												_archer.standBy();
@@ -5052,6 +5056,7 @@ const __stories = [
 											_e19.forEach(x => {
 												x.setAutoMode(0, 1);
 												x.standBy();
+												x.direction = __left;
 											});
 
 											summonMobWithJson({
@@ -5086,6 +5091,7 @@ const __stories = [
 											_e27.forEach(x => {
 												x.setAutoMode(0, 1);
 												x.standBy();
+												x.direction = __right;
 											});
 											episode.enemies.filter(x => x.key !== 'vtm' && x.key !== 'vtl' &&
 												!x.alp && !x.owner && !x.villain)?.forEach(x => x.remove = true);
@@ -5987,7 +5993,6 @@ const __stories = [
 		mission: 'ad',
 		daily:2,
 		minLevel:10,
-		list: false,
 		ticket: 0,
 		perfectFinishRewards: [{ key: 'chest', grade: 2 }],
 		title: {
@@ -6246,6 +6251,346 @@ const __stories = [
 			},
 			getLobbyScene()
 		]
+	},
+	{
+		id:200,
+		loadingCharacterIds: [37,38],
+		disableWorldMap: true,
+		order:200,
+		act:1,
+		minLevel:1,
+		list: false,
+		ticket: 0,
+		mission: 'qp',
+		perfectFinishRewards: [{ key: 'chest', grade: 2 }],
+		title: {
+			en: 'Witch Hunt',
+			tr: 'Cadı Avı'
+		},
+		description: {
+			en: "",
+			tr: ""
+		},
+		resultStars: [
+			{ id: 1, title: 'Clear mission', when: function() {
+				return !mainCharacter.isDead();
+			}},
+			{ id: 2, key: 'time', value: 15 * 60000, title: 'Finish in time',
+				when: function(_item) {
+					//return !isMissionFailed(0) && !isMissionFailed(2) &&
+					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
+			}},
+			{ id: 3, key: 'heart', value: 1, title: 'Stay above 1 heart', when: function(_item) {
+				return mainCharacter.heartCount > _item.value;
+			}}
+		],
+		rewards: [
+			{ key: 'item', grade: 2, type: 'weapon' },
+			{ key: 'gem', grade: 1, type: 'random', count:1 },
+			{ key: 'gold', count: 5000 },
+			{ key: 'exp', count: 1200 }
+		],
+		quests: [
+		],
+		scenes: [
+			{
+				map: 201,
+				heartCount : 3,
+				loots: [
+					{type:'pot', key:'pot', chance:1}
+				],
+				startsWith: 1,
+				save: true,
+				start: function() {
+					clearAudioCache(loadedSounds);
+					removeCoopCharacter();
+					mainCharacter.storyVariables = {
+						level: mainCharacter.level,
+						experience: mainCharacter.experience,
+						maxExperience: mainCharacter.maxExperience
+					};
+					mainCharacter.level = 0;
+					mainCharacter.experience = 0;
+					mainCharacter.maxExperience = 833;
+					setCharacterLevel(13, null, 1);
+					//setCharacterLevel(8, null, 1);
+					addClass(_gameUI, 'demo-playing');
+					episode.pauseBgMusic(1);
+					episode.createBgMusic(null, null, null, 'training');
+					episode.playBgMusic();
+					episode.phase = 1;
+					updateQuestArea(null,
+						{
+							id: 1001,
+							descriptions: {
+								en: 'Become Level 2',
+								tr: 'Seviye 2 ol'
+							},
+							names: {
+								en: 'Power Up',
+								tr: 'Güçlenme'
+							},
+							owner: 'system',
+							minLevel: 1,
+							maps: [201]
+						}
+					);
+					const _es = episode.enemies.filter(x => x.enemy);
+					_es.forEach(_e => 
+						{
+							_e.animations.hurtfeet = new animation(createHurtFeet(_e.zoom, _e.bloodColor));
+						}
+					);
+					episode.loadCharacterSprites(function() {}, null, ['hurtfeet'],1,1);
+					mainCharacter.direction = __right;
+					const _tagChar = episode.enemies.find(x => x.id === 47);
+					if(_tagChar)
+						_tagChar.remove = true;
+					if(mainCharacter.tagContainer)
+					{
+						mainCharacter.tagContainer.remove();
+						delete mainCharacter.tagContainer;
+					}
+					const _desc = document.createElement('div');
+					_desc.className = 'flex show-ui full quick-play-desc-container fade-me';
+					let _html = '';
+					for(let i = 0; i < 6; i++) {
+						const _tip = __quickTips[i];
+						let _skillHtml = '';
+						for(let _sk of _tip.skills) {
+							if(_skillHtml !== '')
+								_skillHtml += '<img src="./images/icons/swap-right.png" class="quick-play-desc-skill-swap" />';
+							_skillHtml += '<div class="quick-play-desc-skill-icon" style="background-image:url(./images/main/skill-icons/warrior/' + _sk + '.png);background-size:cover"></div>';
+						}
+						_skillHtml = `<div class="quick-play-desc-skill-icons flex">` + _skillHtml + '</div>';
+						_html += `<div class="quick-play-desc-item quick-play-desc-item${_tip.id}">`
+							+ _skillHtml +
+					 		`<div class="quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
+					   </div>`;
+					}
+					_desc.innerHTML = _html +
+					   `<div onexactclick="skipQuickPlayTutorial()" class="quick-play-desc-skip flex glow">&lt;&nbsp;${getLangData('UNDERSTOOD')}&nbsp;&gt;</div>`;
+					addClass(_gameUI, 'disable-ui');
+					requestAnimationFrame(() => {
+						_game.suspended = true;
+					});
+					_gameUI.appendChild(_desc);
+				},
+				actions: [
+					{
+						when: function() {
+							return episode.phase < 99 && mainCharacter.level > 12;
+						},
+						do: function() {
+							episode.phase = 99;
+							episode.enemies.filter(x => !x.main && !x.friendly).forEach(x => {
+								x.stopSpawn();
+								x.health = x.experience = 0;
+								x.dead = x.dying = true;
+								x.animate('dead', 1);
+							});
+							episode.mobs = episode.respawners = [];
+							PlaySound({key:'bossalert', volume: .5});
+							warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000);
+							const _elm = document.getElementById('quest-status');
+							addClass(_elm, 'mission-done');
+							__storyScene.bossQuest = {
+								id: 1100,
+								names: {
+									en: 'Party Time',
+									tr: 'Parti Zamanı'
+								},
+								descriptions: {
+									en: 'Eliminate Sisters',
+									tr: 'Kardeşleri Yok Et'
+								},
+								owner: 'system',
+								minLevel: 1,
+								kills: [
+									{
+										enemy: [37],
+										limit: 1,
+										descriptions: {
+											en: 'Yecüc Cleared',
+											tr: 'Yecüc Temizlendi'
+										}
+									},
+									{ 
+										enemy: [38], 
+										limit: 1, 
+										descriptions: {
+											en: 'Mecüc Cleared',
+											tr: 'Mecüc Temizlendi'
+										} 
+									}
+								],
+								maps: [201]
+							};
+							_elm.onanimationend = function(e) {
+								if(e.animationName === 'mission-done')
+									updateQuestArea(null,
+								 		__storyScene.bossQuest
+									);
+							}
+							setTimeout(() => {
+								PlaySound({key:'sistersenter', volume:1});
+								setTimeout(() => {
+									episode.phase = 100;
+									const installBoss = function(_b) {
+										const _boss = summonMobWithJson({
+											id: _b,
+											level: 13,
+											atk: mainCharacter.atk,
+											grade: 4
+										});
+										_boss.health = _boss.maxHP = 1;
+										_boss.class = 'boss';
+										_boss.experience = 0;
+										_boss.setDifficulty(__account.difficulty - 1);
+										_boss.acceptChanges();
+										_boss.pickNewTarget();
+									}
+									installBoss(37);
+									requestAnimationFrame(() => {
+										installBoss(38);
+									});
+									mainCharacter.maxHP = mainCharacter.MAXHP =
+									mainCharacter.maxHP * 1;
+									mainCharacter.setHealth(mainCharacter.MAXHP);
+									episode.pauseAmbianceMusic();
+									episode.pauseBgMusic(1);
+									episode.createBgMusic(null, null, null, 'cyclops-battle', .5);
+									episode.playBgMusic();
+								}, 1000);
+							}, 4000);
+						}
+					},
+					{
+						when: function() {
+							return mainCharacter.level > episode.phase;
+						},
+						do: function() {
+							episode.phase++;
+							for(let x of __storyScene.mobs){
+								let y = summonMobWithJson(structuredClone2(x),0,1);
+								y.experience = mainCharacter.level * 250;
+								y.maxHP = y.MAXHP = mainCharacter.level * 30;
+								y.setHealth(y.maxHP);
+							}
+							updateQuestArea(null, {
+								id: 1000 + mainCharacter.level,
+								descriptions: {
+									en: 'Become Level ' + (mainCharacter.level + 1),
+									tr: 'Seviye ' + (mainCharacter.level + 1) + ' ol'
+								},
+								names: {
+									en: 'Power Up',
+									tr: 'Güçlenme'
+								},
+								owner: 'system',
+								minLevel: mainCharacter.level,
+								maps: [201]
+							});
+							if(mainCharacter.level === 9) {
+								delete mainCharacter.animations.tag.disabled;
+								resetSkill('tag', mainCharacter);
+								PlaySound({key:'conquer', volume:.6});
+								getImage('./images/main/avatars/cyclops.png', function(_img) {
+									const url = _img.toDataURL();
+									warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
+								});
+							}
+						}
+					},
+					{
+						when: function() {
+							return episode.phase === 100 && !episode.enemies.filter(x => x.class === 'boss')?.length;
+						},
+						do: function() {
+							episode.phase = 101;
+							__storyScene.bossQuest.kills[0].count = 1;
+							updateQuestArea(null, __storyScene.bossQuest);
+							__storyPlaying = false;
+							installStoryFinish();
+						}
+					}
+				],
+				mobs: [
+					{
+						id: 19,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						spawn: 1,
+						hp:60,
+						experience: 250
+					},
+					{
+						id: 20,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						spawn: 1,
+						hp:60,
+						experience: 250
+					},
+					{
+						id: 66,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						spawn: 1,
+						hp:60,
+						experience: 250
+					},
+					{
+						id: 28,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						spawn: 1,
+						hp:60,
+						experience: 250
+					},
+					{
+						id: 30,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						spawn: 1,
+						hp:60,
+						experience: 250
+					},
+					{
+						id: 24,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						spawn: 1,
+						hp:60,
+						experience: 250
+					},
+					{
+						id: 7,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						spawn: 1,
+						hp:60,
+						experience: 250
+					},
+					{
+						id: 1,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						spawn: 1,
+						hp:60,
+						experience: 250
+					}
+				]
+			}
+		]
 	}
 ];
 function finishStory() {
@@ -6272,6 +6617,11 @@ function continueStoryAnyway() {
 var __storyBonusItemCount = 0, __storyLastUsedSettings;
 function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 	resetQuestLine();
+	if(_client.quickPlay){
+		_client = new dataOperations(1);
+		_client.loadState();
+		_id = 200;
+	}
 	const _s = __stories.find(x => x.id === _id);
 	if(_s.passive) {
 		warn('<span>' + getLangData('Story is passive for now') + '</span>', 'warn');
@@ -6308,6 +6658,39 @@ function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 		__story.endTime = undefined;
 	});
 	mainCharacter.heartCount = __storyScene.heartCount ?? 1;
+	if(_client.quickPlay) {
+		const _char = __account.characters.find(x => x.class === mainCharacter.class);
+		_char.tag = {id:1, grade:1};
+		resetSkills(null, 1, mainCharacter);
+		delete mainCharacter.animations.tag.delay;
+		mainCharacter.animations.tag.modify = function(_e) {
+			_e.animations.ground1.priority = 1;
+			delete _e.animations.idle.alternateFrames;
+			_e.animations.ground1.frames.forEach(x => {
+				if(x.atk){
+					x.atk.ignoreDef = true;
+					x.atk.rate = 2;
+					if(x.atk.hurt)
+						x.atk.hurt.smash = true;
+				}
+			});
+		}
+		mainCharacter.animations.tag.disabled = true;
+		resetSkills(null, 1, mainCharacter);
+		const warmupAll = async function() {
+			await warmupSpriteSheet("./images/related/boom.png");
+			await warmupSpriteSheet("./images/related/boomgreen.png");
+			await warmupSpriteSheet("./images/sprites/ep47/attack1.png");
+		}
+		warmupAll();
+		mainCharacter.direction = __left;
+		episodeVisibilityHidden = 1;
+		mainCharacter.animations.tag.disabled = false;
+		//mainCharacter.animate('tag', 1);
+		mainCharacter.animations.tag.frames[0].do(mainCharacter);
+		mainCharacter.animations.tag.disabled = true;
+		episodeVisibilityHidden = false;
+	}
 }
 var _storySceneSwitching;
 function switchStoryScene(_func, _newOrder) {
@@ -6369,6 +6752,21 @@ function switchStoryScene(_func, _newOrder) {
 				_func();
 		});
 	//}
+}
+function warmupSpriteSheet(src) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.src = src;
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      const ctx = c.getContext("2d");
+      c.width = img.width;
+      c.height = img.height;
+      // sadece 1 defa çizmek bile GPU’ya bind etmeye yeter
+      ctx.drawImage(img, 0, 0);
+      resolve();
+    };
+  });
 }
 function clearChainSkills(){
 	for (var i = 1; i <= Object.keys(chainSkills).length; i++){
@@ -6734,6 +7132,17 @@ function portTo(_id) {
 			switchStoryScene();
 		else
 			switchMap(_id);
+	}
+}
+function skipQuickPlayTutorial() {
+	const _cont = document.querySelector('.quick-play-desc-container');
+	if(_cont) {
+		PlaySound({key:'click'});
+		_cont.remove();
+		requestAnimationFrame(() => {
+			removeClass(_gameUI, 'disable-ui');
+			_game.suspended = false;
+		});
 	}
 }
 
@@ -7263,9 +7672,11 @@ function tryStartStoryMission(_id, _golds, _exps, _items, _func, _isFirstStart) 
 		playStory(_id, null, function() {
 			if(_s.mission) {
 				let _am = __account.missions.find(x => x.key === _s.mission);
-				_am.current++;
-				_am.lastActivity = _gameTick;
-				_client.saveState(1);
+				if(_am) {
+					_am.current++;
+					_am.lastActivity = _gameTick;
+					_client.saveState(1);
+				}
 			}
 			else
 				tryConsumeTickets(_goldSelected, _expSelected, _itemSelected, _s.ticket);
@@ -7489,3 +7900,357 @@ function delay(ms) {
 // 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/' + _giftOrder[3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
 // 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/' + _giftOrder[3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
 // }, 15000);
+
+function createPromoScreen() {
+	const _data = [
+		{
+			section: 1,
+			title: { 
+				tr: 'Demo Aynı Zamanda Şunları İçerir',
+				en: 'Demo Also Includes'
+			},
+			titlePosition: 'top',
+			contents: [
+				{ 
+					en: 'Fatalities',
+					tr: 'Ölüm Vuruşları'
+				},
+				{ 
+					en: 'Real-time PvP',
+					tr: 'Eş-zamanlı PvP'
+				},
+				{ 
+					en: '3v3 PvP (War)',
+					tr: '3v3 PvP (Savaş)'
+				},
+				{ 
+					en: 'Area Defense (Co-op)',
+					tr: 'Bölge Savunması (Co-op)'
+				},
+				{ 
+					en: 'NPC Characters and Quests',
+					tr: 'NPC Karakterler ve Görevler'
+				},
+				{ 
+					en: 'Play The Boss',
+					tr: 'Patronu Sen Yönet'
+				}
+			]
+		},
+		{
+			section: 2,
+			titlePosition: 'top',
+			title: { 
+				tr: 'Demodaki Kullanıcı Arayüzü İçerikleri',
+				en: 'User Interface Contents In Demo'
+			},
+			contents: [
+				{ 
+					en: 'Inventory System',
+					tr: 'Ekipman Sistemi'
+				},
+				{ 
+					en: 'Skill and Talent Tree System',
+					tr: 'Yetenek ve Beceri Ağacı Sistemi'
+				},
+				{ 
+					en: 'Gem and Socket System',
+					tr: 'Yakut ve Yuva Sistemi'
+				},
+				{ 
+					en: 'Mailbox System',
+					tr: 'Posta Kutusu Sistemi'
+				},
+				{ 
+					en: 'Fragment & Tag Skill System',
+					tr: 'Parçacık ve Destekçi Sistemi'
+				},
+				{ 
+					en: 'Daily Reward System',
+					tr: 'Günlük Ödül Sistemi'
+				}
+			]
+		},
+		{
+			section: 3,
+			title: { 
+				tr: 'Gelecek Planlarımız Neler?',
+				en: 'What Are Our Future Plans?'
+			},
+			titlePosition: 'top',
+			contents: [
+				{ 
+					en: 'About PvP Content',
+					tr: 'PvP İçeriği Hakkında',
+					details: [ 
+						{
+							en: 'Free for all',
+							tr: 'Herkes tek'
+						},
+						{
+							en: 'Guild vs guild PvP',
+							tr: 'Loncalar arası PvP'
+						},
+						{
+							en: '2v2 Arena',
+							tr: '2v2 Arena'
+						},
+						{
+							en: 'Rival humiliation',
+							tr: 'Rakip aşağılama'
+						},
+						{
+							en: 'Online monthly tournament',
+							tr: 'Çevrimiçi aylık turnuva'
+						},
+						{
+							en: 'More team vs team content',
+							tr: 'Daha fazla takımlar arası içerik'
+						}
+					]
+				},
+				{ 
+					en: 'About Story and Acts',
+					tr: 'Hikaye ve Bölümler Hakkında',
+					details: [ 
+						{
+							en: 'More acts',
+							tr: 'Daha fazla bölüm'
+						},
+						{
+							en: 'More stories',
+							tr: 'Daha fazla hikaye'
+						},
+						{
+							en: 'More enemy units',
+							tr: 'Daha fazla düşman'
+						},
+						{
+							en: 'More NPC characters',
+							tr: 'Daha fazla NPC'
+						},
+						{
+							en: 'More main characters',
+							tr: 'Daha fazla ana karakter'
+						},
+						{
+							en: 'More powerful bosses',
+							tr: 'Daha güçlü patronlar'
+						}
+					]
+				},
+				{ 
+					en: 'About Dungeons and Co-op',
+					tr: 'Zindanlar ve Co-op Hakkında',
+					details: [ 
+						{
+							en: 'Real-time raids and dungeons',
+							tr: 'Eş-zamanlı baskın ve zindanlar'
+						},
+						{
+							en: 'World bosses for everyone',
+							tr: 'Herkesin saldırabileceği yaratıklar'
+						},
+						{
+							en: 'World bosses for everyone',
+							tr: 'Herkesin saldırabileceği yaratıklar'
+						},
+						{
+							en: 'Blood match',
+							tr: 'Kan müsabakası'
+						},
+						{
+							en: 'Clan-specific boss creatures',
+							tr: 'Klanlara özgü patron yaratıkları'
+						},
+						{
+							en: 'More real-time co-op content',
+							tr: 'Daha fazla eş-zamanlı co-op içerik'
+						}
+					]
+				},
+				{ 
+					en: 'About Social Functions',
+					tr: 'Sosyal Fonksyonlar Hakkında',
+					details: [ 
+						{
+							en: 'Creating blacklist',
+							tr: 'Karaliste oluşturmak'
+						},
+						{
+							en: 'Adding/Removing friends',
+							tr: 'Arkadaş ekleme/çıkarma'
+						},
+						{
+							en: 'Personal messaging',
+							tr: 'Özel mesajlaşma'
+						},
+						{
+							en: 'Bad words filtering',
+							tr: 'Küfür filtreleme'
+						},
+						{
+							en: 'Message translating',
+							tr: 'Mesaj çevirisi'
+						},
+						{
+							en: 'Guild system',
+							tr: 'Lonca sistemi'
+						}
+					]
+				},
+				{ 
+					en: 'About Mechanics and Effects',
+					tr: 'Mekanikler ve Efektler Hakkında',
+					details: [ 
+						{
+							en: 'VFX visual effects',
+							tr: 'VFX görsel efektler'
+						},
+						{
+							en: 'More fatality options',
+							tr: 'Daha fazla ölüm vuruşları'
+						},
+						{
+							en: 'Improved artifical intelligence',
+							tr: 'Gelişmiş yapay zeka'
+						},
+						{
+							en: 'Weapon specific skills',
+							tr: 'Silah bazlı yetenekler'
+						},
+						{
+							en: 'More interactive effects',
+							tr: 'Daha fazla interaktif efekt'
+						},
+						{
+							en: 'More interaction with objects',
+							tr: 'Daha fazla nesne etkileşimi'
+						}
+					]
+				},
+				{ 
+					en: 'About Us',
+					tr: 'Bizim Hakkımızda',
+					details: [ 
+						{
+							en: 'Follow us on youtube',
+							tr: 'Youtube kanalımızı takip edin'
+						},
+						{
+							noIcon: true,
+							en: '@warriorsoftengri',
+							tr: '@warriorsoftengri'
+						},
+						{
+							en: 'Follow us on instagram',
+							tr: 'Instagram kanalımızı takip edin'
+						},
+						{
+							noIcon: true,
+							en: '#warriors.of.tengri',
+							tr: '#warriors.of.tengri'
+						},
+						{
+							en: 'Visit our website',
+							tr: 'Web sitemizi ziyaret edin'
+						},
+						{
+							noIcon: true,
+							en: 'https://warriorsoftengri.com',
+							tr: 'https://warriorsoftengri.com'
+						}
+					]
+				}
+			]
+		}
+	];
+	const _desc = document.createElement('div');
+	_desc.className = 'show-ui full quick-play-desc-container fade-me';
+	_desc.style = "overflow:hidden;position:relative";
+	_desc.setAttribute('data-order', 1);
+	let _html = '<div class="flex" style="width:100%;height:91%;flex-wrap: nowrap;will-change:transform;transition: transform 0.3s ease;transform:translateX(0);align-items:stretch;justify-content:flex-start">';
+	let j = 1;
+	for (let _d of _data){
+		_html += `<div data-baslik="${encodeURIComponent(_d.title[getLang()])}" class="flex quick-play-slide" style="flex:0 0 100%;height:100%">`;
+		for(let i = 0; i < _d.contents.length; i++) {
+			const _tip = _d.contents[i];
+			let _content;
+			if(_tip.details) {
+				_content = '<div class="full">';
+				for(let row of _tip.details)
+					_content += `<div class="w-100 p-02 flex flex-jc-start quick-play-desc-content-item">` + (row.noIcon ? `&nbsp;&nbsp;-&nbsp;` : `<img src='./images/icons/swap-right.png' />`) + `${row[getLang()]}</div>`;
+				_content += '</div>';
+			}
+			_html += `<div class="quick-play-desc-item flex" style="background:#000 !important">
+			<div class="w-100 flex quick-play-desc-item-title${_content ? ' flex-jc-start' : ''}" style="height:5vh">${_tip[getLang()]}</div>`+
+				(_content ?? `<img style="max-height:calc(100% - 5vh);max-width:100%" src="./images/quickplay/${j.toString() + '-' + (i + 1).toString()}.png" />`) +
+			`</div>`;
+		}
+		_html += `</div>`;
+		j++;
+	}
+	_desc.innerHTML = _html + '</div>' +
+		`<div class="quick-play-desc-skip flex w-100">
+			<div onexactclick="prevPromoSection(${_data.length})" id="quick-play-prev" style="height:100%;width:auto" class="flex p-02 v-none">
+				&lt;&nbsp;${getLangData('BACK')}
+			</div>
+			<div id="quick-play-title" style="height:100%;flex:1" class="flex 0-02">
+				${_data[0].title[getLang()]}
+			</div>
+			<div id="quick-play-next" onexactclick="nextPromoSection(${_data.length})" style="height:100%;width:auto" class="flex p-02">
+				${getLangData('NEXT')}&nbsp;&gt;
+			</div>
+		</div>`;
+	addClass(_gameUI, 'disable-ui');
+	_gameUI.appendChild(_desc);
+}
+
+function prevPromoSection(_max) {
+	const _qp = document.querySelector('.quick-play-desc-container');
+	if(!_qp)
+		return;
+	const _order = parseInt(_qp.getAttribute('data-order'));
+	if(_order === 1)
+		return;
+	PlaySound({ key: 'page', volume: .3, reset: true });
+	_qp.setAttribute('data-order', _order - 1);
+	_qp.firstChild.style.transform = `translateX(-${(_order - 2) * 100}%)`;
+	//_qp.firstChild.style.left = ((_order - 2) * -33.3).toString() + '%';
+	if(_order === _max)
+	{
+		const _next = document.getElementById('quick-play-next');
+		_next.innerHTML = getLangData('NEXT') + '&nbsp;&gt;';
+	}
+	if(_order === 2) {
+		const _prev = document.getElementById('quick-play-prev');
+		addClass(_prev, 'v-none');
+	}
+	document.getElementById('quick-play-title').innerText = decodeURIComponent(_qp.querySelectorAll('.quick-play-slide')[_order - 2].getAttribute('data-baslik'));
+}
+function nextPromoSection(_max) {
+	const _qp = document.querySelector('.quick-play-desc-container');
+	if(!_qp)
+		return;
+	const _order = parseInt(_qp.getAttribute('data-order'));
+	const _prev = document.getElementById('quick-play-prev');
+	removeClass(_prev, 'v-none');
+	if(_order === _max) {
+		PlaySound({key:'click'});
+		_qp.remove();
+		resetOpeningScreen();
+		return;
+	}
+	else {
+		PlaySound({ key: 'page', volume: .3, reset: true });
+		_qp.setAttribute('data-order', _order + 1);
+		_qp.firstChild.style.transform = `translateX(-${_order * 100}%)`;
+		//_qp.firstChild.style.left = (_order * -33.3).toString() + '%';
+		if(_order === (_max-1))
+		{
+			const _next = document.getElementById('quick-play-next');
+			_next.innerHTML = getLangData('CLOSE') + '&nbsp;&times;';
+		}
+	}
+	document.getElementById('quick-play-title').innerText = decodeURIComponent(_qp.querySelectorAll('.quick-play-slide')[_order].getAttribute('data-baslik'));
+}

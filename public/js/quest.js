@@ -243,6 +243,8 @@ function firstQuestData() {
 }
 
 function updateGlobalQuest(_key, _val) {
+	if(_client.quickPlay)
+		return;
 	syncGlobalQuests();
 	var _gQuestIds = _globalQuests.filter(x => x.key === _key);
 	let _updated, _finished;

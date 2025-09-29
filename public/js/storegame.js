@@ -1,8 +1,5 @@
 ﻿'use strict';
 function store(_repeatEpisodeKey) {
-	this.key = 'storm-of-blade-xyzxyz5558';
-	localStorage.removeItem(this.key);
-	localStorage.setItem(this.key, JSON.stringify(mainCharacter));
 	this.getMainCharacter = function (_ch, _friendlyChar) {
 		let _char = _ch ?? createMainCharacter(_friendlyChar);
 		_char = setCharacterFunctions(_char);

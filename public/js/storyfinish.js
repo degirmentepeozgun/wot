@@ -134,7 +134,7 @@ function animateStart(_failed, _extraGain, _content) {
 			_hasRetry = false;
 	}
 	if(_hasNext)
-		_hasNext = __stories.find(x => x.order > __story.order && !x.passive && x.list);
+		_hasNext = _story.missin ? false : __stories.find(x => x.order > __story.order && !x.passive && x.list);
 	const _template = `<div data-module='storyfinish' id="story-finish" class="finish flex d-none">
 		<div class="w-50 side-left flex flex-jc-start" style="height:100% !important;width:55%;flex-direction:column">
 			<div class="${_draw ? 'gray ' : ''}w-100 flex op-none ${_failed ? 'defeat' : 'victory'}-header ms250">${getLangData(_failed ? (_draw ? 'DRAW' : 'DEFEAT') : 'VICTORY')}</div>
@@ -194,10 +194,13 @@ function animateStart(_failed, _extraGain, _content) {
 					<div class="w-33 flex" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(${_failed ? 0 : 1}, ${_id}, ${episode.goldSelected ? 1 : 0}, ${episode.expSelected ? 1 : 0}, ${episode.itemSelected ? 1 : 0})" style="padding: 1%;height: 100%${_isFirstPlay ? ';pointer-events:none!important' : ''}">
 						<div class="btn${((_isFirstPlay && !_failed) || !_hasRetry) ? ' inactivated' : ''} animate-me-500 flex">${getLangData('RETRY')}</div>
 					</div>
-					<div class="w-33 flex" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(${_failed ? 0 : 1})" style="padding: 1%;height: 100%">
+					<div class="w-33 flex${!_client.quickPlay ? ' d-none' : ''}" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);createPromoScreen();detachModule()" style="padding: 1%;height: 100%${_isFirstPlay ? ';pointer-events:none!important' : ''}">
+						<div class="btn${((_isFirstPlay && !_failed) || !_hasRetry) ? ' inactivated' : ''} animate-me-500 flex">${getLangData('BACK')}</div>
+					</div>
+					<div class="w-33 flex${_client.quickPlay ? ' d-none' : ''}" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(${_failed ? 0 : 1})" style="padding: 1%;height: 100%">
 						<div class="btn animate-me-500 flex">${getLangData('LOBBY')}</div>
 					</div>
-					<div class="w-33 flex" style="padding: 1%;height: 100%${!_hasNext ? ';pointer-events:none!important' : ''}" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(1, ${__stories.find(x => !x.passive && x.order > __story.order)?.id}, null, null, null, 1)">
+					<div class="w-33 flex${(_client.quickPlay || _story.mission) ? ' d-none' : ''}" style="padding: 1%;height: 100%${!_hasNext ? ';pointer-events:none!important' : ''}" onexactclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(1, ${__stories.find(x => !x.passive && x.order > __story.order)?.id}, null, null, null, 1)">
 						<div class="btn${!_hasNext ? ' inactivated' : ''} animate-me-500 flex">${getLangData('NEXT')}</div>
 					</div>
 				</div>

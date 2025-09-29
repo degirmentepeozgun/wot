@@ -156,7 +156,7 @@ function map(_m) {
 			_char.lastSprite = _char.lastSpriteKey = undefined;
 		return undefined;
 	}
-	this.loadCharacterSprites = async function(_func, _extraIds, _kk) {
+	this.loadCharacterSprites = async function(_func, _extraIds, _kk, _excludeMain, _useCurrentEnemies) {
 		if(this.menu)
 		{
 			_func();
@@ -165,7 +165,7 @@ function map(_m) {
 		if(!_kk)
 			this.disposing = 1;
 		const _ids = this.mobs.map(x => x.id);
-		if(mainCharacter)
+		if(mainCharacter && !_excludeMain)
 			_ids.push(mainCharacter.realId ?? mainCharacter.id);
 		if(_extraIds?.[0])
 			for(let _id of _extraIds)
@@ -213,7 +213,7 @@ function map(_m) {
 			}
 		}
 		for(const id of _ids)
-			await _loadCharacterSprite(_allEnemies['enemy' + id]());
+			await _loadCharacterSprite(_useCurrentEnemies ? episode.enemies.find(x => x.id === id) : _allEnemies['enemy' + id]());
 		_spls.push('electricboltsmall');
 		for(const key of _spls)
 			await _loadCharacterSprite(new enemy(structuredClone2(spells[key])));
@@ -1587,8 +1587,20 @@ function map(_m) {
 				let sprite = this.enemies[i];
 				if(!sprite)
 					continue;
+				if(sprite.tagContainer && sprite.tagSkillUsed && ((_gameTick - sprite.tagSkillUsed) > 1500)) {
+					const _wrapper = sprite.tagContainer;
+					addClass(_wrapper, 'fade-out');
+					_wrapper.onanimationend = function(ev) {
+						if(ev.animationName === 'fade-out-me'){
+							if(_wrapper)
+								_wrapper.remove();
+							delete sprite.tagContainer;
+						}
+					}
+				}
 				if(sprite.remove || sprite.related?.dead)
 				{
+					sprite.tagContainer?.remove?.();
 					const _bubble = episode.bubbles?.find(x => x.key === sprite.key)?.elem;
 					if (_bubble)
 						removeBubble(_bubble, sprite);

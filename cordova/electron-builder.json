@@ -1,0 +1,24 @@
+{
+  "extraMetadata": {
+    "cordova": {
+      "electron": {
+        "browserWindow": {
+          "autoHideMenuBar": true,
+          "resizable": false,
+          "fullscreen": true,
+          "webPreferences": {
+            "nodeIntegration": true,
+            "devTools": false,
+            "plugins": true
+          }
+        }
+      }
+    }
+  },
+  "extraResources": [
+    {
+      "from": "www/images",
+      "to": "images"
+    }
+  ]
+}

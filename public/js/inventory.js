@@ -1821,7 +1821,9 @@ function closeInventoryQuestionModal(_noSound) {
         if(!_noSound)
             PlaySound({ key: 'click' });
         _qm.remove();
+        return true;
     }
+    return false;
 }
 var powerDiffTimer, _lastNewStats;
 function changePower(_old, _new) {

@@ -26,6 +26,8 @@ function animation(_a) {
 		this.finishType = _a.finishType;
 	if(this.speed)
 		this.frames.forEach(x => x.speed = MathCeil(x.speed / this.speed));
+	if(_a.useInCC)
+		this.useInCC = _a.useInCC;
 	this.passive = _a.passive;
 	this.ultimate = _a.ultimate;
 	this.rage = _a.rage;

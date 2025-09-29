@@ -42,7 +42,7 @@ function dungeon() {
 	this.getDungeons = function(_id) {
 		const _noSelect = tryShowMenuTutorial('dungeon');
 		let _html = '';
-		const _arr = __stories.filter(x => x.mission);
+		const _arr = __stories.filter(x => x.mission && !(x.list === false));
 		const _resetTime = getTodayResetTimestamp();
 		for (var item of _arr){
 			const _mission = __account.missions?.find(x => x.key === item.mission);
@@ -68,7 +68,7 @@ function dungeon() {
 		return _html;
 	}
 	this.selectDungeon = function(_id, _noSound, _noAnimation) {
-		const _arr = __stories.filter(x => x.mission);
+		const _arr = __stories.filter(x => x.mission && !(x.list === false));
 		if(!_id)
 			_id = _arr?.length > 0 ? _arr[0].id : undefined;
 		else
