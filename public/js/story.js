@@ -171,7 +171,6 @@ const __stories = [
 		ticket: 2,
 		act:1,
 		list:true,
-		startScene:2,
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
