@@ -813,7 +813,7 @@ function characterSkill() {
 	}
 	this.getSkillDetailUI = function (_class, _order, _noSound) {
 		if(!_noSound)
-			episode.playSound({ key: 'click' });
+			PlaySound({ key: 'click' });
 		const _skill = this.allSkills.find(x => x.class === _class && x.order === _order);
 		if (_skill) {
 			const _animation = mainCharacter.animations[_skill.key];

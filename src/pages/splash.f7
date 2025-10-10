@@ -99,9 +99,6 @@
 				<div id="add-player" style="cursor:pointer" class="flex" >
 					+
 				</div>
-				<div id="auto-mode-on-off" style="cursor:pointer" class="flex" >
-					A
-				</div>
 				<div id="hit-count" class="flex v-none" style="font-weight:600;font-size:6vh">
 					<div class="flex full scalable">
 						<span class="flex">
@@ -283,12 +280,6 @@
 				skill4: document.getElementById('chain-skill-4')
 			};
 			actionButtons = document.querySelectorAll('.action');
-			// document.getElementById('pot-btn').addEventListener('click', function() {
-			// 	drinkPot();
-			// });
-			document.getElementById('auto-mode-on-off').addEventListener('click', function() {
-				switchAutoMode();
-			});
 			_talkBtn = document.getElementById('skill10');
 			_useBtn = document.getElementById('skill11');
 			testMap = getParameterByName('map');

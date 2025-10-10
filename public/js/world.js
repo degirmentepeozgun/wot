@@ -27,10 +27,10 @@ function world() {
 			mapArea.innerHTML = '<img loading="lazy" src="./images/icons/compass.png" class="map-compass" />';
 		else
 			mapArea.innerHTML = `<div class="full flex act-map-whole">
-				<div class="flex active act-map-part">Act I</div>
-				<div class="flex act-map-part">Act II</div>
-				<div class="flex act-map-part">Act III</div>
-				<div class="flex act-map-part">Act IV</div>
+				<div class="flex active act-map-part">${getLangData('Act')}&nbsp;I</div>
+				<div class="flex act-map-part">${getLangData('Act')}&nbsp;II</div>
+				<div class="flex act-map-part">${getLangData('Act')}&nbsp;III</div>
+				<div class="flex act-map-part">${getLangData('Act')}&nbsp;IV</div>
 				<img loading="lazy" src="./images/icons/world-title.png" />
 			</div>
 			<div class="full world-map-frame"></div>
@@ -101,7 +101,7 @@ function world() {
 	}
  	this.closeMapInfoModal = function(_nosound) {
 		if(!_nosound)
-			episode.playSound({ key: 'click' });
+			PlaySound({ key: 'click' });
 		const _mdc = document.getElementById('map-detail-modal');
 		if(_mdc) {
 			addClass(_mdc, 'fade-out');

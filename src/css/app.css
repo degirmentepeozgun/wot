@@ -80,25 +80,6 @@ body {
 	max-height: 100%
 }
 
-#auto-mode-on-off {
-	z-index: 3;
-	aspect-ratio: 1/1;
-	left: 1vh;
-	bottom:1vh;
-	position: absolute;
-	padding: 0 1vw;
-	border: .6vh solid #ffffff40;
-	border-radius: .5vh;
-	font-size: 2.4vh !important;
-	color: #ffffff40;
-	overflow:hidden
-}
-
-#auto-mode-on-off.selected {
-	animation: shine-border 2s linear infinite;
-	-webkit-animation: shine-border 2s linear infinite
-}
-
 #add-player {
 	z-index: 3;
 	top: 3.6vh;
@@ -6342,7 +6323,7 @@ right:5%;
 		left:45%
 	}
 }
-.skill.disabled-skill, .skill-charge.disabled-skill, #auto-mode-on-off.disabled-skill {
+.skill.disabled-skill, .skill-charge.disabled-skill {
 	display: none !important;
 }
 
@@ -8166,7 +8147,6 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 #game-ui.demo-playing .profile *, 
 #game-ui.demo-playing .enemy-profile, 
 #game-ui.demo-playing .enemy-profile *,
-#game-ui.demo-playing #auto-mode-on-off,
 #game-ui.demo-playing #add-player
 {
 	pointer-events:none !important
@@ -9415,6 +9395,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	border-bottom-left-radius: 4vh;
 	background-color: #171311;
 	box-shadow: 0 0 .5vh 1vh #00000080;
+	z-index:2
 }
 .opening-controls-icon {
 	position: absolute;
@@ -9425,6 +9406,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	border-bottom-right-radius: 4vh;
 	background-color: #171311;
 	box-shadow: 0 0 .5vh 1vh #00000080;
+	z-index:2
 }
 .opening-controls-icon img {
 	height:5vh;
@@ -9575,4 +9557,15 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 }
 .quick-play-desc-item-title.flex-jc-start {
 	padding-left:2vh
+}
+.quit-modal {
+	z-index: 9999 !important;
+}
+#particles {
+	pointer-events:none;
+	position:absolute;
+	top:0;
+	height:100%;
+	aspect-ratio: 16/9;
+	margin:0 auto
 }

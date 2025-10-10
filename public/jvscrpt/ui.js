@@ -674,7 +674,7 @@ function updateExperience(_value, _levelup, _char) {
 				warn('<div class="flex heading achievement" style="position:relative"><img style="height:12vh" src="./images/icons/pvp.png" />&nbsp;<span style="flex:1">' + getLangData('Rage Mode Activated') + '</span></div>', 'level-up', null, 1);
 			}
 			warn('<div class="flex leveling"><img style="height:14vh" src="./images/icons/level-up.png" /></div>', 'level-up');
-			episode.playSound({ key: 'levelup', volume: .5 });
+			PlaySound({ key: 'levelup', volume: .5 });
 			updateGlobalQuest('level-up');
 			dmgFrames.push({
 				text: 'LEVEL UP!',
@@ -706,7 +706,7 @@ function updateGold(_value, _char) {
 	const _c = _char ?? mainCharacter;
 	__account.gold += _value;
 	if (_c.main) {
-		episode.playSound({ key: 'coin', volume: .1 });
+		PlaySound({ key: 'coin', volume: .1 });
 		_goldCount.innerText = __account.gold.formatWithDots();
 	}
 	_client.saveState();
@@ -893,7 +893,7 @@ function openUserActionsModal(_id, _name) {
 	showMyModalPopUp('user-actions');
 }
 function addAsFriend(_id, _name) {
-	episode.playSound({key:'click'});
+	PlaySound({key:'click'});
 	const _f = __account.friends?.find(x => x.id === _id);
 	if(!_f) {
 		if(__account.friends?.length >= 100) {
@@ -905,7 +905,7 @@ function addAsFriend(_id, _name) {
 	}
 }
 function removeFromFriend(_id, _name) {
-	episode.playSound({key:'click'});
+	PlaySound({key:'click'});
 	const _i = __account.friends?.findIndex(x => x.id === _id);
 	if(_i >= 0) {
 		__account.friends.splice(_i, 1);
@@ -936,7 +936,7 @@ function spinLottery() {
 	var currentRate2 = parseInt(style.getPropertyValue('--spin-rate2'));
 	var itemOrder2 = getRandomValue(0, 7);
 	root.style.setProperty('--spin-rate2', currentRate2 + (minRate * itemOrder2));
-	episode.playSound({key:'click'});
+	PlaySound({key:'click'});
 	setTimeout(function() {
 		const sbg = document.getElementById('spinner-bg');
 		const sbg2 = document.getElementById('spinner-bg2');
@@ -944,10 +944,10 @@ function spinLottery() {
 		sbg.src = sbg.src.replace('0.png', '.png');
 		sbg2.style.background = sbg2.style.background.replace('bg0.png', '-bgf.png');
 		addClass(sbg2, 'spin-me2');
-		episode.playSound({key:'spinner', volume: .5});
+		PlaySound({key:'spinner', volume: .5});
 		setTimeout(function() {
 			setTimeout(function() {
-				episode.playSound({key:'gift', volume: .5});
+				PlaySound({key:'gift', volume: .5});
 				setTimeout(function() {
 					removeClass(document.getElementById('spinner-bg'), 'spin-me');
 					removeClass(document.getElementById('spinner-bg2'), 'spin-me2');
@@ -964,7 +964,7 @@ function spinLottery() {
 				checkUpdateAvailable();
 				let itemOrder3;
 				if(itemOrder === itemOrder2){
-					episode.playSound({key:'clap', volume:.3});
+					PlaySound({key:'clap', volume:.3});
 					itemOrder3 = getRandomValue(0, _giftOrder.length - 1);
 					warn('<div class="flex heading achievement jackpot glow-yellow" style="position:relative"><img style="height:12vh" src="./images/icons/' + _giftOrder[itemOrder3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">!!!' + getLangData('JACKPOT') + '!!!</span></div>', 'level-up', null, 1);
 					getChestReward(__account.grade ?? 1, _giftOrder[itemOrder3].type, _giftOrder[itemOrder3].key);
@@ -1021,7 +1021,7 @@ function createArtifactsUI() {
 	return _html + '</div></div>';
 }
 function openArtifactDetailModal(_id) {
-	episode.playSound({ key: 'click' });
+	PlaySound({ key: 'click' });
     var _item = __artifacts.find(x => x.id === _id);
 	_item.bonus = __artifactGroups.find(x => x.id === _item.group).bonus;
 	var _ids = __artifacts.filter(x => x.group === _item.group).map(x => x.id);
@@ -1061,19 +1061,19 @@ function refreshStoreItems() {
 }
 function askBuyStoreItem(_id, _ok) {
 	if(!_ok) {
-		episode.playSound({ key: 'disabled' });
+		PlaySound({ key: 'disabled' });
 		return;
 	}
 	const _item = __storeItems.find(x => x.id === _id);
 	const _price = typeof _item.price === 'function' ? _item.price() : _item.price;
 	if(_price === 0) {
 		if(getDailyFreeStoreItem())
-			episode.playSound({ key: 'reward' });
+			PlaySound({ key: 'reward' });
 		else
-			episode.playSound({ key: 'disabled' });
+			PlaySound({ key: 'disabled' });
 		return;
 	}
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
 	let _title = misc.find(x => x.type === _item.key)?.titles?.[getLang()];
 		if(!_title)
 			switch(_item.key){
@@ -1096,7 +1096,7 @@ function askBuyStoreItem(_id, _ok) {
 			</div>
             <div style="padding:4vh 2vh" class="flex">
                 <div class="game-menu-button flex animate-me" style="cursor:pointer;min-width:10vw;color:#F4BB44 !important;font-size:3vh !important" onclick="buyStoreItem(${_id})">${getLangData('YES')}</div>
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;min-width:10vw;color:#F4BB44 !important;font-size:3vh !important" onclick="episode.playSound({ key: 'click' });closeInventoryQuestionModal()">${getLangData('NO')}</div>
+                <div class="game-menu-button flex animate-me" style="cursor:pointer;min-width:10vw;color:#F4BB44 !important;font-size:3vh !important" onclick="PlaySound({ key: 'click' });closeInventoryQuestionModal()">${getLangData('NO')}</div>
             </div>
         </div>`;
     document.body.appendChild(_modal);
@@ -1109,7 +1109,7 @@ function buyStoreItem(_id) {
 		warn('<span>' + getLangData('Not enough gold') + '</span>', 'warn');
 		return;
 	}
-	episode.playSound({ key: 'reward' });
+	PlaySound({ key: 'reward' });
 	let _title = misc.find(x => x.type === _item.key)?.titles?.[getLang()];
 		if(!_title)
 			switch(_item.key){
@@ -1402,7 +1402,7 @@ function askSomething(_question, _okFuncString) {
 		const _div = document.createElement('div');
 		_div.innerHTML = _modal;
 		document.querySelector('#game-menu').appendChild(_div.querySelector('.inventory-question'));
-		episode.playSound({ key: 'click' });
+		PlaySound({ key: 'click' });
 	}
 	catch(qex) {
 		alert(qex.message);

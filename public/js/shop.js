@@ -41,19 +41,19 @@ function createStoreUI(_noAnimation) {
 
 function askBuyStoreItem(_id, _ok) {
 	if(!_ok) {
-		episode.playSound({ key: 'disabled' });
+		PlaySound({ key: 'disabled' });
 		return;
 	}
 	const _item = __storeItems.find(x => x.id === _id);
 	const _price = typeof _item.price === 'function' ? _item.price() : _item.price;
 	if(_price === 0) {
 		if(getDailyFreeStoreItem(_item.id))
-			episode.playSound({ key: 'reward' });
+			PlaySound({ key: 'reward' });
 		else
-			episode.playSound({ key: 'disabled' });
+			PlaySound({ key: 'disabled' });
 		return;
 	}
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
 	let _title = misc.find(x => x.type === _item.key)?.titles?.[getLang()];
 		if(!_title)
 			switch(_item.key){

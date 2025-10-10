@@ -57,6 +57,8 @@ function war() {
 		const _container = document.getElementById('war-match-opponents');
 		await delay(1000);
 		for(let i = 1; i < 7; i++) {
+			if(!_warMatchInProgress)
+				return;
 			const _team = i < 4 ? 1 : 2;
 			const _op = this.opponents[i - 1];
 			PlaySound({key:'warselect', volume:1, reset: true});
@@ -75,6 +77,8 @@ function war() {
 			_container.appendChild(row);
 			await delay(1000);
 		}
+		if(!_warMatchInProgress)
+			return;
 		PlaySound({key:'enter', volume:.5});
 		_warMatchInProgress = false;
 		createWar(this.opponents);

@@ -49,18 +49,7 @@ function keyboard(_character, _keys) {
 			key: _k,
 			name: _name
 		});
-		// if (/*(_type === 'move' || _k === ' ') && */this.character.main) {
-		// 	const _json = { c: 'ak', hk: _k, s: this.character.socketId };
-		// 	if (_k === 'r' || _k === 'f')
-		// 		_json.ch = 1;
-		// 	//sendMessage(JSON.stringify(_json));
-		// }
 		this.character.lastActivity = _gameTick;
-		// if (this.character.disconnected) {
-		// 	console.log("re-connected");
-		// 	this.character.getNewStatus(1);
-		// 	delete this.character.disconnected;
-		// }
 	}
 	this.removeCommonSkill = function () {
 		this.holdingKeys = this.holdingKeys.filter(x => x.name !== 'common') ?? [];
@@ -69,22 +58,18 @@ function keyboard(_character, _keys) {
 		this.removeKey(_skillName);
 	}
 	this.removeKey = function (_k, _release) {
-		let index = -1;
+		let _has;
 		for (var i = 0; i < this.holdingKeys.length; i++) {
 			const _key = this.holdingKeys[i];
 			if (_key.key === _k) {
+				_has = 1;
 				if(_release)
 					this.recordKey(_k, _key.name);
-				// if (/*(_key.type === 'move' || _key.key === ' ') && */this.character.main)
-				// 	sendMessage(JSON.stringify({ c: 'rk', hk: _k, s: this.character.socketId }));
-				index = i;
 				break;
 			}
 		}
-		if (index > -1) {
-			this.holdingKeys.splice(index, 1);
-			//sendMessage(JSON.stringify({ c: 'rk', k: _k, ck: this.character.key, e: episode.id }));
-		}
+		if(_has)
+			this.holdingKeys = this.holdingKeys.filter(x => x.key !== _k);
 	}
 	this.getXMove = function () {
 		const _arr = this.holdingKeys.filter(x => x.key === self.keys[0] || x.key === self.keys[2]);
@@ -110,7 +95,6 @@ function keyboard(_character, _keys) {
 					return 'up';
 				case self.keys[17]:
 					return 'down';
-
 			}
 		return undefined;
 	}
@@ -377,14 +361,16 @@ function keyboard(_character, _keys) {
 	}
 }
 window.addEventListener('keydown', function (event) {
-	if(mainCharacter?.disableKeyboard)
+	if(mainCharacter?.disableKeyboard){
+		mainCharacter.holdingKeys = [];
 		return;
+	}
 	try {
 		if (event?.key) {
 			if (event.which === 9)
 				event.preventDefault();
-			if(!mainCharacter.keyboard)
-				switchAutoMode();
+			// if(!mainCharacter.keyboard)
+			// 	switchAutoMode();
 			mainCharacter.keyboard.mouseDown(event.key.toLocaleLowerCase());
 		}
 	} catch (e) {
@@ -392,17 +378,23 @@ window.addEventListener('keydown', function (event) {
 	}
 });
 window.addEventListener('keyup', function (event) {
-	if(mainCharacter?.disableKeyboard)
+	if(mainCharacter?.disableKeyboard){
+		mainCharacter.holdingKeys = [];
 		return;
+	}
 	try {
 		if (event?.key) {
 			if (event.which === 9)
 				event.preventDefault();
-			if(!mainCharacter.keyboard)
-				switchAutoMode();
+			// if(!mainCharacter.keyboard)
+			// 	switchAutoMode();
 			mainCharacter.keyboard.mouseUp(event.key.toLowerCase());
 		}
 	} catch (e) {
 
 	}
+});
+window.addEventListener("blur", () => {
+	if(mainCharacter?.keyboard)
+		mainCharacter.keyboard.holdingKeys = [];
 });

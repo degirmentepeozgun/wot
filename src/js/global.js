@@ -790,7 +790,7 @@ const _npcQuests = [
 	// 	then: function() { 
 	// 		_client.upgradeVisitedMaps(6);
 	// 		warn('<div class="flex heading achievement" style="position:relative"><img style="height:12vh" src="./images/icons/scroll.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('New Map Discovered') + '!</span></div>', 'level-up');
-	// 		episode.playSound({ key: 'page', volume: .5 });
+	// 		PlaySound({ key: 'page', volume: .5 });
 	// 	},
 	// },
 	// {
@@ -854,7 +854,7 @@ function drinkPot(_char, _gifter, _event) {
 		return;
 	}
 	_ch.increaseHealth(_hp);
-	episode.playSound({ key: 'drink', volume: 1 });
+	PlaySound({ key: 'drink', volume: 1 });
 	dmgFrames.push({
 		text: 'plus-hp',
 		//class: 'effect-steal',
@@ -4758,7 +4758,7 @@ const mapSprites = [
 							if(_e.remove)
 								return;
 							_e.groupAttack = 1;
-							episode.playSound({key:'itbarakyell', volume: .35});
+							PlaySound({key:'itbarakyell', volume: .35});
 							const _arr = [];
 							let _id = 1;
 							_arr.push({
@@ -25286,7 +25286,7 @@ const cssAnimations = {
 		if(_final)
 			setTimeout(() => {
 				plug();
-				episode.playSound({ key: 'swing', volume: .65 });
+				PlaySound({ key: 'swing', volume: .65 });
 			}, msPerFrame * 3);
 		else
 			plug();
@@ -25478,7 +25478,7 @@ const cssAnimations = {
 		}
 		else {
 			addClass(_gameUI, 'disable-ui');
-			episode.playSound({force:1,volume:1,path:'./images/sounds/boss.mp3'});
+			PlaySound({force:1,volume:1,path:'./images/sounds/boss.mp3'});
 			const _elem = document.querySelector('#css-canvas-foreground');
 			_elem.style.animation = 'none';
 			_elem.offsetHeight;
@@ -25574,7 +25574,7 @@ const cssAnimations = {
 		else {
 			if (_url)
 				_css.innerHTML = '<div id="css-canvas-content" style="opacity:.35" class="full"><div class="full flex pop-outin" style="background:#000"><img src="' + _url + '" style="max-width:80%;max-height:80%" /></div>';
-			episode.playSound({ key: 'curse', volume: .5 });
+			PlaySound({ key: 'curse', volume: .5 });
 			cssAnimationProps.curse = { start: _gameTick, p1: _c, p2: _ms, p3: _url};
 		}
 	},
@@ -25649,7 +25649,7 @@ const cssAnimations = {
 	},
 	fatality: function (_char, _l, _ms) {
 		if(_char.frame === 0 && _char.start === 1 && cssAnimations.dark(_char, _ms ?? 2000))
-			episode.playSound({ key: mainCharacter.gender + 'laugh', reset: true, volume: .3 });
+			PlaySound({ key: mainCharacter.gender + 'laugh', reset: true, volume: .3 });
 	},
 	darkout: function(_ctx, _opacity, _canvas) {
 		if(cssAnimationProps.darkout) {
@@ -25799,7 +25799,7 @@ const cssAnimations = {
 			}
 		}
 		else {
-			episode.playSound({key:'ultimate', volume: .5});
+			PlaySound({key:'ultimate', volume: .5});
 			const _key = 'ultimate-circle';
 			let _a = document.getElementById(_key);
 			if (!_a) {
@@ -26126,7 +26126,7 @@ function createRock(_rock, _container) {
 	// addClass(_leaf, 'leaf' + (_br + (getRandomValue(1, 4) * 30)));
 	//_container.style.width = _leaf.style.width = _w + 'vh';
 	if(episode){
-		episode.playSound({key:'rockfallsmall', volume:.1});
+		PlaySound({key:'rockfallsmall', volume:.1});
 		episode.doTime = _gameTick;
 		episode.repeat = getRandomValue(250, 2000);
 	}
@@ -26443,7 +26443,7 @@ function radixSortLSD(_input_array, getKey) {
 function summonMobWithJson(_json, _noReturn) {
 	episode.mobs.push(_json);
 	let _mob = episode.installMob(_json, null, !_noReturn);
-	episode.playSound({ key: 'puff', volume: .3 });
+	PlaySound({ key: 'puff', volume: .3 });
 	if(_mob)
 		_mob.addObject({
 			key: 'smoke',
@@ -26466,7 +26466,7 @@ function summonMob(_id, _x, _y, _lvl, _target) {
 	};
 	episode.mobs.push(_json);
 	const _mob = episode.installMob(_json, null, 1);
-	episode.playSound({ key: 'puff', volume: .3 });
+	PlaySound({ key: 'puff', volume: .3 });
 	_mob.addObject({
 		key: 'smoke',
 		position: 'middle'

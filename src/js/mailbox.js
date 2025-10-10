@@ -89,7 +89,7 @@ function mailbox() {
 		if(!_id)
 			_id = _arr?.length > 0 ? _arr[0].id : undefined;
 		else
-   			episode.playSound({ key: 'click' });
+   			PlaySound({ key: 'click' });
 		if(!_id)
 			return;
 		const _cards = document.querySelectorAll('.mailbox-content-left .mailbox-card');
@@ -169,7 +169,7 @@ function mailbox() {
 		const _m = _mails.find(x => x.id === _id);
 		if(!_m)
 			return;
-   		episode.playSound({ key: 'paperrip', volume: .5 });
+   		PlaySound({ key: 'paperrip', volume: .5 });
 		const i = _mails.findIndex(x => x.id === _id);
 		if(i >= 0)
 		{

@@ -824,7 +824,7 @@ function map(_m) {
 				if(_warn) {
 					_client.saveState();
 					warn('<div class="flex heading achievement" style="position:relative"><img style="height:12vh" src="./images/icons/forge.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Item Is Ready') + '</span></div>', 'level-up', null, 1);
-					episode.playSound({ key: 'forgeready', volume: .5 });
+					PlaySound({ key: 'forgeready', volume: .5 });
 				}
 			}
 		}

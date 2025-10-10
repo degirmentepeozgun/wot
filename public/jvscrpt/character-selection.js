@@ -55,7 +55,7 @@ function getCharacterInformation(_class, _elem) {
 	const _info = __characterInfos.find(x => x.class === _class);
 	document.querySelectorAll('.char-selection').forEach(x => removeClass(x, 'no-dark'));
 	addClass(_elem, 'no-dark');
-	episode.playSound({key:'switch', volume:.3});
+	PlaySound({key:'switch', volume:.3});
 	document.querySelector('.char-selection-center').innerHTML = `<div class="char-selection-center-inner" style="background:radial-gradient(#232323, #000)"><div class="flex w-100 c-i c-i-name">${_conceptArts[_class].title}</div>
 	<div class="flex w-100 c-i c-i-race">Race: ${_info.race}</div>
 	<div class="flex w-100 c-i c-i-class">Class: ${_info.classText}</div>
@@ -69,7 +69,7 @@ function getCharacterInformation(_class, _elem) {
 	<div class="flex w-100 c-i c-i-btn"><div class="game-btn2 flex" onclick="selectHero('${_info.class}')"><div class="flex">SELECT</div></div></div></div>`;
 }
 function selectHero(_class) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
 	if(_class !== 'warrior'){
         warn('<span>' + getLangData('Not available for demo') + '</span>', 'warn');
 		return;

@@ -10,7 +10,7 @@ function animateStart() {
 			<div class="full" style="position:relative;z-index:2;margin: 0 15% 0 0;width:85%">
 				<div class="stars flex w-100" style="height: 20%;position:relative;background: url(./images/ui/header.png);background-size: contain;background-repeat: no-repeat;background-position: center;">
 					<img class="ms250 op-none" src="./images/ui/star-on.png">
-					<img class="ms500 op-none" src="./images/ui/star-on.png" style="margin-bottom: -4%;margin-top: -6%;">
+					<img class="ms500 op-none" src="./images/ui/star-on.png" style="transform:scale(1.1);margin-top:-6%">
 					<img class="ms750 op-none" src="./images/ui/star-off.png">
 					<div class="w-50 flex" style="position: absolute;left: 25%;height: 30%;font-size: 4vh !important;color: #f3f4f580;z-index: 0;text-shadow: 2px 2px 1px #000;padding-top: 1%;">Story 1-1</div>
 				</div>
@@ -80,10 +80,10 @@ function animateStart() {
 
 				</div>
 				<div class="flex w-100 ms2500 op-none" style="height: 10%;padding:0 4%">
-					<div class="w-33 flex" onclick="episode.playSound({ key: 'click' });loadLastStoryCheckPoint();detachModule()" style="padding: 1%;height: 100%">
+					<div class="w-33 flex" onclick="PlaySound({ key: 'click' });loadLastStoryCheckPoint();detachModule()" style="padding: 1%;height: 100%">
 						<div class="btn animate-me-500 flex">RETRY</div>
 					</div>
-					<div class="w-33 flex" onclick="episode.playSound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(1);detachModule()" style="padding: 1%;height: 100%">
+					<div class="w-33 flex" onclick="PlaySound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(1);detachModule()" style="padding: 1%;height: 100%">
 						<div class="btn animate-me-500 flex">LOBBY</div>
 					</div>
 					<div class="w-33 flex" style="padding: 1%;height: 100%">
@@ -116,7 +116,7 @@ function animateStart() {
 				_seb.style.background = '#232323';
 				_seb.innerText = 'LEVEL UP!';
 				addClass(_seb,'level-up');
-				episode.playSound({key:'levelup', volume:.2});
+				PlaySound({key:'levelup', volume:.2});
 				_sl.innerText = 'Lvl 2';
 				_sl.style.color = '#fff';
 				setTimeout(function () {
@@ -129,9 +129,9 @@ function animateStart() {
 				}, 1000);
 			}
 		}, 2500);
-		episode.playSound({key:'storyfinish', volume:1});
+		PlaySound({key:'storyfinish', volume:1});
 		setTimeout(function () { 
-			episode.playSound({key:'ironx3', volume:.4});	 
+			PlaySound({key:'ironx3', volume:.4});	 
 		}, 500);
 		const fade = function(_selector, _ms) {
 			setTimeout(function () {

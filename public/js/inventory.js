@@ -44,7 +44,7 @@ function refreshInventory() {
 }
 let _sortDirection;
 function sortItems() {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     _sortDirection = _sortDirection ? 0 : 1;
     refreshInventory();
 }
@@ -79,12 +79,12 @@ function autoWearItems() {
     }
     refreshInventory();
     if(_hasChange) {
-        episode.playSound({ key: 'wear', volume: .3 });
+        PlaySound({ key: 'wear', volume: .3 });
         const _newPower = getTotalPower().total;
         changePower(_oldPower, _newPower);
     }
     else {
-        episode.playSound({ key: 'click' });
+        PlaySound({ key: 'click' });
         warn('<span>' + getLangData('Nothing better to wear yet') + '</span>', 'warn');
     }
 }
@@ -184,7 +184,7 @@ function getItemSellCost(_id) {
 function sellItems() {
     const _choices = document.querySelectorAll('.inventory-question .sell-choice.selected');
     if(!_choices?.[0]) {
-        episode.playSound({ key: 'click' });
+        PlaySound({ key: 'click' });
         return;
     }
     const _grades = [];
@@ -196,7 +196,7 @@ function sellItems() {
             sellItem(_item.id, 1, 1);
     closeInventoryQuestionModal();
     checkUpdateAvailable2(1);
-    //episode.playSound({ key: 'sell' });
+    //PlaySound({ key: 'sell' });
 }
 function selectFilterGrade(_elem) {
     if(hasClass(_elem, 'selected')){
@@ -230,7 +230,7 @@ function askFilterSellItems() {
     let _html = '';
     for(let _grade of _grades)
         _html += `<div onexactclick="selectFilterGrade(this)" class="flex sell-choice flex-jc-start animate-me" data-key="${_grade}"><div class="sell-choice-left flex animate-me"></div><div class="sell-choice-right flex grade${_grade}">${getLangData(_grade > 0 ? 'Grade' : 'All') + (_grade > 0 ? ' ' + _grade : '')}</div></div>`;
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     let _modal = `<div class="full fade-me flex inventory-question inventory-question-sell-items">
         <div class="inventory-modal flex" style="flex-direction:column">
             <div style="padding:6vh 4vh 4vh 4vh" class="flex">
@@ -330,7 +330,7 @@ function pushItemIntoInventory(_item) {
     if(!__storyPlaying) {
         _item.new = 1;
         _items.push(_item);
-        episode.playSound({ key: 'item' });
+        PlaySound({ key: 'item' });
     }
     return true;
 }
@@ -510,7 +510,7 @@ function switchInventoryTab(_elem, _order, _noSound) {
     else if(hasClass(_elem, 'selected'))
         return;
     else if(!_noSound)
-        episode.playSound({ key: 'switch' });
+        PlaySound({ key: 'switch' });
     const _tabs = document.querySelectorAll('.inventory-tab');
     for(let _tab of _tabs){
         removeClass(_tab, 'selected');
@@ -609,7 +609,7 @@ function getInventoryTabContent() {
     return _html;
 }
 function selectGemForSocket(_type, _grade) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     removeClass(document.getElementById('item-selection-approve-btn'), 'disabled');
     const _itemIcons = document.querySelectorAll('#gem-picking-area img');
     for(let _ic of _itemIcons) {
@@ -623,7 +623,7 @@ function acceptGemSelection(_id) {
     //seçili gem i bul
     const _itemIcon = document.querySelector('#gem-picking-area img.selected');
     if(_itemIcon) {
-        episode.playSound({ key: 'geminsert', volume:1, reset: true });
+        PlaySound({ key: 'geminsert', volume:1, reset: true });
         var _items = getItems();
         var _item = _items.find(x => x.id === _id);
         const _oldPower = getTotalPower().total;
@@ -647,7 +647,7 @@ function acceptGemSelection(_id) {
     }
 }
 function tryRemoveSocket(_id, _socketIndex) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     var _items = getItems();
     var _item = _items.find(x => x.id === _id);
     const _socket = _item.sockets.sort((a, b) => (b.grade ?? 0) - (a.grade ?? 0))[_socketIndex];
@@ -655,7 +655,7 @@ function tryRemoveSocket(_id, _socketIndex) {
     askSomething(`<img style="height:4vh" src="${getRewardIcon(_socket.grade, 'gem', _socket.key).src}" />&nbsp;${getLangData('Remove this gem for')} <b style="margin-left:1vh;color:#F3f4f5 !important">${_cost.formatWithDots()}</b>&nbsp;<img style="height:2.2vh" src="./images/icons/coin.png" />&nbsp;`, `acceptAndRemoveGemFromSocket(${_id}, ${_cost}, ${_socketIndex})`,1);
 }
 function acceptAndRemoveGemFromSocket(_id, _cost, _socketIndex) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     if(__account.gold < _cost) {
         warn('<span>' + getLangData('Not enough gold') + '</span>', 'warn');
         return;
@@ -683,7 +683,7 @@ function acceptAndRemoveGemFromSocket(_id, _cost, _socketIndex) {
     checkUpdateAvailable2(1);
 }
 function tryAddSocket(_id) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     let _choices = getGemTabContent() ?? '';
     if(_choices)
         _choices = _choices.replace(/openGemItemInfoModal/g, 'selectGemForSocket');
@@ -779,7 +779,7 @@ function getItemInfoModalHtml(_id) {
     return _html;
 }
 function openItemInfoModal(_id) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     //Item Grade
     //Item Type
     //Item Update Level
@@ -814,7 +814,7 @@ function renderItemProps(_item, _defaultColor) {
     return _props;
 }
 function openMiscItemInfoModal(_type, _grade) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     var _item = misc.find(x => x.type === _type);
     var _html = `<div class="full flex item-info-container-parent menu-modal-right">
         <div class="full flex item-info-container">
@@ -859,7 +859,7 @@ function openGemItemInfoModal(_type, _grade) {
         addGemToMelt(_type, _grade);
         return;
     }
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     var _item = __gems.find(x => x.key === _type);
     const _g = _item.grades.find(x => x.grade === _grade);
     var _props = _g.props;
@@ -1130,7 +1130,7 @@ function getItemGradeLetter(_grade) {
 }
 function openCharacterInfoModal() {
     closeCharacterInfoModal();
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     var _level = mainCharacter.level;
     var _class = mainCharacter.class;
     _class = getLangData(_class).toProperCase();
@@ -1174,7 +1174,7 @@ function openGemMeltModal(_type, _grade) {
     if(!_meltParent)
         closeCharacterInfoModal(1);
     closeItemInfoModal(1);
-    //episode.playSound({ key: 'click' });
+    //PlaySound({ key: 'click' });
     let _html = `<div class="full gem-info-container-parent character-info-container-parent menu-modal-left"><div class="full flex character-info-container">
     <div class="flex" style="width:100%;height:12%">
     <div class="flex flex-jc-end item-info-modal-close" onexactclick="closeGemInfoModal()">&times;</div>
@@ -1202,7 +1202,7 @@ function openGemMeltModal(_type, _grade) {
     }, 20);
 }
 function removeMeltGem(_num) {
-    episode.playSound({key:'gem', volume:.5});
+    PlaySound({key:'gem', volume:.5});
     document.getElementById('melt-' + _num).innerHTML = '';
     updateGemMeltPlaces();
 }
@@ -1228,7 +1228,7 @@ function addGemToMelt(_type, _grade) {
         warn('<span>' + getLangData('Melt places are full') + '</span>', 'warn');
         return;
     }
-    episode.playSound({key:'gem', volume:.5});
+    PlaySound({key:'gem', volume:.5});
     _p.innerHTML = "<img data-grade='" + _grade + "' data-key=" + _type + " src='./images/gems/" + _type + _grade + ".png' />";
     updateGemMeltPlaces();
 }
@@ -1334,7 +1334,7 @@ function acceptMelt(_force) {
 function closeItemInfoModal(_noSound) {
     removeClass(document.querySelector('#inventory-list'), 'item-info-opened');
     if(!_noSound)
-        episode.playSound({ key: 'click' });
+        PlaySound({ key: 'click' });
     const _parent = document.querySelector('.item-info-container-parent');
     if(_parent)
         _parent.remove();
@@ -1348,7 +1348,7 @@ function closeGemInfoModal(_noSound) {
 }
 function closeCharacterInfoModal(_noSound) {
     if(!_noSound)
-        episode.playSound({ key: 'click' });
+        PlaySound({ key: 'click' });
     const _parent = document.querySelector('.character-info-container-parent');
     if(_parent)
         _parent.remove();
@@ -1369,7 +1369,7 @@ function unWearItem(_id) {
     _emptySlot.setAttribute('data-item-id', _item.id);
     const _slot = document.querySelector('.item-' + _item.type);
     _slot.innerHTML = '';
-    episode.playSound({ key: 'wear', volume: .3 });
+    PlaySound({ key: 'wear', volume: .3 });
     closeItemInfoModal();
     const _newPower = getTotalPower().total;
     changePower(_oldPower, _newPower);
@@ -1403,7 +1403,7 @@ function wearItem(_id) {
         _slot.innerHTML = getItemIcon(_item);
     }
     closeItemInfoModal();
-    episode.playSound({ key: 'wear', volume: .3 });
+    PlaySound({ key: 'wear', volume: .3 });
     const _newPower = getTotalPower().total;
     changePower(_oldPower, _newPower);
     resetItemsUI();
@@ -1461,7 +1461,7 @@ function upgradeItem(_id) {
 function rollbackOldStats(_id) {
     if(!_randomizedOldProps)
         return;
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     var _items = getItems();
     var _item = _items.find(x => x.id === _id);
     const _oldPower = getTotalPower().total;
@@ -1524,7 +1524,7 @@ function askConfirmNewStats(_id, _noAnimation) {
     document.querySelector('#menu-ui').appendChild(_div.firstChild);
 }
 function sellMiscItem(_type, _grade) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     const _item = __account.misc.find(x => x.type === _type  && (!_grade || (_grade && x.grade === _grade)));
     const _miscItem = misc.find(x => x.type === _type);
     let _modal = `<div class="full flex inventory-question">
@@ -1550,7 +1550,7 @@ function sellMiscItem(_type, _grade) {
     document.querySelector('#menu-ui').appendChild(_div.firstChild);
 }
 function increaseSellCount(_type, _grade) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     const _item = __account.misc.find(x => x.type === _type && (!_grade || (_grade && x.grade === _grade)));
     const _miscItem = misc.find(x => x.type === _type);
     const _sc = document.getElementById('sell-count');
@@ -1563,7 +1563,7 @@ function increaseSellCount(_type, _grade) {
     document.getElementById('misc-sell-cost').innerText = _cost.formatWithDots();
 }
 function decreaseSellCount(_type, _grade) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     const _miscItem = misc.find(x => x.type === _type);
     const _sc = document.getElementById('sell-count');
     let _count = parseInt(_sc.innerText) - 1;
@@ -1575,7 +1575,7 @@ function decreaseSellCount(_type, _grade) {
     document.getElementById('misc-sell-cost').innerText = _cost.formatWithDots();
 }
 function acceptMiscSellCount(_type, _grade) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     const _itemIndex = __account.misc.findIndex(x => x.type === _type && (!_grade || (_grade && x.grade === _grade)));
     const _item = __account.misc[_itemIndex];
     const _miscItem = misc.find(x => x.type === _type);
@@ -1593,7 +1593,7 @@ function acceptMiscSellCount(_type, _grade) {
     switchInventoryTab(null, 3);
 }
 function useMiscItem(_type, _grade) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     const _itemIndex = __account.misc.findIndex(x => x.type === _type && (!_grade || (_grade && x.grade === _grade)));
     const _item = __account.misc[_itemIndex];
     const _miscItem = misc.find(x => x.type === _type);
@@ -1619,7 +1619,7 @@ function askRandomizeItem(_id) {
     askSomething(`${getLangData('Change attributes of this item for')} <b style="margin-left:1vh;color:#F4BB44 !important">1</b> ${getLangData('dice')}`, `acceptAndRandomizeItem(${_id})`);
 }
 function askAddSlot() {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     const _cost = 10000;
     let _modal = `<div class="full fade-me flex inventory-question inventory-question-add-slot">
         <div class="inventory-modal">
@@ -1634,7 +1634,7 @@ function askAddSlot() {
                 </span>
             </div>
             <div style="padding:2vh" class="flex">
-                <span style="color:#f3f4f5cc !important;font-size:3vh !important" class="flex">Cost:&nbsp;<span id="slot-cost" style="margin:0 10px;font-size:3vh !important;color:#f3f4f5 !important">${_cost.formatWithDots()}</span>&nbsp;<img src="./images/icons/coin.png" style="height:3vh" /></span>
+                <span style="color:#f3f4f5cc !important;font-size:3vh !important" class="flex">${getLangData('Cost')}:&nbsp;<span id="slot-cost" style="margin:0 10px;font-size:3vh !important;color:#f3f4f5 !important">${_cost.formatWithDots()}</span>&nbsp;<img src="./images/icons/coin.png" style="height:3vh" /></span>
             </div>
             <div style="padding:4vh" class="flex">
                 <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
@@ -1675,7 +1675,7 @@ function useItemSelectionTicket(_level) {
     document.querySelector('#menu-ui').appendChild(_div.firstChild);
 }
 function selectSelectionItem(_id, _elem) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     removeClass(document.getElementById('item-selection-approve-btn'), 'disabled');
     const _itemIcons = document.querySelectorAll('.selection-item');
     for(let _ic of _itemIcons) {
@@ -1711,7 +1711,7 @@ function calculateSlotCost(_amount) {
     return _cost;
 }
 function increaseSlotAmount() {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     const _sa = document.getElementById('slot-amount');
     let _amount = parseInt(_sa.innerText);
     _amount += 10;
@@ -1724,7 +1724,7 @@ function increaseSlotAmount() {
     _sa.innerText = _amount;
 }
 function decreaseSlotAmount() {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     const _sa = document.getElementById('slot-amount');
     let _amount = parseInt(_sa.innerText);
     _amount -= 10;
@@ -1741,13 +1741,13 @@ function acceptInventorySlot() {
     let _amount = parseInt(_sa.innerText);
     const _cost = calculateSlotCost(_amount);
     if(__account.gold < _cost) {
-        episode.playSound({ key: 'click' });
+        PlaySound({ key: 'click' });
         warn('<span>' + getLangData('Not enough gold') + '</span>', 'warn');
         return;
     }
     updateGold(-_cost);
     //document.querySelector('.account-gold-value').innerText = __account.gold.formatWithDots();
-    episode.playSound({ key: 'upgrade', volume: .5, reset: true });
+    PlaySound({ key: 'upgrade', volume: .5, reset: true });
     closeItemInfoModal();
     __account.slots += _amount;
     _client.saveState();
@@ -1755,7 +1755,7 @@ function acceptInventorySlot() {
 }
 function acceptAndSellItem(_id, _cost, _noSound) {
     // if(!_noSound)
-    //     episode.playSound({ key: 'sell' });
+    //     PlaySound({ key: 'sell' });
     const _iq = document.querySelector('.inventory-question');
     if(_iq)
         _iq.remove();
@@ -1787,7 +1787,7 @@ function acceptAndRandomizeItem(_id, _noAnimation) {
         _ticket.count--;
     else
         __account.misc.splice(_miscIndex, 1);
-    episode.playSound({ key: 'upgrade', volume: .5, reset: true });
+    PlaySound({ key: 'upgrade', volume: .5, reset: true });
     closeItemInfoModal();
     closeCharacterInfoModal();
     openItemInfoModal(_id);
@@ -1852,7 +1852,7 @@ function changePower(_old, _new) {
             if(_old < 0)
                 _old = 0;
             _counter--;
-            episode.playSound({ key: 'count', reset: true, volume:.5 });
+            PlaySound({ key: 'count', reset: true, volume:.5 });
             if(_counter <= 0) {
                 clearInterval(powerDiffTimer);
                 powerDiffTimer = null;
@@ -2015,7 +2015,7 @@ function getChestReward(_grade, _rewardKey, _rewardType, _count) {
 }
 function warnChestReward(_cr) {
     var _crTitle = getLangData(_cr.title ?? _cr.type);
-    episode.playSound({key: 'chestreward', volume: .3, reset: true });
+    PlaySound({key: 'chestreward', volume: .3, reset: true });
     _crTitle = _crTitle.charAt(0).toLocaleUpperCase(getLang()) + _crTitle.substring(1);
     warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="' + _cr.src + '" />&nbsp;' + (_cr.count ?? 1).formatWithDots() + 'x&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + _crTitle + '</span></div>', null, null, 1);
 }

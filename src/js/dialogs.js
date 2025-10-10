@@ -320,7 +320,7 @@ function skipDialog() {
 				__account.questStatus.quest = __account.questStatus.state = undefined;
 				updateQuestArea();
 				warn('<div class="flex heading quest-status-main" style="position:relative;width:auto"><img style="height:15vh;z-index:-1" src="./images/icons/txtbg.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Quest Completed') + '</div></div>', 'level-up');
-				episode.playSound({ key: 'questdone', volume: .8 });
+				PlaySound({ key: 'questdone', volume: .8 });
 			}
 		}
 		else {
@@ -351,7 +351,7 @@ function takeQuest(_storyQuestIndex, _nowarn, _title, _state){
 	//if(!_nowarn)
 	//	warn('<div class="flex heading toast-with-banner" style="position:relative;width:auto"><img style="height:10vh;z-index:-1" src="./images/icons/quest-accepted.png" /><div class="full flex" style="position:absolute;text-shadow:0px 0px 4px #000;color:#f7f7f7 !important">' + getLangData(_title ?? 'Quest Accepted') + '</div></div>', 'level-up');
 	if(!_state)
-		episode.playSound({ key: 'questaccepted', volume: .8 });
+		PlaySound({ key: 'questaccepted', volume: .8 });
 	const _quest = _q ?? __story.quests.find(x => x.id === __account.questStatus.order);
 	const _before = _quest.before;
 	const _after = _quest.after;
@@ -543,7 +543,7 @@ function createBubbleText(_dialog) {
 			episode.bubbles = [];
 		episode.bubbles.push({key:_c.key, elem: _d});
 		if(__story)
-			episode.playSound({key:'st' + __story.id + 'sc' + __storySceneOrder + 'id' + _dialog.id, volume:.5 })
+			PlaySound({key:'st' + __story.id + 'sc' + __storySceneOrder + 'id' + _dialog.id, volume:.5 })
 	}
 	if(!_c.still || _dialog.move || _firstCreation) {
 		let _left, _top;
@@ -590,7 +590,7 @@ function createBubbleText(_dialog) {
 }
 function acceptSideQuest(_id) {
 	warn('<div class="flex heading toast-with-banner" style="position:relative"><img style="position:absolute;z-index:-1;left:-40%;width:180%" src="./images/icons/quest-accepted.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#f7f7f7 !important">' + getLangData('Side Quest Accepted') + '</span></div>', 'level-up');
-	episode.playSound({ key: 'questaccepted', volume: .8 });
+	PlaySound({ key: 'questaccepted', volume: .8 });
 	__account.questStatus.side.quest = JSON.parse(JSON.stringify(_sideQuests.find(x => x.id === _id)));
 	__account.questStatus.side.state = 'progress';
 	episode.reset();
@@ -675,7 +675,7 @@ function createDialog(_questId) {
 			getQuestRewards(__account.questStatus.side.quest, 1);
 			__account.questStatus.side.state = undefined;
 			warn('<div class="flex heading" style="position:relative"><img style="position:absolute;z-index:-1;left:-40%;width:180%" src="./images/icons/banner.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Side Quest Completed') + '</span></div>', 'level-up');
-			episode.playSound({ key: 'questdone', volume: .8 });
+			PlaySound({ key: 'questdone', volume: .8 });
 			if (_quest.end)
 				_quest.end();
 			if (!episode.drawSpriteObjects2(_quest.loot))
@@ -845,7 +845,7 @@ let _nameDeclared, _csEndFunc;
 function declareAccountName() {
 	if(_nameDeclared)
 		return;
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
 	__account.name = document.querySelector('#choose-acc-name input').value?.trim();
 	if(!__account.name?.length) {
 		warn('<span>' + getLangData('Name can\'t be empty') + '</span>', 'warn');

@@ -279,7 +279,7 @@ function addArcherCoopCharacter(_noSound, _append) {
 	const _c = addCoopCharacter(null, 'arc', _append);
 	_squadMemberKey = 'archer';
 	if (!_noSound)
-		episode.playSound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
+		PlaySound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
 	return _c;
 }
 function addWarriorCoopCharacter(_noSound, _append) {
@@ -289,7 +289,7 @@ function addWarriorCoopCharacter(_noSound, _append) {
 	const _c = addCoopCharacter(null, 'wrr', _append);
 	_squadMemberKey = 'warrior';
 	if (!_noSound)
-		episode.playSound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
+		PlaySound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
 	return _c;
 }
 function addThiefCoopCharacter(_noSound, _append) {
@@ -299,7 +299,7 @@ function addThiefCoopCharacter(_noSound, _append) {
 	const _c = addCoopCharacter(null, 'thf', _append);
 	_squadMemberKey = 'thief';
 	if (!_noSound)
-		episode.playSound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
+		PlaySound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
 	return _c;
 }
 function getCharacterJSON(_prefix) {
@@ -497,7 +497,7 @@ function switchCharacter(_force, _nowarn) {
 	// mainCharacter.left -= platformX;
 	_client.setCharacterValues(mainCharacter, 1);
 	_squadMemberKey = _coopMembers[0].class;
-	episode.playSound({ key: mainCharacter.class + 'select' + getRandomValue(1, 2), volume: .5 });
+	PlaySound({ key: mainCharacter.class + 'select' + getRandomValue(1, 2), volume: .5 });
 	_startAnimate = true;
 	_client.loadItems();
 }
@@ -778,7 +778,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 						// }
 						if(_mapDiscovered) {
 							warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/scroll.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('New Map Discovered') + '</span></div>');
-							episode.playSound({ key: 'page', volume: .5 });
+							PlaySound({ key: 'page', volume: .5 });
 						}
 						if(_unarmed)
 							mainCharacter.unarm();
@@ -852,7 +852,7 @@ function loadVideo(_url, _after, _again) {
 }
 let _playingVideo;
 function askSkipVideo(_video, _again) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
 	_playingVideo = _video;
     let _modal = document.createElement('div');
 	_modal.className = "full flex inventory-question";
@@ -1073,7 +1073,7 @@ function showMyModalPopUp(_id) {
 }
 function hideMyMenu() {
 	_dialogAppeared = false;
-	episode.playSound({key:'click'});
+	PlaySound({key:'click'});
 	const _mbd = document.querySelector('.menu-backdrop');
 	if(_mbd)
 		_mbd.remove();
@@ -1109,7 +1109,7 @@ function switchBookPage(_order, _subOrder) {
 	const _removals = document.querySelectorAll('#game-menu .remove-me');
 	for(let _r of _removals ?? [])
 		_r.innerHTML = '';
-	episode.playSound({ key: 'page', volume: .3 });
+	PlaySound({ key: 'page', volume: .3 });
 	let _pvpPressed;
 	detachModule();
 	for (var i = 0; i < 9; i++) {
@@ -1556,7 +1556,7 @@ function selectMenuContainer(_order) {
 	return _container;
 }
 function trySwitchMap(_id) {
-	episode.playSound({ key: 'click' }); 
+	PlaySound({ key: 'click' }); 
 	const _map = mapSprites.find(x => x.id === _id);
 	if(mainCharacter.level < _map.minLevel) {
 		warn('<span>' + getLangData('Your level is too low') + '</span>', 'warn');
@@ -1771,7 +1771,7 @@ setTimeout(function() {
 }, 2000);
 
 const hideModal = function() {
-	episode.playSound({ key: 'page', volume:.3 });
+	PlaySound({ key: 'page', volume:.3 });
 	hideMyModalPopUp();
 }
 

@@ -83,7 +83,7 @@ function getCharacterInformation(_class, _elem, _dir, _another) {
 	if(_info) {
 		document.querySelectorAll('.char-selection').forEach(x => removeClass(x, 'no-dark'));
 		addClass(_elem, 'no-dark');
-		episode.playSound({key:'switch', volume:.3});
+		PlaySound({key:'switch', volume:.3});
 		const _root = document.querySelector(':root');
 		_root.style.setProperty('--main-char-bg', 'url(./../images/main/' + _class + '/bg.png)');
 		let _html = `<div class="char-selection-center-inner flex" style="background:radial-gradient(#232323, #000)"><div class="flex w-100 c-i c-i-name">${_conceptArts[_class]?.title ?? episode.enemies.find(x => x.class === _class)?.name ?? ''}</div>
@@ -172,7 +172,7 @@ function selectStoryHero(_class, _dir, _another) {
 	};
 }
 function selectHero(_class, _dir, _another) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
 	if(_class !== 'warrior'){
 		if(__characterInfos.find(x => x.class === _class)?.race === 'Beast')
 			selectStoryHero(_class, _dir, _another);

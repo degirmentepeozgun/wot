@@ -225,7 +225,7 @@ function addArcherCoopCharacter(_noSound, _append) {
 	const _c = addCoopCharacter(null, 'arc', _append);
 	_squadMemberKey = 'archer';
 	if (!_noSound)
-		episode.playSound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
+		PlaySound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
 	return _c;
 }
 function addWarriorCoopCharacter(_noSound, _append) {
@@ -235,7 +235,7 @@ function addWarriorCoopCharacter(_noSound, _append) {
 	const _c = addCoopCharacter(null, 'wrr', _append);
 	_squadMemberKey = 'warrior';
 	if (!_noSound)
-		episode.playSound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
+		PlaySound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
 	return _c;
 }
 function addThiefCoopCharacter(_noSound, _append) {
@@ -245,7 +245,7 @@ function addThiefCoopCharacter(_noSound, _append) {
 	const _c = addCoopCharacter(null, 'thf', _append);
 	_squadMemberKey = 'thief';
 	if (!_noSound)
-		episode.playSound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
+		PlaySound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
 	return _c;
 }
 function getCharacterJSON(_prefix) {
@@ -430,7 +430,7 @@ function switchCharacter() {
 	// mainCharacter.left -= platformX;
 	_client.setCharacterValues(mainCharacter, 1);
 	_squadMemberKey = _coopMembers[0].class;
-	episode.playSound({ key: mainCharacter.class + 'select' + getRandomValue(1, 2), volume: .5 });
+	PlaySound({ key: mainCharacter.class + 'select' + getRandomValue(1, 2), volume: .5 });
 	_startAnimate = true;
 	_client.loadItems();
 }
@@ -681,7 +681,7 @@ function switchMap(_x, _force, _func, _newId) {
 						}
 						if(_mapDiscovered) {
 							warn('<div class="flex heading achievement" style="position:relative"><img style="height:12vh" src="./images/icons/scroll.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('New Map Discovered') + '</span></div>', 'level-up');
-							episode.playSound({ key: 'page', volume: .5 });
+							PlaySound({ key: 'page', volume: .5 });
 						}
 					// }
 					// catch(_ex2) {
@@ -931,7 +931,7 @@ function switchBookPage(_order) {
 		_r.innerHTML = '';
 	const _elems = document.querySelectorAll('.my-pop-up-content-body, .book-sign, #game-talents');
 	const _step = _elems.length / 2;
-	episode.playSound({ key: 'page', volume: .3 });
+	PlaySound({ key: 'page', volume: .3 });
 	for (var i = 0; i < _step; i++) {
 		if ((i + 1) === _order) {
 			addClass(document.getElementById('book-sign-' + _order), 'selected');
@@ -1120,7 +1120,7 @@ function selectMapArea(_id, _container) {
 		if(!sprite.lobby)
 			openMapDetailModal(sprite.id, _container);
 		else {
-			episode.playSound({ key: 'click' });
+			PlaySound({ key: 'click' });
 			switchMap(sprite.id);
 		}
 	}
@@ -1129,7 +1129,7 @@ function selectMapArea(_id, _container) {
 }
 function closeMapInfoModal(_nosound) {
 	if(!_nosound)
-		episode.playSound({ key: 'click' });
+		PlaySound({ key: 'click' });
 	document.querySelector('.map-description-container')?.remove();
 }
 function openMapDetailModal(_id, _container) {
@@ -1138,7 +1138,7 @@ function openMapDetailModal(_id, _container) {
 	if(_map.coords.key)
 		_mission = _missions.find(x => x.key === _map.coords.key);
 	const _wm = _container ?? document.getElementById('world-map');
-	episode.playSound({ key: 'click' });
+	PlaySound({ key: 'click' });
 	const _quests = _npcQuests.filter(x => x.maps.indexOf(_map.id) !== -1);
 	const _mapQuestCount = _quests?.length ?? 0;
 	const _mapQuestDone = _quests?.filter(x => x.id < __account.questStatus.order)?.length ?? 0;
@@ -1246,7 +1246,7 @@ function openMapDetailModal(_id, _container) {
 	root.style.setProperty('--map-description-url', "url('./../images/map/" + _map.theme + ".png')");
 }
 function trySwitchMap(_id) {
-	episode.playSound({ key: 'click' }); 
+	PlaySound({ key: 'click' }); 
 	const _map = mapSprites.find(x => x.id === _id);
 	if(mainCharacter.level < _map.minLeve) {
 		warn('<span>' + getLangData('Your level is too low') + '</span>', 'warn');
@@ -1419,7 +1419,7 @@ setTimeout(function() {
 }, 2000);
 
 const hideModal = function() {
-	episode.playSound({ key: 'page', volume:.3 });
+	PlaySound({ key: 'page', volume:.3 });
 	hideMyModalPopUp();
 }
 

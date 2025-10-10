@@ -1,4 +1,5 @@
 ﻿'use strict';
+
 console.log('global');
 const __locations = [
 		{
@@ -1292,7 +1293,7 @@ const _npcQuests = [
 			{ enemy: ['Lestat'], limit: 1, key: 'lestat-tooth', type: 'quest-item', chanceRate: 100 }
 		], gain: [{ key: 'gold', value: 3000 }, { key: 'exp', value: 2500 }],
 		then: function () {
-			stopRain();
+			stopWeather();
 			//playCutScene(2);
 		},
 		maps: [5]
@@ -1364,7 +1365,7 @@ const _npcQuests = [
 	// // 		{ enemy: ['Lestat'], limit: 1, key: 'lestat-tooth', type: 'quest-item', chanceRate: 100 }
 	// // 	], gain: [{ key: 'gold', value: 3500 }, { key: 'exp', value: 30000 }],
 	// // 	then: function () {
-	// // 		stopRain();
+	// // 		stopWeather();
 	// // 	},
 	// // 	maps: [5]
 	// // },
@@ -1516,7 +1517,7 @@ const _npcQuests = [
 	// 	then: function() { 
 	// 		_client.upgradeVisitedMaps(6);
 	// 		warn('<div class="flex heading achievement" style="position:relative"><img style="height:12vh" src="./images/icons/scroll.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('New Map Discovered') + '!</span></div>', 'level-up');
-	// 		episode.playSound({ key: 'page', volume: .5 });
+	// 		PlaySound({ key: 'page', volume: .5 });
 	// 	},
 	// },
 	// {
@@ -1560,6 +1561,35 @@ const commonSkills = [
 	{ key: 'waterwave' },
 	{ key: 'poisonpuff' },
 	{ key: 'earthrock' },
+	{ key: 'corpseexplode', 
+		do: function(_char) {
+			const _corpses = episode.enemies.filter(x => x !== _char && x.isDead() && !x.unseen && !x.remove
+			&& x.class !== __spell && !x.finishingBy && !x.owner && !x.related && x.class !== 'object' && !x.corpseExploding);
+			let _used;
+			if(_corpses?.[0])
+			{
+				for(let x of _corpses)
+				{
+					if(x.animation === 'dead')
+					{
+						_char.throwSpell({spell:{key:'corpseexplotion'}}, null, x);
+						x.corpseExploding = x.invisible = 1;
+						if(!_used)
+							_used = 1;
+					}
+				}
+				if(_used){
+					PlaySound({key:'corpse', volume:.3, reset:true});
+					requestAnimationFrame(() => {
+						PlaySound({key:'soul', volume:.7, reset:true});
+					});
+					return true;
+				}
+			}
+			warn('<span>' + getLangData('No corpse around') + '</span>', 'warn');
+			return false;
+		}, 
+	},
 	// { key: 'last', type: 'buff' },
 	// { key: 'hps', type: 'buff', level: 2 },
 	// { key: 'speedup', type: 'buff' },
@@ -1588,7 +1618,7 @@ function drinkPot(_char, _gifter, _event) {
 		return;
 	}
 	_ch.increaseHealth(_hp);
-	episode.playSound({ key: 'drink', volume: 1 });
+	PlaySound({ key: 'drink', volume: 1 });
 	dmgFrames.push({
 		text: 'plus-hp',
 		//class: 'effect-steal',
@@ -1969,7 +1999,7 @@ const relatedObjects = [
 	},
 	{
 		id: 'headsmash', key: 'headsmash', width: 355, height: 117,
-		zoom: .9, totalFrames: 6, speed: 6, singleton: true, still: true, col: 2
+		zoom: 1.2, totalFrames: 6, speed: 6, singleton: true, still: true, col: 2
 	},
 	{
 		id: 'hurtdead2blood', key: 'hurtdead2blood', width: 98, height: 78,
@@ -2182,6 +2212,14 @@ const relatedObjects = [
 	{
 		id: 'aura3', key: 'aura3', width: 192, height: 192, col:5, zoom: 2,
 		totalFrames: 25, speed: 4, singleton: true, repeat:true, stillOnChar: true
+	},
+	{
+		id: 'bam', key: 'bam', width: 200, height: 200, col:6, zoom: 1,
+		totalFrames: 6, speed: 4, singleton: true, still: true, type: 'hurt'
+	},
+	{
+		id: 'target', key: 'target', width: 256, height: 241, col:4, zoom: 1,
+		totalFrames: 28, speed: 4, skip:2, singleton: true, stillOnChar: true
 	}
 ];
 function setRelatedObjectSpeed() {
@@ -2191,6 +2229,12 @@ function setRelatedObjectSpeed() {
 }
 setRelatedObjectSpeed();
 const relatedObjectImages = {
+	target: function () {
+		return getImage('./images/related/target.png?x=2')
+	},
+	bam: function () {
+		return getImage('./images/related/bam.png')
+	},
 	hurtsteal1: function () {
 		return getImage('./images/related/steal1.png')
 	},
@@ -2784,6 +2828,8 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	soul: './images/sounds/soul.mp3?x=3',
+	corpse: './images/sounds/corpse.mp3',
 	conquer: './images/sounds/conquer.mp3',
 	flaghurt1: './images/sounds/flaghurt1.mp3',
 	flaghurt2: './images/sounds/flaghurt2.mp3',
@@ -3132,6 +3178,7 @@ const soundFiles = {
 	mushroomattack: './images/sounds/mushroom-attack.wav',
 	snakeattack: './images/sounds/snake-attack.mp3',
 	icespike: './images/sounds/icespike.mp3',
+	icecrack: './images/sounds/ice-crack.mp3?v=2',
 	landing: './images/sounds/landing.mp3',
 	headoff: './images/sounds/headoff.mp3',
 	wasprun: './images/sounds/wasp-run.wav',
@@ -3199,6 +3246,7 @@ const soundFiles = {
 	questdone: './images/sounds/quest-done.mp3',
 	levelup: './images/sounds/levelup.mp3?v=2',
 	loot: './images/sounds/loot.mp3',
+	commonloot: './images/sounds/common-loot.mp3',
 	charge: './images/sounds/charge.mp3',
 	rockdestroy: './images/sounds/rockdestroy.mp3',
 	crack: './images/sounds/crack.mp3',
@@ -3622,122 +3670,8 @@ const mapSprites = [
 		ground: { width: 6144, height: 1080, zoom: 1.065, yRate: 1.75 },
 		bgAnimations: [],
 	},
-	// {
-	// 	id: 1, coords: { left: '20%', top: '60%', title: 'Village' },
-	// 	theme: 'farm', lobby: true, distance: 1, width: MathFloor(6144 * 1.065),
-	// 	mobs: [
-	// 		{
-	// 			id: 98,
-	// 			minX: 1440,
-	// 			maxX: 1440,
-	// 			count: 1,
-	// 			name: 'carcass1',
-	// 			actions: [
-	// 				{
-	// 					when: function (_e) {
-	// 					return __account.questStatus.quest?.key !== 'carcass' ||
-	// 					__account.questStatus.state !== 'progress';
-	// 					},
-	// 					do: function (_e) {
-	// 						_e.remove = _e.noLoot = 1;
-	// 					}
-	// 				}
-	// 			],
-	// 			yPosition: function() {
-	// 				return MathRound(groundheight / 2);
-	// 			}
-	// 		},
-	// 		{
-	// 			id: 99,
-	// 			minX: 2940,
-	// 			maxX: 2940,
-	// 			count: 1,
-	// 			name: 'carcass2',
-	// 			actions: [
-	// 				{
-	// 					when: function (_e) {
-	// 					return __account.questStatus.quest?.key !== 'carcass' ||
-	// 					__account.questStatus.state !== 'progress';
-	// 					},
-	// 					do: function (_e) {
-	// 						_e.remove = _e.noLoot = 1;
-	// 					}
-	// 				}
-	// 			],
-	// 			yPosition: function() {
-	// 				return MathRound(groundheight / 2);
-	// 			}
-	// 		},
-	// 		{
-	// 			id: 98,
-	// 			minX: 4440,
-	// 			maxX: 4440,
-	// 			count: 1,
-	// 			name: 'carcass3',
-	// 			actions: [
-	// 				{
-	// 					when: function (_e) {
-	// 					return __account.questStatus.quest?.key !== 'carcass' ||
-	// 					__account.questStatus.state !== 'progress';
-	// 					},
-	// 					do: function (_e) {
-	// 						_e.remove = _e.noLoot = 1;
-	// 					}
-	// 				}
-	// 			],
-	// 			yPosition: function() {
-	// 				return MathRound(groundheight / 2);
-	// 			}
-	// 		},
-	// 		{
-	// 			id: 100,
-	// 			minX: 5800 + 256,
-	// 			maxX: 5800 + 256,
-	// 			count: 1,
-	// 			yPosition: function() {
-	// 				return MathRound((groundheight / 2) * 1.1);
-	// 			}
-	// 		},
-	// 	],
-	// 	objects: [
-	// 		{
-	// 			id: 'carcassx1', key: 'carcass1', npc: true, when: function (_npc) {
-	// 				if(!_npc.relatedEnemy)
-	// 					_npc.relatedEnemy = episode.enemies?.find(x => x.displayName === 'carcass1');
-	// 				return installQuestItem(_npc, 1);
-	// 			}, width: 200, height: 0, locate: { left: 1340, bottom: 80 }, zoom: 1, rate: 1
-	// 		},
-	// 		{
-	// 			id: 'carcassx2', key: 'carcass1', npc: true, when: function (_npc) {
-	// 				if(!_npc.relatedEnemy)
-	// 					_npc.relatedEnemy = episode.enemies?.find(x => x.displayName === 'carcass2');
-	// 				return installQuestItem(_npc, 1);
-	// 			}, width: 200, height: 0, locate: { left: 2840, bottom: 80 }, zoom: 1, rate: 1
-	// 		},
-	// 		{
-	// 			id: 'carcassx3', key: 'carcass1', npc: true, when: function (_npc) {
-	// 				if(!_npc.relatedEnemy)
-	// 					_npc.relatedEnemy = episode.enemies?.find(x => x.displayName === 'carcass3');
-	// 				return installQuestItem(_npc, 1);
-	// 			}, width: 200, height: 0, locate: { left: 4340, bottom: 80 }, zoom: 1, rate: 1
-	// 		},
-	// 		{ id: 'ff1', totalFrames: 2, key: 'fireflies', width: 400, height: 300, zoom: 1.2, locate: { left: 10, bottom: 20 } },
-	// 		{ id: 'ff2', totalFrames: 2, key: 'fireflies', width: 400, height: 300, zoom: 1.2, locate: { left: 1500, bottom: 20 }, delay: 200 },
-	// 		{ id: 'ff3', totalFrames: 2, key: 'fireflies', width: 400, height: 300, zoom: 1.2, locate: { left: 3250, bottom: 20 }, delay: 800 },
-	// 		{ id: 'ff4', totalFrames: 2, key: 'fireflies', width: 400, height: 300, zoom: 1.2, locate: { left: 4650, bottom: 20 }, delay: 800 },
-	// 		{ id: 'banner2', totalFrames: 6, speed: 10, key: 'banner2', width: 170, height: 519, zoom: 1.1, locate: { left: 86, bottom: 5 }, wait: 10 },
-	// 		{ id: 'board', topGap: 100, npc: true, width: 100, height: 100, zoom: 1, locate: { left: 1490, bottom: 230 } },
-	// 		{ id: 'portal1', src:'./images/texture/portal.gif', alpha: .75, to: 3, key: 'portal', npc: true, totalFrames: 7, width: 820, height: 0, zoom: 1, locate: { left: 5950, bottom: -200 } },
-	// 	],
-	// 	tiles: [
-	// 		{ name : 'bg2', count: 1, height: 800, zoom: 1.7, rate: .4, width: 4000, bottom: -350 },
-	// 		{ name: 'ground2', count: 1, height: 1080, zoom: 1.065, rate: 1, width: 6144, bottom: -350 }
-	// 	],
-	// 	ground: { width: 6144, height: 1080, zoom: 1.065, yRate: 1.75 },
-	// 	bgAnimations: [],
-	// },
 	{
-		id: 3, do:startAutumn, after:stopAutumn, minLevel: 1, itemGrade: 2, coords: { left: '18.5%', top: '76%', title: 'Forest' }, 
+		id: 3, do:startAutumn, after:stopWeather, minLevel: 1, itemGrade: 2, coords: { left: '18.5%', top: '76%', title: 'Forest' }, 
 		theme: 'jungle', ambianceVolume: .2, distance: 1, width: MathFloor(5888 * 1.065),
 		equipmentDropRates: [
 			{ key:'helmet', rate: 8 },
@@ -3892,7 +3826,7 @@ const mapSprites = [
 		ground: { width: 5888, height: 1080, zoom: 1.065, yRate: 2.5 }
 	},
 	{
-		id: 5, do:startAutumn, after:stopAutumn, ambianceVolume: .2, coords: { left: '3%', top: '65%', title: 'Forest', dir: 'West' }, 
+		id: 5, do:startAutumn, after:stopWeather, ambianceVolume: .2, coords: { left: '3%', top: '65%', title: 'Forest', dir: 'West' }, 
 		theme: 'jungle', distance: 1, width: MathFloor(5888 * 1.065),
 		minLevel: 3, itemGrade: 2,
 		assets: [
@@ -5297,7 +5231,7 @@ const mapSprites = [
 		ground: { width: 5886, height: 1080, zoom: 1.065, yRate: 2.8 }
 	},
 	{
-		id: 93, disabled: true, ambianceVolume: .2, do: startSnow, after: endSnow, 
+		id: 93, disabled: true, ambianceVolume: .2, do: startSnow, after: stopWeather, 
 		coords: { left: '70%', top: '12%', title: 'Snowy Peaks' }, 
 		theme: 'snow', distance: 1, width: MathFloor(6144 * 1.065),
 		minLevel: 1, itemGrade: 3,
@@ -5548,7 +5482,7 @@ const mapSprites = [
 							if(_e.remove)
 								return;
 							_e.groupAttack = 1;
-							episode.playSound({key:'itbarakyell', volume: .35});
+							PlaySound({key:'itbarakyell', volume: .35});
 							const _arr = [];
 							let _id = 1;
 							_arr.push({
@@ -5668,7 +5602,7 @@ const mapSprites = [
 		ground: { width: 6144, height: 1080, zoom: 1.065, yRate: 2.2 }
 	},
 	{
-		id: 103, subMap: 104, repeat:1000, ambianceVolume:.5, do: startQuake, after: stopQuake,
+		id: 103, subMap: 104, repeat:1000, ambianceVolume:.5, do: startQuake, after: stopWeather,
 		ambiancePath: './images/sounds/quake.mp3', 
 		still: true, minLevel : 1, theme: 'chamber',
 		coords: { title: 'Secret Room' },
@@ -5739,7 +5673,7 @@ const mapSprites = [
 	},
 	{
 		id: 102, repeat:1000, subMap: 104,
-		do: startQuake, after: stopQuake, repeat:1000,
+		do: startQuake, after: stopWeather, repeat:1000,
 		ambianceVolume:.5, ambiancePath: './images/sounds/quake.mp3', still: true, minLevel : 1, theme: 'room1',
 		coords: { title: 'Seewers' },
 		distance: 1, width: MathFloor(1920 * 1.067), characterZoom: 1.4,
@@ -5851,7 +5785,7 @@ const mapSprites = [
 		ground: { width: 1920, height: 1076, zoom: 1.067, yRate: .7 }
 	},
 	{
-		id: 104, repeat:1000, do: startQuake, after: stopQuake,
+		id: 104, repeat:1000, do: startQuake, after: stopWeather,
 		ambianceVolume:.5, ambiancePath: './images/sounds/quake.mp3', still: true, minLevel : 1, theme: 'seewers', /*runToSwitch: true,*/
 		coords: { title: 'Dungeon' }, distance: 1, width: MathFloor(1920 * 1.067), characterZoom: 1.4,
 		mobs: [
@@ -11349,7 +11283,6 @@ const spells = {
 		zoom: 1,
 		src: './images/sprites/ep07/bubbles.png',
 		invulnerable: true,
-		extraStepXRate: 1,
 		class: __spell,
 		drawPriority: .5,
 		name: 'Poisonbubbles',
@@ -11365,7 +11298,17 @@ const spells = {
 						spriteHeight: 73,
 						spriteOrigin: 149,
 						bottomGap: 14,
-						speed: 6
+						speed: 6,
+						atk: {
+							yRange: 10,
+							rate: .5,
+							reset: true,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'toxic'
+						}
 					},
 					{
 						spriteLeft: 1333,
@@ -11679,135 +11622,59 @@ const spells = {
 						spriteLeft: 0,
 						spriteTop: 355,
 						spriteWidth: 600,
-						spriteHeight: 335,
+						spriteHeight: 245,
 						spriteOrigin: 300,
+						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
-						extraStepXRate: 1.5,
-						speed: 3
-					},
-					{
-						spriteLeft: 0,
-						spriteTop: 355,
-						spriteWidth: 600,
-						spriteHeight: 335,
-						spriteOrigin: 300,
-						src: './images/sprites/ep07/poison.png',
-						extraStepXRate: 1.5,
-						atk: {
-							yRange: 15,
-							rate: 1,
-							hurt: {
-								key: 'hurtground1',
-								type: 'ground'
-							},
-							type: 'toxic'
-						},
-						speed: 1
+						speed: 6
 					},
 					{
 						spriteLeft: 600,
 						spriteTop: 355,
 						spriteWidth: 600,
-						spriteHeight: 335,
+						spriteHeight: 245,
 						spriteOrigin: 300,
-						extraStepXRate: 1.5,
+						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
-						speed: 3
-					},
-					{
-						spriteLeft: 600,
-						spriteTop: 355,
-						spriteWidth: 600,
-						spriteHeight: 335,
-						spriteOrigin: 300,
-						extraStepXRate: 1.5,
-						src: './images/sprites/ep07/poison.png',
-						speed: 1,
-						atk: {
-							yRange: 15,
-							rate: 1,
-							hurt: {
-								key: 'hurtground1',
-								type: 'ground'
-							},
-							type: 'toxic'
-						},
+						speed: 6
 					},
 					{
 						spriteLeft: 1200,
 						spriteTop: 355,
 						spriteWidth: 600,
-						spriteHeight: 335,
+						spriteHeight: 245,
 						spriteOrigin: 300,
-						extraStepXRate: 1.5,
+						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
-						speed: 3
-					},
-					{
-						spriteLeft: 1200,
-						spriteTop: 355,
-						spriteWidth: 600,
-						spriteHeight: 335,
-						spriteOrigin: 300,
-						extraStepXRate: 1.5,
-						src: './images/sprites/ep07/poison.png',
-						speed: 1,
-						atk: {
-							yRange: 15,
-							rate: 1,
-							hurt: {
-								key: 'hurtground1',
-								type: 'ground'
-							},
-							type: 'toxic'
-						},
+						speed: 6
 					},
 					{
 						spriteLeft: 1800,
 						spriteTop: 355,
 						spriteWidth: 600,
-						spriteHeight: 335,
+						spriteHeight: 245,
 						spriteOrigin: 300,
-						extraStepXRate: 1.5,
+						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
-						speed: 3
-					},
-					{
-						spriteLeft: 1800,
-						spriteTop: 355,
-						spriteWidth: 600,
-						spriteHeight: 335,
-						spriteOrigin: 300,
-						extraStepXRate: 1.5,
-						src: './images/sprites/ep07/poison.png',
-						speed: 1,
-						atk: {
-							yRange: 15,
-							rate: 1,
-							hurt: {
-								key: 'hurtground1',
-								type: 'ground'
-							},
-							type: 'toxic'
-						},
+						speed: 6
 					},
 					{
 						spriteLeft: 2400,
 						spriteTop: 355,
 						spriteWidth: 600,
-						spriteHeight: 335,
+						spriteHeight: 245,
 						spriteOrigin: 300,
-						extraStepXRate: 1.5,
+						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
-						speed: 3
+						speed: 5
 					},
 					{
 						spriteLeft: 2400,
 						spriteTop: 355,
 						spriteWidth: 600,
-						spriteHeight: 335,
+						spriteHeight: 245,
 						spriteOrigin: 300,
-						extraStepXRate: 1.5,
+						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
 						speed: 1,
 						atk: {
@@ -13079,6 +12946,351 @@ const spells = {
 							},
 							type: 'common'
 						}, {key:'rockobom', volume:.5, reset: true})
+			}
+		}
+	},
+	corpseexplotion: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'run',
+		zoom: 4,
+		width: 48,
+		invulnerable: true,
+		autoAim: 100,
+		pierce: true,
+		class: __spell,
+		src: './images/related/ghost.png',
+		name: 'Corpse Explode',
+		animations: {
+			dead: {
+				key: 'dead',
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				priority: 1,
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 256,
+						spriteHeight: 241 - 62,
+						spriteOrigin: 128,
+						src: './images/related/target.png',
+						zoom: .7,
+						bottomGap:10,
+						speed: 2
+					},
+						{
+						spriteLeft: 512,
+						spriteTop: 0,
+						spriteWidth: 256,
+						spriteHeight: 241 - 62,
+						bottomGap:10,
+						spriteOrigin: 128,
+						src: './images/related/target.png',
+						zoom: .7,
+						speed: 2
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 241,
+						spriteWidth: 256,
+						spriteHeight: 241 - 62,
+						bottomGap:10,
+						spriteOrigin: 128,
+						src: './images/related/target.png',
+						zoom: .7,
+						speed: 2
+					},
+						{
+						spriteLeft: 512,
+						spriteTop: 241,
+						spriteWidth: 256,
+						spriteHeight: 241 - 62,
+						bottomGap:10,
+						spriteOrigin: 128,
+						src: './images/related/target.png',
+						zoom: .7,
+						speed: 2
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 241 * 2,
+						spriteWidth: 256,
+						spriteHeight: 241 - 62,
+						bottomGap:10,
+						spriteOrigin: 128,
+						src: './images/related/target.png',
+						zoom: .7,
+						speed: 2
+					},
+						{
+						spriteLeft: 512,
+						spriteTop: 241 * 2,
+						spriteWidth: 256,
+						spriteHeight: 241 - 62,
+						bottomGap:10,
+						spriteOrigin: 128,
+						src: './images/related/target.png',
+						zoom: .7,
+						speed: 2
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 241 * 3,
+						spriteWidth: 256,
+						spriteHeight: 241 - 62,
+						bottomGap:10,
+						spriteOrigin: 128,
+						src: './images/related/target.png',
+						zoom: .7,
+						speed: 2
+					},
+						{
+						spriteLeft: 512,
+						spriteTop: 241 * 3,
+						spriteWidth: 256,
+						spriteHeight: 241 - 62,
+						bottomGap:10,
+						spriteOrigin: 128,
+						src: './images/related/target.png',
+						zoom: .7,
+						speed: 2
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 241 * 4,
+						spriteWidth: 256,
+						spriteHeight: 241 - 62,
+						bottomGap:10,
+						spell: {
+							key: 'groundexplosion',
+							xGap: -130,
+							harmless: true
+						},
+						spriteOrigin: 128,
+						src: './images/related/target.png',
+						zoom: .7,
+						speed: 2
+					},
+						{
+						spriteLeft: 512,
+						spriteTop: 241 * 4,
+						spriteWidth: 256,
+						spriteHeight: 241 - 62,
+						bottomGap:10,
+						spriteOrigin: 128,
+						src: './images/related/target.png',
+						zoom: .7,
+						speed: 2
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 241 * 5,
+						spriteWidth: 256,
+						spriteHeight: 241 - 62,
+						bottomGap:10,
+						spriteOrigin: 128,
+						src: './images/related/target.png',
+						zoom: .7,
+						speed: 2
+					},
+					{
+						spriteLeft: 512,
+						spriteTop: 241 * 5,
+						spriteWidth: 256,
+						spriteHeight: 241 - 62,
+						bottomGap:10,
+						spriteOrigin: 128,
+						src: './images/related/target.png',
+						zoom: .7,
+						speed: 2
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 241 * 6,
+						spriteWidth: 256,
+						spriteHeight: 241 - 62,
+						bottomGap:10,
+						spriteOrigin: 128,
+						src: './images/related/target.png',
+						zoom: .7,
+						speed: 2,
+						atk: {
+							yRange: 20,
+							rate: .1,
+							ignoreDef: true,
+							hitTaken: .5,
+							reset: true,
+							aoe: 20,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground',
+								smash: true
+							},
+							type: 'shadow'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 48,
+						spriteHeight: 64,
+						spriteOrigin: 24,
+						bottomGap: -20,
+						speed: 4
+					},
+						{
+						spriteLeft: 48,
+						spriteTop: 0,
+						spriteWidth: 48,
+						spriteHeight: 64,
+						spriteOrigin: 24,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 48 * 2,
+						spriteTop: 0,
+						spriteWidth: 48,
+						spriteHeight: 64,
+						spriteOrigin: 24,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 48 * 3,
+						spriteTop: 0,
+						spriteWidth: 48,
+						spriteHeight: 64,
+						spriteOrigin: 24,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 48 * 4,
+						spriteTop: 0,
+						spriteWidth: 48,
+						spriteHeight: 64,
+						spriteOrigin: 24,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 48 * 5,
+						spriteTop: 0,
+						spriteWidth: 48,
+						spriteHeight: 64,
+						spriteOrigin: 24,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 48 * 6,
+						spriteTop: 0,
+						spriteWidth: 48,
+						spriteHeight: 64,
+						spriteOrigin: 24,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 48 * 7,
+						spriteTop: 0,
+						spriteWidth: 48,
+						spriteHeight: 64,
+						spriteOrigin: 24,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 48 * 8,
+						spriteTop: 0,
+						spriteWidth: 48,
+						spriteHeight: 64,
+						spriteOrigin: 24,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 48 * 9,
+						spriteTop: 0,
+						spriteWidth: 48,
+						spriteHeight: 64,
+						spriteOrigin: 24,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 48 * 10,
+						spriteTop: 0,
+						spriteWidth: 48,
+						spriteHeight: 64,
+						spriteOrigin: 24,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 48 * 11,
+						spriteTop: 0,
+						spriteWidth: 48,
+						spriteHeight: 64,
+						spriteOrigin: 24,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 48 * 12,
+						spriteTop: 0,
+						spriteWidth: 48,
+						spriteHeight: 64,
+						spriteOrigin: 24,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 48 * 13,
+						spriteTop: 0,
+						spriteWidth: 48,
+						spriteHeight: 64,
+						spriteOrigin: 24,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 48 * 14,
+						spriteTop: 0,
+						spriteWidth: 48,
+						spriteHeight: 64,
+						spriteOrigin: 24,
+						bottomGap: -20,
+						speed: 4
+					},
+					{
+						spriteLeft: 48 * 15,
+						spriteTop: 0,
+						spriteWidth: 48,
+						spriteHeight: 64,
+						spriteOrigin: 24,
+						bottomGap: -20,
+						speed: 4
+					}
+				]
 			}
 		}
 	},
@@ -26769,7 +26981,7 @@ const spells = {
 						sound: { key: 'fireball', volume: .2 },
 						speed: 6,
 						atk: {
-							yRange: 15,
+							yRange: 10,
 							rate: 2,
 							reset: 1,
 							hurt: {
@@ -26789,7 +27001,7 @@ const spells = {
 						extraStepXRate: 1.25,
 						speed: 6,
 						atk: {
-							yRange: 15,
+							yRange: 10,
 							rate: 2,
 							reset: 1,
 							hurt: {
@@ -26809,7 +27021,7 @@ const spells = {
 						extraStepXRate: 1.25,
 						speed: 6,
 						atk: {
-							yRange: 15,
+							yRange: 10,
 							rate: 2,
 							reset: 1,
 							hurt: {
@@ -26829,7 +27041,7 @@ const spells = {
 						extraStepXRate: 1.25,
 						speed: 6,
 						atk: {
-							yRange: 15,
+							yRange: 10,
 							rate: 2,
 							reset: 1,
 							hurt: {
@@ -26849,7 +27061,7 @@ const spells = {
 						extraStepXRate: 1.25,
 						speed: 6,
 						atk: {
-							yRange: 15,
+							yRange: 10,
 							rate: 2,
 							reset: 1,
 							hurt: {
@@ -27319,6 +27531,225 @@ const spells = {
 			}
 		}
 	},
+	tentacles: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'run',
+		zoom: 1,
+		invulnerable: true,
+		class: __spell,
+		width: 256,
+		autoAim: 80,
+		drawPriority: .5,
+		pierce: true,
+		hasShadow: false,
+		still: true,
+		src: './images/sprites/ep38/tentacles.png',
+		name: 'Tentacles',
+		animations: {
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				priority: 1,
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 256,
+						spriteHeight: 40,
+						spriteOrigin: 128,
+						speed: 6
+					},
+					{
+						spriteLeft: 266,
+						spriteTop: 0,
+						spriteWidth: 266,
+						spriteHeight: 80,
+						spriteOrigin: 128,
+						speed: 6,
+						atk: {
+							yRange: 10,
+							rate: 1,
+							reset:1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 532,
+						spriteTop: 0,
+						spriteWidth: 266,
+						spriteHeight: 120,
+						spriteOrigin: 128,
+						speed: 6,
+						atk: {
+							yRange: 10,
+							rate: 1,
+							reset:1,
+							hurt: {
+								buffs: [{
+									level: 1,
+									key: 'root'
+								}],
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 249,
+						spriteWidth: 266,
+						spriteHeight: 160,
+						spriteOrigin: 128,
+						speed: 6
+					},
+					{
+						spriteLeft: 266,
+						spriteTop: 249,
+						spriteWidth: 266,
+						spriteHeight: 200,
+						spriteOrigin: 128,
+						speed: 6
+					},
+					{
+						spriteLeft: 532,
+						spriteTop: 249,
+						spriteWidth: 266,
+						spriteHeight: 230 - 30,
+						spriteOrigin: 128,
+						speed: 6
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 480,
+						spriteWidth: 266,
+						spriteHeight: 228 - 30,
+						spriteOrigin: 128,
+						speed: 6
+					},
+					{
+						spriteLeft: 266,
+						spriteTop: 480,
+						spriteWidth: 266,
+						spriteHeight: 228 - 30,
+						spriteOrigin: 128,
+						speed: 6
+					},
+					{
+						spriteLeft: 532,
+						spriteTop: 480,
+						spriteWidth: 266,
+						spriteHeight: 228 - 30,
+						spriteOrigin: 128,
+						speed: 6
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 266,
+						spriteHeight: 248 - 30,
+						spriteOrigin: 128,
+						speed: 6
+					},
+					{
+						spriteLeft: 266,
+						spriteTop: 0,
+						spriteWidth: 266,
+						spriteHeight: 248 - 30,
+						spriteOrigin: 128,
+						speed: 6
+					},
+					{
+						spriteLeft: 532,
+						spriteTop: 0,
+						spriteWidth: 266,
+						spriteHeight: 248 - 30,
+						spriteOrigin: 128,
+						speed: 6
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 249,
+						spriteWidth: 266,
+						spriteHeight: 230 - 30,
+						spriteOrigin: 128,
+						speed: 6
+					},
+					{
+						spriteLeft: 266,
+						spriteTop: 249,
+						spriteWidth: 266,
+						spriteHeight: 230 - 30,
+						spriteOrigin: 128,
+						speed: 6
+					},
+					{
+						spriteLeft: 532,
+						spriteTop: 249,
+						spriteWidth: 266,
+						spriteHeight: 200,
+						spriteOrigin: 128,
+						speed: 6
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 480,
+						spriteWidth: 266,
+						spriteHeight: 160,
+						spriteOrigin: 128,
+						speed: 6
+					},
+					{
+						spriteLeft: 266,
+						spriteTop: 480,
+						spriteWidth: 266,
+						spriteHeight: 120,
+						spriteOrigin: 128,
+						speed: 6
+					},
+					{
+						spriteLeft: 532,
+						spriteTop: 480,
+						spriteWidth: 266,
+						spriteHeight: 80,
+						spriteOrigin: 128,
+						speed: 6
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 266,
+						spriteHeight: 40,
+						spriteOrigin: 128,
+						speed: 6
+					}
+				]
+			},
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						speed: 1,
+						sound: 'puff',
+						props: {
+							remove: true
+						}
+					}
+				]
+			}
+		}
+	}
 }
 function getExistingImage(src, _isnew) {
 	const _img = loadedEpisodeImages[src] ?? loadedImages[src];
@@ -27487,6 +27918,19 @@ function isObjectsVerticallyInTouch(obj1, obj2) {
 	const bottom2 = top2 + (obj2.HEIGHT ?? (obj2.realHeight ?? obj2.height));
 
 	return !(bottom1 < top2 || top1 > bottom2);
+}
+function isObjectsVerticallyInSameOrder(obj1, obj2) {
+	return isObjectInVisibleRectangle({
+		left:obj1.SCREENLEFT,
+		width:obj1.WIDTH, 
+		height: episode.cHeight,
+		top:0
+	}, {
+		left:obj2.SCREENLEFT,
+		width:obj2.WIDTH, 
+		height: episode.cHeight,
+		top:0
+	});
 }
 function isObjectsPassingOver(obj1, obj2) {
 	const top1 = obj1.TOP ?? obj1.top;
@@ -27969,7 +28413,7 @@ const cssAnimations = {
 		if(_final)
 			setTimeout(() => {
 				plug();
-				episode.playSound({ key: 'swing', volume: .65 });
+				PlaySound({ key: 'swing', volume: .65 });
 			}, msPerFrame * 3);
 		else
 			plug();
@@ -28052,15 +28496,36 @@ const cssAnimations = {
 		}
 		const _elem = document.querySelector(_selector);
 		if(_func && _elem) {
+			const _self = this;
 			setTimeout(() => {
 				const _shield = document.querySelectorAll('.focus-shield')?.[0];
-				if(_shield)
+				if(_shield) {
+					const _s = _self;
 					_shield.onexactclick = function(event) {
 						event.stopPropagation();
 						event.preventDefault();
 						_func();
 						addClass(_elem, 'focus-clicked');
+						if(_s.keyboardHandler)
+							window.removeEventListener('keydown', _s.keyboardHandler);
 					}
+					if(_elem && __isPC) {
+						const _kbKey = _elem.getAttribute('data-key');
+						if(_kbKey) {
+							_self.keyboardHandler = function (event) {
+								try {
+									if (event?.key?.toLowerCase() === _kbKey) {
+										event.preventDefault();
+										_shield.onexactclick(event);
+									}
+								} catch (e) {
+
+								}
+							};
+							window.addEventListener('keydown', _self.keyboardHandler);
+						}
+					}
+				}
 			}, 20);
 		}
 		addClass(_elem, 'focus-me');
@@ -28173,7 +28638,7 @@ const cssAnimations = {
 				addClass(_dPad, 'stay');
 				resetDPadKeyCommands();
 			}
-			episode.playSound({force:1,volume:1,key:'boss'});
+			PlaySound({force:1,volume:1,key:'boss'});
 			const _elem = document.querySelector('#css-canvas-foreground');
 			_elem.style.animation = 'none';
 			_elem.offsetHeight;
@@ -28269,7 +28734,7 @@ const cssAnimations = {
 		else {
 			if (_url)
 				_css.innerHTML = '<div id="css-canvas-content" style="opacity:.35" class="full"><div class="full flex pop-outin" style="background:#000"><img src="' + _url + '" style="max-width:80%;max-height:80%" /></div>';
-			episode.playSound({ key: 'curse', volume: .5 });
+			PlaySound({ key: 'curse', volume: .5 });
 			cssAnimationProps.curse = { start: _gameTick, p1: _c, p2: _ms, p3: _url};
 		}
 	},
@@ -28344,7 +28809,7 @@ const cssAnimations = {
 	},
 	fatality: function (_char, _l, _ms) {
 		if(_char.frame === 0 && _char.start === 1 && cssAnimations.dark(_char, _ms ?? 3000))
-			episode.playSound({ key: mainCharacter.gender + 'laugh', reset: true, volume: .3 });
+			PlaySound({ key: mainCharacter.gender + 'laugh', reset: true, volume: .3 });
 	},
 	darkout: function(_ctx, _opacity, _cnvs) {
 		if(cssAnimationProps.darkout) {
@@ -28493,7 +28958,7 @@ const cssAnimations = {
 			}
 		}
 		else {
-			episode.playSound({key:'ultimate', volume: .5});
+			PlaySound({key:'ultimate', volume: .5});
 			const _key = 'ultimate-circle';
 			let _a = document.getElementById(_key);
 			if (!_a) {
@@ -28826,6 +29291,12 @@ function stopWeatherEffect() {
 		case 'snowy': 
 			endSnow();
 			break;
+		case 'autumn':
+			stopAutumn();
+			break;
+		case 'quake':
+			stopQuake();
+			break;
 	}
 }
 const _autumnColors = [ '#c62c11', '#c1220c', '#b01805', '#9a1703',
@@ -28836,6 +29307,8 @@ function startAutumn(_force) {
 		return;
 	if (__weather.status === 'autumn')
 		return;
+	else if(__weather.status)
+		stopWeather();
 	__weather.status = 'autumn';
 	var _canv = document.getElementById('css-canvas');
 	for(let i = 0; i < 6; i++) {
@@ -28850,15 +29323,16 @@ function startAutumn(_force) {
 	}
 }
 function stopAutumn() {
-	if (__weather.status === 'autumn'){
-		stopWeather();
+	//if (__weather.status === 'autumn'){
 		const _leaves = document.querySelectorAll('img.leaf');
 		if(_leaves?.[0])
 			_leaves.forEach(x => x.remove());
-	}
+	//}
 }
 function startQuake(_force, _noRock) {
 	if (__weather.status !== 'quake'){
+		if(__weather.status)
+			stopWeather();
 		__weather.status = 'quake';
 		addClass(_gamePad, 'shake-horizontal-infinite');
 	}
@@ -28874,13 +29348,12 @@ function startQuake(_force, _noRock) {
 	_canv.appendChild(_container);
 }
 function stopQuake() {
-	if (__weather.status === 'quake') {
-		stopWeather();
+	//if (__weather.status === 'quake') {
 		removeClass(_gamePad, 'shake-horizontal-infinite');
 		const _rocks = document.querySelectorAll('img.rock');
 		if(_rocks?.[0])
 			_rocks.forEach(x => x.remove());
-	}
+	//}
 }
 function createRock(_rock, _container) {
 	var _l = getRandomValue(10, 90);
@@ -28900,7 +29373,7 @@ function createRock(_rock, _container) {
 	// addClass(_leaf, 'leaf' + (_br + (getRandomValue(1, 4) * 30)));
 	//_container.style.width = _leaf.style.width = _w + 'vh';
 	if(episode){
-		episode.playSound({key:'rockfallsmall', volume:.1});
+		PlaySound({key:'rockfallsmall', volume:.1});
 		episode.doTime = _gameTick;
 		episode.repeat = getRandomValue(250, 2000);
 	}
@@ -28944,6 +29417,8 @@ function rain(_container, _noSound, _force) {
 		return;
 	if (__weather.status === 'rainy')
 		return;
+	else if(__weather.status)
+		stopWeather();
 	__weather.status = 'rainy';
 	//const _rain = document.createElement('div');
 	//_rain.className = 'rain';
@@ -28959,17 +29434,18 @@ function rain(_container, _noSound, _force) {
 function stopWeather() {
 	if(__weather.sound)
 		__weather.sound.pause();
-	__weather = {};
 	stopWeatherEffect();
+	__weather = {};
 }
 function stopRain() {
-	if (__weather.status === 'rainy'){
-		stopWeather();
+	//if (__weather.status === 'rainy'){
 		const _rain = document.querySelector('.rain');
 		if(_rain)
 			_rain.remove();
-		stopTheRain();
-	}
+		const _cc = document.querySelector('.rrain');
+		if(_cc)
+			_cc.remove();
+	//}
 }
 function isAudioPlaying(_audio) {
 	return _audio
@@ -29210,11 +29686,6 @@ function dancingInTheRain(_container) {
 	createRain2(_container);
 }
 
-function stopTheRain() {
-	const _cc = document.querySelector('.rrain');
-	if(_cc)
-		_cc.remove();
-}
 function shuffle(array) {
 	let currentIndex = array.length;
 
@@ -29239,19 +29710,91 @@ function copyText(_elem) {
 	}
 }
 
+// function askExitApp(){
+// 	if(closeInventoryQuestionModal())
+// 		return;
+// 	if(__switchingMap || _storySceneSwitching){
+// 		PlaySound({key:'disabled'});
+// 		return;
+// 	}
+// 	const _fs = document.getElementById('first-splash');
+// 	const _isActive = _fs && !hasClass(_fs, 'v-none');
+// 	if(episode?.menu || !__story || __story.mission === 'qp')
+// 		askSomething(getLangData('Application will be closed'), "exitApplication()", "exit-app-question", _isActive ? _fs : undefined);
+// 	else
+// 		askSomething(getLangData('Exit to lobby'), "killStory()", "exit-app-question", _isActive ? _fs : undefined);
+// }
 function askExitApp(){
 	if(closeInventoryQuestionModal())
 		return;
-	if(__switchingMap || _storySceneSwitching){
+	if(__switchingMap || _storySceneSwitching || _game.spinned){
 		PlaySound({key:'disabled'});
 		return;
 	}
 	const _fs = document.getElementById('first-splash');
 	const _isActive = _fs && !hasClass(_fs, 'v-none');
-	if(episode?.menu || !__story || __story.mission === 'qp')
+	PlaySound({key:'click'});
+	if(!__story){
 		askSomething(getLangData('Application will be closed'), "exitApplication()", "exit-app-question", _isActive ? _fs : undefined);
-	else
-		askSomething(getLangData('Exit to lobby'), "killStory()", "exit-app-question", _isActive ? _fs : undefined);
+		return;
+	}
+	let _options = [
+		{
+			step:1,
+			title: {
+				en: 'To Lobby Screen',
+				tr: 'Lobi Ekranına'
+			},
+			action: 'killStory()'
+		},
+		{
+			step:2,
+			title: {
+				en: 'To Opening Screen',
+				tr: 'Açılış Ekranına'
+			},
+			action: 'resetOpeningScreen()'
+		},
+		{
+			step:3,
+			title: {
+				en: 'Leave Game',
+				tr: 'Oyundan Çık'
+			},
+			action: 'exitApplication()'
+		}
+	];
+	if(!__account.storyResults.find(x => x.id === 1))
+		_options = _options.filter(x => x.step !== 1);
+	if(episode?.menu || _client.quickPlay) {
+		_options = _options.filter(x => x.step !== 1);
+		if(_client.quickPlay)
+			_options.splice(_options.length - 1, 0, {
+				step:4,
+				title: {
+					en: 'Restart Current Mission',
+					tr: 'Bölüme Baştan Başla'
+				},
+				action: 'restartStory()'
+			});
+	}
+	let _buttons = '';
+	for(let _op of _options)
+		_buttons += `<div class="game-menu-button flex animate-me" style="padding:0 2vh;height:5.4vh!important;font-size:3vh!important;min-width:80%;margin:1.25vh 0" onexactclick="${_op.action}">${_op.title[getLang()]}</div>`;
+	let _modal = `<div class="full fade-me show-ui flex inventory-question show-info">
+		<div class="inventory-modal flex quit-modal" style="width:25%;flex-direction:column;position:relative;aspect-ratio:auto">
+			<div style="padding:6vh 4vh 2vh 4vh" class="flex w-100">
+				<span style="color:#F4BB44 !important;font-size:3.2vh !important">${getLangData('Go back')}?</span>
+			</div>
+			<div class="flex w-100" style="padding:2vh 2vh 4vh 2vh">`
+				+ _buttons +
+			`</div>
+			<div onexactclick="closeInventoryQuestionModal()" style="font-size:4.2vh !important;color:#9d987f !important;padding:1.6vh 3.2vh" class="item-info-modal-close">&times;</div>
+		</div>
+	</div>`;
+	const _div = document.createElement('div');
+	_div.innerHTML = _modal;
+	(_isActive ? _fs : _gameUI).appendChild(_div.firstChild);
 }
 
 function exitApplication() {
@@ -29305,7 +29848,7 @@ function summonMobWithJson(_json, _noReturn, _noPush) {
 	if(!_noPush)
 		episode.mobs.push(_json);
 	let _mob = episode.installMob(_json, null, !_noReturn);
-	episode.playSound({ key: 'puff', volume: .3 });
+	PlaySound({ key: 'puff', volume: .3 });
 	if(_mob)
 		_mob.addObject({
 			key: 'smoke',
@@ -29328,7 +29871,7 @@ function summonMob(_id, _x, _y, _lvl, _target) {
 	};
 	episode.mobs.push(_json);
 	const _mob = episode.installMob(_json, null, 1);
-	episode.playSound({ key: 'puff', volume: .3 });
+	PlaySound({ key: 'puff', volume: .3 });
 	_mob.addObject({
 		key: 'smoke',
 		position: 'middle'

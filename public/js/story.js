@@ -9,8 +9,9 @@ function isMissionFailed(_index) {
 function getLobbyScene() {
 	return {
 			map: 0,
-			startWith: 10001,
+			startWith: 1,
 			start: function() {
+				closeInventoryQuestionModal(1);
 				__account.questStatus = firstQuestData();
 				if(episode.bgMusic){
 					episode.pauseBgMusic();
@@ -21,9 +22,8 @@ function getLobbyScene() {
 				// mainCharacter.experience = 0;
 				//__account.gold = 0;
 				__storyPlaying = false;
-				stopWeatherEffect();
 				//updateExperience(__story.rewards.find(x => x.key === 'exp').count);
-				removeCoopCharacter();
+				removeCoopCharacter(1);
 				addClass(_gameUI, 'disable-ui');
 				if(mainCharacter){
 					mainCharacter.left = MathRound(1735 * __zoom);
@@ -155,8 +155,6 @@ const __stories = [
 		id: 1,
 		order: 1,
 		disableWorldMap: true,
-		startScene:1,
-		loadingCharacterIds: [1, 2, 28],
 		resultStars: [
 			{ id: 1, title: 'Clear story', when: function() {
 				return !mainCharacter.isDead();
@@ -173,6 +171,7 @@ const __stories = [
 		ticket: 2,
 		act:1,
 		list:true,
+		startScene:2,
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
@@ -727,7 +726,7 @@ const __stories = [
 																to: 1100 * __zoom,
 																y: .75,
 																after: function(_g) {
-																	_king.throwSpell({ spell: { key: 'icespike', priority: 1, smash: 1 }}, null, _g);
+																	_king.throwSpell({ spell: { key: 'icespike', priority: 1, smash: 1}}, null, _g);
 																	_g.immobilize = _g.still = true;
 																	_g.animate('idle', 1);
 																}
@@ -1449,6 +1448,8 @@ const __stories = [
 			{
 				map: 104,
 				startWith: 0,
+				noArtifact: 1,
+				loadingCharacterIds: [1, 2, 28],
 				actions: [
 					{
 						when: function(){
@@ -1458,13 +1459,16 @@ const __stories = [
 							episode.phase++;
 							episode.removeLocationHand();
 							episode.repeat = false;
-							stopQuake();
+							stopWeather();
 							if(episode && episode.bgMusic)
 								episode.pauseBgMusic(1);
 							if(episode && episode.bgSound)
 								episode.pauseAmbianceMusic();
 							removeCoopCharacter();
-							episode.enemies.filter(x => x.alp).forEach(x => x.remove = true);
+							episode.enemies.filter(x => x.alp).forEach(x => {
+								x.stopStepSound();
+								x.remove = true;
+							});
 							setTimeout(() => {
 								__storyTell = new story(1, null, null, 'Two prisoners waiting for death in the dungeon managed to escape among these ruins', function() {
 									//installStoryFinish();
@@ -1510,6 +1514,7 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 11;
+							mainCharacter.enableSkills();
 							switchMap(102, 1, function() {
 								removeCoopCharacter(1);
 								const _char = addCoopCharacter(null, 'arc');
@@ -1522,8 +1527,7 @@ const __stories = [
 								mainCharacter.idle();
 								mainCharacter.animations.attack.chargeDistance.value = 80;
 								episode.removeLocationHand();
-								if(mainCharacter.level === 1)
-									mainCharacter.enableSkills();
+								//if(mainCharacter.level === 1)
 								mainCharacter.still = mainCharacter.immobilize = true;
 								createBubbleText({
 									id: 1,
@@ -1533,7 +1537,7 @@ const __stories = [
 									onend: function() {
 										const _charge = function(){
 											mainCharacter.disableKeyboard = mainCharacter.still = mainCharacter.immobilize = false;
-											mainCharacter.enableSkills();
+											//mainCharacter.enableSkills();
 											mainCharacter.solid = true;
 											episode.enemies.find(x => x.id === 78).npc = 'bow';
 											episode.NPCS = episode.enemies.filter(x => x.npc);
@@ -1551,8 +1555,11 @@ const __stories = [
 										if(!__account.tutorials)
 											__account.tutorials = [];
 										__account.tutorials.push('charge');
+										removeClass(_gameUI, 'disable-ui');
+										delete mainCharacter.disableKeyboard;
 										focusMe('#skill1', function() {
 											_charge();
+											mainCharacter.enableSkill('attack');
 											mainCharacter.animate('attack', 1);
 											removeFocus();
 											disposeFocus();
@@ -1647,9 +1654,10 @@ const __stories = [
 					__storyCutScenePlaying = undefined;
 					addClass(_gameUI, 'disable-ui');
 					setTimeout(function() {
-						injectModule('character-selection', function() {
+						installCharacterSelection(function() {
 							var x = new characterSelection();
 							x.createCharacterSelectionUI();
+							return x;
 						});
 					}, 500);
 				}
@@ -2088,18 +2096,18 @@ const __stories = [
 						episode.pauseBgMusic();
 					if(episode && episode.bgSound)
 						episode.pauseAmbianceMusic();
+					removeCoopCharacter(1);
+					const _char = addCoopCharacter(null, 'arc');
+					_char.direction = 'left';
+					_char.platformX = platformX;
+					_char.yPosition = MathRound(.66 * groundheight);
 					const _princess = summonMob(58, MathRound((mainCharacter.left + mainCharacter.WIDTH + platformX) / __zoom), MathRound(.33 * groundheight), mainCharacter.level);
 					_princess.friendly = _princess.invulnerable = true;
 					_princess.still = _princess.immobilize = false;
 					_princess.direction = 'left';
-					//goToQuest(6);
-					removeCoopCharacter(1);
-					const _char = addCoopCharacter(null, 'arc');
-					_char.direction = 'left';
 					_princess.left = _char.left = mainCharacter.left + platformX - mainCharacter.WIDTH;
-					_char.platformX = platformX;
-					_char.yPosition = MathRound(.66 * groundheight);
 					_char.updateVariables();
+					_princess.updateVariables();
 					completeQuest();
 					episode.endTime = __account.questStatus.lastStoryFinishTime ?? _gameTick;
 					if(__account.questStatus.lastStoryFinishTime)
@@ -3455,6 +3463,7 @@ const __stories = [
 		scenes: [
 			{
 				map: 9999,
+				noArtifact: 1,
 				startsWith: 1,
 				save: true,
 				start: function() {
@@ -3903,7 +3912,7 @@ const __stories = [
 								_e.remove = true;
 								_finishes++;
 								if(_finishes === _l) {
-									stopQuake();
+									stopWeather();
 									__storyTell = new story(7, null, null, 'As the enemy approached, villagers fled with their carts, leaving behind a silent hero carrying only a small handmade toy', function() {
 										installStoryFinish();
 									});
@@ -4531,7 +4540,6 @@ const __stories = [
 		id: 8,
 		order: 8,
 		disableWorldMap: true,
-		loadingCharacterIds: [37,38],
 		resultStars: [
 			{ id: 1, title: 'Clear story', when: function() {
 				return !mainCharacter.isDead();
@@ -4581,8 +4589,9 @@ const __stories = [
 							x.animate('dead', 1);
 						});
 						episode.mobs = episode.respawners = [];
+						//episode.loadCharacterSprites(function() {}, [37,38], null, 1);
 						episode.playSound({key:'bossalert', volume: .5});
-						warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000);
+						warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
 						// const _elm = document.getElementById('quest-status');
 						// addClass(_elm, 'mission-done');
 						// _elm.onanimationend = function(e) {
@@ -4683,16 +4692,13 @@ const __stories = [
 			{
 				map: 201,
 				heartCount : 3,
+				loadingCharacterIds: [37,38],
 				loots: [
 					{type:'pot', key:'pot', chance:1}
 				],
 				startsWith: 1,
 				save: true,
 				start: function() {
-							// installStoryFinish();
-							// return;
-					// clearCanvasCache(loadedImages);
-					// clearCanvasCache(loadedEpisodeImages);
 					clearAudioCache(loadedSounds);
 					removeCoopCharacter();
 					mainCharacter.storyVariables = {
@@ -4904,6 +4910,7 @@ const __stories = [
 				save: true,
 				from: 'left',
 				save: true,
+				noArtifact: 1,
 				startWith: 1,
 				bonusRewards: [
 					{
@@ -4998,7 +5005,7 @@ const __stories = [
 									q2: 'I see dead people'
 								},
 								function() {
-									injectModule('character-selection', function() {
+									installCharacterSelection(function() {
 										mainCharacter.name = 'Gökbörü';
 										episode.width = _canvas.width;
 										delete episode.towerDefenseStart;
@@ -5166,6 +5173,7 @@ const __stories = [
 											episode.chosenFragment = mainCharacter.class;
 											delete episode.storyVariables;
 										}, getLangData('Choose Your Side'));
+										return x;
 									});
 								}
 							);
@@ -6045,7 +6053,7 @@ const __stories = [
 						});
 						episode.mobs = episode.respawners = [];
 						episode.phase = 2;
-						stopRain();
+						stopWeather();
 						episode.isSupporterAlive = _coopMembers?.[0] && !_coopMembers[0].isDead();
 						installStoryFinish();
 					}
@@ -6160,7 +6168,7 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 2;
-							stopRain();
+							stopWeather();
 							installStoryFinish(1);
 						}
 					},
@@ -6229,7 +6237,7 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 2;
-							stopRain();
+							stopWeather();
 							installStoryFinish(1);
 						}
 					}
@@ -6254,7 +6262,6 @@ const __stories = [
 	},
 	{
 		id:200,
-		loadingCharacterIds: [37,38],
 		disableWorldMap: true,
 		order:200,
 		act:1,
@@ -6297,10 +6304,12 @@ const __stories = [
 				map: 201,
 				heartCount : 3,
 				loots: [
-					{type:'pot', key:'pot', chance:1}
+					{type:'pot', key:'pot', chance:1},
+					{type:'common', key:'corpseexplode', chance:1}
 				],
 				startsWith: 1,
 				save: true,
+				loadingCharacterIds: [37,38],
 				start: function() {
 					clearAudioCache(loadedSounds);
 					removeCoopCharacter();
@@ -6312,7 +6321,7 @@ const __stories = [
 					mainCharacter.level = 0;
 					mainCharacter.experience = 0;
 					mainCharacter.maxExperience = 833;
-					setCharacterLevel(13, null, 1);
+					setCharacterLevel(1, null, 1);
 					//setCharacterLevel(8, null, 1);
 					addClass(_gameUI, 'demo-playing');
 					episode.pauseBgMusic(1);
@@ -6390,8 +6399,11 @@ const __stories = [
 								x.animate('dead', 1);
 							});
 							episode.mobs = episode.respawners = [];
+							// setTimeout(function() {
+							// 	episode.loadCharacterSprites(function() {}, [37,38], null, 1);
+							// }, 20);
 							PlaySound({key:'bossalert', volume: .5});
-							warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000);
+							warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
 							const _elm = document.getElementById('quest-status');
 							addClass(_elm, 'mission-done');
 							__storyScene.bossQuest = {
@@ -6432,6 +6444,7 @@ const __stories = [
 								 		__storyScene.bossQuest
 									);
 							}
+							mainCharacter.realLevel = mainCharacter.level;
 							setTimeout(() => {
 								PlaySound({key:'sistersenter', volume:1});
 								setTimeout(() => {
@@ -6443,7 +6456,7 @@ const __stories = [
 											atk: mainCharacter.atk,
 											grade: 4
 										});
-										_boss.health = _boss.maxHP = 1;
+										//_boss.health = _boss.maxHP = 1;
 										_boss.class = 'boss';
 										_boss.experience = 0;
 										_boss.setDifficulty(__account.difficulty - 1);
@@ -6704,8 +6717,12 @@ function switchStoryScene(_func, _newOrder) {
 	const _splash = document.getElementById('splash');
 	removeClass(_splash, 'd-none');
 	hideMyModalPopUp(1);
-	closeInventoryQuestionModal();
+	closeInventoryQuestionModal(1);
 	detachModule();
+	stopWeather();
+	const _extraModals = document.querySelectorAll('.show-ui:not(.my-pop-up-wrapper)');
+	if(_extraModals?.[0])
+		_extraModals.forEach(x => x.remove());
 	__storyScene = __story.scenes[__storySceneOrder - 1];
 	__storyPlaying = 1;
 	if(__storyScene?.save && __storyCheckPoint?.sceneOrder !== (__storySceneOrder - 1)) {
@@ -6752,6 +6769,10 @@ function switchStoryScene(_func, _newOrder) {
 				_func();
 		});
 	//}
+}
+function restartStory() {
+	__storySceneOrder = 0;
+	switchStoryScene();
 }
 function warmupSpriteSheet(src) {
   return new Promise(resolve => {
@@ -6803,7 +6824,10 @@ function story(_id, _func, _noBlack, _desc, _after) {
 		],
 		st2: [
 			{ text: '', ms: 0, w: '40%', position: 'center left' },
-			{ text: 'Over there!', ms: 600, marginLeft:'2%', class: 'talk', order: 3, w: '34.5%', position: 'top center' },
+			{ text: {
+				en:'Over there!',
+				tr: 'İşte orada!'
+			}, ms: 600, marginLeft:'2%', class: 'talk', order: 3, w: '34.5%', position: 'top center' },
 			{ text: '', ms: 1200, imgSize: '125%', order: 4, marginLeft:'2%', w: '28%', position: 'top center' },
 			{ finish: 1, ms: 5000 }
 		],
@@ -6917,7 +6941,7 @@ function story(_id, _func, _noBlack, _desc, _after) {
 
 				this.container.appendChild(_box);
 				_box.appendChild(_boxInner);
-				_boxInner.innerHTML = `<div class="${item.class ?? 'full'}">${item.text ?? ''}</div>`;
+				_boxInner.innerHTML = `<div class="${item.class ?? 'full'}">${item.text?.[getLang()] ?? item.text ?? ''}</div>`;
 			}
 			else {
 				if(this.firstSeen)
@@ -7093,7 +7117,7 @@ function storyBonus(_func, _instant) {
 // }, 2000);
 
 function focusMe(_selector, _func, _transparent, _text, _doneBtn, _fingerFade, _circle) {
-	cssAnimations.focusui(_selector, _func, _transparent, _text, _doneBtn, null, _fingerFade, _circle);
+	new cssAnimations.focusui(_selector, _func, _transparent, _text, _doneBtn, null, _fingerFade, _circle);
 	if(!_transparent) {
 		mainCharacter.disableSkills(1);
 		mainCharacter.immobilize = mainCharacter.still = true;

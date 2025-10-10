@@ -39,19 +39,19 @@ function createStoreUI(_noAnimation) {
 
 function askBuyStoreItem(_id, _ok) {
 	if(!_ok) {
-		episode.playSound({ key: 'disabled' });
+		PlaySound({ key: 'disabled' });
 		return;
 	}
 	const _item = __storeItems.find(x => x.id === _id);
 	const _price = typeof _item.price === 'function' ? _item.price() : _item.price;
 	if(_price === 0) {
 		if(getDailyFreeStoreItem())
-			episode.playSound({ key: 'reward' });
+			PlaySound({ key: 'reward' });
 		else
-			episode.playSound({ key: 'disabled' });
+			PlaySound({ key: 'disabled' });
 		return;
 	}
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
 	let _title = misc.find(x => x.type === _item.key)?.titles?.[getLang()];
 		if(!_title)
 			switch(_item.key){
@@ -74,7 +74,7 @@ function askBuyStoreItem(_id, _ok) {
 			</div>
             <div style="padding:4vh 2vh" class="flex">
                 <div class="game-menu-button flex animate-me" style="cursor:pointer;min-width:10vw;color:#F4BB44 !important;font-size:3vh !important" onclick="buyStoreItem(${_id})">${getLangData('YES')}</div>
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;min-width:10vw;color:#F4BB44 !important;font-size:3vh !important" onclick="episode.playSound({ key: 'click' });closeInventoryQuestionModal()">${getLangData('NO')}</div>
+                <div class="game-menu-button flex animate-me" style="cursor:pointer;min-width:10vw;color:#F4BB44 !important;font-size:3vh !important" onclick="PlaySound({ key: 'click' });closeInventoryQuestionModal()">${getLangData('NO')}</div>
             </div>
         </div>`;
     document.body.appendChild(_modal);
@@ -87,7 +87,7 @@ function buyStoreItem(_id) {
 		warn('<span>' + getLangData('Not enough gold') + '</span>', 'warn');
 		return;
 	}
-	episode.playSound({ key: 'reward' });
+	PlaySound({ key: 'reward' });
 	let _title = misc.find(x => x.type === _item.key)?.titles?.[getLang()];
 		if(!_title)
 			switch(_item.key){

@@ -6,7 +6,6 @@ function startSnow() {
 }
 function endSnow() {
     if(letItSnow) {
-        stopWeather();
         letItSnow.Purify();
         letItSnow = null;
     }

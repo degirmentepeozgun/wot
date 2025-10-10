@@ -858,7 +858,7 @@ function characterSkill() {
 				'<div style="padding:1vh 5vh">+ %' + _nextProps.value + ' ' + getLangData(_nextProps.type) + '</div>' : '');
 		document.getElementById('skill-' + _skill.key + '-level').innerText = _skill.level;
 		document.getElementById('skill-cost').innerText = this.calculateSkillPrice(_skill.key);
-		episode.playSound({ key: 'upgrade', volume: .5, reset: true });
+		PlaySound({ key: 'upgrade', volume: .5, reset: true });
 		shine(1000, document.querySelector('.skills-content-detail-wrapper'));
 		_client.upgradeSkill(mainCharacter, _skill);
 		checkUpdateAvailable();

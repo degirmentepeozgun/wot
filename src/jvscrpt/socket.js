@@ -216,7 +216,7 @@ function getChatMessageTemplate(_m) {
 		</div>`;
 }
 function askClearBigChatArea() {
-	episode.playSound({ key: 'click' });
+	PlaySound({ key: 'click' });
 	let _modal = `<div class="full flex inventory-question">
 		<div class="inventory-modal">
             <div style="padding:4vh 2vh" class="flex">
@@ -243,7 +243,7 @@ let __pmId;
 function openPersonelMessaegs(_id) {
 	var _pms = __personalMessages['PM' + _id];
 	if(_pms) {
-		episode.playSound({ key: 'click' });
+		PlaySound({ key: 'click' });
 		var _people = document.querySelectorAll('#book-content-12 .pvp-opponent-item');
 		for(let _p of _people)
 			if(_p.getAttribute('data-key') === _id.toString())
@@ -348,7 +348,7 @@ function sendChatMessage() {
 	var _txtArea = document.querySelector('.game-chat-bottom-left input');
 	if(!_txtArea)
 		return;
-	episode.playSound({ key: 'click' });
+	PlaySound({ key: 'click' });
 	var _txt = _txtArea.value?.trim() ?? '';
 	if(_txt.length > 0) {
 		let _j = {

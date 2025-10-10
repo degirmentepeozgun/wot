@@ -93,7 +93,7 @@ function talent() {
 		if(!_id)
 			_id = 1;
 		else
-   			episode.playSound({ key: 'click' });
+   			PlaySound({ key: 'click' });
 		if(!_id)
 			return;
 		const _cards = document.querySelectorAll('.talent-content-left .talent-card');
@@ -184,7 +184,7 @@ function talent() {
    		askSomething(`${getLangData('Reset talent build?')}`, `getRef(\'talent\')?.reset()`);
 	}
 	this.reset = function(){
-   		episode.playSound({ key: 'reset', volume:1 });
+   		PlaySound({ key: 'reset', volume:1 });
 		const _char = __account.characters.find(x => x.class === mainCharacter.class);
 		_char.talents = [];
 		_client.saveState();

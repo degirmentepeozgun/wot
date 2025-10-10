@@ -30,7 +30,7 @@ function createArtifactsUI(_id) {
 }
 function openArtifactDetailModal(_id, _containerId) {
 	if(_containerId)
-		episode.playSound({ key: 'click' });
+		PlaySound({ key: 'click' });
 	const _selected = document.querySelector('.skill-card[data-artifact-key="' + _id + '"]');
 	if(_selected) {
 		const _cards = document.querySelectorAll('.skill-card[data-artifact-key]');

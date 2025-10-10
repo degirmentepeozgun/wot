@@ -169,7 +169,7 @@ function mailbox() {
 		const _m = _mails.find(x => x.id === _id);
 		if(!_m)
 			return;
-   		episode.playSound({ key: 'paperrip', volume: .5 });
+   		PlaySound({ key: 'paperrip', volume: .5 });
 		const i = _mails.findIndex(x => x.id === _id);
 		if(i >= 0)
 		{

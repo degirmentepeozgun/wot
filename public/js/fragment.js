@@ -74,7 +74,7 @@ function selectFragment(_id) {
 	}
 }
 function pickTagSkill(_id, _grade) {
-	episode.playSound({ key: 'click' });
+	PlaySound({ key: 'click' });
 	const _item = __fragments.find(x => x.id === _id);
 	const _myfr = __account.fragments.find(x => x.key === _item.key);
 	const _g = (_myfr?.grade ?? 0);
@@ -101,7 +101,7 @@ function pickTagSkill(_id, _grade) {
 }
 function getFragmentDetailUI(_id, _noSound, _noAnimation) {
 	if(!_noSound)
-		episode.playSound({ key: 'click' });
+		PlaySound({ key: 'click' });
 	const _item = __fragments.find(x => x.id === _id);
 	const _myfr = __account.fragments.find(x => x.key === _item.key);
 	const _grade = (_myfr?.grade ?? 0);
@@ -209,13 +209,13 @@ function selectSwapFragment(_elem, _key) {
 	if(hasClass(_elem, 'selected'))
 		return;
 	const _item = __fragments.find(x=> x.key === _key);
-	episode.playSound({ key: 'click' });
+	PlaySound({ key: 'click' });
 	removeClass(document.querySelector('.fragment-list-item.selected'), 'selected');
 	addClass(_elem, 'selected');
 	document.querySelector('.taken-fragment-portrait img').src = './images/fragments/' + _item.key + '.png'
 }
 function askSwapFragmentCharacter(_id) {
-	episode.playSound({ key: 'click' });
+	PlaySound({ key: 'click' });
 	const _item = __fragments.find(x => x.id === _id);
 	const _others = __fragments.filter(x => x.key !== _item.key);
 	let _html = '';
@@ -268,7 +268,7 @@ function askSwapFragmentCharacter(_id) {
         warn('<span>' + getLangData('Not enough fragment') + '</span>', 'warn');
 }
 function increaseSwapCount(_key) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
 	const _item = __account.fragments.find(x => x.key === _key);
     const _sc = document.getElementById('swap-count');
     let _count = parseInt(_sc.innerText) + 3;
@@ -282,7 +282,7 @@ function increaseSwapCount(_key) {
     removeClass(document.getElementById('decrease-count-btn'), 'disabled');
 }
 function decreaseSwapCount(_key) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     const _sc = document.getElementById('swap-count');
     let _count = parseInt(_sc.innerText) - 3;
     _sc.innerText = _count;
@@ -292,7 +292,7 @@ function decreaseSwapCount(_key) {
     removeClass(document.getElementById('increase-count-btn'), 'disabled');
 }
 function swapCharacterFragment(_id) {
-    episode.playSound({ key: 'trade', volume: 1 });
+    PlaySound({ key: 'trade', volume: 1 });
 	const _item = document.querySelector('.fragment-swap-question .selected');
 	if(!_item)
 		return;
@@ -325,12 +325,12 @@ function acceptAndUpgradeFragment(_id, _cost) {
 	const _grade = (_myfr?.grade ?? 0) + 1;
 	const _limit = _item.limits[_myfr?.grade ?? 0];
 	if(__account.gold < _cost) {
-        episode.playSound({ key: 'click' });
+        PlaySound({ key: 'click' });
         warn('<span>' + getLangData('Not enough gold') + '</span>', 'warn');
         return;
     }
 	if((_myfr?.count ?? 0) < _limit.limit) {
-        episode.playSound({ key: 'click' });
+        PlaySound({ key: 'click' });
         warn('<span>' + getLangData('Not enough fragment') + '</span>', 'warn');
         return;
     }

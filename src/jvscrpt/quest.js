@@ -213,7 +213,7 @@ function switchQuestTab(_elem, _order) {
     else if(hasClass(_elem, 'selected'))
         return;
     else
-        episode.playSound({ key: 'switch' });
+        PlaySound({ key: 'switch' });
     const _tabs = document.querySelectorAll('.quest-tab');
     for(let _tab of _tabs){
         removeClass(_tab, 'selected');

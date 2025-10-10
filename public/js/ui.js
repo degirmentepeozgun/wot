@@ -487,8 +487,10 @@ function loadUI() {
 				{if (document.hidden) {
 					if(_gameTick)
 						_lastGameTick = Date.now();
-					if(_openingSound)
+					if(_openingSound){
 						_openingSound.pause();
+						_openingSound.currentTime = 0;
+					}
 					if(mainCharacter?.keyboard)
 						mainCharacter.keyboard.holdingKeys = [];
 					if(episode && episode.bgMusic)
@@ -502,14 +504,22 @@ function loadUI() {
 					pauseQuestTimer();
 					if(episode.hasGoSound)
 						episode.stopGoSound();	
-					episodeVisibilityHidden = true;
+					episodeVisibilityHidden = _closeOpeningMusic = true;
 				} else {
 					_gameTick = Date.now();
 					reconnectSocket();
 					if(_lastGameTick){
 						const _diff = (Date.now() - _lastGameTick);
-						_extraTick += _diff;
+						if(episode?.enemies?.[0])
+							episode.enemies.forEach(x => {
+								for(let _an in x.animations) {
+									const _anm = x.animations[_an];
+									if(_anm.coolDownStart2)
+										_anm.coolDownStart2 += _diff;
+								}
+							});
 					}
+					organizeModules();
 					episodeVisibilityHidden = false;
 					if(episode && episode.bgMusic)
 						episode.playBgMusic();
@@ -518,7 +528,7 @@ function loadUI() {
 					if(__weather?.sound)
 						__weather.sound.play();
 					if(episode.hasGoSound)
-						episode.playSound({key:'go', force: true, loop:true, volume:.5});
+						PlaySound({key:'go', force: true, loop:true, volume:.5});
 					resumeQuestTimer();
 					window.SoundManager.warmAudio();
 				}
@@ -531,8 +541,10 @@ function loadUI() {
 			try {
 				if(_gameTick)
 					_lastGameTick = Date.now();
-				if(_openingSound)
+				if(_openingSound){
 					_openingSound.pause();
+					_openingSound.currentTime = 0;
+				}
 				if(mainCharacter?.keyboard)
 					mainCharacter.keyboard.holdingKeys = [];
 				if(episode && episode.bgMusic)
@@ -546,7 +558,7 @@ function loadUI() {
 				if(episode.hasGoSound)
 					episode.stopGoSound();
 				pauseQuestTimer();
-				episodeVisibilityHidden = true;
+				episodeVisibilityHidden = _closeOpeningMusic = true;
 				if (window.plugins && window.plugins.insomnia)
 					window.plugins.insomnia.allowSleepAgain();
 			}
@@ -557,10 +569,18 @@ function loadUI() {
 		document.addEventListener("resume", () => {
 			try{ 
 				_gameTick = Date.now();
+				organizeModules();
 				reconnectSocket();
 				if(_lastGameTick){
 					const _diff = (Date.now() - _lastGameTick);
-					_extraTick += _diff;
+					if(episode?.enemies?.[0])
+							episode.enemies.forEach(x => {
+								for(let _an in x.animations) {
+									const _anm = x.animations[_an];
+									if(_anm.coolDownStart2)
+										_anm.coolDownStart2 += _diff;
+								}
+							});
 				}
 				episodeVisibilityHidden = false;
 				if(episode && episode.bgMusic)
@@ -570,7 +590,7 @@ function loadUI() {
 				if(__weather?.sound)
 					__weather.sound.play();
 				if(episode.hasGoSound)
-					episode.playSound({key:'go', force: true, loop:true, volume:.5});
+					PlaySound({key:'go', force: true, loop:true, volume:.5});
 				if (window.plugins && window.plugins.insomnia)
 					window.plugins.insomnia.keepAwake();
 				resumeQuestTimer();
@@ -598,8 +618,8 @@ function openChatPage() {
 function resetDPadKeyCommands() {
 	if(!mainCharacter?.keyboard)
 		return;
-	if(!mainCharacter.keyboard)
-		switchAutoMode();
+	// if(!mainCharacter.keyboard)
+	// 	switchAutoMode();
 	mainCharacter.keyboard.mouseUp('w');
 	mainCharacter.keyboard.mouseUp('a');
 	mainCharacter.keyboard.mouseUp('s');
@@ -790,6 +810,17 @@ function warn(_html, _class, _ms, _new, _buttons, _important, _container) {
 	let _toast, _toastWrapper;
 	if(_toastWrappers?.find(x => x.isImportant))
 		return;
+	if(_toastWrappers?.[0]){
+		_toastWrappers.forEach(tw => {
+			if((tw.showTime + tw.showMS) < _gameTick){
+				tw.remove();
+				tw.removed = true;
+			}
+		});
+		_toastWrappers = _toastWrappers.filter(x => !x.removed) ?? [];
+	}
+	if(!_toastWrappers.length)
+		_lastToastHtml = null;
 	if(_lastToastHtml === _html)
 		return;
 	let _extraClassW = '', _extraClass = '';
@@ -809,6 +840,7 @@ function warn(_html, _class, _ms, _new, _buttons, _important, _container) {
 		if(_fccl?.contains('important'))
 			_extraClassW += ' important-wrapper'; 
 	}
+	let _MS = (_ms ?? 1800) + 500;
 	if (!_toastWrappers.length || _new) {
 		const _rand = Math.random();
 		_toastWrapper = document.createElement('div');
@@ -822,6 +854,8 @@ function warn(_html, _class, _ms, _new, _buttons, _important, _container) {
 		_toastWrapper.appendChild(_toast);
 		(_container ?? _gameUI).appendChild(_toastWrapper);
 		_toastWrapper.isImportant = _important;
+		_toastWrapper.showTime = _gameTick;
+		_toastWrapper.showMS = _MS;
 		_toastWrappers.push(_toastWrapper);
 	}
 	else {
@@ -877,7 +911,7 @@ function warn(_html, _class, _ms, _new, _buttons, _important, _container) {
 			_t.addEventListener('animationend', function() {
 				closeToast();
 			}, false);
-		}, (_ms ?? 1800) + 500);
+		}, _MS);
 	}
 }
 function shine(_ms, _elem) {
@@ -886,7 +920,7 @@ function shine(_ms, _elem) {
 	if (_shine && !_shine.shining) {
 		_shine.shining = true;
 		addClass(_shine, _name);
-		episode.playSound({ key: 'upgrade', volume: .5, reset: true, force: true });
+		PlaySound({ key: 'upgrade', volume: .5, reset: true, force: true });
 		_shine.onanimationend = function(event) {
 			if(event.animationName === 'shine') {
 				_shine.shining = false;
@@ -912,7 +946,10 @@ function resetSkill(_key, _char, _num) {
 	resetSkills(_c?.ultimate, 1, _char, _key);
 	return true;
 }
-function resetSkills(_ultimate, _keepCD, _char, _k, _endOfRage) {
+function forceResetSkills(_char) {
+	resetSkills(null,null,_char,null,null,1);
+}
+function resetSkills(_ultimate, _keepCD, _char, _k, _endOfRage, _force) {
 	const _c = _char ?? mainCharacter;
 	const _animations = _c.animations;
 	const _keys = _k ? [_k] : Object.keys(_animations);
@@ -930,21 +967,20 @@ function resetSkills(_ultimate, _keepCD, _char, _k, _endOfRage) {
 				_c.hasFinishingMove = true;
 			if(_endOfRage && _skill.key === 'tag')
 				continue;
-			if (!_keepCD && !_k && !_skill.chain && !_skill.maxCharge) {
-				if (_skill.maxCharge)
-					_skill.charge = _skill.maxCharge;
+			if ((!_keepCD && !_k && !_skill.chain && !_skill.maxCharge) || _force) {
 				if (_skill.coolDownLeft != undefined)
-					_skill.coolDownLeft = undefined;
+					_skill.coolDownLeft = _force ? 1 : undefined;
 				if (_skill.coolDownStart2 != undefined)
 					_skill.coolDownStart2 = undefined;
 			}
 			if (!(_c.ultimate || _ultimate) && _skill.skillOrder && !_k)
 				continue;
-			if (!_skill?.order && !_skill?.skillOrder && !_k)
+			if (!_skill?.order && !_skill?.skillOrder && !_k && !_force)
 				continue;
 			else {
 				if (_c.main) {
-					const _elem = document.getElementById('skill' + (_skill.order ?? _skill.skillOrder ?? _skill.beforeOrder));
+					const _elem = (_force && _skill.chainOrder) ? document.getElementById('chain-skill-' + _skill.chainOrder)
+					: document.getElementById('skill' + (_skill.order ?? _skill.skillOrder ?? _skill.beforeOrder));
 					const _counter = _elem?.querySelector('.counter');
 					if(_skill.disabled) {
 						if (_counter)
@@ -1345,7 +1381,18 @@ function setCharacterLevel(_to, _char, _noWarn) {
 			return;
 	}
 }
-
+function updateLevelUI(_c) {
+	if(!_c)
+		return;
+	const _level = document.getElementById('level-' + _c.key);
+	if(_level)
+		_level.innerText = _c.level;
+	if(episode?.menu) {
+		const _lvl = document.getElementById('main-level-count');
+		if(_lvl)
+			_lvl.innerText = _c.level;
+	}
+}
 function updateExperience(_value, _levelup, _char, _noWarn) {
 	if (!_mainExpBar && (!_char || _char.main))
 		_mainExpBar = document.getElementById('main-exp-bar');
@@ -1365,14 +1412,7 @@ function updateExperience(_value, _levelup, _char, _noWarn) {
 	}
 	if (_levelup) {
 		_c.setHealth(_c.MAXHP);
-		const _level = document.getElementById('level-' + _c.key);
-		if(_level)
-			_level.innerText = _c.level;
-		if(episode?.menu) {
-			const _lvl = document.getElementById('main-level-count');
-			if(_lvl)
-				_lvl.innerText = _c.level;
-		}
+		updateLevelUI(_c);
 		if (_c.main) {
 			if(!_noWarn && !_client.quickPlay && (_c.level === __pvp.unlockLevel)) {
 				warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/duel.png" />&nbsp;<span style="flex:1">' + getLangData('Pvp Content Unlocked') + '</span></div>', null, null, 1);
@@ -1421,7 +1461,7 @@ function updateGold(_value, _char) {
 	updateGlobalQuest('gain-gold', _value);
 	__account.gold += _value;
 	if (_c.main) {
-		episode.playSound({ key: 'coin', volume: .1 });
+		PlaySound({ key: 'coin', volume: .1 });
 		if(_goldCount)
 			_goldCount.innerText = __account.gold.formatWithDots();
 	}
@@ -1535,19 +1575,16 @@ function removeHitCount(_char) {
 function switchAutoMode(_off) {
 	if(_off && mainCharacter?.keyboard)
 		return;
-	const _a = document.getElementById('auto-mode-on-off');
 	if(mainCharacter?.keyboard && !_off) {
 		mainCharacter.keyboard = undefined;
 		mainCharacter.enemy = true;
 		mainCharacter.setAutoMode(2, 1);
 		mainCharacter.enemy = false;
 		mainCharacter.sight = 1000;
-		addClass(_a, 'selected');
 	}
 	else {
 		setKeyBoard(mainCharacter);
 		mainCharacter.autoMode = mainCharacter.realAutoMode = mainCharacter.sight = mainCharacter.autoTarget = undefined;
-		removeClass(_a, 'selected');
 	}
 }
 
@@ -1645,7 +1682,7 @@ function openUserActionsModal(_id, _name) {
 	showMyModalPopUp('user-actions');
 }
 function addAsFriend(_id, _name) {
-	episode.playSound({key:'click'});
+	PlaySound({key:'click'});
 	const _f = __account.friends?.find(x => x.id === _id);
 	if(!_f) {
 		if(__account.friends?.length >= 100) {
@@ -1657,7 +1694,7 @@ function addAsFriend(_id, _name) {
 	}
 }
 function removeFromFriend(_id, _name) {
-	episode.playSound({key:'click'});
+	PlaySound({key:'click'});
 	const _i = __account.friends?.findIndex(x => x.id === _id);
 	if(_i >= 0) {
 		__account.friends.splice(_i, 1);
@@ -1769,7 +1806,7 @@ function showInfo(_json) {
 		const _div = document.createElement('div');
 		_div.innerHTML = _modal;
 		document.querySelector('#menu-ui').appendChild(_div.querySelector('.inventory-question'));
-		episode.playSound({ key: 'click' });
+		PlaySound({ key: 'click' });
 		const _container = document.getElementById('show-info-navigations');
 		for(let _n of _json.navigations ?? []) {
 			const _div2 = document.createElement('div');
@@ -1790,72 +1827,131 @@ function showInfo(_json) {
 		alert(qex.message);
 	}
 }
-
 const __injectedModules = [];
 
-function injectModule(_name, _func) {
-	// if(document.head.querySelector('script[data-name=' + _name + ']'))
-	// 	return;
-	if(__injectedModules.indexOf(_name) !== -1) {
-		if(_func)
-			_func();
+/**
+ * Modül yükleyici
+ * @param {string} _name - modül adı
+ * @param {function} _func - modül yüklendiğinde çağrılacak callback
+ * @param {boolean} _reload - true ise eksik modül yeniden yüklenir
+ */
+function injectModule(_name, _func, _reload) {
+	const _oldModule = __injectedModules.find(x => x.name === _name);
+
+	// Eğer zaten tam yüklüyse
+	if (_oldModule && _oldModule.jsLoaded && _oldModule.cssLoaded) {
+		if (_func) {
+			const scriptRef = document.querySelector(`script[data-name="${_name}"]`);
+			const styleRef = document.querySelector(`style[data-name="${_name}"]`);
+			_func([scriptRef, styleRef], _name);
+		}
 		return;
 	}
-	__injectedModules.push(_name);
+
+	// Hâlihazırda yükleniyor ama reload değilse bekle
+	if (_oldModule && !_reload) return;
+
+	// Mevcut modül objesini koru veya oluştur
+	const _module = _oldModule ?? { name: _name, do: _func, jsLoaded: 0, cssLoaded: 0 };
+	if (!_oldModule) __injectedModules.push(_module);
+
 	const _ver = Math.random();
-	let scriptEle = document.createElement("script");
-	scriptEle.setAttribute('data-name', _name);
-	scriptEle.setAttribute("src", "./js/" + _name + ".js?x=" + _ver);
-	let styleEle = document.createElement("style");
-	styleEle.setAttribute('data-name', _name);
-	// styleEle.setAttribute("href", "./js/" + _name + ".css?x=" + _ver);
-	// styleEle.setAttribute('rel', 'stylesheet');
-	// styleEle.type = "text/css";
-	// styleEle.media = "all";
-	let _installedCount = 0;
-	// styleEle.addEventListener("load", () => {
-	// 	_installedCount++;
-	// 	if(_installedCount > 1 && _func)
-	// 		setTimeout(function(){_func([scriptEle, styleEle], _name);}, 10);
-	// });
-	// styleEle.addEventListener("error", (e) => {
-	// 	alert(JSON.stringify(e));
-	// 	alert(e.message);
-	// });
-	fetch("./css/" + _name + ".css?x=" + _ver)
-	.then(resp => resp.text())
-	.then(cssText => {
-		_installedCount++;
-		const styleEl = document.createElement('style');
-		styleEl.textContent = cssText;
-		styleEl.dataset.name = _name;
-		document.head.appendChild(styleEl);
-		if(_installedCount > 1 &&_func)
-			setTimeout(function(){_func([scriptEle, styleEle], _name);}, 10);
-	})
-	.catch(err => console.error('CSS yüklenemedi:', err));
-	document.head.appendChild(scriptEle);
-	document.head.appendChild(styleEle);
-	scriptEle.addEventListener("load", () => {
-		_installedCount++;
-		if(_installedCount > 1 &&_func)
-			setTimeout(function(){_func([scriptEle, styleEle], _name);}, 10);
-	});
-	scriptEle.addEventListener("error", (e) => {
-		alert(JSON.stringify(e));
-		alert(e.message);
-	});
+	let _installedCount = (_module.jsLoaded ?? 0) + (_module.cssLoaded ?? 0);
+
+	let scriptEl = document.querySelector(`script[data-name="${_name}"]`);
+	let styleEl = document.querySelector(`style[data-name="${_name}"]`);
+
+	// CSS yükleme
+	if (!_module.cssLoaded) {
+		fetch(`./css/${_name}.css?x=${_ver}`)
+			.then(resp => resp.text())
+			.then(cssText => {
+				_module.cssLoaded = 1;
+				_installedCount++;
+
+				// Eski varsa temizle
+				if (styleEl) styleEl.remove();
+
+				styleEl = document.createElement("style");
+				styleEl.textContent = cssText;
+				styleEl.dataset.name = _name;
+				document.head.appendChild(styleEl);
+
+				if (_installedCount > 1 && _func)
+					setTimeout(() => _func([scriptEl, styleEl], _name), 10);
+			})
+			.catch(err => console.error("[injectModule] CSS yüklenemedi:", err));
+	}
+
+	// JS yükleme
+	if (!_module.jsLoaded) {
+		if (scriptEl) scriptEl.remove();
+
+		scriptEl = document.createElement("script");
+		scriptEl.setAttribute("data-name", _name);
+		scriptEl.src = `./js/${_name}.js?x=${_ver}`;
+		document.head.appendChild(scriptEl);
+
+		scriptEl.addEventListener("load", () => {
+			_module.jsLoaded = 1;
+			_installedCount++;
+			if (_installedCount > 1 && _func)
+				setTimeout(() => _func([scriptEl, styleEl], _name), 10);
+		});
+
+		scriptEl.addEventListener("error", e => {
+			console.error("[injectModule] JS yüklenemedi:", e.message);
+		});
+	}
 }
 
+/**
+ * Eksik modülleri yeniden yükle
+ */
+function organizeModules() {
+	setTimeout(() => {
+		for (let _m of __injectedModules) {
+			// Modülün tag’leri var ama callback çalışmamış olabilir
+			const hasScript = document.querySelector(`script[data-name="${_m.name}"]`);
+			const hasStyle = document.querySelector(`style[data-name="${_m.name}"]`);
+			
+			// Eğer tag var ama jsLoaded/cssLoaded flag false ise, 
+			// muhtemelen load event kaçtı => yeniden başlat
+			if (!_m.jsLoaded || !_m.cssLoaded || !hasScript || !hasStyle) {
+				console.warn("Modül yeniden yükleniyor:", _m.name);
+				injectModule(_m.name, _m.do, true);
+			}
+		}
+	}, 100);
+}
+function detachModule() {
+	const _keys = Object.keys(__latestUIModule);
+	if(_keys?.[0]) {
+		try {
+			for(let _k of _keys){
+				const refs = document.querySelectorAll('*[data-module="' + _k + '"]');
+				if(refs?.[0])
+					refs.forEach(x => x.remove());
+				const _arr = __latestUIModule[_k]?.data;
+				if(_arr?.[0])
+					for(let i = _arr.length - 1; i >= 0;  i--)
+						_arr[i].remove();
+				removeModule(_k);
+				delete __latestUIModule[_k];
+			}
+		}
+		catch(_lumex) { }
+	}
+}
 function removeModule(_name) {
-	const _i = __injectedModules.findIndex(x => x === _name);
+	const _i = __injectedModules.findIndex(x => x.name === _name);
 	if(_i >= 0)
 		__injectedModules.splice(_i, 1);
 	document.head.querySelectorAll(`script[data-name="${_name}"], style[data-name="${_name}"]`)
         ?.forEach(x => x.remove());
-	const _module = window.installedModules?.find(x => x.name === _name);
-	if(_module?.ref){
-		delete _module.ref;
-		window.installedModules.splice(window.installedModules.findIndex(x => x.name === _name),1);
-	}
+	// const _module = window.installedModules?.find(x => x.name === _name);
+	// if(_module?.ref){
+	// 	delete _module.ref;
+	// 	window.installedModules.splice(window.installedModules.findIndex(x => x.name === _name),1);
+	// }
 }

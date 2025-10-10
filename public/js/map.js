@@ -106,7 +106,7 @@ function map(_m) {
 	// setTimeout(function() {
 	// 	initDmgFrames();
 	// }, 100);
-	if(this.id < 107 && !this.lobby && !_mapSprite.menu && !this.entertainment)
+	if(this.id < 107 && this.id > 1 && !this.lobby && !_mapSprite.menu && !this.entertainment && !__storyScene?.noArtifact)
 	{
 		//artifact ekleyelim
 		const _minArtifactGrade = __artifacts.map(x => x.group).sort()[0];
@@ -1237,7 +1237,7 @@ function map(_m) {
 				const _team1 = this.enemies.filter(x => x.groupId === 1);
 				const _team2 = this.enemies.filter(x => x.groupId === 2);
 				let _rewardsHtml = '';
-				_rewards.push({key:'honor', title:getLangData('Kill Honor'), count:mainCharacter.killCount ?? 0});
+				_rewards.push({key:'honor', title:getLangData('Blood Honor'), count:mainCharacter.killCount ?? 0});
 				if(_status > 1){
 					let _honorCount = (mainCharacter.killCount ?? 0) + (mainCharacter.killCount > 1 ? 1: 0) + (mainCharacter.killCount > 2 ? 1: 0);
 					//__account.pvp.honor+=_honorCount;
@@ -1715,7 +1715,7 @@ function map(_m) {
 				if(_warn) {
 					_client.saveState();
 					warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/forge.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Item Is Ready') + '</span></div>',  null, null, 1);
-					episode.playSound({ key: 'forgeready', volume: .5 });
+					PlaySound({ key: 'forgeready', volume: .5 });
 				}
 			}
 		}
@@ -2780,14 +2780,14 @@ function map(_m) {
 			this.checkSceneActions();
 			return;
 		}
-		_queue = radixSortLSD(_queue, (a, b) => {
-			return _maxSort - MathFloor((MathRound((a.drawPriority >= 10 ? 
+		for(let a of _queue)
+			a.sortOrder = _maxSort - MathFloor((MathRound((a.drawPriority >= 10 ? 
 				0 : a.char.yPosition) / _yTol)
 			* 100000) + 
 			(a.drawPriority * 10000)
 			+ ((999 - (a.char.drawOrder ?? 0)))
-			); 
-		});
+			);
+		_queue = radixSortLSD(_queue, a => a.sortOrder);
 		c10.clearRect(0, 0, this.cWidth, this.cHeight);
 		offCtx.clearRect(0, 0, this.cWidth, this.cHeight);
 		if(__account.options.gore){
@@ -2836,13 +2836,14 @@ function map(_m) {
 				_bounceCount++;
 			}
 			_backgrounds.length = _preDraws.length = _relateds.length = 0;
-			for(let ob of _item.objects)
-				if(ob.background)
-					_backgrounds.push(ob);
-				else if(ob.preDraw)
-					_preDraws.push(ob);
-				else
-					_relateds.push(ob);
+			if(_item.objects)
+				for(let ob of _item.objects)
+					if(ob.background)
+						_backgrounds.push(ob);
+					else if(ob.preDraw)
+						_preDraws.push(ob);
+					else
+						_relateds.push(ob);
 			this.drawRelatedObjects(_item, _backgrounds);
 			this.drawGoreObjects(_item);
 			if (!_item.alpha) {
@@ -3910,11 +3911,7 @@ this.drawHealthBar2 = function (_item) {
 		}
 		if(episode.enemies)
 			episode.enemies.forEach(e => {
-				if(e.stepSound) {
-					if(!e.stepSound.paused)
-						e.stepSound.pause();
-					e.stepSound = null;
-				}
+				e.stopStepSound();
 			});
 		if(episode.mobs?.find(x => !x.listed))
 			episode.mobs = episode.mobs.filter(x => x.listed);
@@ -3950,6 +3947,7 @@ this.drawHealthBar2 = function (_item) {
 		this.layersDrawn = false;
 		const _wrappers = document.querySelectorAll('.wrapper-3d');
 		_wrappers?.forEach(x => x.remove());
+		stopWeather();
 	}
 	// if(!this.lobby && !this.pvp)
 	// 	this.createBgMusic();

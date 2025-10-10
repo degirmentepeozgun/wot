@@ -167,7 +167,7 @@ const __stories = [
 		],
 		ticket: 2,
 		list:true,
-		//startScene:1,
+		startScene:1,
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
@@ -198,7 +198,7 @@ const __stories = [
 					__account.questStatus.quest = undefined;
 					_client.upgradeQuestStatus();
 					warn('<div class="flex heading toast-with-banner ink" style="position:relative;width:auto"><img style="height:20vh;z-index:-1" src="./images/icons/txtbg.png" /><div class="full flex" style="position:absolute">' + getLangData('Quest Completed') + '</div></div>');
-					episode.playSound({ key: 'questdone', volume: .8 });
+					PlaySound({ key: 'questdone', volume: .8 });
 					episode.showLocationHand('right');
 					episode.width *= 2;
 					episode.moveCamera();
@@ -238,7 +238,7 @@ const __stories = [
 					if(_q)
 						_q.count = 1;
 					getQuestRewards(__account.questStatus.quest);
-					episode.playSound({ key: 'questdone', volume: .8 });
+					PlaySound({ key: 'questdone', volume: .8 });
 					updateQuestArea();
 					episode.dialogs = [{
 						id: 1,
@@ -294,7 +294,7 @@ const __stories = [
 						_chest.animate('dead', 1);
 					else {
 						delete __account.questStatus.quest.after;
-						episode.playSound({ key: 'loot', volume: 1 });
+						PlaySound({ key: 'loot', volume: 1 });
 						const _dead = episode.enemies.find(x => x.id === 78);
 						if(_dead && !_dead.unarmed)
 							_dead.unarm();
@@ -1342,11 +1342,11 @@ const __stories = [
 					__storyCutScenePlaying = undefined;
 					addClass(_gameUI, 'disable-ui');
 					setTimeout(function() {
-						injectModule('character-selection', function() {
+						injectModule(function() {
 							var x = new characterSelection();
 							x.createCharacterSelectionUI();
 						});
-					}, 500);
+					}, 5500);
 				}
 			},
 			getLobbyScene()
@@ -1441,7 +1441,7 @@ const __stories = [
 					const _druid = episode.enemies.find(x => x.id === 67);
 					_druid.remove = true;
 					getQuestRewards(__account.questStatus.quest);
-					episode.playSound({ key: 'questdone', volume: .8 });
+					PlaySound({ key: 'questdone', volume: .8 });
 					takeNextQuest();
 					const _princess = summonMob(58, MathRound(mainCharacter.SCREENLEFT / __zoom), mainCharacter.yPosition, mainCharacter.level);
 					_princess.friendly = _princess.invulnerable = true;
@@ -1923,7 +1923,7 @@ const __stories = [
 						},
 						{
 							do: function() {
-								episode.playSound({key:'femalepain', end: function() {
+								PlaySound({key:'femalepain', end: function() {
 									_char.direction = 'left';
 									createBubbleText({
 										id: 993,
@@ -2810,7 +2810,7 @@ const __stories = [
 						do: function() {
 							episode.phase = 2;
 							focusMe('.enemy-profile', function() {
-								episode.playSound({ key: 'click' });
+								PlaySound({ key: 'click' });
 								episode.still = false;
 								episode.enemies.filter(x => x.stop).forEach(x => {
 									x.still = x.stop = false;
@@ -3117,7 +3117,7 @@ const __stories = [
 								}
 							});
 							startQuake(1,1);
-							episode.playSound({path:'./images/sounds/bulls-run2.mp3?x=2', volume: 1 });
+							PlaySound({path:'./images/sounds/bulls-run2.mp3?x=2', volume: 1 });
 							mainCharacter.direction = 'right';
 							let _finishes = 0, _limit = 0;
 							const _stopBull = function(_e, _l) {
@@ -3473,7 +3473,7 @@ const __stories = [
 					__account.questStatus.quest = undefined;
 					_client.upgradeQuestStatus();
 					warn('<div class="flex heading toast-with-banner ink" style="position:relative;width:auto"><img style="height:20vh;z-index:-1" src="./images/icons/txtbg.png" /><div class="full flex" style="position:absolute">' + getLangData('Quest Completed') + '</div></div>');
-					episode.playSound({ key: 'questdone', volume: .8 });
+					PlaySound({ key: 'questdone', volume: .8 });
 					episode.showLocationHand('right');
 					episode.width *= 2;
 					episode.moveCamera();
@@ -3513,7 +3513,7 @@ const __stories = [
 					if(_q)
 						_q.count = 1;
 					getQuestRewards(__account.questStatus.quest);
-					episode.playSound({ key: 'questdone', volume: .8 });
+					PlaySound({ key: 'questdone', volume: .8 });
 					updateQuestArea();
 					episode.dialogs = [{
 						id: 1,
@@ -3568,7 +3568,7 @@ const __stories = [
 					if(_chest)
 						_chest.animate('dead', 1);
 					else {
-						episode.playSound({ key: 'loot', volume: 1 });
+						PlaySound({ key: 'loot', volume: 1 });
 						const _dead = episode.enemies.find(x => x.id === 78);
 						if(_dead && !_dead.unarmed)
 							_dead.unarm();
@@ -3668,7 +3668,7 @@ const __stories = [
 					const _druid = episode.enemies.find(x => x.id === 67);
 					_druid.remove = true;
 					getQuestRewards(__account.questStatus.quest);
-					episode.playSound({ key: 'questdone', volume: .8 });
+					PlaySound({ key: 'questdone', volume: .8 });
 					updateQuestArea();
 					const _princess = summonMob(58, MathRound(mainCharacter.SCREENLEFT / __zoom), mainCharacter.yPosition, mainCharacter.level);
 					_princess.friendly = _princess.invulnerable = true;
@@ -3930,7 +3930,7 @@ const __stories = [
 								}
 							});
 							startQuake(1,1);
-							episode.playSound({path:'./images/sounds/bulls-run2.mp3?x=2', volume: 1 });
+							PlaySound({path:'./images/sounds/bulls-run2.mp3?x=2', volume: 1 });
 							mainCharacter.direction = 'right';
 							let _finishes = 0, _limit = 0;
 							for(let i = 0; i < 6; i++) {
@@ -4356,7 +4356,7 @@ const __stories = [
 																	mainCharacter.enableSkill('air1');
 																	mainCharacter.animate('air1', 1);
 																	mainCharacter.animations.air1.after = function() {
-																		//episode.playSound({path:'./images/talks/cyclops/haha.mp3', volume: 1 });
+																		//PlaySound({path:'./images/talks/cyclops/haha.mp3', volume: 1 });
 																		episode.dialogs.push({
 																			id: 5,
 																			location: { map: episode.id }, ms: 2000,
@@ -5413,7 +5413,7 @@ const __stories = [
 						},
 						{
 							do: function() {
-								episode.playSound({key:'femalepain', end: function() {
+								PlaySound({key:'femalepain', end: function() {
 									_char.direction = 'left';
 									createBubbleText({
 										id: 993,
@@ -5949,7 +5949,7 @@ const __stories = [
 						do: function() {
 							episode.phase = 2;
 							focusMe('.enemy-profile', function() {
-								episode.playSound({ key: 'click' });
+								PlaySound({ key: 'click' });
 								episode.still = false;
 								episode.enemies.filter(x => x.stop).forEach(x => {
 									x.still = x.stop = false;
@@ -6752,7 +6752,7 @@ const __stories = [
 							//removeCoopCharacter(1);
 							episode.towerDefenseStart = _gameTick;
 							warn('<div class="flex heading achievement-red" style="position:relative;width:auto"><img style="height:15vh;z-index:-1" src="./images/icons/txtbg.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Bomber Frog Incoming') + '</div></div>');
-							episode.playSound({ key: 'curse', volume: .5 });
+							PlaySound({ key: 'curse', volume: .5 });
 							summonMobWithJson({
 								id: 83,
 								minX: 4000,
@@ -6903,7 +6903,7 @@ const __stories = [
 									_char.platformX = platformX;
 									_char.yPosition = MathRound(.4 * groundheight);
 									mainCharacter.disableSkill('defense');
-									episode.playSound({ key: 'puff', volume: .4 });
+									PlaySound({ key: 'puff', volume: .4 });
 									mainCharacter.addObject({
 										key: 'invisiblesmoke',
 										position: 'middle'
@@ -6920,7 +6920,7 @@ const __stories = [
 									episode.pauseBgMusic(1);
 									episode.moveCamera(function(){
 										focusMe('#quest-status', function() {
-											episode.playSound({ key: 'click' });
+											PlaySound({ key: 'click' });
 											mainCharacter.still = mainCharacter.immobilize = false;
 											delete mainCharacter.disableKeyboard;
 											resumeQuestTimer();
@@ -7238,7 +7238,7 @@ const __stories = [
 					mainCharacter.level = 0;
 					mainCharacter.experience = 0;
 					mainCharacter.maxExperience = 833;
-					setCharacterLevel(1, null, 1);
+					setCharacterLevel(13, null, 1);
 					//setCharacterLevel(13, null, 1);
 					addClass(_gameUI, 'demo-playing');
 					episode.pauseBgMusic(1);
@@ -7276,7 +7276,7 @@ const __stories = [
 								x.animate('dead', 1);
 							});
 							episode.mobs = episode.respawners = [];
-							episode.playSound({key:'bossalert', volume: .5});
+							PlaySound({key:'bossalert', volume: .5});
 							warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000);
 							const _elm = document.getElementById('quest-status');
 							addClass(_elm, 'mission-done');
@@ -7305,7 +7305,7 @@ const __stories = [
 									);
 							}
 							setTimeout(() => {
-								episode.playSound({key:'sistersenter', volume:1});
+								PlaySound({key:'sistersenter', volume:1});
 								setTimeout(() => {
 									const _bs = [37, 38];
 									episode.phase = 100;
@@ -7316,7 +7316,7 @@ const __stories = [
 											atk: mainCharacter.atk * 2,
 											grade: 4
 										});
-										//_boss.health = _boss.maxHP = 1;
+										_boss.health = _boss.maxHP = 1;
 										_boss.class = 'boss';
 										//_boss.zoom = _boss.ZOOM = _boss.zoom * 1.2;
 										_boss.experience = 0;
@@ -7943,7 +7943,7 @@ const __stories = [
 							//removeCoopCharacter(1);
 							episode.towerDefenseStart = _gameTick;
 							warn('<div class="flex heading achievement-red" style="position:relative;width:auto"><img style="height:15vh;z-index:-1" src="./images/icons/txtbg.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Bomber Frog Incoming') + '</div></div>');
-							episode.playSound({ key: 'curse', volume: .5 });
+							PlaySound({ key: 'curse', volume: .5 });
 							summonMobWithJson({
 								id: 83,
 								minX: 4000,
@@ -8094,7 +8094,7 @@ const __stories = [
 									_char.platformX = platformX;
 									_char.yPosition = MathRound(.4 * groundheight);
 									mainCharacter.disableSkill('defense');
-									episode.playSound({ key: 'puff', volume: .4 });
+									PlaySound({ key: 'puff', volume: .4 });
 									mainCharacter.addObject({
 										key: 'invisiblesmoke',
 										position: 'middle'
@@ -8111,7 +8111,7 @@ const __stories = [
 									episode.pauseBgMusic(1);
 									episode.moveCamera(function(){
 										focusMe('#quest-status', function() {
-											episode.playSound({ key: 'click' });
+											PlaySound({ key: 'click' });
 											mainCharacter.still = mainCharacter.immobilize = false;
 											delete mainCharacter.disableKeyboard;
 											resumeQuestTimer();
@@ -8494,7 +8494,7 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 1;
-							episode.playSound({key:'alstart', volume:1});
+							PlaySound({key:'alstart', volume:1});
 								setTimeout(() => {
 									const _boss = summonMobWithJson({
 										id: 1000,
@@ -8786,7 +8786,7 @@ function story(_id, _func, _noBlack, _desc) {
 		if((_gameTick - this.start) > item?.ms)
 		{
 			if(this.order === 1) {
-				episode.playSound({key:'story', volume: .5});
+				PlaySound({key:'story', volume: .5});
 			}
 			if(!item.finish) {
 				const _box = document.createElement('div');
@@ -8924,7 +8924,7 @@ function storyBonus(_func, _instant) {
 				}
 				_title.innerText = _cardTitle;
 				removeClass(_s.btn, 'disabled');
-				episode.playSound({key:'select2', volume:.5});
+				PlaySound({key:'select2', volume:.5});
 				_wrapper.classList.add('selected');
 				document.querySelectorAll('.story-gift .match-card').forEach(x =>
 					x.classList.add('flip-card'));
@@ -9018,7 +9018,7 @@ function createStoryResultScreen(_failed) {
 		// 		__story.resultStars[i].failed = true;
 		const _fail = !__story.resultStars.filter(x => !x.failed)?.length;
 		if(!_fail)
-			episode.playSound({ key: 'victory', volume: .2 });
+			PlaySound({ key: 'victory', volume: .2 });
 		else
 			episode.enemies.forEach(x => x.standBy());
 		let _table = '<div class="flex full pvp-result-table story-result"><div class="flex" style="width:100%;height:16vh;position:relative"><img src="./images/ui/wood.png" style="height:30%;margin-top:5vh;z-index:2;filter:drop-shadow(.5vh 1vh 1.5vh black);-webkit-filter:drop-shadow(.5vh 1vh 1.5vh black);position:absolute' + (_fail ? ';-webkit-filter:grayscale(66%);filter:grayscale(66%)': '') + '"' + (_fail ? ' class="gray"': '') + ' /><span style="z-index:2;margin-top:4.5vh;font-size:3.5vh!important;font-weight:600;text-shadow:0px 0px 1vh #000;color:' + (_fail ? 'crimson' : '#F4BB44') + ' !important">' + getLangData('Story' + (_fail ? ' Failed' : ' Cleared')) + '</span></div><div class="game-over-results"><div style="width:100%" class="flex"><span>';
@@ -9256,7 +9256,7 @@ function selectStoryUI(_id) {
 }
 function createStoryDetailUI(_id, _noSound) {
 	if(!_noSound)
-		episode.playSound({ key: 'click' });
+		PlaySound({ key: 'click' });
 	const _s = __stories.find(x => x.id === _id);
 	if(_s?.locked) {
 		warn('<span>' + getLangData('Story is locked for now') + '</span>', 'warn');
@@ -9490,7 +9490,7 @@ function tryConsumeTickets(_goldSelected, _expSelected, _itemSelected) {
 	_client.saveState();
 }
 function askPassStory(_itemSelected, _goldSelected, _expSelected) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     const _limit = __account.misc.find(x => x.type === 'ticket-pass')?.count ?? 0;
     let _modal = `<div class="full fade-me flex inventory-question inventory-question-add-slot">
         <div class="inventory-modal">
@@ -9516,7 +9516,7 @@ function askPassStory(_itemSelected, _goldSelected, _expSelected) {
     document.querySelector('#menu-ui').appendChild(_div.firstChild);
 }
 function useMaxPassAmount() {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     const _limit = __account.misc.find(x => x.type === 'ticket-pass')?.count ?? 0;
     const _sa = document.getElementById('pass-amount');
     let _amount = parseInt(_sa.innerText);
@@ -9527,7 +9527,7 @@ function useMaxPassAmount() {
     _sa.innerText = _amount;
 }
 function increasePassAmount() {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     const _limit = __account.misc.find(x => x.type === 'ticket-pass')?.count ?? 0;
     const _sa = document.getElementById('pass-amount');
     let _amount = parseInt(_sa.innerText);
@@ -9540,7 +9540,7 @@ function increasePassAmount() {
     _sa.innerText = _amount;
 }
 function decreasePassAmount() {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     const _sa = document.getElementById('pass-amount');
     let _amount = parseInt(_sa.innerText);
     _amount--;
@@ -9553,7 +9553,7 @@ function decreasePassAmount() {
 function acceptStoryPass(_itemSelected, _goldSelected, _expSelected) {
 	// warn('<span>' + getLangData('Not available in demo') + '</span>', 'warn');
 	// return;
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     const _sa = document.getElementById('pass-amount');
     let _amount = parseInt(_sa.innerText);
     if(_amount > 0) {
@@ -9578,7 +9578,7 @@ function redeemPassTicket(_id) {
 }
 var __storyAutoPassSkip;
 function skipStoryPass() {
-	episode.playSound({ key: 'click' });
+	PlaySound({ key: 'click' });
 	__storyAutoPassSkip = 1;
 	//üstteki algoritmayı hızlı çalıştır
 }
@@ -9648,7 +9648,7 @@ async function createStoryPassScreen(_amount) {
 	// satır satır ekle
 	for (let i = 0; i < _results.length; i++) {
 		if(!__storyAutoPassSkip)
-			episode.playSound({key:'autopass', volume:.4});
+			PlaySound({key:'autopass', volume:.4});
 		const row = document.createElement('div');
 		row.className = 'w-100 flex flex-jc-start auto-pass-result-item fade-me';
 		row.innerHTML = _results[i];

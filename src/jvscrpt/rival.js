@@ -28467,7 +28467,7 @@ const _allEnemies = {
 									if (_e.autoTarget.isDead())
 										_e.remove = true;
 								});
-								episode.playSound({ key: 'puff', volume: .5 });
+								PlaySound({ key: 'puff', volume: .5 });
 							},
 							def: {
 								iframe: true
@@ -48197,7 +48197,7 @@ const _allEnemies = {
 									minLevel: _e.level,
 									maxLevel: _e.level
 								}, null, 1);
-								episode.playSound({ key: 'puff', volume: .3 });
+								PlaySound({ key: 'puff', volume: .3 });
 								_mob.addObject({
 									key: 'smoke',
 									position: 'middle'
@@ -48792,7 +48792,7 @@ const _allEnemies = {
 									minLevel: _e.level,
 									maxLevel: _e.level
 								}, null, 1);
-								episode.playSound({ key: 'puff', volume: .3 });
+								PlaySound({ key: 'puff', volume: .3 });
 								_mob.addObject({
 									key: 'smoke',
 									position: 'middle'
@@ -49064,7 +49064,7 @@ const _allEnemies = {
 									yPosition : (mainCharacter.yPosition < _e.yPosition ? 
 									mainCharacter.yPosition : _e.yPosition) - 1
 								}, null, 1);
-								episode.playSound({ key: 'puff', volume: .3 });
+								PlaySound({ key: 'puff', volume: .3 });
 								_mob.addObject({
 									key: 'smoke',
 									position: 'middle'
@@ -52116,7 +52116,7 @@ const _allEnemies = {
 							}
 							if(_e.gradeLeft < (_e.grade - 1)) {
 								if(_e.preGrade !== (_e.gradeLeft + 1)) {
-									episode.playSound({key:'wagonphase', volume:.5});
+									PlaySound({key:'wagonphase', volume:.5});
 									_e.addObject({ 
 										key:'bigouch', 
 										position: 'middle'});

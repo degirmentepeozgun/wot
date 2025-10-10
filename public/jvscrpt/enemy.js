@@ -985,7 +985,7 @@ function enemy(_e) {
 							y: _canvas.height - this.yPosition - this.getHeight()
 						});
 					}
-					episode.playSound({ key: 'loot' });
+					PlaySound({ key: 'loot' });
 					if (!useProgress)
 						useProgress = document.getElementById('use-progress');
 					addClass(useProgress, 'd-none');
@@ -1423,7 +1423,7 @@ function enemy(_e) {
 			if(!_sf.range || (!this.main && _sf.range))
 			{
 				this.soundPlaying = this.frame + 1;
-				let _sound = episode.playSound({
+				let _sound = PlaySound({
 					reset: _sf.reset,
 					key: (!this.main ? this.name.toLowerCase() : this.class) + 
 					(typeof _sf === 'string' ? _sf : (_sf?.key ?? this.animation)),
@@ -2090,7 +2090,7 @@ function enemy(_e) {
 											x: this.getLeft(),
 											y: _canvas.height - this.yPosition - this.getHeight()
 										});
-										episode.playSound({ key: 'loot' });
+										PlaySound({ key: 'loot' });
 										_client.upgradeQuestStatus();
 										_used = true;
 									}
@@ -2105,7 +2105,7 @@ function enemy(_e) {
 						}
 						if (_used) {
 							_o.remove = true;
-							episode.playSound({ key: 'inventory', volume: .5 });
+							PlaySound({ key: 'inventory', volume: .5 });
 						}
 					}
 				}
@@ -2242,7 +2242,7 @@ function enemy(_e) {
 		}
 		_buff.applying = true;
 		if(_b.sound)
-			episode.playSound(_b.sound);
+			PlaySound(_b.sound);
 		if (_b.objects)
 			for (const _obj of _b.objects) {
 				const _o = this.addObject(_obj);
@@ -2526,7 +2526,7 @@ function enemy(_e) {
 				if (_result?.enemy) {
 					if (this.start === 1 && this.frame === 0){
 						this.charging = true;
-						episode.playSound({ key: 'charge', volume: .25, owner: this });
+						PlaySound({ key: 'charge', volume: .25, owner: this });
 					}
 					let _speed = 0;
 					for (var i = 0; i <= _anima.chargeDistance.untilFrame ?? 0; i++)
@@ -2535,7 +2535,7 @@ function enemy(_e) {
 						this.charging = (_anima.chargeDistance.value * .66) < (100 * (_result.range / _canvas.width)) ? 1 : 0;
 						if(this.main)
 							_result.enemy.hurtColor = '#880808';
-						episode.playSound({key: 'impact'});
+						PlaySound({key: 'impact'});
 						this.chargeProperties = {
 							enemy: _result.enemy,
 							stepX: MathFloor((_result.range - (_result.enemy.getWidth() / 2)) / (_speed < 2 ? _speed : _speed - 1))//(_speed - this.start))
@@ -3207,7 +3207,7 @@ function enemy(_e) {
 						else if (!_e.alp && _f.atk.hurt.catch === 'front' && _e.direction === _t.direction)
 							_e.direction = _e.direction === 'left' ? 'right' : 'left';
 						if (_f.atk.hurt.sound)
-							episode.playSound({ key: _e.class + _f.atk.hurt.sound, owner: _e }, [_f.atk.hurt.sound]);
+							PlaySound({ key: _e.class + _f.atk.hurt.sound, owner: _e }, [_f.atk.hurt.sound]);
 						if (_f.atk.hurt.props) {
 							const _dying = _e.dying;
 							_e.setProps(_f.atk.hurt.props);
@@ -3220,7 +3220,7 @@ function enemy(_e) {
 							_e.animate('hurtfeet', 1);
 							if(_t.talkCount && (msNow - (_t.lastTalkTime ?? 0) > 10000)) {
 								_t.lastTalkTime = msNow;
-								episode.playSound({path:'./images/talks/' + _t.class + '/' + getRandomValue(1, _t.talkCount) + '.mp3', volume: 1 });
+								PlaySound({path:'./images/talks/' + _t.class + '/' + getRandomValue(1, _t.talkCount) + '.mp3', volume: 1 });
 							}
 							return true;
 						}
@@ -3326,7 +3326,7 @@ function enemy(_e) {
 							const _cced = _f.atk.hurt.type !== 'common' && (!_ep || _tp < _ep);
 							if ((_erelease || _f.atk.hurt.key) && _cced) {
 								if (_erelease) {
-									episode.playSound({ key: 'release', volume: .3});
+									PlaySound({ key: 'release', volume: .3});
 									if(_e.animations.release)
 										_e.animate('release', 1);
 									else
@@ -3337,7 +3337,7 @@ function enemy(_e) {
 									if (!_e.animations[_animateSkill])
 										_animateSkill = 'hurtground1';
 									//if (!_e.animations[_animateSkill]?.frames?.find(x => x.sound))
-									//	episode.playSound({ owner: _e, key: (_e.main ? _e.class : _e.name.toLowerCase()) + (_e.main ? _animateSkill : 'hurt') }, ['hurt']);
+									//	PlaySound({ owner: _e, key: (_e.main ? _e.class : _e.name.toLowerCase()) + (_e.main ? _animateSkill : 'hurt') }, ['hurt']);
 									if (_animateSkill.startsWith('hurt') && !_e.noCC){
 										if(_animateSkill === 'hurtair' && _e.animations.hurtair2)
 										{
@@ -3494,7 +3494,7 @@ function enemy(_e) {
 								key: 'glow',
 								position: 'middle'
 							});
-							episode.playSound({ key: this.class + 'block', owner: this }, 'block');
+							PlaySound({ key: this.class + 'block', owner: this }, 'block');
 							return;
 						}
 					}
@@ -3523,7 +3523,7 @@ function enemy(_e) {
 						_enemy.blocked = false;
 					}
 					else
-						episode.playSound({ owner: this, key: _enemy.class + 'block' }, 'block');
+						PlaySound({ owner: this, key: _enemy.class + 'block' }, 'block');
 				}
 				else if ((!_enemy.dying || (_enemy.dying && this.key == _enemy.killingBy)) && (_thisPriority < (_enemyPriority ?? 10))) {
 					_enemyHurted = hurtEnemy(this, _frame, _enemy, _enemyFrame, _enemyAnima);
@@ -3601,7 +3601,7 @@ function enemy(_e) {
 						_enemy.addBuff({ key: 'ice', level: 1 });
 						break;
 					case 'lightning':
-						episode.playSound({key: 'electric', reset: true });
+						PlaySound({key: 'electric', reset: true });
 						_enemy.addObject(
 							{ key: 'dzzt', position: 'middle' }
 						);
@@ -3792,7 +3792,7 @@ function enemy(_e) {
 					_s.noAttack = false;
 				}
 			}
-			episode.playSound(this.startSound);
+			PlaySound(this.startSound);
 		}
 		if (this.hasStation && ((_e.related ?? _e) !== this.autoTarget)) {
 			const _diff = { at: (_e.related ?? _e).socketId, sy: 1 };
@@ -4838,7 +4838,7 @@ function enemy(_e) {
 									removeClass(useProgress, 'd-none');
 									this.useProgressStart = msNow;
 									if(this.action.sound)
-										this.actionSound = episode.playSound(this.action.sound);
+										this.actionSound = PlaySound(this.action.sound);
 									this.animate('idle', 1, null, 9);
 								}
 								else {
@@ -4863,7 +4863,7 @@ function enemy(_e) {
 								else {
 									__account.questStatus.side.state = 'end';
 									warn('<div class="flex heading" style="position:relative"><img style="position:absolute;z-index:-1;left:-40%;width:180%" src="./images/icons/banner.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('You found it') + '!</span></div>', 'level-up');
-									episode.playSound({ key: 'questdone', volume: .8 });
+									PlaySound({ key: 'questdone', volume: .8 });
 									const _portal = document.getElementById('SPRT-' + this.action.loot);
 									if (_portal)
 										_portal.remove();

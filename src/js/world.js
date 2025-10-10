@@ -98,7 +98,7 @@ function world() {
 	}
  	this.closeMapInfoModal = function(_nosound) {
 		if(!_nosound)
-			episode.playSound({ key: 'click' });
+			PlaySound({ key: 'click' });
 		const _mdc = document.getElementById('map-detail-modal');
 		if(_mdc) {
 			addClass(_mdc, 'fade-out');
@@ -116,7 +116,7 @@ function world() {
 		let _mission;
 		if(_map.coords.key)
 			_mission = _missions.find(x => x.key === _map.coords.key);
-		episode.playSound({ key: 'click' });
+		PlaySound({ key: 'click' });
 		let _container = document.getElementById('map-detail-modal');
 		if(_container)
 			_container.remove();

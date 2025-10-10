@@ -279,7 +279,7 @@ function addArcherCoopCharacter(_noSound, _append) {
 	const _c = addCoopCharacter(null, 'arc', _append);
 	_squadMemberKey = 'archer';
 	if (!_noSound)
-		episode.playSound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
+		PlaySound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
 	return _c;
 }
 function addWarriorCoopCharacter(_noSound, _append) {
@@ -289,7 +289,7 @@ function addWarriorCoopCharacter(_noSound, _append) {
 	const _c = addCoopCharacter(null, 'wrr', _append);
 	_squadMemberKey = 'warrior';
 	if (!_noSound)
-		episode.playSound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
+		PlaySound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
 	return _c;
 }
 function addThiefCoopCharacter(_noSound, _append) {
@@ -299,7 +299,7 @@ function addThiefCoopCharacter(_noSound, _append) {
 	const _c = addCoopCharacter(null, 'thf', _append);
 	_squadMemberKey = 'thief';
 	if (!_noSound)
-		episode.playSound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
+		PlaySound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
 	return _c;
 }
 function getCharacterJSON(_prefix) {
@@ -589,6 +589,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 			return;
 		}
 	}
+	closeInventoryQuestionModal(1);
 	const _map = mapSprites.find(x => x.id === _x);
 	if(episode)
 		episode.dispose();
@@ -600,9 +601,6 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 	const _splash = setTip();
 	prevPlatformX = undefined;
 	frames = 0;
-	const _am = document.getElementById('auto-mode-on-off');
-	removeClass(_am, 'selected');
-	addClass(_am, 'd-none');
 	if (episode?.bgSound) {
 		episode.bgSound.pause();
 		episode.bgSound.currentTime = 0;
@@ -682,6 +680,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 			mainCharacter.immobilize = false;
 			mainCharacter.animate('idle', 1);
 			mainCharacter.lastActivity = _gameTick;
+			mainCharacter.enableSkillUI();
 			episode.playAmbianceMusic();
 			let _mapDiscovered;
 			if (!_isBattleGround && !episode.dungeon && !_isMission && __account.visitedMaps.indexOf(episode.subMap ?? episode.id) === -1) {
@@ -703,7 +702,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 				for(let _acd of _activeCoolDowns)
 					_acd.remove();
 			let _startWith = _ss?.startWith;
-			if(_startWith && mainCharacter?.id !== _startWith)
+			if(_startWith && (mainCharacter?.id % 10000) !== _startWith)
 				startWithThisCharacter(_startWith, null, null, 1);
 			setTimeout(function() {
 				if(_onEnd)
@@ -758,15 +757,19 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 					_game.suspended = false;
 				if(!episode?.menu && mainCharacter?.yPosition > getGroundHeight() && !episode?.pvp)
 					mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
-				if(episode && !episode.menu)
+				if(episode && !episode.menu) {
 					episode.enemies?.forEach(x => {
 						resetSkills(null, null, x);
 						x.hbBars = undefined;
 						x.maxHP = x.MAXHP = x.health;
 						x.setHealth(x.MAXHP);
 					});
+					updateLevelUI(mainCharacter);
+				}
 				removeClass(_gameUI, 'ghost');
 				disposeFocus();
+				if(__particles)
+					__particles.cancel();
 				if(episode.war)
 					_gameUI.setAttribute('data-mapid', 'war');
 				else if(_gameUI.hasAttribute('data-mapid'))
@@ -824,7 +827,7 @@ function loadVideo(_url, _after, _again) {
 }
 let _playingVideo;
 function askSkipVideo(_video, _again) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
 	_playingVideo = _video;
     let _modal = document.createElement('div');
 	_modal.className = "full flex inventory-question";
@@ -906,6 +909,7 @@ function openGame() {
 			startStory(1);
 		else {
 			//__storySceneOrder = __account.lastLobbyUsage.sceneOrder;
+			__storySceneOrder = 1;
 			startStory(__stories.find(x => x.act === __account.act && x.lobby).id, null, 1);
 		}
 		_client.loadGold();
@@ -1061,14 +1065,14 @@ function hideMenu() {
 	if(_upperDiv)
 		_upperDiv.remove();
 }
-function hideMyMenu() {
+function hideMyMenu(_noSound) {
 	if(_warMatchInProgress)
 		return;
 	_dialogAppeared = false;
 	if(!__switchingMap && !_storySceneSwitching)
 		_game.suspended = false;
-	if(episode)
-		episode.playSound({key:'click'});
+	if(episode && !_noSound)
+		PlaySound({key:'click'});
 	const _mbd = document.querySelector('.menu-backdrop');
 	if(_mbd)
 		_mbd.remove();
@@ -1773,7 +1777,7 @@ function selectMenuContainer(_order) {
 	return _container;
 }
 function trySwitchMap(_id) {
-	episode.playSound({ key: 'click' }); 
+	PlaySound({ key: 'click' }); 
 	const _map = mapSprites.find(x => x.id === _id);
 	if(mainCharacter.level < _map.minLevel) {
 		warn('<span>' + getLangData('Your level is too low') + '</span>', 'warn');
@@ -2117,7 +2121,6 @@ function floatDusts() {
 }
 var _openingSound;
 function playOpeningMusic() {
-		return;
 	if(episodeVisibilityHidden)
 		return;
 	_openingSound = document.createElement("audio");
@@ -2126,8 +2129,9 @@ function playOpeningMusic() {
 		_openingSound.autoPlay = false;
 	else
 		_openingSound.preload = 'auto';
-	_openingSound.volume = .8;
-	_openingSound.src = "./images/sounds/opening.mp3";
+	_openingSound.volume = .5;
+	_openingSound.currentTime = 0;
+	_openingSound.src = "./images/sounds/opening3.mp3";
 	_openingSound.play();
 	_openingSound.onended = function() {
 		_openingSound = _closeOpeningMusic = null;
@@ -2201,9 +2205,21 @@ function changeDifficulty(_step){
 	_val.innerText = __difficulties[__account.difficulty - 1].text[getLang()];
 }
 function resetOpeningScreen() {
+	_game.suspended = 1;
+	removeClass(_gamePad, 'ghost-mode');
+	__queue.length = 0;
+	_startAnimate = _warMatchInProgress = false;
+	prevPlatformX = undefined;
+	frames = 0;
+	closeInventoryQuestionModal(1);
+	hideMyModalPopUp();
+	hideMyMenu(1);
+	detachModule();
+	episode?.dispose?.();
 	gameopening = false;
 	setTip();
 	installOpeningScreen(null, 1);
+	episode = __story = mainCharacter = null;
 }
 function approveSelectedLanguage() {
 	const _lang = document.querySelector('.opening-lang-item.selected').getAttribute('data-lang');
@@ -2283,7 +2299,7 @@ function getKeyboardPromo(_force) {
 		PlaySound({key:'click'});
 	const _desc = document.createElement('div');
 	_desc.className = 'flex show-ui full keyboard-promo-container quick-play-desc-container fade-me animate-me';
-	_desc.style = 'position:absolute;top:0;left:0;overflow:hidden';
+	_desc.style = 'position:absolute;top:0;left:0;overflow:hidden;z-index:3';
 	let _html = '<div style="height:calc(100% - 9vh);position:relative" class="w-100 flex"><img src="./images/icons/keys.png" style="border:.2vh solid #F3F4F599;border-top:0;position:absolute;object-fit:cover;max-width:100%;max-height:100%" /></div>';
 	_desc.innerHTML = _html +
 			`<div class="quick-play-desc-skip flex" style="padding:0 5vh;width:91% !important">
@@ -2299,7 +2315,7 @@ function getKeyboardPromo(_force) {
 			</div>`;
 	document.getElementById('first-splash').appendChild(_desc);
 }
-let __isPC = undefined;
+let __isPC = undefined, __particles;
 function installOpeningScreen(_instant, _lateOpening) {
 	const _current = parseInt(localStorage.getItem(__difficultyKey) ?? 3);
 	__account.difficulty = _current;
@@ -2307,13 +2323,14 @@ function installOpeningScreen(_instant, _lateOpening) {
 	var _bg = document.getElementById('splash');
 	var _opening = document.getElementById('first-splash');
 	if(_opening)
-		_opening.innerHTML = `<div onexactclick="getKeyboardPromo(1)" class="opening-controls-icon flex flex-jc-start${__isPC ? '' : ' d-none'}">
+		_opening.innerHTML = `<canvas id="particles"></canvas>
+				<div onexactclick="getKeyboardPromo(1)" class="opening-controls-icon flex flex-jc-start${__isPC ? '' : ' d-none'}">
 				<img src="./images/icons/controls.png" />
 			</div>
 			<div onexactclick="askChangeLanguage()" class="opening-lang-icon flex flex-jc-end">
 				<img src="./images/icons/lang.png" /><span>${getLang().toUpperCase()}</span>
 			</div>
-			<div style="height:20%;width:100%;padding-bottom:30vh" class="flex">
+			<div style="height:20%;width:100%;padding-bottom:30vh;z-index:2" class="flex">
 				<div class="game-difficulty-wrapper flex w-100">
 					<div class="game-difficulty-content flex">
 						<div class="flex">
@@ -2338,9 +2355,8 @@ function installOpeningScreen(_instant, _lateOpening) {
 	}
 	else if(_instant)
 		return;
-	document.getElementById('play-os').click();
 	var _wrapper = document.getElementById('wrapper');
-	_opening.style.width = MathRound(_wrapper.clientWidth * 1.02) + 'px';
+	_opening.style.width = MathRound(_wrapper.clientWidth) + 'px';
 	_opening.style.height = '100vh';
 	_bg.style.background = 'url(./images/icons/logo-rect.png), linear-gradient(0deg, #000, #000)'
 	_bg.style.backgroundSize = '25%, cover';
@@ -2348,12 +2364,15 @@ function installOpeningScreen(_instant, _lateOpening) {
 	_bg.style.backgroundPosition = 'center, center';
 	_img.onload = function() {
 		setTimeout(() => {
+			if(__particles)
+				__particles.cancel();
+			__particles = new dustParticles();
 			_opening.style.opacity = 0;
 			document.getElementById('connect-btn').innerText = getLangData('DEMO PLAY');
 			document.getElementById('qp-btn').innerText = getLangData('QUICK PLAY');
 			removeClass(_opening, 'd-none');
 			removeClass(_opening, 'v-none');
-			_opening.style.background = 'url(./images/loading/0.png), linear-gradient(0deg, #000, #000)'
+			_opening.style.background = 'url(./images/loading/00.png), linear-gradient(0deg, #000, #000)'
 			_opening.style.backgroundSize = 'contain, cover';
 			_opening.style.backgroundRepeat = 'no-repeat, repeat';
 			_opening.style.backgroundPosition = 'center, center';
@@ -2361,21 +2380,17 @@ function installOpeningScreen(_instant, _lateOpening) {
 			setTimeout(function() {
 				_opening.style.opacity = 1;
 				_bg.style.background = '#000';
+				document.getElementById('play-os').click();
 			}, 1000);
 		}, 1000);
 	}
-	_img.src = './images/loading/0.png';
+	_img.src = './images/loading/00.png';
 	if(__isPC && !_lateOpening)
 		setTimeout(() => {
 			getKeyboardPromo();
 		}, 100);
 }
 setTimeout(function() {
-	installOpeningScreen();
-	document.addEventListener('keyup', function(e) {
-		if (e.key === "Escape" && __isPC !== undefined)
-			askExitApp();
-	}, false);
 	if ('ontouchstart' in window ||
 		(window.DocumentTouch && document instanceof window.DocumentTouch) ||
 		navigator.maxTouchPoints > 0 ||
@@ -2383,12 +2398,234 @@ setTimeout(function() {
 		__isPC = false;
 	else
 		__isPC = true;
+	installOpeningScreen();
+	const _stopOpeningSound = function() {
+		if(_openingSound)
+			_openingSound.pause();
+	}
+	document.addEventListener("visibilitychange", () => {
+		if (document.hidden)
+			_stopOpeningSound();
+	});
+	document.addEventListener("pause", () => {
+		_stopOpeningSound();
+	});
+	document.addEventListener('keyup', function(e) {
+		if (e.key === "Escape" && __isPC !== undefined)
+			askExitApp();
+	}, false);
 }, 2000);
 
+function dustParticles() {
+	const c = document.getElementById("particles");
+    const ctx = c.getContext("2d");
+	this.clock;
+	this.rand = function(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+	const _self = this;
+    let particles = [];
+	c.width = c.clientWidth;
+	c.height = c.clientHeight;
+const randomAshColor = function() {
+    const base = { r: 157, g: 152, b: 127 }; // kül rengi
+    const variation = 20;
+    return {
+        r: Math.floor(_self.rand(base.r - variation, base.r + variation)),
+        g: Math.floor(_self.rand(base.g - variation, base.g + variation)),
+        b: Math.floor(_self.rand(base.b - variation, base.b + variation))
+    };
+};
+	const randomFireflyColor = function() {
+    // köz / kor kırmızısı tonları
+	if(getRandomValue2(1,2) > 1)
+		return randomFireflyColor2();
+    const colors = [
+        { r: 255, g: 80,  b: 60 },   // parlak kor kırmızı
+        { r: 220, g: 50,  b: 40 },   // koyu kırmızı
+        { r: 200, g: 30,  b: 20 },   // koyu kor
+        { r: 255, g: 120, b: 80 }    // hafif turuncu yansıma (çok az)
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+};
+const randomFireflyColor2 = function() {
+		// ateş böceği/alev tonları: sarı, turuncu, kırmızı
+		const colors = [
+			{ r: 255, g: 200, b: 80 },   // sarı-turuncu
+			{ r: 255, g: 150, b: 50 },   // turuncu
+			{ r: 220, g: 80,  b: 40 }    // kırmızımsı
+		];
+		return colors[Math.floor(Math.random() * colors.length)];
+	};
+   const createParticle = function(initial = false) {
+    const minSize = 0.55 * c.height / 100;
+    const maxSize = 0.95 * c.height / 100;
+    const size = _self.rand(minSize, maxSize);
 
+    const ratio = (size - minSize) / (maxSize - minSize);
+    const alpha = 0.1 + ratio * 0.5;
+    const speed = 0.005 + ratio * 0.1;
+
+    const isFirefly = Math.random() < 0.1; // %10 alev rengi
+
+    return {
+        x: _self.rand(0, c.width),
+        y: initial ? _self.rand(0, c.height) : c.height + 10,
+        size,
+        speed,
+        angle: _self.rand(-15, 15) * Math.PI / 180,
+        driftChange: _self.rand(0.001, 0.004),
+
+        baseAlpha: alpha,
+        alpha: alpha,
+        color: isFirefly ? randomFireflyColor() : randomAshColor(),
+        firefly: isFirefly, // bayrak koyduk
+
+        // yansıma
+        canReflect: isFirefly ? true : Math.random() < 0.1,
+        reflectTimer: _self.rand(300, 900),
+        reflecting: false,
+        reflectPhase: 0,
+
+        // fade
+        fadePhase: 0,
+        fadeTimer: _self.rand(300, 900),
+    };
+};
+
+
+    const animateParticles = function() {
+	  if(c.width === 0) {
+		c.width = c.clientWidth;
+		c.height = c.clientHeight;
+	  }
+	  if(c.width > 0 && !particles?.[0])
+		for (let i = 0; i < 150; i++)
+			particles.push(createParticle(true));
+      ctx.clearRect(0, 0, c.width, c.height);
+
+      for (let p of particles) {
+        // yansıma
+        if (p.canReflect) {
+          if (!p.reflecting) {
+            p.reflectTimer--;
+            if (p.reflectTimer <= 0) {
+              p.reflecting = true;
+              p.reflectPhase = 1;
+              p.reflectStrength = _self.rand(0.4, 0.8);
+            }
+          } else {
+            if (p.reflectPhase === 1) {
+              p.alpha += 0.01;
+              if (p.alpha >= p.baseAlpha + p.reflectStrength) {
+                p.alpha = p.baseAlpha + p.reflectStrength;
+                p.reflectPhase = 2;
+              }
+            } else if (p.reflectPhase === 2) {
+              p.alpha -= 0.005;
+              if (p.alpha <= p.baseAlpha) {
+                p.alpha = p.baseAlpha;
+                p.reflecting = false;
+                p.reflectPhase = 0;
+                p.reflectTimer = _self.rand(300, 900);
+              }
+            }
+          }
+        }
+		if (!p.reflecting) { // parlayanlar hariç
+			p.fadeTimer--;
+			if (p.fadeTimer <= 0 && p.fadePhase === 0) {
+				p.fadePhase = 1; // fade out başla
+			}
+
+			if (p.fadePhase === 1) {
+				p.alpha -= 0.005; // fade out
+				if (p.alpha <= 0) {
+					p.alpha = 0;
+					p.fadePhase = 3; // fade in başla
+					p.fadeUp = _self.rand(30,60);
+				}
+			}
+			else if(p.fadeUp) {
+				p.fadePhase++;
+				if(p.fadePhase >= p.fadeUp)
+				{
+					delete p.fadeUp;
+					p.fadePhase = 2;
+				}
+			} else if (p.fadePhase === 2) {
+				p.alpha += 0.003; // fade in
+				if (p.alpha >= p.baseAlpha) {
+					p.alpha = p.baseAlpha;
+					p.fadePhase = 0;
+					p.fadeTimer = _self.rand(600, 1200); // bir sonraki fade için bekle
+				}
+			}
+		}
+        // partikül çiz
+		if (p.firefly) {
+			ctx.shadowBlur = p.size * 6; // ateş böceği için daha güçlü glow
+			ctx.shadowColor = `rgba(${p.color.r},${p.color.g},${p.color.b},${p.alpha})`;
+		} else {
+			ctx.shadowBlur = p.size * 3;
+			ctx.shadowColor = `rgba(${p.color.r},${p.color.g},${p.color.b},${p.alpha * 0.5})`;
+		}
+
+		// partikül çiz
+		ctx.save(); // ayarları kaydet
+
+		// gölge/blur ayarı
+		ctx.shadowColor = `rgba(${p.color.r},${p.color.g},${p.color.b},${p.alpha})`;
+		ctx.shadowBlur = p.size * 2; // boyuta göre blur (oranı değiştirebilirsin)
+
+		// gölgeli gradient
+		const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+		gradient.addColorStop(0, `rgba(${p.color.r},${p.color.g},${p.color.b},${p.alpha})`);
+		gradient.addColorStop(1, `rgba(${p.color.r},${p.color.g},${p.color.b},0)`);
+
+		ctx.fillStyle = gradient;
+		ctx.beginPath();
+		ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+		ctx.fill();
+
+		ctx.restore(); // ayarları sıfırla
+
+        // hareket
+        p.x += Math.sin(p.angle) * p.speed;
+        p.y -= Math.cos(p.angle) * p.speed;
+
+        // açı değişimi
+        p.angle += _self.rand(-p.driftChange, p.driftChange);
+        p.angle += Math.sin(Date.now() * 0.001 + p.x) * 0.002;
+
+        // ekran dışına çıkarsa yeniden oluştur
+        if (p.y < -20 || p.x < -50 || p.x > c.width + 50) {
+          Object.assign(p, createParticle());
+        }
+      }
+
+      _self.clock = requestAnimationFrame(animateParticles);
+    }
+
+    this.start = function() {
+        if (!_self.clock) animateParticles();
+    };
+
+    this.cancel = function() {
+        if (_self.clock) {
+            cancelAnimationFrame(_self.clock);
+            _self.clock = null;
+			particles = [];
+			ctx.clearRect(0, 0, c.width, c.height);
+        }
+    };
+
+    // otomatik başlatmak istersen:
+    this.start();
+}
 
 const hideModal = function() {
-	episode.playSound({ key: 'page', volume:.3 });
+	PlaySound({ key: 'page', volume:.3 });
 	hideMyModalPopUp();
 }
 
@@ -2446,6 +2683,12 @@ function spawnMob(_json, _func, _noAnimation, _noSund) {
 var __latestUIModule = {};
 function getRef(_name) {
 	return __latestUIModule[_name]?.ref;
+}
+function installCharacterSelection(_func) {
+	injectModule('character-selection', function(_arr, _name) {
+		const x = _func();
+		__latestUIModule[_name] = { data: _arr, ref: x };
+	})
 }
 function installWorldMap() {
 	injectModule('world', function(_arr, _name) {
@@ -2540,25 +2783,6 @@ function installChat() {
 		checkUpdateAvailable2(4);
 		__latestUIModule[_name] = { data: _arr, ref: x };
 	});
-}
-function detachModule() {
-	const _keys = Object.keys(__latestUIModule);
-	if(_keys?.[0]) {
-		try {
-			for(let _k of _keys){
-				const refs = document.querySelectorAll('*[data-module=' + _k + ']');
-				if(refs?.[0])
-					refs.forEach(x => x.remove());
-				const _arr = __latestUIModule[_k]?.data;
-				if(_arr?.[0])
-					for(let i = _arr.length - 1; i >= 0;  i--)
-						_arr[i].remove();
-				removeModule(_k);
-				delete __latestUIModule[_k];
-			}
-		}
-		catch(_lumex) { }
-	}
 }
 
 async function measureFps(frames = 60) {

@@ -145,7 +145,7 @@
 	}
 ];
 function warnHonorReward(_val) {
-    episode.playSound({key: 'chestreward', volume: .3, reset: true });
+    PlaySound({key: 'chestreward', volume: .3, reset: true });
     warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/honor.png" />&nbsp;' + _val + 'x&nbsp;<span style="flex:1">' + getLangData('Honor Point') + '</span></div>', null, null, 1);
 }
 
@@ -291,7 +291,7 @@ function switchQuestTab(_elem, _order) {
     else if(hasClass(_elem, 'selected'))
         return;
     else
-        episode.playSound({ key: 'switch' });
+        PlaySound({ key: 'switch' });
     const _tabs = document.querySelectorAll('.quest-tab');
     for(let _tab of _tabs){
         removeClass(_tab, 'selected');

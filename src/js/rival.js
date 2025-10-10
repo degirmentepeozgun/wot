@@ -29243,7 +29243,7 @@ const _allEnemies = {
 									if (_e.autoTarget.isDead())
 										_e.remove = true;
 								});
-								episode.playSound({ key: 'puff', volume: .5 });
+								PlaySound({ key: 'puff', volume: .5 });
 							},
 							def: {
 								iframe: true
@@ -42302,7 +42302,7 @@ const _allEnemies = {
 								MathRound(getGroundHeight() * .66), _e.level, _e.autoTarget);
 								const _mob2 = summonMob(27, MathRound((_e.getScreenLeft() + platformX) / __zoom),
 								MathRound(getGroundHeight() * .33), _e.level, _e.autoTarget);
-								episode.playSound({key:'summon', volume:.5});
+								PlaySound({key:'summon', volume:.5});
 								_mob1.enemy = _mob2.enemy = false;
 								//_mob1.friendly = _mob2.friendly = true;
 								_mob1.owner = _mob2.owner = _e;
@@ -51815,7 +51815,7 @@ const _allEnemies = {
 									minLevel: _e.level,
 									maxLevel: _e.level
 								}, null, 1);
-								episode.playSound({ key: 'puff', volume: .3 });
+								PlaySound({ key: 'puff', volume: .3 });
 								_mob.addObject({
 									key: 'smoke',
 									position: 'middle'
@@ -52410,7 +52410,7 @@ const _allEnemies = {
 									minLevel: _e.level,
 									maxLevel: _e.level
 								}, null, 1);
-								episode.playSound({ key: 'puff', volume: .3 });
+								PlaySound({ key: 'puff', volume: .3 });
 								_mob.addObject({
 									key: 'smoke',
 									position: 'middle'
@@ -52682,7 +52682,7 @@ const _allEnemies = {
 							// 		yPosition : (mainCharacter.yPosition < _e.yPosition ? 
 							// 		mainCharacter.yPosition : _e.yPosition) - 1
 							// 	}, null, 1);
-							// 	episode.playSound({ key: 'puff', volume: .3 });
+							// 	PlaySound({ key: 'puff', volume: .3 });
 							// 	_mob.addObject({
 							// 		key: 'smoke',
 							// 		position: 'middle'
@@ -53391,7 +53391,7 @@ const _allEnemies = {
 									minLevel: _e.level,
 									maxLevel: _e.level
 								}, null, 1);
-								episode.playSound({ key: 'puff', volume: .3 });
+								PlaySound({ key: 'puff', volume: .3 });
 								_mob.addObject({
 									key: 'ouch',
 									position: 'middle',
@@ -54045,7 +54045,7 @@ const _allEnemies = {
 							spriteOrigin: 158 / 2,
 							speed: 9,
 							do: function(_e){
-								episode.playSound({path:'./images/talks/cyclops/' + getRandomValue(1, _e.talkCount) + '.mp3', volume: 1 });
+								PlaySound({path:'./images/talks/cyclops/' + getRandomValue(1, _e.talkCount) + '.mp3', volume: 1 });
 							},
 							def: {
 								iframe: true
@@ -56666,7 +56666,7 @@ const _allEnemies = {
 						_mob.experience = 0;
 						_mob.class = 'minion'
 						_mob.direction = _e.direction;
-						episode.playSound({ key: 'puff', volume: .3 });
+						PlaySound({ key: 'puff', volume: .3 });
 						_mob.addObject({
 							key: 'smoke',
 							position: 'middle'
@@ -69477,7 +69477,7 @@ const _allEnemies = {
 							spriteHeight: 0,
 							spriteOrigin: 0,
 							do: function(_e) {
-								episode.playSound({ key: 'loot', volume: 1 });
+								PlaySound({ key: 'loot', volume: 1 });
 								//const _title = getLangData('Weapon');
 								if(_e.toucher?.unarmed){
 									_e.toucher.disableUnarm();
@@ -69508,7 +69508,7 @@ const _allEnemies = {
 											__account.questStatus.quest = __account.questStatus.state = undefined;
 											updateQuestArea();
 											//warn('<div class="flex heading quest-status-main" style="position:relative;width:auto"><img style="height:10vh;z-index:-1" src="./images/icons/quest-completed.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Quest Completed') + '</div></div>', 'level-up');
-											episode.playSound({ key: 'questdone', volume: .8 });
+											PlaySound({ key: 'questdone', volume: .8 });
 											episode.pauseAmbianceMusic();
 											episode.ambiancePath = './images/sounds/quake.mp3';
 											episode.playAmbianceMusic(episode.ambiancePath, 1);
@@ -70196,7 +70196,7 @@ const _allEnemies = {
 							}
 							if(_e.gradeLeft < (_e.grade - 1)) {
 								if(_e.preGrade !== (_e.gradeLeft + 1)) {
-									episode.playSound({key:'wagonphase', volume:.5});
+									PlaySound({key:'wagonphase', volume:.5});
 									_e.addObject({ 
 										key:'bigouch', 
 										position: 'middle'});

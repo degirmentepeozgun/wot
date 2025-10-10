@@ -152,13 +152,13 @@ function selectSwapFragment(_elem, _key) {
 	if(hasClass(_elem, 'selected'))
 		return;
 	const _item = __fragments.find(x=> x.key === _key);
-	episode.playSound({ key: 'click' });
+	PlaySound({ key: 'click' });
 	removeClass(document.querySelector('.fragment-list-item.selected'), 'selected');
 	addClass(_elem, 'selected');
 	document.querySelector('.taken-fragment-portrait img').src = './images/fragments/' + _item.key + '.png'
 }
 function askSwapFragmentCharacter(_order) {
-	episode.playSound({ key: 'click' });
+	PlaySound({ key: 'click' });
 	const _item = __fragments[_order - 1];
 	const _others = __fragments.filter(x => x.key !== _item.key);
 	let _html = '';
@@ -208,7 +208,7 @@ function askSwapFragmentCharacter(_order) {
         warn('<span>' + getLangData('Not enough fragment') + '</span>', 'warn');
 }
 function increaseSwapCount(_key) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
 	const _item = __account.fragments.find(x => x.key === _key);
     const _sc = document.getElementById('swap-count');
     let _count = parseInt(_sc.innerText) + 3;
@@ -219,7 +219,7 @@ function increaseSwapCount(_key) {
     removeClass(document.getElementById('decrease-count-btn'), 'disabled');
 }
 function decreaseSwapCount(_key) {
-    episode.playSound({ key: 'click' });
+    PlaySound({ key: 'click' });
     const _sc = document.getElementById('swap-count');
     let _count = parseInt(_sc.innerText) - 3;
     _sc.innerText = _count;
@@ -229,7 +229,7 @@ function decreaseSwapCount(_key) {
     removeClass(document.getElementById('increase-count-btn'), 'disabled');
 }
 function swapCharacterFragment(_order) {
-    episode.playSound({ key: 'trade', volume: 1 });
+    PlaySound({ key: 'trade', volume: 1 });
 	const _item = document.querySelector('.fragment-swap-question .selected');
 	if(!_item)
 		return;
@@ -262,12 +262,12 @@ function acceptAndUpgradeFragment(_order, _cost) {
 	const _grade = (_myfr?.grade ?? 0) + 1;
 	const _limit = _item.limits[_myfr?.grade ?? 0];
 	if(__account.gold < _cost) {
-        episode.playSound({ key: 'click' });
+        PlaySound({ key: 'click' });
         warn('<span>' + getLangData('Not enough gold') + '</span>', 'warn');
         return;
     }
 	if((_myfr?.count ?? 0) < _limit.limit) {
-        episode.playSound({ key: 'click' });
+        PlaySound({ key: 'click' });
         warn('<span>' + getLangData('Not enough fragment') + '</span>', 'warn');
         return;
     }
@@ -280,7 +280,7 @@ function acceptAndUpgradeFragment(_order, _cost) {
 	closeInventoryQuestionModal();
 	document.getElementById('fragment-' + _item.key + '-limit').innerText = _item.limits[_grade].limit;
 	selectFragment(_order - 1);
-	episode.playSound({ key: 'upgrade', volume: .5, reset: true });
+	PlaySound({ key: 'upgrade', volume: .5, reset: true });
 	shine(1000, document.querySelector('.skills-content-detail-wrapper'));
 }
 function hasFragmentUpdate(_key) {

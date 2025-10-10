@@ -49,7 +49,7 @@ function spinLottery() {
 	var currentRate2 = parseInt(style.getPropertyValue('--spin-rate2'));
 	var itemOrder2 = getRandomValue2(0, 7);
 	root.style.setProperty('--spin-rate2', currentRate2 + (minRate * itemOrder2));
-	episode.playSound({key:'click'});
+	PlaySound({key:'click'});
 	setTimeout(function() {
 		const sbg = document.getElementById('spinner-bg');
 		const sbg2 = document.getElementById('spinner-bg2');
@@ -57,10 +57,10 @@ function spinLottery() {
 		sbg.src = sbg.src.replace('0.png', '.png');
 		sbg2.style.background = sbg2.style.background.replace('bg0.png', '-bgf.png');
 		addClass(sbg2, 'spin-me2');
-		episode.playSound({key:'spinner', volume: .5});
+		PlaySound({key:'spinner', volume: .5});
 		setTimeout(function() {
 			setTimeout(function() {
-				episode.playSound({key:'gift', volume: .5});
+				PlaySound({key:'gift', volume: .5});
 				setTimeout(function() {
 					checkIfLotteryAvailable();
 					removeClass(document.getElementById('spinner-bg'), 'spin-me');
@@ -75,7 +75,7 @@ function spinLottery() {
 				getChestReward(__account.grade ?? 1, _giftOrder[itemOrder2].type, _giftOrder[itemOrder2].key);
 				let itemOrder3;
 				if(itemOrder === itemOrder2){
-					episode.playSound({key:'clap', volume:.3});
+					PlaySound({key:'clap', volume:.3});
 					itemOrder3 = getRandomValue(0, _giftOrder.length - 1);
 					warn('<div class="flex achievement jackpot important" style="position:relative"><img style="height:12vh" src="./images/icons/' + _giftOrder[itemOrder3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">!!!' + getLangData('JACKPOT') + '!!!</span></div>', null, null, 1);
 					getChestReward(__account.grade ?? 1, _giftOrder[itemOrder3].type, _giftOrder[itemOrder3].key);

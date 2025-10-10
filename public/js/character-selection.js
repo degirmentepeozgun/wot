@@ -63,7 +63,7 @@ function characterSelection(){
 		if(_info) {
 			document.querySelectorAll('.char-selection').forEach(x => removeClass(x, 'no-dark'));
 			addClass(_elem, 'no-dark');
-			episode.playSound({key:'switch', volume:.3});
+			PlaySound({key:'switch', volume:.3});
 			const _root = document.querySelector(':root');
 			_root.style.setProperty('--main-char-bg', 'url(./../images/main/' + _class + '/bg.png)');
 			let _html = `<div class="char-selection-center-inner flex"><div class="flex w-100 c-i c-i-name">${_conceptArts[_class]?.title ?? episode.enemies.find(x => x.class === _class)?.name ?? ''}</div>
@@ -110,7 +110,7 @@ function characterSelection(){
 			}
 			_html +=
 			`</div>
-			<div class="flex w-100 c-i c-i-btn"><div class="game-btn2 flex" onexactclick="window.installedModules.find(x => x.name === 'character-selection').ref.selectHero('${_info.class}', '${_dir}', '${_another}')"><div class="flex">SELECT</div></div></div></div>`;
+			<div class="flex w-100 c-i c-i-btn"><div class="game-btn2 flex" onexactclick="getRef('character-selection')?.selectHero('${_info.class}', '${_dir}', '${_another}')"><div class="flex">SELECT</div></div></div></div>`;
 		
 			document.querySelector('.char-selection-center').innerHTML = _html;
 		}
@@ -174,7 +174,7 @@ function characterSelection(){
 		};
 	}
 	this.selectHero = function(_class, _dir, _another) {
-		episode.playSound({ key: 'click' });
+		PlaySound({ key: 'click' });
 		if(_class !== 'warrior'){
 			if(__characterInfos.find(x => x.class === _class)?.race === 'Beast')
 				this.selectStoryHero(_class, _dir, _another);
@@ -237,18 +237,18 @@ function characterSelection(){
 		_div.className = 'full flex char-selection-ui show-ui';
 		_gameUI.appendChild(_div);
 		_div.innerHTML = 
-		`<div onexactclick="window.installedModules.find(x => x.name === 'character-selection').ref.getCharacterInformation('${_key1}', this, 'left', '${_key2}')" class="char-selection char-selection-left no-dark">
+		`<div onexactclick="getRef('character-selection')?.getCharacterInformation('${_key1}', this, 'left', '${_key2}')" class="char-selection char-selection-left no-dark">
 		</div>
 		<div class="flex char-selection-center">`
 			+ this.getCharacterInformation(null, null, null, null, _newTitle) +
 		`</div>
-		<div onexactclick="window.installedModules.find(x => x.name === 'character-selection').ref.getCharacterInformation('${_key2}', this, 'right', '${_key1}')" class="char-selection char-selection-right no-dark">
+		<div onexactclick="getRef('character-selection')?.getCharacterInformation('${_key2}', this, 'right', '${_key1}')" class="char-selection char-selection-right no-dark">
 		</div>`;
 		if(__characterSelectFuncs?.start)
 			__characterSelectFuncs.start();
 	}
-	if(!window.installedModules)
-		window.installedModules = [];
-	window.installedModules.push({name:'character-selection', ref: this});
+	// if(!window.installedModules)
+	// 	window.installedModules = [];
+	// window.installedModules.push({name:'character-selection', ref: this});
 	return this;
 }

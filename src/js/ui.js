@@ -734,7 +734,7 @@ function updateExperience(_value, _levelup, _char, _noWarn) {
 			}
 			if(!_noWarn){
 				warn('<div class="flex leveling"><img style="height:14vh" src="./images/icons/level-up.png" /></div>', 'level-up');
-				episode.playSound({ key: 'levelup', volume: .5 });
+				PlaySound({ key: 'levelup', volume: .5 });
 			}
 			updateGlobalQuest('level-up');
 			if(!_noWarn)
@@ -775,7 +775,7 @@ function updateGold(_value, _char) {
 	const _c = _char ?? mainCharacter;
 	__account.gold += _value;
 	if (_c.main) {
-		episode.playSound({ key: 'coin', volume: .1 });
+		PlaySound({ key: 'coin', volume: .1 });
 		if(_goldCount)
 			_goldCount.innerText = __account.gold.formatWithDots();
 	}
@@ -963,7 +963,7 @@ function openUserActionsModal(_id, _name) {
 	showMyModalPopUp('user-actions');
 }
 function addAsFriend(_id, _name) {
-	episode.playSound({key:'click'});
+	PlaySound({key:'click'});
 	const _f = __account.friends?.find(x => x.id === _id);
 	if(!_f) {
 		if(__account.friends?.length >= 100) {
@@ -975,7 +975,7 @@ function addAsFriend(_id, _name) {
 	}
 }
 function removeFromFriend(_id, _name) {
-	episode.playSound({key:'click'});
+	PlaySound({key:'click'});
 	const _i = __account.friends?.findIndex(x => x.id === _id);
 	if(_i >= 0) {
 		__account.friends.splice(_i, 1);
@@ -1041,7 +1041,7 @@ function askSomething(_question, _okFuncString) {
 		const _div = document.createElement('div');
 		_div.innerHTML = _modal;
 		document.querySelector('#menu-ui').appendChild(_div.querySelector('.inventory-question'));
-		episode.playSound({ key: 'click' });
+		PlaySound({ key: 'click' });
 	}
 	catch(qex) {
 		alert(qex.message);
@@ -1074,7 +1074,7 @@ function showInfo(_json) {
 		const _div = document.createElement('div');
 		_div.innerHTML = _modal;
 		document.querySelector('#menu-ui').appendChild(_div.querySelector('.inventory-question'));
-		episode.playSound({ key: 'click' });
+		PlaySound({ key: 'click' });
 		const _container = document.getElementById('show-info-navigations');
 		for(let _n of _json.navigations ?? []) {
 			const _div2 = document.createElement('div');
@@ -1096,14 +1096,14 @@ function showInfo(_json) {
 	}
 }
 
-const __injectedModules = [];
+window.__injectedModules = [];
 
 function injectModule(_name, _func) {
 	// if(document.head.querySelector('script[data-name=' + _name + ']'))
 	// 	return;
-	if(__injectedModules.indexOf(_name) !== -1)
+	if(window.__injectedModules.indexOf(_name) !== -1)
 		return;
-	__injectedModules.push(_name);
+	window.__injectedModules.push(_name);
 	let scriptEle = document.createElement("script");
 	scriptEle.setAttribute("src", "./js/" + _name + ".js?x=" + Math.random());
 	//scriptEle.setAttribute('data-name', _name);
@@ -1120,9 +1120,9 @@ function injectModule(_name, _func) {
 }
 
 function removeModule(_name) {
-	const _i = __injectedModules.findIndex(x => x === _name);
+	const _i = window.__injectedModules.findIndex(x => x === _name);
 	if(_i >= 0)
-		__injectedModules.splice(_i, 1);
+		window.__injectedModules.splice(_i, 1);
 	return;
 	const _insts = document.head.querySelectorAll('script[data-name=' + _name + '],link[data-name=' + _name + ']');
 	if(_insts?.[0])

@@ -79,7 +79,7 @@ function dungeon() {
 	}
 	this.openDungeonDetail = function(_id, _noSound) {
 		if(!_noSound)
-			episode.playSound({ key: 'click' });
+			PlaySound({ key: 'click' });
 		const _s = __stories.find(x => x.id === _id);
 		let _goals = '';
 		if(_s.resultStars)
