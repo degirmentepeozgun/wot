@@ -59,7 +59,7 @@ function dataOperations(_quickPlay) {
 		const _id = this.createQuestID(10);
 		return {
 			act: 1,
-			version:44,//max 40
+			version:45,//max 40
 			fragments: [],
 			gems: [
 			],

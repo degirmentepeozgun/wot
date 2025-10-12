@@ -461,7 +461,7 @@ const __langData = [
 	{ key: 'We need to get out of here!', tr: 'Acilen buradan çıkmalıyız!' },
 	{ key: 'I will test my lasers', tr: 'Lazerlerimi test edeceğim' },
 	{ key: 'What the hell are you?', tr: 'Sen hangi cehennemden çıktın?' },
-	{ key: 'Get off the rat!', tr: 'Fareyi çek şuradan!' },
+	{ key: 'There it is!', tr: 'İşte orada!' },
 	{ key: 'You shall not pass!', tr: 'Buradan geçemezsiniz!' },
 	{ key: 'We are here for expropriation', tr: 'Ama istimlak için gelmiştik' },
 	{ key: 'You freaks will pay!', tr: 'Size bunu ödeteceğim!' },

@@ -620,10 +620,14 @@ function resetDPadKeyCommands() {
 		return;
 	// if(!mainCharacter.keyboard)
 	// 	switchAutoMode();
-	mainCharacter.keyboard.mouseUp('w');
-	mainCharacter.keyboard.mouseUp('a');
-	mainCharacter.keyboard.mouseUp('s');
-	mainCharacter.keyboard.mouseUp('d');
+	// mainCharacter.keyboard.mouseUp('w');
+	// mainCharacter.keyboard.mouseUp('a');
+	// mainCharacter.keyboard.mouseUp('s');
+	// mainCharacter.keyboard.mouseUp('d');
+	physicalKeys.delete('a');
+	physicalKeys.delete('w');
+	physicalKeys.delete('s');
+	physicalKeys.delete('d');
 }
 function calculateSin(currentX, currentY) {
 	const dx = currentX - touch_startX;
@@ -637,32 +641,44 @@ function calculateSin(currentX, currentY) {
 	resetDPadKeyCommands();
 
 	if (angle >= -22.5 && angle < 22.5) {
-		mainCharacter.keyboard.mouseDown('d'); // sağ
+		//mainCharacter.keyboard.mouseDown('d'); // sağ
+		physicalKeys.add('d');
 	}
 	else if (angle >= 22.5 && angle < 67.5) {
-		mainCharacter.keyboard.mouseDown('d');
-		mainCharacter.keyboard.mouseDown('s'); // sağ-alt
+		//mainCharacter.keyboard.mouseDown('d');
+		physicalKeys.add('d');
+		//mainCharacter.keyboard.mouseDown('s'); // sağ-alt
+		physicalKeys.add('s');
 	}
 	else if (angle >= 67.5 && angle < 112.5) {
-		mainCharacter.keyboard.mouseDown('s'); // alt
+		//mainCharacter.keyboard.mouseDown('s'); // alt
+		physicalKeys.add('s');
 	}
 	else if (angle >= 112.5 && angle < 157.5) {
-		mainCharacter.keyboard.mouseDown('s');
-		mainCharacter.keyboard.mouseDown('a'); // sol-alt
+		//mainCharacter.keyboard.mouseDown('s');
+		physicalKeys.add('s');
+		//mainCharacter.keyboard.mouseDown('a'); // sol-alt
+		physicalKeys.add('a');
 	}
 	else if (angle >= 157.5 || angle < -157.5) {
-		mainCharacter.keyboard.mouseDown('a'); // sol
+		//mainCharacter.keyboard.mouseDown('a'); // sol
+		physicalKeys.add('a');
 	}
 	else if (angle >= -157.5 && angle < -112.5) {
-		mainCharacter.keyboard.mouseDown('a');
-		mainCharacter.keyboard.mouseDown('w'); // sol-üst
+		//mainCharacter.keyboard.mouseDown('a');
+		physicalKeys.add('a');
+		//mainCharacter.keyboard.mouseDown('w'); // sol-üst
+		physicalKeys.add('w');
 	}
 	else if (angle >= -112.5 && angle < -67.5) {
-		mainCharacter.keyboard.mouseDown('w'); // üst
+		//mainCharacter.keyboard.mouseDown('w'); // üst
+		physicalKeys.add('w');
 	}
 	else if (angle >= -67.5 && angle < -22.5) {
-		mainCharacter.keyboard.mouseDown('w');
-		mainCharacter.keyboard.mouseDown('d'); // sağ-üst
+		//mainCharacter.keyboard.mouseDown('w');
+		physicalKeys.add('w');
+		//mainCharacter.keyboard.mouseDown('d'); // sağ-üst
+		physicalKeys.add('d');
 	}
 }
 let deadZone, touch_startX, touch_startY;

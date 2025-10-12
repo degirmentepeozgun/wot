@@ -17459,7 +17459,7 @@ const _allEnemies = {
 			bagSlots: 100,
 			stepXRate: .5,
 			src: './images/sprites/ep01/',
-			immunities: [ 'lightning', 'fire', 'shadow' ],
+			immunities: [ 'lightning', 'fire' ],
 			releaseAfter: 20,
 			buffs: []
 		};
@@ -19095,6 +19095,7 @@ const _allEnemies = {
 				dead: {
 					key: 'dead',
 					type: 'skill',
+					priority: 1,
 					frames: [
 						{
 							spriteLeft: 42,
@@ -19102,7 +19103,21 @@ const _allEnemies = {
 							spriteWidth: 106,
 							spriteHeight: 51,
 							spriteOrigin: 53,
-							speed: 20,
+							speed: 1,
+							props: {
+								still: true
+							},
+							def: {
+								iframe: true
+							}
+						},
+							{
+							spriteLeft: 42,
+							spriteTop: 282,
+							spriteWidth: 106,
+							spriteHeight: 51,
+							spriteOrigin: 53,
+							speed: 1,
 							objects: [{ key: 'cast', position: 'css' }],
 							def: {
 								iframe: true
@@ -19185,6 +19200,8 @@ const _allEnemies = {
 							spriteOrigin: 53,
 							speed: 2,
 							props: {
+								killingBy: undefined,
+								finishTarget: undefined,
 								casting: false
 							},
 							sound: { key: 'emegendead', volume: .5 },
@@ -19199,7 +19216,7 @@ const _allEnemies = {
 								position: 'middle'
 							}],
 							atk: {
-								yRange: 10,
+								yRange: 15,
 								rate: 2,
 								aoe: 120,
 								hurt: {
@@ -55588,11 +55605,9 @@ const _allEnemies = {
 							key: 'smoke',
 							position: 'middle'
 						});
-						if(episode.pvp){
-							_mob.difficulty = 1;
-							_mob.setAutoMode(2);
-							_mob.pickNewTarget();
-						}
+						_mob.difficulty = 1;
+						_mob.setAutoMode(2);
+						_mob.pickNewTarget();
 					}
 				}
 				else if(_e.lastBombSpawnTime)
@@ -56312,6 +56327,7 @@ const _allEnemies = {
 			class: 'bomb',
 			level: 1,
 			touchDead: true,
+			deadAnimationKey: 'ground1',
 			direction: 'left',
 			defaultDirection: 'right',
 			defaultAnimationKey: 'idle',
@@ -65255,7 +65271,7 @@ const _allEnemies = {
 								{ 	
 									key: 'questshine',
 									position: 'middle', 
-									xGap: -126,
+									xGap: -164,
 									yGap: 62,
 									scale:1.4,
 									bind: true
@@ -72099,7 +72115,7 @@ function createHurtFeetAndFreeze(_z) {
 		hurt: 'feet',
 		interactive: true,
 		src: './images/related/ice-crack-5.png',
-		zoom: (1.5 / __scale) * (_z < 1 ? 1 / _z : 1),
+		zoom: 1.5 * (_z < 1 ? 1 / _z : 1),
 		frames: [
 			{
 				spriteLeft: 211,
@@ -72109,7 +72125,7 @@ function createHurtFeetAndFreeze(_z) {
 				spriteOrigin: 38,
 				speed: 1,
 				bottomGap:-25,
-				zoom: (1 / __scale) * (_z < 1 ? 1 / _z : 1),
+				zoom: (_z < 1 ? 1 / _z : 1),
 				props: {
 					killingBy: undefined,
 					finishTarget: undefined,
@@ -72125,7 +72141,7 @@ function createHurtFeetAndFreeze(_z) {
 				spriteWidth: 76,
 				spriteHeight: 91,
 				spriteOrigin: 38,
-				zoom: (1 / __scale) * (_z < 1 ? 1 / _z : 1),
+				zoom: (_z < 1 ? 1 / _z : 1),
 				sound: { key: 'icecrack', volume: .3 },
 				speed: 3,
 				bottomGap:-25,
@@ -72320,7 +72336,7 @@ function createHurtFeet(_z, _color, _key, _bottomGap, _atkType) {
 		hurt: _key ? undefined : 'feet',
 		interactive: true,
 		src: './images/related/boom' + (_color ?? '') + '.png',
-		zoom: (2 / __scale) * (_z < 1 ? 1 / _z : 1),
+		zoom: 2 * (_z < 1 ? 1 / _z : 1),
 		frames: [
 			{
 				spriteLeft: 11,

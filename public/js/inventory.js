@@ -1912,7 +1912,7 @@ function getChestReward(_grade, _rewardKey, _rewardType, _count) {
             {
                 const _max = _grade * 5000;
                 const _min = parseInt(_max / 2);
-                const _val = getRandomValue2(_min, _max);
+                const _val = _count ?? getRandomValue2(_min, _max);
                 updateGold(_val);
                 return {
                     type: 'gold',
@@ -1936,7 +1936,7 @@ function getChestReward(_grade, _rewardKey, _rewardType, _count) {
             {
                 const _max = _grade * 1000;
                 const _min = parseInt(_max / 2);
-                const _val = getRandomValue2(_min, _max);
+                const _val = _count ?? getRandomValue2(_min, _max);
                 updateExperience(_val);
                 return {
                     type: 'exp',

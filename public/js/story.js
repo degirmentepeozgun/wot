@@ -305,6 +305,8 @@ const __stories = [
 						if(_q) {
 							_q.count = 1;
 							updateQuestArea();
+							warn('<div class="flex heading toast-with-banner ink" style="position:relative;width:auto"><img style="height:20vh;z-index:-1" src="./images/icons/txtbg.png" /><div class="full flex" style="position:absolute">' + getLangData('Quest Completed') + '</div></div>');
+							episode.playSound({ key: 'questdone', volume: .8 });
 							episode.dialogs = [{
 								id: 2,
 								location: { map: episode.id }, ms: 2000,
@@ -1516,6 +1518,11 @@ const __stories = [
 							mainCharacter.enableSkills();
 							switchMap(102, 1, function() {
 								removeCoopCharacter(1);
+								if(mainCharacter.level > 1){
+									const _e = episode.enemies.find(x => x.id === 28);
+									if(_e)
+										_e.remove = true;
+								}
 								const _char = addCoopCharacter(null, 'arc');
 								_char.unarm();
 								_char.left = MathRound(_canvas.width * .2);
@@ -1532,7 +1539,7 @@ const __stories = [
 									id: 1,
 									location: { map: episode.id }, ms: 2000,
 									owner: (episode.enemies.find(x => x.class === 'archer')).key,
-									text: "Get off the rat!",
+									text: "There it is!",
 									onend: function() {
 										const _charge = function(){
 											mainCharacter.disableKeyboard = mainCharacter.still = mainCharacter.immobilize = false;
@@ -1541,14 +1548,8 @@ const __stories = [
 											episode.enemies.find(x => x.id === 78).npc = 'bow';
 											episode.NPCS = episode.enemies.filter(x => x.npc);
 										}
-										if(__account.tutorials?.indexOf('charge') >= 0) {
+										if(mainCharacter.level > 1) {
 											_charge();
-											if(mainCharacter.level > 1){
-												const _e = episode.enemies.find(x => x.id === 28);
-												_e.still = _e.reversed = _e.immobilize = _e.noDirection = false;
-												_e.direction = 'left';
-												_e.setAutoMode(2);
-											}
 											return;
 										}
 										if(!__account.tutorials)
@@ -2100,7 +2101,7 @@ const __stories = [
 					_char.direction = 'left';
 					_char.platformX = platformX;
 					_char.yPosition = MathRound(.66 * groundheight);
-					const _princess = summonMob(58, MathRound((mainCharacter.left + mainCharacter.WIDTH + platformX) / __zoom), MathRound(.33 * groundheight), mainCharacter.level);
+					const _princess = summonMob(58, MathRound((mainCharacter.left + mainCharacter.WIDTH + platformX) / __zoom), MathRound(.33 * groundheight), mainCharacter.level, null, 1);
 					_princess.friendly = _princess.invulnerable = true;
 					_princess.still = _princess.immobilize = false;
 					_princess.direction = 'left';
@@ -6044,7 +6045,7 @@ const __stories = [
 				timer: {
 					ms: 120000,
 					after: function() {
-						episode.enemies.filter(x => !x.main && !x.friendly).forEach(x => {
+						episode.enemies.filter(x => !x.main && !x.friendly && x.class !== 'object').forEach(x => {
 							x.stopSpawn();
 							x.health = x.experience = 0;
 							x.dead = x.dying = true;
@@ -6391,7 +6392,7 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 99;
-							episode.enemies.filter(x => !x.main && !x.friendly).forEach(x => {
+							episode.enemies.filter(x => !x.main && !x.friendly && x.class !== 'object').forEach(x => {
 								x.stopSpawn();
 								x.health = x.experience = 0;
 								x.dead = x.dying = true;
@@ -6756,12 +6757,15 @@ function switchStoryScene(_func, _newOrder) {
 					}
 					removeFocus();
 					__account.commonInventory = [];
+					removeClass(_gameUI, 'demo-playing');
 					if(__storyScene.start)
 						__storyScene.start();
 					_storySceneSwitching = false;
 					_game.suspended = false;
 					const _ps = document.querySelectorAll('.placed-skill');
 					_ps?.forEach(x => addClass(x, 'v-none'));
+					if(mainCharacter?.keyboard)
+						mainCharacter.keyboard.holdingKeys = [];
 				}, __storyScene.loadingCharacterIds);
 			}, 1000);
 			if(_func)
@@ -6885,7 +6889,7 @@ function story(_id, _func, _noBlack, _desc, _after) {
 			if(__account.storyTell.indexOf(this.id) === -1) {
 				__account.storyTell.push(this.id);
 				this.firstSeen = 1;
-				_skp.innerHTML = `<div onexactclick="__storyTell.skip()" class="flex">${getLangData('SKIP')}&gt;</div>`;
+				_skp.innerHTML = `<div onexactclick="__storyTell.skip()" class="flex flex-jc-end w-50" style="height:100%"><div class="story-skip-inner flex">${getLangData('SKIP')}&gt;</div></div>`;
 			}
 		}
 		_wrapper.appendChild(_skp);

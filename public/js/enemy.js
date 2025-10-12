@@ -34,6 +34,8 @@ function enemy(_e) {
 	this.attackedUnitCount = 0;
 	this.maxAttackerCount = getRandomValue2((6 - __account.difficulty), (5 - __account.difficulty) * (6 - __account.difficulty)); 
 	this.relatedObjects = [];
+	if(_e.deadAnimationKey)
+		this.deadAnimationKey = _e.deadAnimationKey;
 	if(_e.talkCount)
 		this.talkCount = _e.talkCount;
 	if(_e.size)
@@ -53,7 +55,7 @@ function enemy(_e) {
 		this.lightColor = _e.lightColor;
 	if(_e.bloodColor)
 		this.bloodColor = _e.bloodColor;
-	this.yGap = _e.yGap ?? 0;
+	this.yGap = (_e.yGap ?? 5);
 	this.stepXRate = (_e.stepXRate * (__globalMS / 20)) * (episode.characterZoom ?? 1);
 	this.yPosition = _e.yPosition ?? MathRound(getGroundHeight() / 2);
 	this.maxHP = _e.maxHP ?? _e.health;
@@ -811,6 +813,10 @@ function enemy(_e) {
 				this.setAutoTarget(_enemy.enemy, null, 4);
 				if (this.enemy)
 					this.setAutoMode(2);
+			}
+			if(_isEnemyClose && this.touchDead && !this.isDead()) {
+				this.animate(this.deadAnimationKey ?? 'dead', 1);
+				return;
 			}
 			//yön sabitse
 			if (this.direction === _dir) {
@@ -2278,7 +2284,18 @@ function enemy(_e) {
 								spriteWidth: image.width,
 								spriteHeight: image.height,
 								spriteOrigin: _origin,
-								speed: 100,
+								speed: 50,
+								def: {
+									iframe: true
+								}
+							},
+							{
+								spriteLeft: 0,
+								spriteTop: 0,
+								spriteWidth: image.width,
+								spriteHeight: image.height,
+								spriteOrigin: _origin,
+								speed: 50,
 								def: {
 									iframe: true
 								}
@@ -2341,14 +2358,25 @@ function enemy(_e) {
 					},
 					idle: {
 						alternateFrames: [
-							{ rate: .25, frames: [
+							{ rate: .3, frames: [
 								{
 									spriteLeft: 0,
 									spriteTop: 0,
 									spriteWidth: image.width,
 									spriteHeight: image.height,
 									spriteOrigin: _origin,
-									speed: 19,
+									speed: 1,
+									def: {
+										iframe: true
+									}
+								},
+								{
+									spriteLeft: 0,
+									spriteTop: 0,
+									spriteWidth: image.width,
+									spriteHeight: image.height,
+									spriteOrigin: _origin,
+									speed: 99,
 									objects: [{
 										key: 'shine',
 										position: 'over-head',
@@ -3268,7 +3296,7 @@ function enemy(_e) {
 			const _closestEnemies = [];
 			let _t;
 			for (var _enemy of _enemies) {
-				_t = isObjectsInTouch(_enemy, _aoe > 0 ? cl : hb, (_frame.atk?.yRange ?? 0) * 2, 0);
+				_t = isObjectsInTouch(_enemy, _aoe > 0 ? cl : hb, (_frame.atk?.yRange ?? 0), 0);
 				if (_t.touch) {
 					if (_aoe > 0)
 						_enemy.aoe = true;
@@ -4062,7 +4090,7 @@ function enemy(_e) {
 						}
 						if(_f.atk.hurt.smash && _e.isSmashable()) {
 							if(!_e.animations.hurtfeet)
-								_e.animations.hurtfeet = new animation(_f.atk.hurt.burn ? createHurtFeetAndBurn(_e.ZOOM) : (_f.atk.hurt.knockback ? createHurtFeetWithKnockback(_e.ZOOM, _e.bloodColor, _f.atk.hurt.knockback) : createHurtFeet(_e.ZOOM, _e.bloodColor, null, _f.bottomGap, _f.atk.type)));
+								_e.animations.hurtfeet = new animation(_f.atk.hurt.burn ? createHurtFeetAndBurn(_e.zoom) : (_f.atk.hurt.knockback ? createHurtFeetWithKnockback(_e.zoom, _e.bloodColor, _f.atk.hurt.knockback) : createHurtFeet(_e.zoom, _e.bloodColor, null, _f.bottomGap, _f.atk.type)));
 							_e.animate('hurtfeet', 1);
 							if(!__storyCutScenePlaying && _t.talkCount && (_gameTick - (_t.lastTalkTime ?? 0) > 10000)) {
 								_t.lastTalkTime = _gameTick;
@@ -6258,6 +6286,10 @@ function enemy(_e) {
 			return;
 		}
 		let _anima = this.getCurrentAnimation();
+		// if(!this.keyboard.holdingKeys?.[0] && (this.animationFinished || _anima.imediateBreak) && !this.isDead()) {
+		// 	this.animate('idle', 1, null, 8);
+		// 	return;
+		// }
 		const _blockSkill = this.animation.endsWith('block');
 		if (!(_anima.key === 'run' || this.attacker))
 			this.extraStepXRate = 0;

@@ -7238,7 +7238,7 @@ const __stories = [
 					mainCharacter.level = 0;
 					mainCharacter.experience = 0;
 					mainCharacter.maxExperience = 833;
-					setCharacterLevel(13, null, 1);
+					setCharacterLevel(1, null, 1);
 					//setCharacterLevel(13, null, 1);
 					addClass(_gameUI, 'demo-playing');
 					episode.pauseBgMusic(1);
@@ -7316,7 +7316,7 @@ const __stories = [
 											atk: mainCharacter.atk * 2,
 											grade: 4
 										});
-										_boss.health = _boss.maxHP = 1;
+										//_boss.health = _boss.maxHP = 1;
 										_boss.class = 'boss';
 										//_boss.zoom = _boss.ZOOM = _boss.zoom * 1.2;
 										_boss.experience = 0;

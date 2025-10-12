@@ -714,6 +714,10 @@ function map(_m) {
 			if(!this.tower)
 				this.playSound({ key: 'beep', volume:.3 });
 			_gameUI.appendChild(pvpCounter);
+			if(mainCharacter?.keyboard) {
+				mainCharacter.disableKeyboard = true;
+				mainCharacter.keyboard.holdingKeys = [];
+			}
 		}
 		else {
 			const _baseTime = ((this.tower && (__account.missions.find(x => x.key === 'tower').current % 10) > 0) || this.gold) ? 60 : 180;
@@ -746,6 +750,8 @@ function map(_m) {
 					void pvpCounter.offsetWidth;
 					addClass(pvpCounter, 'pop');
 					delete this.missionCountDown;
+					if(mainCharacter?.keyboard)
+						mainCharacter.disableKeyboard = false;
 				}
 			}
 			else if (pvpCounter.innerText !== _diff.toString()) {

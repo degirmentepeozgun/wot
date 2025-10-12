@@ -2372,10 +2372,14 @@ function installOpeningScreen(_instant, _lateOpening) {
 			document.getElementById('qp-btn').innerText = getLangData('QUICK PLAY');
 			removeClass(_opening, 'd-none');
 			removeClass(_opening, 'v-none');
-			_opening.style.background = 'url(./images/loading/00.png), linear-gradient(0deg, #000, #000)'
-			_opening.style.backgroundSize = 'contain, cover';
-			_opening.style.backgroundRepeat = 'no-repeat, repeat';
-			_opening.style.backgroundPosition = 'center, center';
+			// _opening.style.background = 'url(./images/loading/00.png), linear-gradient(0deg, #000, #000)'
+			// _opening.style.backgroundSize = 'contain, cover';
+			// _opening.style.backgroundRepeat = 'no-repeat, repeat';
+			// _opening.style.backgroundPosition = 'center, center';
+			const _cover = document.createElement('div');
+			_cover.className = 'opening-cover';
+			_cover.innerHTML = '<img src="./images/loading/00.gif" />';
+			_opening.appendChild(_cover)
 			addClass(_opening, 'fade-start');
 			setTimeout(function() {
 				_opening.style.opacity = 1;
@@ -2384,7 +2388,7 @@ function installOpeningScreen(_instant, _lateOpening) {
 			}, 1000);
 		}, 1000);
 	}
-	_img.src = './images/loading/00.png';
+	_img.src = './images/loading/00.gif';
 	if(__isPC && !_lateOpening)
 		setTimeout(() => {
 			getKeyboardPromo();

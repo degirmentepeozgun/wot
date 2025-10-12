@@ -360,41 +360,95 @@ function keyboard(_character, _keys) {
 		this.action(_key);
 	}
 }
-window.addEventListener('keydown', function (event) {
-	if(mainCharacter?.disableKeyboard){
-		mainCharacter.holdingKeys = [];
-		return;
-	}
-	try {
-		if (event?.key) {
-			if (event.which === 9)
-				event.preventDefault();
-			// if(!mainCharacter.keyboard)
-			// 	switchAutoMode();
-			mainCharacter.keyboard.mouseDown(event.key.toLocaleLowerCase());
-		}
-	} catch (e) {
+// window.addEventListener('keydown', function (event) {
+// 	if(mainCharacter?.disableKeyboard){
+// 		mainCharacter.holdingKeys = [];
+// 		return;
+// 	}
+// 	if (event.repeat) return;
+// 	try {
+// 		if (event?.key) {
+// 			if (event.which === 9)
+// 				event.preventDefault();
+// 			// if(!mainCharacter.keyboard)
+// 			// 	switchAutoMode();
+// 			mainCharacter.keyboard.mouseDown(event.key.toLocaleLowerCase());
+// 		}
+// 	} catch (e) {
 
-	}
-});
-window.addEventListener('keyup', function (event) {
-	if(mainCharacter?.disableKeyboard){
-		mainCharacter.holdingKeys = [];
-		return;
-	}
-	try {
-		if (event?.key) {
-			if (event.which === 9)
-				event.preventDefault();
-			// if(!mainCharacter.keyboard)
-			// 	switchAutoMode();
-			mainCharacter.keyboard.mouseUp(event.key.toLowerCase());
-		}
-	} catch (e) {
+// 	}
+// });
+// window.addEventListener('keyup', function (event) {
+// 	if(mainCharacter?.disableKeyboard){
+// 		mainCharacter.holdingKeys = [];
+// 		return;
+// 	}
+// 	try {
+// 		if (event?.key) {
+// 			if (event.which === 9)
+// 				event.preventDefault();
+// 			// if(!mainCharacter.keyboard)
+// 			// 	switchAutoMode();
+// 			mainCharacter.keyboard.mouseUp(event.key.toLowerCase());
+// 		}
+// 	} catch (e) {
 
-	}
+// 	}
+// });
+// window.addEventListener("blur", () => {
+// 	if(mainCharacter?.keyboard)
+// 		mainCharacter.keyboard.holdingKeys = [];
+// });
+let physicalKeys = new Set();
+
+function normalizeKey(key) {
+  const _k = key?.toLowerCase?.() || null;
+  switch (_k) {
+    case 'arrowleft': return 'a';
+    case 'arrowup': return 'w';
+    case 'arrowdown': return 's';
+    case 'arrowright': return 'd';
+  }
+  return _k;
+}
+
+window.addEventListener('keydown', (e) => {
+  if (mainCharacter?.disableKeyboard) return;
+  const k = e.key.toLowerCase();
+  physicalKeys.add(k);
 });
-window.addEventListener("blur", () => {
-	if(mainCharacter?.keyboard)
+
+window.addEventListener('keyup', (e) => {
+  const k = e.key.toLowerCase();
+  physicalKeys.delete(k);
+});
+
+window.addEventListener('blur', () => {
+	physicalKeys.clear();
+	if (mainCharacter?.keyboard) 
 		mainCharacter.keyboard.holdingKeys = [];
 });
+
+// 🔥 her frame'de logical key set oluştur ve karakterle senkronize et
+function syncKeys() {
+	if (!mainCharacter?.keyboard) 
+		return requestAnimationFrame(syncKeys);
+
+	// normalize edilmiş logical set (ör: ['a','w'])
+	const logicalKeys = new Set(Array.from(physicalKeys, normalizeKey));
+
+	const holding = mainCharacter.keyboard.holdingKeys.map(x => x.key);
+
+	// yeni basılanları bul
+	for (const key of logicalKeys)
+		if (!holding.includes(key))
+			mainCharacter.keyboard.mouseDown(key);
+
+	// bırakılanları bul
+	for (const key of holding)
+		if (!logicalKeys.has(key))
+			mainCharacter.keyboard.mouseUp(key);
+
+	requestAnimationFrame(syncKeys);
+}
+syncKeys();

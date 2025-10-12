@@ -234,19 +234,24 @@
 			const addEvent = function(_id, _char) {
 				const _skillbtn = document.getElementById(_id);
 				_skillbtn.addEventListener("mousedown", function() {
-					mainCharacter.keyboard.mouseDown(_char);
+					//mainCharacter.keyboard.mouseDown(_char);
+					physicalKeys.add(_char);
 				});
 				_skillbtn.addEventListener("mouseup", function() {
-					mainCharacter.keyboard.mouseUp(_char);
+					//mainCharacter.keyboard.mouseUp(_char);
+					physicalKeys.delete(_char);
 				});
 				_skillbtn.addEventListener("touchcancel", function() {
-					mainCharacter.keyboard.mouseUp(_char);
+					//mainCharacter.keyboard.mouseUp(_char);
+					physicalKeys.delete(_char);
 				});
 				_skillbtn.addEventListener("touchend", function() {
-					mainCharacter.keyboard.mouseUp(_char);
+					//mainCharacter.keyboard.mouseUp(_char);
+					physicalKeys.delete(_char);
 				});
 				_skillbtn.addEventListener("touchstart", function() {
-					mainCharacter.keyboard.mouseDown(_char);
+					//mainCharacter.keyboard.mouseDown(_char);
+					physicalKeys.add(_char);
 				});
 			}
 			addEvent('skill1', ' ');

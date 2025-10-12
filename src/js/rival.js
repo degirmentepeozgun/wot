@@ -18507,7 +18507,7 @@ const _allEnemies = {
 			bagSlots: 100,
 			stepXRate: .5,
 			src: './images/sprites/ep01/',
-			immunities: [ 'lightning', 'fire', 'shadow' ],
+			immunities: [ 'lightning', 'fire' ],
 			releaseAfter: 20,
 			buffs: []
 		};

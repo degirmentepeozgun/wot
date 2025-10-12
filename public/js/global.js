@@ -6241,7 +6241,7 @@ const spells = {
 							xGap: 60
 						},
 						atk: {
-							yRange: 10,
+							yRange: 15,
 							rate: .1,
 							ignoreDef: true,
 							hitTaken: .1,
@@ -14079,7 +14079,7 @@ const spells = {
 						],
 						atk: {
 							rate: 3,
-							yRange: 10,
+							yRange: 15,
 							aoe: 100,
 							push: 4,
 							hurt: {
@@ -27994,15 +27994,18 @@ function isObjectsInTouch(obj1, obj2, yRange, _tolerance) {
 	// }
 	if (isObjectInVisibleRectangle(obj1, obj2, null, _tolerance))
 		touch = true;
+	let _checkVertical = true;
 	if (touch && obj1.yPosition >= 0 && obj2.yPosition >= 0) {
-		let _yGapTol = (episode.cUIHeight / (320 / ((yRange ?? 10) < 20 ? 20 : yRange)));
+		let _yGapTol = (episode.cHeight / 200) * (yRange ?? 10);
 		// if(_yGapTol < MathRound(groundheight / (yRange ?? 15)))
 		// 	_yGapTol = MathRound(groundheight / (yRange ?? 15));
 		//MathAbs((obj1.yPosition + (obj1.yGap ?? 0)) - (obj2.yPosition + (obj2.yGap ?? 0))) > ((groundheight / 100) * (yRange ?? 5)))
 		if(MathAbs((obj1.yPosition + ((obj1.yGap ?? 10) / 2)) - (obj2.yPosition + ((obj2.yGap ?? 10) / 2))) > _yGapTol)
 			touch = false;
+		else
+			_checkVertical = false;
 	}
-	if (touch && !isObjectsVerticallyInTouch(obj1, obj2))
+	if (_checkVertical && touch && !isObjectsVerticallyInTouch(obj1, obj2))
 		touch = false;
 	return {
 		obj1Direction: obj1Direction,
@@ -28888,7 +28891,7 @@ const cssAnimations = {
 			return;
 		_char.relatedObjects?.forEach(x => { if (x.key === 'cast') x.remove = true; });
 		const _anima = _char.getCurrentAnimation();
-		let _totalSpeed = 0, _left = 0, _right = 0, _top = 0, _bottom = 0, _dir;
+		let _totalSpeed = 0, _left = 0, _right = 0, _top = 0, _height = 0, _dir;
 		for (var i = _char.frame; i < _anima.frames.length; i++) {
 			const _frame = _anima.frames[i];
 			if (!_frame.atk)
@@ -28905,7 +28908,7 @@ const cssAnimations = {
 				}
 				else
 					return;
-				_top = _bottom = MathRound(2 * ((groundheight * (2 * (_frame.atk.yRange ?? 5))) / 100));
+				_height = MathRound(((episode.cHeight * (2 * (_frame.atk.yRange ?? 5))) / 100));
 				break;
 			}
 		}
@@ -28933,9 +28936,9 @@ const cssAnimations = {
 		const _centerY = (_char.yPosition + MathRound((_char.yGap ?? 0) / 2));
 		_wrapper.leftPosition = _centerX;
 		_wrapper.style.left = ((_centerX - MathRound(_char.WIDTH / 2)) * __scale) + 'px';
-		_wrapper.style.bottom = ((_centerY - _top) * __scale) + 'px';
+		_wrapper.style.bottom = ((_centerY - ((_height) / 2)) * __scale) + 'px';
 		_wrapper.style.width = ((_right + _char.WIDTH + _left) * __scale) + 'px';
-		_wrapper.style.height = ((_top + _bottom) * __scale) + 'px';
+		_wrapper.style.height = (_height * __scale) + 'px';
 		_wrapper.appendChild(_castContainer);
 		_css.appendChild(_wrapper);
 		_char.casting = true;
@@ -29844,21 +29847,23 @@ function radixSortLSD(_input_array, getKey) {
     return _input_array;
 }
 
-function summonMobWithJson(_json, _noReturn, _noPush) {
+function summonMobWithJson(_json, _noReturn, _noPush, _noEffect) {
 	if(!_noPush)
 		episode.mobs.push(_json);
 	let _mob = episode.installMob(_json, null, !_noReturn);
-	PlaySound({ key: 'puff', volume: .3 });
-	if(_mob)
-		_mob.addObject({
-			key: 'smoke',
-			position: 'middle'
-		});
+	if(!_noEffect) {
+		PlaySound({ key: 'puff', volume: .3 });
+		if(_mob)
+			_mob.addObject({
+				key: 'smoke',
+				position: 'middle'
+			});
+	}
 	if(!_noReturn)
 		return _mob;
 }
 
-function summonMob(_id, _x, _y, _lvl, _target) {
+function summonMob(_id, _x, _y, _lvl, _target, _noEffect) {
 	const _json = {
 		id: _id,
 		minX: _x,
@@ -29871,11 +29876,13 @@ function summonMob(_id, _x, _y, _lvl, _target) {
 	};
 	episode.mobs.push(_json);
 	const _mob = episode.installMob(_json, null, 1);
-	PlaySound({ key: 'puff', volume: .3 });
-	_mob.addObject({
-		key: 'smoke',
-		position: 'middle'
-	});
+	if(!_noEffect){
+		PlaySound({ key: 'puff', volume: .3 });
+		_mob.addObject({
+			key: 'smoke',
+			position: 'middle'
+		});
+	}
 	_mob.setAutoTarget(_target ?? mainCharacter);
 	_mob.updateVariables();
 	return _mob;
