@@ -658,8 +658,8 @@ function enemy(_e) {
 			this.run(this.getCurrentAnimation(), this.direction, _yMoveSet, 7);
 			return;
 		}
-		if (this.friendly && (!episode.pvp || episode.hasEnemyAlive(this)) && !this.still && !this.isDead() && !episode.enemies?.
-		find(x => x.enemy && !x.invulnerable && !x.remove && !x.isDead() && x.autoTarget && x.autoMode > 0)) {
+		if (this.friendly && (!episode.pvp || episode.hasEnemyAlive(this)) && !this.still && !this.isDead() && !episode.seenEnemies?.
+		find(x => x.enemy && !x.invulnerable && !x.isDead() && x.autoTarget && x.autoMode > 0)) {
 			this.follow(mainCharacter);
 			return;
 		}
@@ -1228,7 +1228,7 @@ function enemy(_e) {
 				if (_portal)
 					_portal.remove();
 				if(this.action.enemyKey){
-					_portal = episode.enemies.find(x => x.key === this.action.enemyKey);
+					_portal = episode.seenEnemies.find(x => x.key === this.action.enemyKey);
 					if(_portal){
 						_portal.npc = undefined;
 						if(!_portal.canSkin && _portal.animations.dead)
@@ -1291,8 +1291,10 @@ function enemy(_e) {
 	this.checkBoss = function () {
 		if (this.class !== 'boss')
 			return;
-		if (this.isDead())
+		if (this.isDead() && !this.minionsRemoved) {
 			episode.enemies?.filter(x => x.class === 'minion')?.forEach(x => x.remove = true);
+			this.minionsRemoved = 1;
+		}
 	}
 	this.checkAutoFillHP = function () {
 		if (!this.main && !this.friendly)
@@ -1417,6 +1419,34 @@ function enemy(_e) {
 		if(!_sound)
 			this.soundPlaying = undefined;
 	}
+	this.checkCommonSkills = function() {
+		let _active;
+		if(!this.lastCommonSkillUsed || (_gameTick - this.lastCommonSkillUsed) > 2000)
+			_active = 1;
+		if(this.commonSkillsActive && !_active) {
+			_commons.forEach(x => {
+				removeClass(x, 'cooldown');
+				void x.offsetWidth;
+				addClass(x, 'cooldown');
+			});
+			this.commonSkillsActive = false;
+		}
+		else if(!this.commonSkillsActive && _active) {
+			_commons.forEach(x => removeClass(x, 'cooldown'));
+			this.commonSkillsActive = true;
+		}
+	}
+	this.checkPotUsage = function() {
+		let _active;
+		if(!this.lastPotUsage || (_gameTick - this.lastPotUsage) > 2000)
+			_active = 1;
+		if(!this.potBtn)
+			this.potBtn = document.getElementById('pot-btn');
+		if(!this.potsActive && _active) {
+			removeClass(this.potBtn, 'cooldown');
+			this.potsActive = true;
+		}
+	}
 	this.draw = function (_queue) {
 		if(this.remove || (_game.suspended && !this.warm))
 			return;
@@ -1449,6 +1479,8 @@ function enemy(_e) {
 		}
 		if(this.main) {
 			this.checkHitCount();
+			this.checkPotUsage();
+			this.checkCommonSkills();
 			checkTimedQuest();
 			this.checkUseProgress();
 		}
@@ -1466,8 +1498,21 @@ function enemy(_e) {
 		let _anima = this.getCurrentAnimation();
 		if(this.isDead() && !this.remove && !this.finishing && !this.attackingOnlyBy && !_anima.interactive 
 			&& !this.animation.startsWith('dead') && !this.animation.startsWith('knockback')){
-			this.addObject({ key: 'bam', position: 'middle' });
-			this.animate('dead', null, null, 1);
+			if(this.hurting && this.class !== 'object') {
+				delete this.hurting;
+				this.laying = true;
+				_anima.frames = _anima.frames?.filter(x => !x.invisibleWhenLay);
+				_anima.frames?.forEach(x => {
+					if(!x.def)
+						x.def = {};
+					if(!x.def.iframe)
+						x.def.iframe = true;
+				});
+				_anima.next = 'dead';
+				this.addObject({ key: 'deadspark' + (this.bloodColor ?? 'red'), position: 'middle' });
+			}
+			else if(!this.laying)
+				this.animate('dead', null, null, 1);
 		}
 		const _move = this.keyboard?.getMove?.() ?? this.rivalMove;
 		if (!_anima.move)
@@ -3349,17 +3394,19 @@ function enemy(_e) {
 						})
 						PlaySound({ key: 'charge', volume: .25, owner: this });
 					}
-					let _speed = 0;
-					for (var i = 0; i <= _anima.chargeDistance.untilFrame ?? 0; i++)
-						_speed += _anima.frames[i].speed;
+					let _speed = this.chargeProperties?.speed ?? 0;
 					if (!this.chargeProperties && this.charging) {
 						this.charging = (_anima.chargeDistance.value * .66) < (100 * (_result.range / episode.cWidth)) ? 1 : 0;
 						if(this.main)
 							_result.enemy.hurtColor = '#880808';
 						PlaySound({key: 'impact'});
+						if(!_speed)
+							for (var i = 0; i <= _anima.chargeDistance.untilFrame ?? 0; i++)
+								_speed += _anima.frames[i].speed;
 						this.chargeProperties = {
 							enemy: _result.enemy,
 							dir: _dir,
+							speed: _speed,
 							stepX: MathFloor((_result.range - (_result.enemy.WIDTH / 2)) / (_speed < 2 ? _speed : _speed - 1))//(_speed - this.start))
 						};
 					}
@@ -3405,7 +3452,7 @@ function enemy(_e) {
 		}
 	}
 	this.addObject = function (_obj) {
-		if ((_obj.main && !this.main) || __batterySaveMode)
+		if ((_obj.main && !this.main) || __batterySaveMode || this.hitStop)
 			return null;
 		const _position = _obj.position;
 		let _o;
@@ -3632,6 +3679,8 @@ function enemy(_e) {
 			_o.type = _obj.type;
 		if (_obj.repeat)
 			_o.repeat = _obj.repeat;
+		if(_obj.remove === false && _o.remove)
+			_o.remove = false;
 		if (_obj.bind && typeof _obj.bind === 'string')
 			_o.bind = _obj.bind;
 		else if (_obj.bind !== undefined)
@@ -3703,7 +3752,7 @@ function enemy(_e) {
 					MathRound((_o.height * _o.zoom) / 2) - ((_obj.bottom ?? 0) * _o.zoom) - ((_o.bottom ?? 0) * _o.zoom);
 				break;
 			default:
-				if (_position.y)
+				if (_position?.y)
 					_o.top = ((episode.cHeight - this.yGap - this.yPosition) - this.HEIGHT) +
 						(_position.y * this.ZOOM);
 				break;
@@ -3734,7 +3783,7 @@ function enemy(_e) {
 			for (var _e of _enemies) {
 				if (_e.dead || (_e.knockbacking && _e.dying) || _e.noCC || _e.autoAttacking)
 					continue;
-				const _enemyFrame = _e.getCurrentAnimation();
+				const _enemyFrame = _e.getCurrentFrame();
 				if(_enemyFrame.def?.iframe)
 					continue;
 				const _skillName = (_e.isDead() && this.alp && _e.animations.deadfly && _e.animation !== 'deadfly') ? 'deadfly' : 'knockback' + ((_enemyFrame.hurt && !_f.atk?.hurt?.reset) ? _enemyFrame.hurt : (_f.atk?.hurt?.type ?? 'air'));
@@ -3742,11 +3791,11 @@ function enemy(_e) {
 					_e.animate(_skillName);
 					continue;
 				} 
-				else if (_knocker.start < 1 && !_enemy) {
+				else if (_knocker.start < 2 && !_enemy) {
 					_e.iframe = false;
 					continue;
 				}
-				else if (_knocker.start === 1 || _enemy) {
+				else if (_knocker.start <= 2 || _enemy) {
 					_e.animate(_skillName);
 					_e.direction = _knocker.direction === __right ? __left : __right;
 					if (_e.dying)
@@ -3900,11 +3949,11 @@ function enemy(_e) {
 	this.getEnemyKillingBy = function () {
 		if(this.onlyTarget)
 		{
-			const _ot = episode.enemies.find(x => x.key ===  this.onlyTarget);
+			const _ot = episode.seenEnemies.find(x => x.key ===  this.onlyTarget);
 			if(_ot)
 				return [{enemy:_ot}];
 		}
-		const _kb = episode.enemies.find(x => x == this.finishTarget && !x.dead && x.health > 0);
+		const _kb = episode.seenEnemies.find(x => x == this.finishTarget && !x.dead && x.health > 0);
 		if (_kb)
 			return [{ enemy: _kb }];
 		return undefined;
@@ -3966,7 +4015,7 @@ function enemy(_e) {
 		const trt = (this.related ?? this);
 		trt.removeBuffByKey('invisibility');
 		const _enemies = this.getAtackableUnits(_anima, _frame, this.important ? 1 : 0);
-		episode.enemies?.forEach(x => {
+		episode.seenEnemies?.forEach(x => {
 			if (x.pushingBy == this || x.attacker == trt)
 				if (!_enemies?.find(y => y == x)) {
 					if (x.pushingBy?.push && x.pushingBy?.class === __spell)
@@ -3991,7 +4040,7 @@ function enemy(_e) {
 				_critHitTaken = false;
 				const _enemyAnima = _enemy.getCurrentAnimation();
 				const hurtEnemy = function (_t, _f, _e, _ef, _ea, _tp, _ep) {
-					if(_t.attackedUnitCount > __maxAttackedCount)
+					if(_t.attackedUnitCount > (_anima.maxAttackedCount ?? __maxAttackedCount))
 						return false;
 					if((_gameTick - _e.comfortStarted) < 500)
 						return false;
@@ -4029,10 +4078,13 @@ function enemy(_e) {
 						}
 					if (_prevAutoMode === 2 && !_e.keyboard && _e.animations.block && _e.fatique >= fatiqueDecreasement) {
 						if (_e.animation === 'run' || _e.animation === 'walk' ||
-							_e.animation === 'idle') {
+							_e.animation === 'idle' || _e.animation === 'hurtblock') {
 							if (_e.checkBlock(_t)) {
-								_e.animate('block', 1);
-								_e.decreaseFatique(_t);
+								if(_e.animations.hurtblock)
+									_e.animate('hurtblock', 1);
+								else
+									_e.animate('block', 1);
+								_e.decreaseFatique(_t, _f.atk?.rate);
 								_e.autoAttacking = true;
 								_e.setAutoTarget(_t, null, 5);
 								dmgFrames.push({
@@ -4076,12 +4128,13 @@ function enemy(_e) {
 							_e.direction = _e.direction === __left ? __right : __left;
 						else if (!_e.alp && _f.atk.hurt.catch === 'front' && _e.direction === _t.direction)
 							_e.direction = _e.direction === __left ? __right : __left;
-						if (_f.atk.hurt.sound) {
-							if(_f.atk.hurt.sound.key)
-								PlaySound(_f.atk.hurt.sound);
-							else
-								PlaySound({ key: _e.class + _f.atk.hurt.sound, owner: _e }, [_f.atk.hurt.sound]);
-						}
+						if (_f.atk.hurt.sound)
+							requestAnimationFrame(() => {
+								if(_f.atk.hurt.sound.key)
+									PlaySound(_f.atk.hurt.sound);
+								else
+									PlaySound({ key: _e.class + _f.atk.hurt.sound, owner: _e }, [_f.atk.hurt.sound]);
+							});
 						if (_f.atk.hurt.props) {
 							const _dying = _e.dying;
 							_e.setProps(_f.atk.hurt.props);
@@ -4224,7 +4277,8 @@ function enemy(_e) {
 								delete _e.attackedByObject;
 							if (_t?.related)
 								_f.atk.hurt.objects?.forEach(x => _e.addObject(x));
-							const _cced = _f.atk.hurt.type !== 'common' && (!_ep || _tp < _ep);
+							const _cced = _f.atk.hurt.type !== 'common' && (!_ep || _tp < _ep) ;
+							let _animateSkill;
 							if ((_erelease || _f.atk.hurt.key) && _cced) {
 								if (_erelease) {
 									PlaySound({ key: 'release', volume: .3});
@@ -4234,7 +4288,7 @@ function enemy(_e) {
 										_e.addBuff({ key: 'release', level: 3, ms: 3000 });
 								}
 								else {
-									let _animateSkill = _e.cc ?? _f.atk.hurt.key;
+									_animateSkill = _e.cc ?? _f.atk.hurt.key;
 									if (!_e.animations[_animateSkill])
 										_animateSkill = 'hurtground1';
 									//if (!_e.animations[_animateSkill]?.frames?.find(x => x.sound))
@@ -4276,7 +4330,7 @@ function enemy(_e) {
 									}
 								}
 							}
-							_e.hurting = { hit:1 };
+							_e.hurting = { hit: 4 };
 							_e.hurtColor = _f.atk.type === 'fire' ? '#E25822' : (_f.atk.type === 'toxic' ? '#66cc1a' : '#ffffff');
 							_e.hurting.count = _e.hurtColor ? ((_f.atk.type === 'fire' || _f.atk.type === 'ice' || _f.atk.type === 'toxic') ? 3 : 4) : 3; // _e.getCurrentFrame().speed;
 							if(_e.size === 'big')
@@ -4300,30 +4354,30 @@ function enemy(_e) {
 											_dmg *= (_t.alp ? _t.getSkillRate() : 1) * _f.atk.rate;
 										if (_dmg < 1)
 											_dmg = 1;
+										const _tr = (_t.related ?? _t);
 										var _calculatedCrit = (((_t.coopWith ?? _t).critRate) * ((100 - ((_e.coopWith ?? _e).critResistRate ?? 0))/100) * 100);
 										if (getRandomValue2(0, 10000) <= _calculatedCrit) {
 											_dmg *= (2 + ((_t.critDmgRate ?? 0) / 100));
 											if((_e.coopWith ?? _e).critDmgResistRate)
 												_dmg *= ((100 - (_e.coopWith ?? _e).critDmgResistRate) / 100);
 											_t.criticalHit = _critHitTaken = true;
-											if((_t.related ?? _t).alp)
+											if(_tr.alp)
 											{
-												const _rstp = (_t.related ?? _t).getTalentPoint('passive-atk-speed');
+												const _rstp = _tr.getTalentPoint('passive-atk-speed');
 												if(_rstp > 0)
-													(_t.related ?? _t).addBuff({ key: 'dance', level: _rstp });
+													_tr.addBuff({ key: 'dance', level: _rstp });
 											}
 											if (episode.pvp) {
 												if (_t.dmgGiven === undefined)
 													_t.dmgGiven = 0;
 												_t.dmgGiven += _dmg;
 											}
-											if (_t.main)
-												_e.addObject({
-													key: 'crit', position: 'middle-front'
-												});
 										}
 										else
 											_t.criticalHit = false;
+										// setTimeout(function() {
+										// 	_t.randomShake(_e, _anima, _f, _dmg, _t.criticalHit);
+										// }, getRandomValue2(20, 35));
 										const _newDmg = _t.calculateElementalDmg(_dmg, _e);
 										let _dmgEffect;
 										if((((_newDmg > _dmg) && (_t.main && !_t.villain)) || (_newDmg >= _dmg)) || (_f.atk.type && _f.atk.type !== 'common')) {
@@ -4338,7 +4392,7 @@ function enemy(_e) {
 										if(episode.war)
 											_dmg *= 2;
 										//_dmg = 1;
-										(_t.related ?? _t).checkSteal(_dmg, _e);
+										_tr.checkSteal(_dmg, _e);
 										if (!_e.main) {
 											if(_t.criticalHit)
 											{
@@ -4365,7 +4419,7 @@ function enemy(_e) {
 											});
 										if (!_e.dmgTaken) {
 											_e.dmgTaken = 0;
-											if (_e.autoMode >= 0 && !(_t.related ?? _t).invulnerable) {
+											if (_e.autoMode >= 0 && !_tr.invulnerable) {
 												if (_e.enemy)
 													_e.setAutoMode(2);
 												if(!_t.invulnerable)
@@ -4376,18 +4430,37 @@ function enemy(_e) {
 										if(!_e.inCombat)
 											_e.inCombat = 1;
 										if(_hasReflect)
-											(_t.related ?? _t).decreaseHealth(_dmg, _e);
+											_tr.decreaseHealth(_dmg, _e);
 										else if(!_e.phased || _decreaseHP){
 											if(_e.realTime && (_t.main || (_t.related ?? _t.owner)?.main))
 												setTransferMessage([{
 													t: _e.socketId,
-													s: (_t.related ?? _t).socketId,
+													s: _tr.socketId,
 													k: _dmg
 												}]);
+											
 											_e.decreaseHealth(_dmg, _t.related ?? _t);
+											let _canStop = false;
+											if(_t.class !== __spell && !_t.hitStop && (_anima.hitStop || _f.atk.hitStop)) {
+												let _stopAdd = -1;
+												if(!_t.criticalHit) {
+													if(_f.atk.rate < 1)
+														_stopAdd = -2;
+													else if(_f.atk.rate >= 2)
+														_stopAdd = 0;
+												}
+												else
+													_stopAdd = 1;
+												const _stopMe = (_f.atk.hitStop ?? _anima.hitStop) + _stopAdd;
+												if(_e.class !== __spell && !_e.hitStop) {
+													_e.hitStop = 2;
+													_t.hitStop = _stopMe;
+													_canStop = 1;
+												}
+											}
 											//_e.addObject({key:'hit' + getRandomValue2(1,5), position: 'middle'});
 											//successfull hit
-											_e.lastHitSkill = (_t.related ?? _t).animation;
+											_e.lastHitSkill = _tr.animation;
 											if(_e.isDead() && (_f.knockback || (_f.push && typeof _f.push === 'number')))
 											{
 												_e.critDead = _t.criticalHit ? 3: 2;
@@ -4400,7 +4473,15 @@ function enemy(_e) {
 													_e.animate('knockbackground', 1);
 												}
 											}
+											if(_canStop && _e.animation.startsWith('hurt')) {
+												if(_e.hitStop)
+													_e.start -= _e.hitStop;
+												if(_t.hitStop)
+													_t.start -= _t.hitStop;
+											}
 										}
+										if(_e.isDead())
+											_e.relatedObjects = _e.relatedObjects.filter(x => x.key !== 'stun');
 									}
 									if (_f.objects)
 										for (var _o of _f.objects)
@@ -4409,8 +4490,30 @@ function enemy(_e) {
 												if(!_hasEffect)
 													_hasEffect = 1;
 											}
-									if(!_hasEffect)
-										_e.addObject({key:'hitwhite', position: 'middle'});
+									if(_animateSkill?.startsWith('hurtground')) {
+										setTimeout(() => {
+											if(_t.criticalHit) {
+												//buraya crit spark
+												_e.addObject({key:'sparkcrit', position: 'middle'});
+											}
+											else {
+												//_e.addObject({key:'hitwhite', position: 'middle'});
+												//buraya normal spark
+												if(_f.atk.rate < 1) {
+													//ufak
+													_e.addObject({key:'sparkhitsmall', position: 'middle'});
+												}
+												else if(_f.atk.rate < 2) {
+													//orta
+													_e.addObject({key:'sparkhitmedium', position: 'middle'});
+												}
+												else {
+													//büyük
+													_e.addObject({key:'sparkhitbig', position: 'middle'});
+												}
+											}
+										}, getRandomValue2(8,20));
+									}
 								}
 							}
 							if (__account.options.gore && _f.atk?.type === 'common' && (_e.bleed || _e.bleed == undefined)) {
@@ -4502,18 +4605,17 @@ function enemy(_e) {
 				}
 				else if (_enemy.blocked && _thisPriority >= 1) {
 					_enemy.animate('hurtblock');
-					const _decreased = _enemy.decreaseFatique(this);
+					const _decreased = _enemy.decreaseFatique(this, _frame.atk?.type);
 					if (!_decreased) {
 						_enemyHurted = hurtEnemy(this, _frame, _enemy, _enemyFrame, _enemyAnima);
-						if (_enemy.blocked)
+						if (_enemy.blocked){
 							this.addObject({
 								key: 'glow',
 								position: 'middle'
 							});
-						_enemy.blocked = false;
+							_enemy.blocked = false;
+						}
 					}
-					else
-						PlaySound({ owner: this, key: _enemy.class + 'block' }, 'block');
 				}
 				else if ((!_enemy.dying || (_enemy.dying && this.key == _enemy.killingBy)) && (_thisPriority < (_enemyPriority ?? 10))) {
 					_enemyHurted = hurtEnemy(this, _frame, _enemy, _enemyFrame, _enemyAnima);
@@ -4546,6 +4648,82 @@ function enemy(_e) {
 		}
 		return _enemyHurted;
 	}
+	// Enemy veya Character sınıfı içine
+	this.randomShake = function (_e, _a, _f, _dmg, _crit) {
+		return;
+		if (!this.main || !_e.getCurrentAnimation().hurt) return; // sadece main karakter için
+		if ((_gameTick - (this.lastShakeTime || 0)) < 500) return;
+		this.lastShakeTime = _gameTick;
+
+		// === HitStop kontrolü ===
+		const hitStop = _f.atk?.hitStop ?? _a.hitStop ?? 0;
+		if (hitStop > 2) return; // uzun hitstop varsa titreme iptal
+
+		// === Amplitude hesaplama ===
+		let baseAmp = 4;
+
+		// Crit bonus
+		if (_crit) baseAmp += 1.2;
+
+		// Skill gücü bonus (rate yüksekse daha fazla titreme)
+		if (_f.atk?.rate >= 2) baseAmp += (_f.atk.rate - 1) * 1.5;
+
+		// Damage şiddetine göre küçük katkı (isteğe bağlı)
+		const dmgFactor = Math.min(_dmg / 100, 2); // aşırı büyük sayılarda sınırla
+		baseAmp += dmgFactor;
+
+		// Hitstop varsa hafif azalt
+		if (hitStop > 0) baseAmp *= (1 - Math.min(hitStop / 5, 0.8));
+
+		// === Ekran boyutuna göre normalize ===
+		const scale = Math.max(1, (window.innerWidth / 1920) * 1.5);
+		let amp = baseAmp * scale;
+
+		// === Rastgele yön belirleme ===
+		const horiz = Math.random() > 0.5;
+		const ampX = horiz ? (Math.random() > 0.5 ? amp : -amp) : 0;
+		const ampY = !horiz ? (Math.random() > 0.5 ? amp : -amp) : 0;
+
+		// === Shake parametreleri ===
+		const duration = 120 + Math.random() * 60; // 120–180 ms
+		const decay = 0.6 + Math.random() * 0.2;  // sönümlenme
+		const steps = 5;
+
+		// === Keyframes oluştur ===
+		let keyframes = '';
+		for (let i = 0; i <= steps; i++) {
+			const t = i / steps;
+			const strength = amp * Math.pow(decay, i);
+			const x = (ampX ? Math.sin(t * Math.PI * 2) * strength : 0).toFixed(2);
+			const y = (ampY ? Math.cos(t * Math.PI * 2) * strength : 0).toFixed(2);
+			keyframes += `${(t * 100).toFixed(1)}% { transform: translate(${x}px, ${y}px); }\n`;
+		}
+
+		// === CSS animasyonu enjekte et ===
+		const styleId = 'shake-style';
+		let styleEl = document.getElementById(styleId);
+		if (!styleEl) {
+			styleEl = document.createElement('style');
+			styleEl.id = styleId;
+			document.head.appendChild(styleEl);
+		}
+
+		const animName = `shake_${Date.now()}_${Math.floor(Math.random()*9999)}`;
+		styleEl.textContent = `@keyframes ${animName} {\n${keyframes}\n}`;
+
+		// === Animasyonu uygula ===
+		const wrapper = _gamePad || document.body;
+		wrapper.style.animation = `${animName} ${duration}ms linear 1`;
+
+		// === Temizleme ===
+		setTimeout(() => {
+			wrapper.style.animation = '';
+			styleEl.textContent = ''; // önceki keyframes temizlenir
+		}, duration + 30);
+	};
+
+
+
 	this.setBleedEffect = function(_f, _anima, _t) {
 		for (var i = 0; i < 1; i++) {
 			const ygap = (getRandomValue(0, 5) * 10) - 30 +
@@ -4839,6 +5017,8 @@ function enemy(_e) {
 	this.useCommonSkill = function (_order) {
 		if(this.isDead() || this.deadTime || episode.pvp)
 			return;
+		if((_gameTick - this.lastCommonSkillUsed) < 2000)
+			return;
 		const _item = __account.commonInventory[_order - 1];
 		let _renew;
 		if (spells[_item.key]) {
@@ -4855,6 +5035,7 @@ function enemy(_e) {
 		if(_renew) {
 			__account.commonInventory.splice(_order - 1, 1);
 			this.checkCommonInventory();
+			this.lastCommonSkillUsed = _gameTick;
 			_client.saveState();
 		}
 	}
@@ -5019,6 +5200,10 @@ function enemy(_e) {
 		//this.relatedObjects = this.relatedObjects?.filter(x => !x.remove) ?? [];
 		const _obj = relatedObjects?.find(x => x.id === _o.key);
 		if (_obj) {
+			if(_o.remove) {
+				this.relatedObjects = this.relatedObjects.filter(x => x.key !== _o.key);
+				return undefined;
+			}
 			const _clone = structuredClone2(_obj);
 			let _anima = this.getCurrentAnimation();
 			if(_anima.hurt)
@@ -5144,10 +5329,16 @@ function enemy(_e) {
 		if(this.autoStepYRate < 1)
 			this.verticalStep *= this.autoStepYRate;
 		const _moveY = this.solidOne ?? _solidity?.moveY;
-		if ((this.moveDirection === 'up' || (_solidity && _moveY === -1)) && _moveY !== 1)
+		if ((this.moveDirection === 'up' || (_solidity && _moveY === -1)) && _moveY !== 1){
 			this.yPosition += this.verticalStep;
-		else if ((this.moveDirection === 'down' || (_solidity && _moveY === 1)) && _moveY !== -1)
+			if(!this.main && this.autoTarget && this.yPosition > this.autoTarget.yPosition)
+				this.yPosition = this.autoTarget.yPosition;
+		}
+		else if ((this.moveDirection === 'down' || (_solidity && _moveY === 1)) && _moveY !== -1){
 			this.yPosition -= this.verticalStep;
+			if(!this.main && this.autoTarget && this.yPosition < this.autoTarget.yPosition)
+				this.yPosition = this.autoTarget.yPosition;
+		}
 	}
 	this.setDifficulty = function(_dif) {
 		if(_dif >= 0)
@@ -5184,7 +5375,10 @@ function enemy(_e) {
 			_extraX = 0;
 		else if ((this.moveDirection === 'down' || this.moveDirection === 'up') && (this.keyboard || (this.realTime && this.alp)) && !this.getKeyboardXMove() && !_solidity?.moveX)
 			_extraX = 0;
-		let _reversed = (this.direction !== this.defaultDirection) || this.reversed;
+		const _dirReversed = (this.direction !== this.defaultDirection);
+		let _reversed = _dirReversed || this.reversed;
+		if(_frame.reversed)
+			_reversed = !_reversed;
 		if (!_anima.move || (_frame.extraStepXRate && (_anima.useExtraStepXRate || (!this.keyboard && (!this.alp || _anima.rivalXMove))) && (_anima.move && !_solidity)))
 		{
 			_xRate = (_frame.extraStepXRate ?? 0) * _speedRate;
@@ -5194,7 +5388,7 @@ function enemy(_e) {
 		let _stepX = _noXRate ? 0 : (((_extraX + (this.pushingBy ? (this.pushRate ?? 0) : 0) + (_xRate)) * episode.cWidth) / 100);
 		if (this.chargeProperties && !_noXRate)
 			_stepX = this.chargeProperties.stepX * _speedRate;
-		if (this.still || this.stop || _noXRate)
+		if (this.still || this.stop || _noXRate || this.hitStop)
 			_stepX = 0;
 		if(this.GO) {
 			_stepX = this.checkCenterOfScreen(this.GO);
@@ -5206,7 +5400,6 @@ function enemy(_e) {
 				_stepX = 0;
 		}
 		//let _oldLeft = this.left;
-		
 		this.left = this.left + (((_reversed || _anima.reversed) && !(_reversed && _anima.reversed)) ? -1 * _stepX : _stepX);
 		const _maxY = this.getMaxYPosition();
 		const yy = this.yPosition / _maxY;
@@ -5225,7 +5418,7 @@ function enemy(_e) {
 		MathRound((_frame.bottomGap ?? 0) * this.ZOOM)) - _stepY - this.yPosition;
 		if (this.turned)
 			this.turned = false;
-		let _invisible = this.invisible && this.enemy;
+		let _invisible = (this.invisible && this.enemy) || this.unseen;
 		if (_queue && !_invisible) {
 			try {
 				//let _oldYPosition = this.yPosition;
@@ -5271,6 +5464,9 @@ function enemy(_e) {
 					const _cutY = _cut?.y ?? 0;
 					if(_frame.src && !_frame.sprite)
 						_frame.sprite = getImage(_frame.src);
+					let _hs = this.hitStop > 0 ? this.hitStop - 1 : 0;
+					if(_hs === 1)
+						_hs = 2;
 					if (this.drawHalf || _cut) { // && (_cutX || _cutY)) {
 						_queue.push({
 							skinColor: this.freeze ? '#a2d2df70' : _frame.color,
@@ -5395,7 +5591,7 @@ function enemy(_e) {
 		if(this.animation !== 'run' && this.animation !== 'walk')
 			return false;
 		const _stepX = MathAbs(_sX), _stepY = MathAbs(_sY);
-		const _solids = episode.enemies.filter(x => x.centerSolid && x.solid && !x.remove && !x.isDead() && x !== this);
+		const _solids = episode.seenEnemies.filter(x => x.centerSolid && x.solid && !x.remove && !x.isDead() && x !== this);
 		if(_solids?.[0]) {
 			let _points = [];
 			const _targetCenter = this.autoTarget?.centerSolid;
@@ -5515,7 +5711,7 @@ function enemy(_e) {
 			return false;
 		if(this.animation !== 'run' && this.animation !== 'walk')
 			return false;
-		const _solids = episode.enemies.filter(x => (x.solid 
+		const _solids = episode.seenEnemies.filter(x => (x.solid 
 			/*|| (x.enemy && this.enemy && x.autoMode !== 0 && this.autoMode !== 0 && this.class !== 'object' && x.class !== 'object')*/
 		) && !x.remove && !x.isDead() && x !== this);
 		if(_solids?.[0]) {
@@ -6404,8 +6600,11 @@ function enemy(_e) {
 							this.idle(7);
 				}
 			}
-			if (!_move)
+			if (!_move) {
 				this.moveDirection = undefined;
+				if(!_skill && (this.animation === 'walk' || this.animation === 'run'))
+					this.idle();
+			}
 			else if (_anima.mobilityY && !this.chargimg && _frame.directionChangeEnabled && this.isYMove(_move))
 				this.moveDirection = _move;
 			else if (_frame.directionChangeEnabled && !this.chargimg && this.isXMove(_move))
@@ -7007,16 +7206,26 @@ function enemy(_e) {
 		// if(this.main && episode.resultStars && (this.health * 2) < _maxHP)
 		// 	episode.resultStars[2].failed = 1;
 	}
-	this.decreaseFatique = function (_attacker) {
-		if (this.fatique < fatiqueDecreasement)
+	this.decreaseFatique = function (_attacker, _rate) {
+		const _r = _rate ?? 1;
+		const _dec = MathRound(fatiqueDecreasement * (_r < 1 ? 1 : _r));
+		if (this.fatique < _dec)
 			return false;
-		this.fatique -= (fatiqueDecreasement * (_attacker?.getCurrentFrame()?.atk?.rate ?? 1));
+		this.fatique -= (_dec * (_attacker?.getCurrentFrame()?.atk?.rate ?? 1));
 		_client.setFatique(this);
 		const _bar = this.fatBar ?? document.querySelector('#char-' + this.key + ' .defbar-value');
 		if(_bar)
 			_bar.style.transform = 'scaleX(' + (this.fatique / this.maxFatique) + ')';
 		if(_bar && !this.fatBar)
 			this.fatBar = _bar;
+		PlaySound({ owner: _attacker, key: this.class + 'block' }, 'block');
+		const _gap = MathRound(this.getCurrentFrame().spriteWidth / 2);
+		if(_r < 1)
+			this.addObject({key:'sparkblocksmall', position: 'middle', xGap: -_gap});
+		else if(_r < 2)
+			this.addObject({key:'sparkblockmedium', position: 'middle', xGap: -_gap});
+		else 
+			this.addObject({key:'sparkblockbig', position: 'middle', xGap: -_gap});
 		return true;
 	}
 	this.increaseFatique = function (_val) {

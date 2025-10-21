@@ -65,6 +65,7 @@ body {
 	width: 24%;
 	margin: .5%;
 	z-index: 1;
+	pointer-events:auto !important;
 	aspect-ratio: 1/1;
 	background: #00000080;
 	border:.2vh solid #f7f7f740;
@@ -438,12 +439,12 @@ body {
 	background: #00000080
 }
 
-.shake-horizontal {
-	animation: horizontal-shaking .15s 1 alternate
-}
-
 .shake-horizontal-infinite {
 	animation: horizontal-shaking-cave .2s infinite
+}
+
+.shake-horizontal {
+	animation: horizontal-shaking .15s 1 alternate
 }
 
 @keyframes horizontal-shaking {
@@ -4608,6 +4609,7 @@ body:has(#cutscene) #skip-cs * {
 	color: #b8860b99 !important;
 	opacity: .85;
 	box-shadow: 0 0 3vh #000 !important;
+	pointer-events: none !important;
 }
   li {
 	  list-style-type: none;
@@ -6098,9 +6100,23 @@ input[type="text"], input[type="password"], textarea  {
 	animation: fade-out-me .4s !important;
 	-webkit-animation: fade-out-me .4s !important;
 }
+.fade-out-99 {
+	will-change: transform, opacity !important;
+	opacity: 0;
+	animation: fade-out-me99 1s !important;
+	-webkit-animation: fade-out-me99 1s !important;
+}
 @keyframes fade-out-me {
 	0% {
 		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+@keyframes fade-out-me99 {
+	0% {
+		opacity: .99;
 	}
 	100% {
 		opacity: 0;
@@ -7097,6 +7113,20 @@ img.dmmg.toxic-dmmg {
 	opacity: 1;
 	animation-name: fade-in5 .6s;
 	-webkit-animation: fade-in5 .6s;
+}
+.fade-me-99 {
+	will-change: transform, opacity !important;
+	opacity: .99;
+	animation-name: fade-in99 .6s;
+	-webkit-animation: fade-in99 .6s;
+}
+@keyframes fade-in99 {
+	from {
+		opacity: 0
+	}
+	to {
+		opacity: .99
+	}
 }
 .fade-me-slide-left {
 	will-change: transform, opacity !important;
@@ -8138,8 +8168,6 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 #game-ui.demo-playing #quest-status, 
 #game-ui.demo-playing .profile, 
 #game-ui.demo-playing .profile *, 
-#game-ui.demo-playing .enemy-profile, 
-#game-ui.demo-playing .enemy-profile *,
 #game-ui.demo-playing #add-player
 {
 	pointer-events:none !important
@@ -9418,7 +9446,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	margin-top:.75vh
 }
 .quick-play-desc-container {
-	background:#000
+	background-color:#000
 }
 .quick-play-desc-item {
 	width:30.5%;
@@ -9580,4 +9608,24 @@ aspect-ratio: 16 / 9;
   	object-fit: contain;
 	width:100%;
 	height:100%
+}
+#game-ui #pot-btn.cooldown::after,
+#game-ui .common.cooldown::after {
+	content: '' !important;
+	position: absolute !important;
+	inset: 0;
+	border-radius: 50%;
+	background: url('/images/ui/skill.png'), conic-gradient(
+		rgba(0,0,0,0.5) 0deg,
+		rgba(0,0,0,0.5) var(--angle, 0deg),
+		transparent var(--angle, 0deg)
+	) !important;
+	background-size:cover !important;
+	animation: cooldown-rotate 2.025s linear forwards;
+	pointer-events: none !important
+}
+
+@keyframes cooldown-rotate {
+	from { --angle: 0deg; }
+	to { --angle: 360deg; }
 }

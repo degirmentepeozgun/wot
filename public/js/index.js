@@ -2223,6 +2223,11 @@ function resetOpeningScreen() {
 }
 function approveSelectedLanguage() {
 	const _lang = document.querySelector('.opening-lang-item.selected').getAttribute('data-lang');
+	if(__account.lang === _lang)
+	{
+		closeInventoryQuestionModal();
+		return;
+	}
 	__account.lang = _lang;
 	_client.saveState();
 	closeInventoryQuestionModal();
@@ -2230,14 +2235,14 @@ function approveSelectedLanguage() {
 }
 function getOpeningLanguages(_selected) {
 	_selected = _selected ?? getLang();
-	return `<div data-lang="en" onexactclick="selectOpeningLanguage('en')" class="opening-lang-item w-100 flex flex-jc-start${_selected === 'en' ? ' selected' : ''}" style="padding:2vh 0 1vh 0">
+	return `<div class="full flex fade-me"><div data-lang="en" onexactclick="selectOpeningLanguage('en')" class="opening-lang-item w-100 flex flex-jc-start${_selected === 'en' ? ' selected' : ''}" style="padding:2vh 0 1vh 0">
 		<img style="height:4.5vh" src="./images/ui/circle-${_selected === 'en' ? 'on' : 'off'}.png" />
 		<div style="margin-left:2vh;font-size:3vh;color:#f3f4f5${_selected === 'en' ? '' : 'cc'}">${getLangData("English")}</div>
 	</div>
 	<div data-lang="tr" onexactclick="selectOpeningLanguage('tr')" class="opening-lang-item w-100 flex flex-jc-start${_selected === 'tr' ? ' selected' : ''}" style="padding:1vh 0 2vh 0">
 		<img style="height:4.5vh" src="./images/ui/circle-${_selected === 'tr' ? 'on' : 'off'}.png" />
 		<div style="margin-left:2vh;font-size:3vh;color:#f3f4f5${_selected === 'tr' ? '' : 'cc'}">${getLangData("Turkish")}</div>
-	</div>`;
+	</div></div>`;
 }
 function selectOpeningLanguage(_key) {
 	PlaySound({key:'click'});
@@ -2266,15 +2271,16 @@ function askChangeLanguage() {
 }
 function approveKeyboardPromo() {
 	const _container = document.querySelector('.keyboard-promo-container');
-	if(hasClass(_container, 'fade-out'))
+	if(hasClass(_container, 'fade-out-99'))
 		return;
 	PlaySound({key:'click'});
+	removeClass(_container, 'fade-me-99');
 	const _elem = document.getElementById('key-promo-skip');
 	if(hasClass(_elem, 'selected'))
 		localStorage.setItem('keyboard-promo-skip', 1);
-	addClass(_container, 'fade-out');
+	addClass(_container, 'fade-out-99');
 	_container.onanimationend = function(_e) {
-		if(_e.animationName === 'fade-out-me')
+		if(_e.animationName === 'fade-out-me99')
 			_container?.remove?.();
 	}
 }
@@ -2298,7 +2304,7 @@ function getKeyboardPromo(_force) {
 	if(_force)
 		PlaySound({key:'click'});
 	const _desc = document.createElement('div');
-	_desc.className = 'flex show-ui full keyboard-promo-container quick-play-desc-container fade-me animate-me';
+	_desc.className = 'flex show-ui full keyboard-promo-container quick-play-desc-container fade-me-99 animate-me';
 	_desc.style = 'position:absolute;top:0;left:0;overflow:hidden;z-index:3';
 	let _html = '<div style="height:calc(100% - 9vh);position:relative" class="w-100 flex"><img src="./images/icons/keys.png" style="border:.2vh solid #F3F4F599;border-top:0;position:absolute;object-fit:cover;max-width:100%;max-height:100%" /></div>';
 	_desc.innerHTML = _html +
@@ -2315,7 +2321,7 @@ function getKeyboardPromo(_force) {
 			</div>`;
 	document.getElementById('first-splash').appendChild(_desc);
 }
-let __isPC = undefined, __particles;
+let __particles;
 function installOpeningScreen(_instant, _lateOpening) {
 	const _current = parseInt(localStorage.getItem(__difficultyKey) ?? 3);
 	__account.difficulty = _current;
@@ -2353,17 +2359,21 @@ function installOpeningScreen(_instant, _lateOpening) {
 		}, 1000);
 		return;
 	}
-	else if(_instant)
-		return;
 	var _wrapper = document.getElementById('wrapper');
 	_opening.style.width = MathRound(_wrapper.clientWidth) + 'px';
 	_opening.style.height = '100vh';
-	_bg.style.background = 'url(./images/icons/logo-rect.png), linear-gradient(0deg, #000, #000)'
-	_bg.style.backgroundSize = '25%, cover';
-	_bg.style.backgroundRepeat = 'no-repeat, repeat';
-	_bg.style.backgroundPosition = 'center, center';
+	if(!_instant) {
+		_bg.style.background = 'url(./images/icons/logo-rect.png), linear-gradient(0deg, #000, #000)'
+		_bg.style.backgroundSize = '25%, cover';
+		_bg.style.backgroundRepeat = 'no-repeat, repeat';
+		_bg.style.backgroundPosition = 'center, center';
+	}
+	else if(_openingSound){
+		_openingSound.pause();
+		_openingSound.currentTime= 0;
+	}
 	_img.onload = function() {
-		setTimeout(() => {
+		const renderOpeningUI = function() {
 			if(__particles)
 				__particles.cancel();
 			__particles = new dustParticles();
@@ -2381,15 +2391,26 @@ function installOpeningScreen(_instant, _lateOpening) {
 			_cover.innerHTML = '<img src="./images/loading/00.gif" />';
 			_opening.appendChild(_cover)
 			addClass(_opening, 'fade-start');
-			setTimeout(function() {
+			if(!_instant)
+				setTimeout(function() {
+					_opening.style.opacity = 1;
+					_bg.style.background = '#000';
+					document.getElementById('play-os').click();
+				}, 1000);
+			else {
 				_opening.style.opacity = 1;
-				_bg.style.background = '#000';
 				document.getElementById('play-os').click();
+			}
+		}
+		if(!_instant)
+			setTimeout(() => {
+				renderOpeningUI();
 			}, 1000);
-		}, 1000);
+		else
+			renderOpeningUI();
 	}
 	_img.src = './images/loading/00.gif';
-	if(__isPC && !_lateOpening)
+	if(__isPC && !_lateOpening && !_instant)
 		setTimeout(() => {
 			getKeyboardPromo();
 		}, 100);

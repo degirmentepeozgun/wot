@@ -241,6 +241,10 @@
 					//mainCharacter.keyboard.mouseUp(_char);
 					physicalKeys.delete(_char);
 				});
+				_skillbtn.addEventListener("mouseout", function() {
+					//mainCharacter.keyboard.mouseUp(_char);
+					physicalKeys.delete(_char);
+				});
 				_skillbtn.addEventListener("touchcancel", function() {
 					//mainCharacter.keyboard.mouseUp(_char);
 					physicalKeys.delete(_char);

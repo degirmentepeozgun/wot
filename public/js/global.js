@@ -1563,7 +1563,7 @@ const commonSkills = [
 	{ key: 'earthrock' },
 	{ key: 'corpseexplode', 
 		do: function(_char) {
-			const _corpses = episode.enemies.filter(x => x !== _char && x.isDead() && !x.unseen && !x.remove
+			const _corpses = episode.seenEnemies.filter(x => x !== _char && x.isDead()
 			&& x.class !== __spell && !x.finishingBy && !x.owner && !x.related && x.class !== 'object' && !x.corpseExploding);
 			let _used;
 			if(_corpses?.[0])
@@ -1607,6 +1607,8 @@ function drinkPot(_char, _gifter, _event) {
 		return;
 	if(_ch.health >= _ch.MAXHP)
 		return;
+	if((_gameTick - _ch.lastPotUsage) < 2000)
+		return;
 	const _hp = MathCeil(_ch.MAXHP / 5);
 	const _pot = __account.pots.find(x => x.key === 'pot');
 	if (episode?.lobby) {
@@ -1639,6 +1641,14 @@ function drinkPot(_char, _gifter, _event) {
 		});
 	if ((!_gifter && _ch === mainCharacter) || _gifter === mainCharacter)
 		_potCount.innerText = (_pot?.value ?? 0) + episodePot;
+	_ch.lastPotUsage = _gameTick;
+	if(_ch.potBtn) {
+		const _pt = _ch.potBtn;
+		removeClass(_pt, 'cooldown');
+		void _pt.offsetWidth;
+		addClass(_pt, 'cooldown');
+		_ch.potsActive = false;
+	}
 	_client.saveState();
 }
 const relatedObjects = [
@@ -2014,6 +2024,18 @@ const relatedObjects = [
 		zoom: 2.4, totalFrames: 5, speed: 5, singleton: true
 	},
 	{
+		id: 'trail', key: 'trail', width: 513/3, height: 84, col: 3, preDraw: true,
+		zoom: 1.5, totalFrames: 5, speed: 4, singleton: true, bind: true, repeat: true
+	},
+	{
+		id: 'shockwave', key: 'shockwave', width: 240, height: 196, col: 3,
+		zoom: 1.2, totalFrames: 4, speed: 3, singleton: true, still: true
+	},
+	{
+		id: 'shockwave2', key: 'shockwave2', width: 180, height: 128, col: 6,
+		zoom: 2, totalFrames: 30, speed: 2, singleton: true, stillOnChar: true
+	},
+	{
 		id: 'ring2', key: 'ring2', width: 202, height: 108, col: 3,
 		zoom: 2, totalFrames: 6, speed: 6, singleton: true
 	},
@@ -2029,6 +2051,10 @@ const relatedObjects = [
 	{
 		id: 'shieldhurt', key: 'shieldhurt', width: 51, height: 111,
 		zoom: 1.35, totalFrames: 1, speed: 1, singleton: true, bind: 'hurtblock', repeat: true
+	},
+	{
+		id: 'shieldhurt2', key: 'shieldhurt2', width: 51, height: 111,
+		zoom: 1.45, totalFrames: 1, speed: 6, singleton: true
 	},
 	{
 		id: 'web', key: 'web', width: 225, height: 82, color: '#f7f7f7ec',
@@ -2218,8 +2244,51 @@ const relatedObjects = [
 		totalFrames: 6, speed: 4, singleton: true, still: true, type: 'hurt'
 	},
 	{
+		id: 'deadsparkred', key: 'deadsparkred', width: 152, height: 166, col:11, zoom: 1, reset: true,
+		totalFrames: 10, speed: 2, singleton: true, still: true, type: 'hurt'
+	},
+	{
+		id: 'deadsparkgreen', key: 'deadsparkgreen', width: 152, height: 166, col:11, zoom: 1, reset: true,
+		totalFrames: 10, speed: 2, singleton: true, still: true, type: 'hurt'
+	},
+	{
 		id: 'target', key: 'target', width: 256, height: 241, col:4, zoom: 1,
 		totalFrames: 28, speed: 4, skip:2, singleton: true, stillOnChar: true
+	},
+	{
+		id: 'sparkblocksmall', key: 'sparkblocksmall',
+		width: 40, height: 40, col:4, zoom: 2, type: 'hurt', baseTop: 0,
+		totalFrames: 4, speed: 3, singleton: true, still: true
+	},
+	{
+		id: 'sparkblockmedium', key: 'sparkblockmedium',
+		width: 40, height: 40, col:4, zoom: 2, type: 'hurt', baseTop: 40,
+		totalFrames: 4, speed: 3, singleton: true, still: true
+	},
+	{
+		id: 'sparkblockbig', key: 'sparkblockbig',
+		width: 40, height: 40, col:4, zoom: 2, type: 'hurt', baseTop: 80,
+		totalFrames: 4, speed: 3, singleton: true, still: true
+	},
+	{
+		id: 'sparkhitsmall', key: 'sparkhitsmall',
+		width: 40, height: 40, col:4, zoom: 2, type: 'hurt', baseTop: 120,
+		totalFrames: 4, speed: 3, singleton: true, still: true
+	},
+	{
+		id: 'sparkhitmedium', key: 'sparkhitmedium',
+		width: 40, height: 40, col:4, zoom: 2, type: 'hurt', baseTop: 160,
+		totalFrames: 4, speed: 3, singleton: true, still: true
+	},
+	{
+		id: 'sparkhitbig', key: 'sparkhitbig',
+		width: 40, height: 40, col:4, zoom: 2, type: 'hurt', baseTop: 200,
+		totalFrames: 4, speed: 3, singleton: true, still: true
+	},
+	{
+		id: 'sparkcrit', key: 'sparkcrit',
+		width: 40, height: 40, col:4, zoom: 2, type: 'hurt', baseTop: 240,
+		totalFrames: 5, speed: 3, singleton: true, still: true
 	}
 ];
 function setRelatedObjectSpeed() {
@@ -2229,11 +2298,47 @@ function setRelatedObjectSpeed() {
 }
 setRelatedObjectSpeed();
 const relatedObjectImages = {
+	trail: function () {
+		return getImage('./images/related/trail.png?x=2')
+	},
+	shockwave2: function () {
+		return getImage('./images/related/shockwave2.png')
+	},
+	// shockwave: function () {
+	// 	return getImage('./images/related/shockwave.png')
+	// },
+	sparkblocksmall: function () {
+		return getImage('./images/related/spark3.png')
+	},
+	sparkblockmedium: function () {
+		return getImage('./images/related/spark3.png')
+	},
+	sparkblockbig: function () {
+		return getImage('./images/related/spark3.png')
+	},
+	sparkhitsmall: function () {
+		return getImage('./images/related/spark3.png')
+	},
+	sparkhitmedium: function () {
+		return getImage('./images/related/spark3.png')
+	},
+	sparkhitbig: function () {
+		return getImage('./images/related/spark3.png')
+	},
+	sparkcrit: function () {
+		return getImage('./images/related/spark3.png')
+	},
 	target: function () {
 		return getImage('./images/related/target.png?x=2')
 	},
 	bam: function () {
 		return getImage('./images/related/bam.png')
+	},
+	deadsparkred: function () {
+		return getImage('./images/related/dead-spark.png')
+	},
+	deadsparkgreen: function () {
+		return getImage('./images/related/dead-spark-green.png')
 	},
 	hurtsteal1: function () {
 		return getImage('./images/related/steal1.png')
@@ -2450,6 +2555,9 @@ const relatedObjectImages = {
 	},
 	shieldhurt: function () {
 		return getImage('./images/related/shield-hurt.png')
+	},
+	shieldhurt2: function () {
+		return getImage('./images/related/shield-hurt.png?v=2')
 	},
 	shieldactive: function () {
 		return getImage('./images/related/shield-active.png')
@@ -2828,6 +2936,11 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	bloodsquish: './images/sounds/bloodsquish.mp3',
+	punchhit: './images/sounds/punchhit4.wav',
+	tak: './images/sounds/tak5.mp3',
+	beyblade: './images/sounds/beyblade.mp3',
+	taklong: './images/sounds/tak.mp3',
 	soul: './images/sounds/soul.mp3?x=3',
 	corpse: './images/sounds/corpse.mp3',
 	conquer: './images/sounds/conquer.mp3',
@@ -2854,6 +2967,7 @@ const soundFiles = {
 	boss: './images/sounds/boss.mp3',
 	bossalert: './images/sounds/boss-alert.mp3',
 	hua: './images/sounds/hua.mp3',
+	fireex: './images/sounds/fireex.mp3',
 	storyfinish: './images/sounds/story-finish-impact.wav',
 	ironx1: './images/sounds/ironx1.mp3',
 	raaa: './images/sounds/raaaaaa.mp3',
@@ -2891,7 +3005,7 @@ const soundFiles = {
 	aura: './images/sounds/aura.mp3',
 	iron: './images/sounds/iron.mp3',
 	spearhurt: './images/sounds/spear-hurt.mp3',
-	speardead: './images/sounds/spear-dead.mp3',
+	speardead: './images/sounds/spear-dead.mp3?x=3',
 	kingattack: './images/sounds/king-attack.mp3',
 	kingcharge: './images/sounds/king-charge2.mp3',
 	rockfallsmall: './images/sounds/rock-fall-small.mp3',
@@ -3671,7 +3785,7 @@ const mapSprites = [
 		bgAnimations: [],
 	},
 	{
-		id: 3, do:startAutumn, after:stopWeather, minLevel: 1, itemGrade: 2, coords: { left: '18.5%', top: '76%', title: 'Forest' }, 
+		id: 3, do:startAutumn, after:stopWeather, repeat:23000, minLevel: 1, itemGrade: 2, coords: { left: '18.5%', top: '76%', title: 'Forest' }, 
 		theme: 'jungle', ambianceVolume: .2, distance: 1, width: MathFloor(5888 * 1.065),
 		equipmentDropRates: [
 			{ key:'helmet', rate: 8 },
@@ -3826,613 +3940,19 @@ const mapSprites = [
 		ground: { width: 5888, height: 1080, zoom: 1.065, yRate: 2.5 }
 	},
 	{
-		id: 5, do:startAutumn, after:stopWeather, ambianceVolume: .2, coords: { left: '3%', top: '65%', title: 'Forest', dir: 'West' }, 
-		theme: 'jungle', distance: 1, width: MathFloor(5888 * 1.065),
-		minLevel: 3, itemGrade: 2,
-		assets: [
-			'./images/sprites/ep01/transform1.png',
-			'./images/sprites/ep01/transform2.png',
-			'./images/sprites/ep29/sprite.png',
-			'./images/sprites/ep29/run.png'
-		],
-		equipmentDropRates: [
-			{ key:'necklace', rate: 8 },
-			{ key:'chest', rate: 8 },
-			{ key:'gloves', rate: 8 }
-		],
+		id: 5, repeat:15000, do:startAutumn2, after:stopWeather, minLevel: 1,
+		coords: { left: '33%', top: '22%', title: 'Greenlands' }, 
+		theme: 'greenwood', distance: 1, width: MathFloor(6000 * 1.065),
 		mobs: [
-			{
-				id: 100,
-				minX: 5800,
-				maxX: 5800,
-				count: 1,
-				yPosition: function() {
-					return MathRound((groundheight / 2) * 1.1);
-				}
-			},
-			{
-				id: 100,
-				minX: 240,
-				maxX: 240,
-				count: 1,
-				props: {
-					reversed: 1
-				},
-				yPosition: function() {
-					return MathRound((groundheight / 2) * 1.1);
-				}
-			},
-			{
-				id: 46,
-				minX: 3000,
-				maxX: 3000,
-				count: 1,
-				sight:1000,
-				minLevel: 5,
-				maxLevel: 5,
-				yPosition: function() {
-					return MathRound(groundheight / 2);
-				},
-				actions: [
-					{
-						when: function (_e) {
-							return __account.questStatus.quest?.key === 'lestat';
-						},
-						do: function (_e) {
-							_e.remove = _e.noLoot = 1;
-						}
-					}
-				]
-			},
-			{
-				id: 34,
-				minX: 3000,
-				maxX: 4500,
-				sight: 50,
-				count: 3,
-				minLevel: 4,
-				maxLevel: 5,
-				attackAfterHit: true,
-				actions: [
-					{
-						when: function (_e) {
-							return __account.questStatus.quest?.key === 'lestat';
-						},
-						do: function (_e) {
-							_e.remove = _e.noLoot = 1;
-						}
-					}
-				]
-			},
-			{
-				id: 20,
-				minX: 1000,
-				maxX: 3000,
-				sight: 50,
-				count: 4,
-				minLevel: 4,
-				maxLevel: 5,
-				attackAfterHit: true,
-				actions: [
-					{
-						when: function (_e) {
-							return __account.questStatus.quest?.key === 'lestat';
-						},
-						do: function (_e) {
-							_e.remove = _e.noLoot = 1;
-						}
-					}
-				]
-			},
-			{
-				id: 1,
-				minX: 4700,
-				maxX: 5000,
-				sight: 150,
-				groupId: 1,
-				grade: 2,
-				name: 'Lestat',
-				yPosition: function () { return MathRound(groundheight * .8) },
-				count: 1,
-				props: {
-					finishableWith: undefined
-				},
-				minLevel: 6,
-				maxLevel: 6,
-				attackAfterHit: true,
-				actions: [
-					{
-						when: function (_e) {
-							return __account.questStatus.quest?.key !== 'lestat' ||
-							__account.questStatus.state !== 'progress';
-						},
-						do: function (_e) {
-							_e.remove = _e.noLoot = 1;
-						}
-					},
-					{
-						when: function (_e) {
-							return !_e.groupAttack && _e.dmgTaken;
-						},
-						do: function (_e) {
-							for(let _a of Object.keys(_e.animations))
-								if(_e.animations[_a].priority > 2)
-									_e.animations[_a].priority = 2;
-							for (var _eyes of document.querySelectorAll('#SPRT-eyes1,#SPRT-eyes2'))
-								_eyes.remove();
-							_e.groupAttack = true;
-							_e.animations['ground2'].attack = true;
-							for (var i = 0; i < 2; i++) {
-								episode.installMob({
-									id: 1,
-									minX: 4750,
-									maxX: 5250,
-									sight: 150,
-									groupId: 1,
-									count: 1,
-									minLevel: _e.level,
-									maxLevel: _e.level
-								});
-								const _mob = episode.enemies[episode.enemies.length - 1];
-								_mob.yPosition = groundheight;
-								_mob.addObject({
-									key: 'smoke',
-									position: 'middle'
-								});
-								_mob.autoTarget = mainCharacter;
-							}
-						}
-					},
-					{
-						when: function (_e) {
-							return _e.action?.command === 'move' && _e.left >= episode.width;
-						},
-						do: function (_e) {
-							_e.health = 0;
-							_e.remove = _e.dead = true;
-						}
-					},
-					{
-						when: function (_e) {
-							return __account.questStatus.quest?.id === (_npcQuests.find(x => x.key === 'lestat')?.id) && _e.health <= 0
-								&& !_e.gradeLeft && !_e.invulnerable;
-						},
-						do: function (_e) {
-							_e.health = 1;
-							_e.invulnerable = true;
-							_e.stepXRate = 1;
-							_e.animations.run.zoom = 1.25;
-							_e.animations.run.maxRepeat = 999;
-							_e.animations.run.imediateBreak = _e.animations.run.hold = _e.animations.run.mobilityY = false;
-							_e.animations.run.src = './images/sprites/ep29/run.png';
-							_e.animations.run.frames = [
-								{
-									spriteLeft: 19,
-									spriteTop: 0,
-									spriteWidth: 230,
-									spriteHeight: 210,
-									spriteOrigin: 115,
-									speed: MathRound(8 / ((__globalMS / 20) - .16)),
-									def: {
-										iframe: true
-									}
-								},
-								{
-									spriteLeft: 19,
-									spriteTop: 0,
-									spriteWidth: 230,
-									spriteHeight: 210,
-									spriteOrigin: 115,
-									speed: 1,
-									do: function(_char) {
-										_char.setBleedEffect(_char.getCurrentFrame(), _char.getCurrentAnimation(), mainCharacter)
-									},
-									def: {
-										iframe: true
-									}
-								},
-								{
-									spriteLeft: 301,
-									spriteTop: 0,
-									spriteWidth: 298,
-									spriteHeight: 210,
-									spriteOrigin: 149,
-									speed: MathRound(8 / ((__globalMS / 20) - .16)),
-									def: {
-										iframe: true
-									}
-								},
-								{
-									spriteLeft: 301,
-									spriteTop: 0,
-									spriteWidth: 298,
-									spriteHeight: 210,
-									spriteOrigin: 149,
-									speed: 1,
-									do: function(_char) {
-										_char.setBleedEffect(_char.getCurrentFrame(), _char.getCurrentAnimation(), mainCharacter)
-									},
-									def: {
-										iframe: true
-									}
-								},
-								{
-									spriteLeft: 620,
-									spriteTop: 0,
-									spriteWidth: 270,
-									spriteHeight: 210,
-									spriteOrigin: 135,
-									speed: MathRound(8 / ((__globalMS / 20) - .16)),
-									def: {
-										iframe: true
-									}
-								},
-								{
-									spriteLeft: 620,
-									spriteTop: 0,
-									spriteWidth: 270,
-									spriteHeight: 210,
-									spriteOrigin: 135,
-									speed: 1,
-									do: function(_char) {
-										_char.setBleedEffect(_char.getCurrentFrame(), _char.getCurrentAnimation(), mainCharacter)
-									},
-									def: {
-										iframe: true
-									}
-								},
-								{
-									spriteLeft: 922,
-									spriteTop: 0,
-									spriteWidth: 236,
-									spriteHeight: 210,
-									spriteOrigin: 118,
-									speed: MathRound(8 / ((__globalMS / 20) - .16)),
-									def: {
-										iframe: true
-									}
-								},
-								{
-									spriteLeft: 922,
-									spriteTop: 0,
-									spriteWidth: 236,
-									spriteHeight: 210,
-									spriteOrigin: 118,
-									speed: 1,
-									do: function(_char) {
-										_char.setBleedEffect(_char.getCurrentFrame(), _char.getCurrentAnimation(), mainCharacter)
-									},
-									def: {
-										iframe: true
-									}
-								}
-							];
-							_e.animations.idle.src = './images/sprites/ep29/sprite.png';
-							_e.animations.idle.maxRepeat = 4;
-							_e.animations.idle.zoom = 1.25;
-							_e.animations.idle.frames = [
-								{
-									spriteLeft: 3332 * 1.5,
-									spriteTop: 160,
-									spriteWidth: 225,
-									spriteHeight: 168,
-									spriteOrigin: 101,
-									sound: { key: 'lestatbreath', volume: 1 },
-									def: {
-										iframe: true
-									},
-									speed: MathRound(18 / ((__globalMS / 20) - .16))
-								},
-								{
-									spriteLeft: 2930 * 1.5,
-									spriteTop: 160,
-									spriteWidth: 154 * 1.5,
-									spriteHeight: 168,
-									spriteOrigin: 105,
-									def: {
-										iframe: true
-									},
-									speed: MathRound(18 / ((__globalMS / 20) - .16))
-								},
-								{
-									spriteLeft: 2526 * 1.5,
-									spriteTop: 160,
-									spriteWidth: 156 * 1.5,
-									spriteHeight: 168,
-									spriteOrigin: 74 * 1.5,
-									def: {
-										iframe: true
-									},
-									speed: MathRound(18 / ((__globalMS / 20) - .16))
-								}
-							];
-							_e.animations.transform = {
-								key: 'transform',
-								type: 'skill',
-								src: './images/sprites/ep01/transform1.png',
-								frames: [
-									{
-										spriteLeft: 38,
-										spriteTop: 0,
-										spriteWidth: 214,
-										spriteHeight: 255,
-										spriteOrigin: 107,
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										sound: { key: 'lestathowl', volume: .5 },
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 352,
-										spriteTop: 0,
-										spriteWidth: 188,
-										spriteHeight: 255,
-										spriteOrigin: 94,
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 661,
-										spriteTop: 0,
-										spriteWidth: 173,
-										spriteHeight: 255,
-										spriteOrigin: 87,
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 950,
-										spriteTop: 0,
-										spriteWidth: 187,
-										spriteHeight: 255,
-										spriteOrigin: 94,
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 1261,
-										spriteTop: 0,
-										spriteWidth: 188,
-										spriteHeight: 255,
-										spriteOrigin: 94,
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 1552,
-										spriteTop: 0,
-										spriteWidth: 196,
-										spriteHeight: 255,
-										spriteOrigin: 98,
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 1839,
-										spriteTop: 0,
-										spriteWidth: 215,
-										spriteHeight: 255,
-										spriteOrigin: 108,
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 2132,
-										spriteTop: 0,
-										spriteWidth: 222,
-										spriteHeight: 255,
-										spriteOrigin: 111,
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										sound: { key: 'lestattransform', volume: 1 },
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 2442,
-										spriteTop: 0,
-										spriteWidth: 220,
-										spriteHeight: 255,
-										spriteOrigin: 110,
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 2744,
-										spriteTop: 0,
-										spriteWidth: 216,
-										spriteHeight: 255,
-										spriteOrigin: 108,
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 3047,
-										spriteTop: 0,
-										spriteWidth: 224,
-										spriteHeight: 255,
-										spriteOrigin: 112,
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 3339 - 3327,
-										spriteTop: 0,
-										spriteWidth: 203,
-										spriteHeight: 255,
-										spriteOrigin: 102,
-										src: './images/sprites/ep01/transform2.png',
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 3621 - 3327,
-										spriteTop: 0,
-										spriteWidth: 240,
-										spriteHeight: 255,
-										spriteOrigin: 120,
-										src: './images/sprites/ep01/transform2.png',
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 3898 - 3327,
-										spriteTop: 0,
-										spriteWidth: 285,
-										spriteHeight: 255,
-										spriteOrigin: 124,
-										src: './images/sprites/ep01/transform2.png',
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 4197 - 3327,
-										spriteTop: 0,
-										spriteWidth: 277,
-										spriteHeight: 255,
-										spriteOrigin: 150,
-										src: './images/sprites/ep01/transform2.png',
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 4520 - 3327,
-										spriteTop: 0,
-										spriteWidth: 254,
-										spriteHeight: 255,
-										spriteOrigin: 128,
-										src: './images/sprites/ep01/transform2.png',
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 4856 - 3327,
-										spriteTop: 0,
-										spriteWidth: 190,
-										spriteHeight: 255,
-										spriteOrigin: 102,
-										src: './images/sprites/ep01/transform2.png',
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 5123 - 3327,
-										spriteTop: 0,
-										spriteWidth: 234,
-										spriteHeight: 255,
-										spriteOrigin: 121,
-										src: './images/sprites/ep01/transform2.png',
-										speed: MathRound(8 / ((__globalMS / 20) - .16)),
-										def: {
-											iframe: true
-										}
-									},
-									{
-										spriteLeft: 5123 - 3327,
-										spriteTop: 0,
-										spriteWidth: 234,
-										spriteHeight: 255,
-										spriteOrigin: 121,
-										src: './images/sprites/ep01/transform2.png',
-										speed: 1,
-										next: 'idle',
-										do: function () {
-											_e.animate('idle', 1);
-											_e.direction = mainCharacter.LEFT > _e.LEFT ? __right : __left;
-											episode.dialogs = [{
-												id: 1, 
-												location: { map: 5 }, ms: 3000,
-												owner: _e.key, text: "That won't end here...", 
-												onend: function (_char) {
-													_char.direction = __right;
-													_char.moveDirection = __right;
-													_char.action = { command: 'move', to: 0 };
-												}
-											}];
-										},
-										def: {
-											iframe: true
-										}
-									}
-								]
-							};
-							_e.upcomingAnimation = 'transform';
-							_e.skipHealthBar = true;
-							_e.animations.transform = new animation(_e.animations.transform);
-							_e.animations.run = new animation(_e.animations.run);
-							_e.animations.idle = new animation(_e.animations.idle);
-							_e.animations.run.interactive = _e.animations.idle.interactive = _e.animations.transform.interactive = true;
-							_e.animate('transform', 1);
-							for (var _key of Object.keys(_e.animations))
-								_e.animations[_key].attack = false;
-							if (__account.questStatus.quest?.loots?.find(x => x.key === 'lestat-tooth'))
-								_e.dropItem('quest-item', 'lestat-tooth')
-						}
-					}]
-			}
 		],
 		objects: [
-			{
-				id: 'mushroomx1', key: 'mushroom', npc: true, when: function (_npc) {
-					return installQuestItem(_npc);
-				}, width: 64, height: 86, locate: { left: 1500, bottom: 72 }, zoom: 1, rate: 1
-			},
-			{
-				id: 'mushroomx2', key: 'mushroom', npc: true, rotate: true, when: function (_npc) {
-					return installQuestItem(_npc);
-				}, width: 64, height: 86, locate: { left: 2640, bottom: 65 }, zoom: 1, rate: 1
-			},
-			{
-				id: 'mushroomx3', key: 'mushroom', npc: true, when: function (_npc) {
-					return installQuestItem(_npc);
-				}, width: 64, height: 86, locate: { left: 3960, bottom: 110 }, zoom: 1, rate: 1
-			},
-			{ id: 'eyes1', totalFrames:2, key: 'eyes', width:41, height:29, zoom: 1.8, locate: { left: 5420, bottom: 230 }},
-			{ id: 'eyes2', totalFrames:2, key: 'eyes', width:41, height:29, zoom: 1.6, locate: { left: 5470, bottom: 270 }, delay: 300 },
-			{ id: 'portal1', src:'./images/texture/portal.gif', alpha: .75, to: 7, key: 'portal', npc: true, totalFrames: 7, width: 850, height: 0, zoom: 1, locate: { left: 5700, bottom: -335 } },
-			//{ id: 'sign-forest', text: 'Forest', key: 'sign', totalFrames: 2, width: 100, height: 40, zoom: 1, locate: { left: 5635, bottom: -380 } },
-			{ id: 'portal2', src:'./images/texture/portal.gif', alpha: .75, to: 3, key: 'portal', npc: true, totalFrames: 7, width: 420, height: 0, zoom: 1, locate: { left: -80, bottom: -335 } },
-			//{ id: 'sign-cemetery', text: 'Cemetery', key: 'sign', totalFrames: 2, width: 100, height: 40, zoom: 1, locate: { left: 245, bottom: -380 } }
 		],
 		tiles: [
-			{ name: 'bg', count: 1, height: 1080, zoom: 1.6, rate: .85, width: 3357, bottom: -700 },
-			{ name: 'back', count: 1, height: 1080, zoom: 1.25, rate: .9, width: 4238, bottom: -700 },
-			{ name: 'ground', count: 1, height: 1080, zoom: 1.065, rate: 1, width: 5888, bottom: -700 },
-			//{ name: 'foreground', count: 1, foreground: true, height: 1080, rate:1.29, zoom: 1.065, width: 5888, bottom: -700 }
+			{ name: 'bg', width: 6144, height: 1080, zoom: 1.1, rate: .9, bottom: -400, count:1 },
+			{ name: 'ground', width: 6000, height: 1055, zoom: 1.065, rate: 1, bottom: -400, count:1 }
 		],
-		ground: { width: 5888, height: 1080, zoom: 1.065, yRate: 3 }
-	},
+		ground: { width: 6000, height: 1055, zoom: 1.065, yRate: 2.35 }
+	},	
 	{
 		id: 7, coords: { left: '15%', top: '47%', title: 'Crypt', key: 'ad' }, 
 		theme: 'cemetery', distance: 1, width: MathFloor(6144 * 1.065),
@@ -18514,10 +18034,10 @@ const spells = {
 						spriteLeft: 373,
 						spriteTop: 1370,
 						spriteWidth: 217,
-						spriteHeight: 198,
+						spriteHeight: 198 + 65,
 						spriteOrigin: 108,
 						extraStepXRate: 1,
-						bottomGap: -80,
+						bottomGap: -15,
 						speed: 12,
 						atk: {
 							yRange: 10,
@@ -18527,6 +18047,7 @@ const spells = {
 							hurt: {
 								key: 'hurtground1',
 								type: 'ground',
+								sound:{key:'punchhit', volume:.5},
 								buffs: [{
 									key: 'slow',
 									level: 2
@@ -18539,10 +18060,10 @@ const spells = {
 						spriteLeft: 607,
 						spriteTop: 1370,
 						spriteWidth: 290,
-						spriteHeight: 198,
+						spriteHeight: 198 + 65,
 						spriteOrigin: 145,
 						extraStepXRate: 1,
-						bottomGap: -80,
+						bottomGap: -15,
 						speed: 12,
 						atk: {
 							yRange: 10,
@@ -18552,6 +18073,7 @@ const spells = {
 							hurt: {
 								key: 'hurtground1',
 								type: 'ground',
+								sound:{key:'punchhit', volume:.5},
 								buffs: [{
 									key: 'slow',
 									level: 2
@@ -18564,10 +18086,10 @@ const spells = {
 						spriteLeft: 373,
 						spriteTop: 1370,
 						spriteWidth: 217,
-						spriteHeight: 198,
+						spriteHeight: 198 + 65,
 						spriteOrigin: 108,
+						bottomGap: -15,
 						extraStepXRate: 1,
-						bottomGap: -80,
 						speed: 12,
 						atk: {
 							yRange: 10,
@@ -18577,6 +18099,7 @@ const spells = {
 							hurt: {
 								key: 'hurtground1',
 								type: 'ground',
+								sound:{key:'punchhit', volume:.5},
 								buffs: [{
 									key: 'slow',
 									level: 2
@@ -18589,10 +18112,10 @@ const spells = {
 						spriteLeft: 607,
 						spriteTop: 1370,
 						spriteWidth: 290,
-						spriteHeight: 198,
+						spriteHeight: 198 + 65,
 						spriteOrigin: 145,
+						bottomGap: -15,
 						extraStepXRate: 1,
-						bottomGap: -80,
 						speed: 12,
 						atk: {
 							yRange: 10,
@@ -18602,6 +18125,7 @@ const spells = {
 							hurt: {
 								key: 'hurtground1',
 								type: 'ground',
+								sound:{key:'punchhit', volume:.5},
 								buffs: [{
 									key: 'slow',
 									level: 2
@@ -24190,6 +23714,7 @@ const spells = {
 						extraStepXRate: 1,
 						bottomGap: -40,
 						speed: 4,
+						sound: { key:'beyblade', volume:.4 },
 						atk: {
 							yRange: 15,
 							rate: 2,
@@ -29194,7 +28719,7 @@ const cssAnimations = {
 		}
 		if(_char.main) {
 			ligthenGradient(_left, _top, _width, cssAnimationProps.lightradius2.p3 ?? _ctx);
-			const _spells = episode.enemies.filter(x => x.class === __spell && (x.owner ?? x.related)?.main);
+			const _spells = episode.seenEnemies.filter(x => x.class === __spell && (x.owner ?? x.related)?.main);
 			if(_spells?.[0])
 				_spells.forEach(x => cssAnimations.lightradius2(x, (cssAnimationProps.lightradius2.p2 ?? _rate) / 2, cssAnimationProps.lightradius2.p3 ?? _ctx, 1));
 		}
@@ -29308,11 +28833,12 @@ const _autumnColors = [ '#c62c11', '#c1220c', '#b01805', '#9a1703',
 function startAutumn(_force) {
 	if(!__account.options.weather && !_force)
 		return;
-	if (__weather.status === 'autumn')
-		return;
-	else if(__weather.status)
+	if(__weather.status)
 		stopWeather();
 	__weather.status = 'autumn';
+	dropLeaves();
+}
+function dropLeaves(_limit) {
 	var _canv = document.getElementById('css-canvas');
 	for(let i = 0; i < 6; i++) {
 		const _container = document.createElement('div');
@@ -29320,10 +28846,18 @@ function startAutumn(_force) {
 		const _leaf = document.createElement('img');
 		_leaf.className = 'leaf';
 		_leaf.number = i + 1;
-		createLeaf(_leaf, _container);
+		createLeaf(_leaf, _container, _limit);
 		_container.appendChild(_leaf);
 		_canv.appendChild(_container);
 	}
+}
+function startAutumn2(_force) {
+	if(!__account.options.weather && !_force)
+		return;
+	if(__weather.status)
+		stopWeather();
+	__weather.status = 'autumn';
+	dropLeaves(4);
 }
 function stopAutumn() {
 	//if (__weather.status === 'autumn'){
@@ -29387,31 +28921,31 @@ function createRock(_rock, _container) {
 		this.remove();
 	}
 }
-function createLeaf(_leaf, _container) {
-	var _h = getRandomValue(150, 250) / 60;
-	var _l = getRandomValue(0, 200);
-	_leaf.src = './images/texture/leaf' + getRandomValue(1, 5) + '.png';
+function createLeaf(_leaf, _container, _limit) {
+	var _h = getRandomValue2(150, 250) / 60;
+	var _l = getRandomValue2(0, 200);
+	_leaf.src = './images/texture/leaf' + getRandomValue2(1, _limit ?? 5) + '.png';
 	_container.style.height = _leaf.style.height = _h + 'vh';
 	//_leaf.style.borderRadius = (_w * .85) + 'vh ' + (_w / 10) + 'vh ' + (_w * 1.25) + 'vh ' + (_w / 10) + 'vh';
 	//_leaf.style.boxShadow = 'inset 0 0 ' + (_w / 4) + 'vh #222';
 	_container.style.left = _l + 'vh';
 	_leaf.startPlatformX = platformX;
-	_container.style.top = -getRandomValue(10, 30) + 'vh';
+	_container.style.top = _limit ? -getRandomValue2(3, 6) + 'vh' : -getRandomValue2(10, 30) + 'vh';
 	// let _br = 15;
 	// for(var i = 1; i <= 4; i++)
 	// 	removeClass(_leaf, 'leaf' + (_br + (i * 30)));
 	// addClass(_leaf, 'leaf' + (_br + (getRandomValue(1, 4) * 30)));
 	//_container.style.width = _leaf.style.width = _w + 'vh';
-	const _time = getRandomValue(9, 12);
-	const _delay = getRandomValue(4, 12);
+	const _time = getRandomValue2(9, 12);
+	const _delay = _limit ? getRandomValue2(1, 3) : getRandomValue2(4, 12);
 	_leaf.fallingTime = (_time + _delay) * 1000;
 	_leaf.fallingStart = _gameTick;
 	//_leaf.style.background = 'linear-gradient(to bottom left, ' + _autumnColors[getRandomValue(0,_autumnColors.length - 1)] + ', ' + _autumnColors[getRandomValue(0, _autumnColors.length - 1)] + ')';
 	_leaf.style.animation = 'none';
 	_leaf.offsetHeight; /* trigger reflow */
 	_leaf.style.animation = null; 
-	_leaf.style.marginLeft = getRandomValue(30, 60) + 'vh';
-	_leaf.style.animation = 'fall' + getRandomValue(1,4) + ' ' + _time + 's ease-in ' + _delay + 's';
+	_leaf.style.marginLeft = getRandomValue2(30, 60) + 'vh';
+	_leaf.style.animation = 'fall' + getRandomValue2(1,4) + ' ' + _time + 's ease-in ' + _delay + 's';
 	_container.style.transform = 'translate3d(0,0,0)';
 	_container.style.setProperty('-webkit-transform', _container.style.transform);
 }

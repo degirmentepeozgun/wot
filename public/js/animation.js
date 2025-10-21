@@ -29,8 +29,13 @@ function animation(_a) {
 	if(_a.useInCC)
 		this.useInCC = _a.useInCC;
 	this.passive = _a.passive;
+	if(_a.maxAttackedCount)
+		this.maxAttackedCount = _a.maxAttackedCount;
+	if(_a.shake)
+		this.shake = _a.shake;
 	this.ultimate = _a.ultimate;
 	this.rage = _a.rage;
+	this.hitStop = _a.hitStop;
 	this.rate = _a.rate;
 	this.level = _a.level;
 	this.maxLevel = _a.maxLevel;

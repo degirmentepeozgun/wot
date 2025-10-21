@@ -43,7 +43,7 @@ function getLobbyScene() {
 						sceneOrder: __storySceneOrder
 					}
 					_client.saveState();
-					if(__account.tutorials?.indexOf('invento-item-equip') >= 0)
+					if(__account.tutorials?.indexOf('invento-item-equipt') >= 0)
 						return;
 					if(!__account.tutorials)
 						__account.tutorials = [];
@@ -51,7 +51,7 @@ function getLobbyScene() {
 					//_weapon.weared = mainCharacter.class;
 					//__account.inventory = __account.inventory.filter(x => !x.weared);
 					//__account.inventory.push(_weapon);
-					__account.tutorials.push('invento-item-equip');
+					__account.tutorials.push('invento-item-equipt');
 					setTimeout(() => {
 						focusMe('.lobby-navbar-left', function() {
 							removeFocus(1);
@@ -596,6 +596,7 @@ const __stories = [
 			{
 				map: 105,
 				startWith: 47,
+				noArtifact: 1,
 				actions: [
 					{
 						when: function() {
@@ -2109,6 +2110,7 @@ const __stories = [
 					_char.updateVariables();
 					_princess.updateVariables();
 					completeQuest();
+					episode.drawSpriteObjects2('wizard', 1);
 					episode.endTime = __account.questStatus.lastStoryFinishTime ?? _gameTick;
 					if(__account.questStatus.lastStoryFinishTime)
 						delete __account.questStatus.lastStoryFinishTime;	
@@ -3683,7 +3685,7 @@ const __stories = [
 						x.still = x.stop = true;
 					});
 					const _spider = summonMob(10, MathRound((_canvas.width  * .4) * __zoom),
-						MathRound(groundheight / 5));
+						MathRound(groundheight / 5), null, null, 1);
 					_spider.puppetMode = true;
 					_spider.direction = 'right';
 					_spider.skipHealthBar = true;
@@ -4744,6 +4746,16 @@ const __stories = [
 						minX: 1580,
 						maxX: 4800,
 						count: 1,
+						sight: 1000,
+						spawn: 1,
+						hp:60
+					},
+					{
+						id: 23,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						sight: 1000,
 						spawn: 1,
 						hp:60
 					},
@@ -4752,23 +4764,26 @@ const __stories = [
 						minX: 1580,
 						maxX: 4800,
 						count: 1,
+						sight: 1000,
 						spawn: 1,
 						hp:60
 					},
-					{
-						id: 66,
-						minX: 1580,
-						maxX: 4800,
-						count: 1,
-						spawn: 1,
-						hp:60
-					},
+					// {
+					// 	id: 66,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	sight: 1000,
+					// 	count: 1,
+					// 	spawn: 1,
+					// 	hp:60
+					// },
 					{
 						id: 28,
 						minX: 1580,
 						maxX: 4800,
 						count: 1,
 						spawn: 1,
+						sight: 1000,
 						hp:60
 					},
 					{
@@ -4777,6 +4792,7 @@ const __stories = [
 						maxX: 4800,
 						count: 1,
 						spawn: 1,
+						sight: 1000,
 						hp:60
 					},
 					{
@@ -4790,6 +4806,7 @@ const __stories = [
 					{
 						id: 7,
 						minX: 1580,
+						sight: 1000,
 						maxX: 4800,
 						count: 1,
 						spawn: 1,
@@ -4799,6 +4816,7 @@ const __stories = [
 						id: 1,
 						minX: 1580,
 						maxX: 4800,
+						sight: 1000,
 						count: 1,
 						spawn: 1,
 						hp:60
@@ -6300,6 +6318,102 @@ const __stories = [
 		quests: [
 		],
 		scenes: [
+			// {
+			// 	map:5,
+			// 	startsWith:1,
+			// 	loadingCharacterIds: [101,102, 103, 104, 19],
+			// 	start: function() {
+			// 		setCharacterLevel(10);
+			// 		const _tagChar = episode.enemies.find(x => x.tag);
+			// 		if(_tagChar)
+			// 			_tagChar.remove = true;
+			// 		if(mainCharacter.tagContainer)
+			// 		{
+			// 			mainCharacter.tagContainer.remove();
+			// 			delete mainCharacter.tagContainer;
+			// 		}
+			// 	},
+			// 	mobs: [
+			// 		{
+			// 			id: 19,
+			// 			minX: 1500,
+			// 			maxX: 2500,
+			// 			count: 10
+			// 		},
+			// 		{
+			// 			id: 101,
+			// 			minX: 0,
+			// 			maxX: 6200,
+			// 			count: 100,
+			// 			do: function(_e) {
+			// 				_e.friendlyFire = true;
+			// 			},
+			// 			yPosition: function() {
+			// 				return MathRound((1 - (getRandomValue2(30, 70) / 100)) * groundheight);
+			// 			}
+			// 		},
+			// 		{
+			// 			id: 102,
+			// 			minX: 0,
+			// 			maxX: 6200,
+			// 			count: 100,
+			// 			do: function(_e) {
+			// 				_e.friendlyFire = true;
+			// 			},
+			// 			yPosition: function() {
+			// 				return MathRound((1 - (getRandomValue2(30, 70) / 100)) * groundheight);
+			// 			}
+			// 		},
+			// 		{
+			// 			id: 103,
+			// 			minX: 0,
+			// 			maxX: 6200,
+			// 			count: 100,
+			// 			do: function(_e) {
+			// 				_e.friendlyFire = true;
+			// 			},
+			// 			yPosition: function() {
+			// 				return MathRound((1 - (getRandomValue2(20, 60) / 100)) * groundheight);
+			// 			}
+			// 		},
+			// 		{
+			// 			id: 104,
+			// 			minX: 0,
+			// 			maxX: 6200,
+			// 			count: 100,
+			// 			do: function(_e) {
+			// 				_e.friendlyFire = true;
+			// 			},
+			// 			yPosition: function() {
+			// 				return MathRound((1 - (getRandomValue2(20, 60) / 100)) * groundheight);
+			// 			}
+			// 		},
+			// 		{
+			// 			id: 105,
+			// 			minX: 0,
+			// 			maxX: 6200,
+			// 			count: 100,
+			// 			do: function(_e) {
+			// 				_e.friendlyFire = true;
+			// 			},
+			// 			yPosition: function() {
+			// 				return MathRound((1 - (getRandomValue2(10, 50) / 100)) * groundheight);
+			// 			}
+			// 		},
+			// 		{
+			// 			id: 106,
+			// 			minX: 0,
+			// 			maxX: 6200,
+			// 			count: 100,
+			// 			do: function(_e) {
+			// 				_e.friendlyFire = true;
+			// 			},
+			// 			yPosition: function() {
+			// 				return MathRound((1 - (getRandomValue2(10, 50) / 100)) * groundheight);
+			// 			}
+			// 		}
+			// 	]
+			// },
 			{
 				map: 201,
 				heartCount : 3,
@@ -6352,7 +6466,7 @@ const __stories = [
 					);
 					episode.loadCharacterSprites(function() {}, null, ['hurtfeet'],1,1);
 					mainCharacter.direction = __right;
-					const _tagChar = episode.enemies.find(x => x.id === 47);
+					const _tagChar = episode.enemies.find(x => x.tag);
 					if(_tagChar)
 						_tagChar.remove = true;
 					if(mainCharacter.tagContainer)
@@ -6530,10 +6644,21 @@ const __stories = [
 				],
 				mobs: [
 					{
+						id: 24,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						sight: 1000,
+						spawn: 1,
+						hp:60,
+						experience: 250
+					},
+					{
 						id: 19,
 						minX: 1580,
 						maxX: 4800,
 						count: 1,
+						sight: 1000,
 						spawn: 1,
 						hp:60,
 						experience: 250
@@ -6543,24 +6668,27 @@ const __stories = [
 						minX: 1580,
 						maxX: 4800,
 						count: 1,
+						sight: 1000,
 						spawn: 1,
 						hp:60,
 						experience: 250
 					},
-					{
-						id: 66,
-						minX: 1580,
-						maxX: 4800,
-						count: 1,
-						spawn: 1,
-						hp:60,
-						experience: 250
-					},
+					// {
+					// 	id: 66,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 1,
+					// 	sight: 1000,
+					// 	spawn: 1,
+					// 	hp:60,
+					// 	experience: 250
+					// },
 					{
 						id: 28,
 						minX: 1580,
 						maxX: 4800,
 						count: 1,
+						sight: 1000,
 						spawn: 1,
 						hp:60,
 						experience: 250
@@ -6570,15 +6698,17 @@ const __stories = [
 						minX: 1580,
 						maxX: 4800,
 						count: 1,
+						sight: 1000,
 						spawn: 1,
 						hp:60,
 						experience: 250
 					},
 					{
-						id: 24,
+						id: 23,
 						minX: 1580,
 						maxX: 4800,
 						count: 1,
+						sight: 1000,
 						spawn: 1,
 						hp:60,
 						experience: 250
@@ -6589,6 +6719,7 @@ const __stories = [
 						maxX: 4800,
 						count: 1,
 						spawn: 1,
+						sight: 1000,
 						hp:60,
 						experience: 250
 					},
@@ -6597,6 +6728,7 @@ const __stories = [
 						minX: 1580,
 						maxX: 4800,
 						count: 1,
+						sight: 1000,
 						spawn: 1,
 						hp:60,
 						experience: 250
@@ -6667,8 +6799,10 @@ function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 	switchStoryScene(function() {
 		if(_func)
 			_func();
-		__story.startTime = _gameTick;
-		__story.endTime = undefined;
+		if(__story) {
+			__story.startTime = _gameTick;
+			__story.endTime = undefined;
+		}
 	});
 	mainCharacter.heartCount = __storyScene.heartCount ?? 1;
 	if(_client.quickPlay) {

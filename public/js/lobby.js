@@ -16,6 +16,8 @@ function hideSideMenu(_func) {
 	}
 }
 function outsideClick(e) {
+	if(document.getElementById('focus-ui'))
+		return;
 	const _m = document.querySelector('.menu-left-opener.opened');
 	if(!_m)
 		return;
