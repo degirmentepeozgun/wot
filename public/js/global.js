@@ -1920,7 +1920,7 @@ const relatedObjects = [
 	},
 	{
 		id: 'touch', key: 'touch', type: 'hurt', width: 204, height: 204, zoom: 1,
-		totalFrames: 6, col: 3, speed: 5, singleton: true
+		totalFrames: 5, col: 3, speed: 4, singleton: true
 	},
 	{
 		id: 'bloodstar', key: 'bloodstar', col: 4, width: 196, height: 158, zoom: .8,
@@ -2115,8 +2115,8 @@ const relatedObjects = [
 	{ id: 'bloodfx5', type: 'hurt', key: 'bloodfx5', reset:true, reversed: true, totalFrames: 8, still: true, speed: 4, singleton: true, width: 110, height: 100, baseTop: 280, zoom: 1.2 },
 	{ id: 'bloodfx6', type: 'hurt', key: 'bloodfx6', reset:true, reversed: true, totalFrames: 7, still: true, speed: 4, singleton: true, width: 110, height: 110, baseTop: 90, zoom: 1.2 },
 	{ id: 'bloodfx7', type: 'hurt', key: 'bloodfx7', reset:true, reversed: true, totalFrames: 6, still: true, speed: 4, singleton: true, width: 110, height: 80, baseTop: 660, zoom: 1.2 },
-	//{ id: 'bloodfx8', type: 'hurt', key: 'bloodfx8', totalFrames: 13, speed: 3, singleton: true, width: 110, height: 106, baseTop: 554, zoom: 1.2 },
-	{ id: 'bloodfx8', type: 'hurt', key: 'bloodfx8',  reset: true, totalFrames: 6, still:true, speed: 5, singleton: true, width: 400, height: 225, zoom: 1.2, xGap: 25, stillOnChar: true },
+	//{ id: 'bloodfx8', type: 'hurt', key: 'bloodfx8', totalFrames: 13, speed: 3, singleton: true, width: 110, height: 106, baseTop: 554, zoom: 1 },
+	{ id: 'bloodfx8red', type: 'hurt', key: 'bloodfx8red',  reset: true, totalFrames: 6, still:true, speed: 5, singleton: true, width: 400, height: 225, zoom: 1, xGap: 25, stillOnChar: true },
 	{ id: 'bloodfx1green', type: 'hurt', key: 'bloodfx1green', reset:true, reversed: true, totalFrames: 8, still: true, speed: 4, singleton: true, width: 114, height: 97, baseTop: 740, zoom: 1.2 },
 	{ id: 'bloodfx2green', type: 'hurt', key: 'bloodfx2green', reset:true, reversed: true, totalFrames: 8, still: true, speed: 4, singleton: true, width: 110, height: 85, baseTop: 470, zoom: 1.2 },
 	{ id: 'bloodfx3green', type: 'hurt', key: 'bloodfx3green', reset:true, reversed: true, totalFrames: 8, still: true, speed: 4, singleton: true, width: 110, height: 100, baseTop: 370, zoom: 1.2 },
@@ -2124,8 +2124,8 @@ const relatedObjects = [
 	{ id: 'bloodfx5green', type: 'hurt', key: 'bloodfx5green', reset:true, reversed: true, totalFrames: 8, still: true, speed: 4, singleton: true, width: 110, height: 100, baseTop: 280, zoom: 1.2 },
 	{ id: 'bloodfx6green', type: 'hurt', key: 'bloodfx6green', reset:true, reversed: true, totalFrames: 7, still: true, speed: 4, singleton: true, width: 110, height: 110, baseTop: 90, zoom: 1.2 },
 	{ id: 'bloodfx7green', type: 'hurt', key: 'bloodfx7green', reset:true, reversed: true, totalFrames: 6, still: true, speed: 4, singleton: true, width: 110, height: 80, baseTop: 660, zoom: 1.2 },
-	//{ id: 'bloodfx8green', type: 'hurt', key: 'bloodfx8green', totalFrames: 13, speed: 3, singleton: true, width: 110, height: 106, baseTop: 554, zoom: 1.2 },
-	{ id: 'bloodfx8green', type: 'hurt', key: 'bloodfx8green', reset: true, totalFrames: 6, speed: 5, still:true, singleton: true, width: 400, height: 225, zoom: 1.2, stillOnChar: true },
+	//{ id: 'bloodfx8green', type: 'hurt', key: 'bloodfx8green', totalFrames: 13, speed: 3, singleton: true, width: 110, height: 106, baseTop: 554, zoom: 1 },
+	{ id: 'bloodfx8green', type: 'hurt', key: 'bloodfx8green', reset: true, totalFrames: 6, speed: 5, still:true, singleton: true, width: 400, height: 225, zoom: 1, stillOnChar: true },
 	{
 		id: 'questshadow', key: 'questshadow', width: 192, height: 67, baseTop:7,
 		zoom: .9, totalFrames: 4, speed: 8, singleton: true, repeat: true, stillOnChar: true
@@ -2204,27 +2204,27 @@ const relatedObjects = [
 		totalFrames: 1, speed: 999, repeat: true, singleton: true, yGap: 50, still: true, background: true
 	},
 	{
-		id: 'hit1', key: 'hit1', width: 192, height: 192, zoom: 2,
+		id: 'hit1', key: 'hit1', width: 192, height: 192, zoom: 1,
 		totalFrames: 10, speed: 4, singleton: true, still: true
 	},
 	{
-		id: 'hit2', key: 'hit2', width: 192, height: 192, zoom: 2,
-		totalFrames: 20, speed: 4, singleton: true, still: true
+		id: 'hit2', key: 'hit2', width: 100, height: 100, zoom: 2, limit:5, col:5,
+		totalFrames: 10, speed: 4, skip:2, singleton: true, still: true
 	},
 	{
-		id: 'hit3', key: 'hit3', width: 192, height: 192, zoom: 2,
-		totalFrames: 20, speed: 4, singleton: true, still: true
+		id: 'hit3', key: 'hit3', width: 192, height: 192, zoom: 1, limit:5, col:5,
+		totalFrames: 15, speed: 4, singleton: true, still: true
 	},
 	{
-		id: 'hit4', key: 'hit4', width: 192, height: 192, zoom: 2,
-		totalFrames: 20, speed: 4, singleton: true, still: true
+		id: 'hit4', key: 'hit4', width: 192, height: 192, zoom: 2, col:5,
+		totalFrames: 12, speed: 4, singleton: true, still: true
 	},
 	{
-		id: 'hit5', key: 'hit5', width: 192, height: 192, zoom: 2,
-		totalFrames: 20, speed: 4, singleton: true, still: true
+		id: 'hit5', key: 'hit5', width: 192, height: 192, col: 5, zoom: 1,
+		totalFrames: 14, speed: 3, singleton: true, still: true
 	},
 	{
-		id: 'hurtvfx', key: 'hurtvfx', width: 192, height: 192, zoom: 2,
+		id: 'hurtvfx', key: 'hurtvfx', width: 192, height: 192, zoom: 1,
 		totalFrames: 20, speed: 4, singleton: true, type: 'hurt'
 	},
 	{
@@ -2233,7 +2233,7 @@ const relatedObjects = [
 	},
 	{
 		id: 'hurtsteal2', key: 'hurtsteal2', width: 192, col:5, height: 192, zoom: 2,
-		totalFrames: 8, speed: 4, singleton: true, type: 'hurt'
+		totalFrames: 8, speed: 3, singleton: true, type: 'hurt'
 	},
 	{
 		id: 'aura3', key: 'aura3', width: 192, height: 192, col:5, zoom: 2,
@@ -2277,18 +2277,28 @@ const relatedObjects = [
 	},
 	{
 		id: 'sparkhitmedium', key: 'sparkhitmedium',
-		width: 40, height: 40, col:4, zoom: 2, type: 'hurt', baseTop: 160,
+		width: 40, height: 40, col:4, zoom: 2.2, type: 'hurt', baseTop: 160,
 		totalFrames: 4, speed: 3, singleton: true, still: true
 	},
 	{
 		id: 'sparkhitbig', key: 'sparkhitbig',
-		width: 40, height: 40, col:4, zoom: 2, type: 'hurt', baseTop: 200,
+		width: 40, height: 40, col:4, zoom: 2.4, type: 'hurt', baseTop: 200,
 		totalFrames: 4, speed: 3, singleton: true, still: true
 	},
 	{
 		id: 'sparkcrit', key: 'sparkcrit',
-		width: 40, height: 40, col:4, zoom: 2, type: 'hurt', baseTop: 240,
+		width: 40, height: 40, col:5, zoom: 2.5, type: 'hurt', baseTop: 240,
 		totalFrames: 5, speed: 3, singleton: true, still: true
+	},
+	{
+		id: 'bloodsplat', key: 'bloodsplat',
+		width: 250, height: 250, col:4, zoom: 1, type: 'hurt',
+		totalFrames: 16, speed: 4, skip:2, singleton: true, still: true
+	},
+	{
+		id: 'bloodsplat2', key: 'bloodsplat2',
+		width: 200, height: 200, col:4, zoom: 1.5,
+		totalFrames: 10, speed: 3, singleton: true, still: true
 	}
 ];
 function setRelatedObjectSpeed() {
@@ -2298,6 +2308,12 @@ function setRelatedObjectSpeed() {
 }
 setRelatedObjectSpeed();
 const relatedObjectImages = {
+	bloodsplat2: function () {
+		return getImage('./images/related/blood-splatter2.png')
+	},
+	bloodsplat: function () {
+		return getImage('./images/related/bloodsplatter.png')
+	},
 	trail: function () {
 		return getImage('./images/related/trail.png?x=2')
 	},
@@ -2353,7 +2369,7 @@ const relatedObjectImages = {
 		return getImage('./images/related/hit_1.png')
 	},
 	hit2: function () {
-		return getImage('./images/related/hit_2.png')
+		return getImage('./images/related/hit2v2.png')
 	},
 	hit3: function () {
 		return getImage('./images/related/hit_3.png')
@@ -2454,7 +2470,7 @@ const relatedObjectImages = {
 	bloodfx7: function () {
 		return getImage('./images/related/bloodfx.png')
 	},
-	bloodfx8: function () {
+	bloodfx8red: function () {
 		return getImage('./images/related/bloodfx9.png')
 	},
 	// bloodfx9: function () {
@@ -2481,9 +2497,6 @@ const relatedObjectImages = {
 	bloodfx7green: function () {
 		return getImage('./images/related/bloodfxgreen.png')
 	},
-	// bloodfx8green: function () {
-	// 	return getImage('./images/related/bloodfxgreen.png')
-	// },
 	bloodfx8green: function () {
 		return getImage('./images/related/bloodfx9green.png')
 	},
@@ -2936,6 +2949,7 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	blockbreak2: './images/sounds/blockbreak2.mp3',
 	bloodsquish: './images/sounds/bloodsquish.mp3',
 	punchhit: './images/sounds/punchhit4.wav',
 	tak: './images/sounds/tak5.mp3',
@@ -27833,9 +27847,9 @@ const canvasAnimations =  {
 			_params.realR = _params.r;
 		_params.start++;
 		const _l  = _char.SCREENLEFT;
-		const _t = _char.TOP;
+		const _t = _char.yPosition;
 		const _x = _l + (MathRound((_params.x  ?? 0) * _char.ZOOM));
-		const _y = _t + MathRound((_params.y  ?? 0) * _char.ZOOM);
+		const _y = _t - MathRound((_params.y  ?? 0) * _char.ZOOM);
 		const _r = MathRound((_params.r  ?? 0) * _char.ZOOM);
 		const _rr = MathRound(3.25 * (_r / 10));
 		const _ca = _canv ?? c10;
@@ -27860,7 +27874,183 @@ const canvasAnimations =  {
 				_params.start = 0;
 				break;
 		}
+	},
+
+	halo: function (_char, _params, _canv) {
+		const ctx = _canv ?? c10;
+		const now = _gameTick;
+		const W = episode.cWidth;
+		const S = W / 1280; // çözünürlüğe göre ölçek faktörü
+
+		// === INIT ===
+		// Efekt başlatıldığında parametreleri sıfırla
+		if (!_params.startTime || _params.finished) {
+			_params.startTime = now;
+			_params.phase = 1;
+			_params.finished = false;
+			_params.sparkLines = []; // Faz 1’deki “ışık çizgileri”
+			_params.particles = [];  // Faz 3’teki “partiküller”
+		}
+
+		// Karakterin ekrandaki merkez koordinatı
+		const c = {
+			x: _char.SCREENLEFT,
+			y: (episode.cHeight - _char.yPosition) - ((_params.y ?? 0) * _char.ZOOM)
+		};
+		if (ctx.reversed) c.x *= -1; // ayna modu için (örneğin karakter sağa dönükse)
+
+		const elapsed = now - _params.startTime;
+
+		// Efekt süresi (toplam ~650ms)
+		const dur1 = 180; // Faz 1: Spark’lar merkeze çekiliyor
+		const dur2 = 90;  // Faz 2: Beyazdan siyaha geçiş anı (flash)
+		const dur3 = 400; // Faz 3: Halo (çember) genişleme + partikül dağılması
+		const total = dur1 + dur2 + dur3;
+
+		ctx.save();
+
+		// === FAZ 1: Spark çizgiler merkeze toplanıyor ===
+		if (elapsed < dur1) {
+			// İlk frame'de çizgileri oluştur
+			if (_params.sparkLines.length === 0) {
+				const count = 12; // 12 yönlü çizgi
+				for (let i = 0; i < count; i++) {
+					const angle = (Math.PI * 2 / count) * i;
+					_params.sparkLines.push({
+						angle,
+						len: (100 + Math.random() * 30) * S, // her çizginin uzunluğu
+					});
+				}
+			}
+
+			ctx.strokeStyle = 'rgb(125,249,255)';
+			ctx.lineWidth = 2 * S;
+			const prog = elapsed / dur1; // zaman ilerleme oranı (0–1)
+
+			// Her spark çizgisini merkeze doğru kısaltarak çiz
+			for (const s of _params.sparkLines) {
+				const r = s.len * (1 - prog);
+				const x1 = c.x + Math.cos(s.angle) * r;
+				const y1 = c.y + Math.sin(s.angle) * r;
+				const x2 = c.x + Math.cos(s.angle) * (r + 8 * S);
+				const y2 = c.y + Math.sin(s.angle) * (r + 8 * S);
+				ctx.beginPath();
+				ctx.moveTo(x1, y1);
+				ctx.lineTo(x2, y2);
+				ctx.stroke();
+			}
+
+			if(elapsed > (dur1 / 2)) {
+				// Küçük merkez parlaması
+				const rad = (40 + 40 * prog) * S;
+				ctx.fillStyle = `rgb(255,255,255)`;
+				ctx.beginPath();
+				ctx.arc(c.x, c.y, rad, 0, Math.PI * 2);
+				ctx.fill();
+			}
+
+			ctx.restore();
+			return;
+		}
+
+		// === FAZ 2: Beyazdan siyaha dönüş (Flash anı) ===
+		if (elapsed < dur1 + dur2) {
+			if(!_params.sound) {
+				PlaySound({key:'ultimate', volume: 1});
+				_params.sound = true;
+			}
+			// const t = (elapsed - dur1) / dur2;
+			// const alpha = 1 - t; // şeffaflık kademeli azalıyor
+			// ctx.fillStyle = `rgb(0,0,0)`;
+			// ctx.beginPath();
+			// ctx.arc(c.x, c.y, 80 * S, 0, Math.PI * 2);
+			// ctx.fill();
+			// ctx.restore();
+			ctx.restore();
+			return;
+		}
+
+		// === FAZ 3: Halo genişliyor + partiküller saçılıyor ===
+		const t3 = (elapsed - dur1 - dur2) / dur3;
+		// 🔸 Dış halka
+		const minR = W * 0.08;
+		const maxR = W * 0.65;
+		const ringR = minR + (maxR - minR) * Math.min(t3, 1); // zamana göre genişler
+		const ringAlpha = 1 - t3 * 1.3; // şeffaflaşır
+		const lineWidth = (12 * S) * (1 - t3 * 0.7); // kalınlık azalır
+
+		if (ringAlpha > 0) {
+			ctx.lineWidth = lineWidth;
+			ctx.strokeStyle = `rgb(125,249,255)`;
+
+			ctx.beginPath();
+			ctx.ellipse(c.x, c.y, ringR * 1.1, ringR * 0.9, 0, 0, Math.PI * 2);
+			ctx.stroke();
+		}
+
+		// 🔸 İç halka (Street Fighter tarzı dotted fade-out)
+		const innerMaxR = ringR * 0.5 * (1 + 0.25 * t3); // %10 ekstra genişleme
+		const innerR = innerMaxR * Math.min(t3 * 1.5, 1);
+		const innerAlpha = Math.max(0, 0.6 - t3); // kademeli şeffaflaşma
+		const innerLineW = (6 * S) * (1 - t3 * 0.5); // çizgi kalınlığı azalıyor
+
+		if (innerAlpha > 0) {
+			ctx.lineWidth = innerLineW;
+			ctx.strokeStyle = `rgb(125,249,255)`;
+
+			const segCount = 14; // kaç parça olacak (nokta sayısı)
+			const gapRatio = 0.45 + (0.35 * t3); // boşluk oranı zamanla artar (0.45 → 0.8)
+
+			// Dotted efekt: her segment arası boş bırakılarak yaylar çizilir
+			for (let i = 0; i < segCount; i++) {
+				const start = (i / segCount) * Math.PI * 2;
+				const end = start + (Math.PI * 2 / segCount) * (1 - gapRatio);
+				ctx.beginPath();
+				ctx.arc(c.x, c.y, innerR, start, end);
+				ctx.stroke();
+			}
+		}
+
+		// 🔸 Partiküller (küçük beyaz tanecikler)
+		if (_params.particles.length === 0) {
+			const pCount = 25;
+			for (let i = 0; i < pCount; i++) {
+				const angle = Math.random() * Math.PI * 2;
+				const spd = (2 + Math.random() * 3) * S;
+				_params.particles.push({
+					x: c.x, y: c.y,
+					vx: Math.cos(angle) * spd,
+					vy: Math.sin(angle) * spd,
+					life: 1,
+					size: (2 + Math.random() * 2) * S
+				});
+			}
+		}
+
+		// Partikül hareket ve solma
+		for (const p of _params.particles) {
+			p.x += p.vx;
+			p.y += p.vy;
+			p.life -= 0.03;
+			if (p.life > 0) {
+				ctx.fillStyle = 'rgb(255,255,255)';
+				ctx.beginPath();
+				ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+				ctx.fill();
+			}
+		}
+
+		ctx.restore();
+
+		// Efekt süresi bitince temizle
+		if (elapsed >= total) {
+			_char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'halo');
+			_params.finished = true;
+			delete _params.sound;
+		}
 	}
+
+
 }
 let _focusMode;
 const cssAnimations = {
@@ -28394,7 +28584,7 @@ const cssAnimations = {
 		return true;
 	},
 	slowMotion: function (_char, _ms, _arg1, _arg2, _rate) {
-		if (fps < _defaultFPS || episode?.war)
+		if (fps < _defaultFPS || episode?.realTime)
 			return;
 		if(!cssAnimationProps.slowMotion){
 			setFps(MathRound(_defaultFPS / (_rate ?? 2)));

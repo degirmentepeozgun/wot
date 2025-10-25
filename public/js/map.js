@@ -1642,8 +1642,9 @@ function map(_m) {
 				}
 				if(!this.hasSolid && sprite.solid)
 					this.hasSolid = 1;
-				sprite.unseen = (((sprite.EXACTLEFT) + sprite.WIDTH) < 0 ||
-					(sprite.EXACTLEFT) > this.cWidth);
+				sprite.out = (((sprite.EXACTLEFT) + sprite.WIDTH) < 0 ||
+						(sprite.EXACTLEFT) > this.cWidth);
+				sprite.unseen = sprite.out && !sprite.npc && sprite.dropType !== 'quest-item';
 				if(!sprite.unseen && updateUnseen && !sprite.remove)
 					this.seenEnemies.push(sprite);
 				if (sprite.autoMode > 0)
@@ -2060,7 +2061,7 @@ function map(_m) {
 	this.resetBgMusicVolume = function() {
 		if(this.bgMusic  && !this.bgMusic.still)
 			if(this.bgMusic.volumeDown && this.bgMusic.volume > (this.minBgMusicVolume ?? .1))
-				if(!(this.bgMusic.lastVolumeChangeTime > (_gameTick - 500))){
+				if ((_gameTick - 500) > this.bgMusic.lastVolumeChangeTime){
 					this.bgMusic.volume -= .02;
 					this.bgMusic.lastVolumeChangeTime = _gameTick;
 					this.setBgMusicPlayBackRate();
@@ -2829,7 +2830,7 @@ function map(_m) {
 				else if(!_hasRightEnemy)
 					_hasRightEnemy = 1;
 			}
-			if(_item.unseen || _item.char.unseen)
+			if(_item.unseen || _item.char.out || _item.char.unseen)
 				continue;
 			if(!_hasDmg && (_item.char.hurting?.count > 0 || _item.skinColor))
 				_hasDmg = true;
@@ -2848,7 +2849,7 @@ function map(_m) {
 		offCtx.reversed = c10.reversed = offGoreCtx.reversed = false;// = _cNPC.cleared = false;
 		//let _zoomRate, _zoomedWidth, _zoomedHeight, _zoomedLeft, _zoomedTop, 
 		let _hurt, _hurted, _rotate, _wDiff, _hDiff, _hurtedCount = 0, _bounceCount = 0;
-		let _preDraws = [], _backgrounds = [], _relateds = [];
+		let _preDraws = [], _backgrounds = [], _relateds = [], _out;
 		for (var _item of _queue) {
 			if (_item.unseen || _item.char.remove || _item.char.unseen)
 				continue;
@@ -2868,7 +2869,8 @@ function map(_m) {
 						_relateds.push(ob);
 			this.drawRelatedObjects(_item, _backgrounds);
 			this.drawGoreObjects(_item);
-			if (!_item.alpha) {
+			_out = _item.char.out || _item.alpha;
+			if (!_out) {
 				if (_item.reversed) {
 					if (!offCtx.reversed) {
 						offCtx.reversed = true;
@@ -2920,7 +2922,7 @@ function map(_m) {
 				if(_item.char.hurting.count <= 0)
 					_item.char.lastHurtTime = _gameTick;
 			}
-			if (!_item.alpha) {
+			if (!_out) {
 				if(_item.char.release || _item.animation === 'release' || 
 					_item.char.buffs?.find(x => x.key === 'release')) {
 					if(!_item.char.releaseCount)

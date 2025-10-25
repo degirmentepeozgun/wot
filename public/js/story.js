@@ -6795,6 +6795,7 @@ function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 		__storySceneOrder--;
 	}
 	episodeGold = episodePot = 0;
+	_client.loadPots();
 	__storyBonusItemCount = 0;
 	switchStoryScene(function() {
 		if(_func)
@@ -6909,7 +6910,7 @@ function switchStoryScene(_func, _newOrder) {
 }
 function restartStory() {
 	__storySceneOrder = 0;
-	switchStoryScene();
+	playStory(__story.id);
 }
 function warmupSpriteSheet(src) {
   return new Promise(resolve => {

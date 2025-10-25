@@ -224,15 +224,15 @@ function dataOperations(_quickPlay) {
 			find(x => x.order === _skill.order).level = _skill.level;
 		this.saveState();
 	}
-	this.loadState = function () {
-		let _reset = this.quickPlay;
+	this.loadState = function (_reset) {
+		let _r = this.quickPlay ?? _reset;
 		let _json = JSON.parse(localStorage.getItem(this.storageKey) ?? '{}');
 		if(_json?.version !== this.getDefaultData().version){
 			localStorage.removeItem(this.storageKey);
 			_json = {};
-			_reset = 1;
+			_r = 1;
 		}
-		if (!_reset)
+		if (!_r)
 			__account = _json;
 		else {
 			__account = this.getDefaultData();
@@ -250,10 +250,9 @@ function dataOperations(_quickPlay) {
 			_goldCount.innerText = __account.gold.formatWithDots();
 	}
 	this.loadPots = function () {
-		if (!_potCount)
-			_potCount = document.getElementById('main-pot-count');
+		const lp = document.getElementById('main-pot-count');
 		let _pot = __account.pots?.find(x => x.key === 'pot');
-		_potCount.innerText = _pot?.value ?? 0;
+		lp.innerText = _pot?.value ?? 0;
 	}
 	this.setCharacterValues = function (_char, _select, _tempLevel) {
 		let _c;

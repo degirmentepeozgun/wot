@@ -459,14 +459,12 @@ function keyboard(_character, _keys) {
 // }
 // syncKeys();
 
-
-
 const physicalKeys = new Set();
 const lastDown = {};
 const lastUp = {};
-const antiGhostMs = 50; // 40–60 ms arası güvenli (re-press ghostları engeller)
+const antiGhostMsDir = 50; // yön tuşları için
+const antiGhostMsOther = 10; // diğer tüm tuşlar için daha düşük
 
-// normalizeKey: yön tuşlarını WASD'e eşler
 function normalizeKey(key) {
   const _k = key?.toLowerCase?.() || null;
   switch (_k) {
@@ -478,7 +476,9 @@ function normalizeKey(key) {
   return _k;
 }
 
-// --- Event listeners ---
+// Yön tuşları seti
+const directionKeys = new Set(['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright']);
+
 window.addEventListener('keydown', (e) => {
   if (mainCharacter?.disableKeyboard) return;
 
@@ -488,11 +488,13 @@ window.addEventListener('keydown', (e) => {
   const now = performance.now();
   const lastUpTime = lastUp[kRaw] || 0;
 
-  // Anti-ghost check — keyup’tan hemen sonra gelen keydown'u yoksay
-  if (now - lastUpTime < antiGhostMs) {
-    // console.log('[Ghost prevented]', kRaw, now - lastUpTime);
+  const antiGhostMs = directionKeys.has(kRaw)
+    ? antiGhostMsDir
+    : antiGhostMsOther;
+
+  // Ghost engelleme
+  if (now - lastUpTime < antiGhostMs)
     return;
-  }
 
   lastDown[kRaw] = now;
   physicalKeys.add(kRaw);
@@ -513,48 +515,39 @@ window.addEventListener('blur', () => {
     mainCharacter.keyboard.holdingKeys = [];
 });
 
-// --- Frame-based senkronizasyon ---
 let frameCounter = 0;
 
 function syncKeysRobust() {
-  if (!mainCharacter?.keyboard) return requestAnimationFrame(syncKeysRobust);
+  if (!mainCharacter?.keyboard)
+    return requestAnimationFrame(syncKeysRobust);
 
-  // === sadece her 3 frame'de bir çalışsın ===
   if (frameCounter++ % 3 === 0) {
     const logicalKeys = new Set(Array.from(physicalKeys, normalizeKey));
     const desiredHolding = [];
 
     for (const k of logicalKeys) {
-      let bestRaw = null;
       let bestTime = 0;
       for (const raw of physicalKeys) {
         if (normalizeKey(raw) === k) {
           const t = lastDown[raw] || 0;
-          if (t > bestTime) {
-            bestTime = t;
-            bestRaw = raw;
-          }
+          if (t > bestTime) bestTime = t;
         }
       }
       if (k) desiredHolding.push({ key: k, time: bestTime });
     }
 
-    desiredHolding.sort((a, b) => (a.time || 0) - (b.time || 0));
+    desiredHolding.sort((a, b) => a.time - b.time);
 
     const desiredKeysArr = desiredHolding.map(x => x.key);
     const holdingKeys = mainCharacter.keyboard.holdingKeys.map(x => x.key);
 
-    for (const k of desiredKeysArr) {
-      if (!holdingKeys.includes(k)) {
+    for (const k of desiredKeysArr)
+      if (!holdingKeys.includes(k))
         mainCharacter.keyboard.mouseDown(k);
-      }
-    }
 
-    for (const k of holdingKeys) {
-      if (!desiredKeysArr.includes(k)) {
+    for (const k of holdingKeys)
+      if (!desiredKeysArr.includes(k))
         mainCharacter.keyboard.mouseUp(k);
-      }
-    }
   }
 
   requestAnimationFrame(syncKeysRobust);

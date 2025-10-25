@@ -394,6 +394,7 @@ const __langData = [
 	{ key: 'Progress', tr: 'Durum' },
 	{ key: 'RESET', tr: 'SIFIRLA' },
 	{ key: 'Rage', tr: 'Öfke' },
+	{ key: 'Affected Target', tr: 'Etkilenen Hedef' },
 	{ key: 'Reset talent build?', tr: 'Beceri ağacını sıfırla?' },
 	{ key: 'Trigger Chance', tr: 'Tetikleme Şansı' },
 	{ key: 'Charge Distance', tr: 'Şarj Mesafesi' },

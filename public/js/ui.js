@@ -1074,14 +1074,16 @@ function resetSkills(_ultimate, _keepCD, _char, _k, _endOfRage, _force) {
 				_ts.style = 'background-image:url(./images/main/skill-icons/' + _myFr.key + '/' + _chosenSkill + '.png?x=2);background-size:contain;background-position:center';
 				removeClass(_ts, 'v-none');
 			}
-			else
-				addClass(document.getElementById('skill12'), 'v-none');
+			else{
+				const _ts = document.getElementById('skill12');
+				//addClass(_ts, 'v-none');
+				addClass(_ts, 'bgless');
+			}
 		}
 		else if(!_ultimate && _c.animations.tag.delay)
 			_c.startCooldown(_c.animations.tag, null, 1);
 	}
 }
-
 function createTagSkill(_char, _tag) {
 	const _c = _char ?? mainCharacter;
 	if(!_c)

@@ -833,6 +833,8 @@ function characterSkill() {
 				(_skill.dmgType ?
 					'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Damage Type') + '</div>' +
 					'<div style="padding:1vh 0" class="w-50 flex flex-jc-end"><img style="height:3vh;margin-right:1vh" src="./images/elemental/' + _skill.dmgType.toLowerCase() + '.png" />' + getLangData(_skill.dmgType) + '</div></div>' : '') +
+				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Affected Target') + '</div>' +
+				'<div style="padding:1vh 0" class="w-50 flex flex-jc-end">' + (_animation.maxAttackedCount ?? __maxAttackedCount) + '</div></div>' +
 				'<div id="skill-current-props"><div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Current Level') + '</div>' +
 				'<div style="padding:1vh 0" class="w-50 flex flex-jc-end">+ %' + _currentProps.value + ' ' + getLangData(_currentProps.type) + '</div></div></div>' +
 				(_nextProps ? '<div id="skill-next-props"><div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Next Level') + '</div>' +

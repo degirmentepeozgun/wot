@@ -1149,7 +1149,7 @@ function enemy(_e) {
 			this.maxAttackerCount = getRandomValue2((6 - __account.difficulty), (5 - __account.difficulty) * (6 - __account.difficulty)); 
 		// if(this.socketDirPressed)
 		// 	this.socketDirPressed = undefined;
-		this.hurting = this.attackerCount = this.noCounter = this.lastSpellTakenKey = this.attacked = this.attacking = this.upcomingAnimation = this.randomStep = undefined;
+		this.hurting = this.chargeProperties = this.chargimg = this.attackerCount = this.noCounter = this.lastSpellTakenKey = this.attacked = this.attacking = this.upcomingAnimation = this.randomStep = undefined;
 		//this.relatedObjects?.filter(x => x.bind === this.animation && !x.remove)?.forEach(x => x.remove = true);
 		if(this.keyboard) {
 			const _dirName = this.getKeyboardXMove();
@@ -1507,9 +1507,17 @@ function enemy(_e) {
 						x.def = {};
 					if(!x.def.iframe)
 						x.def.iframe = true;
+					x.extraStepXRate = 0;
 				});
 				_anima.next = 'dead';
-				this.addObject({ key: 'deadspark' + (this.bloodColor ?? 'red'), position: 'middle' });
+				_anima.frames[0].color = _anima.frames[1].color = 
+				this.skinColor = this.hurtColor = '#7C3030';
+				if(this.hurting?.hit)
+					delete this.hurting.hit;
+				setTimeout(() => {
+					this.addObject({ key: 'hit2', position: 'middle' });	
+				}, getRandomValue2(1,3) * 50);
+				this.extraStepXRate = 0;
 			}
 			else if(!this.laying)
 				this.animate('dead', null, null, 1);
@@ -1846,18 +1854,17 @@ function enemy(_e) {
 							this.animate('dead', null, null, 2);
 					}
 					if (_anima.ultimate) { // && (this.main || this.friendly || episode.pvp)) {
-						if (!this.ultimate) {
+						if (!this.ultimate)
 							this.ultimate = true;
-							if(!this.ultimateUsed)
-								this.ultimateUsed = true;
-						}
+						if(!this.ultimateUsed)
+							this.ultimateUsed = true;
 						if(this.alp || episode.pvp)
 							resetSkills(1, null, this);
 						this.rage = _gameTick;
 						// if(this.main && !__account.options.effect)
 						// 	addClass(_gamePad, 'rage-activated');
 						// if (this.main)
-						// 	removeClass(rageSkill, 'glow');
+						// 	removeClass(rageSkill, 'rage-shimmer');
 					}
 					if (this.class === __spell && this.animation === 'dead'){
 						//episode.enemies = episode.enemies.filter(x => x != this);
@@ -3397,8 +3404,6 @@ function enemy(_e) {
 					let _speed = this.chargeProperties?.speed ?? 0;
 					if (!this.chargeProperties && this.charging) {
 						this.charging = (_anima.chargeDistance.value * .66) < (100 * (_result.range / episode.cWidth)) ? 1 : 0;
-						if(this.main)
-							_result.enemy.hurtColor = '#880808';
 						PlaySound({key: 'impact'});
 						if(!_speed)
 							for (var i = 0; i <= _anima.chargeDistance.untilFrame ?? 0; i++)
@@ -4213,13 +4218,14 @@ function enemy(_e) {
 							if (_f.atk.hurt.spells)
 								for (var _fsp of _f.atk.hurt.spells)
 									_t.throwSpell({ spell: _fsp }, _t.parent ?? _t);
-							_f.atk.hitTaken = _f.atk.hitTaken ?? 1;
+							_f.atk.hitTaken ??= 1;
 							if (_f.atk.hitTaken > 0) {
 								if (_ea.hurt) {
 									if (_e.hitTakenCount === undefined)
 										_e.hitTakenCount = 0;
 									_e.hitTakenCount += _f.atk.hitTaken;
-									_e.increaseRage(_f.atk.hitTaken);
+									if(!_t.attackedUnitCount)
+										_e.increaseRage(_f.atk.hitTaken);
 								}
 								else
 									_e.hitTakenCount = _f.atk.hitTaken;
@@ -4282,6 +4288,7 @@ function enemy(_e) {
 							if ((_erelease || _f.atk.hurt.key) && _cced) {
 								if (_erelease) {
 									PlaySound({ key: 'release', volume: .3});
+									_e.addObject({key:'hurtsteal2', position: 'middle'});
 									if(_e.animations.release)
 										_e.animate('release', 1);
 									else
@@ -4490,25 +4497,29 @@ function enemy(_e) {
 												if(!_hasEffect)
 													_hasEffect = 1;
 											}
-									if(_animateSkill?.startsWith('hurtground')) {
+									if(!_hasEffect && _animateSkill?.startsWith('hurtground')) {
 										setTimeout(() => {
 											if(_t.criticalHit) {
 												//buraya crit spark
 												_e.addObject({key:'sparkcrit', position: 'middle'});
+												_e.addObject({ key: 'deadspark' + (_e.bloodColor ?? 'red'), position: 'middle' });
 											}
 											else {
 												//_e.addObject({key:'hitwhite', position: 'middle'});
 												//buraya normal spark
 												if(_f.atk.rate < 1) {
 													//ufak
+													_e.addObject({key:'shine', position: 'middle'});
 													_e.addObject({key:'sparkhitsmall', position: 'middle'});
 												}
 												else if(_f.atk.rate < 2) {
 													//orta
+													_e.addObject({key:'shine', scale:1.1, position: 'middle'});
 													_e.addObject({key:'sparkhitmedium', position: 'middle'});
 												}
 												else {
 													//büyük
+													_e.addObject({key:'shine', scale:1.2, position: 'middle'});
 													_e.addObject({key:'sparkhitbig', position: 'middle'});
 												}
 											}
@@ -4603,12 +4614,12 @@ function enemy(_e) {
 						}
 					}
 				}
-				else if (_enemy.blocked && _thisPriority >= 1) {
+				else if (_enemy.animation.endsWith('block') && _thisPriority >= 1) {
 					_enemy.animate('hurtblock');
-					const _decreased = _enemy.decreaseFatique(this, _frame.atk?.type);
+					const _decreased = _enemy.decreaseFatique(this, _frame.atk?.rate);
 					if (!_decreased) {
 						_enemyHurted = hurtEnemy(this, _frame, _enemy, _enemyFrame, _enemyAnima);
-						if (_enemy.blocked){
+						if (_enemy.animation.endsWith('block')){
 							this.addObject({
 								key: 'glow',
 								position: 'middle'
@@ -4910,6 +4921,8 @@ function enemy(_e) {
 			return;
 		if (this.rage)
 			return;
+		if((_gameTick - this.lastRageGainTime) < 333)
+			return;
 		if ((this.rageCount ?? 0) < 0)
 			this.rageCount = 0;
 		const _mr = this.getMaxRageCount();
@@ -4948,14 +4961,15 @@ function enemy(_e) {
 		if (this.rageCount > _mr)
 			this.rageCount = _mr;
 		this.updateRageSkillUI();
+		this.lastRageGainTime = _gameTick;
 	}
 	this.decreaseRage = function () {
 		if (this.rageCount <= 0)
 			return;
 		if (this.rage)
 			return;
-		if(this.rageCount === this.getMaxRageCount())
-			removeClass(rageSkill, 'glow');
+		// if(this.main && this.rageCount === this.getMaxRageCount())
+		// 	removeClass(rageSkill, 'rage-shimmer');
 		this.rageCount--;
 		this.attackedUnitTime = _gameTick - 10;
 		this.updateRageSkillUI();
@@ -4985,12 +4999,9 @@ function enemy(_e) {
 			rageSkill = document.getElementById('skill6');
 		if (this.rageCount < 0)
 			this.rageCount = 0;
-		if (this.main)
-			rageSkill.style.background = 'radial-gradient(transparent, transparent, #00000080, transparent, transparent), url(./images/main/skill-icons/air2.png), linear-gradient(0deg, red ' + MathRound(this.rageCount * (100 / this.getMaxRageCount())) + '%, black 0%)';
-		else if(this.hasRageBar){
-			const _bar = document.getElementById('ragebar-hb-' + this.key);
-			if(_bar)
-				_bar.style.width = MathRound(this.rageCount * (100 / this.getMaxRageCount())) + '%';
+		if (this.main) {
+			const _perc = MathRound(this.rageCount * (100 / this.getMaxRageCount()));
+			rageSkill.style.background = 'radial-gradient(transparent, transparent, #00000080, transparent, transparent), url(./images/main/skill-icons/air2.png), linear-gradient(0deg, ' + (_perc < 100 ? '#A42A04':'#FF2020') + ' ' + _perc + '%, black 0%)';
 		}
 		if (this.rageCount === 0) {
 			const _endOfRage = this.ultimate;
@@ -4999,19 +5010,16 @@ function enemy(_e) {
 				resetSkills(null, _doNotResetSkills, this, null, _endOfRage);
 			if (this.main) {
 				removeUltimateCircle();
-				//removeClass(rageSkill, 'glow');
+				//removeClass(rageSkill, 'rage-shimmer');
 			}
 			else if(this.hasRageBar)
 				removeClass(document.getElementById('ragebar-hb-' + this.key), 'raging');
 			return true;
 		}
-		else if (this.rageCount === this.getMaxRageCount()) {
-			// if(this.main)
-			// 	addClass(rageSkill, 'glow');
-			//else 
-			if(this.hasRageBar)
-				addClass(document.getElementById('ragebar-hb-' + this.key), 'raging');
-		}
+		// else if (this.rageCount === this.getMaxRageCount()) {
+		// 	if(this.main)
+		// 		addClass(rageSkill, 'rage-shimmer');
+		// }
 		return false;
 	}
 	this.useCommonSkill = function (_order) {
@@ -6807,6 +6815,7 @@ function enemy(_e) {
 				}
 			}
 		}
+		this.chargeProperties = this.charging = undefined;
 		this.animation = _skill;
 		let anima = this.animations[this.animation];
 		if(anima?.attack){
@@ -7209,9 +7218,12 @@ function enemy(_e) {
 	this.decreaseFatique = function (_attacker, _rate) {
 		const _r = _rate ?? 1;
 		const _dec = MathRound(fatiqueDecreasement * (_r < 1 ? 1 : _r));
-		if (this.fatique < _dec)
+		if (this.fatique < _dec){
+			PlaySound({ key: 'blockbreak2' });
+			this.addObject({key:'bloodhit', position:'middle'});
 			return false;
-		this.fatique -= (_dec * (_attacker?.getCurrentFrame()?.atk?.rate ?? 1));
+		}
+		this.fatique -= _dec;
 		_client.setFatique(this);
 		const _bar = this.fatBar ?? document.querySelector('#char-' + this.key + ' .defbar-value');
 		if(_bar)
@@ -7469,6 +7481,12 @@ function enemy(_e) {
 			}
 			else if(_ak.startsWith('hurtground'))
 				this.groundHurtKeys.push(_ak);
+			else if(_ak.startsWith('knockback'))
+				_aks.frames.forEach(x => {
+					const _blood = x.objects?.find(y => y.key === 'bloodfx8');
+					if(_blood)
+						_blood.key += (this.bloodColor ?? 'red');
+				});
 			else if(_ak.startsWith('hurtair'))
 				this.airHurtKeys.push(_ak);
 			else if(_aks.attack && !_aks.chain)

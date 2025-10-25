@@ -9629,3 +9629,20 @@ aspect-ratio: 16 / 9;
 	from { --angle: 0deg; }
 	to { --angle: 360deg; }
 }
+
+.rage-sf::after {
+	content:'';
+	position: absolute;
+	overflow: hidden;  
+    animation: rageGlow 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 1vh #722F37);
+}
+
+@keyframes rageGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 1vh #722F37);
+  }
+  50% {
+    filter: drop-shadow(0 0 1vh transparent);
+  }
+}

@@ -322,7 +322,7 @@ function createCharacter(_settings) {
 					air2: {
 						key: 'air2',
 						type: 'skill',
-						rage: 1, // __maxRageCount,
+						rage: __maxRageCount,
 						order: 6,
 						attack: true,
 						ultimate: true,
@@ -336,6 +336,20 @@ function createCharacter(_settings) {
 								spriteHeight: 238,
 								spriteOrigin: 62,
 								speed: 1,
+								objects: [
+									{
+										key: 'dark',
+										position: 'css'
+									},
+									{ 
+										key: 'halo', 
+										position: 'canvas', 
+										p1: {
+											ms: 1000,
+											y:120
+										} 
+									}
+								],
 								def: {
 									iframe: true
 								},
@@ -932,7 +946,6 @@ function createCharacter(_settings) {
 						//baseKey: 'attack',
 						src: './images/main/warrior/taktak.png',
 						priority: 2,
-						hitStop:5,
 						frames: [
 							{
 								spriteLeft: 0,
@@ -1015,12 +1028,12 @@ function createCharacter(_settings) {
 								bottomGap: -70,
 								push: true,
 								objects: [
-									
 									{ key: 'zoom', position: 'css', p1: 1.5, p2: 1400, p3: 9 }
 								],
 								atk: {
 									yRange: 15,
 									rate: 2,
+									hitStop:4,
 									aoe: 100,
 									hurt: {
 										// do: function(_f, _c, _e) {
@@ -1035,6 +1048,10 @@ function createCharacter(_settings) {
 										type: 'air',
 										sound: { key:'tak', volume:.3, reset: true},
 										objects: [
+											{
+												key: 'crit',
+												position: 'middle'
+											},
 											{
 												key: 'ouch',
 												position: 'middle-front',
@@ -1097,6 +1114,7 @@ function createCharacter(_settings) {
 								atk: {
 									yRange: 15,
 									rate: 2,
+									hitStop:5,
 									aoe: 100,
 									hurt: {
 										// do: function(_f, _c, _e) {
@@ -1110,7 +1128,10 @@ function createCharacter(_settings) {
 										key: 'hurtair',
 										type: 'air',
 										sound: { key:'tak', volume:.3, reset: true},
-										objects: [
+										objects: [{
+												key: 'crit',
+												position: 'middle'
+											},
 											{
 												key: 'ouch',
 												position: 'middle-front',
@@ -1174,6 +1195,7 @@ function createCharacter(_settings) {
 									yRange: 15,
 									rate: 2,
 									aoe: 100,
+									hitStop:5,
 									hurt: {
 										// do: function(_f, _c, _e) {
 										// 	if(episode?.realTime)
@@ -1186,7 +1208,10 @@ function createCharacter(_settings) {
 										key: 'hurtair',
 										type: 'air',
 										sound: { key:'tak', volume:.3, reset: true},
-										objects: [
+										objects: [{
+												key: 'crit',
+												position: 'middle'
+											},
 											{
 												key: 'ouch',
 												position: 'middle-front',
@@ -1264,6 +1289,7 @@ function createCharacter(_settings) {
 								atk: {
 									yRange: 15,
 									rate: 2,
+									hitStop:4,
 									aoe: 100,
 									hurt: {
 										// do: function(_f, _c, _e) {
@@ -1277,7 +1303,10 @@ function createCharacter(_settings) {
 										key: 'hurtair',
 										sound: { key:'tak', volume:.3, reset: true},
 										type: 'air',
-										objects: [
+										objects: [{
+												key: 'crit',
+												position: 'middle'
+											},
 											{
 												key: 'ouch',
 												position: 'middle-front',
@@ -3447,7 +3476,7 @@ function createCharacter(_settings) {
 								spriteWidth: 116,
 								spriteHeight: 249,
 								spriteOrigin: 55
-							}, { key:'warriorhurtground1' }
+							}, { key:'warriorhurtground1', reset: true }
 					),
 					hurtground2: function() {
 						const _hurt = createHurtGround(
@@ -3472,7 +3501,7 @@ function createCharacter(_settings) {
 							spriteHeight: 145,
 							spriteOrigin: 53
 						}
-						, { key:'warriorhurtground1', volume:.2 });
+						, { key:'warriorhurtground1', volume:.2, reset: true });
 						_hurt.key = 'hurtground2';
 						return _hurt;
 					}(),
@@ -10262,7 +10291,7 @@ function createCharacter(_settings) {
 							spriteOrigin: 56,
 							src: './images/main/archer/hurt1.png'
 						},
-						null, { key: 'archerhurt1' }	
+						null, { key: 'archerhurt1', reset: true }	
 					),
 					// hurtground2: {
 					// 	key: 'hurtground2',
@@ -16520,7 +16549,7 @@ const _allEnemies = {
 						{
 							spriteLeft: 1078,
 							spriteTop: 268,
-							spriteWidth: 197,
+							spriteWidth: 219,
 							spriteHeight: 82,
 							spriteOrigin: 98,
 							def: {
@@ -16531,7 +16560,7 @@ const _allEnemies = {
 						{
 							spriteLeft: 1078,
 							spriteTop: 268,
-							spriteWidth: 197,
+							spriteWidth: 219,
 							spriteHeight: 82,
 							spriteOrigin: 98,
 							speed: 4,
@@ -16542,14 +16571,6 @@ const _allEnemies = {
 								yRange: 15,
 								rate: .3,
 								hurt: {
-									do: function(_f, _t, _e) {
-										_t.addObject({
-												key: 'touch',
-												position: 'middle-front',
-												pushObject: true
-											}
-										);
-									},
 									sound: { key: 'bite' },
 									key: 'hurtground1',
 									type: 'ground'
@@ -16586,8 +16607,16 @@ const _allEnemies = {
 							spriteWidth: 197,
 							spriteHeight: 82,
 							spriteOrigin: 98,
-							speed: 10,
+							speed: 6,
 							directionChangeEnabled: true
+						},
+						{
+							spriteLeft: 1078,
+							spriteTop: 268,
+							spriteWidth: 246,
+							spriteHeight: 82,
+							spriteOrigin: 98,
+							speed: 4,
 						},
 						{
 							spriteLeft: 1337,
@@ -16602,14 +16631,6 @@ const _allEnemies = {
 								yRange: 15,
 								rate: 2,
 								hurt: {
-									do: function(_f, _t, _e) {
-										_t.addObject({
-												key: 'touch',
-												position: 'middle-front',
-												pushObject: true
-											}
-										);
-									},
 									key: 'hurtground1',
 									type: 'ground'
 								},
@@ -16627,104 +16648,104 @@ const _allEnemies = {
 						}
 					]
 				},
-				ground2: {
-					key: 'ground2',
-					order: 4,
-					type: 'skill',
-					//attack: true,
-					move: true,
-					cooldown: 10000,
-					frames: [
-						{
-							spriteLeft: 1632,
-							spriteTop: 247,
-							spriteWidth: 215,
-							spriteHeight: 105,
-							spriteOrigin: 113,
-							speed: 1,
-							def: {
-								iframe: true
-							}
-						},
-						{
-							spriteLeft: 1632,
-							spriteTop: 247,
-							spriteWidth: 215,
-							spriteHeight: 105,
-							spriteOrigin: 113,
-							sound: { key: 'hyenaground2', volume: .2 },
-							speed: 11,
-							def: {
-								iframe: true
-							}
-						},
-						{
-							spriteLeft: 1898,
-							spriteTop: 219,
-							spriteWidth: 189,
-							spriteHeight: 134,
-							spriteOrigin: 95,
-							speed: 12,
-							def: {
-								iframe: true
-							}
-						},
-						{
-							spriteLeft: 2109,
-							spriteTop: 206,
-							spriteWidth: 173,
-							spriteHeight: 147,
-							spriteOrigin: 87,
-							speed: 23,
-							def: {
-								iframe: true
-							}
-						},
-						{
-							spriteLeft: 2109,
-							spriteTop: 206,
-							spriteWidth: 173,
-							spriteHeight: 147,
-							spriteOrigin: 87,
-							speed: 1,
-							buffs: [{
-								level: 2,
-								key: 'speedup'
-							}],
-							def: {
-								iframe: true
-							}
-						},
-						{
-							spriteLeft: 1898,
-							spriteTop: 219,
-							spriteWidth: 189,
-							spriteHeight: 134,
-							spriteOrigin: 95,
-							speed: 1,
-							spell: {
-								key: 'lestatthunder',
-								xGap: 150,
-								bottomGap: -20,
-								pierce: true
-							},
-							def: {
-								iframe: true
-							}
-						},
-						{
-							spriteLeft: 1898,
-							spriteTop: 219,
-							spriteWidth: 189,
-							spriteHeight: 134,
-							spriteOrigin: 95,
-							speed: 11,
-							def: {
-								iframe: true
-							}
-						}
-					]
-				},
+				// ground2: {
+				// 	key: 'ground2',
+				// 	order: 4,
+				// 	type: 'skill',
+				// 	//attack: true,
+				// 	move: true,
+				// 	cooldown: 10000,
+				// 	frames: [
+				// 		{
+				// 			spriteLeft: 1632,
+				// 			spriteTop: 247,
+				// 			spriteWidth: 215,
+				// 			spriteHeight: 105,
+				// 			spriteOrigin: 113,
+				// 			speed: 1,
+				// 			def: {
+				// 				iframe: true
+				// 			}
+				// 		},
+				// 		{
+				// 			spriteLeft: 1632,
+				// 			spriteTop: 247,
+				// 			spriteWidth: 215,
+				// 			spriteHeight: 105,
+				// 			spriteOrigin: 113,
+				// 			sound: { key: 'hyenaground2', volume: .2 },
+				// 			speed: 11,
+				// 			def: {
+				// 				iframe: true
+				// 			}
+				// 		},
+				// 		{
+				// 			spriteLeft: 1898,
+				// 			spriteTop: 219,
+				// 			spriteWidth: 189,
+				// 			spriteHeight: 134,
+				// 			spriteOrigin: 95,
+				// 			speed: 12,
+				// 			def: {
+				// 				iframe: true
+				// 			}
+				// 		},
+				// 		{
+				// 			spriteLeft: 2109,
+				// 			spriteTop: 206,
+				// 			spriteWidth: 173,
+				// 			spriteHeight: 147,
+				// 			spriteOrigin: 87,
+				// 			speed: 23,
+				// 			def: {
+				// 				iframe: true
+				// 			}
+				// 		},
+				// 		{
+				// 			spriteLeft: 2109,
+				// 			spriteTop: 206,
+				// 			spriteWidth: 173,
+				// 			spriteHeight: 147,
+				// 			spriteOrigin: 87,
+				// 			speed: 1,
+				// 			buffs: [{
+				// 				level: 2,
+				// 				key: 'speedup'
+				// 			}],
+				// 			def: {
+				// 				iframe: true
+				// 			}
+				// 		},
+				// 		{
+				// 			spriteLeft: 1898,
+				// 			spriteTop: 219,
+				// 			spriteWidth: 189,
+				// 			spriteHeight: 134,
+				// 			spriteOrigin: 95,
+				// 			speed: 1,
+				// 			spell: {
+				// 				key: 'lestatthunder',
+				// 				xGap: 150,
+				// 				bottomGap: -20,
+				// 				pierce: true
+				// 			},
+				// 			def: {
+				// 				iframe: true
+				// 			}
+				// 		},
+				// 		{
+				// 			spriteLeft: 1898,
+				// 			spriteTop: 219,
+				// 			spriteWidth: 189,
+				// 			spriteHeight: 134,
+				// 			spriteOrigin: 95,
+				// 			speed: 11,
+				// 			def: {
+				// 				iframe: true
+				// 			}
+				// 		}
+				// 	]
+				// },
 				walk: {
 					key: 'walk',
 					type: 'move',
@@ -19062,7 +19083,7 @@ const _allEnemies = {
 						spriteWidth: 112,
 						spriteHeight: 61,
 						spriteOrigin: 58,
-					}, { key: 'emegenhurt' }
+					}, { key: 'emegenhurt', reset: true }
 				),
 				// {
 				// 	key: 'hurtground1',
@@ -48979,6 +49000,13 @@ const _allEnemies = {
 							spriteHeight: 343,
 							spriteOrigin: 85,
 							speed: 6,
+							objects: [{ 
+								key:'aura3', 
+								position:'under-feet',
+								bind:true,
+								yGap: 70,
+								xGap: 0
+							}],
 							def: {
 								iframe: true
 							}
@@ -70386,7 +70414,7 @@ const _allEnemies = {
 							spriteHeight: 455,
 							spriteOrigin: 120,
 							speed: 50
-						}, null, 'alhurt1,alhurt2', './images/sprites/ep1000/dead.png'),
+						}, null, { key: 'alhurt1,alhurt2', reset: true }, './images/sprites/ep1000/dead.png'),
 				hurtground2: createHurtGround(	{
 							spriteLeft: 987,
 							spriteTop: 1151,
@@ -70402,7 +70430,7 @@ const _allEnemies = {
 							spriteHeight: 406,
 							spriteOrigin: 250,
 							speed: 50
-						}, null, 'alhurt1,alhurt2', './images/sprites/ep1000/dead.png'),
+						}, null, { key: 'alhurt1,alhurt2', reset: true }, './images/sprites/ep1000/dead.png'),
 				dead: {
 					key: 'dead',
 					type: 'skill',
@@ -72014,6 +72042,10 @@ function summonShadowClone(_char, _force) {
 
 function createHurtGround(_sprite1, _sprite2, _sprite3, 
 	_sound, _src, _effect, _redSprite) {
+	if(_sound && !_sound.key)
+		_sound = { key: _sound };
+	if(!_sound.reset)
+		_sound.reset = true;
 	let _rate = getRandomValue2(1, 3);
 	let _arr;
 	if(_rate > 2)
@@ -72024,6 +72056,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 		_arr = [2,2,3,3,4,4];
 	if(_rate > 2)
 		_rate = 2;
+	const _shakeDist = getRandomValue2(7, 14);
 	var result = {
 		key: 'hurtground1',
 		type: 'skill',
@@ -72032,9 +72065,9 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 			{
 				spriteLeft: (_redSprite ?? _sprite1).spriteLeft,
 				spriteTop: (_redSprite ?? _sprite1).spriteTop,
-				spriteWidth: (_redSprite ?? _sprite1).spriteWidth,
+				spriteWidth: (_redSprite ?? _sprite1).spriteWidth + _shakeDist,
 				spriteHeight: (_redSprite ?? _sprite1).spriteHeight + (_rate * 1),
-				spriteOrigin: (_redSprite ?? _sprite1).spriteOrigin,
+				spriteOrigin: (_redSprite ?? _sprite1).spriteOrigin - _shakeDist,
 				src: (_redSprite ?? _sprite1).src,
 				bottomGap: ((_redSprite ?? _sprite1).bottomGap ?? 0),
 				do: (_redSprite ?? _sprite1).do,
@@ -72048,9 +72081,9 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 			{
 				spriteLeft: (_redSprite ?? _sprite1).spriteLeft,
 				spriteTop: (_redSprite ?? _sprite1).spriteTop,
-				spriteWidth: (_redSprite ?? _sprite1).spriteWidth,
+				spriteWidth: (_redSprite ?? _sprite1).spriteWidth + MathRound(_shakeDist / 2),
 				spriteHeight: (_redSprite ?? _sprite1).spriteHeight + (_rate * 1),
-				spriteOrigin: (_redSprite ?? _sprite1).spriteOrigin,
+				spriteOrigin: (_redSprite ?? _sprite1).spriteOrigin - MathRound(_shakeDist / 2),
 				src: (_redSprite ?? _sprite1).src,
 				bottomGap: ((_redSprite ?? _sprite1).bottomGap ?? 0),
 				sound: _sound,
@@ -72063,9 +72096,9 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 			{
 				spriteLeft: _sprite1.spriteLeft,
 				spriteTop: _sprite1.spriteTop,
-				spriteWidth: _sprite1.spriteWidth,
+				spriteWidth: _sprite1.spriteWidth + MathRound(_shakeDist / 3),
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin + 2,
+				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 3),
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + 2,
 				objects: _sprite1.objects,
@@ -72078,9 +72111,9 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 			{
 				spriteLeft: _sprite1.spriteLeft,
 				spriteTop: _sprite1.spriteTop,
-				spriteWidth: _sprite1.spriteWidth,
+				spriteWidth: _sprite1.spriteWidth + MathRound(_shakeDist / 4),
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin - 1,
+				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 4),
 				bottomGap: (_sprite1.bottomGap ?? 0) + 3,
 				src: _sprite1.src,
 				objects: _sprite1.objects,
@@ -72093,9 +72126,9 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 			{
 				spriteLeft: _sprite1.spriteLeft,
 				spriteTop: _sprite1.spriteTop,
-				spriteWidth: _sprite1.spriteWidth,
+				spriteWidth: _sprite1.spriteWidth + MathRound(_shakeDist / 5),
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin + 2,
+				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 5),
 				bottomGap: (_sprite1.bottomGap ?? 0) + 1,
 				src: _sprite1.src,
 				objects: _sprite1.objects,
@@ -72108,9 +72141,9 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 			{
 				spriteLeft: _sprite1.spriteLeft,
 				spriteTop: _sprite1.spriteTop,
-				spriteWidth: _sprite1.spriteWidth,
+				spriteWidth: _sprite1.spriteWidth + MathRound(_shakeDist / 6),
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin - 1,
+				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 6),
 				bottomGap: _sprite1.bottomGap,
 				src: _sprite1.src,
 				objects: _sprite1.objects,
@@ -72123,9 +72156,9 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 			{
 				spriteLeft: _sprite1.spriteLeft,
 				spriteTop: _sprite1.spriteTop,
-				spriteWidth: _sprite1.spriteWidth,
+				spriteWidth: _sprite1.spriteWidth + MathRound(_shakeDist / 7),
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin  + 2,
+				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 7),
 				bottomGap: _sprite1.bottomGap,
 				src: _sprite1.src,
 				objects: _sprite1.objects,
@@ -72140,7 +72173,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteTop: _sprite1.spriteTop,
 				spriteWidth: _sprite1.spriteWidth,
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin - 1,
+				spriteOrigin: _sprite1.spriteOrigin,
 				bottomGap: _sprite1.bottomGap,
 				src: _sprite1.src,
 				objects: _sprite1.objects,
@@ -72210,9 +72243,9 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				extraStepXRate: .4,
+				extraStepXRate: .2,
 				bottomGap: -20,
-				speed: 2
+				speed: 3
 			},
 			{
 				spriteLeft: _sprite1.spriteLeft,
@@ -72223,14 +72256,14 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				src: _sprite1.src,
 				extraStepXRate: .4,
 				bottomGap: -40,
-				speed: 2,
+				speed: 1,
 				objects: [
 					{
 					key: 'bloodfx8',
 					position: 'front-head',
 					reversed: true,
 					pushObject: true,
-					xGap: _sprite1.xGap ?? _sprite1.spriteWidth * 4,
+					xGap: _sprite1.xGap ?? _sprite1.spriteWidth * 3,
 					yGap:  MathRound(_sprite1.spriteHeight * .2),
 					still: true
 				},
@@ -72348,14 +72381,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				src: _sprite1.src,
 				bottomGap: -85,
 				extraStepXRate: .3,
-				speed: 2,
-				// objects:[{
-				// 	key: 'bloodfx8',
-				// 	position: 'front-head',
-				// 	still: true,
-				// 	reversed: true,
-				// 	pushObject: true
-				// }]
+				speed: 2
 			},
 			{
 				spriteLeft: _sprite1.spriteLeft,
@@ -73840,6 +73866,10 @@ function createObjectDead(_color, _zoom, _bottomGap, _sound) {
 	};
 }
 function createHurtAir(_sprite1, _sprite2, _sound, _src) {
+	if(_sound && !_sound.key)
+		_sound = { key: _sound };
+	if(!_sound.reset)
+		_sound.reset = true;
 	const _arr = getRandomAirCoords();
 	return {
 		key: 'hurtair',
