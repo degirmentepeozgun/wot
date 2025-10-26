@@ -1959,7 +1959,7 @@ const relatedObjects = [
 		totalFrames: 6, col: 3, speed: 4, still: true, singleton: true
 	},
 	{
-		id: 'dzzt', key: 'dzzt', type: 'hurt', width: 114, height: 205, zoom: 1.2,
+		id: 'dzzt', key: 'dzzt', type: 'hurt', width: 68, height: 123, zoom: 2,
 		totalFrames: 6, speed: 4, singleton: true
 	},
 	{
@@ -1983,8 +1983,8 @@ const relatedObjects = [
 		totalFrames: 13, col: 4, speed: 6, singleton: true
 	},
 	{
-		id: 'landing', key: 'landing', sound: { key: 'landing', volume: .2 }, width: 250, height: 181, zoom: 1.2,
-		totalFrames: 17, col: 4, speed: 2, singleton: true, yGap: 45, still: true
+		id: 'landing', key: 'landing', sound: { key: 'landing', volume: .2 }, width: 150, height: 109, zoom: 2,
+		totalFrames: 17, col: 4, skip:2, speed: 4, singleton: true, yGap: 27, still: true
 	},
 	{
 		id: 'bloodhit', key: 'bloodhit', type: 'hurt', width: 120, height: 120, zoom: 2,
@@ -2774,7 +2774,7 @@ const relatedObjectImages = {
 		return getImage('./images/related/poison2.png')
 	},
 	dzzt: function () {
-		return getImage('./images/related/dzzt2.png')
+		return getImage('./images/related/dzzt-2.png')
 	},
 	jump: function () {
 		return getImage('./images/related/air-jump.png')
@@ -2949,6 +2949,7 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	chargepower: './images/sounds/chargepower5.mp3',
 	blockbreak2: './images/sounds/blockbreak2.mp3',
 	bloodsquish: './images/sounds/bloodsquish.mp3',
 	punchhit: './images/sounds/punchhit4.wav',
@@ -3330,6 +3331,7 @@ const soundFiles = {
 	finish3: './images/sounds/finish3.mp3?v=3',
 	spin: './images/sounds/spin.mp3',
 	thunder: './images/sounds/thunder.mp3',
+	thunder4: './images/sounds/thunder4v2.mp3',
 	dash: './images/sounds/dash.mp3',
 	electric: './images/sounds/electric.mp3',
 	roll: './images/sounds/roll.mp3?v=3',
@@ -27876,76 +27878,265 @@ const canvasAnimations =  {
 		}
 	},
 
+	// halo: function (_char, _params, _canv) {
+	// 	const ctx = _canv ?? c10;
+	// 	const now = _gameTick;
+	// 	const W = episode.cWidth;
+	// 	const TAU = Math.PI * 2;
+	// 	const S = W / 1280; // çözünürlüğe göre ölçek faktörü
+
+	// 	// === INIT ===
+	// 	// Efekt başlatıldığında parametreleri sıfırla
+	// 	if (!_params.startTime || _params.finished) {
+	// 		_params.startTime = now;
+	// 		_params.phase = 1;
+	// 		_params.finished = false;
+	// 		_params.sparkLines = []; // Faz 1’deki “ışık çizgileri”
+	// 		_params.particles = [];  // Faz 3’teki “partiküller”
+	// 	}
+
+	// 	// Karakterin ekrandaki merkez koordinatı
+	// 	const c = {
+	// 		x: _char.SCREENLEFT,
+	// 		y: (episode.cHeight - _char.yPosition) - ((_params.y ?? 0) * _char.ZOOM)
+	// 	};
+	// 	if (ctx.reversed) c.x *= -1; // ayna modu için (örneğin karakter sağa dönükse)
+
+	// 	const elapsed = now - _params.startTime;
+
+	// 	// Efekt süresi (toplam ~650ms)
+	// 	const dur1 = 180; // Faz 1: Spark’lar merkeze çekiliyor
+	// 	const dur2 = 90;  // Faz 2: Beyazdan siyaha geçiş anı (flash)
+	// 	const dur3 = 400; // Faz 3: Halo (çember) genişleme + partikül dağılması
+	// 	const total = dur1 + dur2 + dur3;
+
+	// 	ctx.save();
+
+	// 	// === FAZ 1: Spark çizgiler merkeze toplanıyor ===
+	// 	if (elapsed < dur1) {
+	// 		// İlk frame'de çizgileri oluştur
+	// 		if (_params.sparkLines.length === 0) {
+	// 			const count = 12; // 12 yönlü çizgi
+	// 			for (let i = 0; i < count; i++) {
+	// 				const angle = (TAU / count) * i;
+	// 				_params.sparkLines.push({
+	// 					angle,
+	// 					len: (100 + Math.random() * 30) * S, // her çizginin uzunluğu
+	// 				});
+	// 			}
+	// 		}
+
+	// 		ctx.strokeStyle = 'rgb(125,249,255)';
+	// 		ctx.lineWidth = 2 * S;
+	// 		const prog = elapsed / dur1; // zaman ilerleme oranı (0–1)
+
+	// 		// Her spark çizgisini merkeze doğru kısaltarak çiz
+	// 		for (const s of _params.sparkLines) {
+	// 			const r = s.len * (1 - prog);
+	// 			const x1 = c.x + Math.cos(s.angle) * r;
+	// 			const y1 = c.y + Math.sin(s.angle) * r;
+	// 			const x2 = c.x + Math.cos(s.angle) * (r + 8 * S);
+	// 			const y2 = c.y + Math.sin(s.angle) * (r + 8 * S);
+	// 			ctx.beginPath();
+	// 			ctx.moveTo(x1, y1);
+	// 			ctx.lineTo(x2, y2);
+	// 			ctx.stroke();
+	// 		}
+
+	// 		if(elapsed > (dur1 / 2)) {
+	// 			// Küçük merkez parlaması
+	// 			const rad = (40 + 40 * prog) * S;
+	// 			ctx.fillStyle = `rgb(255,255,255)`;
+	// 			ctx.beginPath();
+	// 			ctx.arc(c.x, c.y, rad, 0, TAU);
+	// 			ctx.fill();
+	// 		}
+
+	// 		ctx.restore();
+	// 		return;
+	// 	}
+
+	// 	// === FAZ 2: Beyazdan siyaha dönüş (Flash anı) ===
+	// 	if (elapsed < dur1 + dur2) {
+	// 		if(!_params.sound) {
+	// 			PlaySound({key:'ultimate', volume: 1});
+	// 			_params.sound = true;
+	// 		}
+	// 		// const t = (elapsed - dur1) / dur2;
+	// 		// const alpha = 1 - t; // şeffaflık kademeli azalıyor
+	// 		// ctx.fillStyle = `rgb(0,0,0)`;
+	// 		// ctx.beginPath();
+	// 		// ctx.arc(c.x, c.y, 80 * S, 0, TAU);
+	// 		// ctx.fill();
+	// 		// ctx.restore();
+	// 		ctx.restore();
+	// 		return;
+	// 	}
+
+	// 	// === FAZ 3: Halo genişliyor + partiküller saçılıyor ===
+	// 	const t3 = (elapsed - dur1 - dur2) / dur3;
+	// 	// 🔸 Dış halka
+	// 	const minR = W * 0.08;
+	// 	const maxR = W * 0.65;
+	// 	const ringR = minR + (maxR - minR) * Math.min(t3, 1); // zamana göre genişler
+	// 	const ringAlpha = 1 - t3 * 1.3; // şeffaflaşır
+	// 	const lineWidth = (12 * S) * (1 - t3 * 0.7); // kalınlık azalır
+
+	// 	if (ringAlpha > 0) {
+	// 		ctx.lineWidth = lineWidth;
+	// 		ctx.strokeStyle = `rgb(184, 251, 255)`;
+
+	// 		ctx.beginPath();
+	// 		ctx.ellipse(c.x, c.y, ringR * 1.1, ringR * 0.9, 0, 0, TAU);
+	// 		ctx.stroke();
+	// 	}
+
+	// 	// 🔸 İç halka (Street Fighter tarzı dotted fade-out)
+	// 	const innerMaxR = ringR * 0.5 * (1 + 0.25 * t3); // %10 ekstra genişleme
+	// 	const innerR = innerMaxR * Math.min(t3 * 1.5, 1);
+	// 	const innerAlpha = Math.max(0, 0.6 - t3); // kademeli şeffaflaşma
+	// 	const innerLineW = (6 * S) * (1 - t3 * 0.5); // çizgi kalınlığı azalıyor
+
+	// 	if (innerAlpha > 0) {
+	// 		ctx.lineWidth = innerLineW;
+	// 		ctx.strokeStyle = `rgb(125,249,255)`;
+
+	// 		const segCount = 14; // kaç parça olacak (nokta sayısı)
+	// 		const gapRatio = 0.45 + (0.35 * t3); // boşluk oranı zamanla artar (0.45 → 0.8)
+
+	// 		// Dotted efekt: her segment arası boş bırakılarak yaylar çizilir
+	// 		ctx.beginPath();
+	// 		for (let i = 0; i < segCount; i++) {
+	// 			const start = (i / segCount) * TAU
+	// 			const end = start + (TAU / segCount) * (1 - gapRatio);
+	// 			ctx.arc(c.x, c.y, innerR, start, end);
+	// 		}
+	// 		ctx.stroke();
+	// 	}
+
+	// 	// 🔸 Partiküller (küçük beyaz tanecikler)
+	// 	if (_params.particles.length === 0) {
+	// 		const pCount = 25;
+	// 		for (let i = 0; i < pCount; i++) {
+	// 			const angle = Math.random() * TAU;
+	// 			const spd = (2 + Math.random() * 3) * S;
+	// 			_params.particles.push({
+	// 				x: c.x, y: c.y,
+	// 				vx: Math.cos(angle) * spd,
+	// 				vy: Math.sin(angle) * spd,
+	// 				life: 1,
+	// 				size: (2 + Math.random() * 2) * S
+	// 			});
+	// 		}
+	// 	}
+
+	// 	// Partikül hareket ve solma
+	// 	for (const p of _params.particles) {
+	// 		p.x += p.vx;
+	// 		p.y += p.vy;
+	// 		p.life -= 0.03;
+	// 		if (p.life > 0) {
+	// 			ctx.fillStyle = 'rgb(255,255,255)';
+	// 			ctx.beginPath();
+	// 			ctx.arc(p.x, p.y, p.size, 0, TAU);
+	// 			ctx.fill();
+	// 		}
+	// 	}
+
+	// 	ctx.restore();
+
+	// 	// Efekt süresi bitince temizle
+	// 	if (elapsed >= total) {
+	// 		_char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'halo');
+	// 		_params.finished = true;
+	// 		delete _params.sound;
+	// 	}
+	// }
+
 	halo: function (_char, _params, _canv) {
+		if(episode?.realTime)
+			return;
 		const ctx = _canv ?? c10;
 		const now = _gameTick;
 		const W = episode.cWidth;
-		const S = W / 1280; // çözünürlüğe göre ölçek faktörü
+		const H = episode.cHeight;
+		const TAU = Math.PI * 2;
+		const S = W / 1280;
 
 		// === INIT ===
-		// Efekt başlatıldığında parametreleri sıfırla
 		if (!_params.startTime || _params.finished) {
 			_params.startTime = now;
 			_params.phase = 1;
 			_params.finished = false;
-			_params.sparkLines = []; // Faz 1’deki “ışık çizgileri”
-			_params.particles = [];  // Faz 3’teki “partiküller”
+
+			// Pre-allocate & reuse arrays
+			if (!_params.sparkLines) _params.sparkLines = new Array(12);
+			if (!_params.particles) _params.particles = new Array(25);
+			for (let i = 0; i < _params.sparkLines.length; i++) _params.sparkLines[i] = null;
+			for (let i = 0; i < _params.particles.length; i++) _params.particles[i] = null;
+			episode.enemies?.forEach(x => x.fps = 100);
+			PlaySound({ key: 'chargepower', volume: 1 });
 		}
 
-		// Karakterin ekrandaki merkez koordinatı
+		// === CONSTANTS ===
+		const dur1 = 510; // Spark toplama
+		const dur2 = 90;  // Flash
+		const dur3 = 400; // Halo genişleme + partiküller
+		const total = dur1 + dur2 + dur3;
+
+		// === COORD ===
 		const c = {
 			x: _char.SCREENLEFT,
-			y: (episode.cHeight - _char.yPosition) - ((_params.y ?? 0) * _char.ZOOM)
+			y: (H - _char.yPosition) - ((_params.y ?? 0) * _char.ZOOM)
 		};
-		if (ctx.reversed) c.x *= -1; // ayna modu için (örneğin karakter sağa dönükse)
+		if (ctx.reversed) c.x *= -1;
 
 		const elapsed = now - _params.startTime;
 
-		// Efekt süresi (toplam ~650ms)
-		const dur1 = 180; // Faz 1: Spark’lar merkeze çekiliyor
-		const dur2 = 90;  // Faz 2: Beyazdan siyaha geçiş anı (flash)
-		const dur3 = 400; // Faz 3: Halo (çember) genişleme + partikül dağılması
-		const total = dur1 + dur2 + dur3;
-
 		ctx.save();
 
-		// === FAZ 1: Spark çizgiler merkeze toplanıyor ===
+		// === FAZ 1: Spark toplama ===
 		if (elapsed < dur1) {
-			// İlk frame'de çizgileri oluştur
-			if (_params.sparkLines.length === 0) {
-				const count = 12; // 12 yönlü çizgi
+			let sparks = _params.sparkLines;
+
+			if (!sparks[0]) {
+				const count = sparks.length;
+				const step = TAU / count;
 				for (let i = 0; i < count; i++) {
-					const angle = (Math.PI * 2 / count) * i;
-					_params.sparkLines.push({
-						angle,
-						len: (100 + Math.random() * 30) * S, // her çizginin uzunluğu
-					});
+					sparks[i] = {
+						angle: step * i,
+						len: (140 + Math.random() * 40) * S // 🔹 biraz daha uzun
+					};
 				}
 			}
 
+			const prog = elapsed / dur1;
 			ctx.strokeStyle = 'rgb(125,249,255)';
 			ctx.lineWidth = 2 * S;
-			const prog = elapsed / dur1; // zaman ilerleme oranı (0–1)
+			ctx.globalAlpha = 1 - prog * 0.5; // 🔹 yavaşça silinir
 
-			// Her spark çizgisini merkeze doğru kısaltarak çiz
-			for (const s of _params.sparkLines) {
+			for (const s of sparks) {
+				const cosA = Math.cos(s.angle);
+				const sinA = Math.sin(s.angle);
 				const r = s.len * (1 - prog);
-				const x1 = c.x + Math.cos(s.angle) * r;
-				const y1 = c.y + Math.sin(s.angle) * r;
-				const x2 = c.x + Math.cos(s.angle) * (r + 8 * S);
-				const y2 = c.y + Math.sin(s.angle) * (r + 8 * S);
+				const x1 = c.x + cosA * r;
+				const y1 = c.y + sinA * r;
+				const x2 = x1 + cosA * (10 * S);
+				const y2 = y1 + sinA * (10 * S);
 				ctx.beginPath();
 				ctx.moveTo(x1, y1);
 				ctx.lineTo(x2, y2);
 				ctx.stroke();
 			}
 
-			if(elapsed > (dur1 / 2)) {
-				// Küçük merkez parlaması
-				const rad = (40 + 40 * prog) * S;
+			// 🔹 Parlama biraz daha geç başlasın
+			if (elapsed > dur1 * 0.91) {
+				const t = (elapsed - dur1 * 0.91) / (dur1 * 0.09);
+				const rad = (40 + 60 * t) * S;
+				ctx.globalAlpha = Math.min(1, t * 1.5);
 				ctx.fillStyle = `rgb(255,255,255)`;
 				ctx.beginPath();
-				ctx.arc(c.x, c.y, rad, 0, Math.PI * 2);
+				ctx.arc(c.x, c.y, rad, 0, TAU);
 				ctx.fill();
 			}
 
@@ -27953,103 +28144,100 @@ const canvasAnimations =  {
 			return;
 		}
 
-		// === FAZ 2: Beyazdan siyaha dönüş (Flash anı) ===
+		// === FAZ 2: Flash ===
 		if (elapsed < dur1 + dur2) {
-			if(!_params.sound) {
-				PlaySound({key:'ultimate', volume: 1});
+			if (!_params.sound) {
+				PlaySound({ key: 'ultimate', volume: 1 });
 				_params.sound = true;
+				episode.enemies?.forEach(x => x.fps = 1);
 			}
-			// const t = (elapsed - dur1) / dur2;
-			// const alpha = 1 - t; // şeffaflık kademeli azalıyor
-			// ctx.fillStyle = `rgb(0,0,0)`;
-			// ctx.beginPath();
-			// ctx.arc(c.x, c.y, 80 * S, 0, Math.PI * 2);
-			// ctx.fill();
-			// ctx.restore();
 			ctx.restore();
 			return;
 		}
 
-		// === FAZ 3: Halo genişliyor + partiküller saçılıyor ===
+		// === FAZ 3: Halo + Partiküller ===
 		const t3 = (elapsed - dur1 - dur2) / dur3;
-		// 🔸 Dış halka
+
+		// ---- Dış halka (eliptik genişleme) ----
 		const minR = W * 0.08;
 		const maxR = W * 0.65;
-		const ringR = minR + (maxR - minR) * Math.min(t3, 1); // zamana göre genişler
-		const ringAlpha = 1 - t3 * 1.3; // şeffaflaşır
-		const lineWidth = (12 * S) * (1 - t3 * 0.7); // kalınlık azalır
+		const ringR = minR + (maxR - minR) * Math.min(t3, 1);
+		//const ringAlpha = 1 - t3 * 1.3;
+		const lineWidth = (12 * S) * (1 - t3 * 1.5);
 
-		if (ringAlpha > 0) {
+		if (lineWidth >= 1) {
 			ctx.lineWidth = lineWidth;
-			ctx.strokeStyle = `rgb(125,249,255)`;
-
+			//ctx.globalAlpha = ringAlpha;
+			ctx.strokeStyle = 'rgb(184,251,255)';
 			ctx.beginPath();
-			ctx.ellipse(c.x, c.y, ringR * 1.1, ringR * 0.9, 0, 0, Math.PI * 2);
+			ctx.ellipse(c.x, c.y, ringR * 1.1, ringR * 0.9, 0, 0, TAU);
 			ctx.stroke();
 		}
 
-		// 🔸 İç halka (Street Fighter tarzı dotted fade-out)
-		const innerMaxR = ringR * 0.5 * (1 + 0.25 * t3); // %10 ekstra genişleme
-		const innerR = innerMaxR * Math.min(t3 * 1.5, 1);
-		const innerAlpha = Math.max(0, 0.6 - t3); // kademeli şeffaflaşma
-		const innerLineW = (6 * S) * (1 - t3 * 0.5); // çizgi kalınlığı azalıyor
+		// ---- İç halka (dotted) ----
+		const innerR = (ringR * 0.5) * Math.min(t3 * 1.5, 1);
+		const innerAlpha = Math.max(0, 0.6 - t3);
+		const innerLineW = (6 * S) * (1 - t3 * 0.5);
 
-		if (innerAlpha > 0) {
+		if (innerAlpha > 0.01) {
+			//ctx.globalAlpha = innerAlpha;
 			ctx.lineWidth = innerLineW;
-			ctx.strokeStyle = `rgb(125,249,255)`;
+			ctx.strokeStyle = 'rgb(125,249,255)';
 
-			const segCount = 14; // kaç parça olacak (nokta sayısı)
-			const gapRatio = 0.45 + (0.35 * t3); // boşluk oranı zamanla artar (0.45 → 0.8)
+			const segCount = 14;
+			const gapRatio = 0.45 + 0.35 * t3;
+			const arcStep = TAU / segCount;
 
-			// Dotted efekt: her segment arası boş bırakılarak yaylar çizilir
+			ctx.beginPath();
 			for (let i = 0; i < segCount; i++) {
-				const start = (i / segCount) * Math.PI * 2;
-				const end = start + (Math.PI * 2 / segCount) * (1 - gapRatio);
-				ctx.beginPath();
+				const start = arcStep * i;
+				const end = start + arcStep * (1 - gapRatio);
 				ctx.arc(c.x, c.y, innerR, start, end);
-				ctx.stroke();
 			}
+			ctx.stroke();
 		}
 
-		// 🔸 Partiküller (küçük beyaz tanecikler)
-		if (_params.particles.length === 0) {
-			const pCount = 25;
+		// ---- Partiküller (reuse & pool) ----
+		let parts = _params.particles;
+		if (!parts[0]) {
+			const pCount = parts.length;
 			for (let i = 0; i < pCount; i++) {
-				const angle = Math.random() * Math.PI * 2;
+				const angle = Math.random() * TAU;
 				const spd = (2 + Math.random() * 3) * S;
-				_params.particles.push({
+				parts[i] = {
 					x: c.x, y: c.y,
 					vx: Math.cos(angle) * spd,
 					vy: Math.sin(angle) * spd,
 					life: 1,
 					size: (2 + Math.random() * 2) * S
-				});
+				};
 			}
 		}
 
-		// Partikül hareket ve solma
-		for (const p of _params.particles) {
+		// Update & Draw (no array filter)
+		//ctx.globalAlpha = 1;
+		for (let i = 0; i < parts.length; i++) {
+			const p = parts[i];
+			if (!p) continue;
 			p.x += p.vx;
 			p.y += p.vy;
 			p.life -= 0.03;
 			if (p.life > 0) {
-				ctx.fillStyle = 'rgb(255,255,255)';
 				ctx.beginPath();
-				ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+				ctx.arc(p.x, p.y, p.size, 0, TAU);
+				ctx.fillStyle = '#FFFFFF';
 				ctx.fill();
-			}
+			} else parts[i] = null; // reuse slot
 		}
 
 		ctx.restore();
 
-		// Efekt süresi bitince temizle
 		if (elapsed >= total) {
 			_char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'halo');
 			_params.finished = true;
 			delete _params.sound;
 		}
 	}
-
 
 }
 let _focusMode;

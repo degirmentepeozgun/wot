@@ -336,20 +336,6 @@ function createCharacter(_settings) {
 								spriteHeight: 238,
 								spriteOrigin: 62,
 								speed: 1,
-								objects: [
-									{
-										key: 'dark',
-										position: 'css'
-									},
-									{ 
-										key: 'halo', 
-										position: 'canvas', 
-										p1: {
-											ms: 1000,
-											y:120
-										} 
-									}
-								],
 								def: {
 									iframe: true
 								},
@@ -370,7 +356,42 @@ function createCharacter(_settings) {
 								spriteHeight: 238,
 								spriteOrigin: 62,
 								speed: 4,
-								sound: 'thunder',
+								def: {
+									iframe: true
+								}
+							},
+							{
+								spriteLeft: 1980,
+								spriteTop: 1040,
+								spriteWidth: 97,
+								spriteHeight: 268,
+								spriteOrigin: 48,
+								speed: 1,
+								objects: [
+									{
+										key: 'dark',
+										position: 'css'
+									},
+									{ 
+										key: 'halo', 
+										position: 'canvas', 
+										p1: {
+											ms: 1000,
+											y:135
+										} 
+									}
+								],
+								def: {
+									iframe: true
+								}
+							},
+							{
+								spriteLeft: 1980,
+								spriteTop: 1040,
+								spriteWidth: 97,
+								spriteHeight: 268,
+								spriteOrigin: 48,
+								speed: 1,
 								def: {
 									iframe: true
 								}
@@ -428,7 +449,7 @@ function createCharacter(_settings) {
 								spriteWidth: 68,
 								spriteHeight: 350,
 								spriteOrigin: 34,
-								speed: 10,
+								speed: 8,
 								def: {
 									iframe: true
 								}
@@ -439,7 +460,8 @@ function createCharacter(_settings) {
 								spriteWidth: 68,
 								spriteHeight: 350,
 								spriteOrigin: 34,
-								speed: 1,
+								sound: { key: 'thunder4', volume: 1 },
+								speed: 3,
 								def: {
 									iframe: true
 								},
@@ -41420,6 +41442,8 @@ const _allEnemies = {
 								iframe: true
 							},
 							do: function(_char) {
+								if(episode?.realTime)
+									return;
 								const _others = episode.enemies.filter(x => x.fps !== 6 && x.enemy && x !== _char);
 								if(_others?.[0])
 									for(let _o of _others)
@@ -41882,6 +41906,8 @@ const _allEnemies = {
 							extraStepYRate: .5* 1.33,
 							speed: 3,
 							do: function() {
+								if(episode?.realTime)
+									return;
 								const _others = episode.enemies.filter(x => x.fps > 1 && x.fps !== 3);
 								if(_others?.[0])
 									for(let _o of _others)
@@ -42061,6 +42087,8 @@ const _allEnemies = {
 								type: 'common'
 							},
 							do: function(_char) {
+								if(episode?.realTime)
+									return;
 								const _others = episode.enemies.filter(x => x.fps > 1);
 								if(_others?.[0])
 									for(let _o of _others)
