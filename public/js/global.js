@@ -27889,7 +27889,6 @@ const canvasAnimations =  {
 	// 	// Efekt başlatıldığında parametreleri sıfırla
 	// 	if (!_params.startTime || _params.finished) {
 	// 		_params.startTime = now;
-	// 		_params.phase = 1;
 	// 		_params.finished = false;
 	// 		_params.sparkLines = []; // Faz 1’deki “ışık çizgileri”
 	// 		_params.particles = [];  // Faz 3’teki “partiküller”
@@ -28066,15 +28065,14 @@ const canvasAnimations =  {
 		// === INIT ===
 		if (!_params.startTime || _params.finished) {
 			_params.startTime = now;
-			_params.phase = 1;
 			_params.finished = false;
 
 			// Pre-allocate & reuse arrays
-			if (!_params.sparkLines) _params.sparkLines = new Array(12);
+			if (!_params.sparkLines) _params.sparkLines = new Array(8);
 			if (!_params.particles) _params.particles = new Array(25);
 			for (let i = 0; i < _params.sparkLines.length; i++) _params.sparkLines[i] = null;
 			for (let i = 0; i < _params.particles.length; i++) _params.particles[i] = null;
-			episode.enemies?.forEach(x => x.fps = 100);
+			episode.enemies?.forEach(x => x.stop = 1);
 			PlaySound({ key: 'chargepower', volume: 1 });
 		}
 
@@ -28097,44 +28095,60 @@ const canvasAnimations =  {
 
 		// === FAZ 1: Spark toplama ===
 		if (elapsed < dur1) {
-			let sparks = _params.sparkLines;
+			// garanti: sparkLines dizisi her zaman tanımlı olur
+			let sparks = _params.sparkLines = _params.sparkLines || [];
 
-			if (!sparks[0]) {
-				const count = sparks.length;
-				const step = TAU / count;
-				for (let i = 0; i < count; i++) {
-					sparks[i] = {
+			// sabit 8 yön
+			const COUNT = 8;
+			if (sparks.length !== COUNT || !sparks[0]) {
+				sparks.length = 0;
+				const step = TAU / COUNT;
+				for (let i = 0; i < COUNT; i++) {
+					sparks.push({
 						angle: step * i,
-						len: (140 + Math.random() * 40) * S // 🔹 biraz daha uzun
-					};
+						len: (140 + Math.random() * 40) * S,
+						curl: (Math.random() * 0.5 - 0.25),
+						offset: Math.random() * TAU
+					});
 				}
 			}
 
 			const prog = elapsed / dur1;
 			ctx.strokeStyle = 'rgb(125,249,255)';
-			ctx.lineWidth = 2 * S;
-			ctx.globalAlpha = 1 - prog * 0.5; // 🔹 yavaşça silinir
+			ctx.lineWidth = 2.5 * S;
+			ctx.globalAlpha = Math.max(0, 1 - prog * 0.6);
 
-			for (const s of sparks) {
-				const cosA = Math.cos(s.angle);
-				const sinA = Math.sin(s.angle);
-				const r = s.len * (1 - prog);
-				const x1 = c.x + cosA * r;
-				const y1 = c.y + sinA * r;
-				const x2 = x1 + cosA * (10 * S);
-				const y2 = y1 + sinA * (10 * S);
+			for (let i = 0; i < sparks.length; i++) {
+				const s = sparks[i];
+				if (!s) continue;
+
+				const shrink = Math.max(0, 1 - prog * 1.1);
+				const len = s.len * shrink;
+
+				const angleBase = s.angle + Math.sin(prog * 6 + s.offset) * s.curl;
+				const cosA = Math.cos(angleBase);
+				const sinA = Math.sin(angleBase);
+
+				const x1 = c.x + cosA * len;
+				const y1 = c.y + sinA * len;
+				const x2 = c.x + cosA * (len - 20 * S);
+				const y2 = c.y + sinA * (len - 20 * S);
+
+				const midX = (x1 + x2) / 2 + sinA * 10 * S;
+				const midY = (y1 + y2) / 2 - cosA * 10 * S;
+
 				ctx.beginPath();
 				ctx.moveTo(x1, y1);
-				ctx.lineTo(x2, y2);
+				ctx.quadraticCurveTo(midX, midY, x2, y2);
 				ctx.stroke();
 			}
 
-			// 🔹 Parlama biraz daha geç başlasın
-			if (elapsed > dur1 * 0.91) {
-				const t = (elapsed - dur1 * 0.91) / (dur1 * 0.09);
-				const rad = (40 + 60 * t) * S;
+			// merkez parlaması (son kısıma doğru)
+			if (elapsed > dur1 * 0.9) {
+				const t = (elapsed - dur1 * 0.9) / (dur1 * 0.1);
+				const rad = (40 + 80 * t) * S;
 				ctx.globalAlpha = Math.min(1, t * 1.5);
-				ctx.fillStyle = `rgb(255,255,255)`;
+				ctx.fillStyle = 'rgb(255,255,255)';
 				ctx.beginPath();
 				ctx.arc(c.x, c.y, rad, 0, TAU);
 				ctx.fill();
@@ -28149,7 +28163,7 @@ const canvasAnimations =  {
 			if (!_params.sound) {
 				PlaySound({ key: 'ultimate', volume: 1 });
 				_params.sound = true;
-				episode.enemies?.forEach(x => x.fps = 1);
+				episode.enemies?.forEach(x => delete x.stop);
 			}
 			ctx.restore();
 			return;
@@ -28235,6 +28249,8 @@ const canvasAnimations =  {
 		if (elapsed >= total) {
 			_char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'halo');
 			_params.finished = true;
+			_params.sparkLines = [];
+			_params.particles = [];
 			delete _params.sound;
 		}
 	}

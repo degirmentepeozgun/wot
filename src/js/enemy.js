@@ -6909,11 +6909,9 @@ function enemy(_e) {
 			return false;
 		this.fatique -= (fatiqueDecreasement * (_attacker?.getCurrentFrame()?.atk?.rate ?? 1));
 		_client.setFatique(this);
-		const _bar = this.fatBar ?? document.querySelector('#char-' + this.key + ' .defbar-value');
+		const _bar = document.querySelector('#char-' + this.key + ' .defbar-value');
 		if(_bar)
 			_bar.style.transform = 'scaleX(' + (this.fatique / this.maxFatique) + ')';
-		if(_bar && !this.fatBar)
-			this.fatBar = _bar;
 		return true;
 	}
 	this.increaseFatique = function (_val) {
@@ -6922,9 +6920,8 @@ function enemy(_e) {
 			this.fatique = this.maxFatique;
 		if (!this.enemy) {
 			try {
-				if(!this.fatBar)
-					this.fatBar = document.querySelector((!this.main ? '#char-' + this.key : '#top-nav') + ' .defbar-value');
-				this.fatBar.style.width = ((this.fatique / this.maxFatique) * 100) + '%';
+				const _bar = document.querySelector('#char-' + this.key + ' .defbar-value');
+				_bar.style.width = ((this.fatique / this.maxFatique) * 100) + '%';
 			}
 			catch (ex) { }
 			_client.setFatique(this);

@@ -695,9 +695,7 @@ function enemy(_e) {
 						_dir = __right;
 					else if (_diff < -_tol)
 						_dir = __left;
-					if(this.direction !== _dir){
-						this.direction = _dir;
-					}
+					this.setDirection(_dir, 1);
 				}
 			}
 			return;
@@ -842,8 +840,7 @@ function enemy(_e) {
 							else {
 								if(!this.ranged){
 									if(isObjectsVerticallyInSameOrder(this, _enemy)){
-										if(this.direction !== _dir)
-											this.direction = _dir;
+										this.setDirection(_dir, 1);
 										if(this.yPosition > _enemy.yPosition && this.moveDirection !== 'down')
 											this.moveDirection = 'down';
 										else if(this.yPosition < _enemy.yPosition && this.moveDirection !== 'up')
@@ -872,7 +869,8 @@ function enemy(_e) {
 					}
 					else {
 						if (!this.puppetMode && (this.animationFinished || this.animation === 'run' || this.animation === 'idle')) {
-							if ((this.yPosition !== _enm.yPosition) && this.yPosition <= getGroundHeight() && _enm.yPosition <= getGroundHeight() && this.animations.walk) {
+							const _touch = isObjectsInTouch(this, _enm)?.touch;
+							if (!_touch && (this.yPosition !== _enm.yPosition) && this.yPosition <= getGroundHeight() && _enm.yPosition <= getGroundHeight() && this.animations.walk) {
 								if (this.animation == 'run' && this.frame < this.animations.walk.frames.length - 1) {
 									const _oldStart = this.start;
 									const _oldFrame = this.frame;
@@ -947,9 +945,7 @@ function enemy(_e) {
 						this.autoStepXRate = this.autoStepYRate = undefined;
 				}
 				else if (!this.chargimg && this.getCurrentFrame()?.directionChangeEnabled)
-					{
-						this.direction = _dir;
-					}
+					this.setDirection(_dir, 1);
 				else if(this.animationFinished)
 					if (!this.animateAutoAnimation(4,_enemy?.enemy,_isEnemyClose)) {
 						this.upcomingAnimation = undefined;
@@ -966,8 +962,8 @@ function enemy(_e) {
 						_enemy = _newEnemy;
 				}
 				if (!this.still || (this.still && _isEnemyClose) || (this.still && this.ranged && _enemy?.enemy)) {
-					this.turned = true;
-					this.direction = this.moveDirection = _dir;
+					this.setDirection(_dir);
+					this.moveDirection = _dir;
 					
 					this.pickRandomAttack(null, null, 1);
 					if (this.upcomingAnimation) {
@@ -997,6 +993,18 @@ function enemy(_e) {
 		// if(!_enemy?.enemy && !this.isDead() && this.animation !== 'idle')
 		// 	this.animate('idle', 1, null, 2);
 		this.pickRandomAttack(null, null, 1);
+	}
+	this.setDirection = function(_dir, _force) {
+		if(this.enemy && this.lastTurnTime > (_gameTick - 500))
+			return;
+		if(this.direction === _dir)
+			return;
+		if(this.enemy)
+			this.lastTurnTime = _gameTick;
+		this.direction = _dir;
+		if(!_force && this.animation !== 'idle' && this.animation !== 'run' && this.animation !== 'walk')
+			return;
+		this.turned = true;
 	}
 	this.animateAutoAnimation = function (_q, _c, _touch) {
 		if(this.animation === 'roll' && !this.animationFinished)
@@ -1153,8 +1161,8 @@ function enemy(_e) {
 		//this.relatedObjects?.filter(x => x.bind === this.animation && !x.remove)?.forEach(x => x.remove = true);
 		if(this.keyboard) {
 			const _dirName = this.getKeyboardXMove();
-			if(_dirName && _dirName !== this.direction)
-				this.direction = _dirName;
+			if(_dirName)
+				this.setDirection(_dirName, 1);
 		}
 		if(_anima?.after)
 			_anima.after(this);
@@ -1356,11 +1364,9 @@ function enemy(_e) {
 		if(this.fatique < this.maxFatique)
 		{
 			this.fatique = this.maxFatique;
-			if (this.hasFatiqueBar) {
-				const _bar = document.querySelector('#defbar-hb-' + this.key);
-				if (_bar)
-					_bar.style.background = 'linear-gradient(90deg, #9D00FF ' + this.fatique + '%, transparent ' + ((this.fatique / this.maxFatique) * 100) + '%)';
-			}
+			const _bar = document.querySelector('#char-' + this.key + ' .defbar-value');
+			if (_bar)
+				_bar.style.transform = 'scaleX(' + (this.fatique / this.maxFatique) + ')';
 		}
 	}
 	this.getRandom = function(_pos) {
@@ -1386,6 +1392,7 @@ function enemy(_e) {
 					x.gradeLeft = x.grade - 1;
 				if(x.health < x.MAXHP)
 					x.setHealth(x.MAXHP);
+				x.resetFatique();
 			});
 			this.immobilize = this.oldProps.immobilize;
 			delete this.deadDramaStart;
@@ -3240,10 +3247,10 @@ function enemy(_e) {
 
 			if(this.getRangeBetween(_enemy) > _range)
 				continue;
-			if(this.ORIGINLEFT > _enemy.ORIGINLEFT && _enemy.direction !== 'right')
-				_enemy.direction = 'right';
-			else if(this.ORIGINLEFT <= _enemy.ORIGINLEFT && _enemy.direction !== 'left')
-				_enemy.direction = 'left';
+			if(this.ORIGINLEFT > _enemy.ORIGINLEFT && _enemy.direction !== __right)
+				_enemy.direction = __right;
+			else if(this.ORIGINLEFT <= _enemy.ORIGINLEFT && _enemy.direction !== __left)
+				_enemy.direction = __left;
 			if(_enemy.animations.knockbackair){
 				_enemy.randomAirCoords(_enemy.animations.knockbackair);
 				_enemy.animate('knockbackair', 1);
@@ -4648,7 +4655,7 @@ function enemy(_e) {
 								_enemy.direction = __right;
 						}
 						if(!this.invulnerable)
-						_enemy.setAutoTarget(this, null, 9);
+							_enemy.setAutoTarget(this, null, 9);
 					}
 				}
 				if (_enemyHurted && !_enemy.isDead())
@@ -5332,9 +5339,9 @@ function enemy(_e) {
 			return;
 		if(_touch && this.yPosition === this.autoTarget.yPosition)
 			return;
-		if(!this.verticalStep)
+		if(!this.verticalStep || _touch)
 			this.verticalStep = this.calculateYStep();
-		if(this.autoStepYRate < 1)
+		if(!_touch && this.autoStepYRate < 1)
 			this.verticalStep *= this.autoStepYRate;
 		const _moveY = this.solidOne ?? _solidity?.moveY;
 		if ((this.moveDirection === 'up' || (_solidity && _moveY === -1)) && _moveY !== 1){
@@ -6970,7 +6977,7 @@ function enemy(_e) {
 			if ((this.direction === __left && _xMove === __right) ||
 				(this.direction === __right && _xMove === __left))
 				this.start = this.frame = 0;
-			this.direction = _xMove;
+			this.setDirection(_xMove, 1);
 			if(!_includeY)
 				this.moveDirection = _xMove;
 			else
@@ -7225,11 +7232,9 @@ function enemy(_e) {
 		}
 		this.fatique -= _dec;
 		_client.setFatique(this);
-		const _bar = this.fatBar ?? document.querySelector('#char-' + this.key + ' .defbar-value');
+		const _bar = document.querySelector('#char-' + this.key + ' .defbar-value');
 		if(_bar)
 			_bar.style.transform = 'scaleX(' + (this.fatique / this.maxFatique) + ')';
-		if(_bar && !this.fatBar)
-			this.fatBar = _bar;
 		PlaySound({ owner: _attacker, key: this.class + 'block' }, 'block');
 		const _gap = MathRound(this.getCurrentFrame().spriteWidth / 2);
 		if(_r < 1)
@@ -7246,9 +7251,8 @@ function enemy(_e) {
 			this.fatique = this.maxFatique;
 		if (!this.enemy) {
 			try {
-				if(!this.fatBar)
-					this.fatBar = document.querySelector((!this.main ? '#char-' + this.key : '#top-nav') + ' .defbar-value');
-				this.fatBar.style.width = ((this.fatique / this.maxFatique) * 100) + '%';
+				const _bar = document.querySelector('#char-' + this.key + ' .defbar-value');
+				_bar.style.transform = 'scaleX(' + (this.fatique / this.maxFatique) + ')';
 			}
 			catch (ex) { }
 			_client.setFatique(this);

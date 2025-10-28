@@ -465,10 +465,11 @@ function createCharacter(_settings) {
 								def: {
 									iframe: true
 								},
-								// objects: [{
-								// 	key: 'lightning',
-								// 	position: 'screen-top'
-								// }]
+								objects: [
+									{
+										key: 'shaketiny', position: 'css'
+									}
+								]
 							},
 							{
 								spriteLeft: 2098,
