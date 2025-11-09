@@ -1741,11 +1741,11 @@ const relatedObjects = [
 		totalFrames: 4, speed: 8, still: true, singleton: true, reversed: true
 	},
 	{
-		id: 'cloudground', key: 'cloudground', width: 252, height: 164, zoom: .8,
+		id: 'cloudground', key: 'cloudground', width: 202, height: 131, zoom: 1,
 		totalFrames: 6, speed: 4, still: true, singleton: true, reversed: true
 	},
 	{
-		id: 'cloudground2', key: 'cloudground2', width: 252, height: 164, zoom: .8,
+		id: 'cloudground2', key: 'cloudground2', width: 202, height: 131, zoom: 1,
 		totalFrames: 6, speed: 4, still: true, singleton: true
 	},
 	{
@@ -2723,10 +2723,10 @@ const relatedObjectImages = {
 		return getImage('./images/related/dash-animated.png')
 	},
 	cloudground: function () {
-		return getImage('./images/related/cloud-ground.png')
+		return getImage('./images/related/cloud-ground3.png')
 	},
 	cloudground2: function () {
-		return getImage('./images/related/cloud-ground.png')
+		return getImage('./images/related/cloud-ground3.png')
 	},
 	glow: function () {
 		return getImage('./images/related/glow2.png')
@@ -3182,7 +3182,6 @@ const soundFiles = {
 	shield: './images/sounds/shield.mp3',
 	reflect: './images/sounds/reflect.mp3',
 	notify: './images/sounds/notify.mp3',
-	snow: './images/sounds/snow.mp3',
 	grove: './images/sounds/grove.mp3',
 	release: './images/sounds/release.mp3',
 	greenwood: './images/sounds/greenwood.mp3',
@@ -4769,6 +4768,7 @@ const mapSprites = [
 	{
 		id: 93, disabled: true, ambianceVolume: .2, do: startSnow, after: stopWeather, 
 		coords: { left: '70%', top: '12%', title: 'Snowy Peaks' }, 
+		ambiancePath: './images/sounds/snow.mp3',
 		theme: 'snow', distance: 1, width: MathFloor(6144 * 1.065),
 		minLevel: 1, itemGrade: 3,
 		equipmentDropRates: [
@@ -17426,10 +17426,10 @@ const spells = {
 						spriteWidth: 126,
 						spriteHeight: 78,
 						spriteOrigin: 63,
-						extraStepXRate: 1,
-						extraStepYRate: 1.6,
+						extraStepXRate: 1.5,
+						extraStepYRate: 2.4,
 						bottomGap: -140,
-						speed: 30
+						speed: 20
 					},
 					{
 						spriteLeft: 0,
@@ -27849,10 +27849,11 @@ const canvasAnimations =  {
 			_params.realR = _params.r;
 		_params.start++;
 		const _l  = _char.SCREENLEFT;
-		const _t = _char.yPosition;
-		const _x = _l + (MathRound((_params.x  ?? 0) * _char.ZOOM));
-		const _y = _t - MathRound((_params.y  ?? 0) * _char.ZOOM);
-		const _r = MathRound((_params.r  ?? 0) * _char.ZOOM);
+		const _t = _char.getTop();
+		const _z = _char.getZoom();
+		const _x = _l + (MathRound((_params.x  ?? 0) * _z));
+		const _y = _t + MathRound((_params.y  ?? 0) * _z);
+		const _r = MathRound((_params.r  ?? 0) * _z);
 		const _rr = MathRound(3.25 * (_r / 10));
 		const _ca = _canv ?? c10;
 		const grad = _ca.createRadialGradient(_x,  _y,  MathRound(_r / 10), _x, _y - _rr, _r);
@@ -28670,6 +28671,18 @@ const cssAnimations = {
 		else {
 			addClass(_gamePad, 'shake-me');
 			cssAnimationProps.shake = { start: _gameTick, p1: _c, p2: _ms, p3: _infinite};
+		}
+	},
+	shakevert: function (_c, _ms, _infinite) {
+		if(cssAnimationProps.shakevert) {
+			if((_gameTick - cssAnimationProps.shakevert.start) > (_ms ?? 1000)) {
+				removeClass(_gamePad, 'shake-vert');
+				delete cssAnimationProps.shakevert;
+			}
+		}
+		else {
+			addClass(_gamePad, 'shake-vert');
+			cssAnimationProps.shakevert = { start: _gameTick, p1: _c, p2: _ms, p3: _infinite};
 		}
 	},
 	shakevertical: function (_c, _ms, _infinite) {

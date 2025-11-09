@@ -615,6 +615,14 @@ function openChatPage() {
 	showMyModalPopUp('game-menu');
 	switchBookPage(12);
 }
+function resetTouchPad() {
+	const _tp = document.getElementById("touch-d-pad-inner");
+	if(_tp)
+	{
+		addClass(_tp, 'stay');
+		_tp.style.transform = 'translate3d(0, 0, 0)';
+	}
+}
 function resetDPadKeyCommands() {
 	if(!mainCharacter?.keyboard)
 		return;
@@ -724,12 +732,14 @@ function activateTouchPad() {
 			y: MathRound(y)
 		};
 		calculateSin(_newTouches.x, _newTouches.y);
-		const _diffX = _newTouches.x - _touches.x;
-		let _left = _dPad.lastX + _diffX;
-		if (_left > _maxLeft) _left = _maxLeft;
-		 else if (_left < -_maxLeft) _left = -_maxLeft;
-		const _diffY = _newTouches.y - _touches.y;
-		let _top = _dPad.lastY + _diffY;
+		const _diffX = _newTouches.x - touch_startX;
+		let _left = _diffX;
+		if (_left > _maxLeft) 
+			_left = _maxLeft;
+		else if (_left < -_maxLeft) 
+			_left = -_maxLeft;
+		const _diffY = _newTouches.y - touch_startY;
+		let _top = _diffY;
 		if (_top > _maxTop) 
 			_top = _maxTop;
 		 else if(_top  < -_maxTop) 
@@ -737,8 +747,6 @@ function activateTouchPad() {
 		if (!(_dPad.lastMoveTime > (_gameTick - __globalMS))) {
 			_dPad.style.transform = `translate3d(${_left}px, ${_top}px, 0)`;
 			_dPad.lastMoveTime = _gameTick;
-			_dPad.lastX = _left;
-			_dPad.lastY = _top;
 		}
 
 		_touches = _newTouches;
@@ -759,10 +767,9 @@ function activateTouchPad() {
 				touchID = t.identifier;
 				removeClass(_dPad, 'stay');
 				_touches = {
-					x: MathRound((_rect.left + (_rect.width / 2)) - _padding),
+					x: MathRound((_rect.left + (_rect.width / 2))),
 					y: MathRound((_rect.top + (_rect.height / 2)))
 				};
-				_dPad.lastX = _dPad.lastY = 0;
 				touch_startX = _touches.x; //MathRound(t.pageX - _padding);
 				touch_startY = _touches.y; // MathRound(t.pageY);
 				lastValidTouch = { x: touch_startX, y: touch_startY };
@@ -799,7 +806,6 @@ function activateTouchPad() {
 					addClass(_dPad, 'stay');
 				_touches = touchID = undefined;
 				resetDPadKeyCommands();
-				_dPad.lastX = _dPad.lastY = 0;
 				if (isCancel && lastValidTouch) {
 					clearTimeout(cancelRecoveryTimeout);
 					cancelRecoveryTimeout = setTimeout(() => {

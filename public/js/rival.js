@@ -1774,7 +1774,7 @@ function createCharacter(_settings) {
 										key: 'blur', position: 'css'
 									},
 									{
-										key: 'shake', position: 'css'
+										key: 'shakevert', position: 'css'
 									}
 								]
 							},
@@ -3241,7 +3241,7 @@ function createCharacter(_settings) {
 								extraStepXRate: 1,
 								directionChangeEnabled: true,
 								speed: 5,
-								sound: { key: 'roll', volume: .5 },
+								sound: { key: 'roll', volume: 1 },
 								def: {
 									iframe: true
 								}
@@ -3293,9 +3293,8 @@ function createCharacter(_settings) {
 								speed: 6,
 								objects: [
 									{
-										key: 'friction',
+										key: 'cloudground',
 										position: 'behind-feet',
-										reversed: false,
 										yGap: 10,
 										bind: false
 									}
@@ -8215,7 +8214,6 @@ function createCharacter(_settings) {
 								spriteWidth: 142,
 								spriteHeight: 153,
 								spriteOrigin: 71,
-								changeDirection: true,
 								directionChangeEnabled: true,
 								speed: 1,
 								sound: { key: 'arrow', volume: 1 },
@@ -8235,7 +8233,6 @@ function createCharacter(_settings) {
 								spriteOrigin: 71,
 								speed: 1,
 								sound: { key: 'arrow', volume: 1 },
-								changeDirection: true,
 								directionChangeEnabled: true,
 								spell: {
 									key: 'archerdownarrow',
@@ -8295,7 +8292,6 @@ function createCharacter(_settings) {
 									key: 'landing',
 									position: 'under-feet'
 								}],
-								changeDirection: true,
 								def: {
 									iframe: true
 								}
@@ -35437,38 +35433,14 @@ const _allEnemies = {
 						}
 					]
 				},
-				hurtground1: {
-					key: 'hurtground1',
-					type: 'skill',
-					hurt: 'ground',
-					frames: [
+				hurtground1: createHurtGround(
 						{
 							spriteLeft: 1023,
 							spriteTop: 600,
 							spriteWidth: 184,
 							spriteHeight: 115,
 							spriteOrigin: 55,
-							bottomGap: 4,
-							speed: 1
-						},
-						{
-							spriteLeft: 1023,
-							spriteTop: 600,
-							spriteWidth: 184,
-							spriteHeight: 115,
-							spriteOrigin: 55,
-							bottomGap: 4,
-							sound: { key: 'trollhurt1', reset: true },
-							speed: 1
-						},
-						{
-							spriteLeft: 1023,
-							spriteTop: 600,
-							spriteWidth: 184,
-							spriteHeight: 115,
-							spriteOrigin: 55,
-							bottomGap: 4,
-							speed: 18
+							bottomGap: 4
 						},
 						{
 							spriteLeft: 588,
@@ -35477,48 +35449,16 @@ const _allEnemies = {
 							spriteHeight: 116,
 							spriteOrigin: 55,
 							bottomGap: 5,
-							speed: 20
-						},
-						{
-							spriteLeft: 153,
-							spriteTop: 600,
-							spriteWidth: 184,
-							spriteHeight: 116,
-							spriteOrigin: 55,
-							bottomGap: 5,
-							speed: 20
-						}
-					]
-				},
-				hurtground2: {
-					key: 'hurtground2',
-					type: 'skill',
-					hurt: 'ground',
-					frames: [
+							invisibleWhenLay: true
+						}, null,
+						{ key: 'trollhurt1', reset: true }),
+				hurtground2: createHurtGround(
 						{
 							spriteLeft: 3607,
 							spriteTop: 1053,
 							spriteWidth: 205,
 							spriteHeight: 139,
-							spriteOrigin: 80,
-							speed: 1
-						},
-						{
-							spriteLeft: 3607,
-							spriteTop: 1053,
-							spriteWidth: 205,
-							spriteHeight: 139,
-							spriteOrigin: 80,
-							sound: { key: 'trollhurt2', reset: true },
-							speed: 1
-						},
-						{
-							spriteLeft: 3607,
-							spriteTop: 1053,
-							spriteWidth: 205,
-							spriteHeight: 139,
-							spriteOrigin: 80,
-							speed: 18
+							spriteOrigin: 80
 						},
 						{
 							spriteLeft: 3179,
@@ -35526,15 +35466,63 @@ const _allEnemies = {
 							spriteWidth: 186,
 							spriteHeight: 167,
 							spriteOrigin: 80,
-							speed: 20
+							invisibleWhenLay: true
+						}, null,
+						{ key: 'trollhurt2', reset: true }
+					),
+				hurtblock: {
+					key: 'hurtblock',
+					hurt: true,
+					type: 'skill',
+					priority: 2,
+					frames: [
+						{
+							spriteLeft: 3651,
+							spriteTop: 776,
+							spriteWidth: 125,
+							spriteHeight: 176,
+							spriteOrigin: 42,
+							speed: 1,
+							sound: {key:'shield', reset: true},
+							objects: [
+								{
+									key: 'shieldactive',
+									remove: true
+								}
+							]
 						},
 						{
-							spriteLeft: 2744,
-							spriteTop: 1023,
-							spriteWidth: 189,
-							spriteHeight: 163,
-							spriteOrigin: 80,
-							speed: 20
+							spriteLeft: 3651,
+							spriteTop: 776,
+							spriteWidth: 125,
+							spriteHeight: 176,
+							spriteOrigin: 42,
+							speed: 6,
+							objects: [
+								{
+									key: 'shieldhurt2',
+									position: 'middle-front',
+									scale:1.5,
+									yGap: 0,
+									xGap: 10
+								}
+							]
+						},
+						{
+							spriteLeft: 3651,
+							spriteTop: 776,
+							spriteWidth: 125,
+							spriteHeight: 176,
+							spriteOrigin: 42,
+							speed: 53,
+							objects: [{	
+								key: 'shieldactive',
+								position: 'middle-front',
+								yGap: 0,
+								xGap: 20,
+								scale:1.5,
+								bind: 'hurtblock'
+							}]
 						}
 					]
 				},
@@ -35562,8 +35550,9 @@ const _allEnemies = {
 							objects: [{
 								key: 'shieldactive',
 								position: 'middle-front',
-								yGap: 50,
-								xGap: 5
+								yGap: 0,
+								scale:1.6,
+								xGap: 20
 							}],
 							directionChangeEnabled: true
 						},
@@ -49408,7 +49397,8 @@ const _allEnemies = {
 						spriteTop: 2406,
 						spriteWidth: 330,
 						spriteHeight: 80,
-						spriteOrigin: 165
+						spriteOrigin: 165,
+						invisibleWhenLay: true
 					},
 					{ key: 'shamanhurt5,shamanhurt6,shamanhurt7', volume: .7, reset: true }
 				),
@@ -49425,7 +49415,8 @@ const _allEnemies = {
 						spriteTop: 2406,
 						spriteWidth: 330,
 						spriteHeight: 80,
-						spriteOrigin: 165
+						spriteOrigin: 165,
+						invisibleWhenLay: true
 					},
 					{ key: 'shamanhurt5,shamanhurt6,shamanhurt7', volume: .6, reset: true }
 				),
@@ -50131,7 +50122,8 @@ const _allEnemies = {
 						spriteTop: 2406,
 						spriteWidth: 330,
 						spriteHeight: 80,
-						spriteOrigin: 165
+						spriteOrigin: 165,
+						invisibleWhenLay: true
 					},
 					{ key: 'shamanhurt5,shamanhurt6,shamanhurt7', reset: true, volume: .7 }
 				),
@@ -50148,7 +50140,8 @@ const _allEnemies = {
 						spriteTop: 2406,
 						spriteWidth: 330,
 						spriteHeight: 80,
-						spriteOrigin: 165
+						spriteOrigin: 165,
+						invisibleWhenLay: true
 					},
 					{ key: 'shamanhurt5,shamanhurt6,shamanhurt7', reset: true, volume: .6 }
 				),
@@ -74097,6 +74090,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteWidth: _sprite2.spriteWidth,
 				spriteHeight: _sprite2.spriteHeight,
 				spriteOrigin: _sprite2.spriteOrigin,
+				invisibleWhenLay: true,
 				src: _sprite2.src,
 				speed: 3,
 				objects: [{
@@ -74112,6 +74106,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteOrigin: _sprite2.spriteOrigin,
 				src: _sprite2.src,
 				speed: 1,
+				invisibleWhenLay: true,
 				invisibleWhenDead: true
 			}
 		]

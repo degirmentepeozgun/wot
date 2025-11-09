@@ -8,7 +8,10 @@ function animateStart(_failed, _extraGain, _content) {
 		// initMainCharacter(_ch, 1);
 		// _client.setCharacterValues();
 		// setCharacterDefaults(mainCharacter);
+		let _oldES = episode.still;
+		episode.still = true;
 		startWithThisCharacter(episode.mainClass, null, 1, 1);
+		episode.still = _oldES;
 	}
 	const _isPvp = (episode.pvp || episode.war) & !episode.gold;
 	const _id = __story.id;

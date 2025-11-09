@@ -1766,6 +1766,8 @@ function map(_m) {
 					_p.style.setProperty('-webkit-transform', _p.style.transform);
 				}
 		}
+		else if(letItSnow)
+			letItSnow.drawSnowFlakes();
 	}
 	// this.drawLayers5 = function () {
 	// 	for (let _lay of this.layers) {

@@ -289,7 +289,7 @@ const _allBuffs = {
 	fire: {
 		id: 14,
 		objects: [
-			{ key: 'burn', stillOnChar: true, position: 'middle', type: 'buff', still: false, singleton: true, bind: 'fire', repeat: true }
+			{ key: 'burn', position: 'middle', type: 'buff', still: false, singleton: true, bind: 'fire', repeat: true }
 		],
 		stack: 3,
 		append: true,

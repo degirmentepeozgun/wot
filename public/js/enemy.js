@@ -991,7 +991,7 @@ function enemy(_e) {
 			if (this.follow(mainCharacter))
 				return;
 		// if(!_enemy?.enemy && !this.isDead() && this.animation !== 'idle')
-		// 	this.animate('idle', 1, null, 2);
+		// 	thisc.animate('idle', 1, null, 2);
 		this.pickRandomAttack(null, null, 1);
 	}
 	this.setDirection = function(_dir, _force) {
@@ -1508,17 +1508,19 @@ function enemy(_e) {
 			if(this.hurting && this.class !== 'object') {
 				delete this.hurting;
 				this.laying = true;
-				_anima.frames = _anima.frames?.filter(x => !x.invisibleWhenLay);
-				_anima.frames?.forEach(x => {
-					if(!x.def)
-						x.def = {};
-					if(!x.def.iframe)
-						x.def.iframe = true;
-					x.extraStepXRate = 0;
-				});
 				_anima.next = 'dead';
-				_anima.frames[0].color = _anima.frames[1].color = 
-				this.skinColor = this.hurtColor = '#7C3030';
+				if(!this.heartCount){
+					_anima.frames = _anima.frames?.filter(x => !x.invisibleWhenLay);
+					_anima.frames?.forEach(x => {
+						if(!x.def)
+							x.def = {};
+						if(!x.def.iframe)
+							x.def.iframe = true;
+						x.extraStepXRate = 0;
+					});
+					_anima.frames[0].color = _anima.frames[1].color = 
+					this.skinColor = this.hurtColor = '#7C3030';
+				}
 				if(this.hurting?.hit)
 					delete this.hurting.hit;
 				setTimeout(() => {
@@ -3814,6 +3816,7 @@ function enemy(_e) {
 						_e.knockbacking = true;
 					if (_f.atk?.hurt?.next === 'dead')
 						_e.getCurrentAnimation().next = 'dead';
+					_e.analyzeSkill();
 				}
 				const _step = MathCeil((_push * ((_f.speed - (_knocker.realTime ? 1 : _knocker.start)) / _f.speed)) / 100);
 				if (_step) {
@@ -4022,6 +4025,23 @@ function enemy(_e) {
 	this.isSmashable = function() {
 		return !this.main && !this.friendly && !this.alp && this.class !== 'object' && !this.noSmash &&
 		this.class !== 'boss' && !this.ironSkin && this.class !== __spell && !this.isDead();
+	}
+	this.analyzeSkill = function() {
+		if(this.animation.startsWith('knockback')) {
+			const _anima = this.getCurrentAnimation();
+			const _frames = _anima.frames;
+			const _rand = getRandomValue2(80, 120) / 100;
+			_frames.forEach(x => {
+				if(x.extraStepXRate && !x.realExtraStepXRate)
+					x.realExtraStepXRate = x.extraStepXRate;
+				if(x.extraStepYRate && !x.realExtraStepYRate)
+					x.realExtraStepYRate = x.extraStepYRate;
+				if(x.realExtraStepXRate)
+					x.extraStepXRate = x.realExtraStepXRate * _rand;
+				if(x.realExtraStepYRate)
+					x.extraStepYRate = x.realExtraStepYRate * _rand;
+			});
+		}
 	}
 	this.attack = function (_anima, _frame) {
 		const trt = (this.related ?? this);
@@ -4293,18 +4313,10 @@ function enemy(_e) {
 							const _cced = _f.atk.hurt.type !== 'common' && (!_ep || _tp < _ep) ;
 							let _animateSkill;
 							if ((_erelease || _f.atk.hurt.key) && _cced) {
-								if (_erelease) {
-									PlaySound({ key: 'release', volume: .3});
-									_e.addObject({key:'hurtsteal2', position: 'middle'});
-									if(_e.animations.release)
-										_e.animate('release', 1);
-									else
-										_e.addBuff({ key: 'release', level: 3, ms: 3000 });
-								}
-								else {
 									_animateSkill = _e.cc ?? _f.atk.hurt.key;
 									if (!_e.animations[_animateSkill])
 										_animateSkill = 'hurtground1';
+								if (!_erelease) {
 									//if (!_e.animations[_animateSkill]?.frames?.find(x => x.sound))
 									//	PlaySound({ owner: _e, key: (_e.main ? _e.class : _e.name.toLowerCase()) + (_e.main ? _animateSkill : 'hurt') }, ['hurt']);
 									if (_animateSkill.startsWith('hurt') && !_e.noCC){
@@ -4475,16 +4487,18 @@ function enemy(_e) {
 											//_e.addObject({key:'hit' + getRandomValue2(1,5), position: 'middle'});
 											//successfull hit
 											_e.lastHitSkill = _tr.animation;
-											if(_e.isDead() && (_f.knockback || (_f.push && typeof _f.push === 'number')))
+											if(_e.isDead())
 											{
-												_e.critDead = _t.criticalHit ? 3: 2;
-												if(_hurtType === 'air' && _e.animations.knockbackair){
-													 _e.animations.knockbackair.next = 'dead';
-													_e.animate('knockbackair', 1);
-												}
-												else if(_e.animations.knockbackground){
-													 _e.animations.knockbackground.next = 'dead';
-													_e.animate('knockbackground', 1);
+												if((_f.knockback || (_f.push && typeof _f.push === 'number'))) {
+													_e.critDead = _t.criticalHit ? 3: 2;
+													if(_hurtType === 'air' && _e.animations.knockbackair){
+														_e.animations.knockbackair.next = 'dead';
+														_e.animate('knockbackair', 1);
+													}
+													else if(_e.animations.knockbackground){
+														_e.animations.knockbackground.next = 'dead';
+														_e.animate('knockbackground', 1);
+													}
 												}
 											}
 											if(_canStop && _e.animation.startsWith('hurt')) {
@@ -4533,6 +4547,14 @@ function enemy(_e) {
 										}, getRandomValue2(8,20));
 									}
 								}
+							}
+							if(!_e.isDead() && _erelease) {
+								PlaySound({ key: 'release', volume: .3});
+								_e.addObject({key:'hurtsteal2', position: 'middle'});
+								if(_e.animations.release)
+									_e.animate('release', 1);
+								else
+									_e.addBuff({ key: 'release', level: 3, ms: 3000 });
 							}
 							if (__account.options.gore && _f.atk?.type === 'common' && (_e.bleed || _e.bleed == undefined)) {
 								_e.addObject({

@@ -778,6 +778,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 					const cfc = chainSkills['skill' + i].firstChild;
 					cfc.removeAttribute("src");
 				}
+				resetTouchPad();
 			}, 2000);
 		});
 	});

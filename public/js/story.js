@@ -6502,7 +6502,7 @@ const __stories = [
 				actions: [
 					{
 						when: function() {
-							return episode.phase < 99 && mainCharacter.level > 12;
+							return episode.phase < 99 && mainCharacter.level > 11;
 						},
 						do: function() {
 							episode.phase = 99;
@@ -6566,7 +6566,7 @@ const __stories = [
 									const installBoss = function(_b) {
 										const _boss = summonMobWithJson({
 											id: _b,
-											level: 13,
+											level: 12,
 											atk: mainCharacter.atk,
 											grade: 4
 										});
