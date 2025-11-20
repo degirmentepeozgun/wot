@@ -2800,6 +2800,164 @@ function map(_m) {
 	this.offDmgCanvas.height = this.cHeight;
 	this.offDmgCtx = this.offDmgCanvas.getContext('2d');
 	this.offDmgCanvas.imageSmoothingEnabled = false;
+	this.drawChargeParticles = function (_item) {
+		  const list = _item.char.spawnDusts;
+    if (!list || list.length === 0) return;
+
+    for (let d of list) {
+
+        // local wobble ve ilerleme etkilerini WORLD pozisyonuna uygula:
+        const pxWorld = d.worldX - ((_item.reversed ? -1 : 1) * (platformX - d.p))
+            + d.wobble * Math.sin(d.progress * 6) * 8
+            - (d.progress * 4);
+        // yukarı çıkış (y zaten dünya/ekran uyumlu olduğunu varsayıyoruz)
+        const py = d.y - d.rise * d.progress;
+
+        // asıl toz tanesinin boyutu
+        const s = d.size * (1 + d.progress * 1.4);
+
+        // üstteki parlak, alttaki flu
+        const alpha = 0.75 * (1 - d.progress);
+
+        // kamera offseti — ekranX = worldX - cameraX
+        const camX = pxWorld;
+
+        // ----------------------------
+        // 1) DALGA izi üretelim (izlerin de worldX olarak saklanması)
+        // ----------------------------
+        if (Math.random() < 0.6) {
+            d.trails.push({
+                worldX: pxWorld,   // world pozisyonu kaydet
+                y: py,
+                size: s * (1 + Math.random() * 0.6),
+                alpha: alpha * 0.6
+            });
+        }
+
+        // İzler çok olursa eskiyi sil
+        if (d.trails.length > 12) d.trails.shift();
+
+        // ----------------------------
+        // 2) İZLERİ ÇİZ (izleri world->cam çevir)
+        // ----------------------------
+        for (let i = d.trails.length - 1; i >= 0; i--) {
+			const t = d.trails[i];
+            t.alpha *= 0.85;     // yavaşça sönsün
+            t.size *= 1.03;     // genişleyerek flu görünüm
+			if(t.alpha < .1)
+				break;
+            offCtx.save();
+            offCtx.globalAlpha = t.alpha;
+            offCtx.fillStyle = "#c7b8a3";
+
+            offCtx.beginPath();
+            // t.worldX -> kameraya çevir
+            offCtx.ellipse(
+                t.worldX, t.y,
+                t.size * 1.3, t.size * 0.75,
+                0, 0, Math.PI * 2
+            );
+            offCtx.fill();
+            offCtx.restore();
+        }
+
+        // ----------------------------
+        // 3) ASIL PARTİKÜLÜ ÇİZ
+        // ----------------------------
+        offCtx.save();
+        offCtx.globalAlpha = alpha;
+        offCtx.fillStyle = "#d6c7b4";
+
+        offCtx.beginPath();
+        offCtx.ellipse(
+            camX, py,
+            s * 1.1, s * 0.7,
+            0, 0, Math.PI * 2
+        );
+        offCtx.fill();
+        offCtx.restore();
+
+        d.progress += 0.1;
+    }
+
+    // Ömür dolunca partikülleri sil
+    _item.char.spawnDusts = list.filter(d => d.progress < 1);
+	return;
+		if (_item.char.spawnDusts) {
+			for(let d of _item.char.spawnDusts) {
+				offCtx.save();
+				const w = d.width;
+				const h = d.height;
+				offCtx.globalAlpha = d.alpha;
+				offCtx.translate(d.x - ((_item.reversed ? -1 : 1) * (platformX - d.p)), d.y);
+
+				// Earth-like color (a bit brownish gray)
+				offCtx.fillStyle = "rgba(200, 180, 160, 0.9)";
+
+				// Soft horizontal oval
+				offCtx.beginPath();
+				offCtx.ellipse(0, 0, w, h * 0.45, 0, 0, Math.PI * 2);
+				offCtx.fill();
+
+				// Side small puffs (adds realism)
+				offCtx.beginPath();
+				offCtx.ellipse(-w * 0.5, -h * 0.1, h * 0.4, h * 0.35, 0, 0, Math.PI * 2);
+				offCtx.ellipse(w * 0.5, -h * 0.1, h * 0.4, h * 0.35, 0, 0, Math.PI * 2);
+				offCtx.fill();
+				offCtx.restore();
+				d.x += d.vx;
+				d.y += d.vy * 0.3;
+				d.vx *= 0.92;
+				d.alpha -= 0.06;
+			}
+			_item.char.spawnDusts = _item.char.spawnDusts.filter(g => g.alpha > 0);
+		}
+	}
+	this.drawCharacterGhost = function (_item, _sprite, _x,_y,_w,_h) {
+		if (_item.char.chargeProperties && _item.char.ghostData) {
+			let _blur = _item.char.ghostData.length;
+			for (let g of _item.char.ghostData) {
+				offCtx.save();
+				offCtx.globalAlpha = g.alpha;
+				offCtx.filter = 'blur(' + this.H(_blur) + 'px)';
+				offCtx.drawImage(
+					g.sprite,
+					g.left - ((_item.reversed ? -1 : 1) * (platformX - g.p)), g.top,
+					g.width, g.height
+				);
+				offCtx.filter = 'none';
+				offCtx.restore();
+				g.alpha -= 0.12;
+				_blur--;
+			}
+			_item.char.ghostData = _item.char.ghostData.filter(g => g.alpha > 0);
+		}
+	}
+	this.H = function(v) {
+		return v * (episode.cHeight / 768);
+	}
+	this.drawSpriteWithFade = function(_can, img, imgx, imgy, imgw, imgh, x, y, w, h, op) {
+		const temp = document.createElement("canvas");
+		temp.width = w;
+		temp.height = h;
+		const tctx = temp.getContext("2d");
+
+		// 1 - Sprite'ı çiz
+		tctx.drawImage(img, imgx, imgy, imgw, imgh, 0, 0, w, h);
+
+		// 2 - Dikey fade: üst %50 → alt %0
+		const g = tctx.createLinearGradient(0, 0, 0, h);
+		g.addColorStop(0.0, `rgba(255,255,255,${op})`);
+		g.addColorStop(0.92, "rgba(255,255,255,0.0)"); // alt
+
+		tctx.globalCompositeOperation = "destination-in";
+		tctx.fillStyle = g;
+		tctx.fillRect(0, 0, w, h);
+		tctx.globalCompositeOperation = "source-over";
+
+		// 3 - Sonucu ana canvasa aktar
+		_can.drawImage(temp, x, y);
+	}
 	this.drawCharacterQueue = function (_queue) {
 		if (this.disposing || !_queue?.[0]){
 			this.checkSceneActions();
@@ -3018,12 +3176,60 @@ function map(_m) {
 									MathRound(_item.top + _hDiff), 
 									MathRound(_item.width * (_item.zoom ?? 1)),
 									MathRound(_item.height * (_item.zoom ?? 1)));
-							else if(_cropped.width > 0)
-								offCtx.drawImage(_cropped,
-									MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff)), 
-									MathRound(_item.top + _hDiff), 
-									MathRound(_item.width * (_item.zoom ?? 1)),
-									MathRound(_item.height * (_item.zoom ?? 1)));
+							else if(_cropped.width > 0) {
+								const _x = MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff));
+								const _y = MathRound(_item.top + _hDiff);
+								const _w = MathRound(_item.width * (_item.zoom ?? 1));
+								const _h = MathRound(_item.height * (_item.zoom ?? 1));
+								this.drawCharacterGhost(_item,_cropped,_x,_y,_w,_h);
+								offCtx.drawImage(_cropped,_x,_y,_w,_h);
+								if(_item.char.chargeProperties) {
+									if(!_item.char.ghostData)
+										_item.char.ghostData = [];
+									_item.char.ghostData.push({
+										left: _x,
+										top: _y,
+										width: _w,
+										height: _h,
+										sprite: _cropped,
+										p : platformX,
+										alpha: .6
+									});
+									if (_item.char.ghostData.length > 5)
+										_item.char.ghostData.shift();
+									// if(!_item.char.spawnDusts)
+									// 	_item.char.spawnDusts = [];
+									const _trails = (_item.char.relatedObjects.filter(x => x.key === 'trail2')?.length ?? 0);
+									const _scale = 1.5 - (_trails * 0.085);
+									_item.char.addObject({
+										key: 'trail2',
+										position: 'behind-feet',
+										xGap: 100 - (_trails * 10),
+										scale: _scale,
+										yGap: -5
+									});
+									// _item.char.spawnDusts.push({
+									// 	worldX: _x,
+									// 	y: _y + _h - 2,
+									// 	p: platformX,
+
+									// 	rise: (_h * 0.5),
+									// 	progress: 0,
+
+									// 	size: this.H(8) + Math.random() * this.H(4),
+									// 	wobble: (Math.random() - 0.5) * 0.5,
+
+									// 	trails: [] // ← işte dalga izi burada
+									// });
+								}
+								else {
+									if(_item.char.ghostData){
+										delete _item.char.ghostData;
+										_item.char.relatedObjects = _item.char.relatedObjects.filter(x => x.key !== 'trail2');
+									}
+								}
+								//this.drawChargeParticles(_item);
+							}
 						}
 						if(_item.char.text)
 						{
@@ -3714,11 +3920,39 @@ this.drawHealthBar2 = function (_item) {
 							spriteWidth: _rel.width - (_rel.baseRight ?? 0),
 							spriteHeight: _rel.height
 						}, _rel.color, _rel.key + '-frame' + (_rel.frame ?? 0));
-					if(_spr?.width > 0)
-						_can.drawImage(_spr, ((_fl ?? 0) * _rel.width) + (_rel.baseLeft ?? 0), _ft + (_rel.baseTop ?? 0), _rel.width - (_rel.baseRight ?? 0), _rel.height,
-						MathRound(_relLeft),
-						MathRound((_rel.stillTop ?? _rel.top) - (((_rel.still ? 0 : (_item.yGap ?? 0)) + ((_rel.yGap ?? 0))) / __scale)),
-						MathFloor((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom), MathFloor(_rel.height * _rel.zoom));
+					// if(_rel.alpha < 1){
+					// 	_can.save();
+					// 	_can.globalAlpha = _rel.alpha;
+					// }
+					if(_spr?.width > 0){
+						if(_rel.alpha < 1) {
+							this.drawSpriteWithFade(_can, _spr, 
+								((_fl ?? 0) * _rel.width) + (_rel.baseLeft ?? 0), 
+								_ft + (_rel.baseTop ?? 0), 
+								_rel.width - (_rel.baseRight ?? 0), 
+								_rel.height,
+							MathRound(_relLeft),
+							MathRound((_rel.stillTop ?? _rel.top) - (((_rel.still ? 0 : (_item.yGap ?? 0)) + ((_rel.yGap ?? 0))) / __scale)),
+							MathFloor((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom), 
+							MathFloor(_rel.height * _rel.zoom), _rel.alpha);
+							if(_rel.fadeZoom)
+								_rel.zoom *= _rel.fadeZoom;
+						}
+						else 
+							_can.drawImage(_spr, ((_fl ?? 0) * _rel.width) + (_rel.baseLeft ?? 0), _ft + (_rel.baseTop ?? 0), _rel.width - (_rel.baseRight ?? 0), _rel.height,
+							MathRound(_relLeft),
+							MathRound((_rel.stillTop ?? _rel.top) - (((_rel.still ? 0 : (_item.yGap ?? 0)) + ((_rel.yGap ?? 0))) / __scale)),
+							MathFloor((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom), MathFloor(_rel.height * _rel.zoom));
+					}
+					// if(_rel.alpha < 1)
+					// 	_can.restore();
+					if(_rel.fade) {
+						if(!_rel.alpha)
+							_rel.alpha = 1;
+						_rel.alpha -= _rel.fade;
+						if(_rel.alpha <= 0)
+							_rel.remove = true;
+					}
 				}
 			}
 			if(_rel.remove && !shouldRemove)

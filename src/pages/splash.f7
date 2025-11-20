@@ -25,6 +25,9 @@
 			<div id="game-pad-left"></div>
 			<div id="game-pad-right"></div>
 			<div id="game-ui" class="full">
+				<div id="pc-bottom-ui">
+					<div id="pc-bottom-ui-inner"></div>
+				</div>
 				<img src="./images/icons/enemy-left.png" class="enemy-left-arrow v-none" />
 				<img src="./images/icons/enemy-right.png" class="enemy-right-arrow v-none" />
 				<div id="top-nav" class="flex flex-jc-start">
@@ -38,10 +41,10 @@
 				<svg id="use-progress" xmlns="http://www.w3.org/2000/svg" version="1.1" class="v-none">
 					<circle cx="6.5vh" cy="6.5vh" r="5.5vh" stroke-lineup="round" />
 				</svg>
-				<div class="skill placed-skill action talk-btn" id="skill10">
+				<div data-key="u" class="skill placed-skill action talk-btn" id="skill10">
 
 				</div>
-				<div data-key="i" class="skill placed-skill action hand-btn" id="skill11">
+				<div data-key="u" class="skill placed-skill action hand-btn" id="skill11">
 
 				</div>
 				<div data-key="f" class="skill placed-skill v-none atk-sf" id="chain-skill-2">
@@ -80,7 +83,7 @@
 				<div data-key="g" class="skill def-sf" id="skill7">
 
 				</div>
-				<div data-key=" " class="skill locked atk-sf" id="skill1">
+				<div data-key="space" class="skill locked atk-sf" id="skill1">
 
 				</div>
 				<div id="pot-btn" data-key="p" class="skill def-sf flex">
@@ -231,33 +234,6 @@
 			_finishingMove = document.getElementById('skill9');
 			_hitCountValues = document.querySelectorAll('.hit-count-img');
 			_canvas = _gamePad;
-			const addEvent = function(_id, _char) {
-				const _skillbtn = document.getElementById(_id);
-				_skillbtn.addEventListener("mousedown", function() {
-					//mainCharacter.keyboard.mouseDown(_char);
-					physicalKeys.add(_char);
-				});
-				_skillbtn.addEventListener("mouseup", function() {
-					//mainCharacter.keyboard.mouseUp(_char);
-					physicalKeys.delete(_char);
-				});
-				_skillbtn.addEventListener("mouseout", function() {
-					//mainCharacter.keyboard.mouseUp(_char);
-					physicalKeys.delete(_char);
-				});
-				_skillbtn.addEventListener("touchcancel", function() {
-					//mainCharacter.keyboard.mouseUp(_char);
-					physicalKeys.delete(_char);
-				});
-				_skillbtn.addEventListener("touchend", function() {
-					//mainCharacter.keyboard.mouseUp(_char);
-					physicalKeys.delete(_char);
-				});
-				_skillbtn.addEventListener("touchstart", function() {
-					//mainCharacter.keyboard.mouseDown(_char);
-					physicalKeys.add(_char);
-				});
-			}
 			addEvent('skill1', ' ');
 			addEvent('skill2', 'h');
 			addEvent('skill3', 'j');

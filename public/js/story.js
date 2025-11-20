@@ -6902,6 +6902,9 @@ function switchStoryScene(_func, _newOrder) {
 					if(mainCharacter?.keyboard)
 						mainCharacter.keyboard.holdingKeys = [];
 				}, __storyScene.loadingCharacterIds);
+				removeClass(document.body, 'pc-mission');
+				if(__isPC && __storyScene?.map > 1)
+					addClass(document.body, 'pc-mission');
 			}, 1000);
 			if(_func)
 				_func();

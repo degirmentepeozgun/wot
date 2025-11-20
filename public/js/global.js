@@ -2028,6 +2028,10 @@ const relatedObjects = [
 		zoom: 1.5, totalFrames: 5, speed: 4, singleton: true, bind: true, repeat: true
 	},
 	{
+		id: 'trail2', key: 'trail2', width: 513/3, height: 84, col: 3, fade: .05, alpha:.95,
+		zoom: 1.5, totalFrames: 5, speed: 2, still: true, multiUse: true, fadeZoom: 1.05
+	},
+	{
 		id: 'shockwave', key: 'shockwave', width: 240, height: 196, col: 3,
 		zoom: 1.2, totalFrames: 4, speed: 3, singleton: true, still: true
 	},
@@ -2291,6 +2295,16 @@ const relatedObjects = [
 		totalFrames: 5, speed: 3, singleton: true, still: true
 	},
 	{
+		id: 'sparkcharge', key: 'sparkcharge',
+		width: 150, height: 150, col:4, zoom: 1.5, type: 'hurt',
+		totalFrames: 14, speed: 3, frame: 2, skip:2, singleton: true, still: true
+	},
+	{
+		id: 'energy', key: 'energy',
+		width: 100, height: 100, col:4, zoom: 2, type: 'hurt',
+		totalFrames: 8, speed: 3, singleton: true
+	},
+	{
 		id: 'bloodsplat', key: 'bloodsplat',
 		width: 250, height: 250, col:4, zoom: 1, type: 'hurt',
 		totalFrames: 16, speed: 4, skip:2, singleton: true, still: true
@@ -2308,6 +2322,9 @@ function setRelatedObjectSpeed() {
 }
 setRelatedObjectSpeed();
 const relatedObjectImages = {
+	energy: function () {
+		return getImage('./images/related/energy.png')
+	},
 	bloodsplat2: function () {
 		return getImage('./images/related/blood-splatter2.png')
 	},
@@ -2315,6 +2332,9 @@ const relatedObjectImages = {
 		return getImage('./images/related/bloodsplatter.png')
 	},
 	trail: function () {
+		return getImage('./images/related/trail.png?x=2')
+	},
+	trail2: function () {
 		return getImage('./images/related/trail.png?x=2')
 	},
 	shockwave2: function () {
@@ -2343,6 +2363,9 @@ const relatedObjectImages = {
 	},
 	sparkcrit: function () {
 		return getImage('./images/related/spark3.png')
+	},
+	sparkcharge: function () {
+		return getImage('./images/related/chargespark.png')
 	},
 	target: function () {
 		return getImage('./images/related/target.png?x=2')
@@ -2396,7 +2419,7 @@ const relatedObjectImages = {
 		return getImage('./images/icons/quest-progress-gray.png')
 	},
 	charge: function () {
-		return getImage('./images/related/charge.png')
+		return getImage('./images/related/charge2.png')
 	},
 	slashturn: function () {
 		return getImage('./images/related/slash-turn.png')
@@ -2949,6 +2972,9 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	dzztshort: './images/sounds/dzzt-short.mp3',
+	chargehit1: './images/sounds/charge-hit1.mp3',
+	chargehit2: './images/sounds/charge-hit2.mp3',
 	chargepower: './images/sounds/chargepower5.mp3',
 	blockbreak2: './images/sounds/blockbreak2.mp3',
 	bloodsquish: './images/sounds/bloodsquish.mp3',
@@ -12667,6 +12693,10 @@ const spells = {
 						src: './images/related/target.png',
 						zoom: .7,
 						speed: 2,
+						objects: [{
+							key: 'bombshock',
+							position: 'css'
+						}],
 						atk: {
 							yRange: 20,
 							rate: .1,
@@ -18722,7 +18752,6 @@ const spells = {
 						spriteWidth: 125,
 						spriteHeight: 70,
 						spriteOrigin: 63,
-						bottomGap: -40,
 						speed: 5,
 						sound: { key: 'shockwave', volume: .2 },
 						atk: {
@@ -18742,7 +18771,6 @@ const spells = {
 						spriteHeight: 0,
 						spriteOrigin: 0,
 						extraStepXRate: -2.5,
-						bottomGap: -40,
 						speed: 2
 					},
 					{
@@ -18751,7 +18779,6 @@ const spells = {
 						spriteWidth: 125,
 						spriteHeight: 70,
 						spriteOrigin: 63,
-						bottomGap: -40,
 						speed: 5,
 						atk: {
 							yRange: 100,
@@ -18770,7 +18797,6 @@ const spells = {
 						spriteHeight: 0,
 						spriteOrigin: 0,
 						extraStepXRate: -2.5,
-						bottomGap: -40,
 						speed: 2
 					},
 					{
@@ -18779,7 +18805,6 @@ const spells = {
 						spriteWidth: 125,
 						spriteHeight: 70,
 						spriteOrigin: 63,
-						bottomGap: -40,
 						speed: 5,
 						atk: {
 							yRange: 100,
@@ -18798,7 +18823,6 @@ const spells = {
 						spriteHeight: 0,
 						spriteOrigin: 0,
 						extraStepXRate: -2.5,
-						bottomGap: -40,
 						speed: 2
 					},
 					{
@@ -18807,7 +18831,6 @@ const spells = {
 						spriteWidth: 125,
 						spriteHeight: 70,
 						spriteOrigin: 63,
-						bottomGap: -40,
 						speed: 5,
 						atk: {
 							yRange: 100,
@@ -29085,6 +29108,156 @@ const cssAnimations = {
 			}
 		}
 	},
+	zoomquick: function (_char) {
+		if(!_char.main)
+			return;
+		const _left = _char.SCREENLEFT;
+		const _width = _char.WIDTH;
+		const _height = _char.HEIGHT;
+		const x = MathRound(_left + (_width / 2));
+		const y = MathRound(episode.cUIHeight - _char.yPosition - (_height / 2));
+		if(!cssAnimationProps.zoomquick){
+			if(_char.getFps() !== 1)
+				return;
+			addClass(_gamePad, 'camera');
+			_gamePad.style.transformOrigin = x + 'px ' + y + 'px';
+			cssAnimationProps.zoomquick = { start: _gameTick, p1: _char };
+		}
+		else {
+			_gamePad.style.transformOrigin = x + 'px ' + y + 'px';
+			if((_gameTick - cssAnimationProps.zoomquick.start) < 80)
+				return;
+			removeClass(_gamePad, 'camera');
+			_gamePad.style.transformOrigin = 'unset';
+			delete cssAnimationProps.zoomquick;
+		}
+	},
+	zoomquickred: function (_char) {
+		const _left = _char.SCREENLEFT;
+		const _width = _char.WIDTH;
+		const _height = _char.HEIGHT;
+		const x = MathRound(_left + (_width / 2));
+		const y = MathRound(episode.cUIHeight - _char.yPosition - (_height / 2));
+		if(!cssAnimationProps.zoomquickred){
+			addClass(_gamePad, 'camera-red');
+			_gamePad.style.transformOrigin = x + 'px ' + y + 'px';
+			cssAnimationProps.zoomquickred = { start: _gameTick, p1: _char };
+		}
+		else {
+			_gamePad.style.transformOrigin = x + 'px ' + y + 'px';
+			if((_gameTick - cssAnimationProps.zoomquickred.start) < 110)
+				return;
+			removeClass(_gamePad, 'camera-red');
+			_gamePad.style.transformOrigin = 'unset';
+			delete cssAnimationProps.zoomquickred;
+		}
+	},
+	bombshock: function (_char) {
+		if(!cssAnimationProps.bombshock){
+			addClass(_gamePad, 'bombshock');
+			cssAnimationProps.bombshock = { start: _gameTick };
+		}
+		else {
+			if((_gameTick - cssAnimationProps.bombshock.start) < 180)
+				return;
+			removeClass(_gamePad, 'bombshock');
+			delete cssAnimationProps.bombshock;
+		}
+	},
+	forceimpact: function(_char, dirX) {
+		delete cssAnimationProps.zoomdynamic;
+		_gamePad.classList.remove(
+			"zoomdynamic-light-right",
+			"zoomdynamic-light-left",
+			"zoomdynamic-medium-right",
+			"zoomdynamic-medium-left",
+			"zoomdynamic-heavy-right",
+			"zoomdynamic-heavy-left",
+			'charge-impact-left',
+			'charge-impact-right'
+		);
+		delete cssAnimationProps.impact;
+		cssAnimations.impact(_char,null,dirX);
+	},
+	zoomdynamic: function (_char, dirX, strength) {
+		if(hasClass(_gamePad, 'camera') || hasClass(_gamePad, 'bombshock'))
+        	return;
+		if (!cssAnimationProps.zoomdynamic) {
+
+			// --- AAA RANDOM MOTION LAYERS ---
+			const micro = (Math.random() * 0.006 - 0.003);   // -0.003vw ~ +0.003vw
+			const delay = (Math.random() * 0.020);           // 0 ~ 20ms
+
+			_gamePad.style.setProperty('--shiftX', micro + 'vw');
+			_gamePad.style.animationDelay = delay + 's';
+			// ---------------------------------
+
+			let cls =
+			(strength <= 1 ? "zoomdynamic-light" :
+			strength <= 2 ? "zoomdynamic-medium" :
+							"zoomdynamic-heavy");
+
+			cls += (dirX === __right ? "-right" : "-left");
+
+			_gamePad.classList.add(cls);
+
+			cssAnimationProps.zoomdynamic = {
+				start: _gameTick,
+				p1: delay * 1000
+			};
+		}
+		else {
+
+			if (_gameTick - cssAnimationProps.zoomdynamic.start < (200 + cssAnimationProps.zoomdynamic.p1))
+				return;
+
+			if (_gameTick - cssAnimationProps.zoomdynamic.start > 400)
+				delete cssAnimationProps.zoomdynamic;
+			else {
+				_gamePad.classList.remove(
+					"zoomdynamic-light-right",
+					"zoomdynamic-light-left",
+					"zoomdynamic-medium-right",
+					"zoomdynamic-medium-left",
+					"zoomdynamic-heavy-right",
+					"zoomdynamic-heavy-left"
+				);
+			}
+		}
+		// if(hasClass(_gamePad, 'camera'))
+		// 	return;
+		// if (!cssAnimationProps.zoomdynamic) {
+		// 	let cls =
+		// 	(strength <= 1 ? "zoomdynamic-light" :
+		// 	strength <= 2 ? "zoomdynamic-medium" :
+		// 					"zoomdynamic-heavy");
+
+    	// 	cls += (dirX === __right ? "-right" : "-left");
+
+		// 	_gamePad.classList.add(cls);
+		// 	cssAnimationProps.zoomdynamic = {
+		// 		start: _gameTick
+		// 	};
+		// }
+		// else {
+
+		// 	if (_gameTick - cssAnimationProps.zoomdynamic.start < 180)
+		// 		return;
+
+
+		// 	if (_gameTick - cssAnimationProps.zoomdynamic.start > 1000)
+		// 		delete cssAnimationProps.zoomdynamic;
+		// 	else
+		// 		_gamePad.classList.remove(
+		// 			"zoomdynamic-light-right",
+		// 			"zoomdynamic-light-left",
+		// 			"zoomdynamic-medium-right",
+		// 			"zoomdynamic-medium-left",
+		// 			"zoomdynamic-heavy-right",
+		// 			"zoomdynamic-heavy-left"
+		// 		);
+		// }
+	},
 	lightradius: function(_char, _rate, _root) {
 		let _left = _char.SCREENLEFT;
 		const _h = MathRound(_char.height * _char.ZOOM);
@@ -29669,76 +29842,79 @@ function copyText(_elem) {
 // 		askSomething(getLangData('Exit to lobby'), "killStory()", "exit-app-question", _isActive ? _fs : undefined);
 // }
 function askExitApp(){
-	if(closeInventoryQuestionModal())
-		return;
-	if(__switchingMap || _storySceneSwitching || _game.spinned){
-		PlaySound({key:'disabled'});
-		return;
-	}
-	const _fs = document.getElementById('first-splash');
-	const _isActive = _fs && !hasClass(_fs, 'v-none');
-	PlaySound({key:'click'});
-	if(!__story){
-		askSomething(getLangData('Application will be closed'), "exitApplication()", "exit-app-question", _isActive ? _fs : undefined);
-		return;
-	}
-	let _options = [
-		{
-			step:1,
-			title: {
-				en: 'To Lobby Screen',
-				tr: 'Lobi Ekranına'
-			},
-			action: 'killStory()'
-		},
-		{
-			step:2,
-			title: {
-				en: 'To Opening Screen',
-				tr: 'Açılış Ekranına'
-			},
-			action: 'resetOpeningScreen()'
-		},
-		{
-			step:3,
-			title: {
-				en: 'Leave Game',
-				tr: 'Oyundan Çık'
-			},
-			action: 'exitApplication()'
+	try {
+		if(closeInventoryQuestionModal())
+			return;
+		if(__switchingMap || _storySceneSwitching || _game.spinned){
+			PlaySound({key:'disabled'});
+			return;
 		}
-	];
-	if(!__account.storyResults.find(x => x.id === 1))
-		_options = _options.filter(x => x.step !== 1);
-	if(episode?.menu || _client.quickPlay) {
-		_options = _options.filter(x => x.step !== 1);
-		if(_client.quickPlay)
-			_options.splice(_options.length - 1, 0, {
-				step:4,
+		const _fs = document.getElementById('first-splash');
+		const _isActive = _fs && !hasClass(_fs, 'v-none');
+		PlaySound({key:'click'});
+		if(!__story){
+			askSomething(getLangData('Application will be closed'), "exitApplication()", "exit-app-question", _isActive ? _fs : undefined);
+			return;
+		}
+		let _options = [
+			{
+				step:1,
 				title: {
-					en: 'Restart Current Mission',
-					tr: 'Bölüme Baştan Başla'
+					en: 'To Lobby Screen',
+					tr: 'Lobi Ekranına'
 				},
-				action: 'restartStory()'
-			});
-	}
-	let _buttons = '';
-	for(let _op of _options)
-		_buttons += `<div class="game-menu-button flex animate-me" style="padding:0 2vh;height:5.4vh!important;font-size:3vh!important;min-width:80%;margin:1.25vh 0" onexactclick="${_op.action}">${_op.title[getLang()]}</div>`;
-	let _modal = `<div class="full fade-me show-ui flex inventory-question show-info">
-		<div class="inventory-modal flex quit-modal" style="width:25%;flex-direction:column;position:relative;aspect-ratio:auto">
-			<div style="padding:6vh 4vh 2vh 4vh" class="flex w-100">
-				<span style="color:#F4BB44 !important;font-size:3.2vh !important">${getLangData('Go back')}?</span>
+				action: 'killStory()'
+			},
+			{
+				step:2,
+				title: {
+					en: 'To Opening Screen',
+					tr: 'Açılış Ekranına'
+				},
+				action: 'resetOpeningScreen()'
+			},
+			{
+				step:3,
+				title: {
+					en: 'Leave Game',
+					tr: 'Oyundan Çık'
+				},
+				action: 'exitApplication()'
+			}
+		];
+		if(!__account.storyResults.find(x => x.id === 1))
+			_options = _options.filter(x => x.step !== 1);
+		if(episode?.menu || _client.quickPlay) {
+			_options = _options.filter(x => x.step !== 1);
+			if(_client.quickPlay)
+				_options.splice(_options.length - 1, 0, {
+					step:4,
+					title: {
+						en: 'Restart Current Mission',
+						tr: 'Bölüme Baştan Başla'
+					},
+					action: 'restartStory()'
+				});
+		}
+		let _buttons = '';
+		for(let _op of _options)
+			_buttons += `<div class="game-menu-button flex animate-me" style="padding:0 2vh;height:5.4vh!important;font-size:3vh!important;min-width:80%;margin:1.25vh 0" onexactclick="${_op.action}">${_op.title[getLang()]}</div>`;
+		let _modal = `<div class="full fade-me show-ui flex inventory-question show-info">
+			<div class="inventory-modal flex quit-modal" style="width:25%;flex-direction:column;position:relative;aspect-ratio:auto">
+				<div style="padding:6vh 4vh 2vh 4vh" class="flex w-100">
+					<span style="color:#F4BB44 !important;font-size:3.2vh !important">${getLangData('Go back')}?</span>
+				</div>
+				<div class="flex w-100" style="padding:2vh 2vh 4vh 2vh">`
+					+ _buttons +
+				`</div>
+				<div onexactclick="closeInventoryQuestionModal()" style="font-size:4.2vh !important;color:#9d987f !important;padding:1.6vh 3.2vh" class="item-info-modal-close">&times;</div>
 			</div>
-			<div class="flex w-100" style="padding:2vh 2vh 4vh 2vh">`
-				+ _buttons +
-			`</div>
-			<div onexactclick="closeInventoryQuestionModal()" style="font-size:4.2vh !important;color:#9d987f !important;padding:1.6vh 3.2vh" class="item-info-modal-close">&times;</div>
-		</div>
-	</div>`;
-	const _div = document.createElement('div');
-	_div.innerHTML = _modal;
-	(_isActive ? _fs : _gameUI).appendChild(_div.firstChild);
+		</div>`;
+		const _div = document.createElement('div');
+		_div.innerHTML = _modal;
+		(_isActive ? _fs : _gameUI).appendChild(_div.firstChild);
+	}
+	catch(ex){}
 }
 
 function exitApplication() {

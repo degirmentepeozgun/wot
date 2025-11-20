@@ -4,6 +4,7 @@ function keyboard(_character, _keys) {
 	this.character = _character;
 	this.lastAction = {};
 	this.holdingKeys = [];
+	this.keyStates = {};
 	this.recordingKeys = [];
 	this.keys = _keys;
 	const self = this;
@@ -40,7 +41,15 @@ function keyboard(_character, _keys) {
 		const _key = this.holdingKeys.find(x => x.key === _k);
 		if (_key)
 			return;
-		this.removeKey(_k);
+		const _end = this.keyStates[_k]?.lastEnd;
+		this.removeKey(_k, null, 1);
+
+		// end/cancel’den sonra çok erken start gelirse ignore
+		if (performance.now() - _end < 40) 
+			return;
+
+		if (!this.keyStates[_k]?.isDown)
+			this.keyStates[_k] = { isDown:true };
 		const _type = (_k === self.keys[16] || _k === self.keys[17] || _k === self.keys[0] || _k === self.keys[2]) ? 'move' : 'skill';
 		if(_type === 'skill')
 			this.holdingKeys = this.holdingKeys.filter(x => x.type !== _type || x.key === ' ');
@@ -55,10 +64,12 @@ function keyboard(_character, _keys) {
 		this.holdingKeys = this.holdingKeys.filter(x => x.name !== 'common') ?? [];
 	}
 	this.removeSkill = function (_skillName) {
-		this.removeKey(_skillName);
+		this.removeKey(_skillName, null, 1);
 	}
-	this.removeKey = function (_k, _release) {
+	this.removeKey = function (_k, _release, _skipState) {
 		let _has;
+		if(!_skipState)
+			this.keyStates[_k] = {isDown: false, lastEnd: performance.now()};
 		for (var i = 0; i < this.holdingKeys.length; i++) {
 			const _key = this.holdingKeys[i];
 			if (_key.key === _k) {
@@ -459,11 +470,111 @@ function keyboard(_character, _keys) {
 // }
 // syncKeys();
 
+// const physicalKeys = new Set();
+// const lastDown = {};
+// const lastUp = {};
+// const antiGhostMsDir = 50; // yön tuşları için
+// const antiGhostMsOther = 10; // diğer tüm tuşlar için daha düşük
+
+// function normalizeKey(key) {
+//   const _k = key?.toLowerCase?.() || null;
+//   switch (_k) {
+//     case 'arrowleft': return 'a';
+//     case 'arrowup': return 'w';
+//     case 'arrowdown': return 's';
+//     case 'arrowright': return 'd';
+//   }
+//   return _k;
+// }
+
+// // Yön tuşları seti
+// const directionKeys = new Set(['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright']);
+
+// window.addEventListener('keydown', (e) => {
+//   if (mainCharacter?.disableKeyboard) return;
+
+//   const kRaw = e.key?.toLowerCase?.();
+//   if (!kRaw) return;
+
+//   const now = performance.now();
+//   const lastUpTime = lastUp[kRaw] || 0;
+
+//   const antiGhostMs = directionKeys.has(kRaw)
+//     ? antiGhostMsDir
+//     : antiGhostMsOther;
+
+//   // Ghost engelleme
+//   if (now - lastUpTime < antiGhostMs)
+//     return;
+
+//   lastDown[kRaw] = now;
+//   physicalKeys.add(kRaw);
+// });
+
+// window.addEventListener('keyup', (e) => {
+//   const kRaw = e.key?.toLowerCase?.();
+//   if (!kRaw) return;
+//   lastUp[kRaw] = performance.now();
+//   physicalKeys.delete(kRaw);
+// });
+// function blurKeyboard() {
+// 	physicalKeys.clear();
+// 	for (const k in lastDown) delete lastDown[k];
+// 	for (const k in lastUp) delete lastUp[k];
+//   	if (mainCharacter?.keyboard)
+//     	mainCharacter.keyboard.holdingKeys = [];
+// }
+// window.addEventListener('blur', () => {
+// 	blurKeyboard();
+// });
+
+// let frameCounter = 0;
+// function syncKeysRobust() {
+//   if (!mainCharacter?.keyboard)
+//     return requestAnimationFrame(syncKeysRobust);
+
+//   // Mobilde her frame, PC'de 3 frame'de bir
+//   const doSync = !__isPC || (frameCounter++ % 3 === 0);
+
+//   if (doSync) {
+//     const logicalKeys = new Set(Array.from(physicalKeys, normalizeKey));
+//     const desiredHolding = [];
+
+//     for (const k of logicalKeys) {
+//       let bestTime = 0;
+//       for (const raw of physicalKeys) {
+//         if (normalizeKey(raw) === k) {
+//           const t = lastDown[raw] || 0;
+//           if (t > bestTime) bestTime = t;
+//         }
+//       }
+//       if (k) desiredHolding.push({ key: k, time: bestTime });
+//     }
+
+//     desiredHolding.sort((a, b) => a.time - b.time);
+//     const desiredKeysArr = desiredHolding.map(x => x.key);
+//     const holdingKeys = mainCharacter.keyboard.holdingKeys.map(x => x.key);
+
+//     for (const k of desiredKeysArr)
+//       if (!holdingKeys.includes(k))
+//         mainCharacter.keyboard.mouseDown(k);
+
+//     for (const k of holdingKeys)
+//       if (!desiredKeysArr.includes(k))
+//         mainCharacter.keyboard.mouseUp(k);
+//   }
+
+//   requestAnimationFrame(syncKeysRobust);
+// }
+// syncKeysRobust();
+
+// --- GLOBAL KEY STATE SYSTEM ---
 const physicalKeys = new Set();
 const lastDown = {};
 const lastUp = {};
-const antiGhostMsDir = 50; // yön tuşları için
-const antiGhostMsOther = 10; // diğer tüm tuşlar için daha düşük
+
+const antiGhostMsDir = 50;   // W A S D yön tuşları için
+const antiGhostMsOther = 10; // diğerleri için
 
 function normalizeKey(key) {
   const _k = key?.toLowerCase?.() || null;
@@ -476,8 +587,7 @@ function normalizeKey(key) {
   return _k;
 }
 
-// Yön tuşları seti
-const directionKeys = new Set(['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright']);
+const directionKeys = new Set(['w','a','s','d','arrowleft','arrowright','arrowup','arrowdown']);
 
 window.addEventListener('keydown', (e) => {
   if (mainCharacter?.disableKeyboard) return;
@@ -492,7 +602,7 @@ window.addEventListener('keydown', (e) => {
     ? antiGhostMsDir
     : antiGhostMsOther;
 
-  // Ghost engelleme
+  // Ghost engelleme (çok hızlı basılıp bırakılmış gibi olaylar)
   if (now - lastUpTime < antiGhostMs)
     return;
 
@@ -503,50 +613,48 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('keyup', (e) => {
   const kRaw = e.key?.toLowerCase?.();
   if (!kRaw) return;
+
   lastUp[kRaw] = performance.now();
   physicalKeys.delete(kRaw);
 });
 
-window.addEventListener('blur', () => {
+// Blur'da tüm tuşları temizleyelim
+function blurKeyboard() {
   physicalKeys.clear();
   for (const k in lastDown) delete lastDown[k];
   for (const k in lastUp) delete lastUp[k];
+
   if (mainCharacter?.keyboard)
     mainCharacter.keyboard.holdingKeys = [];
-});
+}
 
+window.addEventListener('blur', blurKeyboard);
 let frameCounter = 0;
 
 function syncKeysRobust() {
   if (!mainCharacter?.keyboard)
     return requestAnimationFrame(syncKeysRobust);
 
-  if (frameCounter++ % 3 === 0) {
+  const doSync = !__isPC || (frameCounter++ % 3 === 0);
+
+  if (doSync) {
+
+    // normalize edilmiş logical key seti
     const logicalKeys = new Set(Array.from(physicalKeys, normalizeKey));
-    const desiredHolding = [];
 
-    for (const k of logicalKeys) {
-      let bestTime = 0;
-      for (const raw of physicalKeys) {
-        if (normalizeKey(raw) === k) {
-          const t = lastDown[raw] || 0;
-          if (t > bestTime) bestTime = t;
-        }
-      }
-      if (k) desiredHolding.push({ key: k, time: bestTime });
-    }
+    // şu an oyunda kayıtlı holdingKeys
+    const currentHolding = new Set(
+      mainCharacter.keyboard.holdingKeys.map(x => x.key)
+    );
 
-    desiredHolding.sort((a, b) => a.time - b.time);
-
-    const desiredKeysArr = desiredHolding.map(x => x.key);
-    const holdingKeys = mainCharacter.keyboard.holdingKeys.map(x => x.key);
-
-    for (const k of desiredKeysArr)
-      if (!holdingKeys.includes(k))
+    // ✔ Yeni basılanlar → mouseDown
+    for (const k of logicalKeys)
+      if (!currentHolding.has(k))
         mainCharacter.keyboard.mouseDown(k);
 
-    for (const k of holdingKeys)
-      if (!desiredKeysArr.includes(k))
+    // ✔ Bırakılanlar → mouseUp
+    for (const k of currentHolding)
+      if (!logicalKeys.has(k))
         mainCharacter.keyboard.mouseUp(k);
   }
 
@@ -554,3 +662,262 @@ function syncKeysRobust() {
 }
 
 syncKeysRobust();
+
+
+
+function resetTouchPad() {
+	const _tp = document.getElementById("touch-d-pad-inner");
+	if(_tp)
+	{
+		addClass(_tp, 'stay');
+		_tp.style.transform = 'translate3d(0, 0, 0)';
+	}
+}
+function resetDPadKeyCommands() {
+	if(!mainCharacter?.keyboard)
+		return;
+	// if(!mainCharacter.keyboard)
+	// 	switchAutoMode();
+	// mainCharacter.keyboard.mouseUp('w');
+	// mainCharacter.keyboard.mouseUp('a');
+	// mainCharacter.keyboard.mouseUp('s');
+	// mainCharacter.keyboard.mouseUp('d');
+	physicalKeys.delete('a');
+	physicalKeys.delete('w');
+	physicalKeys.delete('s');
+	physicalKeys.delete('d');
+}
+let lastAngle = null;
+let lastDirKeys = new Set();
+const directionThreshold = 18;  // açı farkı bu değeri aşmadıkça yön değişmez
+//const deadZone = 10;            // dokunmatik merkez ölü bölge yarıçapı
+
+function calculateSin(currentX, currentY) {
+	const dx = currentX - touch_startX;
+	const dy = currentY - touch_startY;
+	const distance = Math.sqrt(dx * dx + dy * dy);
+
+	if (distance < deadZone) return; // ölü bölge
+
+	const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+	resetDPadKeyCommands();
+	const _directionChangeable = mainCharacter && (mainCharacter.animation === 'idle' ||
+		mainCharacter.animation === 'run' || mainCharacter.animation === 'walk'
+	);
+	if(_directionChangeable) {
+		if(angle > -85 && angle < 85)
+			mainCharacter.direction = __right;
+		else if(angle > 95 || angle < -95)
+			mainCharacter.direction = __left;
+	}
+	if (angle >= -30 && angle < 30) {
+		// sağ
+		physicalKeys.add('d');
+	}
+	else if (angle >= 30 && angle < 65) {
+		// sağ-alt
+		physicalKeys.add('d');
+		physicalKeys.add('s');
+	}
+	else if (angle >= 65 && angle < 115) {
+		// alt
+		physicalKeys.add('s');
+	}
+	else if (angle >= 115 && angle < 150) {
+		// sol-alt
+		physicalKeys.add('s');
+		physicalKeys.add('a');
+	}
+	else if (angle >= 150 || angle < -150) {
+		// sol
+		physicalKeys.add('a');
+	}
+	else if (angle >= -150 && angle < -115) {
+		// sol-üst
+		physicalKeys.add('a');
+		physicalKeys.add('w');
+	}
+	else if (angle >= -115 && angle < -65) {
+		// üst
+		physicalKeys.add('w');
+	}
+	else if (angle >= -65 && angle < -30) {
+		// sağ-üst
+		physicalKeys.add('w');
+		physicalKeys.add('d');
+	}
+	// if (angle >= -22.5 && angle < 22.5) {
+	// 	//mainCharacter.keyboard.mouseDown('d'); // sağ
+	// 	physicalKeys.add('d');
+	// }
+	// else if (angle >= 22.5 && angle < 67.5) {
+	// 	//mainCharacter.keyboard.mouseDown('d');
+	// 	physicalKeys.add('d');
+	// 	//mainCharacter.keyboard.mouseDown('s'); // sağ-alt
+	// 	physicalKeys.add('s');
+	// }
+	// else if (angle >= 67.5 && angle < 112.5) {
+	// 	//mainCharacter.keyboard.mouseDown('s'); // alt
+	// 	physicalKeys.add('s');
+	// }
+	// else if (angle >= 112.5 && angle < 157.5) {
+	// 	//mainCharacter.keyboard.mouseDown('s');
+	// 	physicalKeys.add('s');
+	// 	//mainCharacter.keyboard.mouseDown('a'); // sol-alt
+	// 	physicalKeys.add('a');
+	// }
+	// else if (angle >= 157.5 || angle < -157.5) {
+	// 	//mainCharacter.keyboard.mouseDown('a'); // sol
+	// 	physicalKeys.add('a');
+	// }
+	// else if (angle >= -157.5 && angle < -112.5) {
+	// 	//mainCharacter.keyboard.mouseDown('a');
+	// 	physicalKeys.add('a');
+	// 	//mainCharacter.keyboard.mouseDown('w'); // sol-üst
+	// 	physicalKeys.add('w');
+	// }
+	// else if (angle >= -112.5 && angle < -67.5) {
+	// 	//mainCharacter.keyboard.mouseDown('w'); // üst
+	// 	physicalKeys.add('w');
+	// }
+	// else if (angle >= -67.5 && angle < -22.5) {
+	// 	//mainCharacter.keyboard.mouseDown('w');
+	// 	physicalKeys.add('w');
+	// 	//mainCharacter.keyboard.mouseDown('d'); // sağ-üst
+	// 	physicalKeys.add('d');
+	// }
+}
+let deadZone, touch_startX, touch_startY;
+let lastValidTouch = null;
+let touchID, _touches;
+let cancelRecoveryTimeout = null;
+
+function activateTouchPad() {
+	if(document.getElementById('touch-d-pad'))
+		return;
+
+	deadZone = Math.min(episode.cWidth, episode.cHeight) * 0.04;
+	const _dPadWrapper = document.createElement('div');
+	_dPadWrapper.id = "touch-d-pad";
+	const _dPad = document.createElement('div');
+	_dPad.id = "touch-d-pad-inner";
+	_dPad.className = "stay";
+	_gameUI.appendChild(_dPad);
+	_gameUI.appendChild(_dPadWrapper);
+	_dPad.style.transform = 'translate3d(0, 0, 0)';
+	const _rect = {
+		left: MathRound(_dPadWrapper.offsetLeft),
+		width: MathRound(_dPadWrapper.offsetWidth),
+		height: MathRound(_dPadWrapper.offsetHeight),
+		top: MathRound(_dPadWrapper.offsetTop)
+	};
+	const _maxLeft = MathRound(_rect.width / 2);
+	const _maxTop = _maxLeft;
+	const _padding = ((document.body.clientWidth - _gamePad.clientWidth) / 2);
+	const _dpadRect = document.getElementById('touch-d-pad').getBoundingClientRect();
+	const _gapY = episode.cUIHeight - _dpadRect.bottom;
+	const dpadRect = {
+		left: _dpadRect.left - _gapY,
+		right: _dpadRect.right + _gapY,
+		bottom: _dpadRect.bottom + _gapY,
+		top: _dpadRect.top - _gapY
+	};
+	const workForDPad = function (x, y) {
+		if(!mainCharacter?.keyboard)
+			return;
+		const _newTouches = {
+			x: MathRound(x - _padding),
+			y: MathRound(y)
+		};
+		calculateSin(_newTouches.x, _newTouches.y);
+		const _diffX = _newTouches.x - touch_startX;
+		let _left = _diffX;
+		if (_left > _maxLeft) 
+			_left = _maxLeft;
+		else if (_left < -_maxLeft) 
+			_left = -_maxLeft;
+		const _diffY = _newTouches.y - touch_startY;
+		let _top = _diffY;
+		if (_top > _maxTop) 
+			_top = _maxTop;
+		 else if(_top  < -_maxTop) 
+			_top = -_maxTop;
+		if (!(_dPad.lastMoveTime > (_gameTick - __globalMS))) {
+			_dPad.style.transform = `translate3d(${_left}px, ${_top}px, 0)`;
+			_dPad.lastMoveTime = _gameTick;
+		}
+
+		_touches = _newTouches;
+		lastValidTouch = _newTouches; // ← dokunmayı sakla
+	};
+	document.addEventListener('touchstart', function (_event) {
+		if (mainCharacter?.disableKeyboard)
+			return;
+
+		for (let t of _event.changedTouches) {
+			if (
+				t.clientX >= dpadRect.left &&
+				t.clientX <= dpadRect.right &&
+				t.clientY >= dpadRect.top &&
+				t.clientY <= dpadRect.bottom
+			) {
+				touchID = t.identifier;
+				removeClass(_dPad, 'stay');
+				_touches = {
+					x: MathRound((_rect.left + (_rect.width / 2))),
+					y: MathRound((_rect.top + (_rect.height / 2)))
+				};
+				touch_startX = _touches.x; //MathRound(t.pageX - _padding);
+				touch_startY = _touches.y; // MathRound(t.pageY);
+				lastValidTouch = { x: touch_startX, y: touch_startY };
+				workForDPad(t.pageX, t.pageY);
+			}
+		}
+	}, { passive: false });
+
+	document.addEventListener('touchmove', function (_event) {
+		if (mainCharacter?.disableKeyboard)
+			return;
+		_event.preventDefault();
+
+		for (let t of _event.changedTouches) {
+			if (t.identifier === touchID) {
+				if (!_touches) {
+					_touches = {
+						x: MathRound(t.pageX - _padding),
+						y: MathRound(t.pageY)
+					};
+				}
+				workForDPad(t.pageX, t.pageY);
+			}
+		}
+	}, { passive: false });
+
+	const handleTouchEndOrCancel = function (_event, isCancel = false) {
+		// if (mainCharacter?.disableKeyboard)
+		// 	return;
+
+		for (let t of _event.changedTouches) {
+			if (t.identifier === touchID) {
+				if (!hasClass(_dPad, 'stay'))
+					addClass(_dPad, 'stay');
+				_touches = touchID = undefined;
+				resetDPadKeyCommands();
+				if (isCancel && lastValidTouch) {
+					clearTimeout(cancelRecoveryTimeout);
+					cancelRecoveryTimeout = setTimeout(() => {
+						if (mainCharacter?.disableKeyboard) return;
+						touch_startX = lastValidTouch.x;
+						touch_startY = lastValidTouch.y;
+						_touches = { ...lastValidTouch };
+						removeClass(_dPad, 'stay');
+					}, 30);
+				}
+			}
+		}
+	};
+
+	document.addEventListener('touchend', e => handleTouchEndOrCancel(e), { passive: false });
+	document.addEventListener('touchcancel', e => handleTouchEndOrCancel(e, true), { passive: false });
+}

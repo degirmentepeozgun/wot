@@ -25,6 +25,7 @@
 	<resource-file src="res/android/values/colors.xml" target="app/src/main/res/values/colors.xml" />
 	<resource-file src="res/android/values/themes.xml" target="app/src/main/res/values/themes.xml" />
       <preference name="Orientation" value="landscape" />
+	<preference name="AndroidOverrideBackButton" value="true" />
 	<preference name="AndroidLaunchMode" value="singleTask" />
       <preference name="AndroidWindowBackground" value="#000000" />
       <preference name="StatusBarBackgroundColor" value="#000000" />

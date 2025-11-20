@@ -38,6 +38,7 @@ html, body, .page, #wrapper,#app, #game-pad {
 body {
     touch-action: manipulation;
 }
+
 .flip {
 	transform: scaleX(-1);
 	-webkit-transform: scaleX(-1);
@@ -65,12 +66,11 @@ body {
 	width: 24%;
 	margin: .5%;
 	z-index: 1;
-	pointer-events:auto !important;
 	aspect-ratio: 1/1;
 	background: #00000080;
 	border:.2vh solid #f7f7f740;
 	border-radius: 100%;
-	box-shadow: 0 0 .5vh #000;
+	box-shadow: 0 0 .5vh #5c4141;
 	padding: .35vh;
 	overflow: hidden
 }
@@ -124,6 +124,9 @@ body {
 	--ligth-radius-left: 30%;
 	--light-radius-top:30%;
 	--light-radius-width:40%;
+	--zd-ease: cubic-bezier(.25,-0.4,.6,1.4);
+  	--zd-ease-heavy: cubic-bezier(.23,-0.6,.7,1.6);
+  	--shiftX: 0vw;
 	--ui-light: #48443F
 }
 
@@ -931,19 +934,23 @@ svg#use-progress.use-in-progress circle {
 }
 #mini-menu {
 	position:absolute;
-	width: 20%;
+	width: 24%;
     height: 4%;
 	padding:.25%;
     top: 24%;
     left: 2%;
 	opacity: .6;
 	z-index: 3;
-	display: none !important;
+	display: flex !important;
+	justify-content: flex-end !important;
 }
 #mini-menu .mini-menu-icon {
 	height: 100%;
 	margin:0 .25%;
 	cursor: pointer;
+	aspect-ratio: 1/1 !important;
+	filter:drop-shadow(0 0 .35vh #000);
+	-webkit-filter:drop-shadow(0 0 .35vh #000)
 }
 .quest-nav {
 	width: 6%;
@@ -2452,37 +2459,38 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	}
 
 #touch-d-pad {
-	position: absolute;
-	bottom: 4vw;
-	left: 7vw;
-	width: 12vw;
-	height: 12vw;
-	background: #ffffff20;
-	border-radius: 999px;
-	box-shadow: 0 0 2vh #00000050
+    position: absolute;
+    bottom: 4vw;
+    left: 7vw;
+    width: 12vw;
+    height: 12vw;
+    background: #ffffff20;
+    border-radius: 999px;
+    box-shadow: 0 0 2vh #00000050;
+
+    touch-action: none !important; /* SADECE BURAYA */
+    -webkit-user-select: none !important;
+    -webkit-tap-highlight-color: transparent;
 }
 
 #touch-d-pad-inner {
-	bottom: 6vw;
-	left: 9vw;
-	width: 8vw;
-	height: 8vw;
-	position: absolute;
-	background: #ffffff24;
-	border: .2vh solid #ffffff20;
-	border-radius: 999px
-}
-#touch-d-pad,
-#touch-d-pad-inner {
-  touch-action: none !important; /* dokunma gecikmelerini engeller */
-  -webkit-user-select: none !important;
-  -webkit-tap-highlight-color: transparent;
+    bottom: 6vw;
+    left: 9vw;
+    width: 8vw;
+    height: 8vw;
+    position: absolute;
+    background: #ffffff24;
+    border: .2vh solid #ffffff20;
+    border-radius: 999px;
+
+    /* BURAYA touch-action VERMİYORUZ */
+    -webkit-user-select: none !important;
+    -webkit-tap-highlight-color: transparent;
 }
 
-	#touch-d-pad-inner.stay {
-		transform:translate3d(0,0,0) !important
-	}
-
+#touch-d-pad-inner.stay {
+    transform: translate3d(0,0,0) !important;
+}
 .buff1-small {
 	width: 24%;
 	margin: .5%;
@@ -4109,12 +4117,12 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	-webkit-animation: shake-tiny .3s
 }
 .charge-impact-right {
-	animation: charge-impact-right .3s;
-	-webkit-animation: charge-impact-right .3s
+	animation: charge-impact-right .25s cubic-bezier(.36,.07,.19,.97);
+	-webkit-animation: charge-impact-right .25s cubic-bezier(.36,.07,.19,.97);
 }
 .charge-impact-left {
-	animation: charge-impact-left .3s;
-	-webkit-animation: charge-impact-left .3s
+	animation: charge-impact-left .25s cubic-bezier(.36,.07,.19,.97);
+	-webkit-animation: charge-impact-left .25s cubic-bezier(.36,.07,.19,.97);
 }
 @keyframes shake {
 	0% { transform: translate(.2vh, .2vh) }
@@ -4148,7 +4156,7 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	80% { transform: translate(.2vh, 0) rotate(-.5deg); }
 	100% { transform: translate(0, -.2vh) rotate(0deg); }
   }
-  @keyframes charge-impact-right {
+  /* @keyframes charge-impact-right {
 	0% { transform: translate(2%, 0) }
 	76% { transform: translate(0, 0) }
 	80% { transform: translate(1%, 0) }
@@ -4157,8 +4165,34 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	92% { transform: translate(0, 0) }
 	96% { transform: translate(.33%, 0) }
 	100% { transform: translate(0, 0) }
-  }
-  @keyframes charge-impact-left {
+  } */
+ @keyframes charge-impact-left {
+    10% { transform: translate(0vw, -2vh) rotate(-1deg); }
+    10% { transform: translate(-0.28vw, -0.14vh) rotate(-1deg); }
+    20% { transform: translate(0.28vw, 0.14vh) rotate(1deg); }
+    30% { transform: translate(-0.21vw, 0.14vh) rotate(-0.5deg); }
+    40% { transform: translate(0.21vw, -0.14vh) rotate(0.5deg); }
+    50% { transform: translate(-0.14vw, 0.21vh) rotate(-0.7deg); }
+    60% { transform: translate(0.14vw, -0.21vh) rotate(0.7deg); }
+    70% { transform: translate(-0.28vw, 0.07vh) rotate(-1deg); }
+    80% { transform: translate(0.21vw, -0.07vh) rotate(0.5deg); }
+    90% { transform: translate(-0.14vw, 0.14vh) rotate(-0.5deg); }
+    100% { transform: translate(0, 0) rotate(0); }
+}
+  @keyframes charge-impact-right {
+    10% { transform: translate(0vw, -2vh) rotate(-1deg); }
+   	 10% { transform: translate(0.28vw, -0.14vh) rotate(1deg); }
+    20% { transform: translate(-0.28vw, 0.14vh) rotate(-1deg); }
+    30% { transform: translate(0.21vw, 0.14vh) rotate(0.5deg); }
+    40% { transform: translate(-0.21vw, -0.14vh) rotate(-0.5deg); }
+    50% { transform: translate(0.14vw, 0.21vh) rotate(0.7deg); }
+    60% { transform: translate(-0.14vw, -0.21vh) rotate(-0.7deg); }
+    70% { transform: translate(0.28vw, 0.07vh) rotate(1deg); }
+    80% { transform: translate(-0.21vw, -0.07vh) rotate(-0.5deg); }
+    90% { transform: translate(0.14vw, 0.14vh) rotate(0.5deg); }
+    100% { transform: translate(0, 0) rotate(0); }
+}
+  /* @keyframes charge-impact-left {
 	0% { transform: translate(-2%, 0) }
 	76% { transform: translate(0, 0) }
 	80% { transform: translate(-1%, 0) }
@@ -4167,7 +4201,7 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	92% { transform: translate(0, 0) }
 	96% { transform: translate(-.33%, 0) }
 	100% { transform: translate(0, 0) }
-  }
+  } */
 .cutscene-bubble {
 	position: absolute;
 	display: inline-block;
@@ -6641,8 +6675,7 @@ img.dmmg.toxic-dmmg {
 	width:100%;
 	height: 100%;
 	left:0;
-	top:0;
-	pointer-events: none !important;
+	top:0
 }
 #game-ui #skill1.atk-sf:after {
 	background-image: url('./../images/ui/skill.png') !important;
@@ -8008,8 +8041,8 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	touch-action: none !important
 }
 .zoom, #game-pad.zoom {
-	animation: zoom-me 1.5s ease-out 1;
-	-webkit-animation: zoom-me 1.5s ease-out 1
+	animation: zoom-me 1.5s ease-out 1 !important;
+	-webkit-animation: zoom-me 1.5s ease-out 1  !important
 }
 @keyframes zoom-me {
 	0% {
@@ -9654,4 +9687,486 @@ aspect-ratio: 16 / 9;
   50% {
     filter: drop-shadow(0 0 1vh transparent);
   }
+}
+body.mobile-device, body.mobile-device #gameUI, body.mobile-device #touch-d-pad, body.mobile-device canvas {
+  touch-action: none;
+  -ms-touch-action: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+#game-ui .common {
+	z-index: 2 !important
+}
+
+body.pc-mission #game-pad  {
+	top:-10%;
+}
+/* body.pc-mission #wrapper #top-nav,
+body.pc-mission #wrapper #pvp-counter,
+body.pc-mission #wrapper #world-mini-map, 
+body.pc-mission #wrapper .enemy-profile{
+	top:calc(2% + 5vw) !important
+} */
+/* body.pc-mission #wrapper #quest-status {
+	top:calc(24% + 5vw) !important
+}
+body.pc-mission #wrapper #mini-menu {
+	top:calc(20% + 5vw) !important
+} */
+
+body.pc-mission #game-ui .skill:not(.common, #chain-skill-1, #chain-skill-2, #chain-skill-3, #chain-skill-4, #skill9, #skill10, #skill11),
+body.pc-mission #game-ui #skill1.atk-sf {
+	margin:0.25% !important;
+	width:4.5% !important;
+	height:auto !important;
+	aspect-ratio: 1/1 !important;
+    bottom: .65% !important;
+	border-radius:0;
+    background-image: url('./../images/ui/12.png');
+	background-size: contain !important;
+	box-shadow: none !important;
+	z-index: 1;
+	position: absolute;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+body.pc-mission #game-ui .skill:not(.common, #chain-skill-1, #chain-skill-2, #chain-skill-3, #chain-skill-4, #skill9, #skill10, #skill11) * {
+	border-radius: 0 !important;
+}
+body.pc-mission #game-ui #skill1 {
+	left: .25% !important;
+}
+body.pc-mission #game-ui #skill3 {
+	left: 5.8% !important;
+}
+body.pc-mission #game-ui #skill4 {
+	left: 11.35% !important;
+}
+body.pc-mission #game-ui #skill5 {
+	left: 16.9% !important;
+}
+body.pc-mission #game-ui #skill6 {
+	left: 22.45% !important;
+}
+body.pc-mission #game-ui #skill2 {
+	left: calc(22.45% + (9 * 5.55%)) !important;
+}
+body.pc-mission #game-ui #skill7 {
+	left: calc(22.45% + (10 * 5.55%)) !important;
+}
+body.pc-mission #game-ui #skill8 {
+	left: calc(22.45% + (11 * 5.55%)) !important;
+}
+body.pc-mission #game-ui #skill9 {
+	bottom:calc(2vh + 10%)
+}
+body.pc-mission #game-ui #chain-skill-1,
+body.pc-mission #game-ui #chain-skill-3 {
+	bottom:calc(23.5vh + 10%)
+}
+body.pc-mission #game-ui #chain-skill-2,
+body.pc-mission #game-ui #chain-skill-4 {
+	bottom:calc(14vh + 10%)
+}
+body.pc-mission #game-ui #skill7-cd-1 {
+	left: 82% !important;
+	bottom:1.5% !important;
+	width:.8% !important;
+	height:auto !important;
+	aspect-ratio: 1/1;
+	border-radius: 0 !important;
+}
+body.pc-mission #game-ui #skill7-cd-2 {
+	left: 82% !important;
+	bottom:4.35% !important;
+	width:.8% !important;
+	height:auto !important;
+	aspect-ratio: 1/1;
+	border-radius: 0 !important;
+}
+body.pc-mission #game-ui #skill7-cd-3 {
+	left: 82% !important;
+	bottom:7.3% !important;
+	width:.8% !important;
+	height:auto !important;
+	aspect-ratio: 1/1;
+	border-radius: 0 !important;
+}
+body.pc-mission #game-ui #skill12 {
+	left: calc(22.45% + (12 * 5.55%)) !important;
+}
+body.pc-mission #game-ui #pot-btn {
+	left: calc(22.45% + (13 * 5.55%)) !important;
+}
+body.pc-mission #game-ui .skill:not(.common, #chain-skill-1, #chain-skill-2, #chain-skill-3, #chain-skill-4, #skill9, #skill10, #skill11)::after,
+body.pc-mission #game-ui #skill1.atk-sf::after{
+	position: absolute !important;
+	content: '' !important;
+	top:0 !important;
+	left:0 !important;
+	background-image: url('./../images/ui/square6.png') !important;
+	background-repeat: no-repeat !important;
+	background-size: cover !important;
+	width:100% !important;
+	height:100% !important;
+}
+body.pc-mission #game-ui .skill#skill6,body.pc-mission #game-ui .skill#skill6::after{
+	animation:none !important;
+	filter:none !important;
+	box-shadow:none !important;
+}
+
+body:not(.pc-mission) #game-ui #pc-bottom-ui {
+	display: none !important;
+}
+body.pc-mission #game-ui #pc-bottom-ui-inner {
+	position:absolute;
+	top:-1.5%;
+	left:28%;
+	width:44%;
+	height:100%;
+	z-index:2;
+	background-color:#000 !important;
+	background:url('./../images/ui/hb-bg-2.png'), radial-gradient(#f3f4f560,#000);
+	background-size: 100% 100%;
+}
+body.pc-mission #game-ui #pc-bottom-ui {
+	background:url('./../images/ui/12.png');
+	background-repeat: repeat-x;
+	background-size: auto 98%;
+	height:10%;
+	position: absolute;
+	z-index: 0;
+	left:0;
+	width:100%;
+	bottom:0
+}
+body.pc-mission #game-ui #pc-bottom-ui-inner::after {
+    content: "";
+    position: absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+    inset: 0;                   /* top:0; left:0; right:0; bottom:0 */
+    background: linear-gradient(180deg, rgba(0,0,0, .35), rgba(0,0,0, .65));   /* karartma miktarı buradan ayarla */
+    pointer-events: none;       /* tıklamayı engellememesi için */
+    z-index: 1;
+}
+body.pc-mission #game-ui .skill::before,
+body.pc-mission #game-ui .common::before {
+    content: attr(data-key);
+    position: absolute;
+    left: 0;
+    bottom: -1vh;
+    font-size: 3.2vh;
+    font-weight: bold;
+    color: #f3f4f5cf;
+    text-shadow: 0 0 1vh black;
+    pointer-events: none;
+    text-transform: uppercase;
+	z-index:5
+}
+body.pc-mission #game-ui .common {
+	overflow: visible !important;
+    bottom: -.5vh
+}
+body.pc-mission #quest-status {
+	top: 25%
+}
+body.pc-mission #mini-menu {
+	top: 21%
+}
+body.pc-mission #game-ui .skill#chain-skill-1,
+body.pc-mission #game-ui .skill#chain-skill-3 {
+	height:10%;
+	width: auto;
+	aspect-ratio: 1 / 1;
+	right: 40%;
+	bottom:calc(10% + 1.5vh)
+}
+body.pc-mission #game-ui .skill#chain-skill-2,
+body.pc-mission #game-ui .skill#chain-skill-4 {
+	height:10%;
+	width: auto;
+	aspect-ratio: 1 / 1;
+	left: 40%;
+	bottom:calc(10% + 1.5vh)
+}
+body.pc-mission #game-ui .skill#skill9,
+body.pc-mission #game-ui .skill#skill10,
+body.pc-mission #game-ui .skill#skill11 {
+	height:10%;
+	width: auto;
+	aspect-ratio: 1 / 1;
+    left: 50%;
+    transform: translateX(-50%);
+	bottom:calc(10% + 1.5vh)
+}
+
+body.pc-mission #game-ui #skill9:after,
+body.pc-mission #game-ui #skill10:after,
+body.pc-mission #game-ui #skill11:after,
+body.pc-mission #game-ui #chain-skill-1:after,
+body.pc-mission #game-ui #chain-skill-2:after,
+body.pc-mission #game-ui #chain-skill-3:after,
+body.pc-mission #game-ui #chain-skill-4:after {
+	left: -.5vh;
+	top: -.5vh;
+	width: calc(100% + 1vh);
+	height: calc(100% + 1vh);
+}
+body.pc-mission #game-ui svg#use-progress {
+	bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+	height: calc(10% + 3vh);
+	width: auto;
+	aspect-ratio: 1 / 1;
+}
+body.pc-mission #game-ui #hit-count {
+	bottom: 66%;
+	right: 2%;
+}
+/* @keyframes zd-light-right {
+  0%   { transform: scale(1) translate(0,0); }
+  25%  { transform: scale(1.005) translate(.18vw, 0.004vh); }
+  50%  { transform: scale(0.995) translate(.17vw, 0.003vh); }
+  100% { transform: scale(1) translate(0,0); }
+}
+
+.zoomdynamic-light-right {
+  animation: zd-light-right 0.18s cubic-bezier(0.22, 0.61, 0.36, 1) !important;
+  -webkit-animation: zd-light-right 0.18s cubic-bezier(0.22, 0.61, 0.36, 1) !important;
+}
+@keyframes zd-light-left {
+  0%   { transform: scale(1) translate(0,0); }
+  25%  { transform: scale(1.005) translate(-.18vw, 0.004vh); }
+  50%  { transform: scale(0.995) translate(-.17vw, 0.003vh); }
+  100% { transform: scale(1) translate(0,0); }
+}
+
+.zoomdynamic-light-left {
+  animation: zd-light-left 0.18s cubic-bezier(0.22, 0.61, 0.36, 1) !important;
+  -webkit-animation: zd-light-left 0.18s cubic-bezier(0.22, 0.61, 0.36, 1) !important;
+}
+@keyframes zd-medium-right {
+  0%   { transform: scale(1) translate(0,0); }
+  25%  { transform: scale(1.007) translate(.24vw, 0.006vh); }
+  50%  { transform: scale(0.993) translate(.22vw, 0.0045vh); }
+  100% { transform: scale(1) translate(0,0); }
+}
+
+.zoomdynamic-medium-right {
+  animation: zd-medium-right 0.18s cubic-bezier(0.22, 0.61, 0.36, 1) !important;
+  -webkit-animation: zd-medium-right 0.18s cubic-bezier(0.22, 0.61, 0.36, 1) !important;
+}
+@keyframes zd-medium-left {
+  0%   { transform: scale(1) translate(0,0); }
+  25%  { transform: scale(1.007) translate(-.24vw, 0.006vh); }
+  50%  { transform: scale(0.993) translate(-.22vw, 0.0045vh); }
+  100% { transform: scale(1) translate(0,0); }
+}
+
+.zoomdynamic-medium-left {
+  animation: zd-medium-left 0.18s cubic-bezier(0.22, 0.61, 0.36, 1) !important;
+  -webkit-animation: zd-medium-left 0.18s cubic-bezier(0.22, 0.61, 0.36, 1) !important;
+}
+@keyframes zd-heavy-right {
+  0%   { transform: scale(1) translate(0,0); }
+  25%  { transform: scale(1.013) translate(.3vw, 0.008vh); }
+  50%  { transform: scale(0.987) translate(.27vw, 0.006vh); }
+  100% { transform: scale(1) translate(0,0); }
+}
+
+.zoomdynamic-heavy-right {
+  animation: zd-heavy-right 0.18s cubic-bezier(0.22, 0.61, 0.36, 1) !important;
+  -webkit-animation: zd-heavy-right 0.18s cubic-bezier(0.22, 0.61, 0.36, 1) !important;
+}
+@keyframes zd-heavy-left {
+  0%   { transform: scale(1) translate(0,0); }
+  25%  { transform: scale(1.013) translate(-.3vw, 0.008vh); }
+  50%  { transform: scale(0.987) translate(-.27vw, 0.006vh); }
+  100% { transform: scale(1) translate(0,0); }
+} 
+
+.zoomdynamic-heavy-left {
+  animation: zd-heavy-left 0.18s cubic-bezier(0.22, 0.61, 0.36, 1) !important;
+  -webkit-animation: zd-heavy-left 0.18s cubic-bezier(0.22, 0.61, 0.36, 1) !important;
+}*/
+@keyframes zd-light-right {
+  0%   { transform: scale(1) translate(0,0) skewX(0deg); }
+  18%  { transform: scale(1.012) translate(calc(.18vw + var(--shiftX)), 0.004vh) skewX(0.6deg); }
+  40%  { transform: scale(0.994) translate(calc(.13vw + var(--shiftX)), 0.003vh) skewX(-0.2deg); }
+  70%  { transform: scale(1.003) translate(calc(.06vw + var(--shiftX)), 0.001vh) skewX(0deg); }
+  100% { transform: scale(1) translate(0,0) skewX(0deg); }
+}
+.zoomdynamic-light-right {
+  animation: zd-light-right 0.18s var(--zd-ease) both !important;
+}
+@keyframes zd-light-left {
+  0%   { transform: scale(1) translate(0,0) skewX(0deg); }
+  18%  { transform: scale(1.012) translate(calc(-.18vw + var(--shiftX)), 0.004vh) skewX(-0.6deg); }
+  40%  { transform: scale(0.994) translate(calc(-.13vw + var(--shiftX)), 0.003vh) skewX(0.2deg); }
+  70%  { transform: scale(1.003) translate(calc(-.06vw + var(--shiftX)), 0.001vh) skewX(0deg); }
+  100% { transform: scale(1) translate(0,0) skewX(0deg); }
+}
+.zoomdynamic-light-left {
+  animation: zd-light-left 0.18s var(--zd-ease) both !important;
+}
+@keyframes zd-medium-right {
+  0%   { transform: scale(1) translate(0,0) skewX(0deg); }
+  16%  { transform: scale(1.018) translate(calc(.24vw + var(--shiftX)), 0.006vh) skewX(0.9deg); }
+  38%  { transform: scale(0.988) translate(calc(.20vw + var(--shiftX)), 0.004vh) skewX(-0.25deg); }
+  72%  { transform: scale(1.004) translate(calc(.09vw + var(--shiftX)), 0.002vh) skewX(0deg); }
+  100% { transform: scale(1) translate(0,0) skewX(0deg); }
+}
+.zoomdynamic-medium-right {
+  animation: zd-medium-right 0.19s var(--zd-ease) both !important;
+}
+@keyframes zd-medium-left {
+  0%   { transform: scale(1) translate(0,0) skewX(0deg); }
+  16%  { transform: scale(1.018) translate(calc(-.24vw + var(--shiftX)), 0.006vh) skewX(-0.9deg); }
+  38%  { transform: scale(0.988) translate(calc(-.20vw + var(--shiftX)), 0.004vh) skewX(0.25deg); }
+  72%  { transform: scale(1.004) translate(calc(-.09vw + var(--shiftX)), 0.002vh) skewX(0deg); }
+  100% { transform: scale(1) translate(0,0) skewX(0deg); }
+}
+.zoomdynamic-medium-left {
+  animation: zd-medium-left 0.19s var(--zd-ease) both !important;
+}
+@keyframes zd-heavy-right {
+  0%   { transform: scale(1) translate(0,0) skewX(0deg); }
+  14%  { transform: scale(1.028) translate(calc(.30vw + var(--shiftX)), 0.008vh) skewX(1.1deg); }
+  33%  { transform: scale(0.982) translate(calc(.25vw + var(--shiftX)), 0.005vh) skewX(-0.35deg); }
+  62%  { transform: scale(1.006) translate(calc(.10vw + var(--shiftX)), 0.002vh) skewX(0deg); }
+  100% { transform: scale(1) translate(0,0) skewX(0deg); }
+}
+
+.zoomdynamic-heavy-right {
+  animation: zd-heavy-right 0.20s var(--zd-ease-heavy) both !important;
+}
+@keyframes zd-heavy-left {
+  0%   { transform: scale(1) translate(0,0) skewX(0deg); }
+  14%  { transform: scale(1.028) translate(calc(-.30vw + var(--shiftX)), 0.008vh) skewX(-1.1deg); }
+  33%  { transform: scale(0.982) translate(calc(-.25vw + var(--shiftX)), 0.005vh) skewX(0.35deg); }
+  62%  { transform: scale(1.006) translate(calc(-.10vw + var(--shiftX)), 0.002vh) skewX(0deg); }
+  100% { transform: scale(1) translate(0,0) skewX(0deg); }
+}
+
+.zoomdynamic-heavy-left {
+  animation: zd-heavy-left 0.20s var(--zd-ease-heavy) both !important;
+}
+
+@keyframes zoomquick {
+    0% {
+        filter: saturate(130%);
+		transform: scale(1.1);
+		-webkit-filter:brightness(130%) saturate(130%)
+    }
+    20% {
+		transform: scale(1.08);
+        filter: brightness(120%) sepia(20%) blur(.8vh);
+		-webkit-filter:brightness(120%) sepia(20%) blur(.8vh);
+    }
+
+    60% {
+		transform: scale(1.04);
+        filter: brightness(120%) sepia(20%) blur(.4vh);
+		-webkit-filter:brightness(120%) sepia(20%) blur(.4vh);
+    }
+
+    100% {
+		transform: scale(1);
+        filter: none;
+		-webkit-filter:none
+    }
+}
+.camera {
+    animation: zoomquick 0.08s ease-out !important;
+    -webkit-animation: zoomquick 0.08s ease-out !important
+}
+
+@keyframes bombashock {
+    0% {
+        transform: scale(1.18);
+        filter: brightness(180%) contrast(140%) saturate(160%);
+        -webkit-filter: brightness(180%) contrast(140%) saturate(160%);
+    }
+
+    15% {
+        transform: scale(1.12) rotate(0.4deg);
+        filter: brightness(140%) sepia(10%) blur(1.2vh);
+        -webkit-filter: brightness(140%) sepia(10%) blur(1.2vh);
+    }
+
+    35% {
+        transform: scale(1.06) rotate(-0.3deg);
+        filter: brightness(120%) sepia(5%) blur(0.6vh);
+        -webkit-filter: brightness(120%) sepia(5%) blur(0.6vh);
+    }
+
+    70% {
+        transform: scale(1.02);
+        filter: brightness(110%) blur(0.2vh);
+        -webkit-filter: brightness(110%) blur(0.2vh);
+    }
+
+    100% {
+        transform: scale(1);
+        filter: none;
+        -webkit-filter: none;
+    }
+}
+
+/* Kullanım */
+.bombshock {
+    animation: bombashock 0.18s cubic-bezier(0.25, 0.55, 0.3, 1) !important;
+    -webkit-animation: bombashock 0.18s cubic-bezier(0.25, 0.55, 0.3, 1) !important;
+    transform-origin: center center;
+}
+@keyframes zoomquick-red {
+    0% {
+        transform: scale(1.12);
+        filter:
+            saturate(220%)
+            sepia(70%)
+            hue-rotate(-40deg)
+            brightness(135%)
+            contrast(140%);
+    }
+
+    20% {
+        transform: scale(1.08);
+        filter:
+            saturate(260%)
+            sepia(80%)
+            hue-rotate(-45deg)
+            brightness(125%)
+            contrast(160%)
+            blur(.8vh);
+    }
+
+    60% {
+        transform: scale(1.04);
+        filter:
+            saturate(200%)
+            sepia(60%)
+            hue-rotate(-30deg)
+            brightness(115%)
+            contrast(130%)
+            blur(.4vh);
+    }
+
+    100% {
+        transform: scale(1);
+        filter: none;
+    }
+}
+
+
+.camera-red {
+    animation: zoomquick-red 0.11s cubic-bezier(.25, 1.7, .35, 1) !important;
+    -webkit-animation: zoomquick-red 0.11s cubic-bezier(.25, 1.7, .35, 1) !important;
 }

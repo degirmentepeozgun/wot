@@ -208,6 +208,7 @@ function launchIntoFullscreen(element) {
 function startGame(_callback) {
 	if (!__isPC)
 		setTimeout(function () {
+			addClass(document.body, 'mobile-device');
 			activateTouchPad();
 		}, 500);
 	//let _openingSong = new Audio('./images/sounds/opening.mpeg');
@@ -778,6 +779,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 					const cfc = chainSkills['skill' + i].firstChild;
 					cfc.removeAttribute("src");
 				}
+				blurKeyboard();
 				resetTouchPad();
 			}, 2000);
 		});
@@ -981,6 +983,33 @@ function setTowerMobsByLevel() {
 function setKeyBoard(_c) {
 	_c.keyboard = new keyboard(_c, ['a', 'g', 'd', ' ', 'h', 'j', 'k', 'l', 'e', 'q', 'r', 'f', 'arrowleft', 'arrowup', 'arrowright', 'arrowdown', 'w', 's', 'u', '1', '2', '3', '4', 'p', 't']);
 }
+function addEvent(_id, _char) {
+	const _skillbtn = document.getElementById(_id);
+	_skillbtn.addEventListener("mousedown", function() {
+		//mainCharacter.keyboard.mouseDown(_char);
+		physicalKeys.add(_char);
+	});
+	_skillbtn.addEventListener("mouseup", function() {
+		//mainCharacter.keyboard.mouseUp(_char);
+		physicalKeys.delete(_char);
+	});
+	_skillbtn.addEventListener("mouseout", function() {
+		//mainCharacter.keyboard.mouseUp(_char);
+		physicalKeys.delete(_char);
+	});
+	_skillbtn.addEventListener("touchcancel", function() {
+		//mainCharacter.keyboard.mouseUp(_char);
+		physicalKeys.delete(_char);
+	});
+	_skillbtn.addEventListener("touchend", function() {
+		//mainCharacter.keyboard.mouseUp(_char);
+		physicalKeys.delete(_char);
+	});
+	_skillbtn.addEventListener("touchstart", function() {
+		//mainCharacter.keyboard.mouseDown(_char);
+		physicalKeys.add(_char);
+	});
+}
 function setCharacterDefaults(_char, _swap) {
 	if (_char.stepSound && !_char.stepSound.paused)
 		_char.stepSound.pause();
@@ -1005,6 +1034,10 @@ function setCharacterDefaults(_char, _swap) {
 			removeClass(_enemyProfile, 'pvp');
 			_commons = document.querySelectorAll('.common');
 			_char.checkCommonInventory();
+			addEvent('common-skill-1', '1');
+			addEvent('common-skill-2', '2');
+			addEvent('common-skill-3', '3');
+			addEvent('common-skill-4', '4');
 		}
 		else
 			_char.disableCommonInventory();
@@ -2165,7 +2198,7 @@ function activateGameStart(_quickPlay, _force) {
 	__account.difficulty = 6 - __account.difficulty;
 	addClass(document.getElementById('connect-btn'), 'disabled2'); 
 	addClass(document.getElementById('qp-btn'), 'disabled2'); 
-	document.getElementById('mini-menu').innerHTML = '<div onexactclick="activatePowerSaveMode()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/power-save.png);background-size: cover"></div>';
+	document.getElementById('mini-menu').innerHTML = '<div onexactclick="askExitApp()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/pause.png);background-size: cover"></div>'; // '<div onexactclick="activatePowerSaveMode()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/power-save.png);background-size: cover"></div>';
 	openGame();
 }
 const __difficulties = [

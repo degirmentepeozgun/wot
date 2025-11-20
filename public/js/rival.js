@@ -966,7 +966,7 @@ function createCharacter(_settings) {
 						beforeOrder: 3,
 						attack: true,
 						bleed: true,
-						//baseKey: 'attack',
+						baseKey: 'ground1',
 						src: './images/main/warrior/taktak.png',
 						priority: 2,
 						frames: [
@@ -1775,6 +1775,9 @@ function createCharacter(_settings) {
 									},
 									{
 										key: 'shakevert', position: 'css'
+									},
+									{
+										key: 'zoomquick', position: 'css'
 									}
 								]
 							},
@@ -1828,7 +1831,7 @@ function createCharacter(_settings) {
 								extraStepXRate: .5,
 								directionChangeEnabled: true,
 								push: true,
-								sound: { volume: .2 },
+								sound: { key: 'warriorground1modified', volume: .3 },
 								atk: {
 									yRange: 15,
 									rate: 1,
@@ -1836,13 +1839,14 @@ function createCharacter(_settings) {
 									hitTaken: .1,
 									hurt: {
 										key: 'hurtair',
+										hitZoom: 1.06,
 										type: 'air',
-										// objects: [
-										// 	{
-										// 		key: 'blood',
-										// 		position: 'middle-front'
-										// 	}
-										// ]
+										objects: [
+											{
+												key: 'energy',
+												position: 'middle-front'
+											}
+										]
 									},
 									type: 'lightning'
 								},
@@ -1882,12 +1886,13 @@ function createCharacter(_settings) {
 									hurt: {
 										key: 'hurtair',
 										type: 'air',
-										// objects: [
-										// 	{
-										// 		key: 'blood',
-										// 		position: 'middle-front'
-										// 	}
-										// ]
+										hitZoom: 1.06,
+										objects: [
+											{
+												key: 'energy',
+												position: 'middle-front'
+											}
+										]
 									},
 									type: 'lightning'
 								},
@@ -1996,14 +2001,16 @@ function createCharacter(_settings) {
 									{
 										key: 'explode',
 										position: 'middle-feet',
-										still: true,
-										alpha: .75
+										still: true
 									},
 									{
 										key: 'blur', position: 'css'
 									},
 									{
-										key: 'shake', position: 'css'
+										key: 'shakevert', position: 'css'
+									},
+									{
+										key: 'zoomquick', position: 'css'
 									}
 								]
 							},
@@ -2059,7 +2066,7 @@ function createCharacter(_settings) {
 								spriteWidth: 127,
 								spriteHeight: 262,
 								spriteOrigin: 68,
-								speed: 5,
+								speed: 4,
 								directionChangeEnabled: true
 							},
 							{
@@ -2068,7 +2075,7 @@ function createCharacter(_settings) {
 								spriteWidth: 146,
 								spriteHeight: 276,
 								spriteOrigin: 87,
-								speed: 5
+								speed: 4
 							},
 							{
 								spriteLeft: 788,
@@ -2076,7 +2083,7 @@ function createCharacter(_settings) {
 								spriteWidth: 160,
 								spriteHeight: 280,
 								spriteOrigin: 95,
-								speed: 4
+								speed: 3
 							},
 							{
 								spriteLeft: 788,
@@ -7292,7 +7299,7 @@ function createCharacter(_settings) {
 								spriteHeight: 133,
 								spriteOrigin: 55,
 								speed: 35,
-								sound: { key: 'dead', volume: .1 },
+								sound: { key: 'dead', volume: .2 },
 								def: {
 									iframe: true
 								}
@@ -7427,7 +7434,7 @@ function createCharacter(_settings) {
 								spriteHeight: 99,
 								spriteOrigin: 54,
 								speed: 36,
-								sound: { key: 'dead', volume: .1 },
+								sound: { key: 'dead', volume: .2 },
 								props: {
 									killingBy: undefined,
 									finishTarget: undefined,
@@ -7743,6 +7750,7 @@ function createCharacter(_settings) {
 					}
 				},
 				id: 10001,
+				talkCount: 12,
 				alp: true,
 				gender: 'male',
 				key: _settings.key,
@@ -53023,7 +53031,8 @@ const _allEnemies = {
 							spriteOrigin: 158 / 2,
 							speed: 9,
 							do: function(_e){
-								PlaySound({path:'./images/talks/cyclops/' + getRandomValue(1, _e.talkCount) + '.mp3', volume: 1 });
+								_e.talk();
+								//PlaySound({path:'./images/talks/cyclops/' + getRandomValue(1, _e.talkCount) + '.mp3', volume: 1 });
 							},
 							def: {
 								iframe: true
@@ -73366,6 +73375,10 @@ function createHurtFeet(_z, _color, _key, _bottomGap, _atkType) {
 				spriteOrigin: 22,
 				speed: 1,
 				bottomGap: _gaps[0],
+				do: function(_e) {
+					cssAnimations.forceimpact(_e, _e.direction === __right ? __left : __right);
+					cssAnimations.zoomquickred(_e);
+				},
 				props: {
 					killingBy: undefined,
 					finishTarget: undefined,

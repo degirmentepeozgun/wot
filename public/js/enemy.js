@@ -1518,14 +1518,17 @@ function enemy(_e) {
 							x.def.iframe = true;
 						x.extraStepXRate = 0;
 					});
+					if(this.frame >= _anima.frames.length)
+						this.frame = _anima.frames.length - 1;
 					_anima.frames[0].color = _anima.frames[1].color = 
-					this.skinColor = this.hurtColor = '#7C3030';
+					this.skinColor = this.hurtColor = (this.chargeDead ? '#FFFFFF' : '#7C3030');
 				}
 				if(this.hurting?.hit)
 					delete this.hurting.hit;
-				setTimeout(() => {
-					this.addObject({ key: 'hit2', position: 'middle' });	
-				}, getRandomValue2(1,3) * 50);
+				if(!this.chargeDead)
+					setTimeout(() => {
+						this.addObject({ key: 'hit2', position: 'middle' });	
+					}, getRandomValue2(1,3) * 50);
 				this.extraStepXRate = 0;
 			}
 			else if(!this.laying)
@@ -3404,19 +3407,20 @@ function enemy(_e) {
 						_result.range = MathAbs(_result.enemy.ORIGINLEFT - this.ORIGINLEFT);
 					if (this.start <= 1 && this.frame === 0 && !this.charging){
 						this.charging = true;
-						this.addObject({
-							key: 'charge',
-							position: 'behind-feet'
-						})
-						PlaySound({ key: 'charge', volume: .25, owner: this });
+						// this.addObject({
+						// 	key: 'charge',
+						// 	position: 'behind-feet'
+						// })
+						PlaySound({ key: 'charge', volume: .5, owner: this });
 					}
 					let _speed = this.chargeProperties?.speed ?? 0;
 					if (!this.chargeProperties && this.charging) {
 						this.charging = (_anima.chargeDistance.value * .66) < (100 * (_result.range / episode.cWidth)) ? 1 : 0;
-						PlaySound({key: 'impact'});
+						//PlaySound({key: 'impact'});
 						if(!_speed)
 							for (var i = 0; i <= _anima.chargeDistance.untilFrame ?? 0; i++)
 								_speed += _anima.frames[i].speed;
+						this.chargeStarted = _gameTick;
 						this.chargeProperties = {
 							enemy: _result.enemy,
 							dir: _dir,
@@ -3803,6 +3807,7 @@ function enemy(_e) {
 				const _skillName = (_e.isDead() && this.alp && _e.animations.deadfly && _e.animation !== 'deadfly') ? 'deadfly' : 'knockback' + ((_enemyFrame.hurt && !_f.atk?.hurt?.reset) ? _enemyFrame.hurt : (_f.atk?.hurt?.type ?? 'air'));
 				if(_skillName === 'deadfly') {
 					_e.animate(_skillName);
+					this.talk();
 					continue;
 				} 
 				else if (_knocker.start < 2 && !_enemy) {
@@ -3811,6 +3816,7 @@ function enemy(_e) {
 				}
 				else if (_knocker.start <= 2 || _enemy) {
 					_e.animate(_skillName);
+					this.talk();
 					_e.direction = _knocker.direction === __right ? __left : __right;
 					if (_e.dying)
 						_e.knockbacking = true;
@@ -4043,6 +4049,22 @@ function enemy(_e) {
 			});
 		}
 	}
+	this.talk = function() {
+		if(!__storyCutScenePlaying && this.talkCount && (_gameTick - (this.lastTalkTime ?? 0) > 10000)) {
+			this.lastTalkTime = _gameTick;
+			let _talkId;
+			while(true) {
+				_talkId = getRandomValue2(1, this.talkCount);
+				if(this.talkCount === 1)
+					break;
+				if(_talkId !== this.lastTalkId){
+					this.lastTalkId = _talkId;
+					break;
+				}
+			}
+			PlaySound({path:'./images/talks/' + this.class + '/' + _talkId + '.mp3', volume: 1 });
+		}
+	}
 	this.attack = function (_anima, _frame) {
 		const trt = (this.related ?? this);
 		trt.removeBuffByKey('invisibility');
@@ -4177,20 +4199,7 @@ function enemy(_e) {
 							if(!_e.animations.hurtfeet)
 								_e.animations.hurtfeet = new animation(_f.atk.hurt.burn ? createHurtFeetAndBurn(_e.zoom) : (_f.atk.hurt.knockback ? createHurtFeetWithKnockback(_e.zoom, _e.bloodColor, _f.atk.hurt.knockback) : createHurtFeet(_e.zoom, _e.bloodColor, null, _f.bottomGap, _f.atk.type)));
 							_e.animate('hurtfeet', 1);
-							if(!__storyCutScenePlaying && _t.talkCount && (_gameTick - (_t.lastTalkTime ?? 0) > 10000)) {
-								_t.lastTalkTime = _gameTick;
-								let _talkId;
-								while(true) {
-									_talkId = getRandomValue2(1, _t.talkCount);
-									if(_t.talkCount === 1)
-										break;
-									if(_talkId !== _t.lastTalkId){
-										_t.lastTalkId = _talkId;
-										break;
-									}
-								}
-								PlaySound({path:'./images/talks/' + _t.class + '/' + _talkId + '.mp3', volume: 1 });
-							}
+							_t.talk();
 							return { smashed:true };
 						}
 						else if(_e.phased) {
@@ -4251,8 +4260,8 @@ function enemy(_e) {
 									if (_e.hitTakenCount === undefined)
 										_e.hitTakenCount = 0;
 									_e.hitTakenCount += _f.atk.hitTaken;
-									if(!_t.attackedUnitCount)
-										_e.increaseRage(_f.atk.hitTaken);
+									// if(!_t.attackedUnitCount)
+									// 	_e.increaseRage(_f.atk.hitTaken);
 								}
 								else
 									_e.hitTakenCount = _f.atk.hitTaken;
@@ -4338,6 +4347,12 @@ function enemy(_e) {
 										if(_t.animations[_t.animation].uncounterable)
 											_e.noCounter = 1;
 										_e.animate(_animateSkill);
+										_e.addObject({
+											position: 'css',
+											key:'zoomdynamic',
+											p1: _t.direction,
+											p2: (_t.criticalHit ? 1 : 0) + _f.atk.rate
+										});
 										//Enemy cced
 										if(_e.alp) {
 											const _pstv = _e.getTalentValue('passive-stun');
@@ -4361,8 +4376,11 @@ function enemy(_e) {
 							_e.hurting.count = _e.hurtColor ? ((_f.atk.type === 'fire' || _f.atk.type === 'ice' || _f.atk.type === 'toxic') ? 3 : 4) : 3; // _e.getCurrentFrame().speed;
 							if(_e.size === 'big')
 								_e.hurting.count = MathCeil(_e.hurting.count / 2);
-							if(_t.charging)
+							const _charged = _t.charging || ((_gameTick - _t.chargeStarted) < 999);
+							if(_charged){
 								_t.addObject({ key: 'impact', position: 'css', p2: _t.direction });
+								_t.talk();
+							}
 							if (!_e.noCC && !_e.still && !_e.finishing && _cced && !_erelease && (_hurtType ?? (_e.animations[_e.cc]?.hurt ?? _f.atk.hurt?.type)) === 'ground')
 								_e.addObject({ key: 'stun', position: 'middle-head', yGap: -25 });
 							if (_cced && _e.casting)
@@ -4370,6 +4388,8 @@ function enemy(_e) {
 							if(_cced && _e.main) 
 								removeClass(_gamePad, 'zoom');
 							if (_f.atk.rate) {
+								if(_f.atk.hurt?.hitZoom)
+									_f.hitZoom = _f.atk.hurt.hitZoom;
 								if (!_f.atk.hurt.dead) {
 									let _hasEffect;
 									if ((_t.class === __spell || _t.start <= 1) && (_e.health > 0 && !_e.finishing)) {
@@ -4466,6 +4486,7 @@ function enemy(_e) {
 												}]);
 											
 											_e.decreaseHealth(_dmg, _t.related ?? _t);
+											_e.increaseRage(_f.atk.hitTaken * (_t.criticalHit ? 2 : 1), null, 1);
 											let _canStop = false;
 											if(_t.class !== __spell && !_t.hitStop && (_anima.hitStop || _f.atk.hitStop)) {
 												let _stopAdd = -1;
@@ -4518,7 +4539,13 @@ function enemy(_e) {
 												if(!_hasEffect)
 													_hasEffect = 1;
 											}
-									if(!_hasEffect && _animateSkill?.startsWith('hurtground')) {
+									if(_charged){
+										_e.addObject({key:'sparkcharge', position: 'middle'});
+										if(_e.isDead())
+											_e.chargeDead = 1;
+										PlaySound({key:'chargehit1', reset: true, volume:.4});
+									}
+									else if(!_hasEffect && _animateSkill?.startsWith('hurtground')) {
 										setTimeout(() => {
 											if(_t.criticalHit) {
 												//buraya crit spark
@@ -4596,8 +4623,18 @@ function enemy(_e) {
 				if (_enemyFrame?.atk) {
 					if (_enemyPriority === _thisPriority) {
 						if (this.class !== __spell && _enemy.class !== __spell && _enemy.direction !== this.direction && !this.friendly && !_enemy.friendly && getRandomValue(1, 10) === 1) {
+							const _eck = _enemy.animations.dash?.chargeKey;
+							if(_eck)
+								delete _enemy.animations.dash.chargeKey;
 							_enemy.animate('dash');
+							if(_eck)
+								_enemy.animations.dash.chargeKey = _eck;
+							const _ck = this.animations.dash?.chargeKey;
+							if(_ck)
+								delete this.animations.dash.chargeKey;
 							this.animate('dash');
+							if(_ck)
+								this.animations.dash.chargeKey = _ck;
 							this.addObject({
 								key: 'glow',
 								position: 'middle'
@@ -4611,6 +4648,8 @@ function enemy(_e) {
 						}
 					}
 					if (_thisPriority < (_enemyPriority ?? 10)) {
+						if(_enemyPriority)
+							this.talk();
 						_enemyHurted = hurtEnemy(this, _frame, _enemy, _enemyFrame, _enemyAnima);
 						if (this.class === __spell && (!this.pierce) && this.animation !== 'dead')
 							this.animate('dead', null, null, 6);
@@ -4943,14 +4982,14 @@ function enemy(_e) {
 				this[_key] = _props[_key];
 		}
 	}
-	this.increaseRage = function (_point, _crit) {
+	this.increaseRage = function (_point, _crit, _hurt) {
 		if (!this.animations.air2 || !this.animations.air2.ultimate)
 			return;
 		if (this.skills['air2']?.locked || this.animations[this.animation].ultimate)
 			return;
 		if (this.rage)
 			return;
-		if((_gameTick - this.lastRageGainTime) < 333)
+		if(!_hurt && (_gameTick - this.lastRageGainTime) < 333)
 			return;
 		if ((this.rageCount ?? 0) < 0)
 			this.rageCount = 0;
@@ -5030,7 +5069,7 @@ function enemy(_e) {
 			this.rageCount = 0;
 		if (this.main) {
 			const _perc = MathRound(this.rageCount * (100 / this.getMaxRageCount()));
-			rageSkill.style.background = 'radial-gradient(transparent, transparent, #00000080, transparent, transparent), url(./images/main/skill-icons/air2.png), linear-gradient(0deg, ' + (_perc < 100 ? '#A42A04':'#FF2020') + ' ' + _perc + '%, black 0%)';
+			rageSkill.style.background = (__isPC ? '' : 'radial-gradient(transparent, transparent, #00000080, transparent, transparent), ') + 'url(./images/main/skill-icons/air2.png), linear-gradient(0deg, ' + (_perc < 100 ? '#A42A04':'#FF2020') + ' ' + _perc + '%, black 0%)';
 		}
 		if (this.rageCount === 0) {
 			const _endOfRage = this.ultimate;
@@ -5130,10 +5169,16 @@ function enemy(_e) {
 					//if(!_parent)
 					//	return false;
 					//else {
-						if(!_parent.freqCount)
+						if(!_parent.freqCount){
 							_parent.freqCount = 1;
-						else
-							_parent.freqCount++;
+							_parent.lastFreq = _gameTick;
+						}
+						else {
+							if(_gameTick !== _parent.lastFreq) {
+								_parent.freqCount++;
+								_parent.lastFreq = _gameTick;
+							}
+						}
 						if(_parent.freqCount > 3)
 							return false;
 					//}
@@ -5504,6 +5549,11 @@ function enemy(_e) {
 					let _hs = this.hitStop > 0 ? this.hitStop - 1 : 0;
 					if(_hs === 1)
 						_hs = 2;
+					let _zoom = _frame.hitZoom;
+					if(_zoom)
+						_zoom *= (_frame.zoom ?? _anima.zoom ?? 1);
+					else
+						_zoom = (_frame.zoom ?? _anima.zoom);
 					if (this.drawHalf || _cut) { // && (_cutX || _cutY)) {
 						_queue.push({
 							skinColor: this.freeze ? '#a2d2df70' : _frame.color,
@@ -5512,7 +5562,7 @@ function enemy(_e) {
 							spriteX: _frame.spriteLeft,
 							spriteY: _frame.spriteTop,
 							alpha: _frame.alpha,
-							zoom: _frame.zoom ?? _anima.zoom,
+							zoom: _zoom,
 							spriteWidth: _frame.spriteWidth,
 							spriteHeight: _frame.spriteHeight,
 							shadow: _frame.hasShadowBehind ? (_frame.shadow ?? '#000000') : undefined,
@@ -5546,7 +5596,7 @@ function enemy(_e) {
 							spriteX: _frame.spriteLeft,
 							spriteY: _cutSpriteTop,
 							alpha: _frame.alpha,
-							zoom: _frame.zoom ?? _anima.zoom,
+							zoom: _zoom,
 							spriteWidth: _cutSpriteWidth,
 							spriteHeight: _cutSpriteHeight,
 							shadow: _frame.hasShadowBehind ? (_frame.shadow ?? '#000000') : undefined,
@@ -5569,7 +5619,7 @@ function enemy(_e) {
 							spriteX: _frame.spriteLeft,
 							spriteY: _frame.spriteTop,
 							alpha: _frame.alpha,
-							zoom: _frame.zoom ?? _anima.zoom,
+							zoom: _zoom,
 							spriteWidth: _frame.spriteWidth,
 							spriteHeight: _frame.spriteHeight,
 							shadow: _frame.hasShadowBehind ? (_frame.shadow ?? '#000000') : undefined,
@@ -5593,6 +5643,8 @@ function enemy(_e) {
 		}
 		if(this.solid)
 			this.centerSolid = this.getCenterSolid();
+		if(_frame.hitZoom)
+			delete _frame.hitZoom;
 	}
 	this.getCenterSolid = function() {
 		let _top = this.TOP;
@@ -6633,7 +6685,7 @@ function enemy(_e) {
 
 					}
 					if (_newAnima.chain || _frame.imediateBreak || (_anima.imediateBreak && !this.charging) || this.animationFinished || _anima.channeling || (_newAnima.useInCC && _anima.hurt))
-						if (!this.animate(_skill))
+						if (!this.animate(_skill) && this.animation !== 'run' && this.animation !== 'walk')
 							this.idle(7);
 				}
 			}
@@ -7538,11 +7590,13 @@ function enemy(_e) {
 							x.atk.hurt.spells = [];
 						if(!x.atk.hurt.spells.find(s => s.key === 'electricboltsmall')){
 							x.atk.hurt.spells.push({
-								key: 'electricboltsmall'
+								key: 'electricboltsmall',
+								reset: true
 							});
 							x.atk.hurt.spells.push({
 								key: 'electricboltsmall',
-								reversed: true
+								reversed: true,
+								reset: true
 							});
 						}
 					}

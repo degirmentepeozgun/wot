@@ -39,8 +39,8 @@
       "cordova-plugin-exit": {}
     },
     "platforms": [
-      "android",
-      "electron"
+      "electron",
+      "android"
     ]
   },
   "dependencies": {
