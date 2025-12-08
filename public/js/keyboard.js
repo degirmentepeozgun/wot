@@ -1,4 +1,224 @@
 ﻿'use strict';
+const _keyCombinations = [
+	{ title: {
+		en: 'Move Left',
+		tr: 'Sola Git'
+	 },
+	  baseKey: 'A',
+	  desc: '<img class="readonly-key-combination" src="./images/icons/left-keyboard.png" style="height:80%" />'
+	},
+	{ title: {
+		en: 'Move Right',
+		tr: 'Sağa Git'
+	 },
+	  baseKey: 'D',
+	  desc: '<img class="readonly-key-combination" src="./images/icons/left-keyboard.png" style="height:80%;transform:rotate(-90deg)" />'
+	},
+	{ title: {
+		en: 'Move Up',
+		tr: 'Yukarı Git'
+	 },
+	  baseKey: 'W',
+	  desc: '<img class="readonly-key-combination" src="./images/icons/left-keyboard.png" style="height:80%;transform:rotate(-180deg)" />'
+	},
+	{ title: {
+		en: 'Move Down',
+		tr: 'Aşağı Git'
+	 },
+	  baseKey: 'S',
+	  desc: '<img class="readonly-key-combination" src="./images/icons/left-keyboard.png" style="height:80%;transform:rotate(-270deg)" />'
+	},
+	{ title: {
+		en: 'Block',
+		tr: 'Korunma'
+	 },
+	  baseKey: 'H',
+	},
+	{ title: {
+		en: 'Dodge',
+		tr: 'Atlama'
+	 },
+	  baseKey: 'G',
+	},
+	{ title: {
+		en: 'Normal Attack',
+		tr: 'Basit Saldırı'
+	 },
+	  baseKey: ' ',
+	},
+	{ title: {
+		en: 'Ground Attack',
+		tr: 'Yerden Saldırı'
+	 },
+	  baseKey: 'J',
+	},
+	{ title: {
+		en: 'Air Attack',
+		tr: 'Hava Saldırısı'
+	 },
+	  baseKey: 'K',
+	},
+	{ title: {
+		en: 'Ranged Attack',
+		tr: 'Uzaktan Saldırı'
+	 },
+	  baseKey: 'L',
+	},
+	{ title: {
+		en: 'Rage Mode',
+		tr: 'Öfke Modu'
+	 },
+	  baseKey: 'E',
+	},
+	{ title: {
+		en: 'Special Skill',
+		tr: 'Özel Yetenek'
+	 },
+	  baseKey: 'Q',
+	},
+	{ title: {
+		en: 'Tag Skill',
+		tr: 'Destek Yeteneği'
+	 },
+	  baseKey: 'T',
+	},
+	{ title: {
+		en: 'Counter Attack Chain',
+		tr: 'Karşı Saldırı Zinciri'
+	 },
+	  baseKey: 'F',
+	},
+	{ title: {
+		en: 'Escape Chain',
+		tr: 'Kaçış Zinciri'
+	 },
+	  baseKey: 'R',
+	},
+	{ title: {
+		en: 'Action',
+		tr: 'Eylem'
+	 },
+	  baseKey: 'U',
+	},
+	{ title: {
+		en: 'Drink Potion',
+		tr: 'İksir İçme'
+	 },
+	  baseKey: 'P',
+	},
+	{ title: {
+		en: 'Common Skill 1',
+		tr: 'Ortak Beceri 1'
+	 },
+	  baseKey: '1',
+	},
+	{ title: {
+		en: 'Common Skill 2',
+		tr: 'Ortak Beceri 2'
+	 },
+	  baseKey: '2',
+	},
+	{ title: {
+		en: 'Common Skill 3',
+		tr: 'Ortak Beceri 3'
+	 },
+	  baseKey: '3',
+	},
+	{ title: {
+		en: 'Common Skill 4',
+		tr: 'Ortak Beceri 4'
+	 },
+	  baseKey: '4',
+	}
+];
+let activeInput = null;
+let previousKeyBindValue = "";
+
+const blockedKeys = [
+  "Shift", "Control", "Alt", "AltGraph", "Meta", "CapsLock",
+  "NumLock", "ScrollLock", "Pause", "Insert"
+];
+const blockedAsciis = [
+	16,17,18,19,20,33,34,35,36,44,45,46,91,92,93,144,145,173,174,175,181,182,183
+]
+function readyToBindKey(_elem){
+	document.querySelectorAll('.key-combination-item')?.forEach(x => removeClass(x, 'waiting'));
+	activeInput = _elem;
+    previousKeyBindValue = _elem.value;
+    _elem.value = "...";
+    addClass(_elem, "waiting");
+}
+function tryResetBindKey(_elem) {
+  	removeClass(_elem,"waiting");
+  	removeClass(_elem,"error");
+	if(_elem.value === '...')
+		_elem.value = previousKeyBindValue === ' ' ? 'SPACE' : previousKeyBindValue;
+  	activeInput = null;
+}
+function formatKeyName(e) {
+  if (e.code === "Space") return "SPACE";
+  if (e.key.length === 1) return e.key.toUpperCase();
+  return e.key.toUpperCase();
+}
+
+function isKeyAlreadyUsed(key, currentInput) {
+  let used = false;
+
+  document.querySelectorAll(".key-combination-item")?.forEach(inp => {
+    if (inp !== currentInput && inp.value === key) {
+      used = true;
+    }
+  });
+
+  return used;
+}
+
+function stopListening() {
+  if (!activeInput) return;
+  removeClass(activeInput,"waiting");
+}
+function setBindKey(_elem, e) {
+	removeClass(_elem, "error");
+    if (!activeInput) return;
+	
+    // TAB -> doğal davranış + sonraki inputa geçiş
+    if (e.key === "Tab") {
+      stopListening();
+      return; // browser default TAB geçişi çalışsın
+    }
+
+    e.preventDefault();
+
+	if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey || e.key === 'Enter') {
+		return;
+	}
+    // ESC -> eski değeri geri getir
+    if (e.key === "Escape") {
+      _elem.value = previousKeyBindValue;
+      stopListening();
+      return;
+    }
+	if(e.keyCode === 8) {
+		readyToBindKey(_elem);
+		return;
+	}
+    // Kontrol tuşlarını engelle
+    if (blockedKeys.includes(e.key)) return;
+
+    if (blockedAsciis.includes(e.keyCode)) return;
+    let keyName = formatKeyName(e);
+
+    // Çakışma kontrolü
+    if (isKeyAlreadyUsed(keyName, _elem)) {
+		PlaySound({key:'disabled'});
+     	addClass(_elem, "error");
+      	return;
+    }
+
+    _elem.value = keyName;
+	PlaySound({key:'keyboard', volume:.2});
+    stopListening();
+}
 function keyboard(_character, _keys) {
 	_character.blockReleased = true;
 	this.character = _character;
@@ -9,11 +229,11 @@ function keyboard(_character, _keys) {
 	this.keys = _keys;
 	const self = this;
 	this.recordKey = function(_k, _name) {
-		// if(!episode?.fatality || episode?.fatalityHappened) {
-		// 	if(this.recordingKeys?.[0])
-		// 		this.recordingKeys = [];
-		// 	return;
-		// }
+		if(!episode?.fatality || episode?.fatalityHappened) {
+			if(this.recordingKeys?.[0])
+				this.recordingKeys = [];
+			return;
+		}
 		this.recordingKeys.push({key:_k, name: _name});
 		if(this.recordingKeys.length > 10)
 			this.recordingKeys.splice(0, 1);
@@ -248,7 +468,7 @@ function keyboard(_character, _keys) {
 			self.addKey(self.keys[18], _skillName);
 	}
 	this.action = function (_key) {
-		if((this.character && (this.character.deadTime || this.character.isDead())) || keyboardHeight > 0)
+		if((this.character && !__storyTell && (this.character.deadTime || this.character.isDead())) || keyboardHeight > 0)
 			return;
 		switch (_key) {
 			case self.keys[13]:
@@ -590,7 +810,10 @@ function normalizeKey(key) {
 const directionKeys = new Set(['w','a','s','d','arrowleft','arrowright','arrowup','arrowdown']);
 
 window.addEventListener('keydown', (e) => {
-  if (mainCharacter?.disableKeyboard) return;
+  if (mainCharacter?.disableKeyboard || mainCharacter?.stop) {
+	blurKeyboard();
+	return;
+  }
 
   const kRaw = e.key?.toLowerCase?.();
   if (!kRaw) return;
@@ -632,8 +855,10 @@ window.addEventListener('blur', blurKeyboard);
 let frameCounter = 0;
 
 function syncKeysRobust() {
-  if (!mainCharacter?.keyboard)
+  if (!mainCharacter?.keyboard){
+	blurKeyboard();
     return requestAnimationFrame(syncKeysRobust);
+  }
 
   const doSync = !__isPC || (frameCounter++ % 3 === 0);
 
@@ -852,9 +1077,10 @@ function activateTouchPad() {
 		lastValidTouch = _newTouches; // ← dokunmayı sakla
 	};
 	document.addEventListener('touchstart', function (_event) {
-		if (mainCharacter?.disableKeyboard)
+		 if (mainCharacter?.disableKeyboard || mainCharacter?.stop) {
+			blurKeyboard();
 			return;
-
+		}
 		for (let t of _event.changedTouches) {
 			if (
 				t.clientX >= dpadRect.left &&
@@ -877,8 +1103,10 @@ function activateTouchPad() {
 	}, { passive: false });
 
 	document.addEventListener('touchmove', function (_event) {
-		if (mainCharacter?.disableKeyboard)
+		 if (mainCharacter?.disableKeyboard || mainCharacter?.stop) {
+			blurKeyboard();
 			return;
+		}
 		_event.preventDefault();
 
 		for (let t of _event.changedTouches) {

@@ -1,7 +1,8 @@
 .talent-content-left {
 	padding:4% 2% 3.5% 2% !important
 }
-.talent-content-right .talent-info {
+.talent-content-right .talent-info,
+.shining-item.talent-info {
 	padding:5% 7% !important
 }
 .talent-card {

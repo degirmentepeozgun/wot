@@ -232,6 +232,7 @@ function dataOperations(_quickPlay) {
 			_json = {};
 			_r = 1;
 		}
+		const _kb = _json?.keyboard;
 		if (!_r)
 			__account = _json;
 		else {
@@ -239,6 +240,8 @@ function dataOperations(_quickPlay) {
 			__account.inventory.forEach(x => x.weared = 'warrior');
 			this.saveState(1);
 		}
+		if(_kb && !__account.keyboard)
+			__account.keyboard = _kb;
 	}
 	this.loadItems = function(hasMainCharacter) {
 		applyCharacterStats(hasMainCharacter);

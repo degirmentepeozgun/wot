@@ -536,6 +536,9 @@ function switchInventoryTab(_elem, _order, _noSound) {
                 addClass(_actionPanel, 'd-none');
                 break;
         }
+        requestAnimationFrame(() => {
+            _slots.scrollTop = 0;
+        });
     }
 }
 function getMiscTabContent() {
@@ -768,7 +771,7 @@ function getItemInfoModalHtml(_id) {
             `</div>
         </div>
         <div class="flex" style="width:100%;height:20%">
-            <div class="game-menu-button animate-me flex${hasMaterial('ticket-random') ? '' : ' disabled'}" style="width:90%;height:40%" onexactclick="askRandomizeItem(${_id})"><div class="flex" style="height:80%;font-size:3vh !important">${getLangData('RANDOMIZE')} (1&nbsp;<img style="height:3vh" src="./images/icons/ticket-random.png" />&nbsp;)</div></div>
+            <div class="game-menu-button animate-me flex${hasMaterial('ticket-random') ? '' : ' disabled'}" style="width:90%;height:40%" onexactclick="askRandomizeItem(${_id})"><div class="flex" style="height:80%;font-size:3vh !important"><div class="flex">${getLangData('RANDOMIZE')} (<img style="height:3vh" src="./images/icons/ticket-random.png" />)</div></div></div>
             <div class="game-menu-button animate-me flex${_itemProps.maxLevel > _item.level ? '' : ' disabled'}" style="width:90%;height:40%" onexactclick="upgradeItem(${_id})"><div class="flex" style="height:80%;font-size:3vh !important">${getLangData('UPDATE')}` + (updateCost > 0 ? ` (${updateCost.formatWithDots()} <img style="height:2vh;margin:0 0 0 1vh" src="./images/icons/coin.png" />)` : '') + `</div></div>
         </div>
         <div class="flex" style="width:100%;height:10%;justify-content:space-evenly">
@@ -789,11 +792,13 @@ function openItemInfoModal(_id) {
     //Item Power Difference
     //Item Update Cost
     var _html = `<div class="full item-info-container-parent menu-modal-right">
-    <div class="full flex item-info-container"><div class="full flex item-info-container-inner">`
+    <div class="full flex item-info-container">
+        <div class="full flex item-info-container-inner">`
         + getItemInfoModalHtml(_id) +
-		`</div><div onexactclick="closeItemInfoModal()" class="item-info-modal-close">&times;</div>
-        <div id="shine"></div>
-    </div>
+		`</div>
+    <div onexactclick="closeItemInfoModal()" class="item-info-modal-close">&times;</div>
+    </div> 
+    <div class="shine-area"></div>
     </div>`;
     var _currentItemModal = document.querySelector('.item-info-container-parent');
     if(_currentItemModal)
@@ -1232,41 +1237,91 @@ function addGemToMelt(_type, _grade) {
     _p.innerHTML = "<img data-grade='" + _grade + "' data-key=" + _type + " src='./images/gems/" + _type + _grade + ".png' />";
     updateGemMeltPlaces();
 }
+// function updateGemMeltPlaces() {
+//     const _defColor = '#f3f4f540';
+//     let _key;
+//     let _len = 0;
+//     const _btn = document.querySelector('.melt-btn');
+//     for(let i = 1; i <= 5; i++) {
+//         const _place = document.getElementById('melt-' + i);
+//         const _next = document.getElementById('melt-' + ((i + 1) > 5 ? 1 : (i + 1)));
+//         const _img = _place.querySelector('img');
+//         const _nextImg = _next.querySelector('img');
+//         let _color = _defColor, _nextColor = _defColor;
+//         if(_img) {
+//             _len++;
+//             _key = _img.getAttribute('data-key');
+//             _color = __gems.find(x => x.key === _key).color;
+//         }
+//         if(_nextImg) {
+//             _key = _nextImg.getAttribute('data-key');
+//             _nextColor = __gems.find(x => x.key === _key).color;
+//         }
+//         if(i < 4)
+//             document.querySelector('.melt-path-' + i).style.background = 'linear-gradient(' + _color + ',' + _nextColor + ')';
+//         else
+//             document.querySelector('.melt-path-' + i).style.background = 'linear-gradient(' + _nextColor + ',' + _color + ')';
+//     }
+//     if(_len < 5){
+//         //addClass(_btn, 'disabled');
+//         removeClass(_btn, 'glow');
+//     }
+//     else{
+//         //removeClass(_btn, 'disabled');
+//         addClass(_btn, 'glow');
+//     }
+//     switchInventoryTab(null, 2, 1);
+// }
 function updateGemMeltPlaces() {
     const _defColor = '#f3f4f540';
     let _key;
     let _len = 0;
     const _btn = document.querySelector('.melt-btn');
+
     for(let i = 1; i <= 5; i++) {
         const _place = document.getElementById('melt-' + i);
         const _next = document.getElementById('melt-' + ((i + 1) > 5 ? 1 : (i + 1)));
         const _img = _place.querySelector('img');
         const _nextImg = _next.querySelector('img');
+
         let _color = _defColor, _nextColor = _defColor;
+
         if(_img) {
             _len++;
             _key = _img.getAttribute('data-key');
             _color = __gems.find(x => x.key === _key).color;
+            addClass(_place, 'melt-orb-glow');
         }
+        else
+            removeClass(_place, 'melt-orb-glow');
         if(_nextImg) {
             _key = _nextImg.getAttribute('data-key');
             _nextColor = __gems.find(x => x.key === _key).color;
+            addClass(_next, 'melt-orb-glow');
         }
-        if(i < 4)
-            document.querySelector('.melt-path-' + i).style.background = 'linear-gradient(' + _color + ',' + _nextColor + ')';
         else
-            document.querySelector('.melt-path-' + i).style.background = 'linear-gradient(' + _nextColor + ',' + _color + ')';
+            removeClass(_next, 'melt-orb-glow');
+        const el = document.querySelector('.melt-path-' + i);
+        if(_img && _nextImg)
+            addClass(el, 'melt-path-glow');
+        else 
+            removeClass(el, 'melt-path-glow');
+        if(i < 4)
+            el.style.background = 'linear-gradient(' + _color + ',' + _nextColor + ')';
+        else
+            el.style.background = 'linear-gradient(' + _nextColor + ',' + _color + ')';
     }
+
     if(_len < 5){
-        //addClass(_btn, 'disabled');
         removeClass(_btn, 'glow');
     }
     else{
-        //removeClass(_btn, 'disabled');
         addClass(_btn, 'glow');
     }
+
     switchInventoryTab(null, 2, 1);
 }
+
 function acceptMelt(_force) {
     const _keys = [];
     let _grade;
@@ -1330,6 +1385,7 @@ function acceptMelt(_force) {
     closeGemInfoModal();
     switchInventoryTab(null, 2);
     PlaySound({ key: 'upgrade', volume: .5, reset: true, force: true });
+    warn(`<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/gems/${_key}${_grade + 1}.png" />&nbsp;1x&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">${getLangData('Gem')}</span></div>`, null, null, 1);
 }
 function closeItemInfoModal(_noSound) {
     removeClass(document.querySelector('#inventory-list'), 'item-info-opened');
@@ -1674,6 +1730,33 @@ function useItemSelectionTicket(_level) {
     _div.innerHTML = _modal;
     document.querySelector('#menu-ui').appendChild(_div.firstChild);
 }
+function useGemSelectionTicket(_level) {
+    _selectionItems.length = 0;
+    for(let _it of __gems)
+        _selectionItems.push({key:_it.key, grade:_level});
+    let _choices = '';
+    for(let _item of _selectionItems)
+        _choices += `<div class="selection-item" onexactclick="selectSelectionItem(null, this)" style="width:17%;aspect-ratio:1/1;position:relative;cursor:pointer">
+            <img src="./images/gems/${_item.key + _item.grade.toString()}.png" class="full grade${_item.grade}-item${_item.grade > 5 ? ' glow' : ''}" />
+        </div>`;
+    let _modal = `<div class="full fade-me flex inventory-question">
+        <div class="inventory-modal">
+            <div style="padding:6vh 4vh 4vh 4vh" class="flex">
+                <span style="color:#f7f7f7dd !important;font-size:3vh !important">${getLangData('Choose your gift')}</span>
+            </div>
+            <div class="flex" style="padding:2vh">`
+               + _choices +
+            `</div>
+            <div style="padding:4vh 2vh" class="flex">
+                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('CANCEL')}</div>
+                <div id="item-selection-approve-btn" class="game-menu-button flex animate-me disabled" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="acceptGemTicketSelection()">${getLangData('APPROVE')}</div>
+            </div>
+        </div>
+    </div>`;
+    const _div = document.createElement('div');
+    _div.innerHTML = _modal;
+    document.querySelector('#menu-ui').appendChild(_div.firstChild);
+}
 function selectSelectionItem(_id, _elem) {
     PlaySound({ key: 'click' });
     removeClass(document.getElementById('item-selection-approve-btn'), 'disabled');
@@ -1682,6 +1765,26 @@ function selectSelectionItem(_id, _elem) {
         removeClass(_ic, 'selected');
         if(_ic === _elem)
             addClass(_ic, 'selected');
+    }
+}
+function acceptGemTicketSelection() {
+    const _itemIcons = document.querySelectorAll('.selection-item');
+    for(let _i = 0; _i < _itemIcons.length; _i++) {
+        const _item = _itemIcons[_i];
+        if(hasClass(_item, 'selected'))
+        {
+            const _choice = _selectionItems[_i];
+            updateGem(_choice.key, _choice.grade, 1);
+            //pushItemIntoInventory(_choice);
+            const _miscItem = __account.misc.find(x => x.type === 'ticket-gem-selection');
+            _miscItem.count--;
+            if(_miscItem.count === 0)
+                __account.misc = __account.misc.filter(x => x.type !== 'ticket-gem-selection');
+            _client.saveState();
+            closeInventoryQuestionModal();
+            switchInventoryTab(null, 3);
+            break;
+        }
     }
 }
 function acceptItemSelection() {

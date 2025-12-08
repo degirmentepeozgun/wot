@@ -5,7 +5,7 @@ const _conceptArts = {
 	druid: { direction: 'right', title: 'Vargas' },
 	archer: { direction: 'right', title: 'Alkin' },
 	thief: { direction: 'right', title: 'Karayel' },
-	warrior: { direction: 'right', title: 'Toygar' },
+	warrior: { direction: 'right', title: 'Basat' },
 	tank: { direction: 'right', title: 'Deli Dumrul' },
 	stables: { direction: 'right', title: 'Stable Master' }
 };
@@ -171,7 +171,7 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 	episode.reset();
 }
 function pauseQuestTimer() {
-	if(__account?.questStatus?.quest?.timer)
+	if(__account?.questStatus?.quest?.timer?.startTime)
 		__account.questStatus.quest.timer.suspended = Date.now();
 }
 function resumeQuestTimer() {
@@ -657,6 +657,8 @@ function createBubbleText(_dialog) {
 		// }
 		// else {
 			_top = MathRound(_c.TOP - (_canvas.height / 7) - (__zoom * (_dialog.bottomGap ?? 0)));
+			if(__isPC && episode?.id > 1)
+				_top -= MathRound(_canvas.height / 10);
 			//_left = MathRound(_c.EXACTLEFT -
 			//	(((_gamePad.clientWidth * .15) - _c.WIDTH) / 2));
 			_left = MathRound((_c.SCREENLEFT - ((_c.width / 2) * _c.ZOOM)) + (__zoom * (_dialog.leftGap ?? 0)));  //MathRound((_c.SCREENLEFT - 

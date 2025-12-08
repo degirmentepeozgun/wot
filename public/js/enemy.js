@@ -259,7 +259,7 @@ function enemy(_e) {
 	}
 	this.getTop = function () {
 		let _stepY = 0;
-		if (this.extraStepYRate)
+		if (this.extraStepYRate && !this.stop)
 			_stepY = MathRound(this.extraStepYRate * (_canvas.height / 100));
 		return MathRound((_canvas.height - this.yPosition - this.getHeight())) - _stepY;
 	}
@@ -1398,34 +1398,108 @@ function enemy(_e) {
 			delete this.deadDramaStart;
 		}
 	}
+	// this.setSound = async function(_sf,_anima) {
+	// 	let _volumeRate = 1;
+	// 	if(this.soundVolumeRate) {
+	// 		_volumeRate *= this.soundVolumeRate;
+	// 		delete this.soundVolumeRate;
+	// 	}
+	// 	if(_sf.skipUnseen && this.unseen) {
+	// 		this.soundPlaying = undefined;
+	// 		return;
+	// 	}
+	// 	let _sound = await PlaySound({
+	// 		reset: _sf.reset,
+	// 		key: (!this.main ? this.name.toLowerCase() : this.class) + 
+	// 		(typeof _sf === 'string' ? _sf : (_sf?.key ?? this.animation)),
+	// 		volume:_sf.volume,
+	// 		volumeRate: _volumeRate,
+	// 		speed: _sf.speed,
+	// 		owner: this,
+	// 		bind: _sf.bind
+	// 	}, [_sf?.key ??_sf], 1);
+	// 	if (_sound && _sf.bind)
+	// 		_anima.sound = _sound;
+	// 	if(_sound && !this.main && _sf.range) {
+	// 		if(_sound.startVolume === undefined)
+	// 			_sound.startVolume = _sound.volume;
+	// 		const _r = this.getRangeBetween(mainCharacter);
+	// 		if(_r > 99)
+	// 			_sound.volume = 0;
+	// 		else
+	// 			_sound.volume = _sound.startVolume * (1 - (_r / 100));
+	// 	}
+	// 	if(!_sound)
+	// 		this.soundPlaying = undefined;
+	// }
 	this.setSound = async function(_sf,_anima) {
+
+		let _volumeRate = 1;
+
+		if(this.soundVolumeRate) {
+			_volumeRate *= this.soundVolumeRate;
+			delete this.soundVolumeRate;
+		}
+
 		if(_sf.skipUnseen && this.unseen) {
 			this.soundPlaying = undefined;
 			return;
 		}
+		_volumeRate = _volumeRate * (getRandomValue2(92,104) / 100);
 		let _sound = await PlaySound({
 			reset: _sf.reset,
 			key: (!this.main ? this.name.toLowerCase() : this.class) + 
 			(typeof _sf === 'string' ? _sf : (_sf?.key ?? this.animation)),
 			volume:_sf.volume,
-			speed: _sf.speed,
+			volumeRate: _volumeRate,
+			speed: (_sf?.speed ?? 1) * (getRandomValue2(95,105) / 100),
 			owner: this,
 			bind: _sf.bind
 		}, [_sf?.key ??_sf], 1);
+
 		if (_sound && _sf.bind)
 			_anima.sound = _sound;
-		if(_sound && !this.main && _sf.range) {
+		if(_sound && !this.main/* && _sf.range*/) {
+
 			if(_sound.startVolume === undefined)
 				_sound.startVolume = _sound.volume;
-			const _r = this.getRangeBetween(mainCharacter);
-			if(_r > 99)
-				_sound.volume = 0;
-			else
-				_sound.volume = _sound.startVolume * (1 - (_r / 100));
+
+			const r = this.getRangeBetween(mainCharacter);
+			const MAX_RANGE = 100;
+			const minAudible = 0.05;
+
+			// VOLUME (range bazlı)
+			let volume = _sound.startVolume * (1 - (r / MAX_RANGE));
+			volume = Math.max(volume, minAudible);
+			_sound.volume = volume;
+
+			// PAN (ekran referanslı)
+			const dx = this.ORIGINLEFT - mainCharacter.ORIGINLEFT;
+
+			// ekran genişliğinin yarısı ideal referans
+			const maxPanDistance = episode.cWidth / 2;
+
+			let pan = dx / maxPanDistance;
+			pan = Math.max(-1, Math.min(1, pan));
+
+			// uzaklaştıkça stereo etkisi azalır
+			const normalizedRange = Math.min(r / MAX_RANGE, 1);
+			pan *= (1 - normalizedRange);
+
+			// yön bias (çok hafif)
+			if (this.direction === __left)  pan -= 0.05;
+			if (this.direction === __right) pan += 0.05;
+
+			if(pan < 0.05 && pan > -0.05) pan = 0;
+
+			if(_sound.pannerNode)
+				_sound.pannerNode.pan.value = pan;
 		}
+
 		if(!_sound)
 			this.soundPlaying = undefined;
 	}
+
 	this.checkCommonSkills = function() {
 		let _active;
 		if(!this.lastCommonSkillUsed || (_gameTick - this.lastCommonSkillUsed) > 2000)
@@ -1503,9 +1577,9 @@ function enemy(_e) {
 			this.checkActions();
 		this.start++;
 		let _anima = this.getCurrentAnimation();
-		if(this.isDead() && !this.remove && !this.finishing && !this.attackingOnlyBy && !_anima.interactive 
+		if(this.isDead() && !episode.fatality && !this.remove && !this.finishing && !this.attackingOnlyBy && !_anima.interactive 
 			&& !this.animation.startsWith('dead') && !this.animation.startsWith('knockback')){
-			if(this.hurting && this.class !== 'object') {
+			if(this.hurting && this.class !== 'object' && !this.phased && !this.still) {
 				delete this.hurting;
 				this.laying = true;
 				_anima.next = 'dead';
@@ -1522,13 +1596,23 @@ function enemy(_e) {
 						this.frame = _anima.frames.length - 1;
 					_anima.frames[0].color = _anima.frames[1].color = 
 					this.skinColor = this.hurtColor = (this.chargeDead ? '#FFFFFF' : '#7C3030');
+					this.hitStop = 6;
+					if(!this.knockDead)
+						PlaySound({key:'deadeffect1'});
 				}
 				if(this.hurting?.hit)
 					delete this.hurting.hit;
-				if(!this.chargeDead)
+				const _alphaFrame = this.animations?.dead?.frames?.[2];
+				if(_alphaFrame && !_alphaFrame.objects)
+					_alphaFrame.objects = [{key: 'sparks', position: 'under-feet', speed:2, scale: 1.8, yGap:50}];
+				if(!this.chargeDead){
 					setTimeout(() => {
-						this.addObject({ key: 'hit2', position: 'middle' });	
-					}, getRandomValue2(1,3) * 50);
+						try{
+							this.addObject({ key: 'hit2v3', position: 'middle', scale:1.2 });
+							this.addObject({ key: 'death', position: 'middle' });	
+						}catch(cex){}
+					}, getRandomValue2(1,3) * (this.animation.startsWith('hurtair') ? 150 : 50));
+				}
 				this.extraStepXRate = 0;
 			}
 			else if(!this.laying)
@@ -3021,7 +3105,7 @@ function enemy(_e) {
 		const _h = MathRound((_frame.spriteHeight + MathAbs(bottomGap)) * zoom);
 		if(_h !== this.HEIGHT)
 			this.HEIGHT = _h;
-		let stepY = this.extraStepYRate ? MathRound(this.extraStepYRate * (episode.cHeight / 100)) : 0;
+		let stepY = this.extraStepYRate && !this.stop ? MathRound(this.extraStepYRate * (episode.cHeight / 100)) : 0;
 		const _t = MathRound((episode.cHeight - this.yPosition - this.HEIGHT)) - stepY;
 		if(_t !== this.TOP)
 			this.TOP = _t;
@@ -3799,7 +3883,7 @@ function enemy(_e) {
 			_enemies = _knocker.finishTarget ? [_knocker.finishTarget] : episode.getAvailableEnemies(_knocker)?.filter(x => x.attacker === _knocker || x.pushingBy === _knocker);
 		if (_enemies?.[0])
 			for (var _e of _enemies) {
-				if (_e.dead || (_e.knockbacking && _e.dying) || _e.noCC || _e.autoAttacking)
+				if (_e.dead || (_e.knockbacking && _e.dying) || _e.noCC || _e.autoAttacking || _e.still)
 					continue;
 				const _enemyFrame = _e.getCurrentFrame();
 				if(_enemyFrame.def?.iframe)
@@ -3826,6 +3910,8 @@ function enemy(_e) {
 				}
 				const _step = MathCeil((_push * ((_f.speed - (_knocker.realTime ? 1 : _knocker.start)) / _f.speed)) / 100);
 				if (_step) {
+					if(!_e.pushback && _e.bleed)
+						PlaySound({key:'bonecrack', volume:1});
 					_e.pushingBy = _knocker;
 					_e.pushback = true;
 					const _eo = _e.SCREENLEFT;
@@ -3930,7 +4016,8 @@ function enemy(_e) {
 				if(((_finishAnima.minRange??0) > _close.range) 
 					|| ((_finishAnima.maxRange??30) < _close.range))
 				{
-					
+					if(episode?.fatalityAvailable)
+						addClass(_finishingMove, 'v-none');
 				}
 				else {
 					this.upcomingFinishingMove = _f;
@@ -4196,6 +4283,7 @@ function enemy(_e) {
 								_e.killingBy = _t.key;
 						}
 						if(_f.atk.hurt.smash && _e.isSmashable()) {
+							_e.smasher = _t.owner ?? _t;
 							if(!_e.animations.hurtfeet)
 								_e.animations.hurtfeet = new animation(_f.atk.hurt.burn ? createHurtFeetAndBurn(_e.zoom) : (_f.atk.hurt.knockback ? createHurtFeetWithKnockback(_e.zoom, _e.bloodColor, _f.atk.hurt.knockback) : createHurtFeet(_e.zoom, _e.bloodColor, null, _f.bottomGap, _f.atk.type)));
 							_e.animate('hurtfeet', 1);
@@ -4346,6 +4434,8 @@ function enemy(_e) {
 											_animateSkill = _e.airHurtKeys[getRandomValue2(0, _e.airHurtKeys.length - 1)];
 										if(_t.animations[_t.animation].uncounterable)
 											_e.noCounter = 1;
+										if(_f.atk.hurt?.airFlow)
+											_e.airFlow = _f.atk.hurt.airFlow; 
 										_e.animate(_animateSkill);
 										_e.addObject({
 											position: 'css',
@@ -4353,6 +4443,25 @@ function enemy(_e) {
 											p1: _t.direction,
 											p2: (_t.criticalHit ? 1 : 0) + _f.atk.rate
 										});
+										// if(_t.class !== __spell){
+										// 	let distortMS;
+										// 	if(_f.atk.rate < 1)
+										// 		distortMS = 80;
+										// 	else if(_f.atk.rate <=2)
+										// 		distortMS = 100;
+										// 	else
+										// 		distortMS = 120;
+										// 	_e.addObject({
+										// 		position:'canvas',
+										// 		key:'distortion',
+										// 		p1: {
+										// 			after:true,
+										// 			rX: MathRound(episode.cWidth / (getRandomValue2(80,100) / 10)),
+										// 			rY: MathRound(episode.cWidth / (getRandomValue2(80,100) / 10)),
+										// 			ms:distortMS
+										// 		}
+										// 	});
+										// }
 										//Enemy cced
 										if(_e.alp) {
 											const _pstv = _e.getTalentValue('passive-stun');
@@ -4376,8 +4485,8 @@ function enemy(_e) {
 							_e.hurting.count = _e.hurtColor ? ((_f.atk.type === 'fire' || _f.atk.type === 'ice' || _f.atk.type === 'toxic') ? 3 : 4) : 3; // _e.getCurrentFrame().speed;
 							if(_e.size === 'big')
 								_e.hurting.count = MathCeil(_e.hurting.count / 2);
-							const _charged = _t.charging || ((_gameTick - _t.chargeStarted) < 999);
-							if(_charged){
+							const _charged = _anima.chargeDistance && (_t.charging || ((_gameTick - _t.chargeStarted) < 999));
+							if(_charged && _t.main){
 								_t.addObject({ key: 'impact', position: 'css', p2: _t.direction });
 								_t.talk();
 							}
@@ -4389,7 +4498,7 @@ function enemy(_e) {
 								removeClass(_gamePad, 'zoom');
 							if (_f.atk.rate) {
 								if(_f.atk.hurt?.hitZoom)
-									_f.hitZoom = _f.atk.hurt.hitZoom;
+									_ef.hitZoom = _f.atk.hurt?.hitZoom;
 								if (!_f.atk.hurt.dead) {
 									let _hasEffect;
 									if ((_t.class === __spell || _t.start <= 1) && (_e.health > 0 && !_e.finishing)) {
@@ -4484,8 +4593,18 @@ function enemy(_e) {
 													s: _tr.socketId,
 													k: _dmg
 												}]);
-											
+											if(_f.atk.hurt?.skipTinyCameraMove)
+												episode.skipTinyCameraMove = _f.atk.hurt.skipTinyCameraMove;
 											_e.decreaseHealth(_dmg, _t.related ?? _t);
+											if(_f.atk.hitZoom)
+												_f.hitZoom = _f.atk.hitZoom;
+											if(_e.main && _critHitTaken && _cced){
+												_e.addObject({
+													position: 'css',
+													key: 'criteffect'
+												});
+												_e.soundVolumeRate = 2;
+											}
 											_e.increaseRage(_f.atk.hitTaken * (_t.criticalHit ? 2 : 1), null, 1);
 											let _canStop = false;
 											if(_t.class !== __spell && !_t.hitStop && (_anima.hitStop || _f.atk.hitStop)) {
@@ -4500,9 +4619,13 @@ function enemy(_e) {
 													_stopAdd = 1;
 												const _stopMe = (_f.atk.hitStop ?? _anima.hitStop) + _stopAdd;
 												if(_e.class !== __spell && !_e.hitStop) {
-													_e.hitStop = 2;
-													_t.hitStop = _stopMe;
-													_canStop = 1;
+													if(!_f.hitStopTime || (_gameTick - _f.hitStopTime) > 500)
+													{
+														_e.hitStop = 2;
+														_t.hitStop = _stopMe;
+														_f.hitStopTime = _gameTick;
+														_canStop = 1;
+													}
 												}
 											}
 											//_e.addObject({key:'hit' + getRandomValue2(1,5), position: 'middle'});
@@ -4512,13 +4635,20 @@ function enemy(_e) {
 											{
 												if((_f.knockback || (_f.push && typeof _f.push === 'number'))) {
 													_e.critDead = _t.criticalHit ? 3: 2;
+													let _knockbacked;
 													if(_hurtType === 'air' && _e.animations.knockbackair){
 														_e.animations.knockbackair.next = 'dead';
 														_e.animate('knockbackair', 1);
+														_knockbacked = 1;
 													}
 													else if(_e.animations.knockbackground){
 														_e.animations.knockbackground.next = 'dead';
 														_e.animate('knockbackground', 1);
+														_knockbacked = 1;
+													}
+													if(_knockbacked) {
+														PlaySound({key:'deadeffect2', volume:.2});
+														_e.knockDead = 1;
 													}
 												}
 											}
@@ -4544,6 +4674,7 @@ function enemy(_e) {
 										if(_e.isDead())
 											_e.chargeDead = 1;
 										PlaySound({key:'chargehit1', reset: true, volume:.4});
+										episode.skipTinyCameraMove = 10;
 									}
 									else if(!_hasEffect && _animateSkill?.startsWith('hurtground')) {
 										setTimeout(() => {
@@ -4582,6 +4713,12 @@ function enemy(_e) {
 									_e.animate('release', 1);
 								else
 									_e.addBuff({ key: 'release', level: 3, ms: 3000 });
+							}
+							if(_e.bleed || _e.bleed == undefined) {
+								if(_f.atk?.hurt?.slam)
+									_e.hurtingStrength = 'slam';
+								else
+									_e.hurtingStrength = _f.atk.rate + (_charged ? 2 : 0);
 							}
 							if (__account.options.gore && _f.atk?.type === 'common' && (_e.bleed || _e.bleed == undefined)) {
 								_e.addObject({
@@ -5023,6 +5160,8 @@ function enemy(_e) {
 			}
 			this.rageCount += (_point ?? 1);
 		}
+		else
+			return;
 		//this.attackedUnitTime = _gameTick - 10;
 		if (!rageSkill)
 			rageSkill = document.getElementById('skill6');
@@ -5069,6 +5208,14 @@ function enemy(_e) {
 			this.rageCount = 0;
 		if (this.main) {
 			const _perc = MathRound(this.rageCount * (100 / this.getMaxRageCount()));
+			if(_perc >= 100){
+				PlaySound({key:'ultiactive', volume:.5});
+				addClass(rageSkill, 'skill-pulse');
+				rageSkill.onanimationend = function(e) {
+					if(e.animationName === 'skillPulse')
+						removeClass(rageSkill, 'skill-pulse');
+				}
+			}
 			rageSkill.style.background = (__isPC ? '' : 'radial-gradient(transparent, transparent, #00000080, transparent, transparent), ') + 'url(./images/main/skill-icons/air2.png), linear-gradient(0deg, ' + (_perc < 100 ? '#A42A04':'#FF2020') + ' ' + _perc + '%, black 0%)';
 		}
 		if (this.rageCount === 0) {
@@ -5097,16 +5244,16 @@ function enemy(_e) {
 			return;
 		const _item = __account.commonInventory[_order - 1];
 		let _renew;
-		if (spells[_item.key]) {
+		const _cs = commonSkills.find(x => x.key === _item.key);
+		if(_cs?.do) {
+			if(_cs.do(this))
+				_renew = 1;
+			else
+				return;
+		}
+		else if (spells[_item.key]) {
 			if (this.throwSpell({ spell: _item }))
 				_renew = 1;
-		}
-		else {
-			const _cs = commonSkills.find(x => x.key === _item.key);
-			if(_cs?.do) {
-				if(_cs.do(this))
-					_renew = 1;
-			}
 		}
 		if(_renew) {
 			__account.commonInventory.splice(_order - 1, 1);
@@ -5179,7 +5326,7 @@ function enemy(_e) {
 								_parent.lastFreq = _gameTick;
 							}
 						}
-						if(_parent.freqCount > 3)
+						if(_parent.freqCount > __maxFreqCount)
 							return false;
 					//}
 					//this.lastSpellTakenKey = _parentKey;
@@ -5221,6 +5368,7 @@ function enemy(_e) {
 			else
 				_spell.top = episode.cHeight - (_enemy ?? this).yPosition - ((_enemy ?? this).ZOOM * ((_enemy ?? this).yGap)) - (_enemy ?? this).HEIGHT;
 			const _en = new enemy(_spell);
+			_en.spellKey = _sp.key;
 			if(_sp.harmless)
 				_en.harmless = true;
 			if (_spell.push)
@@ -5278,6 +5426,13 @@ function enemy(_e) {
 		}
 		return false;
 	}
+	this.getObjectXGap = function(_clone, _o) {
+		let XGAP = _o.xGap;
+		if(_o.xGapMin && _o.xGapMax)
+			XGAP = getRandomValue2(_o.xGapMin, _o.xGapMax);
+		return MathRound((((_clone.width * _clone.zoom) - this.WIDTH) / 2) + (
+				(XGAP ?? 0) * __zoom * (_o.zoom ?? 1)));
+	}
 	this.tryUseRelatedObject = function (_o, _z) {
 		//this.relatedObjects = this.relatedObjects?.filter(x => !x.remove) ?? [];
 		const _obj = relatedObjects?.find(x => x.id === _o.key);
@@ -5300,11 +5455,7 @@ function enemy(_e) {
 				_clone.zoom *= _o.scale;
 			if (_o.yGap)
 				_clone.yGap = _o.yGap * _clone.zoom * __scale;
-			let XGAP = _o.xGap;
-			if(_o.xGapMin && _o.xGapMax)
-				XGAP = getRandomValue2(_o.xGapMin, _o.xGapMax);
-			const _xg = MathRound((((_clone.width * _clone.zoom) - this.WIDTH) / 2) + (
-				/*((this.direction !== this.defaultDirection) ? 1 : 1) * */(XGAP ?? 0) * __zoom * (_o.zoom ?? 1)));
+			const _xg = this.getObjectXGap(_clone, _o);
 			if(_clone.xGap)
 				_clone.xGap += _xg;
 			else
@@ -5426,6 +5577,14 @@ function enemy(_e) {
 		if(_dif >= 0)
 			this.difficulty = _dif;
 	}
+	this.normalizeZoom = function(_zoom) {
+		if(this.size !== 'big')
+			return _zoom;
+		if(_zoom > 1)
+			return 1 + ((_zoom - 1) / 2);
+		else
+			return 1 - ((1 - _zoom) / 2);
+	}
 	this.render = function (_frame, _queue) {
 		if(this.noDirection && (this.direction !== this.defaultDirection))
 			this.direction = this.defaultDirection;
@@ -5442,7 +5601,7 @@ function enemy(_e) {
 		const _fps = this.getFps();
 		if (_fps > 1 && !this.animations[this.animation].hurt)
 			_speedRate /= _fps;
-		this.extraStepYRate = (this.extraStepYRate ?? 0) + (_speedRate * (_frame.extraStepYRate ?? 0));
+		this.extraStepYRate = this.stop ? 0 : (this.extraStepYRate ?? 0) + (_speedRate * (_frame.extraStepYRate ?? 0));
 		let _stepY = this.puppetMode ? 0 : MathRound(this.extraStepYRate * (episode.cHeight / 100));
 		const _solidity = this.isRunningAgainstSolidObject();
 		if (!_anima) {
@@ -5530,8 +5689,11 @@ function enemy(_e) {
 					for (var _o of _frame.objects)
 						if (!_o.hurt)
 							this.addObject(_o);
+				let _particleColor;
 				if (!this.release && this.attacker) {
-					const _objects = this.attacker.getCurrentFrame().atk?.hurt?.objects;
+					const _ah = this.attacker.getCurrentFrame().atk?.hurt;
+					const _objects = _ah?.objects;
+					_particleColor = _ah?.particleColor;
 					if (_objects)
 						_objects.forEach(x => {
 							if (x.crit && this.attacker.criticalHit && this.main)
@@ -5550,13 +5712,16 @@ function enemy(_e) {
 					if(_hs === 1)
 						_hs = 2;
 					let _zoom = _frame.hitZoom;
-					if(_zoom)
+					if(_zoom) {
+						_zoom = this.normalizeZoom(_zoom);
 						_zoom *= (_frame.zoom ?? _anima.zoom ?? 1);
+					}
 					else
 						_zoom = (_frame.zoom ?? _anima.zoom);
 					if (this.drawHalf || _cut) { // && (_cutX || _cutY)) {
 						_queue.push({
 							skinColor: this.freeze ? '#a2d2df70' : _frame.color,
+							particleColor: _particleColor,
 							drawPriority: this.drawPriority,
 							sprite: _frame.sprite ?? (_anima.sprite ?? this.sprite),
 							spriteX: _frame.spriteLeft,
@@ -5574,7 +5739,7 @@ function enemy(_e) {
 							reversed: _reversed,
 							border: _frame.border,
 							frameKey: _frame.frameKey,
-							objects: this.stop ? [] : this.relatedObjects,
+							objects: this.stop ? this.relatedObjects?.filter(x => x.totalFrames === 1) ?? [] : this.relatedObjects,
 							char: this,
 							animation: this.animation
 						});
@@ -5591,6 +5756,7 @@ function enemy(_e) {
 						}
 						_queue.push({
 							skinColor: this.freeze ? '#a2d2df70' : _frame.color,
+							particleColor: _particleColor,
 							drawPriority: .5,
 							sprite: _frame.sprite ?? (_anima.sprite ?? this.sprite),
 							spriteX: _frame.spriteLeft,
@@ -5614,6 +5780,7 @@ function enemy(_e) {
 					else
 						_queue.push({
 							skinColor: this.freeze ? '#a2d2df70' : _frame.color,
+							particleColor: _particleColor,
 							drawPriority: this.drawPriority,
 							sprite: _frame.sprite ?? (_anima.sprite ?? this.sprite),
 							spriteX: _frame.spriteLeft,
@@ -5631,7 +5798,7 @@ function enemy(_e) {
 							reversed: _reversed,
 							border: _frame.border,
 							frameKey: _frame.frameKey,
-							objects: this.stop ? [] : this.relatedObjects,
+							objects: this.stop ? this.relatedObjects?.filter(x => x.totalFrames === 1) ?? [] : this.relatedObjects,
 							char: this,
 							animation: this.animation
 						});
@@ -5643,8 +5810,11 @@ function enemy(_e) {
 		}
 		if(this.solid)
 			this.centerSolid = this.getCenterSolid();
-		if(_frame.hitZoom)
-			delete _frame.hitZoom;
+		if(_frame.hitZoom) {
+			_frame.hitZoom -= 0.025;
+			if(_frame.hitZoom <= 1)
+				delete _frame.hitZoom;
+		}
 	}
 	this.getCenterSolid = function() {
 		let _top = this.TOP;
@@ -6799,14 +6969,29 @@ function enemy(_e) {
 		else if(this.direction === __right && _lm > _la)
 			this.direction = __left;
 	}
-	this.randomAirCoords = function(anima) {
+	this.randomAirCoords = function(anima , _rate) {
 		const _coords = getRandomAirCoords();
 		const _frames = anima.frames;
+		const _len = _coords.length;
+		_rate = _rate ? getRandomValue2(100, _rate * 110) / 100 : 1;
+		const _xRate = _rate / 100;
 		let j = 0;
-		for(var i = 0; i < _coords.length; i++)
-			_frames[++j].bottomGap = _coords[i];
-		for(var i = _coords.length - 1; i >= 0; i--)
-			_frames[++j].bottomGap = _coords[i];
+		for(var i = 0; i < _len; i++){
+			_frames[j].bottomGap = _coords[i] * _rate;
+			if(_rate > 1)
+				_frames[j].extraStepXRate = -_xRate * (j + 1);
+			else
+				delete _frames[j].extraStepXRate;
+			j++;
+		}
+		for(var i = _len - 1; i >= 0; i--){
+			_frames[j].bottomGap = _coords[i] * _rate;
+			if(_rate > 1)
+				_frames[j].extraStepXRate = -_xRate * (j + 1);
+			else
+				delete _frames[j].extraStepXRate;
+			j++;
+		}
 	}
 	this.animate = function (_skill, _force, _dontResetFrame, num) {
 		if(this.puppetMode && _skill === 'walk')
@@ -6915,8 +7100,10 @@ function enemy(_e) {
 			if(!anima)
 				return undefined;
 		}
-		else if(this.randomizeAirCoords && this.animation?.startsWith('hurtair')) {
-			this.randomAirCoords(anima);
+		else if((this.randomizeAirCoords || this.airFlow) && this.animation?.startsWith('hurtair')) {
+			this.randomAirCoords(anima, this.airFlow);
+			if(this.airFlow)
+				delete this.airFlow;
 		}
 		else if(this.skinable && this.animation.startsWith('dead'))  {
 			const _i = anima.frames.findIndex(x => x.alpha);
@@ -6983,8 +7170,14 @@ function enemy(_e) {
 				this.keyboard.removeSkill?.(_skill);
 		if(anima.maxRepeat)
 			anima.repeat = anima.maxRepeat;
-		if (!anima.hurt)
+		if (!anima.hurt){
 			this.attacker = undefined;
+			if(this.main && __story.startTime && !episode.endTime && anima.attack && anima.coolDownLeft > 0)
+			{
+				if(!episode.usedSkill)
+					episode.usedSkill = 1;
+			}
+		}
 		if (!anima.interactive)
 			this.attackingOnlyBy = undefined;
 		if (anima.finishingMove && !this.isInFinishingMove()) {
@@ -7686,7 +7879,7 @@ function enemy(_e) {
 		_attacker.invulnerable = true;
 		_attacker.dead = _attacker.remove = _attacker.dying = undefined;
 		_attacker.lookAtEnemy(this);
-		_attacker.fatalityOnlyTarget = this.key;
+		_attacker.fatalityOnlyTarget = _attacker.onlyTarget = this.key;
 	}
 	this.equalizeHeights = function(_a){
 		if(_a.frames)

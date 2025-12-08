@@ -7225,8 +7225,10 @@ function enemy(_e) {
 		this.standBy();
 	}
 	this.enterFinishState = function(_attacker){
+		console.log('ATTACKER = ' + _attacker?.id);
 		if(!this.animations.hurtground1 || !_attacker)
 			return;
+		console.log('FATALİTY');
 		episode.fatality = true;
 		this.stopRage();
 		if(this.animations.hurtstun) {

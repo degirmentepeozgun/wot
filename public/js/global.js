@@ -1564,7 +1564,8 @@ const commonSkills = [
 	{ key: 'corpseexplode', 
 		do: function(_char) {
 			const _corpses = episode.seenEnemies.filter(x => x !== _char && x.isDead()
-			&& x.class !== __spell && !x.finishingBy && !x.owner && !x.related && x.class !== 'object' && !x.corpseExploding);
+			&& x.class !== __spell && !x.finishingBy && !x.owner && !x.related && 
+			x.class !== 'object' && !x.corpseExploding);
 			let _used;
 			if(_corpses?.[0])
 			{
@@ -1572,7 +1573,7 @@ const commonSkills = [
 				{
 					if(x.animation === 'dead')
 					{
-						_char.throwSpell({spell:{key:'corpseexplotion'}}, null, x);
+						_char.throwSpell({spell:{key:'corpseexplode'}}, null, x);
 						x.corpseExploding = x.invisible = 1;
 						if(!_used)
 							_used = 1;
@@ -1975,8 +1976,12 @@ const relatedObjects = [
 		totalFrames: 5, speed: 12, still: true, singleton: true, reversed: true
 	},
 	{
+		id: 'disease', key: 'disease', width: 75, height: 75, col: 5,
+		zoom: 2.4, totalFrames: 10, speed: 4, singleton: true, stillOnChar: true
+	},
+	{
 		id: 'burn', key: 'burn', width: 90, height: 90, zoom: 1,
-		totalFrames: 10, col: 5, speed: 6, singleton: true
+		totalFrames: 10, col: 5, speed: 6, singleton: true, stillOnChar: true
 	},
 	{
 		id: 'weakness', key: 'weakness', width: 64, height: 64, zoom: 1,
@@ -2014,10 +2019,6 @@ const relatedObjects = [
 	{
 		id: 'hurtdead2blood', key: 'hurtdead2blood', width: 98, height: 78,
 		zoom: 2, totalFrames: 5, speed: 6, singleton: true, still: true
-	},
-	{
-		id: 'disease', key: 'disease', width: 75, height: 75, col: 5,
-		zoom: 2.4, totalFrames: 10, speed: 4, singleton: true
 	},
 	{
 		id: 'ring', key: 'ring', width: 258, height: 50, col: 1,
@@ -2216,6 +2217,14 @@ const relatedObjects = [
 		totalFrames: 10, speed: 4, skip:2, singleton: true, still: true
 	},
 	{
+		id: 'hit2v3', key: 'hit2v3', width: 100, height: 100, zoom: 2, limit:5, col:5,
+		totalFrames: 10, speed: 4, skip:2, singleton: true, still: true
+	},
+	{
+		id: 'hit2v4', key: 'hit2v4', width: 100, height: 100, zoom: 2, limit:5, col:5,
+		totalFrames: 10, speed: 4, skip:2, singleton: true, still: true
+	},
+	{
 		id: 'hit3', key: 'hit3', width: 192, height: 192, zoom: 1, limit:5, col:5,
 		totalFrames: 15, speed: 4, singleton: true, still: true
 	},
@@ -2300,9 +2309,24 @@ const relatedObjects = [
 		totalFrames: 14, speed: 3, frame: 2, skip:2, singleton: true, still: true
 	},
 	{
+		id: 'sparks', key: 'sparks',
+		width: 64, height: 64, col:1, zoom: 1,
+		totalFrames: 11, speed: 2, singleton: true, still: true
+	},
+	{
 		id: 'energy', key: 'energy',
 		width: 100, height: 100, col:4, zoom: 2, type: 'hurt',
 		totalFrames: 8, speed: 3, singleton: true
+	},
+	{
+		id: 'energy2', key: 'energy2',
+		width: 128, height: 128, col:4, zoom: 2,
+		totalFrames: 16, skip:2, speed: 3, singleton: true
+	},
+	{
+		id: 'energy3', key: 'energy3',
+		width: 32, height: 32, col:9, zoom:3,
+		totalFrames: 9, speed: 3, singleton: true
 	},
 	{
 		id: 'bloodsplat', key: 'bloodsplat',
@@ -2313,6 +2337,16 @@ const relatedObjects = [
 		id: 'bloodsplat2', key: 'bloodsplat2',
 		width: 200, height: 200, col:4, zoom: 1.5,
 		totalFrames: 10, speed: 3, singleton: true, still: true
+	},
+	{
+		id: 'death', key: 'death',
+		width: 256, height: 256, col:6, zoom: .8,
+		totalFrames: 24, speed: 3, skip:2, singleton: true, still: true
+	},
+	{
+		id: 'throw', key: 'throw',
+		width: 140, height: 31, col:1, zoom: 1.2,
+		totalFrames: 6, speed: 4, singleton: true, still: true
 	}
 ];
 function setRelatedObjectSpeed() {
@@ -2322,6 +2356,21 @@ function setRelatedObjectSpeed() {
 }
 setRelatedObjectSpeed();
 const relatedObjectImages = {
+	throw: function () {
+		return getImage('./images/related/throwdarker.png')
+	},
+	sparks: function () {
+		return getImage('./images/related/sparks.png')
+	},
+	death: function () {
+		return getImage('./images/related/death.png')
+	},
+	energy3: function () {
+		return getImage('./images/related/energy4.png')
+	},
+	energy2: function () {
+		return getImage('./images/related/energy3.png')
+	},
 	energy: function () {
 		return getImage('./images/related/energy.png')
 	},
@@ -2393,6 +2442,12 @@ const relatedObjectImages = {
 	},
 	hit2: function () {
 		return getImage('./images/related/hit2v2.png')
+	},
+	hit2v3: function () {
+		return getImage('./images/related/hit2v3.png')
+	},
+	hit2v4: function () {
+		return getImage('./images/related/hit2v4.png')
 	},
 	hit3: function () {
 		return getImage('./images/related/hit_3.png')
@@ -2840,6 +2895,26 @@ const __artifacts = [
 ];
 const misc = [
 	{ 
+		titles: { en: 'Gem Selection Ticket', tr: 'Yakut Seçme Bileti' },
+		cost: 100,
+		type:'ticket-gem-selection', 
+		graded: true,
+		descriptions: { 
+			en: 'Choose the gem type you want. Maximum grade of gem depends on your account grade',
+			tr: 'Listeden istediğiniz bir yakutu seçebilirsiniz. Yakut seviyesi hesap seviyenize oranla değişiklik gösterebilir'
+		},
+		do: function(_type, _grade) {
+			let _level = _grade;
+			if(!_level) {
+				_level = 1;
+				const _maxLevel = MathFloor(mainCharacter.level / 10) + 1;
+				if(_maxLevel > _level)
+					_level = getRandomValue(_level, _maxLevel);
+			}
+			useGemSelectionTicket(_level);
+		}
+	},
+	{ 
 		titles: { en: 'Item Selection Ticket', tr: 'Ekipman Seçme Bileti' },
 		cost: 100,
 		type:'ticket-item-selection', 
@@ -2972,7 +3047,27 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	hiaaa: './images/sounds/hia.mp3',
+	bonusactive: './images/sounds/bonus-active.mp3',
+	bonusdone: './images/sounds/bonus-done.mp3',
+	bonecrack: './images/sounds/bonecrack.mp3',
+	root1: './images/sounds/root1.mp3',
+	root2: './images/sounds/root2.mp3',
+	root3: './images/sounds/root3.mp3',
+	root4: './images/sounds/root4.mp3',
+	root5: './images/sounds/root5.mp3',
+	toygarhurt1: './images/sounds/toygarhurt1.mp3',
+	toygarhurt2: './images/sounds/toygarhurt2.mp3',
+	toygarhurt3: './images/sounds/toygarhurt3.mp3',
+	toygarhurt4: './images/sounds/toygarhurt4.mp3',
+	toygarhurt5: './images/sounds/toygarhurt5.mp3',
+	toygarhurt6: './images/sounds/toygarhurt6.mp3',
+	toygarhurt7: './images/sounds/toygarhurt7.mp3',
+	deadeffect1: './images/sounds/deadeffect1.mp3',
+	deadeffect2: './images/sounds/deadeffect2.mp3',
+	ultiactive: './images/sounds/ulti-active.mp3?v=2',
 	dzztshort: './images/sounds/dzzt-short.mp3',
+	keyboard: './images/sounds/keyboard.mp3',
 	chargehit1: './images/sounds/charge-hit1.mp3',
 	chargehit2: './images/sounds/charge-hit2.mp3',
 	chargepower: './images/sounds/chargepower5.mp3',
@@ -3185,7 +3280,14 @@ const soundFiles = {
 	shamanhurt5: './images/sounds/shaman-hurt5.mp3',
 	shamanhurt6: './images/sounds/shaman-hurt6.mp3',
 	shamanhurt7: './images/sounds/shaman-hurt7.mp3',
+	shamanhurtv31: './images/sounds/shamanhurtv31.mp3',
+	shamanhurtv32: './images/sounds/shamanhurtv32.mp3',
+	shamanhurtv33: './images/sounds/shamanhurtv33.mp3',
+	shamanhurtv34: './images/sounds/shamanhurtv34.mp3',
+	shamanhurtv35: './images/sounds/shamanhurtv35.mp3',
+	shamanhurtv36: './images/sounds/shamanhurtv36.mp3',
 	shamanrelease: './images/sounds/shaman-release.mp3',
+	shamanulti: './images/sounds/shamanulti.mp3',
 	slimehurt: './images/sounds/slime-hurt.mp3',
 	slimedead: './images/sounds/slime-dead.mp3',
 	firespray: './images/sounds/firespray.wav',
@@ -3194,6 +3296,9 @@ const soundFiles = {
 	dummyhurt: './images/sounds/dummy-hurt.mp3',
 	ballthrow: './images/sounds/ball-swoosh.mp3',
 	ballhit: './images/sounds/ball-hit.mp3',
+	wolfhurt1: './images/sounds/wolfhurt1.mp3',
+	wolfhurt2: './images/sounds/wolfhurt2.mp3',
+	wolfhurt3: './images/sounds/wolfhurt3.mp3',
 	werewolfcounter: './images/sounds/werewolf-counter.mp3?v=3',
 	werewolfrelease: './images/sounds/werewolf-release.mp3',
 	werewolfattack: './images/sounds/werewolf-attack.mp3',
@@ -3204,6 +3309,8 @@ const soundFiles = {
 	ratdead: './images/sounds/rat-dead.mp3',
 	ratattack: './images/sounds/rat-attack.mp3',
 	rathurt: './images/sounds/rat-hurt.mp3',
+	rathurt2: './images/sounds/rathurt2.mp3',
+	rathurt3: './images/sounds/rathurt3.mp3',
 	howl: './images/sounds/howl.mp3',
 	shield: './images/sounds/shield.mp3',
 	reflect: './images/sounds/reflect.mp3',
@@ -3222,6 +3329,11 @@ const soundFiles = {
 	turnipattack: './images/sounds/turnip-attack.mp3',
 	skeletondead: './images/sounds/seeker-dead.mp3',
 	zombiehurt: './images/sounds/zombie-hurt.mp3',
+	zombiehurt1: './images/sounds/zombiehurt1.mp3',
+	zombiehurt2: './images/sounds/zombiehurt2.mp3',
+	zombiehurt3: './images/sounds/zombiehurt3.mp3',
+	zombiehurt4: './images/sounds/zombiehurt4.mp3',
+	zombiehurt5: './images/sounds/zombiehurt5.mp3',
 	zombiedead: './images/sounds/zombie-dead.mp3',
 	zombieattack: './images/sounds/zombie-attack.mp3',
 	trolldead: './images/sounds/troll-dead.mp3',
@@ -3234,12 +3346,29 @@ const soundFiles = {
 	murlockdead: './images/sounds/murlock-dead.mp3',
 	murlockattack: './images/sounds/murlock-attack.mp3',
 	gnollrelease: './images/sounds/gnoll-release.wav',
-	gnollhurt: './images/sounds/gnoll-hurt.wav',
+	gnollhurt1: './images/sounds/gnollhurt1.mp3',
+	gnollhurt2: './images/sounds/gnollhurt2.mp3',
+	gnollhurt3: './images/sounds/gnollhurt3.mp3',
+	gnollhurt4: './images/sounds/gnollhurt4.mp3',
+	gnollhurt5: './images/sounds/gnollhurt5.mp3',
 	gnolldead: './images/sounds/gnoll-dead.wav',
 	gnollattack: './images/sounds/gnoll-attack.mp3',
 	goblinrelease: './images/sounds/goblin-release.mp3',
 	goblinattack: './images/sounds/goblin-attack.mp3',
 	goblinhurt: './images/sounds/goblin-hurt.mp3',
+	goblinhurt1: './images/sounds/goblinhurt1.mp3',
+	goblinhurt2: './images/sounds/goblinhurt2.mp3',
+	goblinhurt3: './images/sounds/goblinhurt3.mp3',
+	goblinhurt4: './images/sounds/goblinhurt4.mp3',
+	goblinhurt5: './images/sounds/goblinhurt5.mp3',
+	goblinhurt6: './images/sounds/goblinhurt6.mp3',
+	goblinhurt7: './images/sounds/goblinhurt7.mp3',
+	dinohurt1: './images/sounds/dinohurt1.mp3',
+	dinohurt2: './images/sounds/dinohurt2.mp3',
+	dinohurt3: './images/sounds/dinohurt3.mp3',
+	dinohurt4: './images/sounds/dinohurt4.mp3',
+	dinohurt5: './images/sounds/dinohurt5.mp3',
+	dinohurt6: './images/sounds/dinohurt6.mp3',
 	goblindead: './images/sounds/goblin-dead.mp3',
 	puff: './images/sounds/puff.mp3',
 	batrun: './images/sounds/bat-run.mp3',
@@ -3299,6 +3428,9 @@ const soundFiles = {
 	airblock: './images/sounds/block.mp3',
 	skeletonblock: './images/sounds/skeleton-block.mp3',
 	skeletonhurt: './images/sounds/skeleton-hurt.mp3',
+	skeletonhurt2: './images/sounds/skeleton-hurt2.mp3',
+	skeletonhurt3: './images/sounds/skeleton-hurt3.mp3',
+	skeletonhurt4: './images/sounds/skeleton-hurt4.mp3',
 	skeletonattack: './images/sounds/skeleton-attack.mp3',
 	spiderstart: './images/sounds/spider-start.mp3',
 	spiderground1: './images/sounds/spider-ground1.mp3',
@@ -3329,6 +3461,14 @@ const soundFiles = {
 	thiefhurt2: './images/sounds/thief-hurt2.wav',
 	archerhurt1: './images/sounds/archer-hurt1.wav',
 	archerhurt2: './images/sounds/archer-hurt2.wav',
+	alkinhurt1: './images/sounds/alkinhurt1.mp3',
+	alkinhurt2: './images/sounds/alkinhurt2.mp3',
+	alkinhurt3: './images/sounds/alkinhurt3.mp3',
+	karayelhurt1: './images/sounds/karayelhurt1.mp3',
+	karayelhurt2: './images/sounds/karayelhurt2.mp3',
+	karayelhurt3: './images/sounds/karayelhurt3.mp3',
+	karayelhurt4: './images/sounds/karayelhurt4.mp3',
+	karayelhurt5: './images/sounds/karayelhurt5.mp3',
 	mushroomattack: './images/sounds/mushroom-attack.wav',
 	snakeattack: './images/sounds/snake-attack.mp3',
 	icespike: './images/sounds/icespike.mp3',
@@ -3378,12 +3518,15 @@ const soundFiles = {
 	warriorair1: './images/sounds/warrior-air1.mp3?v=2',
 	warriordead: './images/sounds/warrior-dead.mp3?v=2',
 	aduketdead: './images/sounds/aduket-dead.mp3',
-	warriorhurtground1: './images/sounds/warrior-hurt1.mp3?v=2',
-	warriorhurtground2: './images/sounds/warrior-hurt2.mp3',
+	warriorhurtground1: './images/sounds/warriorhurt1.mp3',
+	warriorhurtground2: './images/sounds/warrior-hurt1.mp3',
+	warriorhurtground3: './images/sounds/warriorhurt2.mp3',
 	itbarakyell: './images/sounds/itbyell.mp3',
 	hyenaground2: './images/sounds/hyena-ground2.mp3',
-	hyenahurt: './images/sounds/hyena-hurt.mp3',
-	hyenahurt2: './images/sounds/hyena-hurt5.mp3',
+	hyenahurt1: './images/sounds/hyenahurt1.mp3',
+	hyenahurt2: './images/sounds/hyenahurt2.mp3',
+	hyenahurt3: './images/sounds/hyenahurt3.mp3',
+	hyenahurt4: './images/sounds/hyenahurt4.mp3',
 	hyenadead: './images/sounds/hyena-dead.mp3',
 	hyenadead2: './images/sounds/hyena-dead2.mp3?v=3',
 	teberhurt: './images/sounds/teber-hurt.mp3?v=2',
@@ -5590,14 +5733,14 @@ const mapSprites = [
 ];
 
 const grades = [
-	{ key: 0, color: 'red', hex: '#DC143C' },
-	{ key: 1, color: 'yellow', hex: '#FFD700' },
-	{ key: 2, color: 'green', hex: '#50C878' },
-	{ key: 3, color: 'blue', hex: '#0437F2' },
-	{ key: 4, color: 'orange', hex: '#FF5F15' },
-	{ key: 5, color: 'maroon', hex: '#FF00FF' },
-	{ key: 6, color: 'purple', hex: '#008080' },
-	{ key: 7, color: 'gold', hex: '#E4D00A' }
+	{ key: 0, color: 'red', hex: '#8B0A1A' },
+	{ key: 1, color: 'yellow', hex: '#B59A00' },
+	{ key: 2, color: 'green', hex: '#2D6A3A' },
+	{ key: 3, color: 'blue', hex: '#0A1E6A' },
+	{ key: 4, color: 'orange', hex: '#A83F0F' },
+	{ key: 5, color: 'maroon', hex: '#6A003A' },
+	{ key: 6, color: 'purple', hex: '#3C116A' },
+	{ key: 7, color: 'gold', hex: '#6F5B10' }
 ];
 function getGradeColor(_grade) {
 	return grades.find(x => x.key === _grade)?.color;
@@ -12511,7 +12654,7 @@ const spells = {
 			}
 		}
 	},
-	corpseexplotion: {
+	corpseexplode: {
 		defaultDirection: __right,
 		defaultAnimationKey: 'run',
 		zoom: 4,
@@ -22294,6 +22437,7 @@ const spells = {
 		class: __spell,
 		src: './images/main/warrior/storm2.png',
 		name: 'Hurricane',
+		lightColor: '#00FF0020',
 		animations: {
 			idle: {
 				key: "idle",
@@ -22440,6 +22584,7 @@ const spells = {
 		class: __spell,
 		src: './images/main/warrior/storm.png',
 		name: 'Hurricane',
+		lightColor: '#00FF0020',
 		animations: {
 			idle: {
 				key: "idle",
@@ -27866,11 +28011,14 @@ function checkCSSAnimations() {
 }
 const canvasAnimations =  {
 	glow:function(_char, _params, _canv) {
+		if(_char.glowing && _params.start === undefined)
+			return;
 		if(_params.start === undefined)
 			_params.start = 0;
 		if(!_params.realR)
 			_params.realR = _params.r;
 		_params.start++;
+		_char.glowing = 1;
 		const _l  = _char.SCREENLEFT;
 		const _t = _char.getTop();
 		const _z = _char.getZoom();
@@ -28097,6 +28245,7 @@ const canvasAnimations =  {
 			for (let i = 0; i < _params.sparkLines.length; i++) _params.sparkLines[i] = null;
 			for (let i = 0; i < _params.particles.length; i++) _params.particles[i] = null;
 			episode.enemies?.forEach(x => x.stop = 1);
+			episode.ultimateTimeStop = 1;
 			PlaySound({ key: 'chargepower', volume: 1 });
 		}
 
@@ -28188,6 +28337,7 @@ const canvasAnimations =  {
 				PlaySound({ key: 'ultimate', volume: 1 });
 				_params.sound = true;
 				episode.enemies?.forEach(x => delete x.stop);
+				delete episode.ultimateTimeStop;
 			}
 			ctx.restore();
 			return;
@@ -28277,9 +28427,905 @@ const canvasAnimations =  {
 			_params.particles = [];
 			delete _params.sound;
 		}
+	},
+	// distortion: function(_char, _params, _canv) {
+	// 	const _ms = _params.ms;
+	// 	const _ctx = _canv ?? c10;
+	// 	if(!_ctx?.canvas)
+	// 		return;
+	// 	const _x = _char.ORIGINLEFT;
+	// 	const _y = MathRound(_char.TOP + (_char.HEIGHT / 2));
+	// 	let w, h;
+	// 	try {
+	// 		w = _ctx.canvas.width;
+	// 	 	h = _ctx.canvas.height;
+	// 	}
+	// 	catch(cex) {
+	// 		return;
+	// 	}
+
+	// 	// initialize
+	// 	if (!_params.start)
+	// 		_params.start = _gameTick;
+
+	// 	// time check
+	// 	const elapsed = _gameTick - _params.start;
+	// 	if (elapsed >= _params.ms) {
+	// 		_char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortion');
+	// 		return;
+	// 	}
+
+	// 	// normalize time 0 → 1
+	// 	const t = elapsed / _params.ms;
+
+	// 	// power from character (opsiyonel, sende ne varsa kullan)
+	// 	const baseRadius = /*anim.p1 ? anim.p1.power * 2 : */80;
+
+	// 	const currentRadius = baseRadius * (1 + t * 1.3);
+	// 	const amount = 0.15 * (1 - t);
+
+	// 	const src = _ctx.getImageData(0, 0, w, h);
+	// 	const dst = _ctx.createImageData(w, h);
+
+	// 	const sData = src.data;
+	// 	const dData = dst.data;
+
+	// 	const cx = _x;
+	// 	const cy = _y;
+	// 	const cr2 = currentRadius * currentRadius;
+
+	// 	// PER TICK distortion warp
+	// 	for (let y = 0; y < h; y++) {
+	// 		for (let x = 0; x < w; x++) {
+
+	// 			const dx = x - cx;
+	// 			const dy = y - cy;
+	// 			const dist2 = dx*dx + dy*dy;
+
+	// 			let ox = x;
+	// 			let oy = y;
+
+	// 			if (dist2 < cr2) {
+	// 				const d = Math.sqrt(dist2);
+	// 				const f = (currentRadius - d) / currentRadius;
+	// 				const bend = Math.sin((d / currentRadius) * Math.PI) * amount;
+	// 				ox = x + (dx / d) * bend * currentRadius;
+	// 				oy = y + (dy / d) * bend * currentRadius;
+	// 			}
+
+	// 			const sx = ox|0;
+	// 			const sy = oy|0;
+
+	// 			const sI = (sy * w + sx) * 4;
+	// 			const dI = (y * w + x) * 4;
+
+	// 			if (sx >= 0 && sy >= 0 && sx < w && sy < h) {
+	// 				dData[dI]   = sData[sI];
+	// 				dData[dI+1] = sData[sI+1];
+	// 				dData[dI+2] = sData[sI+2];
+	// 				dData[dI+3] = sData[sI+3];
+	// 			} else {
+	// 				dData[dI+3] = 0;
+	// 			}
+	// 		}
+	// 	}
+
+	// 	_ctx.putImageData(dst, 0, 0);
+	// }
+// distortion: function(_char, _params, _canv) {
+// 	const _ms = _params.ms;
+//     const _ctx = _canv ?? c10;
+//     if(!_ctx?.canvas) return;
+
+//     const _x = _char.ORIGINLEFT;
+//     const _y = MathRound(_char.TOP + (_char.HEIGHT / 2));
+
+// 	let w, h;
+// 	try {
+// 		w = _ctx.canvas.width;
+// 		h = _ctx.canvas.height;
+// 	} catch {
+// 		return;
+// 	}
+
+// 	// initialize
+// 	if (!_params.start)
+// 		_params.start = _gameTick;
+
+// 	// time check
+// 	const elapsed = _gameTick - _params.start;
+// 	if (elapsed >= _params.ms) {
+// 		_char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortion');
+// 		return;
+// 	}
+
+// 	// normalize time 0 → 1
+// 	const t = elapsed / _params.ms;
+
+// 	// base shock radius (opsiyonel power)
+// 	const baseRadius = MathRound(episode.cWidth / 10);  
+// 	const currentRadius = baseRadius * (1 + t * 1.3);
+// 	const amount = 0.15 * (1 - t);
+
+// 	// ---- BOUNDING BOX OPTIMIZATION ----
+// 	const minX = Math.max(0, Math.floor(_x - currentRadius));
+// 	const maxX = Math.min(w - 1, Math.ceil(_x + currentRadius));
+// 	const minY = Math.max(0, Math.floor(_y - currentRadius));
+// 	const maxY = Math.min(h - 1, Math.ceil(_y + currentRadius));
+
+// 	const boxW = maxX - minX + 1;
+// 	const boxH = maxY - minY + 1;
+
+// 	// sadece gerekli alanı alıyoruz
+// 	const src = _ctx.getImageData(minX, minY, boxW, boxH);
+// 	const dst = _ctx.createImageData(boxW, boxH);
+
+// 	const sData = src.data;
+// 	const dData = dst.data;
+
+// 	const cx = _x - minX;
+// 	const cy = _y - minY;
+// 	const cr2 = currentRadius * currentRadius;
+
+// 	// sadece dar alan içinde warp
+// 	for (let y = 0; y < boxH; y++) {
+// 		for (let x = 0; x < boxW; x++) {
+
+// 			const dx = x - cx;
+// 			const dy = y - cy;
+// 			const dist2 = dx*dx + dy*dy;
+
+// 			let ox = x;
+// 			let oy = y;
+
+// 			if (dist2 < cr2) {
+// 				const d = Math.sqrt(dist2);
+// 				const bend = Math.sin((d / currentRadius) * Math.PI) * amount;
+// 				ox = x + (dx / d) * bend * currentRadius;
+// 				oy = y + (dy / d) * bend * currentRadius;
+// 			}
+
+// 			const sx = ox|0;
+// 			const sy = oy|0;
+
+// 			const sI = (sy * boxW + sx) * 4;
+// 			const dI = (y * boxW + x) * 4;
+
+// 			if (sx >= 0 && sy >= 0 && sx < boxW && sy < boxH) {
+// 				dData[dI]   = sData[sI];
+// 				dData[dI+1] = sData[sI+1];
+// 				dData[dI+2] = sData[sI+2];
+// 				dData[dI+3] = sData[sI+3];
+// 			} else {
+// 				dData[dI+3] = 0;
+// 			}
+// 		}
+// 	}
+
+// 	_ctx.putImageData(dst, minX, minY);
+// }
+// distortionhit: function(_char, _params, _canv) {
+// 	if(episode.distorting && episode.distorting !== _char.key)
+// 	{
+// 		_char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit');
+// 		return;
+// 	}
+//     const _ms = _params.ms;
+//     const _ctx = _canv ?? c10;
+//     if (!_ctx?.canvas) return;
+
+//     const _x = _char.ORIGINLEFT;
+//     const _y = MathRound(_char.TOP + (_char.HEIGHT/2));
+
+//   	let w, h;
+// 	try {
+// 		w = _ctx.canvas.width;
+// 		h = _ctx.canvas.height;
+// 	} catch {
+// 		return;
+// 	}
+// 	episode.distorting = _char.key;
+
+//     if (!_params.start) _params.start = _gameTick;
+//     const elapsed = _gameTick - _params.start;
+//     if (elapsed >= _ms) {
+// 		delete episode.distorting;
+// 		delete _params.start;
+//         _char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit');
+//         return;
+//     }
+
+//     const t = elapsed / _ms;
+
+//     // ----- Radius ayarı -----
+//     const rx = _params.rX ?? MathRound(episode.cWidth/10);
+//     const ry = _params.rY ?? rx;
+//     const currentRadiusX = rx * (1 + t*1.3);
+//     const currentRadiusY = ry * (1 + t*1.3);
+//     const amount = 0.15 * (1 - t);
+
+//     // ---- Bounding box ----
+//     const minX = Math.max(0, (_x - currentRadiusX)|0);
+//     const maxX = Math.min(w-1, (_x + currentRadiusX)|0);
+//     const minY = Math.max(0, (_y - currentRadiusY)|0);
+//     const maxY = Math.min(h-1, (_y + currentRadiusY)|0);
+
+//     const boxW = maxX - minX + 1;
+//     const boxH = maxY - minY + 1;
+
+//     const src = _ctx.getImageData(minX, minY, boxW, boxH);
+//     const dst = _ctx.createImageData(boxW, boxH);
+//     const sData = src.data;
+//     const dData = dst.data;
+
+//     const cx = _x - minX;
+//     const cy = _y - minY;
+
+//     for (let y=0; y<boxH; y++) {
+//         for (let x=0; x<boxW; x++) {
+//             const dx = x - cx;
+//             const dy = y - cy;
+//             const nx = dx / currentRadiusX;
+//             const ny = dy / currentRadiusY;
+//             const dist2 = nx*nx + ny*ny;
+
+//             let ox = x;
+//             let oy = y;
+
+//             if (dist2 < 1) {
+//                 const d = Math.sqrt(dist2) || 1;
+//                 const bend = Math.sin(d * Math.PI) * amount;
+
+//                 // --- heatwave akışı ---
+//                 const noise = (Math.sin((x+y+_gameTick)*0.12)*(1-t)) * 3;
+
+//                 ox = x + nx*bend*currentRadiusX + noise;
+//                 oy = y + ny*bend*currentRadiusY + noise*0.5;
+
+//                 // --- mini chromatic ---
+//                 const shift = (1 - t) * 2;
+//                 ox += shift * Math.sin(_gameTick*0.2);
+//                 oy += shift * Math.cos(_gameTick*0.2);
+//             }
+
+//             const sx = ox|0;
+//             const sy = oy|0;
+
+//             const sI = (sy*boxW + sx)*4;
+//             const dI = (y*boxW + x)*4;
+
+//             if (sx>=0 && sy>=0 && sx<boxW && sy<boxH) {
+//                 // RGB ayrışması
+//                 dData[dI]   = sData[sI] + ((sx%2)?2:0); // R slight shift
+//                 dData[dI+1] = sData[sI+1];             // G normal
+//                 dData[dI+2] = sData[sI+2] + ((sy%2)?2:0); // B slight shift
+//                 dData[dI+3] = sData[sI+3];
+//             } else dData[dI+3] = 0;
+//         }
+//     }
+
+//     _ctx.putImageData(dst, minX, minY);
+// },
+distortionhit: function(_char, _params, _canv) {
+
+    if (episode.distorting && episode.distorting !== _char.key) {
+        _char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit');
+        return;
+    }
+
+    const _ms = _params.ms;
+    const _ctx = _canv ?? c10;
+    if (!_ctx?.canvas) return;
+
+
+    let w, h;
+    try {
+        w = _ctx.canvas.width;
+        h = _ctx.canvas.height;
+    } catch {
+        return;
+    }
+
+    if (!_params.start) {
+    	episode.distorting = _char.key;
+		_params.start = _gameTick;
+		return;
+	}
+	
+    // === 30 FPS Throttle ===
+    if (!_params.lastDraw) _params.lastDraw = 0;
+    if (_gameTick - _params.lastDraw < 33) return;
+    _params.lastDraw = _gameTick;
+
+	if (!_params.cx) _params.cx = _char.ORIGINLEFT;
+	if (!_params.cy) _params.cy = MathRound(_char.TOP + (_char.HEIGHT / 2) - ((_params.yGap ?? 0) * _char.ZOOM));
+
+    const _x = _params.cx;
+    const _y = _params.cy;
+
+    const elapsed = _gameTick - _params.start;
+
+    if (elapsed >= _ms) {
+        delete episode.distorting;
+		delete _params.cx;
+		delete _params.cy;
+        delete _params.start;
+        delete _params.lastDraw;
+		delete _params.box;
+        _char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit');
+        return;
+    }
+    const t = elapsed / _ms;
+
+    // ----- Radius ayarı -----
+    const rx = _params.rX ?? MathRound(episode.cWidth / 10);
+    const ry = _params.rY ?? rx;
+
+    const currentRadiusX = rx * (1 + t * 1.3);
+    const currentRadiusY = ry * (1 + t * 1.3);
+
+    // 🔹 Strength parametresi
+    const strength = _params.strength ?? 0.15;  // default eskisiyle aynı
+    const amount = strength * (1 - t);
+	if (!_params.box) {
+		_params.box = {
+			minX: Math.max(0, (_x - currentRadiusX)|0),
+			maxX: Math.min(w-1, (_x + currentRadiusX)|0),
+			minY: Math.max(0, (_y - currentRadiusY)|0),
+			maxY: Math.min(h-1, (_y + currentRadiusY)|0)
+		};
+	}
+	const {minX, maxX, minY, maxY} = _params.box;
+    // ---- Bounding box ----
+    // const minX = Math.max(0, (_x - currentRadiusX) | 0);
+    // const maxX = Math.min(w - 1, (_x + currentRadiusX) | 0);
+    // const minY = Math.max(0, (_y - currentRadiusY) | 0);
+    // const maxY = Math.min(h - 1, (_y + currentRadiusY) | 0);
+
+    const boxW = maxX - minX + 1;
+    const boxH = maxY - minY + 1;
+    if (boxW <= 1 || boxH <= 1) return;
+
+    // === OFFSCREEN CANVAS ===
+    const FX = window._distortFX;
+    const fxC = FX.distc;
+    const fx = FX.dctx;
+
+    // boyut eşitle
+    if (fxC.width !== boxW || fxC.height !== boxH) {
+        fxC.width = boxW;
+        fxC.height = boxH;
+    }
+
+    // ana canvas'tan sadece gerekli alanı fx'e al
+    fx.clearRect(0, 0, boxW, boxH);
+    fx.drawImage(_ctx.canvas, minX, minY, boxW, boxH, 0, 0, boxW, boxH);
+
+    const src = fx.getImageData(0, 0, boxW, boxH);
+    const dst = fx.createImageData(boxW, boxH);
+
+    const sData = src.data;
+    const dData = dst.data;
+
+    const cx = _x - minX;
+    const cy = _y - minY;
+
+    for (let y = 0; y < boxH; y++) {
+        for (let x = 0; x < boxW; x++) {
+
+            const dx = x - cx;
+            const dy = y - cy;
+
+            const nx = dx / currentRadiusX;
+            const ny = dy / currentRadiusY;
+            const dist2 = nx * nx + ny * ny;
+
+            let ox = x;
+            let oy = y;
+
+            if (dist2 < 1) {
+                const d = Math.sqrt(dist2) || 1;
+
+                // 🧠 Basınç hissi
+                const bend = (1 - d) * amount;
+
+                // heatwave
+                const noise = (Math.sin((x + y + _gameTick) * 0.12) * (1 - t)) * 2;
+
+                ox = x + nx * bend * currentRadiusX + noise;
+                oy = y + ny * bend * currentRadiusY + noise * 0.5;
+
+                // micro chromatic shift feel
+                const shift = (1 - t) * 1.5;
+                ox += shift * Math.sin(_gameTick * 0.2);
+                oy += shift * Math.cos(_gameTick * 0.2);
+            }
+
+            const sx = ox | 0;
+            const sy = oy | 0;
+
+            const sI = (sy * boxW + sx) * 4;
+            const dI = (y * boxW + x) * 4;
+
+            if (sx >= 0 && sy >= 0 && sx < boxW && sy < boxH) {
+                dData[dI]     = sData[sI];
+                dData[dI + 1] = sData[sI + 1];
+                dData[dI + 2] = sData[sI + 2];
+                dData[dI + 3] = sData[sI + 3];
+            } else {
+                dData[dI + 3] = 0;
+            }
+        }
+    }
+
+    // fx canvas'a bas
+    fx.putImageData(dst, 0, 0);
+
+    // ana canvas'a geri bas
+    _ctx.drawImage(fxC, minX, minY);
+},
+
+distortionhit2: function(_char, _params, _canv) {
+
+    if (episode.distorting && episode.distorting !== _char.key) {
+        _char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit2');
+        return;
+    }
+
+    const _ms = _params.ms ?? 220;
+    const delay = _params.delay ?? 20; // 🔹 eklenen delay
+    const _ctx = _canv ?? c10;
+    if (!_ctx?.canvas) return;
+
+    // === 30 FPS Throttle ===
+    if (!_params.lastDraw) _params.lastDraw = 0;
+    if (_gameTick - _params.lastDraw < 33) return;
+    _params.lastDraw = _gameTick;
+
+    const _x = _char.ORIGINLEFT;
+    const _y = MathRound(_char.TOP + (_char.HEIGHT / 2));
+
+    let w, h;
+    try {
+        w = _ctx.canvas.width;
+        h = _ctx.canvas.height;
+    } catch {
+        return;
+    }
+
+    episode.distorting = _char.key;
+
+    // 🔹 Delay uygulama
+    if (!_params.start) _params.start = _gameTick + delay;
+    const elapsed = _gameTick - _params.start;
+
+    if (elapsed < 0) return; // delay süresi dolmamış
+
+    if (elapsed >= _ms) {
+        delete episode.distorting;
+        delete _params.start;
+        delete _params.lastDraw;
+        _char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit2');
+        return;
+    }
+
+    const t = elapsed / _ms;
+
+    // ===== PARAMETRELER (hepsi dışarıdan override edilebilir) =====
+    const rx = _params.rX ?? MathRound(episode.cWidth / 10);
+    const ry = _params.rY ?? rx;
+
+    const waveStrength = _params.power ?? 0.20;     // bükme gücü
+    const waveFreq     = _params.freq ?? 10;        // halka sıkılığı
+    const waveSpeed    = _params.speed ?? 6;        // halka yayılma hızı
+
+    const shockRadiusX = rx * (t * 1.4);
+    const shockRadiusY = ry * (t * 1.4);
+    const amount = waveStrength * (1 - t);
+
+    // ---- Bounding box ----
+    const minX = Math.max(0, (_x - rx * 1.5) | 0);
+    const maxX = Math.min(w - 1, (_x + rx * 1.5) | 0);
+    const minY = Math.max(0, (_y - ry * 1.5) | 0);
+    const maxY = Math.min(h - 1, (_y + ry * 1.5) | 0);
+
+    const boxW = maxX - minX + 1;
+    const boxH = maxY - minY + 1;
+    if (boxW <= 1 || boxH <= 1) return;
+
+    const FX = window._distortFX;
+    const fxC = FX.distc;
+    const fx = FX.dctx;
+
+    if (fxC.width !== boxW || fxC.height !== boxH) {
+        fxC.width = boxW;
+        fxC.height = boxH;
+    }
+
+    fx.clearRect(0, 0, boxW, boxH);
+    fx.drawImage(_ctx.canvas, minX, minY, boxW, boxH, 0, 0, boxW, boxH);
+
+    const src = fx.getImageData(0, 0, boxW, boxH);
+    const dst = fx.createImageData(boxW, boxH);
+
+    const sData = src.data;
+    const dData = dst.data;
+
+    const cx = _x - minX;
+    const cy = _y - minY;
+
+    for (let y = 0; y < boxH; y++) {
+        for (let x = 0; x < boxW; x++) {
+
+            const dx = x - cx;
+            const dy = y - cy;
+
+            const nx = dx / rx;
+            const ny = dy / ry;
+            const dist = Math.sqrt(nx * nx + ny * ny);
+
+            let ox = x;
+            let oy = y;
+
+            if (dist < 1) {
+
+                const ringX = shockRadiusX / rx;
+                const ringY = shockRadiusY / ry;
+                const ring = Math.abs(dist - (t * 1.2));
+
+                let ringForce = 0;
+                if (ring < 0.08) ringForce = (1 - ring / 0.08) * 4;
+
+                const bend = (1 - dist) * amount * 40;
+                const wave = Math.sin((dist * waveFreq) - (t * waveSpeed)) * bend;
+				const noise = (_gameTick - _params.start < 1) ? 0 : (Math.sin((x+y+_gameTick)*0.12)*(1-t))*2;
+				const shift = (_gameTick - _params.start < 1) ? 0 : (1-t)*1.5;
+
+                ox = x + (nx * (wave + ringForce)) * rx + noise;
+                oy = y + (ny * (wave + ringForce)) * ry + noise;
+
+                ox += shift * Math.sin(_gameTick * 0.15);
+                oy += shift * Math.cos(_gameTick * 0.15);
+            }
+
+            const sx = ox | 0;
+            const sy = oy | 0;
+
+            const sI = (sy * boxW + sx) * 4;
+            const dI = (y * boxW + x) * 4;
+
+            if (sx >= 0 && sy >= 0 && sx < boxW && sy < boxH) {
+                dData[dI]     = sData[sI];
+                dData[dI + 1] = sData[sI + 1];
+                dData[dI + 2] = sData[sI + 2];
+                dData[dI + 3] = sData[sI + 3];
+            } else {
+                dData[dI + 3] = 0;
+            }
+        }
+    }
+
+    fx.putImageData(dst, 0, 0);
+    _ctx.drawImage(fxC, minX, minY);
+},
+distortionhit3: function(_char, _params, _canv) {
+
+    if (episode.distorting && episode.distorting !== _char.key) {
+        _char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit3');
+        return;
+    }
+
+    const _ms = _params.ms ?? 220;
+    const delay = _params.delay ?? (_params.after ? 20 : 0);
+    const _ctx = _canv ?? c10;
+    if (!_ctx?.canvas) return;
+
+    // 30 FPS Throttle
+    if (!_params.lastDraw) _params.lastDraw = 0;
+    if (_gameTick - _params.lastDraw < 33) return;
+    _params.lastDraw = _gameTick;
+
+    const _x = _char.ORIGINLEFT;
+    const _y = MathRound(_char.TOP + (_char.HEIGHT / 2));
+
+    let w, h;
+    try { w = _ctx.canvas.width; h = _ctx.canvas.height; } catch { return; }
+
+    episode.distorting = _char.key;
+
+    if (!_params.start) _params.start = _gameTick + delay;
+    const elapsed = _gameTick - _params.start;
+
+    if (elapsed < 0) return;
+    if (elapsed >= _ms) {
+        delete episode.distorting;
+        delete _params.start;
+        delete _params.lastDraw;
+        _char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit3');
+        return;
+    }
+
+    // normalize time
+    let t = elapsed / _ms;
+    t = t < 0 ? 0 : t > 1 ? 1 : t; // clamp 0-1
+    // smooth ease
+    t = t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2,2)/2;
+
+    const rx = _params.rX ?? MathRound(episode.cWidth / 10);
+    const ry = _params.rY ?? rx;
+
+    const power = _params.power ?? 0.2;
+    const freq  = _params.freq ?? 10;
+    const speed = _params.speed ?? 6;
+
+    const shockRadiusX = rx * (t * 1.4);
+    const shockRadiusY = ry * (t * 1.4);
+    const amount = power * (1 - t);
+
+    const minX = Math.max(0, (_x - rx*1.5)|0);
+    const maxX = Math.min(w-1, (_x + rx*1.5)|0);
+    const minY = Math.max(0, (_y - ry*1.5)|0);
+    const maxY = Math.min(h-1, (_y + ry*1.5)|0);
+
+    const boxW = maxX - minX + 1;
+    const boxH = maxY - minY + 1;
+    if (boxW <= 1 || boxH <= 1) return;
+
+    const FX = window._distortFX;
+    const fxC = FX.distc;
+    const fx = FX.dctx;
+
+    if (fxC.width !== boxW || fxC.height !== boxH) { fxC.width = boxW; fxC.height = boxH; }
+
+    fx.clearRect(0,0,boxW,boxH);
+    fx.drawImage(_ctx.canvas,minX,minY,boxW,boxH,0,0,boxW,boxH);
+
+    const src = fx.getImageData(0,0,boxW,boxH);
+    const dst = fx.createImageData(boxW,boxH);
+    const sData = src.data;
+    const dData = dst.data;
+
+    const cx = _x - minX;
+    const cy = _y - minY;
+
+    for (let y=0;y<boxH;y++){
+        for (let x=0;x<boxW;x++){
+            const dx = x - cx;
+            const dy = y - cy;
+
+            const nx = dx / rx;
+            const ny = dy / ry;
+            const dist = Math.sqrt(nx*nx + ny*ny);
+
+            let ox = x;
+            let oy = y;
+
+            if(dist < 1){
+                const bend = (1 - dist) * amount * 40;
+                const wave = Math.sin(dist*freq - t*speed) * bend;
+                const noise = Math.sin((x+y+_gameTick)*0.15)*(1-t);
+
+                ox = x + (nx*(wave)) * rx + noise;
+                oy = y + (ny*(wave)) * ry + noise*0.5;
+
+                const shift = (1-t)*0.8;
+                ox += shift*Math.sin(_gameTick*0.15);
+                oy += shift*Math.cos(_gameTick*0.15);
+            }
+
+            const sx = ox|0;
+            const sy = oy|0;
+
+            const sI = (sy*boxW + sx)*4;
+            const dI = (y*boxW + x)*4;
+
+            if(sx>=0 && sy>=0 && sx<boxW && sy<boxH){
+                dData[dI] = sData[sI];
+                dData[dI+1] = sData[sI+1];
+                dData[dI+2] = sData[sI+2];
+                dData[dI+3] = sData[sI+3];
+            } else {
+                dData[dI+3]=0;
+            }
+        }
+    }
+
+    fx.putImageData(dst,0,0);
+    _ctx.drawImage(fxC,minX,minY);
+},
+
+distortion: function(_char, _params, _canv) {
+	if(episode.distorting && episode.distorting !== _char.key)
+	{
+		_char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortion');
+		return;
+	}
+	const _ms = _params.ms;
+    const _ctx = _canv ?? c10;
+    if(!_ctx?.canvas) 
+		return;
+
+    const _x = _char.ORIGINLEFT;
+    const _y = MathRound(_char.TOP + (_char.HEIGHT / 2));
+
+	let w, h;
+	try {
+		w = _ctx.canvas.width;
+		h = _ctx.canvas.height;
+	} catch {
+		return;
+	}
+	episode.distorting = _char.key;
+	// initialize
+	if (!_params.start)
+		_params.start = _gameTick;
+
+	// time check
+	const elapsed = _gameTick - _params.start;
+	if (elapsed >= _ms) {
+		delete episode.distorting;
+		delete _params.start;
+		_char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortion');
+		return;
 	}
 
+	// normalize time 0 → 1
+	// const t = elapsed / _ms;
+
+	// // *** MOBIL DOSTU ***
+	// const baseRadius = MathRound(episode.cWidth / 10);
+	// const currentRadius = baseRadius * (1 + t * 1.3);
+	// const amount = 0.15 * (1 - t);
+
+	// // ---- BOUNDING BOX ----
+	// const minX = Math.max(0, (_x - currentRadius)|0);
+	// const maxX = Math.min(w - 1, (_x + currentRadius)|0);
+	// const minY = Math.max(0, (_y - currentRadius)|0);
+	// const maxY = Math.min(h - 1, (_y + currentRadius)|0);
+
+	// const boxW = maxX - minX + 1;
+	// const boxH = maxY - minY + 1;
+
+	// // SADECE ALAN
+	// const src = _ctx.getImageData(minX, minY, boxW, boxH);
+	// const dst = _ctx.createImageData(boxW, boxH);
+
+	// const sData = src.data;
+	// const dData = dst.data;
+
+	// const cx = _x - minX;
+	// const cy = _y - minY;
+	// const cr2 = currentRadius * currentRadius;
+
+	// // ------- ANA LOOP (sadece etki alanı) -------
+	// for (let y = 0; y < boxH; y++) {
+	// 	for (let x = 0; x < boxW; x++) {
+
+	// 		const dx = x - cx;
+	// 		const dy = y - cy;
+	// 		const dist2 = dx*dx + dy*dy;
+
+	// 		let ox = x;
+	// 		let oy = y;
+
+	// 		if (dist2 < cr2) {
+	// 			const d = Math.sqrt(dist2) || 1;
+
+	// 			const bend = Math.sin((d / currentRadius) * Math.PI) * amount;
+
+	// 			// --- noise SADECE ALAN DAHİLİNDE ---
+	// 			const noise = (Math.sin((x+y + _gameTick) * 0.15) * (1 - t)) * 3;
+
+	// 			const ndx = (dx / d) * bend * currentRadius + noise;
+	// 			const ndy = (dy / d) * bend * currentRadius + noise * 0.5;
+
+	// 			ox = x + ndx;
+	// 			oy = y + ndy;
+	// 		}
+
+	// 		const sx = ox|0;
+	// 		const sy = oy|0;
+
+	// 		const si = (sy * boxW + sx) * 4;
+	// 		const di = (y * boxW + x) * 4;
+
+	// 		if (sx >= 0 && sy >= 0 && sx < boxW && sy < boxH) {
+	// 			dData[di]   = sData[si];
+	// 			dData[di+1] = sData[si+1];
+	// 			dData[di+2] = sData[si+2];
+	// 			dData[di+3] = sData[si+3];
+	// 		} else {
+	// 			dData[di+3] = 0;
+	// 		}
+	// 	}
+	// }
+
+	// _ctx.putImageData(dst, minX, minY);
+	const t = elapsed / _ms;
+
+    // ----- Radius Ayarı -----
+    const rx = _params.rX ?? MathRound(episode.cWidth / 10);
+    const ry = _params.rY ?? rx;
+    const currentRadiusX = rx * (1 + t * 1.3);
+    const currentRadiusY = ry * (1 + t * 1.3);
+    const amount = 0.15 * (1 - t);
+
+    // ---- Bounding Box ----
+    const minX = Math.max(0, Math.floor(_x - currentRadiusX));
+    const maxX = Math.min(w - 1, Math.ceil(_x + currentRadiusX));
+    const minY = Math.max(0, Math.floor(_y - currentRadiusY));
+    const maxY = Math.min(h - 1, Math.ceil(_y + currentRadiusY));
+
+    const boxW = maxX - minX + 1;
+    const boxH = maxY - minY + 1;
+
+    const src = _ctx.getImageData(minX, minY, boxW, boxH);
+    const dst = _ctx.createImageData(boxW, boxH);
+
+    const sData = src.data;
+    const dData = dst.data;
+
+    const cx = _x - minX;
+    const cy = _y - minY;
+
+    // ----- Distortion Loop -----
+    for (let y = 0; y < boxH; y++) {
+        for (let x = 0; x < boxW; x++) {
+            const dx = x - cx;
+            const dy = y - cy;
+
+            // normalize ellipse distance
+            const nx = dx / currentRadiusX;
+            const ny = dy / currentRadiusY;
+            const dist2 = nx*nx + ny*ny;
+
+            let ox = x;
+            let oy = y;
+
+            if (dist2 < 1) {
+                const d = Math.sqrt(dist2) || 1;
+
+                // bend effect
+                const bend = Math.sin(d * Math.PI) * amount;
+
+                // noise ile hava dalgası efekti
+                const noise = (Math.sin((x+y + _gameTick)*0.15) * (1 - t)) * 3;
+
+                ox = x + nx * bend * currentRadiusX + noise;
+                oy = y + ny * bend * currentRadiusY + noise * 0.5;
+            }
+
+            const sx = ox|0;
+            const sy = oy|0;
+
+            const si = (sy * boxW + sx) * 4;
+            const di = (y * boxW + x) * 4;
+
+            if (sx >= 0 && sy >= 0 && sx < boxW && sy < boxH) {
+                dData[di]   = sData[si];
+                dData[di+1] = sData[si+1];
+                dData[di+2] = sData[si+2];
+                dData[di+3] = sData[si+3];
+            } else {
+                dData[di+3] = 0;
+            }
+        }
+    }
+
+    _ctx.putImageData(dst, minX, minY);
 }
+}
+
+// setInterval(function() {
+// 	if(!episode || !mainCharacter)
+// 		return;
+// 	if(episode.id < 2)
+// 		return;
+// 	const _e = episode.seenEnemies.filter(x => x.enemy)?.[0];
+// 	if(_e)
+// 		_e.addObject({key:'distortion', position:'canvas', p1: { ms: 500, after:true }});
+// }, 3000);
+
 let _focusMode;
 const cssAnimations = {
 	blur: function () {
@@ -28491,6 +29537,8 @@ const cssAnimations = {
 			return;
 		_finger = document.createElement('img');
 		_finger.className = 'push-me-finger';
+		if(__isPC && hasClass(_elem, 'skill') && !_elem.id.startsWith('chain-skill'))
+			_finger.className += ' finger-top';
 		if(_fingerFade)
 			_finger.className += ' fade-me';
 		const _rect = _elem.getBoundingClientRect();
@@ -28568,7 +29616,7 @@ const cssAnimations = {
 				if(_func) 
 					_func();
 				delete cssAnimationProps.vs;
-				const _div = _elem.querySelector('#vs-img');
+				const _div = document.querySelector('#vs-img');
 				if(_div) {
 					addClass(_div, 'fade-out');
 					_div.onanimationend = function() {
@@ -28593,7 +29641,7 @@ const cssAnimations = {
 			addClass(_elem, 'flex');
 			const _div = document.createElement('div');
 			_div.id = 'vs-img';
-			_div.className = 'full flex';
+			_div.className = 'full flex show-ui';
 			const _img = document.createElement('img');
 			const _imgVs = document.createElement('img');
 			_imgVs.src = './images/icons/vs.png';
@@ -28603,7 +29651,7 @@ const cssAnimations = {
 			_img.style.height = '100%';
 			_div.appendChild(_img);
 			_div.appendChild(_imgVs);
-			_elem.appendChild(_div);
+			_gameUI.appendChild(_div);
 			const _c1Div = document.createElement('div');
 			_c1Div.className = 'flex';
 			_c1Div.style = 'height:100%;position:absolute;top:0;left:0;width:50&;overflow-hidden';
@@ -28649,7 +29697,7 @@ const cssAnimations = {
 			const _y = MathRound(_c.TOP - ((_zoom ?? 1) * (_c.getHeightWithoutGap() / 2)));
 			const _centerX = MathRound(episode.cUIWidth / 2);
 			const _centerY = MathRound(episode.cUIHeight / 2);
-			_elem.style.backgroundPosition = (-1 * (_centerX - _x)) + 'px ' + (-1 *(_centerY - _y)) + 'px';
+			_elem.style.setProperty('background-position',(-1 * (_centerX - _x)) + 'px ' + (-1 *(_centerY - _y)) + 'px', 'important');
 		}
 	},
 	white: function () {
@@ -28664,6 +29712,22 @@ const cssAnimations = {
 			const _elem = document.querySelector('#css-canvas-foreground');
 			addClass(_elem, 'white-bg');
 			cssAnimationProps.white = { start: _gameTick };
+		}
+	},
+	criteffect: function () {
+		if(__storyCutScenePlaying)
+			return;
+		if(cssAnimationProps.criteffect) {
+			if((_gameTick - cssAnimationProps.criteffect.start) > 600) {
+				const _elem = document.querySelector('#css-canvas-foreground');
+				removeClass(_elem, 'critEffect');
+				delete cssAnimationProps.criteffect;
+			}
+		}
+		else {
+			const _elem = document.querySelector('#css-canvas-foreground');
+			addClass(_elem, 'critEffect');
+			cssAnimationProps.criteffect = { start: _gameTick };
 		}
 	},
 	curse: function (_c, _ms, _url) {
@@ -28748,21 +29812,36 @@ const cssAnimations = {
 			cssAnimationProps.shaketiny = { start: _gameTick, p1: _c, p2: _ms, p3: _infinite};
 		}
 	},
-	impact: function (_c, _ms, _dir) {
+	impact: function (_c, _ms) {
 		if(cssAnimationProps.impact) {
 			if((_gameTick - cssAnimationProps.impact.start) > (_ms ?? 1000)) {
-				removeClass(_gamePad, 'charge-impact-' + _dir);
+				removeClass(_gamePad, 'charge-impact-left');
+				removeClass(_gamePad, 'charge-impact-right');
 				delete cssAnimationProps.impact;
 			}
 		}
 		else {
-			if(!_dir)
-				_dir = _c.direction;
 			if(!_ms)
-				_ms = 500;
-			//cssAnimations.dark(_c, _ms);
-			addClass(_gamePad, 'charge-impact-' + _dir);
-			cssAnimationProps.impact = { start: _gameTick, p1: _c, p2: _ms, p3: _dir };
+				_ms = 1000;
+			addClass(_gamePad, 'charge-impact-' + _c.direction);
+			cssAnimationProps.impact = { start: _gameTick, p1: _c, p2: _ms, p3: _c.direction };
+		}
+	},
+	impactsmall: function (_c, _ms) {
+		if(cssAnimationProps.impactsmall) {
+			if((_gameTick - cssAnimationProps.impactsmall.start) > ( cssAnimationProps.impactsmall.p2 ?? 1000)) {
+				removeClass(_gamePad, 'impact-left');
+				removeClass(_gamePad, 'impact-right');
+				removeClass(_gamePad, 'heavy-hitting');
+				delete cssAnimationProps.impactsmall;
+			}
+		}
+		else {
+			if(!_ms)
+				_ms = 1000;
+			addClass(_gamePad, 'impact-' + _c.direction);
+			addClass(_gamePad, 'heavy-hitting');
+			cssAnimationProps.impactsmall = { start: _gameTick, p1: _c, p2: _ms, p3: _c.direction };
 		}
 	},
 	fatality: function (_char, _l, _ms) {
@@ -28779,11 +29858,13 @@ const cssAnimations = {
 				delete cssAnimationProps.darkout;
 				return;
 			}
-			_ctx.clearRect(0, 0, episode.cUIWidth, episode.cUIHeight);
-			//_ctx.filter = 'blur(' + _opacity + 'px)';
-			_ctx.fillStyle = 'rgba(0,0,0,' + (_opacity / 100) + ')';
+			if(_ctx?.clearRect && typeof _ctx.clearRect === 'function'){
+				_ctx.clearRect(0, 0, episode.cUIWidth, episode.cUIHeight);
+				//_ctx.filter = 'blur(' + _opacity + 'px)';
+				_ctx.fillStyle = 'rgba(0,0,0,' + (_opacity / 100) + ')';
+				_ctx.fillRect(0, 0, episode.cUIWidth, episode.cUIHeight);
+			}
 			cssAnimationProps.darkout.p2 = _opacity;
-			_ctx.fillRect(0, 0, episode.cUIWidth, episode.cUIHeight);
 		}
 		else
 			cssAnimationProps.darkout = { start: _gameTick, p1: _ctx, p2: _opacity, p3: _cnvs};
@@ -28795,7 +29876,7 @@ const cssAnimations = {
 				delete cssAnimationProps.dark;
 				cssAnimations.darkout(_ctx, _opacity, _cnvs);
 			}
-			else if(_ctx) {
+			else if(_ctx?.clearRect && typeof _ctx.clearRect === 'function') {
 				_opacity+= 16;
 				if(_opacity <= 80) {
 					_ctx.clearRect(0, 0, episode.cUIWidth, episode.cUIHeight);
@@ -29081,18 +30162,7 @@ const cssAnimations = {
 				return;
 			}
 			addClass(_gamePad, _force ? 'film-zoom-in' : 'zoom');
-			//const _frame = document.getElementById('Frame');
-			//addClass(_frame, 'dark-border');
 			_gamePad.style.transformOrigin = x + 'px ' + y + 'px';
-			//for (var _a of _areas)
-			//addClass(_a, 'gray');
-			// setTimeout(function () {
-			// 	removeClass(_gamePad, 'zoom');
-			// 	//removeClass(_frame, 'dark-border');
-			// 	_gamePad.style.transformOrigin = 'unset';
-			// 	//for (var _a of _areas)
-			// 	//removeClass(_a, 'gray');
-			// }, _ms);
 			_gamePad.lastZoomTime = _gameTick;
 			cssAnimationProps.zoom = { start: _gameTick, p1: _char, p2: _rate, p3: _ms, p4: _group, p5: _force };
 		}
@@ -29109,7 +30179,7 @@ const cssAnimations = {
 		}
 	},
 	zoomquick: function (_char) {
-		if(!_char.main)
+		if(!_char.main || __storyCutScenePlaying)
 			return;
 		const _left = _char.SCREENLEFT;
 		const _width = _char.WIDTH;
@@ -29120,6 +30190,7 @@ const cssAnimations = {
 			if(_char.getFps() !== 1)
 				return;
 			addClass(_gamePad, 'camera');
+			addClass(_gamePad, 'heavy-hitting');
 			_gamePad.style.transformOrigin = x + 'px ' + y + 'px';
 			cssAnimationProps.zoomquick = { start: _gameTick, p1: _char };
 		}
@@ -29128,11 +30199,14 @@ const cssAnimations = {
 			if((_gameTick - cssAnimationProps.zoomquick.start) < 80)
 				return;
 			removeClass(_gamePad, 'camera');
+			removeClass(_gamePad, 'heavy-hitting');
 			_gamePad.style.transformOrigin = 'unset';
 			delete cssAnimationProps.zoomquick;
 		}
 	},
 	zoomquickred: function (_char) {
+		if(__storyCutScenePlaying)
+			return;
 		const _left = _char.SCREENLEFT;
 		const _width = _char.WIDTH;
 		const _height = _char.HEIGHT;
@@ -29140,6 +30214,7 @@ const cssAnimations = {
 		const y = MathRound(episode.cUIHeight - _char.yPosition - (_height / 2));
 		if(!cssAnimationProps.zoomquickred){
 			addClass(_gamePad, 'camera-red');
+			addClass(_gamePad, 'heavy-hitting');
 			_gamePad.style.transformOrigin = x + 'px ' + y + 'px';
 			cssAnimationProps.zoomquickred = { start: _gameTick, p1: _char };
 		}
@@ -29148,23 +30223,118 @@ const cssAnimations = {
 			if((_gameTick - cssAnimationProps.zoomquickred.start) < 110)
 				return;
 			removeClass(_gamePad, 'camera-red');
+			removeClass(_gamePad, 'heavy-hitting');
 			_gamePad.style.transformOrigin = 'unset';
 			delete cssAnimationProps.zoomquickred;
 		}
 	},
 	bombshock: function (_char) {
+		if(__storyCutScenePlaying)
+			return;
 		if(!cssAnimationProps.bombshock){
 			addClass(_gamePad, 'bombshock');
+			addClass(_gamePad, 'heavy-hitting');
 			cssAnimationProps.bombshock = { start: _gameTick };
 		}
 		else {
 			if((_gameTick - cssAnimationProps.bombshock.start) < 180)
 				return;
 			removeClass(_gamePad, 'bombshock');
+			removeClass(_gamePad, 'heavy-hitting');
 			delete cssAnimationProps.bombshock;
 		}
 	},
+	smallexplosion: function (_char) {
+		if(__storyCutScenePlaying)
+			return;
+		if(!cssAnimationProps.smallexplosion){
+			addClass(_gamePad, 'small-explosion');
+			addClass(_gamePad, 'heavy-hitting');
+			cssAnimationProps.smallexplosion = { start: _gameTick };
+		}
+		else {
+			if((_gameTick - cssAnimationProps.smallexplosion.start) < 180)
+				return;
+			removeClass(_gamePad, 'small-explosion');
+			removeClass(_gamePad, 'heavy-hitting');
+			delete cssAnimationProps.smallexplosion;
+		}
+	},	
+	combofinisherimpact: function (_char) {
+		if(!cssAnimationProps.combofinisherimpact){
+			addClass(_gamePad, 'combo-finisher-impact');
+			addClass(_gamePad, 'heavy-hitting');
+			cssAnimationProps.combofinisherimpact = { start: _gameTick };
+		}
+		else {
+			if((_gameTick - cssAnimationProps.combofinisherimpact.start) < 180)
+				return;
+			removeClass(_gamePad, 'combo-finisher-impact');
+			removeClass(_gamePad, 'heavy-hitting');
+			delete cssAnimationProps.combofinisherimpact;
+		}
+	},
+	impactdizzy: function (_char, strength = 2) {
+		if(__storyCutScenePlaying)
+			return;
+		if (!cssAnimationProps.impactdizzy) {
+
+			// Strength preset seçimi
+			let sClass = (
+				strength <= 1 ? 'dizzy-light' :
+				strength <= 2 ? 'dizzy-medium' :
+								'dizzy-heavy'
+			);
+
+			// 🎲 Mikro random hissiyat
+			let randX = (0.7 + Math.random() * 0.6).toFixed(2); // 0.7 - 1.3
+			if(_char.direction === __left)
+				randX *= -1;
+			let randY = (0.7 + Math.random() * 0.6).toFixed(2);
+			let randTime = (0.20 + Math.random() * 0.12).toFixed(3); // 0.20 - 0.32
+
+			_gamePad.style.setProperty('--ix', randX + 'vw');
+			_gamePad.style.setProperty('--iy', randY + 'vh');
+			_gamePad.style.setProperty('--impact-time', randTime + 's');
+
+			addClass(_gamePad, 'impact-dizzy');
+			addClass(_gamePad, 'heavy-hitting');
+			addClass(_gamePad, sClass);
+
+			cssAnimationProps.impactdizzy = {
+				start: _gameTick,
+				p2: sClass
+			};
+		}
+		else {
+
+			if ((_gameTick - cssAnimationProps.impactdizzy.start) < 320)
+				return;
+
+			removeClass(_gamePad, 'impact-dizzy');
+			removeClass(_gamePad, 'heavy-hitting');
+			removeClass(_gamePad, cssAnimationProps.impactdizzy.sClass);
+
+			delete cssAnimationProps.impactdizzy;
+		}
+	},
 	forceimpact: function(_char, dirX) {
+		let _mainRelated = _char.main || _char.related?.main || _char.owner?.main || _char.smasher?.main || _char.smasher?.related?.main 
+		|| _char.friendly || _char.related?.friendly || _char.owner?.friendly || _char.smasher?.friendly || _char.smasher?.related?.friendly
+		|| _char.tag || _char.related?.tag || _char.owner?.tag || _char.smasher?.tag || _char.smasher?.related?.tag;
+		if(_mainRelated) {
+			const _isSpell = _char.smasher?.spellKey;
+			if(_isSpell) {
+				const _isCommon = commonSkills.find(x => x.key === _isSpell);
+				if(_isCommon)
+					_mainRelated = false;
+			}
+		}
+		if(_mainRelated)
+		{
+			cssAnimations.smallexplosion(_char.attacker);
+			return false;
+		}
 		delete cssAnimationProps.zoomdynamic;
 		_gamePad.classList.remove(
 			"zoomdynamic-light-right",
@@ -29174,13 +30344,16 @@ const cssAnimations = {
 			"zoomdynamic-heavy-right",
 			"zoomdynamic-heavy-left",
 			'charge-impact-left',
-			'charge-impact-right'
+			'charge-impact-right',
+			'impact-left',
+			'impact-right'
 		);
 		delete cssAnimationProps.impact;
 		cssAnimations.impact(_char,null,dirX);
+		return true;
 	},
 	zoomdynamic: function (_char, dirX, strength) {
-		if(hasClass(_gamePad, 'camera') || hasClass(_gamePad, 'bombshock'))
+		if(hasClass(_gamePad, 'heavy-hitting') || __storyCutScenePlaying)
         	return;
 		if (!cssAnimationProps.zoomdynamic) {
 
@@ -29189,7 +30362,7 @@ const cssAnimations = {
 			const delay = (Math.random() * 0.020);           // 0 ~ 20ms
 
 			_gamePad.style.setProperty('--shiftX', micro + 'vw');
-			_gamePad.style.animationDelay = delay + 's';
+			//_gamePad.style.animationDelay = delay + 's';
 			// ---------------------------------
 
 			let cls =
@@ -29198,7 +30371,6 @@ const cssAnimations = {
 							"zoomdynamic-heavy");
 
 			cls += (dirX === __right ? "-right" : "-left");
-
 			_gamePad.classList.add(cls);
 
 			cssAnimationProps.zoomdynamic = {
@@ -29303,9 +30475,36 @@ const cssAnimations = {
 			if(_spells?.[0])
 				_spells.forEach(x => cssAnimations.lightradius2(x, (cssAnimationProps.lightradius2.p2 ?? _rate) / 2, cssAnimationProps.lightradius2.p3 ?? _ctx, 1));
 		}
-		else
-			ligthenGradientColored(_left, _top, _width, cssAnimationProps.lightradius2.p3 ?? _ctx, _char.lightColor);
+		else{
+			ligthenGradientColored(_left, _top, _width, cssAnimationProps.lightradius2.p3 ?? _ctx, 
+			adjustColorForIntensity(_char.lightColor ?? '#0000FF10', __maxFreqCount));
+		}
 	}
+
+}
+
+const __maxFreqCount = 3;
+function adjustColorForIntensity(hex, yogunluk) {
+    // #RRGGBBAA
+    let r = parseInt(hex.substring(1, 3), 16);
+    let g = parseInt(hex.substring(3, 5), 16);
+    let b = parseInt(hex.substring(5, 7), 16);
+    let a = parseInt(hex.substring(7, 9), 16) / 255;
+
+    // Normalizasyon faktörü
+    const f = 1 / Math.sqrt((yogunluk - 1 / 2));
+
+    r = Math.round(r * f);
+    g = Math.round(g * f);
+    b = Math.round(b * f);
+    a = a * f;
+
+    const rr = r.toString(16).padStart(2, '0');
+    const gg = g.toString(16).padStart(2, '0');
+    const bb = b.toString(16).padStart(2, '0');
+    const aa = Math.round(a * 255).toString(16).padStart(2, '0');
+
+    return `#${rr}${gg}${bb}${aa}`;
 }
 function ligthenGradient(x, y, radius, ctx) {
 	const _c = ctx.canvas;
@@ -29376,7 +30575,7 @@ async function PlaySound(_s, _alternateKeys, _volumeRate) {
 	catch(cex) {
 		console.log(_alternateKeys);
 	}
-	return await window.SoundManager.play(_soundKey, _s.path, (_hasEnd && _hidden) ? 0 : (_s.volume ?? .1), _s.loop, _s.rate, _s.reset, _s.force, _s.end, _s.bind);
+	return await window.SoundManager.play(_soundKey, _s.path, (_hasEnd && _hidden) ? 0 : (_s.volume ?? .1) * (_s.volumeRate ?? 1), _s.loop, _s.rate, _s.reset, _s.force, _s.end, _s.bind);
 }
 function flash(_count, _elem) {
 	setTimeout(function () {
@@ -29844,6 +31043,8 @@ function copyText(_elem) {
 function askExitApp(){
 	try {
 		if(closeInventoryQuestionModal())
+			return;
+		if(document.querySelector('.key-combinations'))
 			return;
 		if(__switchingMap || _storySceneSwitching || _game.spinned){
 			PlaySound({key:'disabled'});

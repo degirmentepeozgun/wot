@@ -178,7 +178,7 @@ function talent() {
 		</div>`;
 		const _container = document.querySelector('.talent-content-right .menu-modal-right-container');
 		if(_container)
-			_container.innerHTML = _html + '<div id="shine"></div></div></div>';
+			_container.innerHTML = _html + '</div><div class="shine-area"></div></div>';
 	}
 	this.askReset = function() {
    		askSomething(`${getLangData('Reset talent build?')}`, `getRef(\'talent\')?.reset()`);

@@ -729,6 +729,8 @@ function warn(_html, _class, _ms, _new, _buttons, _important, _container) {
 	}
 }
 function shine(_ms, _elem) {
+	addUpgradeEffect();
+	return true;
 	const _name = 'shine' + (_ms ? '-' + _ms.toString() : '');
 	const _shine = _elem ? _elem.querySelector('#shine') : document.getElementById('shine');
 	if (_shine && !_shine.shining) {
@@ -1770,4 +1772,449 @@ function removeModule(_name) {
 	// 	delete _module.ref;
 	// 	window.installedModules.splice(window.installedModules.findIndex(x => x.name === _name),1);
 	// }
+}
+
+// function applyComputedStylesDeep(sourceEl, targetEl) {
+//     // 1) source element’in computed style’larını al
+//     const computed = getComputedStyle(sourceEl);
+
+//     // 2) target element’in inline style’ına yaz
+//     for (let prop of computed) {
+//         targetEl.style.setProperty(prop, computed.getPropertyValue(prop));
+//     }
+
+//     // 3) Çocukları recursive eşleştir
+//     const sourceChildren = sourceEl.children;
+//     const targetChildren = targetEl.children;
+
+//     for (let i = 0; i < sourceChildren.length; i++) {
+//         applyComputedStylesDeep(sourceChildren[i], targetChildren[i]);
+//     }
+// }
+/**
+ * Inline'a: sourceElement'e şu anda uygulanan tüm CSS kurallarını kopyalar.
+ * - performans için sadece gerçekten MATCH eden selector'ları işler.
+ * - rule.style içindeki yalnızca tanımlı deklarasyonları target'a yazar (priority ile).
+ * - media/supports vs. iç içe kuralları da iterate eder.
+ */
+// cache for parsed rules to avoid repeated heavy parsing
+const __RULE_CACHE = {
+  flatRules: null,   // array of {selectorText, style, ownerSheetHref}
+  lastSheetsCount: 0
+};
+
+function _buildFlatRuleList() {
+  // If stylesheet count unchanged and cache exists, reuse
+  const sheets = Array.from(document.styleSheets);
+  if (__RULE_CACHE.flatRules && __RULE_CACHE.lastSheetsCount === sheets.length) {
+    return __RULE_CACHE.flatRules;
+  }
+
+  const flat = [];
+
+  function processRules(rules, ownerHref) {
+    for (const rule of rules) {
+      try {
+        if (rule.type === CSSRule.STYLE_RULE) {
+          // store minimal necessary info
+          flat.push({
+            selectorText: rule.selectorText,
+            style: rule.style,
+            owner: ownerHref || null
+          });
+        } else if (rule.cssRules && rule.cssRules.length) {
+          // MEDIA / SUPPORTS etc -> recurse
+          processRules(rule.cssRules, ownerHref);
+        }
+      } catch (e) {
+        // ignore weird/invalid rules
+        continue;
+      }
+    }
+  }
+
+  for (const sheet of sheets) {
+    let rules;
+    try {
+      rules = sheet.cssRules;
+    } catch (e) {
+      // CORS-protected sheet -> skip but record as null owner
+      continue;
+    }
+    if (!rules) continue;
+    processRules(rules, sheet.href || null);
+  }
+
+  __RULE_CACHE.flatRules = flat;
+  __RULE_CACHE.lastSheetsCount = sheets.length;
+  return flat;
+}
+
+/**
+ * Copy all CSS declarations from rules that actually match sourceEl,
+ * apply them inline to targetEl, BUT do not override existing inline props on targetEl.
+ * Returns stats object.
+ */
+// function applyAppliedRulesPreserveInline(sourceEl, targetEl, options = {}) {
+//   // options:
+//   //  - skipPseudo: true/false (default false)  -> we ignore ::before/::after rules in selector matching
+//   //  - debug: true/false
+//   const skipPseudo = !!options.skipPseudo;
+//   const debug = !!options.debug;
+
+//   const flatRules = _buildFlatRuleList();
+
+//   let matchedRules = 0;
+//   let appliedProps = 0;
+//   let skippedPropsBecauseInline = 0;
+//   const skippedSheets = new Set();
+
+//   // quick lookup for target's existing inline properties -> don't overwrite these
+//   const targetInline = {};
+//   for (let i = 0; i < targetEl.style.length; i++) {
+//     const p = targetEl.style[i];
+//     if (p) targetInline[p] = true;
+//   }
+
+//   // Also collect source's inline properties (we'll apply them if not present on target)
+//   const sourceInline = {};
+//   for (let i = 0; i < sourceEl.style.length; i++) {
+//     const p = sourceEl.style[i];
+//     if (p) sourceInline[p] = {
+//       value: sourceEl.style.getPropertyValue(p),
+//       priority: sourceEl.style.getPropertyPriority(p)
+//     };
+//   }
+
+//   // iterate flat rules and test selectors
+//   for (const r of flatRules) {
+//     const selectorText = r.selectorText;
+//     if (!selectorText) continue;
+
+//     // split multiple selectors in a rule
+//     const selectors = selectorText.split(",").map(s => s.trim());
+//     let ruleMatches = false;
+
+//     for (const sel of selectors) {
+//       if (!sel) continue;
+//       if (skipPseudo && sel.includes("::")) continue;
+
+//       // safe matches check
+//       try {
+//         if (sourceEl.matches(sel)) {
+//           ruleMatches = true;
+//           break;
+//         }
+//       } catch (e) {
+//         // invalid selector for matches() -> skip
+//         continue;
+//       }
+//     }
+
+//     if (!ruleMatches) continue;
+
+//     // this rule applies to sourceEl in its original context
+//     matchedRules++;
+
+//     const style = r.style;
+//     for (let i = 0; i < style.length; i++) {
+//       const prop = style[i];
+//       const val = style.getPropertyValue(prop);
+//       const pr  = style.getPropertyPriority(prop); // 'important' if present
+
+//       // do not override target's pre-existing inline properties
+//       if (targetInline[prop]) {
+//         skippedPropsBecauseInline++;
+//         continue;
+//       }
+
+//       try {
+//         targetEl.style.setProperty(prop, val, pr);
+//         appliedProps++;
+//       } catch (e) {
+//         // some properties might be invalid to set inline -> ignore
+//       }
+//     }
+//   }
+
+//   // Finally: apply source's inline styles (since they are author's explicit)
+//   for (const prop in sourceInline) {
+//     if (!Object.prototype.hasOwnProperty.call(targetInline, prop)) {
+//       // set only if target didn't already have that inline prop
+//       try {
+//         targetEl.style.setProperty(prop, sourceInline[prop].value, sourceInline[prop].priority);
+//         appliedProps++;
+//       } catch (e) {}
+//     } else {
+//       skippedPropsBecauseInline++;
+//     }
+//   }
+
+//   if (debug) {
+//     console.log('[applyAppliedRulesPreserveInline] matchedRules', matchedRules,
+//                 'appliedProps', appliedProps,
+//                 'skippedInline', skippedPropsBecauseInline);
+//   }
+
+//   return { matchedRules, appliedProps, skippedPropsBecauseInline };
+// }
+// ---------- OPTIMIZED VERSION ----------
+ const DEFAULT_WHITELIST = [
+    "display","position","z-index","top","left","right","bottom",
+    "width","height","min-width","min-height","max-width","max-height",
+    "flex","flex-direction","align-items","justify-content","gap",
+    "padding","margin","box-shadow","border","border-radius",
+    "background","background-image","background-color","color",
+    "font-size","font-family","line-height","white-space",
+    "transform","transform-origin","filter","backdrop-filter",
+    "opacity","pointer-events"
+  ];
+function applyAppliedRulesPreserveInlineFast(sourceEl, targetEl, options = {}) {
+  const skipPseudo = !!options.skipPseudo;
+  const debug = !!options.debug;
+  // minimal whitelist - ihtiyaca göre genişlet
+ 
+  const whitelist = Array.isArray(options.whitelist) ? options.whitelist : DEFAULT_WHITELIST;
+
+  const flatRules = _buildFlatRuleList(); // reuse your cached flat list
+  let matchedRules = 0, appliedProps = 0, skippedPropsBecauseInline = 0;
+
+  // quick lookup of target inline properties (do not override)
+  const targetInline = {};
+  for (let i = 0; i < targetEl.style.length; i++) {
+    const p = targetEl.style[i];
+    if (p) targetInline[p] = true;
+  }
+
+  // source inline props (to apply later if not present on target)
+  const sourceInline = {};
+  for (let i = 0; i < sourceEl.style.length; i++) {
+    const p = sourceEl.style[i];
+    if (p) sourceInline[p] = {
+      value: sourceEl.style.getPropertyValue(p),
+      priority: sourceEl.style.getPropertyPriority(p)
+    };
+  }
+
+  // build small token set to prefilter rules (class names, id, tag)
+  const tokens = new Set();
+  const tag = sourceEl.tagName && sourceEl.tagName.toLowerCase();
+  if (tag) tokens.add(tag);
+  if (sourceEl.id) tokens.add("#" + sourceEl.id);
+  for (const c of sourceEl.classList) tokens.add("." + c);
+
+  // prefilter rules by string inclusion of any token - much cheaper than matches()
+  const candidateRules = [];
+  for (const r of flatRules) {
+    const s = (r.selectorText || "").toLowerCase();
+    // if rule has pseudo and skipPseudo true, skip
+    if (skipPseudo && s.includes("::")) continue;
+
+    // quick accept if selectorText contains any token
+    let ok = false;
+    for (const t of tokens) {
+      if (s.includes(t)) { ok = true; break; }
+    }
+    // also accept if selector is generic (contains tag or '.' or '#') - fallback to include,
+    // but to avoid scanning everything, require at least one of tokens OR the selector contains the full class names
+    if (!ok) {
+      // cheap heuristic: if selector uses attributes or universal selectors, ignore (rare)
+      continue;
+    }
+    candidateRules.push(r);
+  }
+
+  // if no candidates (very unlikely), fall back to small subset of flatRules to avoid empty
+  const rulesToCheck = candidateRules.length ? candidateRules : flatRules.slice(0, 200);
+
+  // now test matches only on candidates
+  for (const r of rulesToCheck) {
+    const selectorText = r.selectorText;
+    if (!selectorText) continue;
+
+    const selectors = selectorText.split(",").map(s => s.trim());
+    let ruleMatches = false;
+    for (const sel of selectors) {
+      if (!sel) continue;
+      if (skipPseudo && sel.includes("::")) continue;
+
+      try {
+        if (sourceEl.matches(sel)) { ruleMatches = true; break; }
+      } catch (e) {
+        continue;
+      }
+    }
+    if (!ruleMatches) continue;
+
+    matchedRules++;
+    const style = r.style;
+    for (let i = 0; i < style.length; i++) {
+      const prop = style[i];
+      // whitelist check (fast) - skip non-essential props
+      if (whitelist && whitelist.length && !whitelist.includes(prop)) continue;
+
+      const val = style.getPropertyValue(prop);
+      const pr  = style.getPropertyPriority(prop);
+
+      // don't override target inline
+      if (targetInline[prop]) { skippedPropsBecauseInline++; continue; }
+
+      // skip if target already has same computed inline string (avoid reflow)
+      try {
+        const cur = targetEl.style.getPropertyValue(prop) || "";
+        const curPr = targetEl.style.getPropertyPriority(prop) || "";
+        if (cur === val && curPr === pr) continue;
+      } catch(e){}
+
+      try {
+        targetEl.style.setProperty(prop, val, pr);
+        appliedProps++;
+      } catch (e) {
+        // ignore invalid props
+      }
+    }
+  }
+
+  // finally apply source inline props if target doesn't have them
+  for (const prop in sourceInline) {
+    if (!Object.prototype.hasOwnProperty.call(targetInline, prop)) {
+      try {
+        targetEl.style.setProperty(prop, sourceInline[prop].value, sourceInline[prop].priority);
+        appliedProps++;
+      } catch(e){}
+    } else {
+      skippedPropsBecauseInline++;
+    }
+  }
+
+  return { matchedRules, appliedProps, skippedPropsBecauseInline, candidates: rulesToCheck.length };
+}
+
+
+function addUpgradeEffect() {
+
+  const _area   = document.querySelector('.shine-area');
+  if(!_area) return;
+
+  const target  = _area.parentNode;
+  const _item   = target.firstElementChild;
+  if(!_item) return;
+
+  /* RESET + TRIGGER ITEM */
+  removeClass(_item,'shining-item');
+  void _item.offsetWidth;
+  addClass(_item,'shining-item');
+
+  const rect = _item.getBoundingClientRect();
+
+  /* OVERLAY */
+  const overlay = document.createElement("div");
+  overlay.className = 'upgrade-overlay';
+
+  /* GHOST WRAP */
+  const ghostWrap = document.createElement("div");
+  ghostWrap.className = "ghost-wrap active-shine";
+  Object.assign(ghostWrap.style,{
+    position: "fixed",
+    top: rect.top + "px",
+    left: rect.left + "px",
+    width: rect.width + "px",
+    height: rect.height + "px",
+    zIndex: 9999,
+    pointerEvents: "none",
+    "--angle": "0deg",
+    opacity: 1,
+    transition: "1s"
+  });
+
+  /* CLONE */
+  const ghost = _item.cloneNode(true);
+  applyAppliedRulesPreserveInlineFast(_item, ghost);
+
+  Object.assign(ghost.style, {
+    width: "100%",
+    height: "100%",
+    margin: 0,
+    pointerEvents: "none",
+    transform: "scale(1)",
+    transition: "transform .4s cubic-bezier(.2,.8,.3,1.2)"
+  });
+
+  /* GLOW LAYER */
+  const glow = document.createElement("div");
+  Object.assign(glow.style, {
+    position: "absolute",
+    inset: "-0.7vh",
+    boxShadow: `
+  0 0 1vh rgba(255, 240, 200, 0.9),
+  0 0 4vh rgba(255, 210, 120, 0.75),
+  0 0 8vh rgba(255, 170, 40, 0.55),
+  0 0 14vh rgba(255, 160, 0, 0.35),
+  inset 0 0 4vh rgba(255, 240, 200, 0.65),
+  inset 0 0 2vh rgba(255, 255, 255, 0.25)
+    `,
+    opacity: "1",
+    pointerEvents: "none",
+    transition: "opacity 1s ease"
+  });
+	ghostWrap.style.transformOrigin = "center center";
+	ghost.style.transformOrigin = "center center";
+	/* APPEND ORDER */
+	ghostWrap.appendChild(ghost);
+	ghostWrap.appendChild(glow);
+	document.body.appendChild(overlay);
+	document.body.appendChild(ghostWrap);
+
+ghostWrap.style.setProperty("--angle", "360deg"); 
+
+// 2 FRAME BEKLET → 0ms START
+ghostWrap.style.transition = "none";
+glow.style.transition = "none";
+overlay.style.transition = "none";
+ghost.style.transition = "none";
+	addClass(ghost, 'fade-me-300');
+requestAnimationFrame(() => {
+	addClass(ghost, 'shining-item');
+        // ghostWrap.animate(
+        //   [{ "--angle": "360deg" }, { "--angle": "0deg" }],
+        //   { duration: 1000, easing: "linear" }
+        // );
+		const _rAngle = getRandomValue2(0,20);
+		ghostWrap.animate(
+		[
+			{ "--angle": _rAngle + "deg" },
+			{ "--angle": (_rAngle + 240) + "deg" }  // 1.33 tur
+		],
+		{ duration: 1000, easing: "cubic-bezier(.3,.9,.3,1)" }
+		);
+    requestAnimationFrame(() => {
+		ghostWrap.style.animation = "micro-wiggle 90ms 2 linear";
+  		PlaySound({ key: 'upgrade', volume: .5, reset: true, force: true });
+		ghostWrap.style.transition = "0.2s ease";
+		glow.style.transition       = "0.3s ease";
+		overlay.style.transition    = "0.3s ease";
+		ghost.style.transition      = "0.25s ease";
+    });
+});
+  /* SCALE UP */
+    ghost.style.transform = "scale(1)";
+  requestAnimationFrame(() => {
+    ghost.style.transform = "scale(1.03)";
+  });
+
+  /* RETURN */
+  setTimeout(() => {
+    ghost.style.transform = "scale(1)";
+    glow.style.opacity = "0";
+    ghostWrap.style.opacity = "0";
+    overlay.style.opacity = "0";
+  }, 400);
+
+  /* CLEAN */
+  setTimeout(() => {
+    overlay.remove();
+    ghostWrap.remove();
+  	removeClass(_item,'shining-item');
+  }, 1000);
+
 }

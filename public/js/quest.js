@@ -166,7 +166,7 @@
 		when: function(_current) {
 			return __account.storyResults?.filter(x => x.perfect)?.length > _current ? 1 : 0;
 		},
-		reward: { key: 'ticket-item-selection', value: 10, grade: 3, type: 'misc' },
+		reward: { key: 'ticket-gem-selection', value: 10, grade: 1, type: 'misc' },
 		use: function() {
 			warnChestReward(getChestReward(this.reward.grade ?? 1, 'misc', this.reward.key, this.reward.value));
 		}
@@ -204,7 +204,29 @@
 		use: function() {
 			warnChestReward(getChestReward(1, this.reward.type, this.reward.key, this.reward.value));
 		}
-	}
+	},
+	{
+		id: 23, key: 'complete-act-side', names: { 
+			tr: 'Perde 1 yan hedefleri bitir', 
+			en: 'Act I Bonus Achievements Done'
+		},
+		limit:__stories.filter(x => x.act === 1).reduce((sum, x) => sum + (x.bonusAchievements?.length || 0), 0),
+		// when: function(_current) {
+		// 	const _act1Stories = __stories.filter(x => x.act === 1);
+		// 	for(let _s of _act1Stories) {
+		// 		const _sr = __account.storyResults?.find(x => x.id === _s.id);
+		// 		const _sbal = _s.bonusAchievements?.length ?? 0;
+		// 		const _srbal = _sr?.bonusAchievements?.filter(x => x.done)?.length ?? 0;
+		// 		if(_sbal !== _srbal)
+		// 			return false;
+		// 	}
+		// 	return true;
+		// },
+		reward: { key: 'ticket-item-selection', value: 10, grade: 3, type: 'misc' },
+		use: function() {
+			warnChestReward(getChestReward(this.reward.grade ?? 1, 'misc', this.reward.key, this.reward.value));
+		}
+	},
 ];
 function warnHonorReward(_val) {
 	__account.pvp.honor += _val;

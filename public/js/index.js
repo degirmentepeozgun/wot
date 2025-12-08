@@ -65,6 +65,10 @@ function animate(_tick) {
 	//	_renderDmgFrame--;
 	if(__storyTell)
 		__storyTell.render();
+	
+	const _moved = episode.tinyMoveCamera();
+	if(_moved)
+		prevPlatformX = undefined;
 	requestAnimationFrame(animate);
 }
 //animate();
@@ -781,6 +785,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 				}
 				blurKeyboard();
 				resetTouchPad();
+				checkPC();
 			}, 2000);
 		});
 	});
@@ -922,6 +927,7 @@ function openGame() {
 			connectSocket();
 		_client.saveState();
 		updateQuestArea();
+		setNewKeyCombinations();
 	}, 2000);
 }
 function setTowerMobsByLevel() {
@@ -981,7 +987,33 @@ function setTowerMobsByLevel() {
 	removeCoopCharacter();
 }
 function setKeyBoard(_c) {
-	_c.keyboard = new keyboard(_c, ['a', 'g', 'd', ' ', 'h', 'j', 'k', 'l', 'e', 'q', 'r', 'f', 'arrowleft', 'arrowup', 'arrowright', 'arrowdown', 'w', 's', 'u', '1', '2', '3', '4', 'p', 't']);
+	_c.keyboard = new keyboard(_c, [
+		__account.keyboard?.[0]?.toLowerCase() ?? 'a', 
+		__account.keyboard?.[5]?.toLowerCase() ?? 'g', 
+		__account.keyboard?.[1]?.toLowerCase() ?? 'd', 
+		__account.keyboard?.[6]?.toLowerCase() ?? ' ', 
+		__account.keyboard?.[4]?.toLowerCase() ?? 'h', 
+		__account.keyboard?.[7]?.toLowerCase() ?? 'j', 
+		__account.keyboard?.[8]?.toLowerCase() ?? 'k', 
+		__account.keyboard?.[9]?.toLowerCase() ?? 'l', 
+		__account.keyboard?.[10]?.toLowerCase() ?? 'e', 
+		__account.keyboard?.[11]?.toLowerCase() ?? 'q', 
+		__account.keyboard?.[14]?.toLowerCase() ?? 'r', 
+		__account.keyboard?.[13]?.toLowerCase() ?? 'f', 
+		'arrowleft', 
+		'arrowup', 
+		'arrowright', 
+		'arrowdown', 
+		__account.keyboard?.[2]?.toLowerCase() ?? 'w', 
+		__account.keyboard?.[3]?.toLowerCase() ?? 's', 
+		__account.keyboard?.[15]?.toLowerCase() ?? 'u', 
+		__account.keyboard?.[17]?.toLowerCase() ?? '1', 
+		__account.keyboard?.[18]?.toLowerCase() ?? '2', 
+		__account.keyboard?.[19]?.toLowerCase() ?? '3', 
+		__account.keyboard?.[20]?.toLowerCase() ?? '4', 
+		__account.keyboard?.[16]?.toLowerCase() ?? 'p', 
+		__account.keyboard?.[12]?.toLowerCase() ?? 't'
+	]);
 }
 function addEvent(_id, _char) {
 	const _skillbtn = document.getElementById(_id);
@@ -1027,17 +1059,19 @@ function setCharacterDefaults(_char, _swap) {
 		if (_bar)
 			_bar.style.width = ((_char.fatique / _char.maxFatique) * 100) + '%';
 		if(!episode.pvp) {
-			_enemyProfile.innerHTML = `<div data-key="1" id='common-skill-1' class="flex common"></div>
-					<div data-key="2" id='common-skill-2' class="flex common"></div>
-					<div data-key="3" id='common-skill-3' class="flex common"></div>
-					<div data-key="4" id='common-skill-4' class="flex common"></div>`;
+			_enemyProfile.innerHTML = `<div data-key="1" data-new-key="${document.getElementById('common-skill-1')?.getAttribute?.('data-new-key')}" id='common-skill-1' class="flex common"></div>
+					<div data-key="2" id='common-skill-2' data-new-key="${document.getElementById('common-skill-2')?.getAttribute?.('data-new-key')}" class="flex common"></div>
+					<div data-key="3" id='common-skill-3' data-new-key="${document.getElementById('common-skill-3')?.getAttribute?.('data-new-key')}" class="flex common"></div>
+					<div data-key="4" id='common-skill-4' data-new-key="${document.getElementById('common-skill-4')?.getAttribute?.('data-new-key')}" class="flex common"></div>`;
 			removeClass(_enemyProfile, 'pvp');
 			_commons = document.querySelectorAll('.common');
 			_char.checkCommonInventory();
-			addEvent('common-skill-1', '1');
-			addEvent('common-skill-2', '2');
-			addEvent('common-skill-3', '3');
-			addEvent('common-skill-4', '4');
+			setTimeout(() => {
+				addEvent('common-skill-1', document.getElementById('common-skill-1')?.getAttribute?.('data-new-key'));
+				addEvent('common-skill-2', document.getElementById('common-skill-2')?.getAttribute?.('data-new-key'));
+				addEvent('common-skill-3', document.getElementById('common-skill-3')?.getAttribute?.('data-new-key'));
+				addEvent('common-skill-4', document.getElementById('common-skill-4')?.getAttribute?.('data-new-key'));
+			}, 20);
 		}
 		else
 			_char.disableCommonInventory();
@@ -2303,6 +2337,55 @@ function askChangeLanguage() {
 	_div.innerHTML = _modal;
 	document.getElementById('first-splash').appendChild(_div.firstChild);
 }
+function askResetKeyboardConfig() {
+	PlaySound({key:'click'});
+	let _modal = `<div class="full fade-me show-ui flex inventory-question">
+		<div class="inventory-modal flex">`
+			+
+			`<div style="padding:6vh 4vh 2vh 4vh" class="flex w-100">
+				<span style="color:#F4BB44 !important;font-size:3.2vh !important">${getLangData('Reset to default settings')}?</span>
+			</div>
+			<div style="padding:2vh 2vh 6vh 2vh" class="flex w-100">
+				<div class="game-menu-button flex animate-me" style="font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('IGNORE')}</div>
+				<div id="item-selection-approve-btn" class="game-menu-button flex animate-me" style="font-size:3vh !important" onexactclick="resetKeyboardConfig()">${getLangData('APPROVE')}</div>
+			</div>
+		</div>
+	</div>`;
+	const _div = document.createElement('div');
+	_div.innerHTML = _modal;
+	let _parent = document.getElementById('first-splash');
+	if(hasClass(_parent, 'v-none'))
+		_parent = document.querySelector('#menu-ui') ?? _gameUI;
+	_parent.appendChild(_div.firstChild);
+}
+function resetKeyboardConfig() {
+	const _coms = document.querySelectorAll('.key-combination-item');
+	let i = 0;
+	for(let kc of _keyCombinations) {
+		_coms[i].value = kc.baseKey === ' ' ? 'SPACE' : kc.baseKey;
+		i++;
+	}
+	closeInventoryQuestionModal();
+}
+function cancelKeyboardConfig() {
+	approveKeyboardPromo();
+}
+function approveKeyboardConfig() {
+	__account.keyboard = [];
+	const _coms = document.querySelectorAll('.key-combination-item');
+	_coms?.forEach(x => __account.keyboard.push(x.value === 'SPACE' ? ' ' : x.value));
+	_client.saveState();
+	setNewKeyCombinations();
+	approveKeyboardPromo();
+}
+function setNewKeyCombinations() {
+	const dk = document.querySelectorAll('#game-ui div[data-key]');
+	for(let _item of dk) {
+		const _key = _item.getAttribute('data-key');
+		const _index = _keyCombinations.findIndex(x => (x.baseKey === ' ' ? 'space' : x.baseKey).toLowerCase() === _key);
+		_item.setAttribute('data-new-key', (__account.keyboard?.[_index] === ' ' ? 'space' : __account.keyboard?.[_index]?.toLowerCase?.()) ?? _key);
+	}
+}
 function approveKeyboardPromo() {
 	const _container = document.querySelector('.keyboard-promo-container');
 	if(hasClass(_container, 'fade-out-99'))
@@ -2339,21 +2422,56 @@ function getKeyboardPromo(_force) {
 		PlaySound({key:'click'});
 	const _desc = document.createElement('div');
 	_desc.className = 'flex show-ui full keyboard-promo-container quick-play-desc-container fade-me-99 animate-me';
-	_desc.style = 'position:absolute;top:0;left:0;overflow:hidden;z-index:3';
-	let _html = '<div style="height:calc(100% - 9vh);position:relative" class="w-100 flex"><img src="./images/icons/keys.png" style="border:.2vh solid #F3F4F599;border-top:0;position:absolute;object-fit:cover;max-width:100%;max-height:100%" /></div>';
-	_desc.innerHTML = _html +
-			`<div class="quick-play-desc-skip flex" style="padding:0 5vh;width:91% !important">
-				<div id="key-promo-skip" onexactclick="skipKeyboardPromo()" class="flex flex-jc-start w-50${_seenBefore ? ' v-none' : ''}" style="height:100%">
-					<div class="flex" style="height:100%">
-						<img src="./images/ui/star-off.png" style="height:5vh;transform:rotate(44deg);-webkit-transform:rotate(44deg)" />
-						<div class="flex" style="margin:0 2vh">${getLangData("Don't show again")}</div>
-					</div>
+	_desc.style = 'position:absolute;top:0;left:0;overflow:hidden;z-index:1499';
+	//let _html = '<div style="height:calc(100% - 9vh);position:relative" class="w-100 flex"><img src="./images/icons/keys.png" style="border:.2vh solid #F3F4F599;border-top:0;position:absolute;object-fit:cover;max-width:100%;max-height:100%" /></div>';
+	// _desc.innerHTML = _html +
+	// 		`<div class="quick-play-desc-skip flex" style="padding:0 5vh;width:91% !important">
+	// 			<div id="key-promo-skip" onexactclick="skipKeyboardPromo()" class="flex flex-jc-start w-50${_seenBefore ? ' v-none' : ''}" style="height:100%">
+	// 				<div class="flex" style="height:100%">
+	// 					<img src="./images/ui/star-off.png" style="height:5vh;transform:rotate(44deg);-webkit-transform:rotate(44deg)" />
+	// 					<div class="flex" style="margin:0 2vh">${getLangData("Don't show again")}</div>
+	// 				</div>
+	// 			</div>
+	// 			<div onexactclick="approveKeyboardPromo()" class="flex flex-jc-end w-50" style="height:100%">
+	// 				${getLangData('UNDERSTOOD')}
+	// 			</div>
+	// 		</div>`;
+	let _html = '<div style="height:calc(100% - 9vh);position:relative;background:radial-gradient(#00000080, #000000cc), linear-gradient(180deg, #000, transparent, transparent, #00000080, #000), url(./images/icons/kb-bg.png);background-size:contain;background-position:center;background-repeat:no-repeat" class="w-100 flex key-combinations"><div class="w-50" style="height:100%">';
+	for(let i = 0; i < 11; i++) {
+		const _item = { title: _keyCombinations[i].title, baseKey: __account.keyboard?.[i] ?? _keyCombinations[i].baseKey };
+		_html += `<div class="w-100 flex" style="height:9%">
+			<div class="w-50 flex flex-jc-end" style="height:100%">${_item.title[getLang()]}</div>
+			<div class="w-50 flex flex-jc-start" style="height:100%"><input onkeydown="setBindKey(this, event)" data-key="${_item.baseKey}" onfocus="readyToBindKey(this)" onblur="tryResetBindKey(this)" class="key-combination-item" type="text" style="height:100%;aspect-ratio:5/1" value="${_item.baseKey === ' ' ? 'SPACE' : _item.baseKey}" />` 
+			+ (_keyCombinations[i].desc ?? '') +
+			`</div>
+		</div>`;
+	}
+	_html += '</div><div class="w-50" style="height:100%">';
+	for(let i = 11; i < 21; i++) {
+		const _item = { title: _keyCombinations[i].title, baseKey: __account.keyboard?.[i] ?? _keyCombinations[i].baseKey };
+		_html += `<div class="w-100 flex" style="height:9%">
+			<div class="w-50 flex flex-jc-end" style="height:100%">` 
+			+ (_keyCombinations[i].desc ?? '') +
+			`<input onkeydown="setBindKey(this, event)" data-key="${_item.baseKey}" onfocus="readyToBindKey(this)" onblur="tryResetBindKey(this)" class="key-combination-item" type="text" style="height:100%;aspect-ratio:5/1" value="${_item.baseKey === ' ' ? 'SPACE' : _item.baseKey}" /></div>
+			<div class="w-50 flex flex-jc-start" style="height:100%">${_item.title[getLang()]}</div>
+		</div>`;
+	}
+	_desc.innerHTML = _html + '</div></div>' +
+			`<div class="quick-play-desc-skip flex" style="padding:0 10vh">
+				<div onexactclick="cancelKeyboardConfig()" class="flex flex-jc-end" style="height:100%">
+					${getLangData('CANCEL')}
 				</div>
-				<div onexactclick="approveKeyboardPromo()" class="flex flex-jc-end w-50" style="height:100%">
-					${getLangData('UNDERSTOOD')}
+				<div onexactclick="askResetKeyboardConfig()" class="flex flex-jc-end" style="height:100%">
+					${getLangData('RESET')}
+				</div>
+				<div onexactclick="approveKeyboardConfig()" class="flex flex-jc-end" style="height:100%">
+					${getLangData('APPROVE')}
 				</div>
 			</div>`;
-	document.getElementById('first-splash').appendChild(_desc);
+	let _parent = document.getElementById('first-splash');
+	if(hasClass(_parent, 'v-none'))
+		_parent = document.querySelector('#menu-ui') ?? _gameUI;
+	_parent.appendChild(_desc);
 }
 let __particles;
 function installOpeningScreen(_instant, _lateOpening) {
@@ -2444,10 +2562,10 @@ function installOpeningScreen(_instant, _lateOpening) {
 			renderOpeningUI();
 	}
 	_img.src = './images/loading/00.gif';
-	if(__isPC && !_lateOpening && !_instant)
-		setTimeout(() => {
-			getKeyboardPromo();
-		}, 100);
+	// if(__isPC && !_lateOpening && !_instant)
+	// 	setTimeout(() => {
+	// 		getKeyboardPromo();
+	// 	}, 100);
 }
 setTimeout(function() {
 	if ('ontouchstart' in window ||

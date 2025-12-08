@@ -6485,7 +6485,8 @@ const __stories = [
 								minLevel: mainCharacter.level,
 								maps: [201]
 							});
-							if(mainCharacter.level === 9) {
+							if(mainCharacter.level > 8 && mainCharacter.animations.tag.disabled) {
+								alert(1);
 								delete mainCharacter.animations.tag.disabled;
 								resetSkill('tag', mainCharacter);
 								PlaySound({key:'conquer', volume:.6});

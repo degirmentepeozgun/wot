@@ -11,6 +11,12 @@ const _borderRates = [
 ];
 console.log('map');
 function map(_m) {
+	
+	if (!window._distortFX) {
+		const distc = document.createElement('canvas');
+		const dctx = distc.getContext('2d', { willReadFrequently: true });
+		window._distortFX = { distc, dctx };
+	}
 	this.season = _m.season;
 	const _mapSprite = mapSprites.find(x => x.id == this.season);
 	this.still = _mapSprite.still;
@@ -28,6 +34,8 @@ function map(_m) {
 	c90 = document.getElementById('droad90');
 	c9 = document.getElementById('dobj-foreground');
 	this.FootShadow = getImage('./images/related/shadow3.png');
+	this.HBMob = getImage('./images/icons/hbmob.png');
+	this.HBBoss = getImage('./images/icons/hbboss.png');
 	const _cArr = [c3, c9, c50, c85, c90, cc];
 	for(let _c of _cArr) {
 		_c.innerHTML = '';
@@ -269,12 +277,12 @@ function map(_m) {
 				_endFunc();
 			return;
 		}
-		const _chars = this.seenEnemies.filter(x => x.class !== 'object' && !x.isDead() && !x.remove && !x.immobilize);
+		const _chars = this.enemies.filter(x => x.class !== 'object' && !x.isDead() && !x.remove && !x.immobilize);
 		if(_chars?.[0]) {
 			if(!this.cameraMoveStep) {
 				_chars.forEach(x => x.immobilize = x.disableKeyboard = true);
 				mainCharacter.fps = 1;
-				mainCharacter.keyboard.holdingKeys = [];
+				blurKeyboard();
 				this.cameraMoveStep = MathCeil((mainCharacter.calculateMoveXStep() * this.cWidth) / 100);
 				this.cameraMoveEndFunc = _endFunc;
 			}
@@ -1567,6 +1575,73 @@ function map(_m) {
 			this.lastStoryTicketTimerCheck = _gameTick;
 		}
 	}
+	this.tinyMoveCamera = function() {
+		if(__storyCutScenePlaying || this.end || _dialogAppeared || _game.suspended)
+			return false;
+		if(this.skipTinyCameraMove) {
+			this.skipTinyCameraMove--;
+			return false;
+		}
+		if(!mainCharacter || this?.still || this.ultimateTimeStop || __storyCutScenePlaying || mainCharacter.animation === 'run')
+			return false;
+		const _deadLeft = mainCharacter.direction === __left ? this.cWidth * .55 : this.cWidth * .35;
+		const _deadRight = mainCharacter.direction === __left ? this.cWidth * .65 : this.cWidth * .45;
+		if(mainCharacter.left > _deadLeft && mainCharacter.left < _deadRight)
+			return false;
+		if(!this.cameraEasing){
+			this.cameraEasing = 1;
+			this.cameraEasingStart = 0;
+		}
+		this.cameraEasingStart++;
+		if(this.cameraEasingStart !== this.cameraEasing)
+			return false;
+		else
+			this.cameraEasingStart = 0;
+		const _half = mainCharacter.direction === __left ? _deadRight : _deadLeft;
+		const _part = this.cWidth / 10;
+		let _step = episode.cWidth / 400;
+		if(mainCharacter.left < (_half - _step))
+		{
+			if(mainCharacter.getCurrentAnimation()?.attack || mainCharacter.animation === 'roll'
+		|| mainCharacter.animation === 'dash' || mainCharacter.animation === 'escape')
+				_step *= 2;
+			if(mainCharacter.chargeProperties)
+				_step *= 4;
+			if(_step > 1 && mainCharacter.left > (_half - _part))
+				_step *= .5;
+			else if(_step > 1 && mainCharacter.left > (_half - _part * 2))
+				_step *= .75;
+			if(mainCharacter.direction === __right)
+				_step *= .75;
+			_step = MathCeil(_step);
+			if((platformX - _step) >= 0){
+				platformX -= _step;
+				mainCharacter.left += _step;
+				return true;
+			}
+		}
+		else if(mainCharacter.left > (_half + _step)) {
+			if(mainCharacter.getCurrentAnimation()?.attack || mainCharacter.animation === 'roll'
+		|| mainCharacter.animation === 'dash' || mainCharacter.animation === 'escape')
+				_step *= 2;
+			if(mainCharacter.chargeProperties)
+				_step *= 4;
+			if(_step > 1 && mainCharacter.left < (_half + _part))
+				_step *= .5;
+			else if(_step > 1 && mainCharacter.left < (_half + _part * 2))
+				_step *= .75;
+			if(mainCharacter.direction === __left)
+				_step *= .75;
+			_step = MathCeil(_step);
+			const _maxW = this.width - this.cWidth;
+			if((platformX + _step) <= _maxW){
+				platformX += _step;
+				mainCharacter.left -= _step;
+				return true;
+			}
+		}
+		return false;
+	}
 	this.drawEnemies = function (_queue) {
 		//const rect = getVisibleRectangle();
 		if(this.disposing)
@@ -2789,6 +2864,9 @@ function map(_m) {
 	this.offCanvas.width = this.cWidth;
 	this.offCanvas.height = this.cHeight;
 	const offCtx = this.offCanvas.getContext('2d');
+	this.getOffContext = function() {
+		return offCtx;
+	}
 	this.offCanvas.imageSmoothingEnabled = false;
 	this.offGoreCanvas = document.createElement('canvas');
 	this.offGoreCanvas.width = this.cWidth;
@@ -2958,6 +3036,235 @@ function map(_m) {
 		// 3 - Sonucu ana canvasa aktar
 		_can.drawImage(temp, x, y);
 	}
+	this.drawHitParticles = function(_char, x, y, direction, color, strength, reversed, _key) {
+	if (!_char.particles) _char.particles = [];
+
+	if (x) {
+
+		strength = Math.max(1, Math.min(3, strength - 1));
+		let _countRate = 1;
+		if(strength >= 2 && strength < 3)
+			_countRate = getRandomValue2(100, 300) / 100;
+		else if(strength >= 3)
+			_countRate = 4;
+		if(_char.particles.length > 0 && _countRate < 4)
+			return;
+		const count = (16 + _countRate) + strength * _countRate * ((_char.width * _char.ZOOM) / 30);
+		const spread = (20 + _countRate) + strength * 20;
+		const baseSpeed = (getRandomValue2(25, 45) / 10) + _countRate * ((_char.width * _char.ZOOM) / (60 + (_countRate * 15)));
+
+		// 2.5D için kontrollü aşağı eğim
+		let downwardBias = 18 + Math.random() * 6;
+		for (let i = 0; i < count; i++) {
+
+			const angle =
+				direction +
+				downwardBias +
+				(Math.random() * spread - spread / 2);
+			
+			const rad = angle * Math.PI / 180;
+
+			// HER PARTİKÜL FARKLI HAREKET PROFİLİ ALIR
+			let speedVariance = Math.random();
+			let speed =
+				baseSpeed *
+				(0.6 + speedVariance * speedVariance * 1.6);
+
+			let vx = Math.cos(rad) * speed;
+			let vy = Math.sin(rad) * speed;
+			if (_key === 'slam')
+				vy -= speed * 0.8;
+
+			// Mikro yön bozulması (robotik hissi öldürür)
+			vx += (Math.random() - 0.5) * 0.6;
+			vy += (Math.random() - 0.5) * 0.4;
+
+			_char.particles.push({
+				x,
+				y,
+				vx,
+				vy,
+				p: platformX,
+				radius: 1.5 + Math.random() * 3.2,
+				life: getRandomValue2(80, 110) / 100,
+				decay: 0.035 + Math.random() * 0.05,
+				frame: 0,
+				gravity: 0.28 + Math.random() * 0.5,
+				wobble: Math.random() * 2,
+				color: randomShade(color)
+			});
+		}
+	}
+
+	const oldAlpha = offCtx.globalAlpha;
+	const _reversed = (offCtx.reversed && !reversed) || (!offCtx.reversed && reversed);
+	for (let i = _char.particles.length - 1; i >= 0; i--) {
+		const p = _char.particles[i];
+
+		// Agresif başlangıç
+		let speedMultiplier = p.frame < 2 ? 2.5 : 1;
+		let sizeMultiplier  = p.frame < 2 ? 1.5 : 1;
+
+		// Organik jitter (çizgi hissini yok eder)
+		p.x += p.vx * speedMultiplier + Math.sin(p.frame + p.wobble) * 0.4;
+		p.y += p.vy * speedMultiplier;
+
+		p.vy += p.gravity;
+		p.vx *= 0.96; // hafif sürtünme
+
+		p.life -= p.decay;
+		p.frame++;
+
+		offCtx.globalAlpha = p.life;
+		offCtx.beginPath();
+		offCtx.fillStyle = p.color;
+		offCtx.ellipse(
+			p.x - ((_reversed ? -1 : 1) * (platformX - p.p)),
+			p.y,
+			p.radius * sizeMultiplier * (getRandomValue2(8, 24) / 10),
+			p.radius * sizeMultiplier * (getRandomValue2(8, 12) / 10),
+			0,
+			0,
+			Math.PI * 2
+		);
+		offCtx.fill();
+
+		if (p.life <= 0)
+			_char.particles.splice(i, 1);
+	}
+
+	offCtx.globalAlpha = oldAlpha;
+
+	if (_char.particles.length === 0)
+		delete _char.particles;
+
+	function randomShade(hex) {
+		let r = parseInt(hex.substr(1,2),16);
+		let g = parseInt(hex.substr(3,2),16);
+		let b = parseInt(hex.substr(5,2),16);
+
+		r += Math.random() * 35 - 15;
+		g += Math.random() * 25 - 10;
+		b += Math.random() * 20 - 5;
+
+		return `rgb(${r|0},${g|0},${b|0})`;
+	}
+}
+
+// 	this.drawHitParticles = function(_char, x, y, direction, color, strength, reversed) {
+// 	if (!_char.particles) _char.particles = [];
+
+// 	if (x) {
+// 		if(_char.particles.length > 0)
+// 			return;
+
+// 		strength = Math.max(1, Math.min(3, strength - 1));
+// 		let _countRate = 1;
+// 		if(strength >= 2 && strength < 3)
+// 			_countRate = getRandomValue2(100, 300) / 100;
+// 		else if(strength >= 3)
+// 			_countRate = 4;
+// 		const count = 8 + strength * _countRate * ((_char.width * _char.ZOOM) / 30);
+// 		const spread = (18 + _countRate) + strength * 6;
+// 		const baseSpeed = (getRandomValue2(18, 28) / 10) + _countRate * ((_char.width * _char.ZOOM) / 120);
+
+// 		// 2.5D için kontrollü aşağı eğim
+// 		const downwardBias = strength >= 2 ? 12 : 6;
+
+// 		for (let i = 0; i < count; i++) {
+
+// 			const angle =
+// 				direction +
+// 				downwardBias +
+// 				(Math.random() * spread - spread / 2);
+
+// 			const rad = angle * Math.PI / 180;
+
+// 			// HER PARTİKÜL FARKLI HAREKET PROFİLİ ALIR
+// 			let speedVariance = Math.random();
+// 			let speed =
+// 				baseSpeed *
+// 				(0.6 + speedVariance * speedVariance * 1.6);
+
+// 			let vx = Math.cos(rad) * speed;
+// 			let vy = Math.sin(rad) * speed * 0.6;
+
+// 			// Mikro yön bozulması (robotik hissi öldürür)
+// 			vx += (Math.random() - 0.5) * 1.2;
+// 			vy += (Math.random() - 0.5) * 0.8;
+
+// 			_char.particles.push({
+// 				x,
+// 				y,
+// 				vx,
+// 				vy,
+// 				p: platformX,
+// 				radius: 1.5 + Math.random() * 3.2,
+// 				life: 1,
+// 				decay: 0.035 + Math.random() * 0.045,
+// 				frame: 0,
+// 				gravity: 0.32 + Math.random() * 0.18,
+// 				wobble: Math.random() * 2,
+// 				color: randomShade(color)
+// 			});
+// 		}
+// 	}
+
+// 	const oldAlpha = offCtx.globalAlpha;
+// 	const _reversed = (offCtx.reversed && !reversed) || (!offCtx.reversed && reversed);
+// 	for (let i = _char.particles.length - 1; i >= 0; i--) {
+// 		const p = _char.particles[i];
+
+// 		// Agresif başlangıç
+// 		let speedMultiplier = p.frame < 2 ? 3.4 : 1;
+// 		let sizeMultiplier  = p.frame < 2 ? 1.5 : 1;
+
+// 		// Organik jitter (çizgi hissini yok eder)
+// 		p.x += p.vx * speedMultiplier + Math.sin(p.frame + p.wobble) * 0.4;
+// 		p.y += p.vy * speedMultiplier;
+
+// 		p.vy += p.gravity;
+// 		p.vx *= 0.92; // hafif sürtünme
+
+// 		p.life -= p.decay;
+// 		p.frame++;
+
+// 		offCtx.globalAlpha = p.life;
+// 		offCtx.beginPath();
+// 		offCtx.fillStyle = p.color;
+// 		offCtx.ellipse(
+// 			p.x - ((_reversed ? -1 : 1) * (platformX - p.p)),
+// 			p.y,
+// 			p.radius * sizeMultiplier * (getRandomValue2(8, 20) / 10),
+// 			p.radius * sizeMultiplier * (getRandomValue2(8, 12) / 10),
+// 			0,
+// 			0,
+// 			Math.PI * 2
+// 		);
+// 		offCtx.fill();
+
+// 		if (p.life <= 0)
+// 			_char.particles.splice(i, 1);
+// 	}
+
+// 	offCtx.globalAlpha = oldAlpha;
+
+// 	if (_char.particles.length === 0)
+// 		delete _char.particles;
+
+// 	function randomShade(hex) {
+// 		let r = parseInt(hex.substr(1,2),16);
+// 		let g = parseInt(hex.substr(3,2),16);
+// 		let b = parseInt(hex.substr(5,2),16);
+
+// 		r += Math.random() * 35 - 15;
+// 		g += Math.random() * 25 - 10;
+// 		b += Math.random() * 20 - 5;
+
+// 		return `rgb(${r|0},${g|0},${b|0})`;
+// 	}
+// }
+
 	this.drawCharacterQueue = function (_queue) {
 		if (this.disposing || !_queue?.[0]){
 			this.checkSceneActions();
@@ -3009,7 +3316,7 @@ function map(_m) {
 		offCtx.reversed = c10.reversed = offGoreCtx.reversed = false;// = _cNPC.cleared = false;
 		//let _zoomRate, _zoomedWidth, _zoomedHeight, _zoomedLeft, _zoomedTop, 
 		let _hurt, _hurted, _rotate, _wDiff, _hDiff, _hurtedCount = 0, _bounceCount = 0;
-		let _preDraws = [], _backgrounds = [], _relateds = [], _out;
+		let _preDraws = [], _backgrounds = [], _relateds = [], _afterCanvasAnimations = [], _out;
 		for (var _item of _queue) {
 			if (_item.unseen || _item.char.remove || _item.char.unseen)
 				continue;
@@ -3095,7 +3402,7 @@ function map(_m) {
 					_wDiff = (offCtx.reversed ? -1 : 1) * ((_item.width - (_item.width * (_item.zoom ?? 1))) / 2);
 					_hDiff = (_item.height - (_item.height * (_item.zoom ?? 1)));
 					if(!__batterySaveMode) {
-						_hurted = (_hurt || _item.skinColor);// && (_item.char.frame + _item.char.start) > 0;
+						_hurted = !(_item.char.readyForFatality && _item.animation === 'hurtground1') && (_hurt || _item.skinColor);// && (_item.char.frame + _item.char.start) > 0;
 						if(!_hurted && !_item.char.dead && _shadowItems?.[0]) {
 							let _shadowItemOrder = 55;
 							for(let _shadowItem of _shadowItems) {
@@ -3124,6 +3431,7 @@ function map(_m) {
 						// _zoomedLeft = MathRound((_zoomedWidth - _item.width) / 2);
 						// _zoomedTop = MathRound(_zoomedHeight - _item.height);
 						//_colorized = false;
+						let _drawParticles = 1;
 						if(_hurted && _item.char.frame < 2 && (_hurtedCount < 4 || _item.char.main)) {
 							//if(!_item.char.colorized) {
 								//_item.char.colorized = _colorized = true;
@@ -3228,9 +3536,23 @@ function map(_m) {
 										_item.char.relatedObjects = _item.char.relatedObjects.filter(x => x.key !== 'trail2');
 									}
 								}
-								//this.drawChargeParticles(_item);
+								if(_item.char.hurtingStrength) {
+									const _knockback = _item.char.animation.startsWith('knockback');
+									let _hs = _item.char.hurtingStrength;
+									if(typeof _hs === 'string')
+										_hs = 4;
+									else 
+										_hs += (_knockback ? 2 : (_item.particleColor ? 3 : 0));
+									this.drawHitParticles(_item.char, _x + MathRound(_w / 2),
+									_y + MathRound(_h / 2), getRandomValue2(150, 190), '#880808', 
+									_hs, _knockback, _item.char.hurtingStrength);
+									delete _item.char.hurtingStrength;
+									_drawParticles = 0;
+								}
 							}
 						}
+						if(_drawParticles && _item.char.particles)
+							this.drawHitParticles(_item.char);
 						if(_item.char.text)
 						{
 							let _restored;
@@ -3280,9 +3602,16 @@ function map(_m) {
 			}
 			this.drawRelatedObjects(_item, _relateds);
 			if(_item.char.canvasObjects?.[0])
-				for(let _cobj of _item.char.canvasObjects)
-					canvasAnimations[_cobj.key](_item.char, _cobj.params, offCtx);
+				for(let _cobj of _item.char.canvasObjects){
+					if(!_cobj.params.after)
+						canvasAnimations[_cobj.key](_item.char, _cobj.params, offCtx);
+					else
+						_afterCanvasAnimations.push({key:_cobj.key, char:_item.char,params:_cobj.params});
+				}
 		}
+		if(_afterCanvasAnimations?.[0])
+			for(let _cobj of _afterCanvasAnimations)
+				canvasAnimations[_cobj.key](_cobj.char, _cobj.params, offCtx);
 		if(offCtx.reversed) {
 			offCtx.restore();
 			offCtx.reversed = false;
@@ -3627,10 +3956,223 @@ function map(_m) {
 	this.healthBarCache = this.healthBarCache ?? new Map();
 this.w100 = MathRound(this.cWidth / 100);
 this.VH3 = MathRound(window.innerHeight / 33);
+this.drawMobHealthBar = function(cofftx, _item, x, y, w) {
+	const _char = _item.char;
+	const h = MathRound(w * (26 / 124));
+    // HP Ratio
+    let ratio = Math.max(0, Math.min(1, _char.health / _char.MAXHP));
+
+    // İlk tick ise previousHPRatio yok → oluştur
+    if (_char.previousHPRatio === undefined) {
+        _char.previousHPRatio = ratio;
+        _char.damageFlash = 0; 
+    }
+
+    // HP düştüyse flash tetikle
+    if (ratio < _char.previousHPRatio) {
+        _char.damageFlash = 1; 
+    }
+
+    // Flash zamanla sönsün
+    if (_char.damageFlash > 0) {
+        _char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
+    }
+
+    // Yeni HP değerini sakla
+    _char.previousHPRatio = ratio;
+	const _rev = offCtx.reversed;
+	if(offCtx.reversed)
+		offCtx.restore();
+
+    // --- 1. ÇERÇEVEYİ ÇİZ ---
+    cofftx.drawImage(this.HBMob, x, y, w, h);
+
+
+    // --- 2. INNER BAR MARGIN ---
+	let padX = w * .06;
+	let padY = h * .225;
+    let innerX = x + padX;
+    let innerY = y + padY;
+    let innerW = w - padX * 2;
+    let innerH = h - padY * 2;
+
+    // --- 3. HEALTH COLOR (yeşil → kırmızı) ---
+    let r = Math.floor(255 * (1 - ratio));
+    let g = Math.floor(255 * ratio);
+    let color = `rgb(${r},${g},0)`;
+
+    // Bar genişliği
+    let barW = innerW * ratio;
+
+    // Health bar'ı çiz
+    cofftx.save();
+    cofftx.fillStyle = color;
+    cofftx.fillRect(innerX, innerY, barW, innerH);
+    cofftx.restore();
+
+
+    // --- 4. DAMAGE FLASH (otomatik) ---
+    if (_char.damageFlash > 0) {
+        cofftx.save();
+        cofftx.globalAlpha = _char.damageFlash;
+        cofftx.fillStyle = "white";
+        cofftx.fillRect(innerX, innerY, innerW, innerH);
+        cofftx.restore();
+    }
+	if(_rev) {
+		offCtx.save();
+		offCtx.scale(-1, 1);
+	}
+}
+
+this.drawBossName = function(cofftx, _char, x, y, w, padX) {
+
+    const name = _char.displayName ?? _char.name ?? "BOSS";
+
+    // Font ölçeklemesi (her çözünürlükte temiz)
+    let fontSize = MathRound(w * 0.12); // genişliğe göre ayarlanır
+
+    cofftx.save();
+
+    cofftx.font = `${fontSize}px 'Cinzel', serif`;
+    cofftx.textBaseline = "top";
+    cofftx.textAlign = "left";
+
+    // Stroke kalınlığı (dinamik)
+    cofftx.lineWidth = fontSize * 0.15;
+
+    // --- OUTLINE ---
+    cofftx.strokeStyle = "black";
+    cofftx.strokeText(name, x, y - fontSize);
+
+    // --- FILL ---
+    cofftx.fillStyle = "#F2F2F2"; // okunabilir kirli beyaz
+    cofftx.fillText(name, x, y - fontSize);
+	if(_char.gradeLeft > 0) {
+		const gradeText = "x" + (_char.gradeLeft + 1);
+		cofftx.strokeText(gradeText, x + w + padX, y);
+		cofftx.fillText(gradeText, x + w + padX, y);
+	}
+    cofftx.restore();
+};
+this.drawBossHealthBar = function(cofftx, _item, x, y, w) {
+
+	const _char = _item.char;
+	const h = MathRound(w * (26 / 252)); // boss bar aspect ratio
+
+	// HP Ratio
+	let ratio = Math.max(0, Math.min(1, _char.health / _char.MAXHP));
+
+	// Init
+	if (_char.previousHPRatio === undefined) {
+		_char.previousHPRatio = ratio;
+		_char.damageFlash = 0;
+	}
+
+	// Flash trigger
+	if (ratio < _char.previousHPRatio) {
+		_char.damageFlash = 1;
+	}
+
+	// Fade flash
+	if (_char.damageFlash > 0) {
+		_char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
+	}
+
+	_char.previousHPRatio = ratio;
+
+	// Reverse fix
+	const _rev = offCtx.reversed;
+	if (_rev) offCtx.restore();
+
+	// --- 1. ÇERÇEVE ---
+	cofftx.drawImage(this.HBBoss, x, y, w, h);
+
+	// --- 2. INNER BAR MARGIN ---
+	let padX = w * .03;
+	let padY = h * .225;
+	let innerX = x + padX;
+	let innerY = y + padY;
+	let innerW = w - padX * 2;
+	let innerH = h - padY * 2;
+
+	// --- 3. Renkler (daha parlak DF paleti) ---
+	const fantasy = [
+		"#C62828",
+		"#2ECC71",
+		"#2874A6",
+		"#E67E22",
+		"#8E44AD",
+		"#6C3483",
+		"#F1C40F"
+	];
+
+	let mainColor = fantasy[_char.gradeLeft + 1];
+	let underColor = fantasy[_char.gradeLeft];
+
+	// Bar width
+	let barW = innerW * ratio;
+
+	// --- 4. GradeLeft = 0 → Mob mantığı ---
+	if (_char.gradeLeft === 0) {
+
+		// arka plan yok (transparan)
+		// sadece ratio'lu ön bar var
+
+		if (ratio >= 0.5) {
+			// mob yeşil
+			mainColor = "#3CA64C";
+		} else {
+			// mob kırmızı
+			mainColor = "#B22222";
+		}
+
+		cofftx.save();
+		cofftx.fillStyle = mainColor;
+		cofftx.fillRect(innerX, innerY, barW, innerH);
+		cofftx.restore();
+
+	} else {
+
+		// --- 5. GradeLeft > 0 → Çift katmanlı boss bar ---
+
+		// Arka katman (gradeLeft)
+		cofftx.save();
+		cofftx.fillStyle = underColor;
+		cofftx.fillRect(innerX, innerY, innerW, innerH);
+		cofftx.restore();
+
+		// Üst katman (grade)
+		cofftx.save();
+		cofftx.fillStyle = mainColor;
+		cofftx.fillRect(innerX, innerY, barW, innerH);
+		cofftx.restore();
+	}
+
+	// --- 6. DAMAGE FLASH ---
+	if (_char.damageFlash > 0) {
+		cofftx.save();
+		cofftx.globalAlpha = _char.damageFlash;
+		cofftx.fillStyle = "white";
+		cofftx.fillRect(innerX, innerY, innerW, innerH);
+		cofftx.restore();
+	}
+	
+	this.drawBossName(cofftx, _item.char, x + padX, y, w, MathRound(padX * .5));
+	// Reverse geri al
+	if (_rev) {
+		offCtx.save();
+		offCtx.scale(-1, 1);
+	}
+};
+
 this.drawHealthBar2 = function (_item) {
 	const _isPvp = !this.gold && ((this.pvp || this.war) || _item.char.flagCapturer);
 	if(__batterySaveMode || _item.char.skipHealthBar || _item.char.health <= 0 || _item.char.dead)
 		return;
+
+	// if(!(_item.char.grade > 1))
+	// 	return;
 
 	if (_item.char.main || (_isPvp && _item.char.alp)) {
 		this.drawBuffs(_item.char, 'big');
@@ -3638,11 +4180,72 @@ this.drawHealthBar2 = function (_item) {
 			return;
 	}
 	if(!_isPvp) {
-		if (!_item.char.key || (!_item.char.hpDropped && (_item.char.class !== 'boss' && _item.char.phased == undefined)) || _item.char.MAXHP <= 1 || _item.char.class === __spell || _item.animation === 'respawn')
+		const _pass = (_item.char.class !== 'boss' && _item.char.phased == undefined);
+		if (!_item.char.key || (!_item.char.hpDropped && _pass) || _item.char.MAXHP <= 1 || _item.char.class === __spell || _item.animation === 'respawn')
 			return;
 
-		if (_item.char.class !== 'boss' && _item.char.phased == undefined && _item.char.hpDropped < (_gameTick - 4000))
+		if (_pass && _item.char.hpDropped < mainCharacter.attackedUnitTime)
 			return;
+	}
+	else{
+		const _isBoss = _item.char.class === 'boss';
+
+		let _hWidth = MathRound((this.cWidth / 100) * (_isBoss ? 10 : 4));
+		if (_item.char.healthBarWidthRate)
+			_hWidth = MathRound(_item.char.healthBarWidthRate * _hWidth);
+
+		const _xGap = MathRound((_item.char.WIDTH - _hWidth) / 2);
+		const _hLeft = MathRound(_item.char.EXACTLEFT + _xGap);
+		const isWarPlayer = _item.char.enemy;
+		const _extraTop = isWarPlayer ? MathRound(-40 * __zoom * __scale) : MathRound(-10 * __zoom * __scale);
+		let _hHeight = this.cHeight / 75;
+		if (_item.char.healthBarHeightRate)
+			_hHeight *= _item.char.healthBarHeightRate;
+
+		const _hTop = MathRound(
+			(this.cHeight + _extraTop)
+			- _hHeight
+			- ((_item.char.healtbarGap ?? 0))
+			- _item.char.yPosition
+			- _item.char.HEIGHT
+			- (_item.yGap ?? 0)
+			- ((_item.char.yGap ?? 0))
+		);
+		const c = document.createElement('canvas');
+		const _ch = _hHeight * 2;
+		c.width = _hWidth;
+		c.height = _ch;
+		const ctx = c.getContext('2d');
+		ctx.imageSmoothingEnabled = false;
+
+		// Üçgenin noktaları
+		const x1 = MathRound(_hWidth * .25), y1 = 0;   // sol üst
+		const x2 = MathRound(_hWidth * .75), y2 = 0;  // sağ üst
+		const x3 = MathRound(_hWidth * .5), y3 = _ch; // alt orta (uç)
+
+		// Çizim
+		ctx.beginPath();
+		ctx.moveTo(x1, y1);
+		ctx.lineTo(x2, y2);
+		ctx.lineTo(x3, y3);
+		ctx.closePath();
+
+		// Dolgu rengi
+		ctx.fillStyle = _item.char.main ? "orange" : "red";
+		ctx.fill();
+
+		// Çerçeve (opsiyonel)
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = MathCeil(episode.cHeight / 500);
+		ctx.stroke();
+		if(offCtx.reversed)
+			offCtx.restore();
+		offCtx.drawImage(c, _hLeft, _hTop);
+		if(offCtx.reversed) {
+			offCtx.save();
+			offCtx.scale(-1, 1);
+		}
+		return;
 	}
 	const _hpRate = _item.char.healthRate;
 
@@ -3676,6 +4279,12 @@ this.drawHealthBar2 = function (_item) {
 		- (_item.yGap ?? 0)
 		- ((_item.char.yGap ?? 0))
 	);
+	_hHeight = MathCeil(_hHeight);
+	if(!(_item.char.grade > 1))
+		this.drawMobHealthBar(offCtx, _item, _hLeft, _hTop, _hWidth);
+	else 
+		this.drawBossHealthBar(offCtx, _item, _hLeft, _hTop, _hWidth);
+	return;
 	const _hpBG = !_item.char.gradeLeft ? '#B2BEB5' : getGradeBGColor(_item.char.gradeLeft + 1);
 	let _bg = 'yellow';
 	if (hpGroupRate === 100 || hpGroupRate === 75)
@@ -3683,7 +4292,6 @@ this.drawHealthBar2 = function (_item) {
 	else if(_item.char.gradeLeft)
 		_bg = getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
 	// === Cache'e bak ===
-	_hHeight = MathCeil(_hHeight);
 	const cacheKey = _isPvp ? `group-${_item.char.groupId}` : `group-${hpGroupRate}-${_hWidth}x${_hHeight}-${_bg}`;
 	let cached = this.healthBarCache.get(cacheKey);
 
@@ -3851,14 +4459,22 @@ this.drawHealthBar2 = function (_item) {
 					_rel.stillXGap = (_rel.xGap + ((_rel.reversable === false && _item.reversed) ? _item.char.WIDTH : 0));
 					if (_rel.reversable != false)
 						_rel.stillReversed = _reversed;
-				} else if(_rel.stillOnChar) {
-					if(_rel.stillLeft !== _left){
-						if(!_rel.still)
+				} 
+				else if(_rel.type === 'buff') {
+					_rel.xGap = _item.char.getObjectXGap(_rel, {});
+					_rel.stillPlatformX = platformX;
+					_rel.stillReversed = _reversed;
+					_rel.stillLeft = _left;
+					_rel.stillXGap = _rel.xGap + ((_item.reversed ? 1 : -1) * (_rel.stillLeft === undefined ? 0 : _rel.stillLeft - _left));
+					_rel.stillTop = _rel.top;
+				}else if(_rel.stillOnChar) {
+					if(_rel.stillLeft !== _left || _rel.type === 'buff'){
+						if(!_rel.still && _rel.type !== 'buff')
 							_rel.still = true;
 						_rel.stillPlatformX = platformX;
+						_rel.stillLeft = _left;
 						_rel.stillXGap = _rel.xGap + ((_item.reversed ? 1 : -1) * (_rel.stillLeft === undefined ? 0 : _rel.stillLeft - _left));
 						_rel.stillReversed = _reversed;
-						_rel.stillLeft = _left;
 					}
 					if(_rel.stillTop !== _rel.top)
 						_rel.stillTop = _rel.top;
@@ -3920,10 +4536,6 @@ this.drawHealthBar2 = function (_item) {
 							spriteWidth: _rel.width - (_rel.baseRight ?? 0),
 							spriteHeight: _rel.height
 						}, _rel.color, _rel.key + '-frame' + (_rel.frame ?? 0));
-					// if(_rel.alpha < 1){
-					// 	_can.save();
-					// 	_can.globalAlpha = _rel.alpha;
-					// }
 					if(_spr?.width > 0){
 						if(_rel.alpha < 1) {
 							this.drawSpriteWithFade(_can, _spr, 
@@ -3932,7 +4544,7 @@ this.drawHealthBar2 = function (_item) {
 								_rel.width - (_rel.baseRight ?? 0), 
 								_rel.height,
 							MathRound(_relLeft),
-							MathRound((_rel.stillTop ?? _rel.top) - (((_rel.still ? 0 : (_item.yGap ?? 0)) + ((_rel.yGap ?? 0))) / __scale)),
+							MathRound((_rel.stillTop ?? _rel.top) - (((_rel.stillTop ? 0 : (_item.yGap ?? 0)) + ((_rel.yGap ?? 0))) / __scale)),
 							MathFloor((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom), 
 							MathFloor(_rel.height * _rel.zoom), _rel.alpha);
 							if(_rel.fadeZoom)
@@ -3941,11 +4553,9 @@ this.drawHealthBar2 = function (_item) {
 						else 
 							_can.drawImage(_spr, ((_fl ?? 0) * _rel.width) + (_rel.baseLeft ?? 0), _ft + (_rel.baseTop ?? 0), _rel.width - (_rel.baseRight ?? 0), _rel.height,
 							MathRound(_relLeft),
-							MathRound((_rel.stillTop ?? _rel.top) - (((_rel.still ? 0 : (_item.yGap ?? 0)) + ((_rel.yGap ?? 0))) / __scale)),
+							MathRound((_rel.stillTop ?? _rel.top) - (((_rel.stillTop ? 0 : (_item.yGap ?? 0)) + ((_rel.yGap ?? 0))) / __scale)),
 							MathFloor((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom), MathFloor(_rel.height * _rel.zoom));
 					}
-					// if(_rel.alpha < 1)
-					// 	_can.restore();
 					if(_rel.fade) {
 						if(!_rel.alpha)
 							_rel.alpha = 1;
@@ -4061,14 +4671,15 @@ this.drawHealthBar2 = function (_item) {
 		if(!_force && (_char.lastAvailableEnemyPickDate > (_gameTick - 100)))
 			return  _char.lastAvailableEnemies;
 		_char.lastAvailableEnemyPickDate = _gameTick;
+		const _enemies = this.pvp ? this.enemies : this.seenEnemies;
 		if(_char.onlyTarget){
-			const _en = this.seenEnemies.find(x => x.key === _char.onlyTarget);
+			const _en = _enemies.find(x => x.key === _char.onlyTarget);
 			if(_en){
 				_char.lastAvailableEnemies = [_en];
 				return _char.lastAvailableEnemies;
 			}
 		}
-		// const onlyTarget = this.seenEnemies?.find(x => x.attackingOnlyBy && x.attackingOnlyBy === _char.key && 
+		// const onlyTarget = _enemies?.find(x => x.attackingOnlyBy && x.attackingOnlyBy === _char.key && 
 		// 	x != _char && x.enemy != undefined && !x.dead && !(x.knockbacking && x.dying) && 
 		// 	(_ff || x.enemy !== _char.enemy) && isObjectInVisibleRectangle(x));
 		// if (onlyTarget) 
@@ -4083,7 +4694,7 @@ this.drawHealthBar2 = function (_item) {
 		const _iv = !(_char.main && _char.autoMode === 2);
 		const _x = [];
 		const _ff = _char.friendlyFire && (_char.enemy !== mainCharacter.enemy);
-		for(let x of episode.seenEnemies) {
+		for(let x of _enemies) {
 			if(x.attackingOnlyBy && x.attackingOnlyBy === _char.key && 
 			x != _char && x.enemy != undefined && !x.dead && !(x.knockbacking && x.dying) && 
 			(_ff || x.enemy !== _char.enemy) && isObjectInVisibleRectangle(x))
@@ -4111,10 +4722,10 @@ this.drawHealthBar2 = function (_item) {
 				continue;
 
 			const anim = x.getCurrentAnimation?.();
-			if (anim?.interactive && !episode?.fatality) 
+			if (anim?.interactive && !this?.fatality) 
 				continue;
 
-			if (!episode.pvp && _iv && !isObjectInVisibleRectangle(x))
+			if (!this.pvp && _iv && !isObjectInVisibleRectangle(x))
 				continue;
 
 			_x.push(x);
@@ -4246,7 +4857,5 @@ this.drawHealthBar2 = function (_item) {
 		stopWeather();
 		this.seenEnemies.length = 0;
 	}
-	// if(!this.lobby && !this.pvp)
-	// 	this.createBgMusic();
 	setBusyState(!(this.menu || this.lobby));
 }

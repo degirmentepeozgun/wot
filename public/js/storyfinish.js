@@ -2,6 +2,7 @@
 console.log('story-finish');
 function animateStart(_failed, _extraGain, _content) {
 	_game.suspended = true;
+	clearChainSkills();
 	if(episode.mainClass && mainCharacter.id !== episode.mainClass) {
 		// delete __account.characters.find(x => x.selected).selected;
 		// const _ch = __account.characters.find(x => x.class === episode.mainClass);
@@ -82,7 +83,7 @@ function animateStart(_failed, _extraGain, _content) {
 								<img src="./images/ui/star-${_ok ? 'on' : 'off'}.png" style="height: 70%;margin-right: 2.5%;">${getLangData(_rs.title)}
 							</div>`;
 		}
-	let _rewardsHtml = (_failed && !_extraGain) ? '' : getStoryRewardsResultHtml(_story, null, null, _extraGain);
+	let _rewardsHtml = (_failed && !_extraGain) ? '' : getStoryRewardsResultHtml(_story, null, null, _extraGain, 1, _totalStar >= 1);
 	if(_isPerfect && !_isBeforePerfect && _story.perfectFinishRewards)
         updateMisc(structuredClone2(_story.perfectFinishRewards));
 	if(_isFirstFinish && _story.firstFinishRewards)

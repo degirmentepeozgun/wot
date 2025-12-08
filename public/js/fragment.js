@@ -32,8 +32,7 @@ function getFragmentUI(_id) {
 						'<div class="skills-content-right fragments-content-right">' +
 							'<div class="skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">' +
 								(_content !== '' ? _content : getFragmentDetailUI(_id, 1, 1)) +
-							'<div id="shine"></div>' +
-						'</div>' +
+						'</div><div class="shine-area"></div>' +
 					'</div>' +
 				'</div>' +
 			'</div>';

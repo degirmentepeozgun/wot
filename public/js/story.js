@@ -155,6 +155,7 @@ const __stories = [
 		id: 1,
 		order: 1,
 		disableWorldMap: true,
+		bonusAchievements: [],
 		resultStars: [
 			{ id: 1, title: 'Clear story', when: function() {
 				return !mainCharacter.isDead();
@@ -606,6 +607,7 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 3;
+							__storyCutScenePlaying = true;
 							episode.enemies.filter(x => x !== mainCharacter)?.forEach(x => {
 								x.remove = true;
 							});
@@ -2860,6 +2862,34 @@ const __stories = [
 		list:true,
 		minLevel: 2,
 		act:1,
+		bonusAchievements: [
+			{
+				id:1,
+				minCount: 3,
+				title: {
+					en: 'Finish in 1 minute',
+					tr: '1 dakika içinde bitir'
+				},
+				when: function() {
+					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
+					<= 60000;
+				},
+				reward: //{ key: 'misc', type: 'ticket-gem-selection', grade:1, count:1}
+				{ key:'gold', count: 20000 }
+			},
+			{
+				id:2,
+				minCount: 5,
+				title: {
+					en: 'Do not use skill',
+					tr: 'Yetenek kullanma'
+				},
+				when: function() {
+					return !episode.usedSkill;
+				},
+				reward: { key: 'misc', type: 'ticket-gem-selection', grade:1, count:1}
+			}
+		],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
@@ -3145,6 +3175,21 @@ const __stories = [
 		list:true,
 		minLevel: 4,
 		act:1,
+		bonusAchievements: [
+			{
+				id:1,
+				minCount: 3,
+				title: {
+					en: 'Finish in 1.5 minute',
+					tr: '1.5 dakika içinde bitir'
+				},
+				when: function() {
+					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
+					<= 90000;
+				},
+				reward: { key:'gold', count: 20000 }
+			}
+		],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
@@ -3433,6 +3478,34 @@ const __stories = [
 		act:1,
 		bonus: true,
 		boss:'wan',
+		bonusAchievements: [
+			{
+				id:1,
+				minCount: 3,
+				title: {
+					en: 'Finish in 30 seconds',
+					tr: '30 saniye içinde bitir'
+				},
+				when: function() {
+					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
+					<= 30000;
+				},
+				reward: { key:'gold', count: 30000 }
+			},
+			{
+				id:2,
+				minCount: 3,
+				title: {
+					en: 'Finish in 15 seconds',
+					tr: '15 saniye içinde bitir'
+				},
+				when: function() {
+					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
+					<= 15000;
+				},
+				reward: { key:'gold', count: 50000 }
+			}
+		],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		resultStars: [
@@ -3521,6 +3594,19 @@ const __stories = [
 		list:true,
 		act:1,
 		minLevel: 6,
+		bonusAchievements: [{
+			id:1,
+			minCount: 3,
+			title: {
+				en: 'Finish in 1.5 minutes',
+				tr: '1.5 dakika içinde bitir'
+			},
+			when: function() {
+				return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
+				<= 90000;
+			},
+			reward: { key:'gold', count: 30000 }
+		}],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
@@ -3844,6 +3930,19 @@ const __stories = [
 		list:true,
 		act:1,
 		minLevel: 7,
+		bonusAchievements: [{
+			id:1,
+			minCount: 3,
+			title: {
+				en: 'Finish in 1.5 minutes',
+				tr: '1.5 dakika içinde bitir'
+			},
+			when: function() {
+				return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
+				<= 90000;
+			},
+			reward: { key:'gold', count: 30000 }
+		}],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
@@ -4220,6 +4319,19 @@ const __stories = [
 		list: true,
 		act:1,
 		ticket:2,
+		bonusAchievements: [{
+			id:1,
+			minCount: 3,
+			title: {
+				en: 'Finish in 1.5 minutes',
+				tr: '1.5 dakika içinde bitir'
+			},
+			when: function() {
+				return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
+				<= 90000;
+			},
+			reward: { key:'gold', count: 30000 }
+		}],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		title: {
@@ -4227,8 +4339,8 @@ const __stories = [
 			tr: 'Destek Bulmak'
 		},
 		description: {
-			en: "Alkin, one of our heroes, goes to Toygar and the people of the village to rescue the wolves enslaved by the giant trolls living in the Ice Land and ask for their support so that they can support them in a possible war.",
-			tr: "Kahramanlarımızdan Alkin, Toygar' a ve Köy halkına, olası savaşta destek olabilmeleri adına Buz Diyarında yaşayan dev trollerin köleleştirdiği kurtları kurtarmaya ve onların desteğini istemeye gider."
+			en: "Alkin, one of our heroes, goes to Basat and the people of the village to rescue the wolves enslaved by the giant trolls living in the Ice Land and ask for their support so that they can support them in a possible war.",
+			tr: "Kahramanlarımızdan Alkin, Basat' a ve Köy halkına, olası savaşta destek olabilmeleri adına Buz Diyarında yaşayan dev trollerin köleleştirdiği kurtları kurtarmaya ve onların desteğini istemeye gider."
 		},
 		resultStars: [
 			{ id: 1, title: 'Clear story', when: function() {
@@ -4560,6 +4672,19 @@ const __stories = [
 		list:true,
 		minLevel: 10,
 		act:1,
+		bonusAchievements: [{
+			id:1,
+			minCount: 2,
+			title: {
+				en: 'Finish in 4 minutes',
+				tr: '4 dakika içinde bitir'
+			},
+			when: function() {
+				return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
+				<= 240000;
+			},
+			reward: { key:'gold', count: 30000 }
+		}],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
@@ -4846,6 +4971,19 @@ const __stories = [
 		ticket: 4,
 		list:true,
 		act:1,
+		bonusAchievements: [{
+			id:1,
+			minCount: 2,
+			title: {
+				en: 'Finish in 3.5 minutes',
+				tr: '3.5 dakika içinde bitir'
+			},
+			when: function() {
+				return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
+				<= 210000;
+			},
+			reward: { key:'gold', count: 30000 }
+		}],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
@@ -5473,7 +5611,6 @@ const __stories = [
 							mainCharacter.yPosition = MathRound(groundheight / 2);
 							episode.still = false;
 							episode.width = MathRound(episode.width / 2);
-							takeQuest(0, 1, null, null, 1);
 							pauseQuestTimer();
 							episode.pauseBgMusic(1);
 							episode.moveCamera(function(){
@@ -5530,6 +5667,7 @@ const __stories = [
 									_char.releaseAfter = 5;
 									episode.towerDefenseStart = _gameTick;
 									disposeFocus();
+									takeQuest(0, 1, null, null, 1);
 								}, false, getLangData('Defend the huts') + ',<br/>' + getLangData('keep your friends alive') + '<br/>' + getLangData('until that period of time'), 1);
 								createBubbleText({
 									id: 6,
@@ -5646,6 +5784,19 @@ const __stories = [
 		minLevel:10,
 		list: true,
 		ticket:2,
+		bonusAchievements: [{
+			id:1,
+			minCount: 2,
+			title: {
+				en: 'Finish in 3 minutes',
+				tr: '3 dakika içinde bitir'
+			},
+			when: function() {
+				return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
+				<= 180000;
+			},
+			reward: { key:'gold', count: 30000 }
+		}],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		title: {
@@ -6563,10 +6714,11 @@ const __stories = [
 								PlaySound({key:'sistersenter', volume:1});
 								setTimeout(() => {
 									episode.phase = 100;
-									const installBoss = function(_b) {
+									const installBoss = function(_b, _name) {
 										const _boss = summonMobWithJson({
 											id: _b,
 											level: 12,
+											name: _name,
 											atk: mainCharacter.atk,
 											grade: 4
 										});
@@ -6576,10 +6728,11 @@ const __stories = [
 										_boss.setDifficulty(__account.difficulty - 1);
 										_boss.acceptChanges();
 										_boss.pickNewTarget();
+										_boss.releaseAfter = 25;
 									}
-									installBoss(37);
+									installBoss(37, 'Yecüc');
 									requestAnimationFrame(() => {
-										installBoss(38);
+										installBoss(38, 'Mecüc');
 									});
 									mainCharacter.maxHP = mainCharacter.MAXHP =
 									mainCharacter.maxHP * 1;
@@ -6618,8 +6771,9 @@ const __stories = [
 								minLevel: mainCharacter.level,
 								maps: [201]
 							});
-							if(mainCharacter.level === 9) {
+							if(mainCharacter.level > 8 && !mainCharacter.tagSkillSet) {
 								delete mainCharacter.animations.tag.disabled;
+								mainCharacter.tagSkillSet = 1;
 								resetSkill('tag', mainCharacter);
 								PlaySound({key:'conquer', volume:.6});
 								getImage('./images/main/avatars/cyclops.png', function(_img) {
@@ -6902,14 +7056,19 @@ function switchStoryScene(_func, _newOrder) {
 					if(mainCharacter?.keyboard)
 						mainCharacter.keyboard.holdingKeys = [];
 				}, __storyScene.loadingCharacterIds);
-				removeClass(document.body, 'pc-mission');
-				if(__isPC && __storyScene?.map > 1)
-					addClass(document.body, 'pc-mission');
 			}, 1000);
 			if(_func)
 				_func();
 		});
 	//}
+}
+function checkPC () {
+	removeClass(document.body, 'pc-mission');
+	removeClass(document.body, 'pc-mission-without-skillui');
+	if(__isPC && episode?.id > 1)
+		addClass(document.body, 'pc-mission');
+	else if(__isPC && episode?.id <= 1)
+		addClass(document.body, 'pc-mission-without-skillui');
 }
 function restartStory() {
 	__storySceneOrder = 0;
@@ -7695,10 +7854,49 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 							</div>
 						</div>`;
 	}
+	let _bonusAchHTML = '';
+	for(let _ba of _s.bonusAchievements) {
+		const _rs = __account.storyResults?.find(x => x.id === _id);
+		const _myba = _rs?.bonusAchievements ?? [];
+		const _stat = _myba?.find(x => x.id === _ba.id);
+		const _active = _stat && !_stat.done;
+		const _done = _stat?.done;
+		const _reward = getRewardIcon(_ba.reward?.grade ?? 1, _ba.reward.key, _ba.reward.type);
+		_bonusAchHTML += `<div class="w-100 story-bonus-achievement-item flex${_active ? ' ba-active' : ''}${_done ? ' ba-done' : ''}${(!_active && !_done) ? ' ba-locked' : ''}">
+				<div class="flex story-bonus-achievement-icon">
+					<img src="./images/ui/${_done ? 'circle-on' : (_active ? 'circle-off' : 'lock')}.png" />
+				</div>
+				<div class="flex flex-jc-start story-bonus-achievement-title">
+					<div class="w-100 flex flex-jc-start ba-requirement">
+						<div class="flex flex-jc-start">
+							${getLangData('Story Finish Count')}
+						</div>
+						<div class="flex flex-jc-end">
+							<span class="ba-current-count">${_rs?.count > _ba.minCount ? _ba.minCount : _rs?.count ?? 0}</span>/<span class="ba-min-count">${_ba.minCount}</span>
+						</div>
+					</div>
+					<div class="w-100 flex flex-jc-start">
+						${_ba.title[getLang()]}
+					</div>
+				</div>
+				<div class="flex story-bonus-achievement-icon story-bonus-achievement-reward">
+					<img src="${_reward.src}" />
+					<div class="w-100 flex story-bonus-achievement-reward-count">
+						${(_ba.reward.count ?? 1).formatWithDots()}
+					</div>
+					<div class="full flex story-bonus-achievement-reward-taken">
+						<img src="./images/icons/tick.png" />
+					</div>
+				</div>
+			</div>`;
+	}
+	const _hasBonusAch = _bonusAchHTML !== '';
 	_html +=
 		`</div>
 		<div class="flex flex-jc-start story-detail-heading" style="margin-top:2vh">${getLangData('Description')}</div>
 		<div class="story-description">${_s.description[getLang()]}</div>
+		<div class="flex flex-jc-start story-detail-heading${_hasBonusAch ? '' : ' d-none'}" style="margin-top:2vh">${getLangData('Bonus Achievements')}</div>
+		<div class="story-description${_hasBonusAch ? '' : ' d-none'}">` + _bonusAchHTML + `</div>
 		</div>
 		<div class="w-100 flex action-button-container" style="height:14%">
 			<div onexactclick="tryStartStoryMission(${_id})" class="flex game-menu-button">
@@ -7709,7 +7907,43 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 	//_gameUI.appendChild(_div);
 	return _html;
 }
-function getStoryRewardsResultHtml(_story, _bonus, _pass, _looseGain) {
+function checkStoryBonusAchievement(_story, _isRealPlay) {
+	const _rs = __account.storyResults.find(x => x.id === _story.id);
+	_rs.count = _rs.count > 0 ? _rs.count + 1 : 1;
+	if(!_rs.bonusAchievements)
+		_rs.bonusAchievements = [];
+	const _myBonusStats = _rs.bonusAchievements;
+	const _storyBonus = _story.bonusAchievements ?? [];
+	for(let _sb of _storyBonus) {
+		const _myStat = _myBonusStats?.find(x => x.id === _sb.id);
+		if(_myStat && !_myStat.done) {
+			//ach açık ama henüz yapılmamış
+			if(_sb.when())
+			{
+				_myStat.done = 1;
+				updateGlobalQuest('complete-act-side');
+				warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/cup.png" />&nbsp;<span style="flex:1">' + getLangData('Bonus Achievement Completed') + '</span></div>', null, null, 1);
+				PlaySound({key:'bonusdone', volume:1});
+				warnChestReward(getChestReward(_sb.reward.grade ?? 1, _sb.reward.key, _sb.reward.type, _sb.reward.count ?? 1));
+			}
+		}
+		else if(!_myStat) {
+			if(_sb.minCount === _rs.count) {
+				_myBonusStats.push({id:_sb.id});
+				warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/cup.png" />&nbsp;<span style="flex:1">' + getLangData('Bonus Achievement Unlocked') + '</span></div>', null, null, 1);
+				PlaySound({key:'bonusactive', volume:1});
+			}
+		}
+	}
+	//bonus achievementlara bak eğer açık fakat yapılmamış varsa story özelinde +
+	//varsa when fonksyonundan tamamlanmış mı diye bak ve tamamlandıysa bildir +
+	//eğer tamamlandıysa tamamlandı olarak işaretle +
+	//bonus achievement count u 1 arttır +
+	//Bonus Achievement açıldı mı bak açıldı ise bildir +
+}
+function getStoryRewardsResultHtml(_story, _bonus, _pass, _looseGain, _isRealPlay, _isSuccess) {
+	if(_isSuccess)
+		checkStoryBonusAchievement(_story, _isRealPlay);	
 	let _rewardsHtml = '';
 	if(_bonus){
 		if(_bonus === 'item') {
@@ -7980,6 +8214,7 @@ async function createStoryPassScreen(_amount) {
 	episode.expSelected = _expSelected;
 
 	const _s = __stories.find(x => x.id === _uiSelectedStoryId);
+
 	const _results = [];
 	let _allTickets = __account.storyTicket;
 	const _startTicketCount = _allTickets;
@@ -8006,7 +8241,7 @@ async function createStoryPassScreen(_amount) {
 		const _tix = __account.misc.find(x => x.type === 'ticket-pass');
 		if (_tix?.count > 0) _tix.count--;
 		const _bonus = (new storyBonus(null, 1)).get();
-		_results.push(getStoryRewardsResultHtml(_s, _bonus, 1));
+		_results.push(getStoryRewardsResultHtml(_s, _bonus, 1, null, false, true));
 	}
 	updateTicket(_allTickets - _startTicketCount);
 	updateRightMenuTemplate();

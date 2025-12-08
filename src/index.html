@@ -93,6 +93,7 @@
 	<script src="./js/shop.js"></script>
 	<script src="./js/honor.js"></script>
 	<script src="./js/settings.js"></script>
+	<script src="./js/story.js"></script>
 	<script src="./js/quest.js"></script>
 	<script src="./js/data.js"></script>
 	<script src="./js/ui.js"></script>
@@ -110,7 +111,6 @@
 	<script src="./js/buff.js"></script>
 	<script src="./js/socket2.js"></script>
 	<script src="./js/index.js"></script>
-	<script src="./js/story.js"></script>
 	<script src="./js/sound.js"></script>
 	<script src="./js/dataoperations.js"></script>
 	<script src="./js/lobby.js"></script>
@@ -133,12 +133,15 @@
 
 		function resetStyle(_name) {
 			try	{
+				if(navigator.connection.type === "none" || !navigator.onLine)
+					throw "";
 				var _link = document.createElement('link');
 				_link.rel = 'stylesheet';
 				_link.href = _rootPathCss + _name + '/?v=' + Math.random();
 				document.head.appendChild(_link);
 			}
-			catch(ex) {}
+			catch(ex) {
+			}
 		}
 		function resetStyles(_names) {
 			_names.forEach(x => resetStyle(x));
