@@ -49,7 +49,7 @@ function spinLottery() {
 	var currentRate2 = parseInt(style.getPropertyValue('--spin-rate2'));
 	var itemOrder2 = getRandomValue2(0, 7);
 	root.style.setProperty('--spin-rate2', currentRate2 + (minRate * itemOrder2));
-	PlaySound({key:'click'});
+	playClick();
 	setTimeout(function() {
 		const sbg = document.getElementById('spinner-bg');
 		const sbg2 = document.getElementById('spinner-bg2');

@@ -440,7 +440,7 @@ function talent() {
 		if(!_id)
 			_id = 1;
 		else
-   			PlaySound({ key: 'click' });
+   			playClick();
 		if(!_id)
 			return;
 		const _cards = document.querySelectorAll('.talent-content-left .talent-card');

@@ -1,5 +1,6 @@
 ﻿'use strict';
 function mailbox() {
+	this.mails = _client.getMails();
 	this.key = 'mailbox';
 	this.tutorial = {
 		tr: {
@@ -17,7 +18,7 @@ function mailbox() {
 		let _content = showMenuTutorial(this.tutorial, this.key);
 		updateMenuBottom(3);
 		const _container = selectMenuContainer();
-		if(!_mails?.length) {
+		if(!this.mails?.length) {
 			_container.innerHTML = 
 			`<div data-module='mailbox' class="book-page-wrapper mailbox-container${_noAnimation ? '' : ' fade-me'}">
 				<div class="flex book-page-bg">
@@ -52,7 +53,7 @@ function mailbox() {
 	}
 	this.getMails = function() {
 		let html = '';
-		const _arr = _mails?.sort((a,b) => b.ts - a.ts);
+		const _arr = this.mails?.sort((a,b) => b.ts - a.ts);
 		for (var _m of _arr) {
 			const _mail = __account.mailbox?.find(x => x.id === _m.id);
 			html += `<div data-key="${_m.id}" onexactclick="getRef(\'mailbox\')?.selectMail(${_m.id})" class="skill-card mailbox-card animate-me flex${_mail ? ' read' : ''}${_m.attachment ? ' loot' : ''}${_mail?.looted ? ' looted' : ''}">
@@ -73,11 +74,11 @@ function mailbox() {
 		return html;
 	}
 	this.selectMail = function(_id, _looted) {
-		const _arr = _mails?.sort((a,b) => b.ts - a.ts);
+		const _arr = this.mails?.sort((a,b) => b.ts - a.ts);
 		if(!_id)
 			_id = _arr?.length > 0 ? _arr[0].id : undefined;
 		else
-   			PlaySound({ key: 'click' });
+   			playClick();
 		if(!_id)
 			return;
 		const _cards = document.querySelectorAll('.mailbox-content-left .mailbox-card');
@@ -98,7 +99,7 @@ function mailbox() {
 		if(!_id)
 			_html += '<div class="full flex">' + getLangData('Your mailbox is empty') + '</div>';
 		else {
-			const _m = _mails.find(x => x.id === _id);
+			const _m = this.mails.find(x => x.id === _id);
 			let _mail = __account.mailbox?.find(x => x.id === _m.id);
 			if(!_mail)
 			{
@@ -112,7 +113,7 @@ function mailbox() {
 			let _attachment = '';
 			if(_m.attachment)
 				for(let _at of _m.attachment)
-					_attachment += '<div class="item-slot flex' + (_mail?.looted ? ' gray' : '') + '">' + getMiscItemIcon(_at) + '</div>';
+					_attachment += '<div class="item-slot flex' + (_mail?.looted ? ' gray' : '') + '">' + getMailAttachmentIcon(_at) + '</div>';
 			_html += 
 			`<div class="full mailbox-desc" style="height:86%">
 				<div class="w-100 mailbox-desc-text">${_m.body?.[getLang()] ?? _m.body}</div>
@@ -140,22 +141,26 @@ function mailbox() {
 			_container.innerHTML = _html + '</div></div>';
 	}
 	this.lootMail = function(_id) {
-		const _m = _mails.find(x => x.id === _id);
+		const _m = this.mails.find(x => x.id === _id);
 		if(!_m)
 			return;
 		const _mail = __account.mailbox?.find(x => x.id === _m.id);
 		if(_mail && _m.attachment)
 		{
-			_mail.looted = 1;
-			_client.saveState();
-			this.selectMail(_id, 1);
-			for(let _at of _m.attachment)
-				warnChestReward(getChestReward(1, 'misc', _at.type, _at.count ?? 1));
+			for(let _at of _m.attachment) {
+				const _r = getChestReward(1, _at.key, _at.type, _at.count ?? 1, _at);
+				if(_r) {
+					warnChestReward(_r);
+					_mail.looted = 1;
+					_client.saveState();
+					this.selectMail(_id, 1);
+				}
+			}
 		}
 		checkUpdateAvailable2(4);
 	}
 	this.askDeleteMail = function(_id) {
-		const _m = _mails.find(x => x.id === _id);
+		const _m = this.mails.find(x => x.id === _id);
 		if(!_m)
 			return;
 		const _mail = __account.mailbox?.find(x => x.id === _m.id);
@@ -166,16 +171,17 @@ function mailbox() {
    		askSomething(`${getLangData('Remove mail from your mailbox?')}`, `getRef(\'mailbox\')?.deleteMail(${_id})`);
 	}
 	this.deleteMail = function(_id) {
-		const _m = _mails.find(x => x.id === _id);
+		const _m = this.mails.find(x => x.id === _id);
 		if(!_m)
 			return;
    		PlaySound({ key: 'paperrip', volume: .5 });
-		const i = _mails.findIndex(x => x.id === _id);
+		const i = this.mails.findIndex(x => x.id === _id);
 		if(i >= 0)
 		{
-			_mails.splice(i, 1);
+			this.mails.splice(i, 1);
 			this.render(1);
 			closeInventoryQuestionModal();
+			_client.saveMailState();
 		}
 	}
 	return this;

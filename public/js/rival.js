@@ -748,7 +748,7 @@ function createCharacter(_settings) {
 								atk: {
 									yRange: 15,
 									rate: 2,
-									hitStop:5,
+									hitStop:4,
 									hurt: {
 										hitZoom: 1.05,
 										objects: [
@@ -1795,6 +1795,18 @@ function createCharacter(_settings) {
 								spriteHeight: 233,
 								spriteOrigin: 35,
 								speed: 17,
+								do: function() {
+									mainCharacter.addObject(
+									{
+										key: 'flash', 
+										position: 'canvas', 
+										p1: {
+											r: 160,
+											yGap: -100,
+											xGap: 100
+										} 
+									});
+								},
 								atk: {
 									yRange: 15,
 									rate: 4,
@@ -2072,6 +2084,18 @@ function createCharacter(_settings) {
 								spell: {
 									key: 'earthspikes2',
 									pierce: true
+								},
+								do: function() {
+									mainCharacter.addObject(
+									{
+										key: 'flash', 
+										position: 'canvas', 
+										p1: {
+											r: 160,
+											yGap: -100,
+											xGap: 100
+										} 
+									});
 								},
 								atk: {
 									yRange: 15,
@@ -20675,7 +20699,7 @@ const _allEnemies = {
 						spriteWidth: 213,
 						spriteHeight: 148,
 						spriteOrigin: 107,
-						bottomGap: -140
+						bottomGap: -140,
 					},
 					{
 						spriteLeft: 304,
@@ -20683,7 +20707,8 @@ const _allEnemies = {
 						spriteWidth: 213,
 						spriteHeight: 148,
 						spriteOrigin: 107,
-						bottomGap: -140
+						bottomGap: -140,
+						invisibleWhenLay: true
 					},
 					null,
 					{ key: 'wasphurt', volume:.2, reset: true},
@@ -20705,7 +20730,8 @@ const _allEnemies = {
 							spriteWidth: 154,
 							spriteHeight: 250,
 							spriteOrigin: 77,
-							bottomGap: -150
+							bottomGap: -150,
+							invisibleWhenLay: true
 						},
 						null,
 						{ key: 'wasphurt', volume:.2, reset: true},
@@ -43510,11 +43536,12 @@ const _allEnemies = {
 							atk: {
 								rate: .1,
 								reset: true,
+								yRange: 100,
 								hurt: {
 									catch: 'front',
 									sound: {key:'heavyhit', volume:1},
 									objects:[{ key: 'slowMotion', position: 'css', p4: 10 }],
-						
+									reset: true,
 									props: {
 										skipHealthBar: true,
 										finishing: true,
@@ -43557,11 +43584,12 @@ const _allEnemies = {
 							atk: {
 								rate: .1,
 								reset: true,
+								yRange: 100,
 								hurt: {
 									catch: 'front',
 									sound: {key:'heavyhit', volume:1},
 									objects:[{ key: 'slowMotion', position: 'css', p4: 10 }],
-									
+									reset: true,
 									props: {
 										skipHealthBar: true,
 										finishing: true,
@@ -43588,11 +43616,12 @@ const _allEnemies = {
 							atk: {
 								rate: .1,
 								reset: true,
+								yRange: 100,
 								hurt: {
 									catch: 'front',
 									sound: {key:'heavyhit', volume:1},
 									objects:[{ key: 'slowMotion', position: 'css', p4: 10 }],
-								
+									reset: true,
 									props: {
 										skipHealthBar: true,
 										finishing: true,
@@ -43619,11 +43648,12 @@ const _allEnemies = {
 							atk: {
 								rate: .1,
 								reset: true,
+								yRange: 100,
 								hurt: {
 									catch: 'front',
 									sound: {key:'heavyhit', volume:1},
 									objects:[{ key: 'slowMotion', position: 'css', p4: 10 }],
-								
+									reset: true,
 									props: {
 										skipHealthBar: true,
 										finishing: true,
@@ -43657,11 +43687,12 @@ const _allEnemies = {
 							atk: {
 								rate: .1,
 								reset: true,
+								yRange: 100,
 								hurt: {
 									catch: 'front',
 									sound: {key:'heavyhit', volume:1},
 									objects:[{ key: 'slowMotion', position: 'css', p4: 10 }],
-									
+									reset: true,
 									props: {
 										skipHealthBar: true,
 										finishing: true,
@@ -43688,11 +43719,12 @@ const _allEnemies = {
 							atk: {
 								rate: .1,
 								reset: true,
+								yRange: 100,
 								hurt: {
 									catch: 'front',
 									sound: {key:'heavyhit', volume:1},
 									objects:[{ key: 'slowMotion', position: 'css', p4: 10 }],
-								
+									reset: true,
 									props: {
 										skipHealthBar: true,
 										finishing: true,
@@ -43719,11 +43751,12 @@ const _allEnemies = {
 							atk: {
 								rate: .1,
 								reset: true,
+								yRange: 100,
 								hurt: {
 									catch: 'front',
 									sound: {key:'heavyhit', volume:1},
 									objects:[{ key: 'slowMotion', position: 'css', p4: 10 }],
-								
+									reset: true,
 									props: {
 										skipHealthBar: true,
 										finishing: true,
@@ -43750,11 +43783,12 @@ const _allEnemies = {
 							atk: {
 								rate: .1,
 								reset: true,
+								yRange: 100,
 								hurt: {
 									catch: 'front',
 									sound: {key:'heavyhit', volume:1},
 									objects:[{ key: 'slowMotion', position: 'css', p4: 10 }],
-								
+									reset: true,
 									props: {
 										skipHealthBar: true,
 										finishing: true,
@@ -55740,8 +55774,8 @@ const _allEnemies = {
 					baseKey: 'finish',
 					minRange: -2,
 					maxRange: 8,
-					when: function(_e) {
-						return episode.fatality && 
+					when: function(_e, _t) {
+						return episode.fatality && _t.yPosition > _e.yPosition &&
 						_e.animations['hurtend'] && 
 						isObjectsInTouch(mainCharacter, _e, 10, 7)?.touch
 						&& !_e.animation.startsWith('hurtair');
@@ -55826,6 +55860,7 @@ const _allEnemies = {
 									},
 									imediateBreak: true,
 									key: 'hurtend',
+									reset: true,
 									type: 'ground'
 								},
 								type: 'common'
@@ -64423,7 +64458,7 @@ const _allEnemies = {
 					spriteHeight: 229,
 					spriteOrigin: 83,
 					src: './images/sprites/ep75/hurt.png'
-				}, { key: 'bomberhurt1,bomberhurt2', volume:.2, reset: true }),
+				}, { key: 'bomberhurt1,bomberhurt2', volume:.3, reset: true }),
 				hurtair: createHurtAir(
 					{
 						spriteLeft: 241 * 4,
@@ -67921,6 +67956,443 @@ const _allEnemies = {
 			buffs: []
 		};
 	},
+	enemy94: function () {
+		return {
+			animations: {
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					next: 'lurk',
+					frames: [
+						{
+							spriteLeft: 656,
+							spriteTop: 24,
+							spriteWidth: 563,
+							spriteHeight: 540,
+							spriteOrigin: 282,
+							speed: 360
+						}
+					]
+				},
+				lurk: {
+					key: 'lurk',
+					type: 'skill',
+					next: 'idle',
+					frames: [
+						{
+							spriteLeft: 13,
+							spriteTop: 82,
+							spriteWidth: 592,
+							spriteHeight: 482,
+							spriteOrigin: 296,
+							sound: { key:'hivelurk', volume:.5},
+							speed: 12
+						},
+						{
+							spriteLeft: 656,
+							spriteTop: 24,
+							spriteWidth: 563,
+							spriteHeight: 540,
+							spriteOrigin: 282,
+							speed: 12
+						},
+						{
+							spriteLeft: 1292,
+							spriteTop: 0,
+							spriteWidth: 553,
+							spriteHeight: 564,
+							spriteOrigin: 277,
+							speed: 12
+						},
+						{
+							spriteLeft: 656,
+							spriteTop: 24,
+							spriteWidth: 563,
+							spriteHeight: 540,
+							spriteOrigin: 282,
+							do: function(_e) {
+								const _mob = summonMob(7, MathRound((_e.SCREENLEFT + platformX) / __zoom),
+								_e.yPosition - 5);
+								_mob.updateVariables();
+								_mob.atk = _e.atk;
+								_mob.def = _e.def;
+								_mob.sight = _e.sight;
+							},
+							speed: 12
+						}
+					]
+				},
+				hurtground1: createHurtGround(
+					{
+						spriteLeft: 13,
+						spriteTop: 82,
+						spriteWidth: 592,
+						spriteHeight: 482,
+						spriteOrigin: 296,
+					},
+					{
+						spriteLeft: 13,
+						spriteTop: 82,
+						spriteWidth: 592,
+						spriteHeight: 482,
+						spriteOrigin: 296,
+					},
+					null, {key:'hivehurt1,hivehurt2', reset: true, volume:1}
+				),
+				// dead: {
+				// 	key: 'dead',
+				// 	type: 'skill',
+				// 	interactive: true,
+				// 	zoom: 1.2,
+				// 	src: './images/sprites/ep94/dead.png',
+				// 	frames: [
+				// 		{
+				// 			spriteLeft: 0,
+				// 			spriteTop: 2,
+				// 			spriteWidth: 185,
+				// 			spriteHeight: 440,
+				// 			spriteOrigin: 93,
+				// 			speed: 1,
+				// 			props: {
+				// 				killingBy: undefined,
+				// 				finishTarget: undefined,
+				// 				dead: true
+				// 			}
+				// 		},
+				// 		{
+				// 			spriteLeft: 0,
+				// 			spriteTop: 2,
+				// 			spriteWidth: 185,
+				// 			spriteHeight: 440,
+				// 			spriteOrigin: 93,
+				// 			sound: { key: 'swing', volume: .3 },
+				// 			speed: 7
+				// 		},
+				// 		{
+				// 			spriteLeft: 240,
+				// 			spriteTop: 37,
+				// 			spriteWidth: 233,
+				// 			spriteHeight: 403,
+				// 			spriteOrigin: 117,
+				// 			speed: 8
+				// 		},
+				// 		{
+				// 			spriteLeft: 533,
+				// 			spriteTop: 81,
+				// 			spriteWidth: 278,
+				// 			spriteHeight: 359,
+				// 			spriteOrigin: 139,
+				// 			speed: 8
+				// 		},
+				// 		{
+				// 			spriteLeft: 864,
+				// 			spriteTop: 270,
+				// 			spriteWidth: 258,
+				// 			spriteHeight: 170,
+				// 			spriteOrigin: 129,
+				// 			speed: 8
+				// 		},
+				// 		{
+				// 			spriteLeft: 1158,
+				// 			spriteTop: 181,
+				// 			spriteWidth: 205,
+				// 			spriteHeight: 267,
+				// 			spriteOrigin: 103,
+				// 			zoom: 1.2,
+				// 			speed: 8
+				// 		},
+				// 		{
+				// 			spriteLeft: 1392,
+				// 			spriteTop: 336,
+				// 			spriteWidth: 1,
+				// 			spriteHeight: 1,
+				// 			spriteOrigin: 1,
+				// 			props: {
+				// 				remove: true
+				// 			},
+				// 			speed: 1
+				// 		}
+				// 	]
+				// },
+				dead: {
+					key: 'dead',
+					type: 'skill',
+					interactive: true,
+					zoom: 1.3,
+					src: './images/sprites/ep94/dead2.png',
+					frames: [
+						{
+							spriteLeft: 480,
+							spriteTop: 0,
+							spriteWidth: 445,
+							spriteHeight: 377,
+							spriteOrigin: 200,
+							speed: 1,
+							props: {
+								killingBy: undefined,
+								finishTarget: undefined,
+								dead: true
+							}
+						},
+						{
+							spriteLeft: 480,
+							spriteTop: 0,
+							spriteWidth: 445,
+							spriteHeight: 377,
+							spriteOrigin: 200,
+							sound: { key: 'swing', volume: .3 },
+							speed: 7
+						},
+						{
+							spriteLeft: 19,
+							spriteTop: 422,
+							spriteWidth: 437,
+							spriteHeight: 290,
+							spriteOrigin: 219,
+							speed: 8
+						},
+						{
+							spriteLeft: 44,
+							spriteTop: 752,
+							spriteWidth: 876,
+							spriteHeight: 112,
+							spriteOrigin: 438,
+							zoom: .7,
+							speed: 22
+						},
+						{
+							spriteLeft: 44,
+							spriteTop: 752,
+							spriteWidth: 876,
+							spriteHeight: 112,
+							spriteOrigin: 438,
+							zoom: .7,
+							alpha: true,
+							speed: 16
+						},
+						{
+							spriteLeft: 44,
+							spriteTop: 752,
+							spriteWidth: 876,
+							spriteHeight: 112,
+							spriteOrigin: 438,
+							zoom: .7,
+							speed: 22
+						},
+						{
+							spriteLeft: 44,
+							spriteTop: 752,
+							spriteWidth: 876,
+							spriteHeight: 112,
+							spriteOrigin: 438,
+							zoom: .7,
+							alpha: true,
+							speed: 16
+						},
+						{
+							spriteLeft: 44,
+							spriteTop: 752,
+							spriteWidth: 876,
+							spriteHeight: 112,
+							spriteOrigin: 438,
+							zoom: .7,
+							speed: 22
+						},
+						{
+							spriteLeft: 44,
+							spriteTop: 752,
+							spriteWidth: 876,
+							spriteHeight: 112,
+							spriteOrigin: 438,
+							zoom: .7,
+							alpha: true,
+							speed: 16
+						},
+						{
+							spriteLeft: 44,
+							spriteTop: 752,
+							spriteWidth: 876,
+							spriteHeight: 112,
+							spriteOrigin: 438,
+							zoom: .7,
+							props: {
+								remove: true
+							},
+							speed: 1
+						}
+					]
+				}
+			},
+			key: 'hive-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 60,
+			id: 94,
+			healtbarGap: 40,
+			name: 'Hive',
+			class: 'object',
+			level: 1,
+			direction: 'right',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1,
+			height: 540,
+			width: 563,
+			stepX: 0,
+			size: 'big',
+			maxHP: 2000,
+			weight: 1000,
+			stepXRate: 0,
+			immobilize: true,
+			noDirection: true,
+			noLoot: true,
+			still: true,
+			solid: true,
+			bloodColor: 'green',
+			immunities: [ 'toxic' ],
+			src: './images/sprites/ep94/',
+			buffs: []
+		};
+	},
+	enemy95: function () {
+		return {
+			animations: {
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 115,
+							spriteHeight: 107,
+							spriteOrigin: 58,
+							speed: 999
+						},
+					]
+				}
+			},
+			key: 'bone1-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 10,
+			id: 95,
+			healtbarGap: 0,
+			name: 'Bone 1',
+			class: 'object',
+			level: 1,
+			solid: true,
+			direction: 'right',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: .55,
+			height: 107,
+			width: 115,
+			stepX: 0,
+			maxHP: 1,
+			weight: 1000,
+			stepXRate: 0,
+			invulnerable: true,
+			immobilize: true,
+			noDirection: true,
+			noLoot: true,
+			skipHealthBar: true,
+			still: true,
+			immunities: [],
+			src: './images/sprites/ep95/',
+			buffs: []
+		};
+	},
+	enemy96: function () {
+		return {
+			animations: {
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 128,
+							spriteHeight: 85,
+							spriteOrigin: 64,
+							speed: 999
+						},
+					]
+				}
+			},
+			key: 'bone2-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 10,
+			id: 96,
+			healtbarGap: 0,
+			name: 'Bone 2',
+			class: 'object',
+			level: 1,
+			solid: true,
+			direction: 'right',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1,
+			height: 85,
+			width: 128,
+			stepX: 0,
+			maxHP: 1,
+			weight: 1000,
+			stepXRate: 0,
+			invulnerable: true,
+			immobilize: true,
+			noDirection: true,
+			noLoot: true,
+			skipHealthBar: true,
+			still: true,
+			immunities: [],
+			src: './images/sprites/ep96/',
+			buffs: []
+		};
+	},
+	enemy97: function () {
+		return {
+			animations: {
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 80,
+							spriteHeight: 61,
+							spriteOrigin: 40,
+							speed: 999
+						},
+					]
+				}
+			},
+			key: 'bone3-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 10,
+			id: 97,
+			solid: true,
+			healtbarGap: 0,
+			name: 'Bone 3',
+			class: 'object',
+			level: 1,
+			direction: 'right',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1,
+			height: 61,
+			width: 80,
+			stepX: 0,
+			maxHP: 1,
+			weight: 1000,
+			stepXRate: 0,
+			invulnerable: true,
+			immobilize: true,
+			noDirection: true,
+			noLoot: true,
+			skipHealthBar: true,
+			still: true,
+			immunities: [],
+			src: './images/sprites/ep97/',
+			buffs: []
+		};
+	},
 	enemy2001: function () {
 		return {
 			animations: {
@@ -69099,6 +69571,209 @@ const _allEnemies = {
 			touchDead:true,
 			deadAnimationKey: 'soar',
 			src: './images/weather/leaf6.png',
+			buffs: []
+		};
+	},
+	enemy107: function () {
+		return {
+			animations: {
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 1136,
+							spriteHeight: 547,
+							spriteOrigin: 568,
+							speed: 8
+						},
+						{
+							spriteLeft: 1136,
+							spriteTop: 0,
+							spriteWidth: 1136,
+							spriteHeight: 547,
+							spriteOrigin: 568,
+							speed: 8
+						},
+						{
+							spriteLeft: 1136 * 2,
+							spriteTop: 0,
+							spriteWidth: 1136,
+							spriteHeight: 547,
+							spriteOrigin: 568,
+							speed: 8
+						},
+						{
+							spriteLeft: 1136 * 3,
+							spriteTop: 0,
+							spriteWidth: 1136,
+							spriteHeight: 547,
+							spriteOrigin: 568,
+							speed: 8
+						},
+						{
+							spriteLeft: 1136 * 4,
+							spriteTop: 0,
+							spriteWidth: 1136,
+							spriteHeight: 547,
+							spriteOrigin: 568,
+							speed: 8
+						},
+						{
+							spriteLeft: 1136 * 5,
+							spriteTop: 0,
+							spriteWidth: 1136,
+							spriteHeight: 547,
+							spriteOrigin: 568,
+							speed: 8
+						}
+					]
+				}
+			},
+			key: 'wtrfll-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 1,
+			id: 107,
+			healtbarGap: 0,
+			name: 'Waterfall',
+			class: 'environment',
+			level: 1,
+			direction: 'right',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1,
+			height: 547,
+			width: 1136,
+			stepX: 0,
+			maxHP: 1,
+			weight: 1000,
+			stepXRate: 0,
+			invulnerable: true,
+			immobilize: true,
+			noDirection: true,
+			noLoot: true,
+			skipHealthBar: true,
+			still: true,
+			immunities: [],
+			src: './images/sprites/ep101/',
+			buffs: []
+		};
+	},
+	enemy108: function () {
+		return {
+			animations: {
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 595,
+							spriteHeight: 88,
+							spriteOrigin: 298,
+							speed: 999
+						}
+					]
+				}
+			},
+			key: 'hvrt-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 88,
+			id: 108,
+			healtbarGap: 0,
+			name: 'Hive Roots',
+			class: 'object',
+			level: 1,
+			direction: 'right',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1,
+			height: 88,
+			width: 595,
+			stepX: 0,
+			maxHP: 1,
+			weight: 1000,
+			stepXRate: 0,
+			invulnerable: true,
+			immobilize: true,
+			noDirection: true,
+			noLoot: true,
+			skipHealthBar: true,
+			still: true,
+			immunities: [],
+			drawPriority: 999,
+			src: './images/sprites/ep102/',
+			buffs: []
+		};
+	},
+	enemy109: function () {
+		return {
+			animations: {
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 166,
+							spriteHeight: 95,
+							spriteOrigin: 83,
+							speed: 8
+						},
+							{
+							spriteLeft: 166,
+							spriteTop: 0,
+							spriteWidth: 166,
+							spriteHeight: 95,
+							spriteOrigin: 83,
+							speed: 8
+						},
+							{
+							spriteLeft: 166 * 2,
+							spriteTop: 0,
+							spriteWidth: 166,
+							spriteHeight: 95,
+							spriteOrigin: 83,
+							speed: 8
+						},
+							{
+							spriteLeft: 166 * 3,
+							spriteTop: 0,
+							spriteWidth: 166,
+							spriteHeight: 95,
+							spriteOrigin: 83,
+							speed: 8
+						}
+					]
+				}
+			},
+			key: 'swrm-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 10,
+			id: 109,
+			healtbarGap: 0,
+			name: 'Swarm',
+			class: 'object',
+			level: 1,
+			direction: 'right',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1,
+			height: 95,
+			width: 166,
+			stepX: 0,
+			maxHP: 1,
+			weight: 1000,
+			stepXRate: 0,
+			invulnerable: true,
+			immobilize: true,
+			noDirection: true,
+			noLoot: true,
+			skipHealthBar: true,
+			still: true,
+			immunities: [],
+			src: './images/related/swarm.png',
 			buffs: []
 		};
 	},
@@ -72434,6 +73109,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				src: (_redSprite ?? _sprite1).src,
 				bottomGap: ((_redSprite ?? _sprite1).bottomGap ?? 0),
 				do: (_redSprite ?? _sprite1).do,
+				invisibleWhenLay: (_redSprite ?? _sprite1).invisibleWhenLay,
 				zoom: .95,
 				objects: (_redSprite ?? _sprite1).objects,
 				chain: [
@@ -72451,6 +73127,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				src: (_redSprite ?? _sprite1).src,
 				bottomGap: ((_redSprite ?? _sprite1).bottomGap ?? 0) + MathRound(_r * .075),
 				sound: _sound,
+				invisibleWhenLay: (_redSprite ?? _sprite1).invisibleWhenLay,
 				zoom: .95,
 				chain: [
 					{ key: 'escape', num: 1 },
@@ -72467,6 +73144,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + MathRound(_r * .125),
 				objects: _sprite1.objects,
+				invisibleWhenLay: _sprite1.invisibleWhenLay,
 				chain: [
 					{ key: 'escape', num: 1 },
 					{ key: 'counterstun', num: 4 },
@@ -72482,6 +73160,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				bottomGap: (_sprite1.bottomGap ?? 0) + MathRound(_r * .15),
 				src: _sprite1.src,
 				objects: _sprite1.objects,
+				invisibleWhenLay: _sprite1.invisibleWhenLay,
 				chain: [
 					{ key: 'escape', num: 1 },
 					{ key: 'counterstun', num: 4 },
@@ -72496,6 +73175,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 5),
 				bottomGap: (_sprite1.bottomGap ?? 0) + MathRound(_r * .065),
 				src: _sprite1.src,
+				invisibleWhenLay: _sprite1.invisibleWhenLay,
 				objects: _sprite1.objects,
 				chain: [
 					{ key: 'escape', num: 1 },
@@ -72511,6 +73191,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 6),
 				bottomGap: _sprite1.bottomGap,
 				src: _sprite1.src,
+				invisibleWhenLay: _sprite1.invisibleWhenLay,
 				objects: _sprite1.objects,
 				chain: [
 					{ key: 'escape', num: 1 },
@@ -72526,6 +73207,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 7),
 				bottomGap: (_sprite1.bottomGap ?? 0) - MathRound(_r * .065),
 				src: _sprite1.src,
+				invisibleWhenLay: _sprite1.invisibleWhenLay,
 				objects: _sprite1.objects,
 				chain: [
 					{ key: 'escape', num: 1 },
@@ -72540,6 +73222,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 7),
 				bottomGap: (_sprite1.bottomGap ?? 0) - MathRound(_r * .0375),
+				invisibleWhenLay: _sprite1.invisibleWhenLay,
 				src: _sprite1.src,
 				objects: _sprite1.objects,
 				chain: [
@@ -72555,6 +73238,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 7),
 				bottomGap: (_sprite1.bottomGap ?? 0) + MathRound(_r * .025),
+				invisibleWhenLay: _sprite1.invisibleWhenLay,
 				src: _sprite1.src,
 				objects: _sprite1.objects,
 				chain: [
@@ -72569,6 +73253,8 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteWidth: _sprite1.spriteWidth,
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
+				invisibleWhenLay: _sprite1.invisibleWhenLay,
+				bottomGap: _sprite1.bottomGap,
 				src: _sprite1.src,
 				objects: _sprite1.objects,
 				chain: [
@@ -72594,15 +73280,15 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				speed: 16
 			},
 			{
-				spriteLeft: (_sprite3 ?? _sprite1).spriteLeft,
-				spriteTop: (_sprite3 ?? _sprite1).spriteTop,
-				spriteWidth: (_sprite3 ?? _sprite1).spriteWidth,
-				spriteHeight: (_sprite3 ?? _sprite1).spriteHeight,
-				spriteOrigin: (_sprite3 ?? _sprite1).spriteOrigin,
-				objects: (_sprite3 ?? _sprite1).objects,
-				bottomGap: (_sprite3 ?? _sprite1).bottomGap,
+				spriteLeft: (_sprite3 ?? _sprite2 ?? _sprite1).spriteLeft,
+				spriteTop: (_sprite3 ?? _sprite2 ?? _sprite1).spriteTop,
+				spriteWidth: (_sprite3 ?? _sprite2 ?? _sprite1).spriteWidth,
+				spriteHeight: (_sprite3 ?? _sprite2 ?? _sprite1).spriteHeight,
+				spriteOrigin: (_sprite3 ?? _sprite2 ?? _sprite1).spriteOrigin,
+				objects: (_sprite3 ?? _sprite2 ?? _sprite1).objects,
+				bottomGap: (_sprite3 ?? _sprite2 ?? _sprite1).bottomGap,
 				invisibleWhenLay: (_sprite3 ?? _sprite2 ?? _sprite1).invisibleWhenLay,
-				src: (_sprite3 ?? _sprite1).src,
+				src: (_sprite3 ?? _sprite2 ?? _sprite1).src,
 				chain: [
 					{ key: 'escape', num: 1 },
 					{ key: 'counterstun', num: 4 },
@@ -72950,7 +73636,7 @@ function createKnockBackGround(_sprite1, _sprite2, _src) {
 					spriteOrigin: _sprite1.spriteOrigin,
 					src: _sprite1.src,
 					extraStepXRate: .2,
-					bottomGap: -10,
+					bottomGap: (_sprite1.bottomGap ?? 0) - 10,
 					speed: 4,
 					objects: [
 						//{ key: 'slowMotion', position: 'css' },
@@ -72968,7 +73654,7 @@ function createKnockBackGround(_sprite1, _sprite2, _src) {
 					spriteOrigin: _sprite1.spriteOrigin,
 					src: _sprite1.src,
 					extraStepXRate: .2,
-					bottomGap: -10,
+					bottomGap: (_sprite1.bottomGap ?? 0) - 10,
 					chain: [
 						{ key: 'escape', num: 1 },
 						{ key: 'counterground', num: 2 }
@@ -72983,7 +73669,7 @@ function createKnockBackGround(_sprite1, _sprite2, _src) {
 					spriteOrigin: _sprite1.spriteOrigin,
 					src: _sprite1.src,
 					extraStepXRate: .3,
-					bottomGap: -10,
+					bottomGap: (_sprite1.bottomGap ?? 0) - 10,
 					speed: 24,
 					chain: [
 						{ key: 'escape', num: 1 },
@@ -73012,7 +73698,7 @@ function createKnockBackGround(_sprite1, _sprite2, _src) {
 					spriteOrigin: _sprite1.spriteOrigin,
 					src: _sprite1.src,
 					extraStepXRate: .2,
-					bottomGap: -10,
+					bottomGap: (_sprite1.bottomGap ?? 0) - 10,
 					chain: [
 						{ key: 'escape', num: 1 },
 						{ key: 'counterground', num: 2 }
@@ -73026,7 +73712,7 @@ function createKnockBackGround(_sprite1, _sprite2, _src) {
 					spriteHeight: _sprite1.spriteHeight,
 					spriteOrigin: _sprite1.spriteOrigin,
 					src: _sprite1.src,
-					bottomGap: -5,
+					bottomGap: (_sprite1.bottomGap ?? 0) - 5,
 					extraStepXRate: .15,
 					chain: [
 						{ key: 'escape', num: 1 },
@@ -73041,6 +73727,7 @@ function createKnockBackGround(_sprite1, _sprite2, _src) {
 					spriteHeight: _sprite1.spriteHeight,
 					spriteOrigin: _sprite1.spriteOrigin,
 					src: _sprite1.src,
+					bottomGap: _sprite1.bottomGap,
 					extraStepXRate: .15,
 					speed: 4,
 					invisibleWhenDead: true
@@ -73052,6 +73739,7 @@ function createKnockBackGround(_sprite1, _sprite2, _src) {
 					spriteHeight: _sprite2.spriteHeight,
 					spriteOrigin: _sprite2.spriteOrigin,
 					src: _sprite2.src,
+					bottomGap: _sprite2.bottomGap,
 					objects: [
 						{
 							key: 'throw',

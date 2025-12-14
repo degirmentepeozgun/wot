@@ -179,7 +179,8 @@ function map(_m) {
 			_ids.push(mainCharacter.realId ?? mainCharacter.id);
 		if(_extraIds?.[0])
 			for(let _id of _extraIds)
-				_ids.push(_id);
+				if(_ids.indexOf(_id) === -1)
+					_ids.push(_id);
 		const _spls = [];
 		const _loadCharacterSprite = async function(_e) {
 			const _keys = _kk ?? Object.keys(_e.animations);
@@ -1480,7 +1481,7 @@ function map(_m) {
 		mainCharacter.left = _center;
 		mainCharacter.updateVariables();
 		prevPlatformX = undefined;
-		PlaySound({key:'click'});
+		playClick();
 	}
 	this.checkRespawn = function() {
 		if(!this.respawners?.[0])
@@ -2668,7 +2669,21 @@ function map(_m) {
 		// _opc = Math.min(1, _opc / 100);
 		let _color;
 		if (_item?.char?.hurting?.hit) {
-			_color = `rgba(255,255,255,${_force ? _opc : _item.char.hurting.hit > 2 ? 1 : _item.char.hurting.hit * .3})`;
+			// _color = `rgba(255,255,255,${_force ? _opc : _item.char.hurting.hit > 2 ? 1 : _item.char.hurting.hit * .3})`;
+			// _item.char.hurting.hit--;
+			let h = _item.char.hurting.hit;
+			if (h >= 3) {
+				// İlk şok
+				_color = 'rgba(255,255,255,1)';
+			}
+			else if (h === 2) {
+				// Heat flash
+				_color = 'rgba(255,230,150,0.85)';
+			}
+			else if (h === 1) {
+				// Burn fade
+				_color = 'rgba(255,110,40,0.55)';
+			}
 			_item.char.hurting.hit--;
 		} else {
 			const base = _col ?? _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
@@ -2678,7 +2693,7 @@ function map(_m) {
 				let b = parseInt(base.slice(5, 7), 16);
 				if(base.length === 9)
 					_opc = parseInt(base.slice(7, 9), 16) / 255;
-				_color = `rgba(${r},${g},${b},${_force ? _opc : 1})`;
+				_color = `rgba(${r},${g},${b},${_force ? MathRound(_opc * 10) / 10 : 1})`;
 			} else
 				_color = base;
 		}
@@ -3432,10 +3447,10 @@ function map(_m) {
 						// _zoomedTop = MathRound(_zoomedHeight - _item.height);
 						//_colorized = false;
 						let _drawParticles = 1;
-						if(_hurted && _item.char.frame < 2 && (_hurtedCount < 4 || _item.char.main)) {
+						if((_hurted && _item.char.frame < 2 && (_hurtedCount < 4 || _item.char.main)) || _item.skinColor) {
 							//if(!_item.char.colorized) {
 								//_item.char.colorized = _colorized = true;
-								const _hurtSprite = this.colorizeSprite4(_item);
+								const _hurtSprite = this.colorizeSprite4(_item, null, _item.skinColor ? 1 : null);
 								if(_hurtSprite?.width > 0)
 									offCtx.drawImage(_hurtSprite,
 										MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff)), 
@@ -3544,7 +3559,7 @@ function map(_m) {
 									else 
 										_hs += (_knockback ? 2 : (_item.particleColor ? 3 : 0));
 									this.drawHitParticles(_item.char, _x + MathRound(_w / 2),
-									_y + MathRound(_h / 2), getRandomValue2(150, 190), '#880808', 
+									_y + MathRound(_h / 2), getRandomValue2(150, 190), _item.char.bloodColor === 'green' ? '#1f6f2e' : '#880808', 
 									_hs, _knockback, _item.char.hurtingStrength);
 									delete _item.char.hurtingStrength;
 									_drawParticles = 0;
@@ -4856,6 +4871,7 @@ this.drawHealthBar2 = function (_item) {
 		_wrappers?.forEach(x => x.remove());
 		stopWeather();
 		this.seenEnemies.length = 0;
+		window.SoundManager.clearLoops();
 	}
 	setBusyState(!(this.menu || this.lobby));
 }

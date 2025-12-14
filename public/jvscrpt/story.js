@@ -2810,7 +2810,7 @@ const __stories = [
 						do: function() {
 							episode.phase = 2;
 							focusMe('.enemy-profile', function() {
-								PlaySound({ key: 'click' });
+								playClick();
 								episode.still = false;
 								episode.enemies.filter(x => x.stop).forEach(x => {
 									x.still = x.stop = false;
@@ -5949,7 +5949,7 @@ const __stories = [
 						do: function() {
 							episode.phase = 2;
 							focusMe('.enemy-profile', function() {
-								PlaySound({ key: 'click' });
+								playClick();
 								episode.still = false;
 								episode.enemies.filter(x => x.stop).forEach(x => {
 									x.still = x.stop = false;
@@ -6920,7 +6920,7 @@ const __stories = [
 									episode.pauseBgMusic(1);
 									episode.moveCamera(function(){
 										focusMe('#quest-status', function() {
-											PlaySound({ key: 'click' });
+											playClick();
 											mainCharacter.still = mainCharacter.immobilize = false;
 											delete mainCharacter.disableKeyboard;
 											resumeQuestTimer();
@@ -8111,7 +8111,7 @@ const __stories = [
 									episode.pauseBgMusic(1);
 									episode.moveCamera(function(){
 										focusMe('#quest-status', function() {
-											PlaySound({ key: 'click' });
+											playClick();
 											mainCharacter.still = mainCharacter.immobilize = false;
 											delete mainCharacter.disableKeyboard;
 											resumeQuestTimer();
@@ -9256,7 +9256,7 @@ function selectStoryUI(_id) {
 }
 function createStoryDetailUI(_id, _noSound) {
 	if(!_noSound)
-		PlaySound({ key: 'click' });
+		playClick();
 	const _s = __stories.find(x => x.id === _id);
 	if(_s?.locked) {
 		warn('<span>' + getLangData('Story is locked for now') + '</span>', 'warn');
@@ -9490,7 +9490,7 @@ function tryConsumeTickets(_goldSelected, _expSelected, _itemSelected) {
 	_client.saveState();
 }
 function askPassStory(_itemSelected, _goldSelected, _expSelected) {
-    PlaySound({ key: 'click' });
+    playClick();
     const _limit = __account.misc.find(x => x.type === 'ticket-pass')?.count ?? 0;
     let _modal = `<div class="full fade-me flex inventory-question inventory-question-add-slot">
         <div class="inventory-modal">
@@ -9516,7 +9516,7 @@ function askPassStory(_itemSelected, _goldSelected, _expSelected) {
     document.querySelector('#menu-ui').appendChild(_div.firstChild);
 }
 function useMaxPassAmount() {
-    PlaySound({ key: 'click' });
+    playClick();
     const _limit = __account.misc.find(x => x.type === 'ticket-pass')?.count ?? 0;
     const _sa = document.getElementById('pass-amount');
     let _amount = parseInt(_sa.innerText);
@@ -9527,7 +9527,7 @@ function useMaxPassAmount() {
     _sa.innerText = _amount;
 }
 function increasePassAmount() {
-    PlaySound({ key: 'click' });
+    playClick();
     const _limit = __account.misc.find(x => x.type === 'ticket-pass')?.count ?? 0;
     const _sa = document.getElementById('pass-amount');
     let _amount = parseInt(_sa.innerText);
@@ -9540,7 +9540,7 @@ function increasePassAmount() {
     _sa.innerText = _amount;
 }
 function decreasePassAmount() {
-    PlaySound({ key: 'click' });
+    playClick();
     const _sa = document.getElementById('pass-amount');
     let _amount = parseInt(_sa.innerText);
     _amount--;
@@ -9553,7 +9553,7 @@ function decreasePassAmount() {
 function acceptStoryPass(_itemSelected, _goldSelected, _expSelected) {
 	// warn('<span>' + getLangData('Not available in demo') + '</span>', 'warn');
 	// return;
-    PlaySound({ key: 'click' });
+    playClick();
     const _sa = document.getElementById('pass-amount');
     let _amount = parseInt(_sa.innerText);
     if(_amount > 0) {
@@ -9578,7 +9578,7 @@ function redeemPassTicket(_id) {
 }
 var __storyAutoPassSkip;
 function skipStoryPass() {
-	PlaySound({ key: 'click' });
+	playClick();
 	__storyAutoPassSkip = 1;
 	//üstteki algoritmayı hızlı çalıştır
 }

@@ -69,7 +69,7 @@ function getCharacterInformation(_class, _elem) {
 	<div class="flex w-100 c-i c-i-btn"><div class="game-btn2 flex" onclick="selectHero('${_info.class}')"><div class="flex">SELECT</div></div></div></div>`;
 }
 function selectHero(_class) {
-    PlaySound({ key: 'click' });
+    playClick();
 	if(_class !== 'warrior'){
         warn('<span>' + getLangData('Not available for demo') + '</span>', 'warn');
 		return;

@@ -852,7 +852,7 @@ function loadVideo(_url, _after, _again) {
 }
 let _playingVideo;
 function askSkipVideo(_video, _again) {
-    PlaySound({ key: 'click' });
+    playClick();
 	_playingVideo = _video;
     let _modal = document.createElement('div');
 	_modal.className = "full flex inventory-question";
@@ -1073,7 +1073,7 @@ function showMyModalPopUp(_id) {
 }
 function hideMyMenu() {
 	_dialogAppeared = false;
-	PlaySound({key:'click'});
+	playClick();
 	const _mbd = document.querySelector('.menu-backdrop');
 	if(_mbd)
 		_mbd.remove();
@@ -1556,7 +1556,7 @@ function selectMenuContainer(_order) {
 	return _container;
 }
 function trySwitchMap(_id) {
-	PlaySound({ key: 'click' }); 
+	playClick(); 
 	const _map = mapSprites.find(x => x.id === _id);
 	if(mainCharacter.level < _map.minLevel) {
 		warn('<span>' + getLangData('Your level is too low') + '</span>', 'warn');

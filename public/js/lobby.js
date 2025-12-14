@@ -26,11 +26,11 @@ function outsideClick(e) {
 	closeSideMenu();
 }
 function closeSideMenu() {
-	PlaySound({key:'click'});
+	playClick();
 	hideSideMenu();
 }
 function openSideMenu() {
-   	PlaySound({ key: 'click' });
+   	playClick();
 	const _ml = document.querySelector('.menu-left-opener');
 	if(_ml)
 		return;
@@ -83,7 +83,7 @@ function openSectionFromMenu(_order, _subOrder, _tabOrder) {
 	const _ml = document.querySelector('.menu-left-opener');
 	if(!_ml || !hasClass(_ml, 'opened') || hasClass(_ml, 'closing'))
 		return;
-	PlaySound({key:'click'});
+	playClick();
 	hideSideMenu(function() {
 		switchBookPage(_order, _subOrder, _tabOrder);
 	})
@@ -110,7 +110,7 @@ function getStoryTemplates() {
 }
 
 function openStoryDetail(_id) {
-    PlaySound({ key: 'click' });
+    playClick();
 	const _s = __stories.find(x => x.id === _id);
 	if(_s?.locked) {
 		warn('<span>' + getLangData('Story is locked for now') + '</span>', 'warn');
@@ -136,7 +136,7 @@ function openStoryDetail(_id) {
 }
 
 function closeStoryModal() {
-    PlaySound({ key: 'click' });
+    playClick();
 	const _cards = document.querySelectorAll('.story-card');
 	for(let _card of _cards)
 		removeClass(_card, 'selected');

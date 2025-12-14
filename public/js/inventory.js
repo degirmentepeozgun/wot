@@ -44,7 +44,7 @@ function refreshInventory() {
 }
 let _sortDirection;
 function sortItems() {
-    PlaySound({ key: 'click' });
+    playClick();
     _sortDirection = _sortDirection ? 0 : 1;
     refreshInventory();
 }
@@ -84,7 +84,7 @@ function autoWearItems() {
         changePower(_oldPower, _newPower);
     }
     else {
-        PlaySound({ key: 'click' });
+        playClick();
         warn('<span>' + getLangData('Nothing better to wear yet') + '</span>', 'warn');
     }
 }
@@ -184,7 +184,7 @@ function getItemSellCost(_id) {
 function sellItems() {
     const _choices = document.querySelectorAll('.inventory-question .sell-choice.selected');
     if(!_choices?.[0]) {
-        PlaySound({ key: 'click' });
+        playClick();
         return;
     }
     const _grades = [];
@@ -230,7 +230,7 @@ function askFilterSellItems() {
     let _html = '';
     for(let _grade of _grades)
         _html += `<div onexactclick="selectFilterGrade(this)" class="flex sell-choice flex-jc-start animate-me" data-key="${_grade}"><div class="sell-choice-left flex animate-me"></div><div class="sell-choice-right flex grade${_grade}">${getLangData(_grade > 0 ? 'Grade' : 'All') + (_grade > 0 ? ' ' + _grade : '')}</div></div>`;
-    PlaySound({ key: 'click' });
+    playClick();
     let _modal = `<div class="full fade-me flex inventory-question inventory-question-sell-items">
         <div class="inventory-modal flex" style="flex-direction:column">
             <div style="padding:6vh 4vh 4vh 4vh" class="flex">
@@ -259,6 +259,14 @@ function getMiscItemIcon(_item) {
     return '<span class="item-in-slot full' + (_item.grade !== undefined ? ' grade' + _item.grade + '-item' : '') + '" style="display:inline-block;position:relative"><img style="background:#010101" onexactclick="openMiscItemInfoModal(\'' + _item.type + '\', ' + _item.grade + ')" class="item-img" src="./images/icons/' + _item.type + '.png"/>' + _level +
     (_item.new ? '<div style="height:2vh;width:2vh;top:-.5vh;right:-.5vh;position:absolute;background:darkred;border-radius:100%"></div>' : '') + '</span>';
 }
+function getMailAttachmentIcon(_item) {
+    if(!_item)
+        return '';
+    let _level = '';
+    if(_item.count > 1)
+        _level = '<span style="bottom:-.8vh;right:-.8vh;position:absolute;display:inline-block;padding:0 .8vh;color:#f7f7f7cc !important;font-size:2vh !important;background:#262626">' + _item.count + '</span>';
+    return '<span class="item-in-slot full' + (_item.grade !== undefined ? ' grade' + _item.grade + '-item' : '') + '" style="display:inline-block;position:relative"><img style="background:#010101" onexactclick="openMiscItemInfoModal(\'' + _item.type + '\', ' + _item.grade + ')" class="item-img" src="' + getRewardIcon(_item.grade??1, _item.key, _item.type).src + '"/>' + _level + '</span>';
+}
 function getGemItemIcon(_item, _c) {
     if(!_item)
         return '';
@@ -285,7 +293,7 @@ function getItemIcon(_item, _noBadge) {
     if(_item.level > 1)
         _level = '<span class="item-level-badge" style="color:#f7f7f7cc !important">' + _item.level + '</span>';
     return _diffIconHtml + '<span class="item-in-slot full grade' + _item.grade + '-item" style="display:inline-block;position:relative" onexactclick="openItemInfoModal(' + _item.id + ')"><img style="background:#010101" class="item-img" src="./images/items/icons/' + (_item.for ? (_item.for + '/') : '') + _item.type + _item.grade + '.png"/>' + _level +
-    (_item.new ? '<div style="z-index:2;pointer-events:none;height:2vh;width:2vh;top:-.5vh;right:-.5vh;position:absolute;background:darkred;border-radius:100%"></div>' : '') + '</span>';
+    (_item.new ? '<div class="inventory-item-new-badge"></div>' : '') + '</span>';
 }
 function getMinPropValue(_key, _item) {
     const _ep = _equips[_item.type]['grade' + _item.grade].props.find(x => x.key === _key); 
@@ -321,10 +329,14 @@ function getRandomProps(_type, _grade, _level) {
     }
     return _p;
 }
-function pushItemIntoInventory(_item) {
+function pushItemIntoInventory(_item, _fromMail) {
     var _items = getItems();
     if(__account.slots <= _items.filter(x => !x.weared).length) {
         warn('<span>' + getLangData('No room in inventory') + '</span>', 'warn');
+        if(!_fromMail) {
+            //maile gönder
+            _client.pushItemIntoMail(_item);
+        }
         return false;
     }
     if(!__storyPlaying) {
@@ -612,7 +624,7 @@ function getInventoryTabContent() {
     return _html;
 }
 function selectGemForSocket(_type, _grade) {
-    PlaySound({ key: 'click' });
+    playClick();
     removeClass(document.getElementById('item-selection-approve-btn'), 'disabled');
     const _itemIcons = document.querySelectorAll('#gem-picking-area img');
     for(let _ic of _itemIcons) {
@@ -650,7 +662,7 @@ function acceptGemSelection(_id) {
     }
 }
 function tryRemoveSocket(_id, _socketIndex) {
-    PlaySound({ key: 'click' });
+    playClick();
     var _items = getItems();
     var _item = _items.find(x => x.id === _id);
     const _socket = _item.sockets.sort((a, b) => (b.grade ?? 0) - (a.grade ?? 0))[_socketIndex];
@@ -658,7 +670,7 @@ function tryRemoveSocket(_id, _socketIndex) {
     askSomething(`<img style="height:4vh" src="${getRewardIcon(_socket.grade, 'gem', _socket.key).src}" />&nbsp;${getLangData('Remove this gem for')} <b style="margin-left:1vh;color:#F3f4f5 !important">${_cost.formatWithDots()}</b>&nbsp;<img style="height:2.2vh" src="./images/icons/coin.png" />&nbsp;`, `acceptAndRemoveGemFromSocket(${_id}, ${_cost}, ${_socketIndex})`,1);
 }
 function acceptAndRemoveGemFromSocket(_id, _cost, _socketIndex) {
-    PlaySound({ key: 'click' });
+    playClick();
     if(__account.gold < _cost) {
         warn('<span>' + getLangData('Not enough gold') + '</span>', 'warn');
         return;
@@ -686,7 +698,7 @@ function acceptAndRemoveGemFromSocket(_id, _cost, _socketIndex) {
     checkUpdateAvailable2(1);
 }
 function tryAddSocket(_id) {
-    PlaySound({ key: 'click' });
+    playClick();
     let _choices = getGemTabContent() ?? '';
     if(_choices)
         _choices = _choices.replace(/openGemItemInfoModal/g, 'selectGemForSocket');
@@ -782,7 +794,7 @@ function getItemInfoModalHtml(_id) {
     return _html;
 }
 function openItemInfoModal(_id) {
-    PlaySound({ key: 'click' });
+    playClick();
     //Item Grade
     //Item Type
     //Item Update Level
@@ -819,7 +831,7 @@ function renderItemProps(_item, _defaultColor) {
     return _props;
 }
 function openMiscItemInfoModal(_type, _grade) {
-    PlaySound({ key: 'click' });
+    playClick();
     var _item = misc.find(x => x.type === _type);
     var _html = `<div class="full flex item-info-container-parent menu-modal-right">
         <div class="full flex item-info-container">
@@ -864,7 +876,7 @@ function openGemItemInfoModal(_type, _grade) {
         addGemToMelt(_type, _grade);
         return;
     }
-    PlaySound({ key: 'click' });
+    playClick();
     var _item = __gems.find(x => x.key === _type);
     const _g = _item.grades.find(x => x.grade === _grade);
     var _props = _g.props;
@@ -1135,7 +1147,7 @@ function getItemGradeLetter(_grade) {
 }
 function openCharacterInfoModal() {
     closeCharacterInfoModal();
-    PlaySound({ key: 'click' });
+    playClick();
     var _level = mainCharacter.level;
     var _class = mainCharacter.class;
     _class = getLangData(_class).toProperCase();
@@ -1179,7 +1191,7 @@ function openGemMeltModal(_type, _grade) {
     if(!_meltParent)
         closeCharacterInfoModal(1);
     closeItemInfoModal(1);
-    //PlaySound({ key: 'click' });
+    //playClick();
     let _html = `<div class="full gem-info-container-parent character-info-container-parent menu-modal-left"><div class="full flex character-info-container">
     <div class="flex" style="width:100%;height:12%">
     <div class="flex flex-jc-end item-info-modal-close" onexactclick="closeGemInfoModal()">&times;</div>
@@ -1343,7 +1355,7 @@ function acceptMelt(_force) {
             break;
     }
     if(_keys.length < 5) {
-        PlaySound({ key: 'click' });
+        playClick();
         warn('<span>' + getLangData('Need more gem to melt') + '</span>', 'warn');
         return;
     }
@@ -1351,7 +1363,7 @@ function acceptMelt(_force) {
     const _g = __gems.find(x => x.key === _key);
     const _hasGrade = _g.grades.find(x=> x.grade === (_grade + 1));
     if(!_hasGrade) {
-        PlaySound({ key: 'click' });
+        playClick();
         warn('<span>' + getLangData('You can not melt more') + '</span>', 'warn');
         return;
     }
@@ -1390,7 +1402,7 @@ function acceptMelt(_force) {
 function closeItemInfoModal(_noSound) {
     removeClass(document.querySelector('#inventory-list'), 'item-info-opened');
     if(!_noSound)
-        PlaySound({ key: 'click' });
+        playClick();
     const _parent = document.querySelector('.item-info-container-parent');
     if(_parent)
         _parent.remove();
@@ -1404,7 +1416,7 @@ function closeGemInfoModal(_noSound) {
 }
 function closeCharacterInfoModal(_noSound) {
     if(!_noSound)
-        PlaySound({ key: 'click' });
+        playClick();
     const _parent = document.querySelector('.character-info-container-parent');
     if(_parent)
         _parent.remove();
@@ -1517,7 +1529,7 @@ function upgradeItem(_id) {
 function rollbackOldStats(_id) {
     if(!_randomizedOldProps)
         return;
-    PlaySound({ key: 'click' });
+    playClick();
     var _items = getItems();
     var _item = _items.find(x => x.id === _id);
     const _oldPower = getTotalPower().total;
@@ -1580,7 +1592,7 @@ function askConfirmNewStats(_id, _noAnimation) {
     document.querySelector('#menu-ui').appendChild(_div.firstChild);
 }
 function sellMiscItem(_type, _grade) {
-    PlaySound({ key: 'click' });
+    playClick();
     const _item = __account.misc.find(x => x.type === _type  && (!_grade || (_grade && x.grade === _grade)));
     const _miscItem = misc.find(x => x.type === _type);
     let _modal = `<div class="full flex inventory-question">
@@ -1606,7 +1618,7 @@ function sellMiscItem(_type, _grade) {
     document.querySelector('#menu-ui').appendChild(_div.firstChild);
 }
 function increaseSellCount(_type, _grade) {
-    PlaySound({ key: 'click' });
+    playClick();
     const _item = __account.misc.find(x => x.type === _type && (!_grade || (_grade && x.grade === _grade)));
     const _miscItem = misc.find(x => x.type === _type);
     const _sc = document.getElementById('sell-count');
@@ -1619,7 +1631,7 @@ function increaseSellCount(_type, _grade) {
     document.getElementById('misc-sell-cost').innerText = _cost.formatWithDots();
 }
 function decreaseSellCount(_type, _grade) {
-    PlaySound({ key: 'click' });
+    playClick();
     const _miscItem = misc.find(x => x.type === _type);
     const _sc = document.getElementById('sell-count');
     let _count = parseInt(_sc.innerText) - 1;
@@ -1631,7 +1643,7 @@ function decreaseSellCount(_type, _grade) {
     document.getElementById('misc-sell-cost').innerText = _cost.formatWithDots();
 }
 function acceptMiscSellCount(_type, _grade) {
-    PlaySound({ key: 'click' });
+    playClick();
     const _itemIndex = __account.misc.findIndex(x => x.type === _type && (!_grade || (_grade && x.grade === _grade)));
     const _item = __account.misc[_itemIndex];
     const _miscItem = misc.find(x => x.type === _type);
@@ -1649,7 +1661,7 @@ function acceptMiscSellCount(_type, _grade) {
     switchInventoryTab(null, 3);
 }
 function useMiscItem(_type, _grade) {
-    PlaySound({ key: 'click' });
+    playClick();
     const _itemIndex = __account.misc.findIndex(x => x.type === _type && (!_grade || (_grade && x.grade === _grade)));
     const _item = __account.misc[_itemIndex];
     const _miscItem = misc.find(x => x.type === _type);
@@ -1675,7 +1687,7 @@ function askRandomizeItem(_id) {
     askSomething(`${getLangData('Change attributes of this item for')} <b style="margin-left:1vh;color:#F4BB44 !important">1</b> ${getLangData('dice')}`, `acceptAndRandomizeItem(${_id})`);
 }
 function askAddSlot() {
-    PlaySound({ key: 'click' });
+    playClick();
     const _cost = 10000;
     let _modal = `<div class="full fade-me flex inventory-question inventory-question-add-slot">
         <div class="inventory-modal">
@@ -1722,7 +1734,7 @@ function useItemSelectionTicket(_level) {
             `</div>
             <div style="padding:4vh 2vh" class="flex">
                 <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('CANCEL')}</div>
-                <div id="item-selection-approve-btn" class="game-menu-button flex animate-me disabled" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="acceptItemSelection()">${getLangData('APPROVE')}</div>
+                <div id="item-selection-approve-btn" class="game-menu-button flex animate-me disabled" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="acceptItemSelection(${_level})">${getLangData('APPROVE')}</div>
             </div>
         </div>
     </div>`;
@@ -1758,7 +1770,7 @@ function useGemSelectionTicket(_level) {
     document.querySelector('#menu-ui').appendChild(_div.firstChild);
 }
 function selectSelectionItem(_id, _elem) {
-    PlaySound({ key: 'click' });
+    playClick();
     removeClass(document.getElementById('item-selection-approve-btn'), 'disabled');
     const _itemIcons = document.querySelectorAll('.selection-item');
     for(let _ic of _itemIcons) {
@@ -1776,18 +1788,19 @@ function acceptGemTicketSelection() {
             const _choice = _selectionItems[_i];
             updateGem(_choice.key, _choice.grade, 1);
             //pushItemIntoInventory(_choice);
-            const _miscItem = __account.misc.find(x => x.type === 'ticket-gem-selection');
+            const _miscItem = __account.misc.find(x => x.type === 'ticket-gem-selection' && x.grade === _choice.grade);
             _miscItem.count--;
             if(_miscItem.count === 0)
-                __account.misc = __account.misc.filter(x => x.type !== 'ticket-gem-selection');
+                __account.misc = __account.misc.filter(x => !(x.type === 'ticket-gem-selection' && x.grade === _choice.grade));
             _client.saveState();
             closeInventoryQuestionModal();
             switchInventoryTab(null, 3);
+	        PlaySound({key:'bell', volume:.5, reset: true});
             break;
         }
     }
 }
-function acceptItemSelection() {
+function acceptItemSelection(_level) {
     const _itemIcons = document.querySelectorAll('.selection-item');
     for(let _i = 0; _i < _itemIcons.length; _i++) {
         const _item = _itemIcons[_i];
@@ -1795,10 +1808,10 @@ function acceptItemSelection() {
         {
             const _choice = _selectionItems[_i];
             pushItemIntoInventory(_choice);
-            const _miscItem = __account.misc.find(x => x.type === 'ticket-item-selection');
+            const _miscItem = __account.misc.find(x => x.type === 'ticket-item-selection' && x.grade === _level);
             _miscItem.count--;
             if(_miscItem.count === 0)
-                __account.misc = __account.misc.filter(x => x.type !== 'ticket-item-selection');
+                __account.misc = __account.misc.filter(x => !(x.type === 'ticket-item-selection' && x.grade === _level));
             _client.saveState();
             closeInventoryQuestionModal();
             switchInventoryTab(null, 3);
@@ -1814,7 +1827,7 @@ function calculateSlotCost(_amount) {
     return _cost;
 }
 function increaseSlotAmount() {
-    PlaySound({ key: 'click' });
+    playClick();
     const _sa = document.getElementById('slot-amount');
     let _amount = parseInt(_sa.innerText);
     _amount += 10;
@@ -1827,7 +1840,7 @@ function increaseSlotAmount() {
     _sa.innerText = _amount;
 }
 function decreaseSlotAmount() {
-    PlaySound({ key: 'click' });
+    playClick();
     const _sa = document.getElementById('slot-amount');
     let _amount = parseInt(_sa.innerText);
     _amount -= 10;
@@ -1844,7 +1857,7 @@ function acceptInventorySlot() {
     let _amount = parseInt(_sa.innerText);
     const _cost = calculateSlotCost(_amount);
     if(__account.gold < _cost) {
-        PlaySound({ key: 'click' });
+        playClick();
         warn('<span>' + getLangData('Not enough gold') + '</span>', 'warn');
         return;
     }
@@ -1922,7 +1935,7 @@ function closeInventoryQuestionModal(_noSound) {
     var _qm = document.querySelector('.inventory-question');
     if(_qm) {
         if(!_noSound)
-            PlaySound({ key: 'click' });
+            playClick();
         _qm.remove();
         return true;
     }
@@ -1984,14 +1997,14 @@ const _chestRewards = [
     { minRate:61, maxRate: 80, key: 'misc' },
     { minRate:81, maxRate: 100, key: 'pot' },
 ];
-function getChestReward(_grade, _rewardKey, _rewardType, _count) {
+function getChestReward(_grade, _rewardKey, _rewardType, _count, _fromMail) {
     const _val = getRandomValue2(1, 100);
     const _reward = _rewardKey ? { key: _rewardKey } : _chestRewards.find(x => x.minRate <= _val && x.maxRate >= _val);
     switch(_reward.key) {
         case 'item':
             {
                 const _type = _rewardType ?? itemTypes[getRandomValue2(0, itemTypes.length - 1)];
-                const _item = getRandomItem(_grade, _type.key);
+                const _item = _fromMail ?? getRandomItem(_grade, _type.key);
                 let _src;
                 if(_item.type === 'weapon')
                 {
@@ -2003,7 +2016,8 @@ function getChestReward(_grade, _rewardKey, _rewardType, _count) {
                 }
                 else
                     _src = './images/items/icons/' + _item.type + _item.grade.toString() + '.png';
-                pushItemIntoInventory(_item);
+                if(!pushItemIntoInventory(_item, _fromMail ? 1 : undefined))
+                    return undefined;
                 return {
                     type: _item.type,
                     src: _src,
@@ -2117,6 +2131,8 @@ function getChestReward(_grade, _rewardKey, _rewardType, _count) {
     }
 }
 function warnChestReward(_cr) {
+    if(!_cr)
+        return;
     var _crTitle = getLangData(_cr.title ?? _cr.type);
     PlaySound({key: 'chestreward', volume: .3, reset: true });
     _crTitle = _crTitle.charAt(0).toLocaleUpperCase(getLang()) + _crTitle.substring(1);

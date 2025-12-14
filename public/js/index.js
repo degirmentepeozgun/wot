@@ -835,7 +835,7 @@ function loadVideo(_url, _after, _again) {
 }
 let _playingVideo;
 function askSkipVideo(_video, _again) {
-    PlaySound({ key: 'click' });
+    playClick();
 	_playingVideo = _video;
     let _modal = document.createElement('div');
 	_modal.className = "full flex inventory-question";
@@ -1140,7 +1140,7 @@ function hideMyMenu(_noSound) {
 	if(!__switchingMap && !_storySceneSwitching)
 		_game.suspended = false;
 	if(episode && !_noSound)
-		PlaySound({key:'click'});
+		playClick();
 	const _mbd = document.querySelector('.menu-backdrop');
 	if(_mbd)
 		_mbd.remove();
@@ -1269,7 +1269,8 @@ function switchBookPage(_order, _subOrder, _tabOrder) {
 	checkUpdateAvailable2(_order);
 }
 function checkIfMailItemAvailable() {
-	for(const _m of _mails)
+	const _ma = _client.getMails();
+	for(const _m of _ma)
 	{
 		const _mail = __account.mailbox?.find(x => x.id === _m.id);
 		if(!_mail || (_m.attachment && !_mail.looted))
@@ -1507,7 +1508,7 @@ function zoomInWorldMap(_act) {
 		removeClass(_zo, 'disabled');
 		removeClass(_zo, 'gray');
 	}
-	PlaySound({key:'click'});
+	playClick();
 }
 function zoomOutWorldMap() {
 	if(!episode?.menu)
@@ -1526,7 +1527,7 @@ function zoomOutWorldMap() {
 		removeClass(_zi, 'disabled');
 		removeClass(_zi, 'gray');
 	}
-	PlaySound({key:'click'});
+	playClick();
 }
 function updateRightMenuTemplate(_index) {
 	const _ec = __account.misc?.find(x => x.type === 'ticket-exp')?.count ?? 0;
@@ -1845,7 +1846,7 @@ function selectMenuContainer(_order) {
 	return _container;
 }
 function trySwitchMap(_id) {
-	PlaySound({ key: 'click' }); 
+	playClick(); 
 	const _map = mapSprites.find(x => x.id === _id);
 	if(mainCharacter.level < _map.minLevel) {
 		warn('<span>' + getLangData('Your level is too low') + '</span>', 'warn');
@@ -2313,11 +2314,11 @@ function getOpeningLanguages(_selected) {
 	</div></div>`;
 }
 function selectOpeningLanguage(_key) {
-	PlaySound({key:'click'});
+	playClick();
 	document.getElementById('opening-languages').innerHTML = getOpeningLanguages(_key);
 }
 function askChangeLanguage() {
-	PlaySound({key:'click'});
+	playClick();
 	let _modal = `<div class="full fade-me show-ui flex inventory-question">
 		<div class="inventory-modal flex" style="width:50vh;aspect-ratio:1/1;flex-direction:column">`
 			+
@@ -2338,7 +2339,7 @@ function askChangeLanguage() {
 	document.getElementById('first-splash').appendChild(_div.firstChild);
 }
 function askResetKeyboardConfig() {
-	PlaySound({key:'click'});
+	playClick();
 	let _modal = `<div class="full fade-me show-ui flex inventory-question">
 		<div class="inventory-modal flex">`
 			+
@@ -2390,7 +2391,7 @@ function approveKeyboardPromo() {
 	const _container = document.querySelector('.keyboard-promo-container');
 	if(hasClass(_container, 'fade-out-99'))
 		return;
-	PlaySound({key:'click'});
+	playClick();
 	removeClass(_container, 'fade-me-99');
 	const _elem = document.getElementById('key-promo-skip');
 	if(hasClass(_elem, 'selected'))
@@ -2404,7 +2405,7 @@ function approveKeyboardPromo() {
 function skipKeyboardPromo() {
 	const _elem = document.getElementById('key-promo-skip');
 	const _img = _elem.querySelector('img');
-	PlaySound({key:'click'});
+	playClick();
 	if(hasClass(_elem, 'selected')) {
 		removeClass(_elem, 'selected');
 		_img.src = './images/ui/star-off.png';
@@ -2419,7 +2420,7 @@ function getKeyboardPromo(_force) {
 	if(_seenBefore && !_force)
 		return;
 	if(_force)
-		PlaySound({key:'click'});
+		playClick();
 	const _desc = document.createElement('div');
 	_desc.className = 'flex show-ui full keyboard-promo-container quick-play-desc-container fade-me-99 animate-me';
 	_desc.style = 'position:absolute;top:0;left:0;overflow:hidden;z-index:1499';

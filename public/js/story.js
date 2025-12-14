@@ -598,6 +598,7 @@ const __stories = [
 				map: 105,
 				startWith: 47,
 				noArtifact: 1,
+				loadingCharacterIds: [ 51,52,19 ],
 				actions: [
 					{
 						when: function() {
@@ -1763,6 +1764,7 @@ const __stories = [
 						}
 					}
 				],
+				loadingCharacterIds: [ 66,49,19 ],
 				mobs: [
 					{
 						id: 5,
@@ -2972,6 +2974,7 @@ const __stories = [
 				map: 106,
 				from: 'left',
 				startWith: 1,
+				loadingCharacterIds: [ 28 ],
 				start: function(){
 					takeQuest(0, 1, null, null, 1);
 					removeClass(_gameUI, 'disable-ui');
@@ -3188,6 +3191,19 @@ const __stories = [
 					<= 90000;
 				},
 				reward: { key:'gold', count: 20000 }
+			},
+			{
+				id:2,
+				minCount: 5,
+				title: {
+					en: 'Kill hive in 30 seconds',
+					tr: '30 saniyede kovanı öldür'
+				},
+				when: function() {
+					return ((__story.hiveKilledTime ?? episode.endTime) - __story.startTime) 
+					<= 30000;
+				},
+				reward: { key: 'misc', type: 'ticket-random', count:5 }
 			}
 		],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
@@ -3247,10 +3263,23 @@ const __stories = [
 				map: 11,
 				from: 'left',
 				startWith: 1,
+				loadingCharacterIds: [3,7,94],
+				actions: [
+					{
+						when: function() {
+							return !__story.hiveKilledTime && 
+							episode.enemies?.find(x => x.id === 94)?.health <= 0;
+						},
+						do: function() {
+							__story.hiveKilledTime = _gameTick;
+						}
+					}
+				],
 				start: function(){
 					takeQuest(0, 1, null, 'progress', 1);
 					removeClass(_gameUI, 'disable-ui');
 					removeCoopCharacter(1);
+					mainCharacter.solid = episode.hasSolid = true;
 				},
 				mobs: [
 					{
@@ -3338,15 +3367,98 @@ const __stories = [
 						atk: 10,
 						def: 10
 					},
+					// {
+					// 	id: 7,
+					// 	minX: 4500,
+					// 	maxX: 5500,
+					// 	count: 2,
+					// 	groupId: 5,
+					// 	sight: 50,
+					// 	atk: 10,
+					// 	def: 20
+					// },
 					{
-						id: 7,
-						minX: 4500,
-						maxX: 5500,
-						count: 2,
-						groupId: 5,
+						id: 108,
+						minX: 5802,
+						maxX: 5802,
+						count: 1,
+						yPosition: function() {
+							return MathRound(groundheight * .61);
+						}
+					},
+					{
+						id: 94,
+						minX: 5800,
+						maxX: 5800,
+						count: 1,
+						yPosition: function() {
+							return MathRound(groundheight * .66);
+						},
 						sight: 50,
 						atk: 10,
 						def: 20
+					},
+					// {
+					// 	id: 95,
+					// 	minX: 5990,
+					// 	maxX: 5990,
+					// 	count: 1,
+					// 	yPosition: function() {
+					// 		return MathRound(groundheight * .64);
+					// 	}
+					// },
+					// {
+					// 	id: 96,
+					// 	minX: 5880,
+					// 	maxX: 5880,
+					// 	count: 1,
+					// 	yPosition: function() {
+					// 		return MathRound(groundheight * .48);
+					// 	}
+					// },
+					// {
+					// 	id: 97,
+					// 	minX: 5766,
+					// 	maxX: 5766,
+					// 	count: 1,
+					// 	do: function(_e) {
+					// 		_e.reversed = true;
+					// 	},
+					// 	yPosition: function() {
+					// 		return MathRound(groundheight * .54);
+					// 	}
+					// },
+					// {
+					// 	id: 107,
+					// 	minX: 3400,
+					// 	maxX: 3400,
+					// 	count: 1,
+					// 	yPosition: function() {
+					// 		return MathRound(groundheight * 1.45);
+					// 	}
+					// },
+					{
+						id: 109,
+						minX: 3480,
+						maxX: 3480,
+						count: 1,
+						yPosition: function() {
+							return MathRound(groundheight * 1.97);
+						},
+					},
+					{
+						id: 500,
+						minX: 3500,
+						maxX: 3500,
+						count: 1,
+						do: function(_e) {
+							const _fs = _e.animations.idle.frames;
+							delete _fs.forEach(x => delete x.objects);
+							_fs[0].sound = { key: 'waterfall', volume:.2, bind:true, loop: true };
+						},
+						yPosition: function() {
+							return groundheight;
+						},
 					},
 					{
 						id: 79,
@@ -3673,6 +3785,7 @@ const __stories = [
 				map: 36,
 				from: 'left',
 				startWith: 1,
+				loadingCharacterIds: [ 18,10 ],
 				actions: [
 					{
 						when: function() {
@@ -3681,7 +3794,7 @@ const __stories = [
 						do: function() {
 							episode.phase = 2;
 							focusMe('.enemy-profile', function() {
-								episode.playSound({ key: 'click' });
+								playClick();
 								episode.still = false;
 								episode.enemies.filter(x => x.stop).forEach(x => {
 									x.still = x.stop = false;
@@ -3690,6 +3803,7 @@ const __stories = [
 								delete mainCharacter.disableKeyboard;
 								mainCharacter.enableSkills();
 								disposeFocus();
+								__story.startTime = _gameTick;
 							}, false, getLangData('You can use these single-use abilities anytime. It allows you to deal with crowd'), 1);
 						}
 					}
@@ -4087,6 +4201,7 @@ const __stories = [
 				map: 41,
 				from: 'left',
 				startWith: 1,
+				loadingCharacterIds: [ 75,76,77 ],
 				start: function() {
 					takeQuest(0, 1, null, 'progress', 1);
 					removeClass(_gameUI, 'disable-ui');
@@ -5068,6 +5183,7 @@ const __stories = [
 				save: true,
 				noArtifact: 1,
 				startWith: 1,
+				loadingCharacterIds: [27, 29, 19, 66, 47, 83, 49],
 				bonusRewards: [
 					{
 						when: function(_class) { return 'cyclops' === _class },
@@ -5129,6 +5245,10 @@ const __stories = [
 							mainCharacter.still = mainCharacter.immobilize = true;
 							mainCharacter.animate('idle');
 							mainCharacter.enableSkill('defense');
+							if(mainCharacter.rageCount > 0 || mainCharacter.ultimate) {
+								mainCharacter.rageCount = 0;
+								mainCharacter.updateRageSkillUI();
+							}
 							episode.pauseBgMusic(1);
 							setTimeout(() => {
 								mainCharacter.yPosition = MathRound(groundheight / 2);
@@ -5615,7 +5735,7 @@ const __stories = [
 							episode.pauseBgMusic(1);
 							episode.moveCamera(function(){
 								focusMe('#quest-status', function() {
-									episode.playSound({ key: 'click' });
+									playClick();
 									mainCharacter.still = mainCharacter.immobilize = false;
 									delete mainCharacter.disableKeyboard;
 									resumeQuestTimer();
@@ -5897,8 +6017,8 @@ const __stories = [
 						_flower.experience = 0;
 						_flower.direction = 'left';
 						_flower.yPosition = MathRound(getGroundHeight() / 2);
-						});
-
+						__story.startTime = _gameTick;
+					});
 				},
 				actions: [
 					{
@@ -6903,7 +7023,7 @@ function resetStoryVariables() {
 	__storyScene = __storyCutScenePlaying = __storyPlaying = undefined;
 }
 function continueStoryAnyway() {
-	PlaySound({key:'click'});
+	playClick();
 	playStory(
 		__storyLastUsedSettings.id, 
 		__storyLastUsedSettings.step, 
@@ -7167,7 +7287,7 @@ function story(_id, _func, _noBlack, _desc, _after) {
 	this.order = 1;
 	const _s = this;
 	this.skip = function() {
-		PlaySound({key:'click'});
+		playClick();
 		delete this.firstSeen;
 		this.skipped = 1;
 		this.order = this.data['st' + this.id].length;
@@ -7461,7 +7581,7 @@ function portTo(_id) {
 function skipQuickPlayTutorial() {
 	const _cont = document.querySelector('.quick-play-desc-container');
 	if(_cont) {
-		PlaySound({key:'click'});
+		playClick();
 		_cont.remove();
 		requestAnimationFrame(() => {
 			removeClass(_gameUI, 'disable-ui');
@@ -7769,7 +7889,7 @@ function selectStoryUI(_id) {
 }
 function createStoryDetailUI(_id, _noSound, _noAnimation) {
 	if(!_noSound)
-		episode.playSound({ key: 'click' });
+		playClick();
 	const _s = __stories.find(x => x.id === _id);
 	if(_s?.locked) {
 		warn('<span>' + getLangData('Story is locked for now') + '</span>', 'warn');
@@ -8113,7 +8233,7 @@ function tryConsumeTickets(_goldSelected, _expSelected, _itemSelected, _portal) 
 	_client.saveState(1);
 }
 function askPassStory(_itemSelected, _goldSelected, _expSelected) {
-    episode.playSound({ key: 'click' });
+    playClick();
     const _limit = __account.misc.find(x => x.type === 'ticket-pass')?.count ?? 0;
     let _modal = `<div class="full fade-me flex inventory-question inventory-question-add-slot">
         <div class="inventory-modal">
@@ -8139,7 +8259,7 @@ function askPassStory(_itemSelected, _goldSelected, _expSelected) {
     document.querySelector('#menu-ui').appendChild(_div.firstChild);
 }
 function useMaxPassAmount() {
-    episode.playSound({ key: 'click' });
+    playClick();
     const _limit = __account.misc.find(x => x.type === 'ticket-pass')?.count ?? 0;
     const _sa = document.getElementById('pass-amount');
     let _amount = parseInt(_sa.innerText);
@@ -8150,7 +8270,7 @@ function useMaxPassAmount() {
     _sa.innerText = _amount;
 }
 function increasePassAmount() {
-    episode.playSound({ key: 'click' });
+    playClick();
     const _limit = __account.misc.find(x => x.type === 'ticket-pass')?.count ?? 0;
     const _sa = document.getElementById('pass-amount');
     let _amount = parseInt(_sa.innerText);
@@ -8163,7 +8283,7 @@ function increasePassAmount() {
     _sa.innerText = _amount;
 }
 function decreasePassAmount() {
-    episode.playSound({ key: 'click' });
+    playClick();
     const _sa = document.getElementById('pass-amount');
     let _amount = parseInt(_sa.innerText);
     _amount--;
@@ -8176,7 +8296,7 @@ function decreasePassAmount() {
 function acceptStoryPass(_itemSelected, _goldSelected, _expSelected) {
 	// warn('<span>' + getLangData('Not available in demo') + '</span>', 'warn');
 	// return;
-    episode.playSound({ key: 'click' });
+    playClick();
     const _sa = document.getElementById('pass-amount');
     let _amount = parseInt(_sa.innerText);
     if(_amount > 0) {
@@ -8201,7 +8321,7 @@ function redeemPassTicket(_id) {
 }
 var __storyAutoPassSkip;
 function skipStoryPass() {
-	episode.playSound({ key: 'click' });
+	playClick();
 	__storyAutoPassSkip = 1;
 	//üstteki algoritmayı hızlı çalıştır
 }
@@ -8636,7 +8756,7 @@ function nextPromoSection(_max) {
 	const _prev = document.getElementById('quick-play-prev');
 	removeClass(_prev, 'v-none');
 	if(_order === _max) {
-		PlaySound({key:'click'});
+		playClick();
 		_qp.remove();
 		resetOpeningScreen();
 		return;

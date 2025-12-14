@@ -41,12 +41,12 @@ function refreshInventory() {
 }
 let _sortDirection;
 function sortItems() {
-    PlaySound({ key: 'click' });
+    playClick();
     _sortDirection = _sortDirection ? 0 : 1;
     refreshInventory();
 }
 function askAutoWearItems() {
-    PlaySound({ key: 'click' });
+    playClick();
     let _modal = `<div class="full flex inventory-question">
         <div class="inventory-modal">
             <div style="padding:6vh 4vh 4vh 4vh" class="flex">
@@ -93,7 +93,7 @@ function autoWearItems() {
         changePower(_oldPower, _newPower);
     }
     else {
-        PlaySound({ key: 'click' });
+        playClick();
         warn('<span>' + getLangData('Nothing better to wear yet') + '</span>', 'warn');
     }
 }
@@ -171,7 +171,7 @@ function getItemSellCost(_id) {
 function sellItems() {
     const _choices = document.querySelectorAll('.inventory-question .sell-choice.selected');
     if(!_choices?.[0]) {
-        PlaySound({ key: 'click' });
+        playClick();
         return;
     }
     const _grades = [];
@@ -216,7 +216,7 @@ function askFilterSellItems() {
     let _html = '';
     for(let _grade of _grades)
         _html += `<div onclick="selectFilterGrade(this)" class="flex sell-choice flex-jc-start animate-me" data-key="${_grade}"><div class="sell-choice-left flex animate-me"></div><div class="sell-choice-right flex grade${_grade}">${getLangData(_grade > 0 ? 'Grade' : 'All') + (_grade > 0 ? ' ' + _grade : '')}</div></div>`;
-    PlaySound({ key: 'click' });
+    playClick();
     let _modal = `<div class="full flex inventory-question">
         <div class="inventory-modal">
             <div style="padding:6vh 4vh 4vh 4vh" class="flex">
@@ -490,7 +490,7 @@ function getInventoryTabContent() {
     return _html;
 }
 function openItemInfoModal(_id) {
-    PlaySound({ key: 'click' });
+    playClick();
     var _items = getItems();
     var _item = _items.find(x => x.id === _id);
     var _itemProps = _equips[_item.type]['grade' + _item.grade];
@@ -565,7 +565,7 @@ function renderItemProps(_item) {
     return _props;
 }
 function openMiscItemInfoModal(_type) {
-    PlaySound({ key: 'click' });
+    playClick();
     var _item = misc.find(x => x.type === _type);
     var _html = `<div class="full flex item-info-container-parent" style="z-index:2;position:absolute;padding:4.5% 8% 4.5% 0;top:0;left:0;margin:4% 6% 4% 0;width:94%;height:92%">
         <div class="full flex item-info-container" style="overflow:hidden;background:radial-gradient(#262626, #000);border-radius:1.6vh;border:.4vh solid darkgoldenrod;position:relative">
@@ -745,7 +745,7 @@ function getItemGradeLetter(_grade) {
     }
 }
 function openCharacterInfoModal() {
-    PlaySound({ key: 'click' });
+    playClick();
     var _level = mainCharacter.level;
     var _class = mainCharacter.class;
     _class = getLangData(_class).toProperCase();
@@ -785,13 +785,13 @@ function openCharacterInfoModal() {
     document.getElementById('character-screen').innerHTML += _html;
 }
 function closeItemInfoModal() {
-    PlaySound({ key: 'click' });
+    playClick();
     const _parent = document.querySelector('.item-info-container-parent');
     if(_parent)
         _parent.remove();
 }
 function closeCharacterInfoModal() {
-    PlaySound({ key: 'click' });
+    playClick();
     const _parent = document.querySelector('.character-info-container-parent');
     if(_parent)
         _parent.remove();
@@ -894,7 +894,7 @@ function upgradeItem(_id) {
 function rollbackOldStats(_id) {
     if(!_randomizedOldProps)
         return;
-    PlaySound({ key: 'click' });
+    playClick();
     var _items = getItems();
     var _item = _items.find(x => x.id === _id);
     const _oldPower = getTotalPower().total;
@@ -944,7 +944,7 @@ function askConfirmNewStats(_id) {
     document.querySelector('.inventory-screen').innerHTML += _modal;
 }
 function sellMiscItem(_type) {
-    PlaySound({ key: 'click' });
+    playClick();
     const _item = __account.misc.find(x => x.type === _type);
     const _miscItem = misc.find(x => x.type === _type);
     let _modal = `<div class="full flex inventory-question">
@@ -968,7 +968,7 @@ function sellMiscItem(_type) {
     document.querySelector('.inventory-screen').innerHTML += _modal;
 }
 function increaseSellCount(_type) {
-    PlaySound({ key: 'click' });
+    playClick();
     const _item = __account.misc.find(x => x.type === _type);
     const _miscItem = misc.find(x => x.type === _type);
     const _sc = document.getElementById('sell-count');
@@ -981,7 +981,7 @@ function increaseSellCount(_type) {
     document.getElementById('misc-sell-cost').innerText = _cost.formatWithDots();
 }
 function decreaseSellCount(_type) {
-    PlaySound({ key: 'click' });
+    playClick();
     const _miscItem = misc.find(x => x.type === _type);
     const _sc = document.getElementById('sell-count');
     let _count = parseInt(_sc.innerText) - 1;
@@ -993,7 +993,7 @@ function decreaseSellCount(_type) {
     document.getElementById('misc-sell-cost').innerText = _cost.formatWithDots();
 }
 function acceptMiscSellCount(_type) {
-    PlaySound({ key: 'click' });
+    playClick();
     const _itemIndex = __account.misc.findIndex(x => x.type === _type);
     const _item = __account.misc[_itemIndex];
     const _miscItem = misc.find(x => x.type === _type);
@@ -1011,7 +1011,7 @@ function acceptMiscSellCount(_type) {
     switchInventoryTab(null, 3);
 }
 function useMiscItem(_type) {
-    PlaySound({ key: 'click' });
+    playClick();
     const _itemIndex = __account.misc.findIndex(x => x.type === _type);
     const _item = __account.misc[_itemIndex];
     const _miscItem = misc.find(x => x.type === _type);
@@ -1026,7 +1026,7 @@ function useMiscItem(_type) {
 }
 function sellItem(_id, _noSound, _imediateSell) {
     if(!_noSound)
-        PlaySound({ key: 'click' });
+        playClick();
     var sellCost = getItemSellCost(_id);
     if(_imediateSell) {
         acceptAndSellItem(_id, sellCost, _noSound);
@@ -1045,7 +1045,7 @@ function sellItem(_id, _noSound, _imediateSell) {
     document.querySelector('.inventory-screen').innerHTML += _modal;
 }
 function askRandomizeItem(_id) {
-    PlaySound({ key: 'click' });
+    playClick();
     let _modal = `<div class="full flex inventory-question">
         <div class="inventory-modal">
             <div style="padding:6vh 4vh 4vh 4vh;text-align:center" class="flex">
@@ -1059,7 +1059,7 @@ function askRandomizeItem(_id) {
     document.querySelector('.inventory-screen').innerHTML += _modal;
 }
 function askAddSlot() {
-    PlaySound({ key: 'click' });
+    playClick();
     const _cost = 10000;
     let _modal = `<div class="full flex inventory-question">
         <div class="inventory-modal">
@@ -1111,7 +1111,7 @@ function useItemSelectionTicket(_level) {
     document.querySelector('.inventory-screen').innerHTML += _modal;
 }
 function selectSelectionItem(_id, _elem) {
-    PlaySound({ key: 'click' });
+    playClick();
     removeClass(document.getElementById('item-selection-approve-btn'), 'disabled');
     const _itemIcons = document.querySelectorAll('.selection-item');
     for(let _ic of _itemIcons) {
@@ -1147,7 +1147,7 @@ function calculateSlotCost(_amount) {
     return _cost;
 }
 function increaseSlotAmount() {
-    PlaySound({ key: 'click' });
+    playClick();
     const _sa = document.getElementById('slot-amount');
     let _amount = parseInt(_sa.innerText);
     _amount += 10;
@@ -1160,7 +1160,7 @@ function increaseSlotAmount() {
     _sa.innerText = _amount;
 }
 function decreaseSlotAmount() {
-    PlaySound({ key: 'click' });
+    playClick();
     const _sa = document.getElementById('slot-amount');
     let _amount = parseInt(_sa.innerText);
     const _cost = calculateSlotCost(_amount);
@@ -1177,7 +1177,7 @@ function acceptInventorySlot() {
     let _amount = parseInt(_sa.innerText);
     const _cost = calculateSlotCost(_amount);
     if(__account.gold < _cost) {
-        PlaySound({ key: 'click' });
+        playClick();
         warn('<span>' + getLangData('Not enough gold') + '</span>', 'warn');
         return;
     }
@@ -1235,7 +1235,7 @@ function acceptAndRandomizeItem(_id) {
 function closeInventoryQuestionModal() {
     var _qm = document.querySelector('.inventory-question');
     if(_qm) {
-        PlaySound({ key: 'click' });
+        playClick();
         _qm.remove();
     }
 }

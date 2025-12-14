@@ -174,7 +174,7 @@ function characterSelection(){
 		};
 	}
 	this.selectHero = function(_class, _dir, _another) {
-		PlaySound({ key: 'click' });
+		playClick();
 		if(_class !== 'warrior'){
 			if(__characterInfos.find(x => x.class === _class)?.race === 'Beast')
 				this.selectStoryHero(_class, _dir, _another);

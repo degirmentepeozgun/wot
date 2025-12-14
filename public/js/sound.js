@@ -85,14 +85,14 @@
 
       if (!id || !soundBuffers[id]) {
         if (!url) url = soundFiles?.[id];
-        if (!url) return;
+        if (!url) return undefined;
         if (!id && url) id = url;
         await this.preload(id, url);
       }
 
       const now = performance.now();
       const buffer = soundBuffers[id];
-      const durationMs = (buffer.duration / rate) * 1000;
+      const durationMs = loop ? Infinity : (buffer.duration / rate) * 1000;
 
       // Reset / cooldown sistemi (dokunmadım)
       const prev = playing[id];
@@ -101,9 +101,10 @@
         const stillPlaying = elapsed < prev.durationMs;
 
         if (stillPlaying) {
-          if (!reset) return;
+          if (!reset) return undefined;
 
-          if (reset && !end && !force && elapsed < COOLDOWN_MS) return;
+          if (reset && !end && !force && elapsed < COOLDOWN_MS) 
+            return undefined;
 
           try { prev.source.stop(); } catch (_) {}
           prev.gain._inUse = false;
@@ -116,7 +117,7 @@
       source.buffer = buffer;
       source.loop = loop;
       source.playbackRate.value = rate;
-
+      
       // Gain node pool
       const gain = getGainNode(id);
 
@@ -125,12 +126,18 @@
       gain.gain.value = volume * normGain;
       gain._inUse = true;
 
-      source.connect(gain);
+      const panner = ctx.createStereoPanner();
+      panner.pan.value = 0; // başlangıç değeri
+
+      // Zincir
+      source.connect(panner);
+      panner.connect(gain);
 
       source.start(0);
       playing[id] = {
         source,
         gain,
+        panner,
         startedAt: now,
         durationMs,
         ended: end
@@ -138,14 +145,25 @@
 
       const cleanup = () => {
         end?.();
-        gain._inUse = false;
-        if (playing[id]?.source === source)
+        if (playing[id]?.source === source){
+          gain._inUse = false;
           delete playing[id];
+        }
       };
 
       source.onended = cleanup;
+      source.volume = gain.gain.value;
+      source.gain = gain.gain;
+      source.pannerNode = panner;
+      return Promise.resolve(source);
+    },
+    
+    suspend() {
+      ctx.suspend();
+    },
 
-      return bind ? Promise.resolve(source) : undefined;
+    resume() {
+        ctx.resume();
     },
 
     stop(id) {
@@ -162,7 +180,22 @@
         this.stop(id);
       }
     },
-
+    clearLoops() {
+      preloaded.clear();
+      for(let id in playing){
+         const p = playing[id];
+          if (p?.source?.loop) {
+            try { p.source.stop(); } catch (_) {}
+            p.gain._inUse = false;
+            delete playing[id];
+            const gn = gainNodePools?.[id];
+            if(gn)
+              gn.length = 0;
+            delete soundBuffers[id];
+            delete audioNormalizeCache[id];
+          }
+      }
+    },
     clearAll() {
       this.stopAll();
       for (const k in soundBuffers) delete soundBuffers[k];
@@ -174,6 +207,9 @@
 
       //Normalize cache de temizlensin
       for (const k in audioNormalizeCache) delete audioNormalizeCache[k];
+    },
+    getPlaying(id) {
+        return playing[id] || playing[soundFiles?.[id]] || null;
     }
   };
 })();

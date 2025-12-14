@@ -51,7 +51,7 @@ function askBuyStoreItem(_id, _ok) {
 			PlaySound({ key: 'disabled' });
 		return;
 	}
-    PlaySound({ key: 'click' });
+    playClick();
 	let _title = misc.find(x => x.type === _item.key)?.titles?.[getLang()];
 		if(!_title)
 			switch(_item.key){
@@ -74,7 +74,7 @@ function askBuyStoreItem(_id, _ok) {
 			</div>
             <div style="padding:4vh 2vh" class="flex">
                 <div class="game-menu-button flex animate-me" style="cursor:pointer;min-width:10vw;color:#F4BB44 !important;font-size:3vh !important" onclick="buyStoreItem(${_id})">${getLangData('YES')}</div>
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;min-width:10vw;color:#F4BB44 !important;font-size:3vh !important" onclick="PlaySound({ key: 'click' });closeInventoryQuestionModal()">${getLangData('NO')}</div>
+                <div class="game-menu-button flex animate-me" style="cursor:pointer;min-width:10vw;color:#F4BB44 !important;font-size:3vh !important" onclick="playClick();closeInventoryQuestionModal()">${getLangData('NO')}</div>
             </div>
         </div>`;
     document.body.appendChild(_modal);

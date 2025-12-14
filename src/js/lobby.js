@@ -92,7 +92,7 @@ function hideSideMenu() {
 	}
 }
 function openSideMenu() {
-   	PlaySound({ key: 'click' });
+   	playClick();
 	const _ml = document.querySelector('.menu-left-opener');
 	if(_ml){
 		hideSideMenu();
@@ -160,7 +160,7 @@ function getStoryTemplates() {
 }
 
 function openStoryDetail(_id) {
-    PlaySound({ key: 'click' });
+    playClick();
 	const _s = __stories.find(x => x.id === _id);
 	if(_s?.locked) {
 		warn('<span>' + getLangData('Story is locked for now') + '</span>', 'warn');
@@ -186,7 +186,7 @@ function openStoryDetail(_id) {
 }
 
 function closeStoryModal() {
-    PlaySound({ key: 'click' });
+    playClick();
 	const _cards = document.querySelectorAll('.story-card');
 	for(let _card of _cards)
 		removeClass(_card, 'selected');

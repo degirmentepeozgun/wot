@@ -101,7 +101,7 @@ function world() {
 	}
  	this.closeMapInfoModal = function(_nosound) {
 		if(!_nosound)
-			PlaySound({ key: 'click' });
+			playClick();
 		const _mdc = document.getElementById('map-detail-modal');
 		if(_mdc) {
 			addClass(_mdc, 'fade-out');
@@ -115,7 +115,7 @@ function world() {
 		}
 	}
 	this.startPort = function(_id) {
-		PlaySound({key:'click'});
+		playClick();
 		const _map = mapSprites.find(x => x.id === _id);
 		let _mission;
 		if(_map.coords.key)
@@ -134,7 +134,7 @@ function world() {
 			_mission = _missions.find(x => x.key === _map.coords.key);
 		if(!_mission)
 			return;
-		PlaySound({ key: 'click' });
+		playClick();
 		let _container = document.getElementById('map-detail-modal');
 		if(_container)
 			_container.remove();

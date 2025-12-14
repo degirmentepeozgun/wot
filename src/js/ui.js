@@ -963,7 +963,7 @@ function openUserActionsModal(_id, _name) {
 	showMyModalPopUp('user-actions');
 }
 function addAsFriend(_id, _name) {
-	PlaySound({key:'click'});
+	playClick();
 	const _f = __account.friends?.find(x => x.id === _id);
 	if(!_f) {
 		if(__account.friends?.length >= 100) {
@@ -975,7 +975,7 @@ function addAsFriend(_id, _name) {
 	}
 }
 function removeFromFriend(_id, _name) {
-	PlaySound({key:'click'});
+	playClick();
 	const _i = __account.friends?.findIndex(x => x.id === _id);
 	if(_i >= 0) {
 		__account.friends.splice(_i, 1);
@@ -1041,7 +1041,7 @@ function askSomething(_question, _okFuncString) {
 		const _div = document.createElement('div');
 		_div.innerHTML = _modal;
 		document.querySelector('#menu-ui').appendChild(_div.querySelector('.inventory-question'));
-		PlaySound({ key: 'click' });
+		playClick();
 	}
 	catch(qex) {
 		alert(qex.message);
@@ -1074,7 +1074,7 @@ function showInfo(_json) {
 		const _div = document.createElement('div');
 		_div.innerHTML = _modal;
 		document.querySelector('#menu-ui').appendChild(_div.querySelector('.inventory-question'));
-		PlaySound({ key: 'click' });
+		playClick();
 		const _container = document.getElementById('show-info-navigations');
 		for(let _n of _json.navigations ?? []) {
 			const _div2 = document.createElement('div');

@@ -10,7 +10,7 @@ function pvp() {
 	this.match = function(_key) {
 		const _opponent = this.opponents.find(x => x.key === _key);
 		if(_opponent) {
-			PlaySound({ key: 'click' });
+			playClick();
 			if(__account.pvp.duelCount > 0)
 			{
 				__account.pvp.duelCount--;

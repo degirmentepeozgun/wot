@@ -172,7 +172,7 @@ function selectStoryHero(_class, _dir, _another) {
 	};
 }
 function selectHero(_class, _dir, _another) {
-    PlaySound({ key: 'click' });
+    playClick();
 	if(_class !== 'warrior'){
 		if(__characterInfos.find(x => x.class === _class)?.race === 'Beast')
 			selectStoryHero(_class, _dir, _another);

@@ -501,6 +501,7 @@ function loadUI() {
 						__weather.sound.pause();
 					mainCharacter.stopHeartBeatSound();
 					mainCharacter.stopStepSound();
+        			SoundManager.suspend();
 					pauseQuestTimer();
 					if(episode.hasGoSound)
 						episode.stopGoSound();	
@@ -529,7 +530,9 @@ function loadUI() {
 						__weather.sound.play();
 					if(episode.hasGoSound)
 						PlaySound({key:'go', force: true, loop:true, volume:.5});
+        			SoundManager.resume();
 					resumeQuestTimer();
+
 					window.SoundManager.warmAudio();
 				}
 			}
@@ -557,6 +560,7 @@ function loadUI() {
 				mainCharacter.stopStepSound();
 				if(episode.hasGoSound)
 					episode.stopGoSound();
+        		SoundManager.suspend();
 				pauseQuestTimer();
 				episodeVisibilityHidden = _closeOpeningMusic = true;
 				if (window.plugins && window.plugins.insomnia)
@@ -593,6 +597,7 @@ function loadUI() {
 					PlaySound({key:'go', force: true, loop:true, volume:.5});
 				if (window.plugins && window.plugins.insomnia)
 					window.plugins.insomnia.keepAwake();
+        		SoundManager.resume();
 				resumeQuestTimer();
 				window.SoundManager.warmAudio();
 			}
@@ -659,7 +664,7 @@ function warn(_html, _class, _ms, _new, _buttons, _important, _container) {
 		const _rand = Math.random();
 		_toastWrapper = document.createElement('div');
 		_toastWrapper.id = 'toast-wrapper-'+ _rand;
-		_toastWrapper.className = 'toast-wrapper' + (_hasButton ? ' need-action' : '') + ' show-ui flex fade-start' + _extraClassW;
+		_toastWrapper.className = 'toast-wrapper' + (_class === 'warn' ? ' toast-with-warning' : '') + (_hasButton ? ' need-action' : '') + ' show-ui flex fade-start' + _extraClassW;
 		_toast = document.createElement('div');
 		_toast.id = 'toast';
 		_toast.className = 'fade-start flex my-toast' + _extraClass;
@@ -1500,7 +1505,7 @@ function openUserActionsModal(_id, _name) {
 	showMyModalPopUp('user-actions');
 }
 function addAsFriend(_id, _name) {
-	PlaySound({key:'click'});
+	playClick();
 	const _f = __account.friends?.find(x => x.id === _id);
 	if(!_f) {
 		if(__account.friends?.length >= 100) {
@@ -1512,14 +1517,16 @@ function addAsFriend(_id, _name) {
 	}
 }
 function removeFromFriend(_id, _name) {
-	PlaySound({key:'click'});
+	playClick();
 	const _i = __account.friends?.findIndex(x => x.id === _id);
 	if(_i >= 0) {
 		__account.friends.splice(_i, 1);
 		_client.saveState();
 	}
 }
-
+function playClick() {
+	PlaySound({key:'click', reset: true});
+}
 function switchTipsUI(_inc) {
 	const _at = document.getElementById('all-tips');
 	let _order = parseInt(_at.getAttribute('data-order'));
@@ -1591,7 +1598,7 @@ function askSomething(_question, _okFuncString, _singletonAttr, _container) {
 		_div.innerHTML = _modal;
 		const _mu = _container ?? document.querySelector('#menu-ui');
 		(_mu ?? _gameUI).appendChild(_div.querySelector('.inventory-question'));
-		PlaySound({ key: 'click' });
+		playClick();
 	}
 	catch(qex) {
 		alert(qex.message);
@@ -1624,7 +1631,7 @@ function showInfo(_json) {
 		const _div = document.createElement('div');
 		_div.innerHTML = _modal;
 		document.querySelector('#menu-ui').appendChild(_div.querySelector('.inventory-question'));
-		PlaySound({ key: 'click' });
+		playClick();
 		const _container = document.getElementById('show-info-navigations');
 		for(let _n of _json.navigations ?? []) {
 			const _div2 = document.createElement('div');

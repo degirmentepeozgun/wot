@@ -1931,7 +1931,9 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	-webkit-transform: translateZ(0);
 	/* background: linear-gradient(90deg, transparent, #26262620, #26262620, transparent); */
 }
-
+.toast-wrapper.toast-with-warning {
+	top: 11% !important
+}
 	.toast-wrapper .achievement {
 		background: #000000cc;
 		border: .4vh solid darkgoldenrod;
@@ -2024,21 +2026,31 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 }
 .talk-bubble {
 	max-width: 75vw;
-	border-radius: 2vh;
+	border-radius: 1vh;
 	padding: 2vh;
-	border: .2vh solid #C19A6B;
-	background: #262626;
+	border: .2vh solid #191213;
+	background: #dcc5b2;
 	position: absolute;
+	border-color: #191213 !important;
 }
-
+.talk-bubble::before {
+  content: "";
+  position: absolute;
+  inset: 2px;               /* üst/sağ/alt/sol = 10px */
+  border: 1px solid #191213ab;
+  pointer-events: none;
+  border-radius: .6vh
+}
 	.talk-bubble * {
-		background: #262626;
-		color: #ffffffcc !important;
-		font-size: 3vh !important
+		background: #dcc5b2;
+		color: #282320 !important;
+		text-shadow: 1px 1px 1px rgba(0,0,0,0.6);
+		font-size: 3vh !important;
+		line-height: 1vh !important;
 	}
 
 .talk-bubble-inner {
-	background: #262626;
+	background: #dcc5b2;
 	z-index: 2;
 	position: relative
 }
@@ -2048,10 +2060,10 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	transform: rotate(-45deg);
 	border-left: .2vh solid #C19A6B;
 	border-bottom: .2vh solid #C19A6B;
-	width: 16px;
-	height: 16px;
-	left: calc(50% - 10px);
-	bottom: -8px
+	width: 1.6vh;
+	height: 1.6vh;
+	left: calc(50% - .8vh);
+	bottom: -.8vh
 }
 
 .shine {
@@ -3726,8 +3738,9 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	right:-.8vh;
 	position:absolute;
 	display:inline-block;
-	padding:0 .8vh;
+	padding:.4vh .8vh;
 	font-size:2vh !important;
+	line-height:2vh !important;
 	background:#262626;
 	border-radius: .5vh;
 	pointer-events: none;
@@ -5514,11 +5527,6 @@ body:has(#quest-dialog:not(.d-none)) #skill10 {
 	transform: rotate(180deg);
 	animation: lightining 20s linear infinite;
 	opacity: 0;
-}
-.talk-bubble * {
-	background: #262626;
-	color: #ffffffcc !important;
-	font-size: 3vh !important
 }
 
 video::-webkit-media-controls-start-playback-button {
@@ -7497,10 +7505,13 @@ body:not(.pc-mission) .tag-sf.bgless {
 .menu-top-item {
 	width:10.6%;
 	height: 100%;
-	margin:0 0 0 .5%
+	margin:0 0 0 .5%;
+}
+.menu-top-item:not(.flex-jc-start) {
+	justify-content:flex-end !important
 }
 .menu-top-item.flex-jc-end img {
-	margin-right: .25%;
+	margin-right: .25% !important;
 }
 .menu-top-item.flex-jc-start {
 	padding-left: .25%;
@@ -7751,14 +7762,41 @@ body:not(.pc-mission) .tag-sf.bgless {
 .my-badge::before {
 	content:'';
 	position: absolute;
-	top:0;
-	right: 0;
+	top: -.05vh;
+	right: -.05vh;
 	width:2vh;
 	height: 2vh;
-	background:#ff6c00 !important;
+	background: radial-gradient(
+    circle at 35% 35%,
+    #fff2e8 0%,
+    #ffb36b 25%,
+    #ff6c00 55%,
+    #c94f00 100%
+);
+box-shadow:
+    0 0 6px rgba(255,108,0,.6),
+    inset 0 -2px 3px rgba(0,0,0,.35);
 	border-radius: 1vh;
 	z-index: 1;
 	pointer-events: none !important;
+}
+.inventory-item-new-badge {
+	z-index:2;
+	pointer-events:none;
+	height:2vh;
+	width:2vh;
+	top:-.5vh;
+	right:-.5vh;
+	position:absolute;
+	background: radial-gradient(
+    circle at 30% 30%,
+    #c03030 0%,
+    #9b2424 30%,
+    #771b1b 55%,
+    #561313 75%,
+    #3d0d0d 100%
+);
+	border-radius:100%
 }
 #spinner-bg {
 	position: absolute;margin:auto;height:88%
@@ -7977,7 +8015,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	cursor: pointer;
 }
 .menu-top-item img {
-	margin-right:1.5vh !important
+	margin-right:.5vh !important
 }
 #decrease-count-btn:not(.disabled),
 #increase-count-btn:not(.disabled) {
@@ -9087,7 +9125,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	font-weight: 400 !important;
 	font-size: 2.2vw !important;
 	color:#F4BB44 !important;
-	padding: 4% 0 3% 0;
+	padding: 3.5% 0 2.5% 0;
 	border-bottom: 1px solid #f3f4f510;
 	margin-bottom:2%
 }
@@ -9169,8 +9207,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
     z-index: 2;
     top:0;
     left: 0;
-    background: #00000080;
-    border-bottom: 1px solid #000;
+    background: linear-gradient(180deg, #232323, #000) !important;
 }
 .stories-wrapper {
     min-height: 100%;
@@ -9350,15 +9387,15 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
     color: #f3f4f5cc !important
 }
 .lobby-navbar-left > div img {
-	height: 5vh !important
+	height: 4vh !important
 }
 .lobby-navbar-right {
 	padding: 0 2vh;
-    font-size: 5vh !important;
+    font-size: 4vh !important;
     color: #f3f4f5cc !important
 }
 .menu-icon-wrapper {
-    height:80%;
+    height:100%;
     cursor: pointer;
 }
 .menu-icon-wrapper img {
@@ -9378,7 +9415,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	top:0;
 	height:100%;
 	position: absolute;
-	background:linear-gradient(135deg, #000 6%, #00000040 100%);
+	background:linear-gradient(180deg, #232323, #000);
 	z-index: 2;
 	padding: 1% .5%;
 	box-shadow: 2vh 0 2vh #00000080;
@@ -10081,8 +10118,9 @@ body.pc-mission #game-ui .skill img {
 body.pc-mission #game-ui.disable-ui .skill::before {
 	display: none !important
 }
-body.pc-mission-without-skillui .skill,
-body.pc-mission-without-skillui .skill * {
+body.pc-mission-without-skillui .skill:not(.action.talk-btn),
+body.pc-mission-without-skillui .skill-charge,
+body.pc-mission-without-skillui .skill:not(.action.talk-btn) * {
 	display: none !important;
 }
 /* @keyframes zd-light-right {

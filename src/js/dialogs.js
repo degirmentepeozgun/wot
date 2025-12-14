@@ -845,7 +845,7 @@ let _nameDeclared, _csEndFunc;
 function declareAccountName() {
 	if(_nameDeclared)
 		return;
-    PlaySound({ key: 'click' });
+    playClick();
 	__account.name = document.querySelector('#choose-acc-name input').value?.trim();
 	if(!__account.name?.length) {
 		warn('<span>' + getLangData('Name can\'t be empty') + '</span>', 'warn');

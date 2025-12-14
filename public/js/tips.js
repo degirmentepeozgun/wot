@@ -126,7 +126,7 @@ function tips() {
 	}
 	this.giveRate = function(_order, _noSound) {
 		if(!_noSound)
-    		PlaySound({ key: 'click' });
+    		playClick();
 		this.rate = _order;
 		const _imgs = document.querySelectorAll('.tips-left-top-right img');
 		for(let i = 0; i < 5; i++) {
@@ -143,7 +143,7 @@ function tips() {
 	this.addToWishList = function(_clicked) {
 		//warn('<span>' + getLangData('Visit www.warriorsoftengri.com') + '</span>', 'warn');
 		const _elem = document.getElementById('wot-subscribe-input');
-    	PlaySound({ key: 'click' });
+    	playClick();
 		let _txt = _elem.value;
 		_txt = _txt.replace(/\s/g, '');
 		if(_txt.length === 0 || !this.isEmail(_txt))
@@ -165,7 +165,7 @@ function tips() {
 	this.sendRate = function(_clicked) {
 		//warn('<span>' + getLangData('Visit www.warriorsoftengri.com') + '</span>', 'warn');
 		const _elem = document.getElementById('wot-feedback-input');
-    	PlaySound({ key: 'click' });
+    	playClick();
 		let _txt = _elem.value.trim();
 		if(!this.rate && _txt.length === 0)
 		{

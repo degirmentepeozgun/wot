@@ -195,24 +195,24 @@ function animateStart(_failed, _extraGain, _content) {
 					+ _firstFinishRewardsHtml +
 				`</div>
 				<div class="flex w-100 ms2500 op-none${_isPvp ? ' d-none' : ''}" style="height: 10%;padding:0 4%">
-					<div class="w-33 flex" onexactclick="PlaySound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(${_failed ? 0 : 1}, ${_id}, ${episode.goldSelected ? 1 : 0}, ${episode.expSelected ? 1 : 0}, ${episode.itemSelected ? 1 : 0})" style="padding: 1%;height: 100%${_isFirstPlay ? ';pointer-events:none!important' : ''}">
+					<div class="w-33 flex" onexactclick="playClick();hideMyModalPopUp(1);checkStoryFinish(${_failed ? 0 : 1}, ${_id}, ${episode.goldSelected ? 1 : 0}, ${episode.expSelected ? 1 : 0}, ${episode.itemSelected ? 1 : 0})" style="padding: 1%;height: 100%${_isFirstPlay ? ';pointer-events:none!important' : ''}">
 						<div class="btn${((_isFirstPlay && !_failed) || !_hasRetry) ? ' inactivated' : ''} animate-me-500 flex">${getLangData('RETRY')}</div>
 					</div>
-					<div class="w-33 flex${!_client.quickPlay ? ' d-none' : ''}" onexactclick="PlaySound({ key: 'click' });hideMyModalPopUp(1);createPromoScreen();detachModule()" style="padding: 1%;height: 100%${_isFirstPlay ? ';pointer-events:none!important' : ''}">
+					<div class="w-33 flex${!_client.quickPlay ? ' d-none' : ''}" onexactclick="playClick();hideMyModalPopUp(1);createPromoScreen();detachModule()" style="padding: 1%;height: 100%${_isFirstPlay ? ';pointer-events:none!important' : ''}">
 						<div class="btn${((_isFirstPlay && !_failed) || !_hasRetry) ? ' inactivated' : ''} animate-me-500 flex">${getLangData('BACK')}</div>
 					</div>
-					<div class="w-33 flex${_client.quickPlay ? ' d-none' : ''}" onexactclick="PlaySound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(${_failed ? 0 : 1})" style="padding: 1%;height: 100%">
+					<div class="w-33 flex${_client.quickPlay ? ' d-none' : ''}" onexactclick="playClick();hideMyModalPopUp(1);checkStoryFinish(${_failed ? 0 : 1})" style="padding: 1%;height: 100%">
 						<div class="btn animate-me-500 flex">${getLangData('LOBBY')}</div>
 					</div>
-					<div class="w-33 flex${(_client.quickPlay || _story.mission) ? ' d-none' : ''}" style="padding: 1%;height: 100%${!_hasNext ? ';pointer-events:none!important' : ''}" onexactclick="PlaySound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(1, ${__stories.find(x => !x.passive && x.order > __story.order)?.id}, null, null, null, 1)">
+					<div class="w-33 flex${(_client.quickPlay || _story.mission) ? ' d-none' : ''}" style="padding: 1%;height: 100%${!_hasNext ? ';pointer-events:none!important' : ''}" onexactclick="playClick();hideMyModalPopUp(1);checkStoryFinish(1, ${__stories.find(x => !x.passive && x.order > __story.order)?.id}, null, null, null, 1)">
 						<div class="btn${!_hasNext ? ' inactivated' : ''} animate-me-500 flex">${getLangData('NEXT')}</div>
 					</div>
 				</div>
 				<div class="flex w-100 ms1000 op-none${!_isPvp ? ' d-none' : ''}" style="height:${_isDuel ? 12 : 10}%;padding:0 4%">
-					<div class="w-50 flex" onexactclick="PlaySound({ key: 'click' });hideMyModalPopUp(1);detachModule();switchStoryScene(null, __storySceneOrder)" style="padding: 1%;height: 100%">
+					<div class="w-50 flex" onexactclick="playClick();hideMyModalPopUp(1);detachModule();switchStoryScene(null, __storySceneOrder)" style="padding: 1%;height: 100%">
 						<div class="btn animate-me-500 flex">${getLangData('QUIT')}</div>
 					</div>
-					<div class="w-50 flex" onexactclick="PlaySound({ key: 'click' });hideMyModalPopUp(1);detachModule();switchStoryScene(function() { switchBookPage(${episode.realTime ? 4 : 5}, ${episode.war ? 3 : (episode.realTime ? 3 : 1)}); }, __storySceneOrder)" style="padding: 1%;height: 100%">
+					<div class="w-50 flex" onexactclick="playClick();hideMyModalPopUp(1);detachModule();switchStoryScene(function() { switchBookPage(${episode.realTime ? 4 : 5}, ${episode.war ? 3 : (episode.realTime ? 3 : 1)}); }, __storySceneOrder)" style="padding: 1%;height: 100%">
 						<div class="btn animate-me-500 flex">${getLangData('BACK')}</div>
 					</div>
 				</div>

@@ -152,13 +152,13 @@ function selectSwapFragment(_elem, _key) {
 	if(hasClass(_elem, 'selected'))
 		return;
 	const _item = __fragments.find(x=> x.key === _key);
-	PlaySound({ key: 'click' });
+	playClick();
 	removeClass(document.querySelector('.fragment-list-item.selected'), 'selected');
 	addClass(_elem, 'selected');
 	document.querySelector('.taken-fragment-portrait img').src = './images/fragments/' + _item.key + '.png'
 }
 function askSwapFragmentCharacter(_order) {
-	PlaySound({ key: 'click' });
+	playClick();
 	const _item = __fragments[_order - 1];
 	const _others = __fragments.filter(x => x.key !== _item.key);
 	let _html = '';
@@ -208,7 +208,7 @@ function askSwapFragmentCharacter(_order) {
         warn('<span>' + getLangData('Not enough fragment') + '</span>', 'warn');
 }
 function increaseSwapCount(_key) {
-    PlaySound({ key: 'click' });
+    playClick();
 	const _item = __account.fragments.find(x => x.key === _key);
     const _sc = document.getElementById('swap-count');
     let _count = parseInt(_sc.innerText) + 3;
@@ -219,7 +219,7 @@ function increaseSwapCount(_key) {
     removeClass(document.getElementById('decrease-count-btn'), 'disabled');
 }
 function decreaseSwapCount(_key) {
-    PlaySound({ key: 'click' });
+    playClick();
     const _sc = document.getElementById('swap-count');
     let _count = parseInt(_sc.innerText) - 3;
     _sc.innerText = _count;
@@ -262,12 +262,12 @@ function acceptAndUpgradeFragment(_order, _cost) {
 	const _grade = (_myfr?.grade ?? 0) + 1;
 	const _limit = _item.limits[_myfr?.grade ?? 0];
 	if(__account.gold < _cost) {
-        PlaySound({ key: 'click' });
+        playClick();
         warn('<span>' + getLangData('Not enough gold') + '</span>', 'warn');
         return;
     }
 	if((_myfr?.count ?? 0) < _limit.limit) {
-        PlaySound({ key: 'click' });
+        playClick();
         warn('<span>' + getLangData('Not enough fragment') + '</span>', 'warn');
         return;
     }

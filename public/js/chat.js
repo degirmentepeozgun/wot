@@ -121,7 +121,7 @@ function chat() {
 				return;
 			}
 		}
-    	PlaySound({ key: 'click' });
+    	playClick();
 		const cscr = document.querySelector('.chat-screen-inner');
 		const div = document.createElement('div');
 		const _data = {text:_text.value, me: 1, id:__account.name};

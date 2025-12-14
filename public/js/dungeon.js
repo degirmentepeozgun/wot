@@ -72,7 +72,7 @@ function dungeon() {
 		if(!_id)
 			_id = _arr?.length > 0 ? _arr[0].id : undefined;
 		else
-   			PlaySound({ key: 'click' });
+   			playClick();
 		if(!_id)
 			return;
 		const _cards = document.querySelectorAll('.dungeon-content-left .dungeon-card');
@@ -86,7 +86,7 @@ function dungeon() {
 	}
 	this.openDungeonDetail = function(_id, _noSound, _noAnimation) {
 		if(!_noSound)
-			PlaySound({ key: 'click' });
+			playClick();
 		const _s = __stories.find(x => x.id === _id);
 		let _goals = '';
 		if(_s.resultStars)
@@ -205,7 +205,7 @@ function dungeon() {
 			if(_save)
 				_client.saveState();
 		}
-   		PlaySound({ key: 'click' });
+   		playClick();
 		const _mission = _missions.find(x => x.key === _s.mission);
 		if(_mission?.before) {
 			_mission.before(_id);
@@ -214,7 +214,7 @@ function dungeon() {
 		tryStartStoryMission(_id);
 	}
 	this.approve = function(_id) {
-		PlaySound({key:'click'});
+		playClick();
 		tryStartStoryMission(_id);
 	}
 	return this;

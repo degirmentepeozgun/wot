@@ -329,7 +329,7 @@ function skipDialog() {
 					let _bgSkip = document.createElement('div');
 					_bgSkip.innerHTML = `<div class="flex cs-skip">${getLangData("SKIP")}</div>`;
 					_bgSkip.onexactclick = function() {
-						PlaySound({key:'click'});
+						playClick();
 						__account.questStatus.dialogOrder = __account.questStatus.dialogArr.length;
 						this.remove();
 						skipDialog();
@@ -964,7 +964,7 @@ let _nameDeclared, _csEndFunc;
 function declareAccountName() {
 	if(_nameDeclared)
 		return;
-    PlaySound({ key: 'click' });
+    playClick();
 	__account.name = document.querySelector('#choose-acc-name input')?.value?.trim();
 	if(!__account.name?.length) {
 		warn('<span>' + getLangData('Name can\'t be empty') + '</span>', 'warn');

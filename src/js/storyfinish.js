@@ -80,10 +80,10 @@ function animateStart() {
 
 				</div>
 				<div class="flex w-100 ms2500 op-none" style="height: 10%;padding:0 4%">
-					<div class="w-33 flex" onclick="PlaySound({ key: 'click' });loadLastStoryCheckPoint();detachModule()" style="padding: 1%;height: 100%">
+					<div class="w-33 flex" onclick="playClick();loadLastStoryCheckPoint();detachModule()" style="padding: 1%;height: 100%">
 						<div class="btn animate-me-500 flex">RETRY</div>
 					</div>
-					<div class="w-33 flex" onclick="PlaySound({ key: 'click' });hideMyModalPopUp(1);checkStoryFinish(1);detachModule()" style="padding: 1%;height: 100%">
+					<div class="w-33 flex" onclick="playClick();hideMyModalPopUp(1);checkStoryFinish(1);detachModule()" style="padding: 1%;height: 100%">
 						<div class="btn animate-me-500 flex">LOBBY</div>
 					</div>
 					<div class="w-33 flex" style="padding: 1%;height: 100%">

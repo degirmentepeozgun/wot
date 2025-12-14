@@ -1120,7 +1120,7 @@ function selectMapArea(_id, _container) {
 		if(!sprite.lobby)
 			openMapDetailModal(sprite.id, _container);
 		else {
-			PlaySound({ key: 'click' });
+			playClick();
 			switchMap(sprite.id);
 		}
 	}
@@ -1129,7 +1129,7 @@ function selectMapArea(_id, _container) {
 }
 function closeMapInfoModal(_nosound) {
 	if(!_nosound)
-		PlaySound({ key: 'click' });
+		playClick();
 	document.querySelector('.map-description-container')?.remove();
 }
 function openMapDetailModal(_id, _container) {
@@ -1138,7 +1138,7 @@ function openMapDetailModal(_id, _container) {
 	if(_map.coords.key)
 		_mission = _missions.find(x => x.key === _map.coords.key);
 	const _wm = _container ?? document.getElementById('world-map');
-	PlaySound({ key: 'click' });
+	playClick();
 	const _quests = _npcQuests.filter(x => x.maps.indexOf(_map.id) !== -1);
 	const _mapQuestCount = _quests?.length ?? 0;
 	const _mapQuestDone = _quests?.filter(x => x.id < __account.questStatus.order)?.length ?? 0;
@@ -1246,7 +1246,7 @@ function openMapDetailModal(_id, _container) {
 	root.style.setProperty('--map-description-url', "url('./../images/map/" + _map.theme + ".png')");
 }
 function trySwitchMap(_id) {
-	PlaySound({ key: 'click' }); 
+	playClick(); 
 	const _map = mapSprites.find(x => x.id === _id);
 	if(mainCharacter.level < _map.minLeve) {
 		warn('<span>' + getLangData('Your level is too low') + '</span>', 'warn');

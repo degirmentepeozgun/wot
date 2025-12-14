@@ -78,7 +78,7 @@ function getOptionsUI() {
 	_container.innerHTML = _html + '</div></div></div></div>';
 }
 function langSelect(_lang) {
-	PlaySound({key:'click'});
+	playClick();
 	__account.lang = _lang;
 	_client.saveState();
 	getOptionsUI();
@@ -108,7 +108,7 @@ const _optionActions = [
 		}}
 	];
 function optionSelect(_elem, _key) {
-	PlaySound({key:'click'});
+	playClick();
 	const _lastStatus = _client.upgradeOptions(_key);
 	if(__account.options[_key])
 		addClass(_elem, 'selected');

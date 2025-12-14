@@ -3584,7 +3584,7 @@ const __stories = [
 						do: function() {
 							episode.phase = 2;
 							focusMe('.enemy-profile', function() {
-								PlaySound({ key: 'click' });
+								playClick();
 								episode.still = false;
 								episode.enemies.filter(x => x.stop).forEach(x => {
 									x.still = x.stop = false;
@@ -5449,7 +5449,7 @@ const __stories = [
 							episode.pauseBgMusic(1);
 							episode.moveCamera(function(){
 								focusMe('#quest-status', function() {
-									PlaySound({ key: 'click' });
+									playClick();
 									mainCharacter.still = mainCharacter.immobilize = false;
 									delete mainCharacter.disableKeyboard;
 									resumeQuestTimer();
@@ -6599,7 +6599,7 @@ function resetStoryVariables() {
 	__storyScene = __storyCutScenePlaying = __storyPlaying = undefined;
 }
 function continueStoryAnyway() {
-	PlaySound({key:'click'});
+	playClick();
 	playStory(
 		__storyLastUsedSettings.id, 
 		__storyLastUsedSettings.step, 
@@ -6838,7 +6838,7 @@ function story(_id, _func, _noBlack, _desc, _after) {
 	this.order = 1;
 	const _s = this;
 	this.skip = function() {
-		PlaySound({key:'click'});
+		playClick();
 		delete this.firstSeen;
 		this.skipped = 1;
 		this.order = this.data['st' + this.id].length;
@@ -7132,7 +7132,7 @@ function portTo(_id) {
 function skipQuickPlayTutorial() {
 	const _cont = document.querySelector('.quick-play-desc-container');
 	if(_cont) {
-		PlaySound({key:'click'});
+		playClick();
 		_cont.remove();
 		requestAnimationFrame(() => {
 			removeClass(_gameUI, 'disable-ui');
@@ -7440,7 +7440,7 @@ function selectStoryUI(_id) {
 }
 function createStoryDetailUI(_id, _noSound, _noAnimation) {
 	if(!_noSound)
-		PlaySound({ key: 'click' });
+		playClick();
 	const _s = __stories.find(x => x.id === _id);
 	if(_s?.locked) {
 		warn('<span>' + getLangData('Story is locked for now') + '</span>', 'warn');
@@ -7709,7 +7709,7 @@ function tryConsumeTickets(_goldSelected, _expSelected, _itemSelected, _portal) 
 	_client.saveState(1);
 }
 function askPassStory(_itemSelected, _goldSelected, _expSelected) {
-    PlaySound({ key: 'click' });
+    playClick();
     const _limit = __account.misc.find(x => x.type === 'ticket-pass')?.count ?? 0;
     let _modal = `<div class="full fade-me flex inventory-question inventory-question-add-slot">
         <div class="inventory-modal">
@@ -7735,7 +7735,7 @@ function askPassStory(_itemSelected, _goldSelected, _expSelected) {
     document.querySelector('#menu-ui').appendChild(_div.firstChild);
 }
 function useMaxPassAmount() {
-    PlaySound({ key: 'click' });
+    playClick();
     const _limit = __account.misc.find(x => x.type === 'ticket-pass')?.count ?? 0;
     const _sa = document.getElementById('pass-amount');
     let _amount = parseInt(_sa.innerText);
@@ -7746,7 +7746,7 @@ function useMaxPassAmount() {
     _sa.innerText = _amount;
 }
 function increasePassAmount() {
-    PlaySound({ key: 'click' });
+    playClick();
     const _limit = __account.misc.find(x => x.type === 'ticket-pass')?.count ?? 0;
     const _sa = document.getElementById('pass-amount');
     let _amount = parseInt(_sa.innerText);
@@ -7759,7 +7759,7 @@ function increasePassAmount() {
     _sa.innerText = _amount;
 }
 function decreasePassAmount() {
-    PlaySound({ key: 'click' });
+    playClick();
     const _sa = document.getElementById('pass-amount');
     let _amount = parseInt(_sa.innerText);
     _amount--;
@@ -7772,7 +7772,7 @@ function decreasePassAmount() {
 function acceptStoryPass(_itemSelected, _goldSelected, _expSelected) {
 	// warn('<span>' + getLangData('Not available in demo') + '</span>', 'warn');
 	// return;
-    PlaySound({ key: 'click' });
+    playClick();
     const _sa = document.getElementById('pass-amount');
     let _amount = parseInt(_sa.innerText);
     if(_amount > 0) {
@@ -7797,7 +7797,7 @@ function redeemPassTicket(_id) {
 }
 var __storyAutoPassSkip;
 function skipStoryPass() {
-	PlaySound({ key: 'click' });
+	playClick();
 	__storyAutoPassSkip = 1;
 	//üstteki algoritmayı hızlı çalıştır
 }
@@ -8231,7 +8231,7 @@ function nextPromoSection(_max) {
 	const _prev = document.getElementById('quick-play-prev');
 	removeClass(_prev, 'v-none');
 	if(_order === _max) {
-		PlaySound({key:'click'});
+		playClick();
 		_qp.remove();
 		resetOpeningScreen();
 		return;

@@ -810,12 +810,17 @@ function normalizeKey(key) {
 const directionKeys = new Set(['w','a','s','d','arrowleft','arrowright','arrowup','arrowdown']);
 
 window.addEventListener('keydown', (e) => {
+  const kRaw = e.key?.toLowerCase?.();
+  if(e.repeat) {
+	if(!physicalKeys.has(kRaw))
+		return;
+  }
   if (mainCharacter?.disableKeyboard || mainCharacter?.stop) {
 	blurKeyboard();
 	return;
   }
 
-  const kRaw = e.key?.toLowerCase?.();
+  
   if (!kRaw) return;
 
   const now = performance.now();

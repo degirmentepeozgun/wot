@@ -89,7 +89,7 @@ function mailbox() {
 		if(!_id)
 			_id = _arr?.length > 0 ? _arr[0].id : undefined;
 		else
-   			PlaySound({ key: 'click' });
+   			playClick();
 		if(!_id)
 			return;
 		const _cards = document.querySelectorAll('.mailbox-content-left .mailbox-card');

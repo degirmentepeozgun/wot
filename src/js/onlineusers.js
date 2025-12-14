@@ -46,7 +46,7 @@ function onlineusers() {
 	this.refresh = function() {
 		if(this.loading)
 			return;
-		PlaySound({key:'click'});
+		playClick();
 		document.getElementById('online-users-list').innerHTML = this.getOnlineUsers();
 	}
 	this.getOnlineUsers = function() {
@@ -102,7 +102,7 @@ function onlineusers() {
 		askSomething('Request a duel battle', "getRef(\'onlineusers\').askDuelWithSelectingCharacter(\'" + _id + "\')");
 	}
 	this.selectCharacter = function(_class) {
-		PlaySound({key:'click'});
+		playClick();
 		document.querySelectorAll('.selection-char').forEach(x => removeClass(x, 'selected-character'));
 		const _clicked = document.querySelector('.selection-char[data-class="' + _class + '"]');
 		addClass(_clicked, 'selected-character');
@@ -115,7 +115,7 @@ function onlineusers() {
 	}
 	this.askDuelWithSelectingCharacter = function(_id) {
 		closeInventoryQuestionModal(1);
-		PlaySound({key:'click'});
+		playClick();
 		let _choices = '', _selected = 1;
 		__selectedPvPClass = _selectableChars[0].class;
 		for(let _item of _selectableChars){

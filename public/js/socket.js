@@ -241,7 +241,7 @@ function openPersonelMessages(_id) {
 	if(_pms) {
 		__pmId = _pms.a;
 		__pmName = _pms.n;
-		PlaySound({ key: 'click' });
+		playClick();
 		const _people = document.querySelectorAll('#book-content-12 .pvp-opponent-item');
 		for(let _p of _people)
 			if(_p.getAttribute('data-key') === _id.toString())
@@ -373,7 +373,7 @@ function selectChatTab(_t, _num) {
 	for(let _tab of _tabs)
 		removeClass(_tab, 'selected');
 	addClass(_t, 'selected');
-	PlaySound({ key: 'click' });
+	playClick();
 	switch(_num) {
 		case 0:
 			getOnlineUsersUI();
@@ -417,7 +417,7 @@ function sendChatMessage() {
 	var _txtArea = document.querySelector('.game-chat-bottom-left input');
 	if(!_txtArea)
 		return;
-	PlaySound({ key: 'click' });
+	playClick();
 	var _txt = _txtArea.value?.trim() ?? '';
 	if(_txt.length > 0) {
 		let _j = {

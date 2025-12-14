@@ -893,7 +893,7 @@ function openUserActionsModal(_id, _name) {
 	showMyModalPopUp('user-actions');
 }
 function addAsFriend(_id, _name) {
-	PlaySound({key:'click'});
+	playClick();
 	const _f = __account.friends?.find(x => x.id === _id);
 	if(!_f) {
 		if(__account.friends?.length >= 100) {
@@ -905,7 +905,7 @@ function addAsFriend(_id, _name) {
 	}
 }
 function removeFromFriend(_id, _name) {
-	PlaySound({key:'click'});
+	playClick();
 	const _i = __account.friends?.findIndex(x => x.id === _id);
 	if(_i >= 0) {
 		__account.friends.splice(_i, 1);
@@ -936,7 +936,7 @@ function spinLottery() {
 	var currentRate2 = parseInt(style.getPropertyValue('--spin-rate2'));
 	var itemOrder2 = getRandomValue(0, 7);
 	root.style.setProperty('--spin-rate2', currentRate2 + (minRate * itemOrder2));
-	PlaySound({key:'click'});
+	playClick();
 	setTimeout(function() {
 		const sbg = document.getElementById('spinner-bg');
 		const sbg2 = document.getElementById('spinner-bg2');
@@ -1021,7 +1021,7 @@ function createArtifactsUI() {
 	return _html + '</div></div>';
 }
 function openArtifactDetailModal(_id) {
-	PlaySound({ key: 'click' });
+	playClick();
     var _item = __artifacts.find(x => x.id === _id);
 	_item.bonus = __artifactGroups.find(x => x.id === _item.group).bonus;
 	var _ids = __artifacts.filter(x => x.group === _item.group).map(x => x.id);
@@ -1073,7 +1073,7 @@ function askBuyStoreItem(_id, _ok) {
 			PlaySound({ key: 'disabled' });
 		return;
 	}
-    PlaySound({ key: 'click' });
+    playClick();
 	let _title = misc.find(x => x.type === _item.key)?.titles?.[getLang()];
 		if(!_title)
 			switch(_item.key){
@@ -1096,7 +1096,7 @@ function askBuyStoreItem(_id, _ok) {
 			</div>
             <div style="padding:4vh 2vh" class="flex">
                 <div class="game-menu-button flex animate-me" style="cursor:pointer;min-width:10vw;color:#F4BB44 !important;font-size:3vh !important" onclick="buyStoreItem(${_id})">${getLangData('YES')}</div>
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;min-width:10vw;color:#F4BB44 !important;font-size:3vh !important" onclick="PlaySound({ key: 'click' });closeInventoryQuestionModal()">${getLangData('NO')}</div>
+                <div class="game-menu-button flex animate-me" style="cursor:pointer;min-width:10vw;color:#F4BB44 !important;font-size:3vh !important" onclick="playClick();closeInventoryQuestionModal()">${getLangData('NO')}</div>
             </div>
         </div>`;
     document.body.appendChild(_modal);
@@ -1402,7 +1402,7 @@ function askSomething(_question, _okFuncString) {
 		const _div = document.createElement('div');
 		_div.innerHTML = _modal;
 		document.querySelector('#game-menu').appendChild(_div.querySelector('.inventory-question'));
-		PlaySound({ key: 'click' });
+		playClick();
 	}
 	catch(qex) {
 		alert(qex.message);

@@ -65,7 +65,7 @@ function dungeon() {
 		if(!_id)
 			_id = _arr?.length > 0 ? _arr[0].id : undefined;
 		else
-   			PlaySound({ key: 'click' });
+   			playClick();
 		if(!_id)
 			return;
 		const _cards = document.querySelectorAll('.dungeon-content-left .dungeon-card');
@@ -79,7 +79,7 @@ function dungeon() {
 	}
 	this.openDungeonDetail = function(_id, _noSound) {
 		if(!_noSound)
-			PlaySound({ key: 'click' });
+			playClick();
 		const _s = __stories.find(x => x.id === _id);
 		let _goals = '';
 		if(_s.resultStars)

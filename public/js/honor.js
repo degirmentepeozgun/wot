@@ -133,7 +133,7 @@ function selectHonorItem(_type) {
 }
 function getHonorItemDetailUI(_type, _noSound, _noAnimation) {
 	if(!_noSound)
-		PlaySound({ key: 'click' });
+		playClick();
 	var _item = JSON.parse(JSON.stringify(_equips[_type].grade4));
 	_item.type = _type;
 	_item.grade = 4;

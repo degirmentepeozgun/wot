@@ -1157,7 +1157,9 @@ function enemy(_e) {
 			this.maxAttackerCount = getRandomValue2((6 - __account.difficulty), (5 - __account.difficulty) * (6 - __account.difficulty)); 
 		// if(this.socketDirPressed)
 		// 	this.socketDirPressed = undefined;
-		this.hurting = this.chargeProperties = this.chargimg = this.attackerCount = this.noCounter = this.lastSpellTakenKey = this.attacked = this.attacking = this.upcomingAnimation = this.randomStep = undefined;
+		this.hurting = this.chargeProperties = this.chargimg = this.attackerCount = this.noCounter = 
+		this.lastSpellTakenKey = this.attacked = this.attacking = this.upcomingAnimation = 
+		this.randomStep = this.soundPlaying = undefined;
 		//this.relatedObjects?.filter(x => x.bind === this.animation && !x.remove)?.forEach(x => x.remove = true);
 		if(this.keyboard) {
 			const _dirName = this.getKeyboardXMove();
@@ -1451,6 +1453,7 @@ function enemy(_e) {
 			key: (!this.main ? this.name.toLowerCase() : this.class) + 
 			(typeof _sf === 'string' ? _sf : (_sf?.key ?? this.animation)),
 			volume:_sf.volume,
+			loop: _sf.loop,
 			volumeRate: _volumeRate,
 			speed: (_sf?.speed ?? 1) * (getRandomValue2(95,105) / 100),
 			owner: this,
@@ -1459,6 +1462,12 @@ function enemy(_e) {
 
 		if (_sound && _sf.bind)
 			_anima.sound = _sound;
+		this.setVolume(_sound);
+
+		if(!_sound)
+			this.soundPlaying = undefined;
+	}
+	this.setVolume = function(_sound) {
 		if(_sound && !this.main/* && _sf.range*/) {
 
 			if(_sound.startVolume === undefined)
@@ -1469,10 +1478,14 @@ function enemy(_e) {
 			const minAudible = 0.05;
 
 			// VOLUME (range bazlı)
-			let volume = _sound.startVolume * (1 - (r / MAX_RANGE));
+			let volume = _sound.startVolume;
+			if(r > MAX_RANGE)
+				volume *= .1;
+			else 
+				volume *= (1 - (r / MAX_RANGE));
 			volume = Math.max(volume, minAudible);
-			_sound.volume = volume;
-
+			_sound.gain.value = volume;
+			
 			// PAN (ekran referanslı)
 			const dx = this.ORIGINLEFT - mainCharacter.ORIGINLEFT;
 
@@ -1495,11 +1508,7 @@ function enemy(_e) {
 			if(_sound.pannerNode)
 				_sound.pannerNode.pan.value = pan;
 		}
-
-		if(!_sound)
-			this.soundPlaying = undefined;
 	}
-
 	this.checkCommonSkills = function() {
 		let _active;
 		if(!this.lastCommonSkillUsed || (_gameTick - this.lastCommonSkillUsed) > 2000)
@@ -1592,11 +1601,16 @@ function enemy(_e) {
 							x.def.iframe = true;
 						x.extraStepXRate = 0;
 					});
-					if(this.frame >= _anima.frames.length)
+					const _fLen =  _anima.frames?.length ?? 0;
+					if(this.frame >= _fLen && _fLen > 0)
 						this.frame = _anima.frames.length - 1;
-					_anima.frames[0].color = _anima.frames[1].color = 
-					this.skinColor = this.hurtColor = (this.chargeDead ? '#FFFFFF' : '#7C3030');
-					this.hitStop = 6;
+					if(_fLen > 1) {
+						_anima.frames[0].color = _anima.frames[1].color = 
+						this.skinColor = this.hurtColor = (this.chargeDead ? '#FFFFFF' : '#7C3030');
+						this.hitStop = this.knockDead ? getRandomValue2(3,4) : getRandomValue2(5,6);
+					}
+					else
+						this.animate(_anima.next);
 					if(!this.knockDead)
 						PlaySound({key:'deadeffect1'});
 				}
@@ -1811,6 +1825,8 @@ function enemy(_e) {
 				this.setSound(_sf, _anima);
 			}
 		}
+		else if(_anima.sound)
+			this.setVolume(_anima.sound);
 		if(this.do)
 			this.do(this);
 		this.checkNPC();
@@ -3473,11 +3489,11 @@ function enemy(_e) {
 			const _y = this.yPosition;
 			const _dir = this.getKeyboardXMove() ?? this.direction;
 			let _result = this.chargeProperties?.enemy ? undefined : this.getClosestEnemy(_anima.normalRange ?? 0, _dir, function (_e) {
-				return MathAbs(_e.yPosition - _y) < (getGroundHeight() / 3);
+				return MathAbs(_e.yPosition - _y) < (getGroundHeight() / 3) && _e.health > 0;
 			}, 33, null, 1);
 			if (!_result?.enemy) {
 				_result = this.chargeProperties?.enemy ? { enemy: this.chargeProperties.enemy } : this.getClosestEnemy(_anima.chargeDistance.value, _dir, function (_e) {
-					return MathAbs(_e.yPosition - _y) < (getGroundHeight() / 3);
+					return MathAbs(_e.yPosition - _y) < (getGroundHeight() / 3) && _e.health > 0;
 				}, 33, null, 1);
 				if(!_result?.enemy && this.autoTarget && !this.main && _anima.chargeDistance.value)
 					_result = { 
@@ -4011,7 +4027,7 @@ function enemy(_e) {
 		(_enemy.readyForFatality || ((_enemy.health * (100 / (_enemy.finishAfter ?? __finishingMoveHPPercent))) <= _enemy.MAXHP))) {
 			const _f = this.upcomingFinishingMove ?? _enemy.finishingMoves[getRandomValue(0, _enemy.finishingMoves.length - 1)];
 			const _finishAnima = this.animations['finish' + _f];
-			if(_finishAnima && (!_finishAnima.when || _finishAnima.when(_enemy))) {
+			if(_finishAnima && (!_finishAnima.when || _finishAnima.when(_enemy, this))) {
 				_close.range = (_close.range / episode.cWidth) * 100;
 				if(((_finishAnima.minRange??0) > _close.range) 
 					|| ((_finishAnima.maxRange??30) < _close.range))
@@ -7872,6 +7888,7 @@ function enemy(_e) {
 			}
 			x.stopSpawn();
 		});
+		this.animations.hurtground1.frames.forEach(x => delete x.def);
 		this.animate('hurtground1', 1);
 		_attacker.animate('idle', 1);
 		if(_attacker.health <= 0)

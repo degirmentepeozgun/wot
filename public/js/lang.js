@@ -61,6 +61,7 @@ const __langData = [
 	{ key: 'Content Is Locked', tr: 'İçerik Kilitli' },
 	{ key: 'Current Grade', tr: 'Mevcut Seviye' },
 	{ key: 'Current Attack Rate', tr: 'Mevcut Saldırı' },
+	{ key: 'Item Pushed Into Your Mailbox', tr: 'Ekipman Posta Kutunuza Gönderildi' },
 	{ key: 'Current Skill', tr: 'Mevcut Yetenek' },
 	{ key: 'Story Finish Count', tr: 'Hikaye Bitiş Sayısı' },
 	{ key: 'Pvp League Updated', tr: 'Pvp Ligi Güncellendi' },

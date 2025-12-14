@@ -438,38 +438,6 @@ const __passiveSkills = [
 			]
 		}
 	];
-const _mails = [
-		{
-			id: 1000,
-			ts: Date.now() - 16545700,
-			owner: {
-				en: 'Just A Friend',
-				tr: 'Bir Dost'
-			},
-			body: {
-				en: 'Hail to you champion, welcome to the world\'s best game ever! Ahhh god, i know it will take too long but this is a mailbox system to check what is inside and you probably saying "Sh****t!" because this is an empty one but be patient with a hard work and being polite to other players, you will gain special rewards!!!',
-				tr: 'Selam sana şampiyon, dünyanın en iyi oyununa hoş geldin! Ahhh tanrım, çok uzun süreceğini biliyorum ama bu, içinde ne olduğunu kontrol etmek için bir posta kutusu sistemi ve muhtemelen boş olduğu için "S****t!" diyorsun ama sabırlı ol, sıkı çalış ve diğer oyunculara karşı nazik ol, özel ödüller kazanacaksın!!!'
-			}
-		},
-		{
-			id: 1001,
-			ts: Date.now() - 6545700,
-			owner: {
-				en: 'Developer Team',
-				tr: 'Geliştirici Ekibi'
-			},
-			body: {
-				en: 'We hope you enjoy using this little welcome gift that we think will accompany and guide you on your adventure.',
-				tr: 'Sana maceranda eşlik edecek ve yol göstereceğini düşündüğümüz bu küçük aramıza hoşgeldin hediyesini  güle güle kullanmanı dileriz'
-			},
-			attachment: [
-				{ type:'ticket-gold', count: 5 },
-				{ type:'ticket-exp', count: 5 },
-				{ type:'ticket-item', count: 5 },
-				{ type:'ticket-pass', count: 5 }
-			]
-		}
-	];
 const __chatMessages = [
 	// { id: 'BladeX8X', text: 'Guys? How can i gain more tickets?' },
 	// { id: 'Divorc€', text: 'Check your mailbox, may be you can find some in store / roulette' },
@@ -767,7 +735,7 @@ function decreaseDummyCount() {
 	let _dc = parseInt(_dcc.innerText);
 	if(_dc < 2)
 		return;
-	PlaySound({key:'click'});
+	playClick();
 	_dc--;
 	_dcc.innerText = _dc;
 }
@@ -776,12 +744,12 @@ function increaseDummyCount() {
 	let _dc = parseInt(_dcc.innerText);
 	if(_dc > 98)
 		return;
-	PlaySound({key:'click'});
+	playClick();
 	_dc++;
 	_dcc.innerText = _dc;
 }
 function selectCTFCharacter(_class) {
-	PlaySound({key:'click'});
+	playClick();
 	const _si = document.querySelectorAll('.ctf-supporters .selection-item');
 	for(let _sitem of _si) 
 	{
@@ -3047,7 +3015,13 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	waterfall: './images/sounds/waterfall2.mp3',
+	hivedeath: './images/sounds/hivedeath.mp3',
+	hivehurt1: './images/sounds/hivehurt1.mp3',
+	hivehurt2: './images/sounds/hivehurt2.mp3',
+	hivelurk: './images/sounds/hivelurk.mp3',
 	hiaaa: './images/sounds/hia.mp3',
+	bell: './images/sounds/bell.mp3',
 	bonusactive: './images/sounds/bonus-active.mp3',
 	bonusdone: './images/sounds/bonus-done.mp3',
 	bonecrack: './images/sounds/bonecrack.mp3',
@@ -4738,12 +4712,16 @@ const mapSprites = [
 			{ id: 'ripplex1', key: 'ripple', totalFrames: 4, width: 260, height: 145, zoom: .41 * 2, locate: { left: 2480, bottom: 0 } },
 			{ id: 'ripplex2', key: 'ripple', totalFrames: 4, width: 260, height: 145, zoom: .36 * 2, locate: { left: 1920, bottom: 35}, rotate: true },
 			{ id: 'ripplex3', key: 'ripple', totalFrames: 4, width: 260, height: 145, zoom: .41 * 2, locate: { left: 4270, bottom: 80 } },
+			{ id: 'waterfall3', key: 'waterfall3', totalFrames: 6, width: 1136, height: 547, zoom: 1.07, locate: { left: 2812, bottom: 168 } },
+			
 			//{ id: 'portal1', src:'./images/texture/portal.gif', alpha: .75, to: 9, key: 'portal', npc: true, totalFrames: 7, width: 420, height: 0, zoom: 1, locate: { left: -80, bottom: -235 } },
 			//{ id: 'portal2', src:'./images/texture/portal.gif', alpha: .75, to: 13, key: 'portal', npc: true, totalFrames: 7, width: 850, height: 0, zoom: 1, locate: { left: 5950, bottom: -200 } },
 		],
 		tiles: [
 			{ name : 'bg', count: 1, height: 1080, zoom: 1.065, rate: .85, width: 6144, bottom: -400 },
-			{ name: 'ground', count: 1, height: 1080, zoom: 1.065, rate: 1, width: 6144, bottom: -400 }
+			{ name: 'ground', count: 1, height: 1080, zoom: 1.065, rate: 1, width: 6144, bottom: -400 },
+			// { name: 'fog', count: 7, height: 540, zoom: 1, rate: 1.1, foreground: true, width: 960, 
+			// 	bottom: -400, marginTop: 400 }
 		],
 		ground: { width: 6144, height: 1080, zoom: 1.065, yRate: 2 }
 	},
@@ -4869,6 +4847,8 @@ const mapSprites = [
 			{ id: 'ripple', totalFrames: 4, width: 260, height: 145, zoom: .4, locate: { left: 2480 * __scale, bottom: 0 } },
 			{ id: 'ripple', totalFrames: 4, width: 260, height: 145, zoom: .35, locate: { left: 1920 * __scale, bottom: 35 * __scale }, rotate: true },
 			{ id: 'ripple', totalFrames: 4, width: 260, height: 145, zoom: .4, locate: { left: 4270 * __scale, bottom: 80 * __scale } },
+			{ id: 'waterfall', totalFrames: 6, width: 1136, height: 547, zoom: 1.06, locate: { left: 2700 * __scale, bottom: 180 * __scale } },
+
 			//{ id: 'portal1', src:'./images/texture/portal.gif', alpha: .75, to: 11, key: 'portal', npc: true, totalFrames: 7, width: 420, height: 0, zoom: 1, locate: { left: -80, bottom: -235 } },
 			//{ id: 'portal2', src:'./images/texture/portal.gif', alpha: .75, to: 15, key: 'portal', npc: true, totalFrames: 7, width: 850, height: 0, zoom: 1, locate: { left: 5950, bottom: -200 } },
 		],
@@ -28010,6 +27990,80 @@ function checkCSSAnimations() {
 	}
 }
 const canvasAnimations =  {
+	flash: function(_char, _params, _canv) {
+		const ctx = _canv ?? c10;
+		if (_params.start === undefined) {
+			_params.start = 0;
+			_params.phase = 0;                // 0 = full, 1 = fade
+			_params.alpha = 1;                // başlangıç parlaklığı
+			_params.durationFull = _params.dfu ?? 1;         // 4 tick tam parlak (≈60ms)
+			_params.durationFade = _params.dfa ?? 3;        // 10 tick fade (≈150ms)
+			_params.realR = _params.r;        // ana yarıçap
+			_params.x = _char.ORIGINLEFT + ((_params.xGap ?? 0) * _char.ZOOM * (ctx.reversed ? -1 : 1));
+			_params.y = MathRound(_char.TOP + (_char.HEIGHT / 2) - ((_params.yGap ?? 0) * _char.ZOOM));
+		}
+
+		_params.start++;
+
+		// Koordinatlar (senin glow ile birebir aynı)
+		const _z = _char.getZoom();
+
+		const _x = _params.x;
+		const _y = _params.y;
+		const _r = MathRound((_params.r ?? 0) * _z);
+		const _rr = MathRound(3.25 * (_r / 10));
+
+
+		// Faz geçişleri
+		if (_params.start <= _params.durationFull) {
+			// full glow
+			_params.alpha = 1;
+		} 
+		else if (_params.start <= _params.durationFull + _params.durationFade) {
+			// fade-out
+			const p = (_params.start - _params.durationFull) / _params.durationFade;
+			_params.alpha = 1 - p;            // 1 → 0
+		} 
+		else {
+			// bitti
+			delete _params.start;
+			_params.alpha = 0;
+        	_char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'flash');
+			return; // animasyon sona erdi, tekrar çağırmaya gerek yok
+		}
+
+		// Radial Gradient
+		const grad = ctx.createRadialGradient(
+			_x, _y, MathRound(_r / 15),
+			_x, _y - _rr, _r
+		);
+
+		// AAA golden impact colors
+		const c1 = `rgba(255, 212, 138, ${_params.alpha ?? 0})`;      // #ffd48a
+		const c2 = `rgba(255, 242, 200, ${(_params.alpha ?? 0) * .4})`;
+		const c3 = `rgba(255, 255, 255, 0)`;                     // edge transparent
+
+		grad.addColorStop(0,     c1);
+		grad.addColorStop(0.35,  c2);
+		grad.addColorStop(1,     c3);
+
+		if(ctx.reversed)
+			ctx.restore();
+		ctx.fillStyle = grad;
+		const oldGCO = ctx.globalCompositeOperation;
+		ctx.globalCompositeOperation = 'lighter';
+		ctx.beginPath();
+		ctx.arc(_x, _y - _rr, _r, 0, Math.PI * 2);
+		ctx.fill();
+
+		// restore
+		ctx.globalCompositeOperation = oldGCO;
+		if(ctx.reversed) {
+			ctx.save();
+			ctx.scale(-1, 1);
+		}
+	},
+
 	glow:function(_char, _params, _canv) {
 		if(_char.glowing && _params.start === undefined)
 			return;
@@ -28706,7 +28760,7 @@ const canvasAnimations =  {
 
 //     _ctx.putImageData(dst, minX, minY);
 // },
-distortionhit: function(_char, _params, _canv) {
+	distortionhit: function(_char, _params, _canv) {
 
     if (episode.distorting && episode.distorting !== _char.key) {
         _char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit');
@@ -30908,7 +30962,7 @@ function skipMenuTutorial(_key) {
 	 _menuContainer.appendChild(_splscr);
 	__account.menuTutorials.push(_key);
 	_client.saveState();
-	PlaySound({key:'click'});
+	playClick();
 	addClass(_splscr, 'fade-out-400');
 	const _elm = document.querySelector('.menu-sub-button.active.selected');
 	if(_elm)
@@ -31052,7 +31106,7 @@ function askExitApp(){
 		}
 		const _fs = document.getElementById('first-splash');
 		const _isActive = _fs && !hasClass(_fs, 'v-none');
-		PlaySound({key:'click'});
+		playClick();
 		if(!__story){
 			askSomething(getLangData('Application will be closed'), "exitApplication()", "exit-app-question", _isActive ? _fs : undefined);
 			return;

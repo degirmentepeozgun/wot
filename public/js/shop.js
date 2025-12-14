@@ -53,7 +53,7 @@ function askBuyStoreItem(_id, _ok) {
 			PlaySound({ key: 'disabled' });
 		return;
 	}
-    PlaySound({ key: 'click' });
+    playClick();
 	let _title = misc.find(x => x.type === _item.key)?.titles?.[getLang()];
 		if(!_title)
 			switch(_item.key){

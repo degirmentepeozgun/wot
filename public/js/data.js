@@ -1,6 +1,7 @@
 ﻿'use strict';
 function dataOperations(_quickPlay) {
 	this.quickPlay = _quickPlay;
+	this.mails = [];
 	this.storageKey = 'com-bi-frame-wot-wrath-of-erlik'; //(__deviceId ?? 411191);// + '-' + (_dataId ?? '08');
 	this.localData = {
 		warrior: {
@@ -224,6 +225,80 @@ function dataOperations(_quickPlay) {
 			find(x => x.order === _skill.order).level = _skill.level;
 		this.saveState();
 	}
+	this.saveMailState = function () {
+		localStorage.setItem(this.storageKey + '-mails', JSON.stringify(this.getMails()));
+	}
+	this.getMails = function() {
+		return this.mails;
+	}
+	this.pushItemIntoMail = function(_item) {
+		let _max = 0;
+		for(let m of this.mails ?? [])
+			if(m.id > _max)
+				_max = m.id;
+		for(let m of __account.mailbox ?? [])
+			if(m.id > _max)
+				_max = m.id;	
+		_item.key = 'item';
+		this.mails.push({
+			id: _max + 1,
+			ts: Date.now(),
+			owner: {
+				en: 'Developer Team',
+				tr: 'Geliştirici Ekibi'
+			},
+			body: {
+				en: 'Since your inventory is full, the equipment has been sent to your email inbox.',
+				tr: 'Envanteriniz dolu olduğu için ekipman posta kutunuza gönderildi.'
+			},
+			attachment: [
+				structuredClone2(_item)
+			]
+		});
+		requestAnimationFrame(() => {
+			warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/mailbox.png" />&nbsp;<span style="flex:1">' + getLangData('Item Pushed Into Your Mailbox') + '</span></div>', null, null, 1);
+		});
+		this.saveMailState();
+	}
+	this.loadMails = function() {
+		let _json = JSON.parse(localStorage.getItem(this.storageKey + '-mails') ?? '[]');
+		if(_json.length === 0)
+		{
+			_json = [
+				{
+					id: 1000,
+					ts: Date.now() - 16545700,
+					owner: {
+						en: 'Just A Friend',
+						tr: 'Bir Dost'
+					},
+					body: {
+						en: 'Hail to you champion, welcome to the world\'s best game ever! Ahhh god, i know it will take too long but this is a mailbox system to check what is inside and you probably saying "Sh****t!" because this is an empty one but be patient with a hard work and being polite to other players, you will gain special rewards!!!',
+						tr: 'Selam sana şampiyon, dünyanın en iyi oyununa hoş geldin! Ahhh tanrım, çok uzun süreceğini biliyorum ama bu, içinde ne olduğunu kontrol etmek için bir posta kutusu sistemi ve muhtemelen boş olduğu için "S****t!" diyorsun ama sabırlı ol, sıkı çalış ve diğer oyunculara karşı nazik ol, özel ödüller kazanacaksın!!!'
+					}
+				},
+				{
+					id: 1001,
+					ts: Date.now() - 6545700,
+					owner: {
+						en: 'Developer Team',
+						tr: 'Geliştirici Ekibi'
+					},
+					body: {
+						en: 'We hope you enjoy using this little welcome gift that we think will accompany and guide you on your adventure.',
+						tr: 'Sana maceranda eşlik edecek ve yol göstereceğini düşündüğümüz bu küçük aramıza hoşgeldin hediyesini  güle güle kullanmanı dileriz'
+					},
+					attachment: [
+						{ key:'misc', type:'ticket-gold', count: 5 },
+						{ key:'misc', type:'ticket-exp', count: 5 },
+						{ key:'misc', type:'ticket-item', count: 5 },
+						{ key:'misc', type:'ticket-pass', count: 5 }
+					]
+				}
+			];
+		}
+		this.mails = _json;
+	}
 	this.loadState = function (_reset) {
 		let _r = this.quickPlay ?? _reset;
 		let _json = JSON.parse(localStorage.getItem(this.storageKey) ?? '{}');
@@ -242,6 +317,7 @@ function dataOperations(_quickPlay) {
 		}
 		if(_kb && !__account.keyboard)
 			__account.keyboard = _kb;
+		this.loadMails();
 	}
 	this.loadItems = function(hasMainCharacter) {
 		applyCharacterStats(hasMainCharacter);
