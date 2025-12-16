@@ -3492,7 +3492,8 @@ function enemy(_e) {
 				return MathAbs(_e.yPosition - _y) < (getGroundHeight() / 3) && _e.health > 0;
 			}, 33, null, 1);
 			if (!_result?.enemy) {
-				_result = this.chargeProperties?.enemy ? { enemy: this.chargeProperties.enemy } : this.getClosestEnemy(_anima.chargeDistance.value, _dir, function (_e) {
+				const _enemyHalf = (this.WIDTH * 50) / episode.cWidth;
+				_result = this.chargeProperties?.enemy ? { enemy: this.chargeProperties.enemy } : this.getClosestEnemy(_anima.chargeDistance.value + _enemyHalf, _dir, function (_e) {
 					return MathAbs(_e.yPosition - _y) < (getGroundHeight() / 3) && _e.health > 0;
 				}, 33, null, 1);
 				if(!_result?.enemy && this.autoTarget && !this.main && _anima.chargeDistance.value)
@@ -3515,7 +3516,8 @@ function enemy(_e) {
 					}
 					let _speed = this.chargeProperties?.speed ?? 0;
 					if (!this.chargeProperties && this.charging) {
-						this.charging = (_anima.chargeDistance.value * .66) < (100 * (_result.range / episode.cWidth)) ? 1 : 0;
+						this.charging = (_anima.chargeDistance.value * .66) < 
+						(100 * (_result.range / episode.cWidth)) ? 1 : 0;
 						//PlaySound({key: 'impact'});
 						if(!_speed)
 							for (var i = 0; i <= _anima.chargeDistance.untilFrame ?? 0; i++)
@@ -4565,21 +4567,22 @@ function enemy(_e) {
 										//_dmg = 1;
 										_tr.checkSteal(_dmg, _e);
 										if (!_e.main) {
-											if(_t.criticalHit)
-											{
-												dmgFrames.push({
-													text: 'crit',
-													x: _e.LEFT + ((_e.direction === __left ? 1 : -1) * __dmgFrameDistance),
-													y: episode.cHeight - _e.yPosition - _e.HEIGHT -  __dmgFrameDistance
-												});
-											}
-											else
-												dmgFrames.push({
-													atkType: _f.atk?.type ?? _dmgEffect ?? 'common',
-													val: _dmg,
-													x: _e.LEFT,
-													y: episode.cHeight - _e.yPosition - _e.HEIGHT
-												});
+											// if(_t.criticalHit)
+											// {
+											// 	dmgFrames.push({
+											// 		text: 'crit',
+											// 		x: _e.LEFT + ((_e.direction === __left ? 1 : -1) * __dmgFrameDistance),
+											// 		y: episode.cHeight - _e.yPosition - _e.HEIGHT -  __dmgFrameDistance
+											// 	});
+											// }
+											dmgFrames.push({
+												atkType: _f.atk?.type ?? _dmgEffect ?? 'common',
+												val: _dmg,
+												crit: _t.criticalHit,
+												heavy: _charged || _f.atk?.hurt?.slam || _f.atk.rate > 2 || _t.criticalHit,
+												x: _e.LEFT,
+												y: episode.cHeight - _e.yPosition - _e.HEIGHT
+											});
 										}
 										else
 											dmgFrames.push({

@@ -134,6 +134,13 @@ function drawDmgFrames() {
 							_frame.stepY = 3;
 					}
 					_frame.startZoom = _frame.zoom;
+					if(_frame.heavy || _frame.crit)
+						_frame.pop = {
+							strength: getRandomValue2(101, 131) / 100, // heavy hit buradan ayarlanır
+							overshoot: getRandomValue2(105, 110) / 100,                   // ne kadar fazla şişsin
+							duration: getRandomValue2(5,6),                       // kaç frame sürecek
+							t: 0
+						};
 				}
 				renderText(_frame, dmg + 1);
 			}
@@ -166,55 +173,6 @@ function renderText(_frame, _i) {
 		images: getDmgFrameNumbers2(_frame),
 		ms: 1000
 	});
-}
-
-function getDmgFrameNumbers(_frame) {
-	let _r = '', _type = '', _text = _frame.val?.toString() ?? '';
-	switch(_frame.atkType) {
-		case 'common':
-			_type = 'dmg';
-			break;
-		case 'toxic':
-			_type = 'toxic';
-			break;
-		case 'fire': 
-			_type = 'fire';
-			break;
-		case 'ice': 
-			_type = 'ice';
-			break;
-		case 'lightning': 
-			_type = 'lightning';
-			break;
-		case 'hurt': 
-			_type = 'hit';
-			break;
-		default:
-			if(_frame.text)
-				return `<img class="dmmg" src="./images/frames/${_frame.text}.png" />`;
-			else if(_frame.item?.quest)
-				return `<img class="dmmg" src="./images/frames/plus.png" />
-			<img class="dmmg" src="./images/frames/1.png" />
-			<img class="dmmg quest-item-dmmg" src="./images/quest-item/icons/${_frame.item.key}.png" />`;
-			else if(_frame.item) {
-				_r += '<img class="dmmg" src="./images/frames/plus.png" />';
-				if(_frame.val) {
-					for(var i = 0; i < _text.length; i++)
-						_r += `<img class="dmmg dmg-num" src="./images/frames/${_text.charAt(i)}.png" />`;
-				}
-				else
-					_r += '<img class="dmmg" src="./images/frames/1.png" />';
-				if(_frame.item.grade)
-					_r += `<img class="dmmg item-dmmg" src="./images/items/icons/${_frame.item.for ? _frame.item.for + '/' : ''}${_frame.item.key}${_frame.item.grade}.png" />`;
-				else					
-					_r += `<img class="dmmg icon-dmmg" src="./images/icons/${_frame.item.key}.png" />`;
-				return _r;
-			}
-			break;
-	}
-	for(var i = 0; i < _text.length; i++)
-		_r += `<img class="dmmg ${_type}-dmmg dmg-num" src="./images/frames/${_type === '' ? '' : _type + '/'}${_text.charAt(i)}.png" />`;
-	return _r;
 }
 
 function getDmgFrameNumbers2(_frame) {
@@ -261,59 +219,13 @@ function getDmgFrameNumbers2(_frame) {
 	return _r;
 }
 
-function renderTextElement(_settings) {
-	if(!episode.damages)
-		episode.damages = [];
-	let damages = episode.damages;
-	let _lastUsed = _gameTick, _textElem;
-	if (damages.length >= 5)
-		for (var dmg of damages) {
-			if (!dmg.lastUsed) {
-				_textElem = dmg;
-				break;
-			}
-			if (dmg.lastUsed < _lastUsed) {
-				_textElem = dmg;
-				_lastUsed = dmg.lastUsed;
-			}
-		}
-	if (!_textElem) {
-		_textElem = document.createElement('div');
-		const _big = (_settings.crit ? '2' : getRandomValue2(3, 5));
-		_textElem.className = 'dmg pop-outin' + _big;
-		_textElem._big = _big;
-		_textElem.style.left = (_settings.x < 0 ? 0 : _settings.x) + 'px';
-		_textElem.platformX = platformX;
-		_textElem.style.top = (_settings.y) + 'px';
-		_textElem.innerHTML = _settings.text;
-		_gamePad.appendChild(_textElem);
-		episode.damages.push(_textElem);
-	}
-	else {
-		// _textElem.style.animation = 'none';
-		// _textElem.offsetHeight;
-		// _textElem.style.animation = null;
-		removeClass(_textElem, 'pop-outin' + _textElem._big);
-		requestAnimationFrame(() => {
-			const _big = (_settings.crit ? '2' : getRandomValue2(3, 5));
-			addClass(_textElem, 'pop-outin'+ _big);
-			_textElem._big = _big;
-			_textElem.style.left = (_settings.x < 0 ? 0 : _settings.x) + 'px';
-			_textElem.platformX = platformX;
-			_textElem.style.top = (_settings.y) + 'px';
-			_textElem.innerHTML = _settings.text;
-		});
-	}
-	_textElem.lastUsed = _gameTick;
-	_textElem.onanimationend = function () {
-		delete _textElem.lastUsed;
-	}
-}
+
 function renderTextElement2(_settings) {
 	if(_settings.images?.[0]){
 		let _l = _settings.x, i = 0, _settingsY = (_settings.frame.maxStepY - _settings.frame.totalStepY);
 		for(let _sprite of _settings.images)
 			if(_sprite) {
+				const _sim = _sprite.img ?? _sprite;
 				const _spriteHeight = MathRound((episode.dmgFrameHeight) * _settings.frame.zoom);
 				const _y =  _settings.frame.startY - 
 				(_settings.frame.zoom > 1  ? 0 : MathRound(_settingsY * 
@@ -322,26 +234,66 @@ function renderTextElement2(_settings) {
 					_settings.frame.remove = true;
 					return;
 				}
-				const _spriteWidth = (_sprite.width *  _spriteHeight) / _sprite.height;
-				let _sWidth =  MathRound(_spriteWidth * _settings.frame.zoom);
-				episode.offDmgCtx.drawImage(_sprite, 
+				const _spriteWidth = (_sim.width *  _spriteHeight) / _sim.height;
+				if(_settings.images.find(x => x.img))
+					console.log(_sim.height);
+				let _sWidth = _spriteWidth;//  MathRound(_spriteWidth * _settings.frame.zoom);
+				episode.offDmgCtx.drawImage(_sim, 
 					(_l + (_settings.frame.platformX - platformX)) - MathRound(i * (_spriteHeight / 5)) - MathRound((_sWidth - _spriteWidth) / 2),
 					_y, _sWidth, _spriteHeight);
 				_l += _spriteWidth;
 				i++;
 			}
-		if(_settings.frame.zoom > 1){
-			if(!_settings.frame.start)
+		if (_settings.frame.zoom > 1) {
+			if (!_settings.frame.start)
 				_settings.frame.start = 0;
-			if(_settings.frame.start === 2)
-				_settings.frame.zoom -= (_settings.frame.startZoom - 1) / 2;
-			else if(_settings.frame.start === 4)
-				_settings.frame.zoom = 1;
+			if(_settings.frame.pop) {
+				const pop = _settings.frame.pop;
+				if (_settings.frame.start < pop.duration) {
+					if (pop && pop.t < (pop.duration / 2)) {
+						const p = pop.t / pop.duration;
+
+						//const max = pop.strength;
+						// let ease;
+						// if (p < 0.3) {
+						// 	ease = 1 + (max - 1) * (p / 0.3);
+						// } else {
+						// 	const q = (p - 0.3) / 0.7;
+						// 	ease = max - (max - 1) * q;
+						// }
+						const ease = 1 + (pop.strength - 1) * (1 - Math.pow(1 - p, 2));
+
+						_settings.frame.zoom = _settings.frame.startZoom * ease;
+						pop.t++;
+					}
+					else {
+						// eski davranışın aynısı
+						//_settings.frame.zoom -= (_settings.frame.startZoom - 1) / 2;
+						_settings.frame.zoom += (1 - _settings.frame.zoom) * 0.35;
+					}
+				}
+				else if (_settings.frame.start === pop.duration)
+					_settings.frame.zoom = 1;
+			}
+			else {
+				if(_settings.frame.start === 2)
+					_settings.frame.zoom -= (_settings.frame.startZoom - 1) / 2;
+				else if (_settings.frame.start === 4)
+					_settings.frame.zoom = 1;
+			}
 			_settings.frame.start++;
 		}
-		else
-			_settings.frame.totalStepY--;
-		if(_settings.frame.totalStepY <= 0)
+		else {
+			//_settings.frame.totalStepY--;
+			// POP bitmeden yukarı çıkma çok yavaş
+			if (_settings.frame.heavy || _settings.frame.crit) {
+				_settings.frame.totalStepY -= .75;
+			} else {
+				_settings.frame.totalStepY--;
+			}
+			
+		}
+		if (_settings.frame.totalStepY <= 0)
 			_settings.frame.remove = true;
 	}
 }
