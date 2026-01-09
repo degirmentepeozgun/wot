@@ -511,7 +511,7 @@ function getQuestRewards(_quest, _isSideQuest) {
 			if(_looted) {
 				const _val = _item.value, _k = _item.key;
 				setTimeout(function () {
-					dmgFrames.push({
+					addDmgFrame({
 						//text: _val + ' x &nbsp;<img src="./images/icons/' + _k + '.png" style="width:4vh" />',
 						//class: 'dmg quest-reward',
 						val: _val,
@@ -707,7 +707,7 @@ function createDialogScreen(_arr, _quest) {
 	if(_dialogAppeared)
 		return;
 	_lastSkipTime = _gameTick;
-	mainCharacter.keyboard.holdingKeys = [];
+	blurKeyboard();
 	__account.questStatus.isStaticDialog = _quest ? false : true;
 	if (__account.questStatus.isStaticDialog)
 		__account.questStatus.dialogArr = _arr;
@@ -855,9 +855,10 @@ function createPotDialog(_class) {
 								owner: _npc.key, 
 								text: "Here one for you"
 							});
-							dmgFrames.push({
+							addDmgFrame({
 								item: { key: 'pot' },
 								val: 1,
+								from: mainCharacter.key,
 								x: mainCharacter.LEFT,
 								y: _canvas.height - mainCharacter.yPosition - mainCharacter.HEIGHT
 							});

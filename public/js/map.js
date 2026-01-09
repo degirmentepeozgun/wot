@@ -1,13 +1,17 @@
 ﻿'use strict';
 const _borderRates = [
-	1.065, 1.065, 1.065, 
-	1.055, 1.055, 1.055, 1.055,
+	1.06, 1.06, 1.06, 
+	1.05, 1.05, 1.05, 1.05,
 	1.04, 1.04, 1.04, 1.04,
-	1.02, 1.02, 1.02, 1.02, 1.02,
-	1.02, 1.02, 1.02, 1.02, 1.02,
+	1.025, 1.025, 1.025, 1.025, 1.025,
+	1.025, 1.025, 1.025, 1.025, 1.025,
+	1.025, 1.025, 1.025, 1.025, 1.025,
+	1.025, 1.025, 1.025, 1.025, 1.025,
+	1.025, 1.025, 1.025, 1.025, 1.025,
+	1.025, 1.025, 1.025, 1.025, 1.025,
 	1.04, 1.04, 1.04, 1.04, 
-	1.055, 1.055, 1.055, 1.055,
-	1.065, 1.065, 1.065,
+	1.05, 1.05, 1.05, 1.05,
+	1.06, 1.06, 1.06,
 ];
 console.log('map');
 function map(_m) {
@@ -727,7 +731,7 @@ function map(_m) {
 			_gameUI.appendChild(pvpCounter);
 			if(mainCharacter?.keyboard) {
 				mainCharacter.disableKeyboard = true;
-				mainCharacter.keyboard.holdingKeys = [];
+				blurKeyboard();
 			}
 		}
 		else {
@@ -3283,8 +3287,10 @@ function map(_m) {
 	this.drawCharacterQueue = function (_queue) {
 		if (this.disposing || !_queue?.[0]){
 			this.checkSceneActions();
+			this.checkSceneActions(1);
 			return;
 		}
+		this.checkSceneActions(1);
 		for(let a of _queue)
 			a.sortOrder = _maxSort - MathFloor((MathRound((a.drawPriority >= 10 ? 
 				0 : a.char.yPosition) / _yTol)
@@ -3342,13 +3348,14 @@ function map(_m) {
 			}
 			_backgrounds.length = _preDraws.length = _relateds.length = 0;
 			if(_item.objects)
-				for(let ob of _item.objects)
+				for(let ob of _item.objects) {
 					if(ob.background)
 						_backgrounds.push(ob);
 					else if(ob.preDraw)
 						_preDraws.push(ob);
 					else
 						_relateds.push(ob);
+				}
 			this.drawRelatedObjects(_item, _backgrounds);
 			this.drawGoreObjects(_item);
 			_out = _item.char.out || _item.alpha;
@@ -3473,9 +3480,16 @@ function map(_m) {
 										_item.char.borderIndex =  0;
 								}
 								const _borderRate = _borderRates[_item.char.borderIndex];
-								const _zoomBRate = 1 * _borderRate;
-								const _zoomedBWidth = MathRound(_item.width * _zoomBRate);
-								const _zoomedBHeight = MathRound(_item.height * _zoomBRate);
+								const _zoomBRate = 1 * _borderRate * (_item.char.borderRate ?? 1);
+								let _zoomedBWidth, _zoomedBHeight;
+								if(_item.width >= _item.height) {
+									_zoomedBWidth = MathCeil(_item.width * _zoomBRate);
+									_zoomedBHeight = (_zoomedBWidth - _item.width) + _item.height;
+								}
+								else {
+									_zoomedBHeight = MathCeil(_item.height * _zoomBRate);
+									_zoomedBWidth = (_zoomedBHeight - _item.height) + _item.width;
+								}
 								const _zoomedBLeft = MathRound((_zoomedBWidth - _item.width) / 2);
 								const _zoomedBTop = MathRound((_zoomedBHeight - _item.height) / 2);
 								const _borderSprite = this.colorizeSprite4(_item, _item.border);
@@ -3740,12 +3754,15 @@ function map(_m) {
 			c10.fill(path);
 		}
 	}
-	this.checkSceneActions = function() {
+	this.checkSceneActions = function(_before) {
 		if(!__storyScene?.actions)
 			return;
-		for(let _act of __storyScene.actions)
+		for(let _act of __storyScene.actions) {
+			if((_act.before && !_before) || (!_act.before && _before))
+				continue;
 			if(_act.when() && _act.do)
 				_act.do();
+		}
 	}
 	
 	this.checkBubbleText = function (_char) {
@@ -4118,8 +4135,13 @@ this.drawBossHealthBar = function(cofftx, _item, x, y, w) {
 		"#2874A6",
 		"#E67E22",
 		"#8E44AD",
-		"#6C3483",
-		"#F1C40F"
+		"#F1C40F",
+		'#1FA6A0',
+		'#7CB342',
+		'#C13A4A',
+		'#7470bbff',
+		'#C7CCD6',
+		'#3d354b'
 	];
 
 	let mainColor = fantasy[_char.gradeLeft + 1];

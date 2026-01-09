@@ -72,7 +72,7 @@ function characterSelection(){
 			<div class="flex w-100 c-i c-i-weapon"><div class="flex flex-jc-start w-50">${getLangData("Weapon")}</div><div class="flex flex-jc-end w-50">${_info.weapon}</div></div>
 			<div class="flex w-100 c-i c-i-elemental"><div class="flex flex-jc-start w-50">${getLangData("Elemental")}</div><div class="flex flex-jc-end w-50">${_info.elemental}</div></div>
 			<div class="flex w-100 c-i c-i-cc"><div class="flex flex-jc-start w-50">${getLangData("Control")}</div><div class="flex flex-jc-end w-50">${_info.cc}</div></div>
-			<div class="flex w-100 c-i c-i-stats">`;
+			<div class="flex w-100 c-i c-i-stats" style="padding:0">`;
 			const _bonus = __storyScene.bonusRewards;
 			if(!_bonus){
 				_html += `<div class="flex w-100 c-i c-i-stat">

@@ -945,7 +945,7 @@ svg#use-progress.use-in-progress circle {
 	opacity: .6;
 	z-index: 3;
 	display: flex !important;
-	justify-content: flex-end !important;
+	justify-content: flex-start !important;
 }
 #mini-menu .mini-menu-icon {
 	height: 100%;
@@ -2026,9 +2026,10 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 }
 .talk-bubble {
 	max-width: 75vw;
-	border-radius: 1vh;
-	padding: 2vh;
+	border-radius: .8vh;
+	padding: 2.2vh 2vh;
 	border: .2vh solid #191213;
+    box-shadow: .5vh .5vh 1vh #191213;
 	background: #dcc5b2;
 	position: absolute;
 	border-color: #191213 !important;
@@ -2037,9 +2038,11 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
   content: "";
   position: absolute;
   inset: 2px;               /* üst/sağ/alt/sol = 10px */
-  border: 1px solid #191213ab;
+  border: 1px groove #19121380;
+  box-shadow: 1px 1px 6px #19121340;
   pointer-events: none;
-  border-radius: .6vh
+  border-color: #19121380 !important;
+  border-radius: .8vh
 }
 	.talk-bubble * {
 		background: #dcc5b2;
@@ -4160,6 +4163,7 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	80% { transform: translate(.2vh, 0) rotate(-.5deg); }
 	100% { transform: translate(0, -.2vh) rotate(0deg); }
   }
+
  /* @keyframes charge-impact-left {
     10% { transform: translate(0vw, -2vh) rotate(-1deg); }
     10% { transform: translate(-0.28vw, -0.14vh) rotate(-1deg); }
@@ -8061,8 +8065,8 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	touch-action: none !important
 }
 .zoom, #game-pad.zoom {
-	animation: zoom-me 1.5s ease-out 1 !important;
-	-webkit-animation: zoom-me 1.5s ease-out 1  !important
+	animation: zoom-me 1.45s cubic-bezier(.22, .61, .36, 1) 1 !important;
+	-webkit-animation: zoom-me 1.45s cubic-bezier(.22, .61, .36, 1) 1 !important;
 }
 @keyframes zoom-me {
 	0% {
@@ -8073,9 +8077,9 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 		transform: scale(1.2);
 		-webkit-transform: scale(1.2)
 	}
-	85% {
-		transform: scale(1.2);
-		-webkit-transform: scale(1.2)
+	75% {
+		transform: scale(1.15);
+		-webkit-transform: scale(1.15)
 	}
 	100% {
 		transform: scale(1);
@@ -8776,14 +8780,14 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	color: #F4BB44 !important
 }
 .war-final-screen .team-1-header {
-	background:linear-gradient(-235deg, transparent, #E34234, #f3f4f520, #f3f4f540, #f3f4f530);
+	background:linear-gradient(-235deg, transparent, #6B1A11, #f3f4f520, #f3f4f540, #f3f4f530);
 	border-radius: 1vh;
 	box-shadow: -1vh 0 .5vh #000;
 	border-bottom-right-radius: 2vh;
 	border-top-right-radius: 2vh;
 }
 .war-final-screen .team-2-header {
-	background:linear-gradient(-235deg, transparent, #0F52BA, #f3f4f520, #f3f4f540, #f3f4f530);
+	background:linear-gradient(-235deg, transparent, #1E3A73, #f3f4f520, #f3f4f540, #f3f4f530);
 	border-radius: 1vh;
 	border-top-right-radius: 2vh;
 	border-bottom-right-radius: 2vh;
@@ -9907,6 +9911,74 @@ body.pc-mission #game-ui #skill5 {
 body.pc-mission #game-ui #skill6 {
 	left: 22.45% !important;
 }
+body.pc-mission #game-ui .game-status-screen {
+	left: 29% !important;
+	width: 42% !important;
+	bottom: 1% !important;
+	height: 8% !important;
+	overflow-y:auto;
+	z-index: 0;
+	position: absolute;
+}
+body.pc-mission #game-ui .game-status-screen .status-item-container {
+	height:100% !important;
+	background:#00000080;
+	min-height: 0;
+	overflow:hidden
+}
+body.pc-mission #game-ui .game-status-screen .status-item-action-container {
+	height:100% !important;
+	flex:1;
+	color:#F4BB44cc !important;
+	font-size:2.6vh !important
+}
+body.pc-mission #game-ui .game-status-screen .status-item-action-container .game-menu-button{
+	height:80% !important;
+	width:96% !important;
+	margin:0 !important;
+	padding:0 !important;
+	background: linear-gradient(90deg, transparent, #1f8f4a, #1f8f4a, transparent);
+	line-height: 2.6vh !important;
+	color:#F4BB44 !important
+}
+body.pc-mission #game-ui .game-status-screen .status-item-action-container .game-menu-button span{
+	color:#f3f4f5 !important;
+	margin-left:.5vh;
+	font-size:2.6vh !important;
+	line-height: 2.6vh !important;
+}
+body.pc-mission #game-ui .game-status-screen .status-item-action-container .game-menu-button *{
+	height:100% !important;
+	font-size:2.6vh !important;
+	line-height: 2.6vh !important;
+}
+body.pc-mission #game-ui .game-status-screen .status-item-action-container .item-title-wrapper{
+	height:50% !important;
+	padding:0 1vh
+}
+body.pc-mission #game-ui .game-status-screen .status-item-action-container .item-action-wrapper{
+	height:50% !important;
+	padding:0 1vh
+}
+body.pc-mission #game-ui .game-status-screen .status-item-icon-container {
+	height:100% !important;
+	aspect-ratio: 1/1;
+}
+body.pc-mission #game-ui .game-status-screen .status-item-icon-container .inventory-item-new-badge,
+body.pc-mission #game-ui .game-status-screen .status-item-icon-container img
+{
+	display: none !important
+}
+body.pc-mission #game-ui .game-status-screen .status-item-icon-container span img
+{
+	display: flex !important;  
+	animation: glow 1s cubic-bezier(.18,.9,.25,1.1) infinite alternate !important;
+	-webkit-animation: glow 1s cubic-bezier(.18,.9,.25,1.1) infinite alternate !important
+}
+body.pc-mission #game-ui .game-status-screen .status-item-icon-container img{
+	height:100% !important;
+	aspect-ratio: 1/1;
+}
 body.pc-mission #game-ui #skill2 {
 	left: calc(22.45% + (9 * 5.55%)) !important;
 }
@@ -10013,6 +10085,7 @@ body.pc-mission #game-ui #pc-bottom-ui-inner::after {
     z-index: 1;
 }
 body.pc-mission #game-ui .skill::before,
+body.pc-mission-without-skillui #game-ui .skill.action.placed-skill::before,
 body.pc-mission #game-ui .common::before {
     content: attr(data-new-key);
     position: absolute;
@@ -10647,7 +10720,7 @@ body.pc-mission #game-ui .skill#skill6.skill-pulse,body.pc-mission #game-ui .ski
 }
 
 .finger-top {
-	transform:rotate(180deg);
+	transform:rotate(180deg) scaleX(-1);
 	transform-origin: top center;
 }
 .key-combinations {

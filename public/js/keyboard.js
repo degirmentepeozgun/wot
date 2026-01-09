@@ -256,7 +256,7 @@ function keyboard(_character, _keys) {
 		}
 	}
 	this.addKey = function (_k, _name) {
-		if ((this.character?.immobilize || this.character?.sleep || _dialogAppeared) && !_focusMode)
+		if ((this.character?.immobilize || __storyTell || this.character?.sleep || _dialogAppeared) && !_focusMode)
 			return;
 		const _key = this.holdingKeys.find(x => x.key === _k);
 		if (_key)
@@ -461,6 +461,10 @@ function keyboard(_character, _keys) {
 		//}
 	}
 	this.fatality = function(_force) {
+		if(this.character.hasAdvicedItem){
+			wearStatusItem();
+			return;
+		}
 		let _skillName = 'finish' + (this.character.upcomingFinishingMove ?? '');
 		if(!_force && this.character.animations[_skillName]?.keyCombination)
 			return;
@@ -566,6 +570,10 @@ function keyboard(_character, _keys) {
 			case self.keys[3]:
 				if (this.character.main && __account.questStatus.dialogArr) {
 					skipDialog();
+					return;
+				}
+				else if(__storyTell?.firstSeen) {
+					__storyTell.skip();
 					return;
 				}
 				self.addKey(self.keys[3], 'attack');

@@ -3,7 +3,7 @@
 	padding:.25vw 1.5vw 1vw 1.5vw !important
 }
 .chat-screen {
-	margin:.5% 0 0 0;
+	margin:0;
 	border-radius: .3vw;
 	height: calc(95.5% - 3.2vw) !important;
 	border:1px solid #f3f4f540;

@@ -16,6 +16,7 @@ function animation(_a) {
 	this.shadow = _a.shadow;
 	this.disabled = _a.disabled;
 	this.speed = _a.speed;
+	this.swapBeforeStart = _a.swapBeforeStart;
 	this.particleColor = _a.particleColor;
 	this.oldSpeed = this.speed;
 	this.frames = _a.frames;

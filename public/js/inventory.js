@@ -336,10 +336,11 @@ function pushItemIntoInventory(_item, _fromMail) {
         if(!_fromMail) {
             //maile gönder
             _client.pushItemIntoMail(_item);
+            checkUpdateAvailable2(4);
         }
         return false;
     }
-    if(!__storyPlaying) {
+    if(!__storyPlaying || _client.quickPlay) {
         _item.new = 1;
         _items.push(_item);
         PlaySound({ key: 'item' });
@@ -794,6 +795,9 @@ function getItemInfoModalHtml(_id) {
     return _html;
 }
 function openItemInfoModal(_id) {
+    const _parent = document.querySelector('#inventory-list');
+    if(!_parent)
+        return;
     playClick();
     //Item Grade
     //Item Type
@@ -817,7 +821,7 @@ function openItemInfoModal(_id) {
         _currentItemModal.remove();
     const _div = document.createElement('div');
     _div.innerHTML = _html;
-    document.querySelector('#inventory-list').appendChild(_div.firstChild);
+    _parent.appendChild(_div.firstChild);
     addClass(document.querySelector('#inventory-list'), 'item-info-opened');
     //document.getElementById('inventory-list').innerHTML += _html;
 }
@@ -1443,6 +1447,33 @@ function unWearItem(_id) {
     changePower(_oldPower, _newPower);
     resetItemsUI();
     checkUpdateAvailable2(1);
+}
+function wearStatusItem(_id, _power) {
+    if(mainCharacter.lastItemEquipTime > (_gameTick - 500))
+        return;
+    if(!_id) { 
+        const _child = document.querySelector('.status-item-container .game-menu-button');
+        if(_child?.onexactclick)
+            _child.onexactclick();
+        return;
+    }
+    wearItem(_id);
+    const _parent = document.querySelector('div[data-status-item-id="' + _id + '"]');
+    if(_parent)
+        _parent.remove();
+    const _child = document.querySelector('.status-item-container');
+    if(!_child)
+        delete mainCharacter.hasAdvicedItem;
+    addDmgFrame({
+        val: _power,
+        img: './images/icons/power-up.png',
+        x: mainCharacter.LEFT,
+        from:mainCharacter.key,
+        y: episode.cHeight - mainCharacter.yPosition - mainCharacter.HEIGHT
+    });
+	mainCharacter.addObject({ key: 'hit', position: 'middle', scale:1.2 });
+    PlaySound({key:'itemweared', volume:.5, reset: true});
+    mainCharacter.lastItemEquipTime = _gameTick;
 }
 function wearItem(_id) {
     var _items = getItems();

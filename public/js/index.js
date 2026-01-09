@@ -786,6 +786,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 				blurKeyboard();
 				resetTouchPad();
 				checkPC();
+				clearStatusBoard();
 			}, 2000);
 		});
 	});
@@ -800,6 +801,11 @@ function requestVideo(_order, _again) {
 		if(_ts)
 			_ts.remove();
 	}, _again);
+}
+function clearStatusBoard() {
+	const _board = document.querySelector('.game-status-screen');
+	if(_board)
+		_board.remove();
 }
 function loadVideo(_url, _after, _again) {
 	var r = new XMLHttpRequest();

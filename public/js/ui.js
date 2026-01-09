@@ -76,8 +76,8 @@ const avatarTemplate = function (char, _name) {
 						<div class="full healthvalue" style="position:absolute;background:#0818A8;clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 0% 100%); width:${100 * (char.health / char.MAXHP)}%">
 						</div>
 					</div>
-					<div style="width:68%;height:12%;background:#FFFFFF99;clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 0% 100%);overflow:hidden">
-						<div class="full defbar-value" style="background:#702963;clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 0% 100%)"></div>
+					<div style="width:68%;height:10%;background:#FFFFFF99;clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 0% 100%);overflow:hidden">
+						<div class="full defbar-value" style="background:#BF40BF;clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 0% 100%)"></div>
 					</div>
 					<div class="buffs flex flex-jc-start" style="padding:.4vw .8vw"></div>
 				</div>
@@ -90,6 +90,28 @@ const avatarTemplate = function (char, _name) {
 					<img src='./images/icons/heart.png' id='heartcount3' />`;
 			}
 		return _html + '</div>';
+}
+function addDmgFrame(_item) {
+	if(dmgFrames?.[0]){
+		let _found;
+		for(let df of dmgFrames)
+			if(df.from === _item.from && df.startTime > (_gameTick - 100)) {
+				if(_item.item?.key && df.item?.key === _item.item.key && 
+					(!_item.val || _item.val === df.val))
+					_found = 1;
+				else if(_item.val && df.val === _item.val && df.crit === _item.crit)
+					_found = 1;
+				else if(_item.text && df.text === _item.text)
+					_found = 1;
+				if(_found) {
+					df.startTime = _gameTick;
+					df.t = 0;
+					return;
+				}
+			}
+	}
+	_item.startTime = _gameTick;
+	dmgFrames.push(_item);
 }
 var lastDmgFrameRenderTime;
 function drawDmgFrames() {
@@ -110,7 +132,7 @@ function drawDmgFrames() {
 			continue;
 		if (dmg < 5) {
 			if(_texts.find(x => x === _frame.text)){
-				dmg--;
+				dmg--; 
 				_frame.remove = true;
 			}
 			else {
@@ -214,6 +236,8 @@ function getDmgFrameNumbers2(_frame) {
 			}
 			break;
 	}
+	if(_frame.img)
+		_r.push(getImage(`./images/icons/power-up.png`));
 	for(var i = 0; i < _text.length; i++)
 		_r.push(getImage(`./images/frames/${_type === '' ? '' : _type + '/'}${_text.charAt(i)}.png`));
 	return _r;
@@ -443,8 +467,7 @@ function loadUI() {
 						_openingSound.pause();
 						_openingSound.currentTime = 0;
 					}
-					if(mainCharacter?.keyboard)
-						mainCharacter.keyboard.holdingKeys = [];
+					blurKeyboard();
 					if(episode && episode.bgMusic)
 						episode.pauseBgMusic();
 					if(episode && episode.bgSound)
@@ -500,8 +523,7 @@ function loadUI() {
 					_openingSound.pause();
 					_openingSound.currentTime = 0;
 				}
-				if(mainCharacter?.keyboard)
-					mainCharacter.keyboard.holdingKeys = [];
+				blurKeyboard();
 				if(episode && episode.bgMusic)
 					episode.pauseBgMusic();
 				if(episode && episode.bgSound)
@@ -914,6 +936,7 @@ function createTagSkill(_char, _tag) {
 						}
 						_mob.enemy = _mob.still = false;
 						_mob.friendly = _mob.invulnerable = _mob.puppetMode = _mob.alp = true;
+						_mob.puppetXMove = 0;
 						_mob.related = _mob.owner = _e;
 						_mob.experience = 0;
 						_mob.class = 'minion';
@@ -1199,8 +1222,9 @@ function updateExperience(_value, _levelup, _char, _noWarn) {
 			}
 			updateGlobalQuest('level-up');
 			if(!_noWarn && !episode?.menu)
-				dmgFrames.push({
+				addDmgFrame({
 					text: 'level-up',
+					from:mainCharacter.key,
 					//class: 'effect-gain level-up-pop',
 					x: mainCharacter.LEFT,
 					y: _canvas.height - mainCharacter.yPosition - mainCharacter.HEIGHT

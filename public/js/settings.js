@@ -100,8 +100,10 @@ const _optionActions = [
 					episode.pauseAmbianceMusic();
 			} else {
 				
-				if(episode && episode.bgMusic)
+				if(episode && episode.bgMusic) {
+					episode.createBgMusic();
 					episode.playBgMusic();
+				}
 				if(episode && episode.bgSound)
 					episode.resumeAmbianceMusic();
 			}

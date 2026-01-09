@@ -28,7 +28,7 @@ function talent() {
 							<span style="color:#9d987f !important">${getLangData('Points Used')}:</span>&nbsp;&nbsp;<span id="talent-points-remaining">${_char.talents?.reduce((x, {count}) => x + count, 0) ?? 0}</span>&nbsp;/&nbsp;<span id="talent-points-all">${MathFloor(mainCharacter.level / 2)}</span>
 						</div>
 						<div class="w-50 flex flex-jc-end">
-							 <div onexactclick="getRef(\'talent\').askReset()" class="game-menu-button btn-reset flex animate-me"s>${getLangData('RESET')}</div>
+							 <div onexactclick="getRef(\'talent\').askReset()" class="game-menu-button btn-reset flex animate-me" style="height:80% !important">${getLangData('RESET')}</div>
 						</div>
 					</div>
 					<div class="w-100 flex flex-ai-start talent-tree-middle">`

@@ -40851,6 +40851,7 @@ const _allEnemies = {
 							spriteWidth: 94,
 							spriteHeight: 76,
 							spriteOrigin: 50,
+							invisibleWhenLay: true,
 							speed: 1,
 							props: {
 								killingBy: undefined,
@@ -40864,6 +40865,7 @@ const _allEnemies = {
 							spriteWidth: 94,
 							spriteHeight: 76,
 							spriteOrigin: 50,
+							invisibleWhenLay: true,
 							speed: 11
 						},
 						{
@@ -40872,6 +40874,7 @@ const _allEnemies = {
 							spriteWidth: 93,
 							spriteHeight: 76,
 							spriteOrigin: 56,
+							invisibleWhenLay: true,
 							sound: true,
 							speed: 12
 						},
@@ -40881,6 +40884,7 @@ const _allEnemies = {
 							spriteWidth: 104,
 							spriteHeight: 76,
 							spriteOrigin: 67,
+							invisibleWhenLay: true,
 							speed: 12
 						},
 						{
@@ -40889,6 +40893,11 @@ const _allEnemies = {
 							spriteWidth: 136,
 							spriteHeight: 39,
 							spriteOrigin: 84,
+							props: {
+								killingBy: undefined,
+								finishTarget: undefined,
+								dead: true
+							},
 							speed: 12
 						},
 						{
@@ -60077,7 +60086,7 @@ function summonShadowClone(_char, _force) {
 	_shadowClone.skipHealthBar = true;
 	_shadowClone.noCC = true;
 	_shadowClone.sight = 200;
-	_shadowClone.dmgTaken = true;
+	_shadowClone.dmgTaken = 1;
 	_shadowClone.health = _shadowClone.maxHP = 1;
 	_shadowClone.owner = _char;
 	_shadowClone.pickRandomAttack();
