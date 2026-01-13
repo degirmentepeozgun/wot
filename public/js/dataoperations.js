@@ -33,7 +33,8 @@ function DataOperations(_apiUrl) {
                     _failfunc();
 			}
 		}
-		catch {
+		catch(_ex) {
+            console.log(_ex.message);
             if(_failfunc)
                 _failfunc();
 		}

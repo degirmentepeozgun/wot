@@ -88,7 +88,7 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 			const _f = (_item.count ?? 0) >= _item.limit;
 			if(!_f)
 				_finish = undefined;
-			_steps += '<div class="one-line flex flex-jc-start"><div class="d-none flex" style="width:15%"><img style="width:3vh;background:none" src="./images/icons/quest-progress.png"' + (!_finish ? 'class="gray"' : '') + ' /></div><div style="width:85%;color:' + (!_finish ? '#ffffff80' : '#fff') + ' !important">(' + (_item.count ?? 0) + '/' + _item.limit + ') ' + (_item.descriptions ?? _q.descriptions)[getLang()]  + '</div></div>';
+			_steps += '<div class="one-line flex flex-jc-start"><div class="d-none flex" style="width:15%"><img style="width:3vh;background:none" src="./images/icons/quest-progress.png"' + (!_finish ? ' class="gray"' : '') + ' /></div><div style="width:85%;color:' + (!_finish ? '#ffffff80' : '#fff') + ' !important">(' + (_item.count ?? 0) + '/' + _item.limit + ') ' + (_item.descriptions ?? _q.descriptions)[getLang()]  + '</div></div>';
 			_stepsAdded = 1;
 		}
 		if (_finish) {
@@ -117,7 +117,7 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 			_steps += `<div class="timedquest-timer one-line flex flex-jc-start">`
 					+ _icon + 
 					`<div class='timedquest-progress-wrapper'><div class='timedquest-progress'></div></div></div>`;
-
+			_steps += '<div class="one-line flex flex-jc-start"><div style="width:100%;padding:0 2vh;color:' + (!_finish ? '#ffffff80' : '#fff') + ' !important">' + (_q.descriptions?.[getLang()] ?? '') + '</div></div>';
 		} 
 		else {
 			_state = 'end';

@@ -2902,16 +2902,34 @@ function installDungeonUI() {
 	});
 }
 function installStoryFinish(_failed, _extraGain, _content) {
+	if(__storyScene?.leaderBoards)
+	{
+		installQuickPlayStageFinish(_failed);
+		return;
+	}
 	episode.end = true;
 	__storyPlaying = false;
 	addClass(_gameUI, 'disable-ui');
 	mainCharacter.disableKeyboard = true;
-	mainCharacter.keyboard.holdingKeys = [];
+	blurKeyboard();
 	episode.enemies?.forEach(x=> x.standBy());
 	episode.pauseBgMusic(1);
 	injectModule('storyfinish', function(_arr, _name) {
 		__latestUIModule[_name] = { data: _arr };
 		animateStart(_failed, _extraGain, _content);
+	});
+}
+function installQuickPlayStageFinish(_failed) {
+	episode.end = true;
+	__storyPlaying = false;
+	addClass(_gameUI, 'disable-ui');
+	mainCharacter.disableKeyboard = true;
+	blurKeyboard();
+	episode.enemies?.forEach(x=> x.standBy());
+	episode.pauseBgMusic(1);
+	injectModule('stagefinish', function(_arr, _name) {
+		__latestUIModule[_name] = { data: _arr };
+		animateStart(_failed);
 	});
 }
 function installTalents() {

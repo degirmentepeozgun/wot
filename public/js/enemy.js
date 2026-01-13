@@ -748,6 +748,11 @@ function enemy(_e) {
 				if (!(_enemy.enemy.related ?? _enemy.enemy).invulnerable)
 					this.setAutoTarget(_enemy.enemy, null, 3);
 				_newAnima.useExtraStepXRate = _charge;
+				if(_isEnemyClose && this.touchDead && !this.isDead()) {
+					this.toucher = _enemy.enemy;
+					this.animate(this.deadAnimationKey ?? 'dead', 1);
+					return;
+				}
 				if (this.animation !== 'before' && (!_anima.hurt || (_anima.hurt && _newAnima.chain))) {
 					if(this.animation === 'walk' && !this.animationFinished && this.upcomingAnimation === 'idle')
 						return;
@@ -818,6 +823,7 @@ function enemy(_e) {
 					this.setAutoMode(2);
 			}
 			if(_isEnemyClose && this.touchDead && !this.isDead()) {
+				this.toucher = _enemy.enemy;
 				this.animate(this.deadAnimationKey ?? 'dead', 1);
 				return;
 			}
@@ -1385,6 +1391,7 @@ function enemy(_e) {
 	}
 	this.standUp = function() {
 		this.heartCount--;
+		this.dmgTaken = 0;
 			addClass(document.getElementById('heartcount' + (this.heartCount + 1)), 'gray');
 		if(this.heartCount > 0) {
 			//this.finishAnimation();
@@ -2272,7 +2279,8 @@ function enemy(_e) {
 		let _item, _isEquipment, _src;
 		switch (_type) {
 			case 'gold':
-				_src = './images/icons/gold.png';
+				_item = { type: _type, key: _key };
+				_src = './images/items/icons/gold/' + getRandomValue2(1,9) + '.png';
 				if(false){// (this.killedBy) {
 					const _ch = mainCharacter;
 					if (_ch) {
@@ -2740,6 +2748,7 @@ function enemy(_e) {
 										const _minAmount = .25 * _maxAmount;
 										const _goldAmount = getRandomValue(_minAmount, _maxAmount);
 										updateGold(_goldAmount, _ch);
+										_used = 1;
 										addDmgFrame({
 											item: { key: 'gold' },
 											val: _goldAmount,

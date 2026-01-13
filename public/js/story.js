@@ -4909,8 +4909,8 @@ const __stories = [
 			{
 				id: 1,
 				descriptions: {
-					en: 'Enemies killed',
-					tr: 'Düşman öldürüldü'
+					en: 'Kill enemies',
+					tr: 'Düşmanları öldür'
 				},
 				names: {
 					en: 'Power Up',
@@ -5027,10 +5027,10 @@ const __stories = [
 			tr: "Kahramanlarımızın daha fazla güçlenmesi için bu aşama tecrübelerini boostlayacak. Kalabalık düşman topluluğuna karşı kendilerini sınayacaklar ve bir yandan da zamana karşı yarışıyor olacaklar"
 		},
 		boss: "sisters",
+		heartCount : 3,
 		scenes: [
 			{
 				map: 201,
-				heartCount : 3,
 				loadingCharacterIds: [37,38],
 				loots: [
 					{type:'pot', key:'pot', chance:1}
@@ -6646,468 +6646,6 @@ const __stories = [
 			getLobbyScene()
 		]
 	},
-	// {
-	// 	id:200,
-	// 	disableWorldMap: true,
-	// 	order:200,
-	// 	act:1,
-	// 	minLevel:1,
-	// 	list: false,
-	// 	ticket: 0,
-	// 	mission: 'qp',
-	// 	perfectFinishRewards: [{ key: 'chest', grade: 2 }],
-	// 	title: {
-	// 		en: 'Witch Hunt',
-	// 		tr: 'Cadı Avı'
-	// 	},
-	// 	description: {
-	// 		en: "",
-	// 		tr: ""
-	// 	},
-	// 	resultStars: [
-	// 		{ id: 1, title: 'Clear mission', when: function() {
-	// 			return !mainCharacter.isDead();
-	// 		}},
-	// 		{ id: 2, key: 'time', value: 15 * 60000, title: 'Finish in time',
-	// 			when: function(_item) {
-	// 				//return !isMissionFailed(0) && !isMissionFailed(2) &&
-	// 				return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
-	// 		}},
-	// 		{ id: 3, key: 'heart', value: 1, title: 'Stay above 1 heart', when: function(_item) {
-	// 			return mainCharacter.heartCount > _item.value;
-	// 		}}
-	// 	],
-	// 	rewards: [
-	// 		{ key: 'item', grade: 2, type: 'weapon' },
-	// 		{ key: 'gem', grade: 1, type: 'random', count:1 },
-	// 		{ key: 'gold', count: 5000 },
-	// 		{ key: 'exp', count: 1200 }
-	// 	],
-	// 	quests: [
-	// 	],
-	// 	scenes: [
-	// 		// {
-	// 		// 	map:5,
-	// 		// 	startsWith:1,
-	// 		// 	loadingCharacterIds: [101,102, 103, 104, 19],
-	// 		// 	start: function() {
-	// 		// 		setCharacterLevel(10);
-	// 		// 		const _tagChar = episode.enemies.find(x => x.tag);
-	// 		// 		if(_tagChar)
-	// 		// 			_tagChar.remove = true;
-	// 		// 		if(mainCharacter.tagContainer)
-	// 		// 		{
-	// 		// 			mainCharacter.tagContainer.remove();
-	// 		// 			delete mainCharacter.tagContainer;
-	// 		// 		}
-	// 		// 	},
-	// 		// 	mobs: [
-	// 		// 		{
-	// 		// 			id: 19,
-	// 		// 			minX: 1500,
-	// 		// 			maxX: 2500,
-	// 		// 			count: 10
-	// 		// 		},
-	// 		// 		{
-	// 		// 			id: 101,
-	// 		// 			minX: 0,
-	// 		// 			maxX: 6200,
-	// 		// 			count: 100,
-	// 		// 			do: function(_e) {
-	// 		// 				_e.friendlyFire = true;
-	// 		// 			},
-	// 		// 			yPosition: function() {
-	// 		// 				return MathRound((1 - (getRandomValue2(30, 70) / 100)) * groundheight);
-	// 		// 			}
-	// 		// 		},
-	// 		// 		{
-	// 		// 			id: 102,
-	// 		// 			minX: 0,
-	// 		// 			maxX: 6200,
-	// 		// 			count: 100,
-	// 		// 			do: function(_e) {
-	// 		// 				_e.friendlyFire = true;
-	// 		// 			},
-	// 		// 			yPosition: function() {
-	// 		// 				return MathRound((1 - (getRandomValue2(30, 70) / 100)) * groundheight);
-	// 		// 			}
-	// 		// 		},
-	// 		// 		{
-	// 		// 			id: 103,
-	// 		// 			minX: 0,
-	// 		// 			maxX: 6200,
-	// 		// 			count: 100,
-	// 		// 			do: function(_e) {
-	// 		// 				_e.friendlyFire = true;
-	// 		// 			},
-	// 		// 			yPosition: function() {
-	// 		// 				return MathRound((1 - (getRandomValue2(20, 60) / 100)) * groundheight);
-	// 		// 			}
-	// 		// 		},
-	// 		// 		{
-	// 		// 			id: 104,
-	// 		// 			minX: 0,
-	// 		// 			maxX: 6200,
-	// 		// 			count: 100,
-	// 		// 			do: function(_e) {
-	// 		// 				_e.friendlyFire = true;
-	// 		// 			},
-	// 		// 			yPosition: function() {
-	// 		// 				return MathRound((1 - (getRandomValue2(20, 60) / 100)) * groundheight);
-	// 		// 			}
-	// 		// 		},
-	// 		// 		{
-	// 		// 			id: 105,
-	// 		// 			minX: 0,
-	// 		// 			maxX: 6200,
-	// 		// 			count: 100,
-	// 		// 			do: function(_e) {
-	// 		// 				_e.friendlyFire = true;
-	// 		// 			},
-	// 		// 			yPosition: function() {
-	// 		// 				return MathRound((1 - (getRandomValue2(10, 50) / 100)) * groundheight);
-	// 		// 			}
-	// 		// 		},
-	// 		// 		{
-	// 		// 			id: 106,
-	// 		// 			minX: 0,
-	// 		// 			maxX: 6200,
-	// 		// 			count: 100,
-	// 		// 			do: function(_e) {
-	// 		// 				_e.friendlyFire = true;
-	// 		// 			},
-	// 		// 			yPosition: function() {
-	// 		// 				return MathRound((1 - (getRandomValue2(10, 50) / 100)) * groundheight);
-	// 		// 			}
-	// 		// 		}
-	// 		// 	]
-	// 		// },
-	// 		{
-	// 			map: 201,
-	// 			heartCount : 3,
-	// 			loots: [
-	// 				{type:'pot', key:'pot', chance:1},
-	// 				{type:'common', key:'corpseexplode', chance:1}
-	// 			],
-	// 			startsWith: 1,
-	// 			save: true,
-	// 			loadingCharacterIds: [37,38],
-	// 			start: function() {
-	// 				clearAudioCache(loadedSounds);
-	// 				removeCoopCharacter();
-	// 				mainCharacter.storyVariables = {
-	// 					level: mainCharacter.level,
-	// 					experience: mainCharacter.experience,
-	// 					maxExperience: mainCharacter.maxExperience
-	// 				};
-	// 				mainCharacter.level = 0;
-	// 				mainCharacter.experience = 0;
-	// 				mainCharacter.maxExperience = 833;
-	// 				setCharacterLevel(1, null, 1);
-	// 				//setCharacterLevel(8, null, 1);
-	// 				addClass(_gameUI, 'demo-playing');
-	// 				episode.pauseBgMusic(1);
-	// 				episode.createBgMusic(null, null, null, 'training');
-	// 				episode.playBgMusic();
-	// 				episode.phase = 1;
-	// 				updateQuestArea(null,
-	// 					{
-	// 						id: 1001,
-	// 						descriptions: {
-	// 							en: 'Become Level 2',
-	// 							tr: 'Seviye 2 ol'
-	// 						},
-	// 						names: {
-	// 							en: 'Power Up',
-	// 							tr: 'Güçlenme'
-	// 						},
-	// 						owner: 'system',
-	// 						minLevel: 1,
-	// 						maps: [201]
-	// 					}
-	// 				);
-	// 				const _es = episode.enemies.filter(x => x.enemy);
-	// 				_es.forEach(_e => 
-	// 					{
-	// 						_e.animations.hurtfeet = new animation(createHurtFeet(_e.zoom, _e.bloodColor));
-	// 					}
-	// 				);
-	// 				episode.loadCharacterSprites(function() {}, null, ['hurtfeet'],1,1);
-	// 				mainCharacter.direction = __right;
-	// 				const _tagChar = episode.enemies.find(x => x.tag);
-	// 				if(_tagChar)
-	// 					_tagChar.remove = true;
-	// 				if(mainCharacter.tagContainer)
-	// 				{
-	// 					mainCharacter.tagContainer.remove();
-	// 					delete mainCharacter.tagContainer;
-	// 				}
-	// 				const _desc = document.createElement('div');
-	// 				_desc.className = 'flex show-ui full quick-play-desc-container fade-me';
-	// 				let _html = '';
-	// 				for(let i = 0; i < 6; i++) {
-	// 					const _tip = __quickTips[i];
-	// 					let _skillHtml = '';
-	// 					for(let _sk of _tip.skills) {
-	// 						if(_skillHtml !== '')
-	// 							_skillHtml += '<img src="./images/icons/swap-right.png" class="quick-play-desc-skill-swap" />';
-	// 						_skillHtml += '<div class="quick-play-desc-skill-icon" style="background-image:url(./images/main/skill-icons/warrior/' + _sk + '.png);background-size:cover"></div>';
-	// 					}
-	// 					_skillHtml = `<div class="quick-play-desc-skill-icons flex">` + _skillHtml + '</div>';
-	// 					_html += `<div class="quick-play-desc-item quick-play-desc-item${_tip.id}">`
-	// 						+ _skillHtml +
-	// 				 		`<div class="quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
-	// 				   </div>`;
-	// 				}
-	// 				_desc.innerHTML = _html +
-	// 				   `<div onexactclick="skipQuickPlayTutorial()" class="quick-play-desc-skip flex glow">&lt;&nbsp;${getLangData('UNDERSTOOD')}&nbsp;&gt;</div>`;
-	// 				addClass(_gameUI, 'disable-ui');
-	// 				requestAnimationFrame(() => {
-	// 					_game.suspended = true;
-	// 				});
-	// 				_gameUI.appendChild(_desc);
-	// 			},
-	// 			actions: [
-	// 				{
-	// 					when: function() {
-	// 						return episode.phase < 99 && mainCharacter.level > 11;
-	// 					},
-	// 					do: function() {
-	// 						episode.phase = 99;
-	// 						episode.enemies.filter(x => !x.main && !x.friendly && x.class !== 'object').forEach(x => {
-	// 							x.stopSpawn();
-	// 							x.health = x.experience = 0;
-	// 							x.dead = x.dying = true;
-	// 							x.animate('dead', 1);
-	// 						});
-	// 						episode.mobs = episode.respawners = [];
-	// 						// setTimeout(function() {
-	// 						// 	episode.loadCharacterSprites(function() {}, [37,38], null, 1);
-	// 						// }, 20);
-	// 						PlaySound({key:'bossalert', volume: .5});
-	// 						warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
-	// 						const _elm = document.getElementById('quest-status');
-	// 						addClass(_elm, 'mission-done');
-	// 						__storyScene.bossQuest = {
-	// 							id: 1100,
-	// 							names: {
-	// 								en: 'Party Time',
-	// 								tr: 'Parti Zamanı'
-	// 							},
-	// 							descriptions: {
-	// 								en: 'Eliminate Sisters',
-	// 								tr: 'Kardeşleri Yok Et'
-	// 							},
-	// 							owner: 'system',
-	// 							minLevel: 1,
-	// 							kills: [
-	// 								{
-	// 									enemy: [37],
-	// 									limit: 1,
-	// 									descriptions: {
-	// 										en: 'Yecüc Cleared',
-	// 										tr: 'Yecüc Temizlendi'
-	// 									}
-	// 								},
-	// 								{ 
-	// 									enemy: [38], 
-	// 									limit: 1, 
-	// 									descriptions: {
-	// 										en: 'Mecüc Cleared',
-	// 										tr: 'Mecüc Temizlendi'
-	// 									} 
-	// 								}
-	// 							],
-	// 							maps: [201]
-	// 						};
-	// 						_elm.onanimationend = function(e) {
-	// 							if(e.animationName === 'mission-done')
-	// 								updateQuestArea(null,
-	// 							 		__storyScene.bossQuest
-	// 								);
-	// 						}
-	// 						mainCharacter.realLevel = mainCharacter.level;
-	// 						setTimeout(() => {
-	// 							PlaySound({key:'sistersenter', volume:1});
-	// 							setTimeout(() => {
-	// 								episode.phase = 100;
-	// 								const installBoss = function(_b, _name) {
-	// 									const _boss = summonMobWithJson({
-	// 										id: _b,
-	// 										level: 12,
-	// 										name: _name,
-	// 										atk: mainCharacter.atk,
-	// 										grade: 4
-	// 									});
-	// 									//_boss.health = _boss.maxHP = 1;
-	// 									_boss.class = 'boss';
-	// 									_boss.experience = 0;
-	// 									_boss.setDifficulty(__account.difficulty - 1);
-	// 									_boss.acceptChanges();
-	// 									_boss.pickNewTarget();
-	// 									_boss.releaseAfter = 25;
-	// 								}
-	// 								installBoss(37, 'Yecüc');
-	// 								requestAnimationFrame(() => {
-	// 									installBoss(38, 'Mecüc');
-	// 								});
-	// 								mainCharacter.maxHP = mainCharacter.MAXHP =
-	// 								mainCharacter.maxHP * 1;
-	// 								mainCharacter.setHealth(mainCharacter.MAXHP);
-	// 								episode.pauseAmbianceMusic();
-	// 								episode.pauseBgMusic(1);
-	// 								episode.createBgMusic(null, null, null, 'cyclops-battle', .5);
-	// 								episode.playBgMusic();
-	// 							}, 1000);
-	// 						}, 4000);
-	// 					}
-	// 				},
-	// 				{
-	// 					when: function() {
-	// 						return mainCharacter.level > episode.phase;
-	// 					},
-	// 					do: function() {
-	// 						episode.phase++;
-	// 						for(let x of __storyScene.mobs){
-	// 							let y = summonMobWithJson(structuredClone2(x),0,1);
-	// 							y.experience = mainCharacter.level * 250;
-	// 							y.maxHP = y.MAXHP = mainCharacter.level * 30;
-	// 							y.setHealth(y.maxHP);
-	// 						}
-	// 						updateQuestArea(null, {
-	// 							id: 1000 + mainCharacter.level,
-	// 							descriptions: {
-	// 								en: 'Become Level ' + (mainCharacter.level + 1),
-	// 								tr: 'Seviye ' + (mainCharacter.level + 1) + ' ol'
-	// 							},
-	// 							names: {
-	// 								en: 'Power Up',
-	// 								tr: 'Güçlenme'
-	// 							},
-	// 							owner: 'system',
-	// 							minLevel: mainCharacter.level,
-	// 							maps: [201]
-	// 						});
-	// 						if(mainCharacter.level > 8 && !mainCharacter.tagSkillSet) {
-	// 							delete mainCharacter.animations.tag.disabled;
-	// 							mainCharacter.tagSkillSet = 1;
-	// 							resetSkill('tag', mainCharacter);
-	// 							PlaySound({key:'conquer', volume:.6});
-	// 							getImage('./images/main/avatars/cyclops.png', function(_img) {
-	// 								const url = _img.toDataURL();
-	// 								warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
-	// 							});
-	// 						}
-	// 					}
-	// 				},
-	// 				{
-	// 					when: function() {
-	// 						return episode.phase === 100 && !episode.enemies.filter(x => x.class === 'boss')?.length;
-	// 					},
-	// 					do: function() {
-	// 						episode.phase = 101;
-	// 						__storyScene.bossQuest.kills[0].count = 1;
-	// 						updateQuestArea(null, __storyScene.bossQuest);
-	// 						__storyPlaying = false;
-	// 						installStoryFinish();
-	// 					}
-	// 				}
-	// 			],
-	// 			mobs: [
-	// 				{
-	// 					id: 24,
-	// 					minX: 1580,
-	// 					maxX: 4800,
-	// 					count: 1,
-	// 					sight: 1000,
-	// 					spawn: 1,
-	// 					hp:60,
-	// 					experience: 250
-	// 				},
-	// 				{
-	// 					id: 19,
-	// 					minX: 1580,
-	// 					maxX: 4800,
-	// 					count: 1,
-	// 					sight: 1000,
-	// 					spawn: 1,
-	// 					hp:60,
-	// 					experience: 250
-	// 				},
-	// 				{
-	// 					id: 20,
-	// 					minX: 1580,
-	// 					maxX: 4800,
-	// 					count: 1,
-	// 					sight: 1000,
-	// 					spawn: 1,
-	// 					hp:60,
-	// 					experience: 250
-	// 				},
-	// 				// {
-	// 				// 	id: 66,
-	// 				// 	minX: 1580,
-	// 				// 	maxX: 4800,
-	// 				// 	count: 1,
-	// 				// 	sight: 1000,
-	// 				// 	spawn: 1,
-	// 				// 	hp:60,
-	// 				// 	experience: 250
-	// 				// },
-	// 				{
-	// 					id: 28,
-	// 					minX: 1580,
-	// 					maxX: 4800,
-	// 					count: 1,
-	// 					sight: 1000,
-	// 					spawn: 1,
-	// 					hp:60,
-	// 					experience: 250
-	// 				},
-	// 				{
-	// 					id: 30,
-	// 					minX: 1580,
-	// 					maxX: 4800,
-	// 					count: 1,
-	// 					sight: 1000,
-	// 					spawn: 1,
-	// 					hp:60,
-	// 					experience: 250
-	// 				},
-	// 				{
-	// 					id: 23,
-	// 					minX: 1580,
-	// 					maxX: 4800,
-	// 					count: 1,
-	// 					sight: 1000,
-	// 					spawn: 1,
-	// 					hp:60,
-	// 					experience: 250
-	// 				},
-	// 				{
-	// 					id: 7,
-	// 					minX: 1580,
-	// 					maxX: 4800,
-	// 					count: 1,
-	// 					spawn: 1,
-	// 					sight: 1000,
-	// 					hp:60,
-	// 					experience: 250
-	// 				},
-	// 				{
-	// 					id: 1,
-	// 					minX: 1580,
-	// 					maxX: 4800,
-	// 					count: 1,
-	// 					sight: 1000,
-	// 					spawn: 1,
-	// 					hp:60,
-	// 					experience: 250
-	// 				}
-	// 			]
-	// 		}
-	// 	]
-	// },
 	{
 		id:200,
 		disableWorldMap: true,
@@ -7115,48 +6653,13 @@ const __stories = [
 		act:1,
 		minLevel:1,
 		list: false,
-		leaderBoards: {
-			calculate: function() {
-				//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
-				//Kalan kalp (3 adet te) + 1000 * 3
-				//Yediği Damage ın toplam sağlığına oranı negatif bonusu (50 * 10) dmgTaken
-				
-				const _result = {
-					description: [
-						{
-							title: {
-								en: 'Time Bonus',
-								tr: 'Zaman Bonusu'
-							},
-							value: MathRound(((10 * 60000) - 
-							((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick))) / 10)
-						},
-						{
-							title: {
-								en: 'Heart Bonus',
-								tr: 'Kalp Bonusu'
-							},
-							value: (mainCharacter.heartCount ?? 0) * 1000
-						},
-						{
-							title: {
-								en: 'Damage Taken',
-								tr: 'Hasar Alma'
-							},
-							value: -1 * (((mainCharacter.dmgTaken ?? 0) / mainCharacter.MAXHP) * 1000)
-						}
-					]
-				};
-				_result.score = _result.reduce((prev, next) => prev.value + next.value);
-				return _result;
-			}
-		},
 		ticket: 0,
 		mission: 'qp',
+		point: 0,
 		perfectFinishRewards: [{ key: 'chest', grade: 2 }],
 		title: {
-			en: 'Pinata Hive',
-			tr: 'Pinyata Kovanı'
+			en: 'Witch Hunt',
+			tr: 'Cadı Avı'
 		},
 		description: {
 			en: "",
@@ -7166,7 +6669,7 @@ const __stories = [
 			{ id: 1, title: 'Clear mission', when: function() {
 				return !mainCharacter.isDead();
 			}},
-			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
+			{ id: 2, key: 'time', value: 15 * 60000, title: 'Finish in time',
 				when: function(_item) {
 					//return !isMissionFailed(0) && !isMissionFailed(2) &&
 					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
@@ -7183,6 +6686,27 @@ const __stories = [
 		],
 		quests: [
 			{
+				id: 1010,
+				descriptions: {
+					en: 'Become Level 12',
+					tr: 'Seviye 12 ol'
+				},
+				names: {
+					en: 'Power Up',
+					tr: 'Güçlenme'
+				},
+				owner: 'system',
+				minLevel: 1,
+				maps: [201],
+				timer: {
+					ms: 3000,
+					after: function() {
+						episode.timerFailed = 1;
+						episode.phase = 98;
+					}
+				}
+			},
+			{
 				id: 1011,
 				descriptions: {
 					en: 'Hive smashed',
@@ -7196,7 +6720,7 @@ const __stories = [
 				minLevel: 1,
 				maps: [11],
 				timer: {
-					ms: 150000,
+					ms: 5000, //150000
 					after: function() {
 						if(episode.boss && !episode.boss.isDead()) {
 							episode.phase = 200;
@@ -7229,13 +6753,468 @@ const __stories = [
 				maps: [11]
 			}
 		],
+		heartCount : 3,
 		scenes: [
 			{
-				map: 11,
-				heartCount : 3,
+				map: 201,
+				leaderBoards: {
+					calculate: function() {
+						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
+						//Kalan kalp (3 adet te) + 1000 * 3
+						//Yediği Damage ın toplam sağlığına oranı negatif bonusu (50 * 10) dmgTaken
+						
+						const _result = {
+							description: [
+								{
+									title: {
+										en: 'Time Bonus',
+										tr: 'Zaman Bonusu'
+									},
+									icon: 'time',
+									value: MathRound(((10 * 60000) - 
+									((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick))) / 10)
+								},
+								{
+									title: {
+										en: 'Quest Bonus',
+										tr: 'Görev Bonusu'
+									},
+									icon: 'strong',
+									value: episode.timerFailed ? 0 : 1000
+								},
+								{
+									title: {
+										en: 'Damage Taken',
+										tr: 'Hasar Alma'
+									},
+									icon: 'heart',
+									value: (-1 * MathRound(((mainCharacter.dmgTaken ?? 0) / mainCharacter.MAXHP) * 500)) -
+										((3 - (mainCharacter.heartCount ?? 0)) * 500)
+								}
+							]
+						};
+						_result.score = _result.description.reduce(
+							(sum, item) => sum + (item.value ?? 0),
+							0
+						);
+						return _result;
+					}
+				},
 				loots: [
 					{type:'pot', key:'pot', chance:1},
 					{type:'common', key:'corpseexplode', chance:1}
+				],
+				startsWith: 1,
+				save: true,
+				loadingCharacterIds: [37,38],
+				start: function() {
+					clearAudioCache(loadedSounds);
+					removeCoopCharacter();
+					mainCharacter.storyVariables = {
+						level: mainCharacter.level,
+						experience: mainCharacter.experience,
+						maxExperience: mainCharacter.maxExperience
+					};
+					mainCharacter.level = 0;
+					mainCharacter.experience = 0;
+					mainCharacter.maxExperience = 833;
+					setCharacterLevel(11, null, 1);
+					//setCharacterLevel(8, null, 1);
+					addClass(_gameUI, 'demo-playing');
+					episode.pauseBgMusic(1);
+					episode.createBgMusic(null, null, null, 'training');
+					episode.playBgMusic();
+					episode.phase = 1;
+					const _es = episode.enemies.filter(x => x.enemy);
+					_es.forEach(_e => 
+						{
+							_e.animations.hurtfeet = new animation(createHurtFeet(_e.zoom, _e.bloodColor));
+						}
+					);
+					episode.loadCharacterSprites(function() {}, null, ['hurtfeet'],1,1);
+					mainCharacter.direction = __right;
+					const _tagChar = episode.enemies.find(x => x.tag);
+					if(_tagChar)
+						_tagChar.remove = true;
+					if(mainCharacter.tagContainer)
+					{
+						mainCharacter.tagContainer.remove();
+						delete mainCharacter.tagContainer;
+					}
+					const _desc = document.createElement('div');
+					_desc.className = 'flex show-ui full quick-play-desc-container fade-me';
+					let _html = '';
+					for(let i = 0; i < 6; i++) {
+						const _tip = __quickTips[i];
+						let _skillHtml = '';
+						for(let _sk of _tip.skills) {
+							if(_skillHtml !== '')
+								_skillHtml += '<img src="./images/icons/swap-right.png" class="quick-play-desc-skill-swap" />';
+							_skillHtml += '<div class="quick-play-desc-skill-icon" style="background-image:url(./images/main/skill-icons/warrior/' + _sk + '.png);background-size:cover"></div>';
+						}
+						_skillHtml = `<div class="quick-play-desc-skill-icons flex">` + _skillHtml + '</div>';
+						_html += `<div class="quick-play-desc-item quick-play-desc-item${_tip.id}">`
+							+ _skillHtml +
+					 		`<div class="quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
+					   </div>`;
+					}
+					_desc.innerHTML = _html +
+					   `<div onexactclick="takeQuest(0, 1, null, null, 1);skipQuickPlayTutorial()" class="quick-play-desc-skip flex glow">&lt;&nbsp;${getLangData('UNDERSTOOD')}&nbsp;&gt;</div>`;
+					addClass(_gameUI, 'disable-ui');
+					requestAnimationFrame(() => {
+						_game.suspended = true;
+					});
+					_gameUI.appendChild(_desc);
+				},
+				actions: [
+					{
+						when: function() {
+							return episode.phase < 99 && (mainCharacter.level > 11 || episode.phase === 98);
+						},
+						do: function() {
+							episode.phase = 99;
+							episode.enemies.filter(x => !x.main && !x.friendly && x.class !== 'object').forEach(x => {
+								x.stopSpawn();
+								x.health = x.experience = 0;
+								x.dead = x.dying = true;
+								x.animate('dead', 1);
+							});
+							episode.mobs = episode.respawners = [];
+							// setTimeout(function() {
+							// 	episode.loadCharacterSprites(function() {}, [37,38], null, 1);
+							// }, 20);
+							PlaySound({key:'bossalert', volume: .5});
+							warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
+							const _elm = document.getElementById('quest-status');
+							addClass(_elm, 'mission-done');
+							__storyScene.bossQuest = {
+								id: 1100,
+								names: {
+									en: 'Party Time',
+									tr: 'Parti Zamanı'
+								},
+								descriptions: {
+									en: 'Eliminate Sisters',
+									tr: 'Kardeşleri Yok Et'
+								},
+								owner: 'system',
+								minLevel: 1,
+								kills: [
+									{
+										enemy: [37],
+										limit: 1,
+										descriptions: {
+											en: 'Yecüc Cleared',
+											tr: 'Yecüc Temizlendi'
+										}
+									},
+									{ 
+										enemy: [38], 
+										limit: 1, 
+										descriptions: {
+											en: 'Mecüc Cleared',
+											tr: 'Mecüc Temizlendi'
+										} 
+									}
+								],
+								maps: [201]
+							};
+							if(_elm)
+								_elm.onanimationend = function(e) {
+									if(e.animationName === 'mission-done')
+										updateQuestArea(null,
+											__storyScene.bossQuest
+										);
+								}
+							mainCharacter.realLevel = mainCharacter.level;
+							setTimeout(() => {
+								PlaySound({key:'sistersenter', volume:1});
+								setTimeout(() => {
+									episode.phase = 100;
+									const installBoss = function(_b, _name) {
+										const _boss = summonMobWithJson({
+											id: _b,
+											level: 12,
+											name: _name,
+											atk: mainCharacter.atk,
+											grade: 4
+										});
+										_boss.health = _boss.maxHP = 1;
+										_boss.class = 'boss';
+										_boss.experience = 0;
+										_boss.setDifficulty(__account.difficulty - 1);
+										_boss.acceptChanges();
+										_boss.pickNewTarget();
+										_boss.releaseAfter = 25;
+									}
+									installBoss(37, 'Yecüc');
+									requestAnimationFrame(() => {
+										installBoss(38, 'Mecüc');
+									});
+									mainCharacter.maxHP = mainCharacter.MAXHP =
+									mainCharacter.maxHP * 1;
+									mainCharacter.setHealth(mainCharacter.MAXHP);
+									episode.pauseAmbianceMusic();
+									episode.pauseBgMusic(1);
+									episode.createBgMusic(null, null, null, 'cyclops-battle', .5);
+									episode.playBgMusic();
+								}, 1000);
+							}, 4000);
+						}
+					},
+					{
+						when: function() {
+							return mainCharacter.level > episode.phase;
+						},
+						do: function() {
+							episode.phase++;
+							for(let x of __storyScene.mobs){
+								let y = summonMobWithJson(structuredClone2(x),0,1);
+								y.experience = mainCharacter.level * 250;
+								y.maxHP = y.MAXHP = mainCharacter.level * 30;
+								y.setHealth(y.maxHP);
+							}
+							// updateQuestArea(null, {
+							// 	id: 1000 + mainCharacter.level,
+							// 	descriptions: {
+							// 		en: 'Become Level ' + (mainCharacter.level + 1),
+							// 		tr: 'Seviye ' + (mainCharacter.level + 1) + ' ol'
+							// 	},
+							// 	names: {
+							// 		en: 'Power Up',
+							// 		tr: 'Güçlenme'
+							// 	},
+							// 	owner: 'system',
+							// 	minLevel: mainCharacter.level,
+							// 	maps: [201]
+							// });
+							if(mainCharacter.level > 8 && !mainCharacter.tagSkillSet) {
+								delete mainCharacter.animations.tag.disabled;
+								mainCharacter.tagSkillSet = 1;
+								resetSkill('tag', mainCharacter);
+								PlaySound({key:'conquer', volume:.6});
+								getImage('./images/main/avatars/cyclops.png', function(_img) {
+									const url = _img.toDataURL();
+									warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
+								});
+							}
+						}
+					},
+					{
+						when: function() {
+							if(episode.phase !== 100)
+								return false;
+							const _bosses = episode.enemies.filter(x => x.class === 'boss');
+							const _result = _bosses?.length === 1;
+							if(_result) {
+								__storyScene.bossQuest.kills.find(x => x.enemy[0] !== _bosses[0].id).count = 1;
+								updateQuestArea(null, __storyScene.bossQuest);
+							}
+							return _result;
+						},
+						do: function() {
+
+						}
+					},
+					{
+						when: function() {
+							return episode.phase === 100 && !episode.enemies.filter(x => x.class === 'boss')?.length;
+						},
+						do: function() {
+							episode.phase = 101;
+							const _counter = __storyScene.bossQuest.kills.find(x => x.count !== 1);
+							if(_counter) {
+								_counter.count = 1;
+								updateQuestArea(null, __storyScene.bossQuest);
+							}
+							// __storyPlaying = false;
+							// installStoryFinish();
+							
+							const _portal = summonMob(112, 
+								MathRound((mainCharacter.left + platformX + (mainCharacter.WIDTH * (mainCharacter.direction === __left ? -1 : 1))) / __zoom), 
+								MathRound(groundheight * .5), 1);
+							setTimeout(() => {
+								_portal.animations.after.frames.forEach(x => {
+									x.do = function(_e) {
+										x.zoom = 1.1;
+										x.health = 0;
+										x.bottomGap += MathRound(x.spriteHeight / 20);
+										PlaySound({key:'portalclose', volume:.3 });
+										if(_e.toucher) {
+											_e.toucher.standBy();
+											_e.toucher.yPosition = _e.yPosition - 1;
+											_e.toucher.updateVariables();
+											const _oldLeft = _e.toucher.left;
+											_e.toucher.left = _e.left - MathRound((_e.toucher.WIDTH - _e.WIDTH) / 2) - platformX;
+											if(_e.toucher.left < _oldLeft && _e.toucher.direction === __right)
+												_e.toucher.direction = __left;
+											else if(_e.toucher.left > _oldLeft && _e.toucher.direction === __left)
+												_e.toucher.direction = __right;
+											_portal.animations.after.frames.forEach(y => delete y.do);
+											mainCharacter.addObject(
+											{ 
+												key: 'zoom2x', 
+												position: 'css', 
+												p1: 1.5, 
+												p2: 10000
+											});
+											__storyPlaying = false;
+											installStoryFinish();
+											setTimeout(() => {
+												//_e.toucher.remove = true;
+												requestAnimationFrame(() => {
+													//switchStoryScene();
+												});
+											}, 250);
+										}
+									}
+								});
+							}, 100);
+						}
+					}
+				],
+				mobs: [
+					{
+						id: 24,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						sight: 1000,
+						spawn: 1,
+						hp:60,
+						experience: 250
+					},
+					{
+						id: 19,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						sight: 1000,
+						spawn: 1,
+						hp:60,
+						experience: 250
+					},
+					{
+						id: 20,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						sight: 1000,
+						spawn: 1,
+						hp:60,
+						experience: 250
+					},
+					// {
+					// 	id: 66,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 1,
+					// 	sight: 1000,
+					// 	spawn: 1,
+					// 	hp:60,
+					// 	experience: 250
+					// },
+					{
+						id: 28,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						sight: 1000,
+						spawn: 1,
+						hp:60,
+						experience: 250
+					},
+					{
+						id: 30,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						sight: 1000,
+						spawn: 1,
+						hp:60,
+						experience: 250
+					},
+					{
+						id: 23,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						sight: 1000,
+						spawn: 1,
+						hp:60,
+						experience: 250
+					},
+					{
+						id: 7,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						spawn: 1,
+						sight: 1000,
+						hp:60,
+						experience: 250
+					},
+					{
+						id: 1,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						sight: 1000,
+						spawn: 1,
+						hp:60,
+						experience: 250
+					}
+				]
+			},
+			{
+				map: 11,
+				leaderBoards: {
+					calculate: function() {
+						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
+						//Kalan kalp (3 adet te) + 1000 * 3
+						//Yediği Damage ın toplam sağlığına oranı negatif bonusu (50 * 10) dmgTaken
+						
+						const _result = {
+							description: [
+								{
+									title: {
+										en: 'Time Bonus',
+										tr: 'Zaman Bonusu'
+									},
+									icon: 'time',
+									value: MathRound(((10 * 60000) - 
+									((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick))) / 10)
+								},
+								{
+									title: {
+										en: 'Quest Bonus',
+										tr: 'Görev Bonusu'
+									},
+									icon: 'strong',
+									value: episode.timerFailed ? 0 : 1000
+								},
+								{
+									title: {
+										en: 'Damage Taken',
+										tr: 'Hasar Alma'
+									},
+									icon: 'heart',
+									value: (-1 * MathRound(((mainCharacter.dmgTaken ?? 0) / mainCharacter.MAXHP) * 500)) -
+										((3 - (mainCharacter.heartCount ?? 0)) * 500)
+								}
+							]
+						};
+						_result.score = _result.description.reduce(
+							(sum, item) => sum + (item.value ?? 0),
+							0
+						);
+						return _result;
+					}
+				},
+				loots: [
+					{type:'pot', key:'pot', chance:1},
+					{type:'common', key:'corpseexplode', chance:1},
+					{type:'common', key:'firespray', chance:1}
 				],
 				startsWith: 1,
 				save: true,
@@ -7274,9 +7253,10 @@ const __stories = [
 					resetSkill('tag', mainCharacter);
 					//PlaySound({key:'conquer', volume:.6});
 					//episode.lastItemDropTime = _gameTick;
-					takeQuest(0, 1, null, null, 1);
+					takeQuest(1, 1, null, null, 1);
 					episode.boss = episode.enemies.find(x => x.id === 111);
 					episode.phase = episode.boss.grade;
+					removeClass(_gameUI, 'disable-ui');
 					// getImage('./images/main/avatars/cyclops.png', function(_img) {
 					// 	const url = _img.toDataURL();
 					// 	warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
@@ -7357,15 +7337,7 @@ const __stories = [
 					},
 					{
 						when: function() {
-							return (episode.boss?.gradeLeft + 1) < episode.phase;
-							// if(episode.phase < 10 && (_gameTick - episode.lastItemDropTime) > 5000){
-							// 	 const _enemy = episode.enemies.find(x => x.enemy && x.class !== __spell && x.class !== 'object' && x.health === 0);
-							// 	 if(_enemy){
-							// 		episode.itemDroppingMob = _enemy;
-							// 		return true;
-							// 	 }
-							// }
-							// return false;
+							return (episode.boss?.gradeLeft + 1) < episode.phase && episode.phase < 100;
 						},
 						do: function() {
 							if(episode.boss) {
@@ -7374,15 +7346,15 @@ const __stories = [
 									enemy: episode.boss,
 									loots: [
 										{type:'item',key:episode.itemDropOrder[episode.boss.grade - episode.phase], grade:2},
-										// {type:'gold'},
-										// {type:'gold'},
-										// {type:'gold'},
-										// {type:'gold'},
-										// {type:'gold'},
-										// {type:'gold'},
-										// {type:'gold'},
-										// {type:'gold'},
-										// {type:'gold'}
+										{type:'gold'},
+										{type:'gold'},
+										{type:'gold'},
+										{type:'gold'},
+										{type:'gold'},
+										{type:'gold'},
+										{type:'gold'},
+										{type:'gold'},
+										{type:'gold'}
 									]
 								}
 								episode.phase--;
@@ -7430,7 +7402,7 @@ const __stories = [
 											zoom: .66,
 											grade: 5
 										});
-										//_boss.health = _boss.maxHP = 1;
+										_boss.health = _boss.maxHP = 1;
 										_boss.class = 'boss';
 										_boss.experience = 0;
 										_boss.setDifficulty(__account.difficulty - 1);
@@ -7438,6 +7410,7 @@ const __stories = [
 										_boss.pickNewTarget();
 									}
 									installBoss(47);
+									PlaySound({key:'conquer', volume:.6});
 									mainCharacter.maxHP = mainCharacter.MAXHP =
 									mainCharacter.maxHP * 1;
 									mainCharacter.setHealth(mainCharacter.MAXHP);
@@ -7449,7 +7422,7 @@ const __stories = [
 									// episode.createBgMusic(null, null, null, 'cyclops-battle', .5);
 									// episode.playBgMusic();
 								}, 1000);
-								takeQuest(1, null, null, 'progress', 1);
+								takeQuest(2, null, null, 'progress', 1);
 							}, 4000);
 							// __storyScene.bossQuest.kills[0].count = 1;
 							// updateQuestArea(null, __storyScene.bossQuest);
@@ -7524,7 +7497,416 @@ const __stories = [
 				]
 			}
 		]
-	}
+	},
+	// {
+	// 	id:200,
+	// 	disableWorldMap: true,
+	// 	order:200,
+	// 	act:1,
+	// 	minLevel:1,
+	// 	list: false,
+	// 	leaderBoards: {
+	// 		calculate: function() {
+	// 			//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
+	// 			//Kalan kalp (3 adet te) + 1000 * 3
+	// 			//Yediği Damage ın toplam sağlığına oranı negatif bonusu (50 * 10) dmgTaken
+				
+	// 			const _result = {
+	// 				description: [
+	// 					{
+	// 						title: {
+	// 							en: 'Time Bonus',
+	// 							tr: 'Zaman Bonusu'
+	// 						},
+	// 						value: MathRound(((10 * 60000) - 
+	// 						((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick))) / 10)
+	// 					},
+	// 					{
+	// 						title: {
+	// 							en: 'Heart Bonus',
+	// 							tr: 'Kalp Bonusu'
+	// 						},
+	// 						value: (mainCharacter.heartCount ?? 0) * 1000
+	// 					},
+	// 					{
+	// 						title: {
+	// 							en: 'Damage Taken',
+	// 							tr: 'Hasar Alma'
+	// 						},
+	// 						value: -1 * (((mainCharacter.dmgTaken ?? 0) / mainCharacter.MAXHP) * 1000)
+	// 					}
+	// 				]
+	// 			};
+	// 			_result.score = _result.reduce((prev, next) => prev.value + next.value);
+	// 			return _result;
+	// 		}
+	// 	},
+	// 	ticket: 0,
+	// 	mission: 'qp',
+	// 	perfectFinishRewards: [{ key: 'chest', grade: 2 }],
+	// 	title: {
+	// 		en: 'Pinata Hive',
+	// 		tr: 'Pinyata Kovanı'
+	// 	},
+	// 	description: {
+	// 		en: "",
+	// 		tr: ""
+	// 	},
+	// 	resultStars: [
+	// 		{ id: 1, title: 'Clear mission', when: function() {
+	// 			return !mainCharacter.isDead();
+	// 		}},
+	// 		{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
+	// 			when: function(_item) {
+	// 				//return !isMissionFailed(0) && !isMissionFailed(2) &&
+	// 				return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
+	// 		}},
+	// 		{ id: 3, key: 'heart', value: 1, title: 'Stay above 1 heart', when: function(_item) {
+	// 			return mainCharacter.heartCount > _item.value;
+	// 		}}
+	// 	],
+	// 	rewards: [
+	// 		{ key: 'item', grade: 2, type: 'weapon' },
+	// 		{ key: 'gem', grade: 1, type: 'random', count:1 },
+	// 		{ key: 'gold', count: 5000 },
+	// 		{ key: 'exp', count: 1200 }
+	// 	],
+	// 	quests: [
+	// 		{
+	// 			id: 1011,
+	// 			descriptions: {
+	// 				en: 'Hive smashed',
+	// 				tr: 'Kovan parçalandı'
+	// 			},
+	// 			names: {
+	// 				en: 'Smash The Hive',
+	// 				tr: 'Kovanı Parçala'
+	// 			},
+	// 			owner: 'system',
+	// 			minLevel: 1,
+	// 			maps: [11],
+	// 			timer: {
+	// 				ms: 150000,
+	// 				after: function() {
+	// 					if(episode.boss && !episode.boss.isDead()) {
+	// 						episode.phase = 200;
+	// 					}
+	// 				}
+	// 			}
+	// 		},
+	// 		{
+	// 			id: 1012,
+	// 			names: {
+	// 				en: 'Face the giant',
+	// 				tr: 'Dev ile yüzleş'
+	// 			},
+	// 			descriptions: {
+	// 				en: 'Eliminate Cyclops',
+	// 				tr: 'Tepegöz\'ü Yok Et'
+	// 			},
+	// 			owner: 'system',
+	// 			minLevel: 1,
+	// 			kills: [
+	// 				{
+	// 					enemy: [47],
+	// 					limit: 1,
+	// 					descriptions: {
+	// 						en: 'Cyclops Cleared',
+	// 						tr: 'Tepegöz Temizlendi'
+	// 					}
+	// 				}
+	// 			],
+	// 			maps: [11]
+	// 		}
+	// 	],
+	// 	scenes: [
+	// 		{
+	// 			map: 11,
+	// 			heartCount : 3,
+	// 			loots: [
+	// 				{type:'pot', key:'pot', chance:1},
+	// 				{type:'common', key:'corpseexplode', chance:1}
+	// 			],
+	// 			startsWith: 1,
+	// 			save: true,
+	// 			loadingCharacterIds: [47],
+	// 			start: function() {
+	// 				episode.itemDropOrder = [ 
+	// 					'belt', 'gloves', 'bracers', 'helmet', 'leggings',
+	// 					'necklace', 'chest', 'ring', 'boots', 'weapon'
+	// 				];
+	// 				clearAudioCache(loadedSounds);
+	// 				removeCoopCharacter();
+	// 				setCharacterLevel(12, null, 1);
+	// 				//setCharacterLevel(8, null, 1);
+	// 				addClass(_gameUI, 'demo-playing');
+	// 				episode.pauseBgMusic(1);
+	// 				//episode.createBgMusic(null, null, null, 'training');
+	// 				//episode.playBgMusic();
+	// 				const _es = episode.enemies.filter(x => x.enemy);
+	// 				_es.forEach(_e => 
+	// 					{
+	// 						_e.animations.hurtfeet = new animation(createHurtFeet(_e.zoom, _e.bloodColor));
+	// 					}
+	// 				);
+	// 				episode.loadCharacterSprites(function() {}, null, ['hurtfeet'],1,1);
+	// 				mainCharacter.direction = __right;
+	// 				const _tagChar = episode.enemies.find(x => x.tag);
+	// 				if(_tagChar)
+	// 					_tagChar.remove = true;
+	// 				if(mainCharacter.tagContainer)
+	// 				{
+	// 					mainCharacter.tagContainer.remove();
+	// 					delete mainCharacter.tagContainer;
+	// 				}
+	// 				delete mainCharacter.animations.tag.disabled;
+	// 				mainCharacter.tagSkillSet = 1;
+	// 				resetSkill('tag', mainCharacter);
+	// 				//PlaySound({key:'conquer', volume:.6});
+	// 				//episode.lastItemDropTime = _gameTick;
+	// 				takeQuest(0, 1, null, null, 1);
+	// 				episode.boss = episode.enemies.find(x => x.id === 111);
+	// 				episode.phase = episode.boss.grade;
+	// 				// getImage('./images/main/avatars/cyclops.png', function(_img) {
+	// 				// 	const url = _img.toDataURL();
+	// 				// 	warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
+	// 				// });
+	// 				// const _desc = document.createElement('div');
+	// 				// _desc.className = 'flex show-ui full quick-play-desc-container fade-me';
+	// 				// let _html = '';
+	// 				// for(let i = 0; i < 6; i++) {
+	// 				// 	const _tip = __quickTips[i];
+	// 				// 	let _skillHtml = '';
+	// 				// 	for(let _sk of _tip.skills) {
+	// 				// 		if(_skillHtml !== '')
+	// 				// 			_skillHtml += '<img src="./images/icons/swap-right.png" class="quick-play-desc-skill-swap" />';
+	// 				// 		_skillHtml += '<div class="quick-play-desc-skill-icon" style="background-image:url(./images/main/skill-icons/warrior/' + _sk + '.png);background-size:cover"></div>';
+	// 				// 	}
+	// 				// 	_skillHtml = `<div class="quick-play-desc-skill-icons flex">` + _skillHtml + '</div>';
+	// 				// 	_html += `<div class="quick-play-desc-item quick-play-desc-item${_tip.id}">`
+	// 				// 		+ _skillHtml +
+	// 				//  		`<div class="quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
+	// 				//    </div>`;
+	// 				// }
+	// 				// _desc.innerHTML = _html +
+	// 				//    `<div onexactclick="skipQuickPlayTutorial()" class="quick-play-desc-skip flex glow">&lt;&nbsp;${getLangData('UNDERSTOOD')}&nbsp;&gt;</div>`;
+	// 				// addClass(_gameUI, 'disable-ui');
+	// 				// requestAnimationFrame(() => {
+	// 				// 	_game.suspended = true;
+	// 				// });
+	// 				// _gameUI.appendChild(_desc);
+	// 			},
+	// 			actions: [
+	// 				{
+	// 					when: function() {
+	// 						return mainCharacter?.lastItemLootedTime === _gameTick;
+	// 					},
+	// 					do: function() {
+	// 						let _div = document.querySelector('.game-status-screen');
+	// 						if(!_div) {
+	// 							_div = document.createElement('div');
+	// 							_div.className = 'flex game-status-screen';
+	// 							_gameUI.appendChild(_div);
+	// 						}
+	// 						episode.lastItemDropTime = _gameTick;
+	// 						const _inventory = getItems().filter(x => !x.weared);
+	// 						const _item = _inventory[_inventory.length - 1];
+	// 						const _icon = getItemIcon(_item);
+	// 						let _title = getLangData(_item.type);
+	// 						const _newPower = getPowerOfItem(_item.id);
+	// 						const _wearedItemId = _inventory.find(x => x.type === _item.type && x.weared)?.id;
+	// 						const _oldPower = _wearedItemId ? getPowerOfItem(_wearedItemId) : 0;
+	// 						const _powerDiff = MathRound(_newPower - _oldPower);
+	// 						_title = _title[0].toLocaleUpperCase(getLang()) + _title.substring(1);
+
+	// 						const frag = document.createDocumentFragment();
+	// 						const _subDiv = document.createElement('div');
+	// 						_subDiv.innerHTML = `<div data-status-item-id="${_item.id}" class="flex status-item-container w-50 flex flex-ai-start">
+	// 							<div class="status-item-icon-container">`
+	// 								+ _icon +
+	// 							`</div>
+	// 							<div class="status-item-action-container flex">
+	// 								<div class="item-title-wrapper flex w-50">
+	// 									${_title}
+	// 								</div>
+	// 								<div class="item-title-wrapper flex w-50">
+	// 									<img style="height:80%;max-height:2.6vh" src="./images/icons/power-up.png" />${_powerDiff}
+	// 								</div>
+	// 								<div class="item-action-wrapper flex flex-jc-start w-100">
+	// 									<div class="game-menu-button animate-me flex" onexactclick="wearStatusItem(${_item.id}, ${_powerDiff})">
+	// 										<div class="flex">${getLangData('WEAR')}<span class="flex">(U)</span></div>
+	// 									</div>
+	// 								</div>
+	// 							</div>
+	// 						</div>`;
+
+	// 						frag.appendChild(_subDiv.firstElementChild);
+	// 						_div.prepend(frag);
+	// 						mainCharacter.hasAdvicedItem = 1;
+	// 					}
+	// 				},
+	// 				{
+	// 					when: function() {
+	// 						return (episode.boss?.gradeLeft + 1) < episode.phase;
+	// 					},
+	// 					do: function() {
+	// 						if(episode.boss) {
+	// 							delete episode.boss.looted;
+	// 							episode.loot = {
+	// 								enemy: episode.boss,
+	// 								loots: [
+	// 									{type:'item',key:episode.itemDropOrder[episode.boss.grade - episode.phase], grade:2},
+	// 									// {type:'gold'},
+	// 									// {type:'gold'},
+	// 									// {type:'gold'},
+	// 									// {type:'gold'},
+	// 									// {type:'gold'},
+	// 									// {type:'gold'},
+	// 									// {type:'gold'},
+	// 									// {type:'gold'},
+	// 									// {type:'gold'}
+	// 								]
+	// 							}
+	// 							episode.phase--;
+	// 						}
+	// 					}
+	// 				},
+	// 				{
+	// 					when: function() {
+	// 						return episode.phase === 101 && !episode.enemies.filter(x => x.class === 'boss')?.length;
+	// 					},
+	// 					do: function() {
+	// 						episode.phase = 102;
+	// 						updateQuestArea();
+	// 						__storyPlaying = false;
+	// 						installStoryFinish();
+	// 					}
+	// 				},
+	// 				{
+	// 					when: function() {
+	// 						return (episode.boss?.health <= 0 && episode.phase < 10) || episode.phase === 200;
+	// 					},
+	// 					do: function() {
+	// 						episode.phase = 100;
+	// 						delete episode.boss;
+	// 						episode.enemies.filter(x => !x.main && !x.friendly).forEach(x => {
+	// 								x.stopSpawn();
+	// 							x.health = x.experience = 0;
+	// 							x.dead = x.dying = true;
+	// 							x.animate('dead', 1);
+	// 						});
+	// 						episode.mobs = episode.respawners = [];
+	// 						episode.playSound({key:'bossalert', volume: .5});
+	// 						warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
+						
+	// 						setTimeout(() => {
+	// 							//episode.playSound({key:'sistersenter', volume:1});
+	// 							setTimeout(() => {
+	// 								if(episode?.id !== 11)
+	// 									return;
+	// 								const installBoss = function(_b) {
+	// 									const _boss = summonMobWithJson({
+	// 										id: _b,
+	// 										level: 13,
+	// 										atk: mainCharacter.atk,
+	// 										zoom: .66,
+	// 										grade: 5
+	// 									});
+	// 									//_boss.health = _boss.maxHP = 1;
+	// 									_boss.class = 'boss';
+	// 									_boss.experience = 0;
+	// 									_boss.setDifficulty(__account.difficulty - 1);
+	// 									_boss.acceptChanges();
+	// 									_boss.pickNewTarget();
+	// 								}
+	// 								installBoss(47);
+	// 								mainCharacter.maxHP = mainCharacter.MAXHP =
+	// 								mainCharacter.maxHP * 1;
+	// 								mainCharacter.setHealth(mainCharacter.MAXHP);
+	// 								requestAnimationFrame(() => {
+	// 									episode.phase = 101;
+	// 								});
+	// 								// episode.pauseAmbianceMusic();
+	// 								// episode.pauseBgMusic(1);
+	// 								// episode.createBgMusic(null, null, null, 'cyclops-battle', .5);
+	// 								// episode.playBgMusic();
+	// 							}, 1000);
+	// 							takeQuest(1, null, null, 'progress', 1);
+	// 						}, 4000);
+	// 						// __storyScene.bossQuest.kills[0].count = 1;
+	// 						// updateQuestArea(null, __storyScene.bossQuest);
+	// 						// __storyPlaying = false;
+	// 						// installStoryFinish();
+	// 					}
+	// 				}
+	// 			],
+	// 			mobs: [
+	// 				{
+	// 					id: 111,
+	// 					minX: 2580,
+	// 					maxX: 2580,
+	// 					count: 1,
+	// 					sight: 1000,
+	// 					grade: 11,
+	// 					hp: 2000,
+	// 					zoom: .34,
+	// 					yPosition: function() {
+	// 						return MathRound(groundheight * .5);
+	// 					}
+	// 				},
+	// 				// {
+	// 				// 	id: 112,
+	// 				// 	minX: 3580,
+	// 				// 	maxX: 3580,
+	// 				// 	count: 1,
+	// 				// 	yPosition: function() {
+	// 				// 		return MathRound(groundheight * .5);
+	// 				// 	}
+	// 				// },
+	// 				{
+	// 					id: 35,
+	// 					minX: 1580,
+	// 					maxX: 4800,
+	// 					count: 4,
+	// 					sight: 1000,
+	// 					spawn: 10,
+	// 					hp:300,
+	// 					experience: 0
+	// 				},
+	// 				{
+	// 					id: 7,
+	// 					minX: 2000,
+	// 					maxX: 3200,
+	// 					count: 2,
+	// 					sight: 1000,
+	// 					spawn: 10,
+	// 					hp:300,
+	// 					experience: 0
+	// 				},
+	// 				{
+	// 					id: 2,
+	// 					minX: 1580,
+	// 					maxX: 4800,
+	// 					count: 6,
+	// 					sight: 1000,
+	// 					spawn: 10,
+	// 					hp:300,
+	// 					experience: 0
+	// 				},
+	// 				{
+	// 					id: 33,
+	// 					minX: 1580,
+	// 					maxX: 4800,
+	// 					count: 1,
+	// 					sight: 1000,
+	// 					spawn: 10,
+	// 					hp:300,
+	// 					experience: 0
+	// 				}
+	// 			]
+	// 		}
+	// 	]
+	// }
 ];
 function finishStory() {
 	__account.questStatus.lastStoryFinishTime = _gameTick;
@@ -7583,6 +7965,11 @@ function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 		__storySceneOrder--;
 	}
 	episodeGold = episodePot = 0;
+	if(__story.point !== undefined) {
+		__story.point = 0;
+		__story.leaderBoards = new leaderboards();
+		__story.leaderBoards.createToken();
+	}
 	_client.loadPots();
 	__storyBonusItemCount = 0;
 	switchStoryScene(function() {
@@ -7593,7 +7980,7 @@ function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 			__story.endTime = undefined;
 		}
 	});
-	mainCharacter.heartCount = __storyScene.heartCount ?? 1;
+	mainCharacter.heartCount = __story.heartCount ?? 1;
 	if(_client.quickPlay) {
 		const _char = __account.characters.find(x => x.class === mainCharacter.class);
 		_char.tag = {id:2, grade:4};
@@ -7648,6 +8035,7 @@ function switchStoryScene(_func, _newOrder) {
 		_extraModals.forEach(x => x.remove());
 	__storyScene = __story.scenes[__storySceneOrder - 1];
 	__storyPlaying = 1;
+	let _oldHeartCount = mainCharacter?.heartCount;
 	if(__storyScene?.save && __storyCheckPoint?.sceneOrder !== (__storySceneOrder - 1)) {
 		// __storyCheckPoint = JSON.parse(JSON.stringify(__account));
 		// __storyCheckPoint.warn = 1;
@@ -7669,6 +8057,12 @@ function switchStoryScene(_func, _newOrder) {
 					document.querySelector('#world-mini-map .world-mini-map-img').style.
 					setProperty('background-position', _loc.left + ' ' + _loc.top, 'important');
 				}
+				if(_oldHeartCount && __story.heartCount)
+				{
+					mainCharacter.heartCount = _oldHeartCount;
+					_navbar.innerHTML = avatarTemplate(mainCharacter);
+				}
+				//if(__storyScene.leaderBoards)
 				episode.loadCharacterSprites(function() {
 					addClass(_splash, 'd-none');
 					const _ts = document.getElementById('tip-screen');

@@ -70275,88 +70275,277 @@ const _allEnemies = {
 	enemy112: function () {
 		return {
 			animations: {
+				before: {
+					key: 'before',
+					next: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 57,
+							spriteTop: 0,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40 - 113,
+							sound: { range: true, key:'portalopen', volume:.5 },
+							zoom: .1,
+							speed: 4
+						},
+						{
+							spriteLeft: 250 + 57,
+							spriteTop: 0,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40 - 100,
+							zoom: .2,
+							speed: 4
+						},
+						{
+							spriteLeft: 500 + 57,
+							spriteTop: 0,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40 - 88,
+							zoom: .3,
+							speed: 4
+						},
+						{
+							spriteLeft: 57,
+							spriteTop: 250,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40 - 75,
+							zoom: .4,
+							speed: 4
+						},
+						{
+							spriteLeft: 307,
+							spriteTop: 250,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40 - 63,
+							zoom: .5,
+							speed: 4
+						},
+						{
+							spriteLeft: 557,
+							spriteTop: 250,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40 - 50,
+							zoom: .6,
+							speed: 4
+						},
+						{
+							spriteLeft: 57,
+							spriteTop: 500,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40 - 38,
+							zoom: .7,
+							speed: 4
+						},
+						{
+							spriteLeft: 307,
+							spriteTop: 500,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40 - 25,
+							zoom: .8,
+							speed: 4
+						},
+						{
+							spriteLeft: 557,
+							spriteTop: 500,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40 - 13,
+							zoom: .9,
+							speed: 4
+						}
+					]
+				},
 				idle: {
 					key: 'idle',
 					type: 'skill',
 					frames: [
 						{
-							spriteLeft: 0,
+							spriteLeft: 57,
 							spriteTop: 0,
-							spriteWidth: 250,
+							spriteWidth: 136,
 							spriteHeight: 250,
-							spriteOrigin: 125,
+							spriteOrigin: 68,
 							bottomGap: -40,
 							speed: 6
 						},
 						{
-							spriteLeft: 250,
+							spriteLeft: 307,
 							spriteTop: 0,
-							spriteWidth: 250,
+							spriteWidth: 136,
 							spriteHeight: 250,
-							spriteOrigin: 125,
+							spriteOrigin: 68,
 							bottomGap: -40,
+							props: {
+								touchDead: true,
+								deadAnimationKey: 'after'
+							},
 							speed: 6
 						},
 						{
-							spriteLeft: 500,
+							spriteLeft: 557,
 							spriteTop: 0,
-							spriteWidth: 250,
+							spriteWidth: 136,
 							spriteHeight: 250,
-							spriteOrigin: 125,
+							spriteOrigin: 68,
 							bottomGap: -40,
 							speed: 6
 						},
 						{
-							spriteLeft: 0,
+							spriteLeft: 57,
 							spriteTop: 250,
-							spriteWidth: 250,
+							spriteWidth: 136,
 							spriteHeight: 250,
-							spriteOrigin: 125,
+							spriteOrigin: 68,
 							bottomGap: -40,
 							speed: 6
 						},
 						{
-							spriteLeft: 250,
+							spriteLeft: 307,
 							spriteTop: 250,
-							spriteWidth: 250,
+							spriteWidth: 136,
 							spriteHeight: 250,
-							spriteOrigin: 125,
+							spriteOrigin: 68,
 							bottomGap: -40,
 							speed: 6
 						},
 						{
-							spriteLeft: 500,
+							spriteLeft: 557,
 							spriteTop: 250,
-							spriteWidth: 250,
+							spriteWidth: 136,
 							spriteHeight: 250,
-							spriteOrigin: 125,
+							spriteOrigin: 68,
 							bottomGap: -40,
 							speed: 6
 						},
 						{
-							spriteLeft: 0,
+							spriteLeft: 57,
 							spriteTop: 500,
-							spriteWidth: 250,
+							spriteWidth: 136,
 							spriteHeight: 250,
-							spriteOrigin: 125,
+							spriteOrigin: 68,
 							bottomGap: -40,
 							speed: 6
 						},
 						{
-							spriteLeft: 250,
+							spriteLeft: 307,
 							spriteTop: 500,
-							spriteWidth: 250,
+							spriteWidth: 136,
 							spriteHeight: 250,
-							spriteOrigin: 125,
+							spriteOrigin: 68,
 							bottomGap: -40,
 							speed: 6
 						},
 						{
-							spriteLeft: 500,
+							spriteLeft: 557,
 							spriteTop: 500,
-							spriteWidth: 250,
+							spriteWidth: 136,
 							spriteHeight: 250,
-							spriteOrigin: 125,
+							spriteOrigin: 68,
+							bottomGap: -40,
+							speed: 6
+						}
+					]
+				},
+				after: {
+					key: 'idle', // bu çok önemli
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 57,
+							spriteTop: 0,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40,
+							speed: 6
+						},
+						{
+							spriteLeft: 307,
+							spriteTop: 0,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40,
+							speed: 6
+						},
+						{
+							spriteLeft: 557,
+							spriteTop: 0,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40,
+							speed: 6
+						},
+						{
+							spriteLeft: 57,
+							spriteTop: 250,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40,
+							speed: 6
+						},
+						{
+							spriteLeft: 307,
+							spriteTop: 250,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40,
+							speed: 6
+						},
+						{
+							spriteLeft: 557,
+							spriteTop: 250,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40,
+							speed: 6
+						},
+						{
+							spriteLeft: 57,
+							spriteTop: 500,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40,
+							speed: 6
+						},
+						{
+							spriteLeft: 307,
+							spriteTop: 500,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
+							bottomGap: -40,
+							speed: 6
+						},
+						{
+							spriteLeft: 557,
+							spriteTop: 500,
+							spriteWidth: 136,
+							spriteHeight: 250,
+							spriteOrigin: 68,
 							bottomGap: -40,
 							speed: 6
 						}
@@ -70373,9 +70562,9 @@ const _allEnemies = {
 			direction: 'right',
 			defaultDirection: 'right',
 			defaultAnimationKey: 'idle',
-			zoom: 1,
+			zoom: 1.1,
 			height: 250,
-			width: 250,
+			width: 136,
 			stepX: 0,
 			maxHP: 1,
 			weight: 1000,

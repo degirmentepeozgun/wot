@@ -1,0 +1,113 @@
+
+#story-finish .op-none {
+	opacity:0
+}
+
+#story-finish.finish {
+	aspect-ratio: 770 / 413;
+	background: url(./../images/ui/full-border.png), radial-gradient(#232323, #000);
+	background-size: 100% 100%, 50% 100% !important;
+	position: absolute;
+	opacity: 1;
+	min-width: 90%;
+	max-width: 95%;
+	max-height: 95%;
+	min-height: 90%;
+	width: auto;
+	border: 1px solid #f3f4f540;
+	box-shadow: 0 0 2vh #000;
+	border-radius: 2vh;
+	margin: auto !important;
+	left: 50%;
+	overflow:hidden;
+	top: 50%;
+	transform: translate(-50%,-50%);
+	-webkit-transform: translate(-50%,-50%);
+}
+#story-finish.animate .fade-me,
+#story-finish.animate.fade-me {
+	animation: fade-me .5s ease;
+	-webkit-animation: fade-me .5s ease;
+}
+
+#story-finish.animate .slide-right {
+	animation: slide-right .5s ease;
+	-webkit-animation: slide-right .5s ease;
+}
+
+#story-finish .after-1 {
+	animation-delay: 1s !important
+}
+
+#story-finish .after-2 {
+	animation-delay: 2s !important
+}
+
+#story-finish .w-33 {
+	width: 33.33%
+}
+#story-finish .w-50 {
+	width: 50%
+}
+#story-finish .w-100 {
+	width: 100%
+}
+@keyframes slide-right {
+	0% {
+		left: -100%;
+		opacity:0
+	}
+
+	100% {
+		left: 0;
+		opacity:1
+	}
+}
+
+#story-finish .char {
+	max-height: 75%;
+	max-width: 75%;
+	position: relative;
+}
+
+#story-finish .side-left, 
+#story-finish .side-right {
+	position: relative;
+	height: 80%;
+	overflow:hidden
+}
+#story-finish .side-right {
+	padding:2% 0
+}
+#story-finish .btn {
+   	background: url(./../images/ui/toast1.png);
+    background-size: 100% 100%;
+    width: auto !important;
+    font-weight: 400 !important;
+	font-size: 3vh !important;
+    height: 80% !important;
+    color: #cfcfcf !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+    aspect-ratio: 500 / 125 !important;
+	box-shadow:0 -1vh 2vh #000;
+	cursor:pointer
+}
+#story-finish .btn:hover {
+	color:#e0e0e0 !important
+}
+@keyframes fade-me {
+	0% {
+		opacity: 0
+	}
+
+	100% {
+		opacity: 1
+	}
+}
+#story-finish .victory-header {
+	height: 15%;
+	font-size: 6vh  !important;
+	color: #F4BB44 !important;
+	padding-top: 4%;
+	text-shadow: .4vh .4vh 0 #9d987f
+}

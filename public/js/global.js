@@ -3016,6 +3016,10 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	nointernet: './images/sounds/no-internet.mp3',
+	newrecord: './images/sounds/new-record.mp3',
+	portalclose: './images/sounds/portal-close.mp3',
+	portalopen: './images/sounds/portal-open.mp3',
 	itemweared: './images/sounds/item-weared.mp3',
 	waterfall: './images/sounds/waterfall2.mp3',
 	hivedeath: './images/sounds/hivedeath.mp3',
@@ -3023,6 +3027,7 @@ const soundFiles = {
 	hivehurt2: './images/sounds/hivehurt2.mp3',
 	hivelurk: './images/sounds/hivelurk.mp3',
 	hiaaa: './images/sounds/hia.mp3',
+	tiktak: './images/sounds/tiktak.mp3',
 	bell: './images/sounds/bell.mp3',
 	bonusactive: './images/sounds/bonus-active.mp3',
 	bonusdone: './images/sounds/bonus-done.mp3',
@@ -31817,6 +31822,30 @@ const cssAnimations = {
 				if(!_force)
 					_gamePad.style.transformOrigin = 'unset';
 				delete cssAnimationProps.zoom;
+			}
+		}
+	},
+	zoom2x: function (_char, _rate, _ms) {
+		if(!_char)
+			return;
+		const _left = _char.SCREENLEFT;
+		const _width = _char.WIDTH;
+		const _height = _char.HEIGHT;
+		const x = MathRound(_left + (_width / 2));
+		const y = MathRound(episode.cUIHeight - _char.yPosition - (_height / 2));
+		if(!cssAnimationProps.zoom2x){
+			addClass(_gamePad, 'zoom2x');
+			_gamePad.style.transformOrigin = x + 'px ' + y + 'px';
+			_gamePad.style.setProperty('--zoom-duration', (_ms ?? 2000) + 'ms');
+			_gamePad.style.setProperty('--zoom-2x', (_rate ?? 2));
+			cssAnimationProps.zoom2x = { start: _gameTick, p1: _char, p2: _rate, p3: _ms };
+		}
+		else {
+			_gamePad.style.transformOrigin = x + 'px ' + y + 'px';
+			if((_gameTick - cssAnimationProps.zoom2x.start) > (_ms ?? 2000)) {
+				removeClass(_gamePad, 'zoom2x');
+				_gamePad.style.transformOrigin = 'unset';
+				delete cssAnimationProps.zoom2x;
 			}
 		}
 	},

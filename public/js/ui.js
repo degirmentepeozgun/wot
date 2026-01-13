@@ -68,7 +68,7 @@ const avatarTemplate = function (char, _name) {
 				</div>
 				<div style="width:66%;height:100%">
 					<div class="flex flex-ai-start flex-jc-start" style="width:100%;height:24%">
-						<span class="character-name-text" style="color:#E2DFD2;font-weight:600;font-size:1.4vw !important;text-shadow:.25vh .25vh .5vh #000">${char?.main ? __account.name ?? char.name : char?.displayName ?? char?.name}</span>
+						<span class="character-name-text" style="color:#E2DFD2;font-weight:600;font-size:1.4vw !important;text-shadow:.25vh .25vh .5vh #000">${char?.main ? (__account.name === '' ? getLangData('Player') + ' ' + __account.id.substring(0,4).toUpperCase() : __account.name) ?? char.name : char?.displayName ?? char?.name}</span>
 					</div>
 					<div style="position:relative;margin-top:2%;height:16%;background:#FFFFFF99;clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 0% 100%); width:95%;overflow:hidden">
 						<div class="full healthvalue" style="position:absolute;background:#880808;clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 0% 100%); width:${100 * (char.health / char.MAXHP)}%">
@@ -86,8 +86,8 @@ const avatarTemplate = function (char, _name) {
 			<img class="aid${episode?.pvp || char.main || char.isDead() || char.health >= char.MAXHP ? ' v-none' : ''}" id="aid-${char.key}" onexactclick="drinkPot(episode.enemies.find(x => x.key === '${char.key}'), mainCharacter, event)" src="./images/icons/aid.png" />`
 			if(char.main && char.heartCount > 1) {
 				_html += `<img src='./images/icons/heart.png' id='heartcount1' />
-					<img src='./images/icons/heart.png' id='heartcount2' />
-					<img src='./images/icons/heart.png' id='heartcount3' />`;
+					<img${char.heartCount > 1 ? '' : ' class="gray"'} src='./images/icons/heart.png' id='heartcount2' />
+					<img${char.heartCount > 2 ? '' : ' class="gray"'} src='./images/icons/heart.png' id='heartcount3' />`;
 			}
 		return _html + '</div>';
 }

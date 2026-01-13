@@ -632,7 +632,10 @@ function map(_m) {
 			pvpCounter = document.createElement('div');
 			pvpCounter.className = 'flex animate-me-600 map-name countdown';
 			pvpCounter.id = 'pvp-counter';
-			pvpCounter.innerText = __locations.find(x => x.mapId === _mapSprite.id)?.titles?.[getLang()] ?? getLangData( _mapSprite.coords.title);
+			if(!__storyScene?.leaderBoards)
+				pvpCounter.innerText = __locations.find(x => x.mapId === _mapSprite.id)?.titles?.[getLang()] ?? getLangData( _mapSprite.coords.title);
+			else
+				pvpCounter.innerHTML = '<div class="flex" style="color:#F4BB44">' + getLangData('Stage') + ' ' + __storySceneOrder + '</div><div class="flex w-100">' + getLangData('Score') + ': ' + (__story.point ?? 0).formatWithDots() + '</div>'; 
 			_gameUI.appendChild(pvpCounter);
 		}
 		else if((_gameTick - this.nameWriten) > 2399) {

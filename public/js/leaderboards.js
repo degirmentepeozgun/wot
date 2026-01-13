@@ -26,11 +26,21 @@ function leaderboards() {
 			.map(b => b.toString(16).padStart(2, "0"))
 			.join("");
 	}
+	this.getData = function() {
+		const _cachedData = JSON.parse(localStorage.getItem(this.cacheKey) ?? '{}');
+		if(!_cachedData.name){
+			const _x = { name: __account.id, offlineScores: [] };
+			localStorage.setItem(this.cacheKey, JSON.stringify(_x));
+			return _x;
+		}
+		__account.id = _cachedData.name;
+		return _cachedData;
+	}
 	this.createToken = function() {
-		if(!__story?.leaderboards?.calculate || !__story?.mission)
+		if(!__story?.mission)
 			return false;
 		const _payload = {
-			deviceId:__account.id,
+			deviceId: this.data.name,
 			missionKey: __story.mission
 		};
 		webClient.post('missionsession/start', _payload, function(_resp) {
@@ -38,22 +48,34 @@ function leaderboards() {
 			_self.sessionGuid = _response.sessionGuid;
 			_self.secretKey = _response.secretKey;
 		}, function(_failResponse) {
+			PlaySound({key:'nointernet',volume:1});
+			warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/internet.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('No Internet') + '</span></div>', null, null, 1);
 			//token oluşturulamadı, internet yok vs. Kullanıcıyı uyar
 		});
 	}
 	this.get = function(_func) {
 		if(!_func)
 			return;
-		webClient.get('leaderboards/get', _payload, function(_resp) {
+		if(!this.data?.name)
+		{
+			_func([]);
+			return;
+		}
+		webClient.get('leaderboards/get?deviceid=' + this.data.name + '&missionkey=' + __story.mission, function(_resp) {
+			if(_resp.data?.length > 10)
+				_resp.data.splice(9,1);
+			const _me = _resp.data.find(x => x.id === _self.data.name);
+			if(_me)
+				_me.me = 1;
 			_func(_resp.data);
 		}, function(_failResponse) {
+			PlaySound({key:'nointernet',volume:1});
+			warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/internet.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('No Internet') + '</span></div>', null, null, 1);
 			//token oluşturulamadı, internet yok vs. Kullanıcıyı uyar
 		});
 	}
-	this.updateScore = function(_key, _score, _warn) {
-		if(!this.offlineScores)
-			this.offlineScores = JSON.parse(localStorage.get(this.cacheKey) ?? '[]');
-		const _off = this.offlineScores.find(x => x.key === _key);
+	this.updateScore = function(_key, _score, _warn, _func) {
+		const _off = this.data.offlineScores.find(x => x.key === _key);
 		let _updateCache;
 		if(_off) {
 			if(_off.score < _score) {
@@ -61,44 +83,48 @@ function leaderboards() {
 				_updateCache = 1;
 				if(_warn) {
 					//yeni rekorun diye uyar
-					//warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/tick.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Feedback Sent') + '</span></div>', null, null, 1);
+					PlaySound({key:'newrecord',volume:1});
+					warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/punch-blast.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('New Record') + '</span></div>', null, null, 1);
 				}
 			}
 		}
 		else {
-			this.offlineScores.push({key:_key, score:_score});
+			this.data.offlineScores.push({key:_key, score:_score});
 			_updateCache = 1;
 		}
 		if(_updateCache)
-			localStorage.set(this.cacheKey, JSON.stringify(this.offlineScores));
+			localStorage.setItem(this.cacheKey, JSON.stringify(this.data));
+		_func();
 	}
-	this.set = function() {
-		if(!__story?.leaderboards?.calculate || !__story?.mission || !this.signature || !this.sessionGuid)
+	this.set = function(_func) {
+		if(!__storyScene?.leaderBoards?.calculate || !__story?.mission || !this.secretKey || !this.sessionGuid)
 			return false;
-		const _calc = __story.leaderboards.calculate();
-		const _score = _calc.score;
+		const _score = __story.point;
 		if(_score <= 0)
 			return false;
-		const _deviceId = __account.id;
+		const _deviceId = this.data.name;
 		const _missionKey = __story.mission;
 		const _sessionGuid = this.sessionGuid;
 		const _secretKey = this.secretKey;
 		const payload = `${_sessionGuid}|${_deviceId}|${_missionKey}|${_score}`;
-		hmacSha256Hex(_secretKey, payload).then(_signature => {
+		this.hmacSha256Hex(_secretKey, payload).then(_signature => {
 			const _payload = {
 				deviceId:_deviceId,
 				missionKey: _missionKey,
 				sessionGuid: _sessionGuid,
-				name: __acount.name,
+				name: _self.data.name,
 				point: _score,
 				signature: _signature
 			}
-			webClient.post('leaderboards/edit', _payload, function(_response) {
-				_self.updateScore(_missionKey, _score, _response.newRecord);
+			webClient.post('leaderboards/edit', _payload, function(_resp) {
+				_self.updateScore(_missionKey, _score, _resp.data.newRecord, _func);
 			}, function() {	
 				//internete bağlanamazsa burası çalışır
-				_self.updateScore(_missionKey, _score, 1);
+				PlaySound({key:'nointernet',volume:1});
+				warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/internet.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('No Internet') + '</span></div>', null, null, 1);
+				_self.updateScore(_missionKey, _score, 1, _func);
 			});
 		});
 	}
+	this.data = _self.getData();
 }
