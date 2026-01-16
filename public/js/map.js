@@ -159,9 +159,16 @@ function map(_m) {
 		const _key = _fKey ?? ('l' + _x + 't' + _y +'w' + _w  + 'h'+ _h);
 		if(_char.lastSpriteKey === _key)
 			return _char.lastSprite;
-		let _map = this.croppedSprites.get(_src);
-		if (_map) {
-			let sprite = _map[_key];
+		// let _map = this.croppedSprites.get(_src);
+		// if (_map) {
+		// 	let sprite = _map[_key];
+		// 	_char.lastSprite = sprite;
+		// 	_char.lastSpriteKey = _key;
+		// 	return sprite;
+		// }
+		let srcMap = this.croppedSprites.get(_src);
+		if (srcMap) {
+			let sprite = srcMap.get(_key);
 			_char.lastSprite = sprite;
 			_char.lastSpriteKey = _key;
 			return sprite;
@@ -218,11 +225,19 @@ function map(_m) {
 						_cacheCAN.imageSmoothingEnabled = false;
 						_cacheCTX.drawImage(_img, _f.spriteLeft, _f.spriteTop, 
 						_f.spriteWidth, _f.spriteHeight, 0, 0, _cacheCAN.width, _cacheCAN.height);
-						if (!episode.croppedSprites.has(_src))
-							episode.croppedSprites.set(_src, {});
-						const _map = episode.croppedSprites.get(_src);
-						if (!_map[_cKey])
-							_map[_cKey] = _cacheCAN;
+						// if (!episode.croppedSprites.has(_src))
+						// 	episode.croppedSprites.set(_src, {});
+						// const _map = episode.croppedSprites.get(_src);
+						// if (!_map[_cKey])
+						// 	_map[_cKey] = _cacheCAN;
+						let srcMap = episode.croppedSprites.get(_src);
+						if (!srcMap) {
+							srcMap = new Map();
+							episode.croppedSprites.set(_src, srcMap);
+						}
+						if (!srcMap.has(_cKey)) {
+							srcMap.set(_cKey, _cacheCAN);
+}
 					}
 				}
 			}
@@ -274,21 +289,21 @@ function map(_m) {
 	
 	this.XStep = MathRound(getGroundHeight() / 4);
 	this.YStep = MathRound(getGroundHeight() / 5);
-	this.moveCamera = function(_endFunc) {
+	this.moveCamera = function(_endFunc, speed, force) {
 		if(!mainCharacter)
 			return;
-		if(mainCharacter.left <= centerMinX) {
+		if(!force && mainCharacter.left <= centerMinX) {
 			if(_endFunc)
 				_endFunc();
 			return;
 		}
-		const _chars = this.enemies.filter(x => x.class !== 'object' && !x.isDead() && !x.remove && !x.immobilize);
+		const _chars = this.enemies.filter(x => x.class !== 'object' && !x.isDead() && !x.remove && (!x.immobilize || force));
 		if(_chars?.[0]) {
 			if(!this.cameraMoveStep) {
 				_chars.forEach(x => x.immobilize = x.disableKeyboard = true);
 				mainCharacter.fps = 1;
 				blurKeyboard();
-				this.cameraMoveStep = MathCeil((mainCharacter.calculateMoveXStep() * this.cWidth) / 100);
+				this.cameraMoveStep = (speed ?? 1) * MathCeil((mainCharacter.calculateMoveXStep() * this.cWidth) / 100);
 				this.cameraMoveEndFunc = _endFunc;
 			}
 		}
@@ -1678,6 +1693,8 @@ function map(_m) {
 			this.seenEnemies.length = 0;
 		}
 		this.limitedEffects.length = 0;
+		if(mainCharacter)
+			mainCharacter.hasLeftEnemy = mainCharacter.hasRightEnemy = undefined;
 		if (_len)
 			for (var i = 0; i < _len; i++) {
 				let sprite = this.enemies[i];
@@ -1728,6 +1745,21 @@ function map(_m) {
 				sprite.out = (((sprite.EXACTLEFT) + sprite.WIDTH) < 0 ||
 						(sprite.EXACTLEFT) > this.cWidth);
 				sprite.unseen = sprite.out && !sprite.npc && sprite.dropType !== 'quest-item';
+				if(sprite.unseen && !sprite.main) {
+					if(sprite.autoTarget && !sprite.invulnerable && !sprite.friendly && 
+						!sprite.puppetMode && sprite.enemy && sprite.class !== __spell && 
+						sprite.class !== 'object' && !sprite.isDead() && mainCharacter &&
+						sprite.autoTarget === mainCharacter)
+						{
+							if(mainCharacter.EXACTLEFT > sprite.EXACTLEFT)
+							{
+								if(!mainCharacter.hasLeftEnemy)
+									mainCharacter.hasLeftEnemy = 1;
+							}
+							else if(!mainCharacter.hasRightEnemy)
+								mainCharacter.hasRightEnemy = 1;
+						}
+				}
 				if(!sprite.unseen && updateUnseen && !sprite.remove)
 					this.seenEnemies.push(sprite);
 				if (sprite.autoMode > 0)
@@ -2662,153 +2694,276 @@ function map(_m) {
 		}
 	}
 	this.hurtSprites = {}, this.hurtRelSprites = {};
+	// this.colorizeSprite4 = function (_item, _col, _force) {
+	// 	let _opc = .01;
+	// 	// switch (_item?.char?.hurting?.count) {
+	// 	// 	case 5: case 4: case 3:
+	// 	// 		_item.char.hurting.count = 2;
+	// 	// 		_opc = 90 / MathCeil((_item.char.attackerRange ?? 10) / 10);
+	// 	// 		break;
+	// 	// 	case 1: case 2:
+	// 	// 		_opc = 150 / MathCeil((_item.char.attackerRange ?? 10) / 10);
+	// 	// 		break;
+	// 	// }
+	// 	// _opc = Math.min(1, _opc / 100);
+	// 	let _color;
+	// 	if (_item?.char?.hurting?.hit) {
+	// 		// _color = `rgba(255,255,255,${_force ? _opc : _item.char.hurting.hit > 2 ? 1 : _item.char.hurting.hit * .3})`;
+	// 		// _item.char.hurting.hit--;
+	// 		let h = _item.char.hurting.hit;
+	// 		if (h >= 3) {
+	// 			// İlk şok
+	// 			_color = 'rgba(255,255,255,1)';
+	// 		}
+	// 		else if (h === 2) {
+	// 			// Heat flash
+	// 			_color = 'rgba(255,230,150,0.85)';
+	// 		}
+	// 		else if (h === 1) {
+	// 			// Burn fade
+	// 			_color = 'rgba(255,110,40,0.55)';
+	// 		}
+	// 		_item.char.hurting.hit--;
+	// 	} else {
+	// 		const base = _col ?? _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
+	// 		if (base.startsWith('#') && base.length >= 7) {
+	// 			let r = parseInt(base.slice(1, 3), 16);
+	// 			let g = parseInt(base.slice(3, 5), 16);
+	// 			let b = parseInt(base.slice(5, 7), 16);
+	// 			if(base.length === 9)
+	// 				_opc = parseInt(base.slice(7, 9), 16) / 255;
+	// 			_color = `rgba(${r},${g},${b},${_force ? MathRound(_opc * 10) / 10 : 1})`;
+	// 		} else
+	// 			_color = base;
+	// 	}
+	// 	const _key1 = 'i' + _item.char.id;
+	// 	const _key2 = 'a' + _item.animation;
+	// 	const _key3 = 
+	// 		'c' + _color + 'l' + _item.spriteX + 't' + _item.spriteY +
+	// 		'w' + _item.spriteWidth + 'h' + _item.spriteHeight;
+	// 	const _key = _key1 + _key2 + _key3;
+	// 	if(_key === _item.char.lastHurtSpriteKey)
+	// 		return _item.char.lastHurtSprite;
+	// 	let _hs = this.hurtSprites[_key1]?.[_key2]?.[_key3];
+	// 	if(!_hs) {
+	// 		this._colorizeCanvas = document.createElement('canvas');
+	// 		const _osc = this._colorizeCanvas;
+	// 		_osc.width = MathRound(_item.spriteWidth);
+	// 		_osc.height = MathRound(_item.spriteHeight);
+	// 		const ctx = _osc.getContext('2d');
+	// 		if(_osc.imageSmoothingEnabled != false)
+	// 			_osc.imageSmoothingEnabled = false;
+	// 		ctx.clearRect(0, 0, _osc.width, _osc.height);
+	// 		ctx.drawImage(_item.sprite,
+	// 			_item.spriteX,
+	// 			_item.spriteY,
+	// 			_item.spriteWidth,
+	// 			_item.spriteHeight,
+	// 			0, 0,
+	// 			_osc.width,
+	// 			_osc.height
+	// 		);
+	// 		ctx.globalCompositeOperation = 'source-atop';
+	// 		ctx.fillStyle = _color;
+	// 		ctx.fillRect(0, 0, _osc.width, _osc.height);
+	// 		ctx.globalCompositeOperation = 'source-over';
+	// 		if(!this.hurtSprites[_key1])
+	// 			this.hurtSprites[_key1] = {};
+	// 		if(!this.hurtSprites[_key1][_key2])
+	// 			this.hurtSprites[_key1][_key2] = {};
+	// 		this.hurtSprites[_key1][_key2][_key3] = _hs = _osc;
+	// 	}
+	// 	if (_hs) {
+	// 		_item.char.lastHurtSprite = _hs;
+	// 		_item.char.lastHurtSpriteKey = _key;
+	// 		return _hs;
+	// 	}
+	// 	else 	
+	// 		_item.char.lastHurtSprite = _item.char.lastHurtSpriteKey = undefined;
+	// 	if (_item.char?.hurting?.count <= 0)
+	// 		delete _item.char.hurtColor;
+	// 	return null;
+	// };
 	this.colorizeSprite4 = function (_item, _col, _force) {
-		let _opc = .01;
-		// switch (_item?.char?.hurting?.count) {
-		// 	case 5: case 4: case 3:
-		// 		_item.char.hurting.count = 2;
-		// 		_opc = 90 / MathCeil((_item.char.attackerRange ?? 10) / 10);
-		// 		break;
-		// 	case 1: case 2:
-		// 		_opc = 150 / MathCeil((_item.char.attackerRange ?? 10) / 10);
-		// 		break;
-		// }
-		// _opc = Math.min(1, _opc / 100);
-		let _color;
-		if (_item?.char?.hurting?.hit) {
-			// _color = `rgba(255,255,255,${_force ? _opc : _item.char.hurting.hit > 2 ? 1 : _item.char.hurting.hit * .3})`;
-			// _item.char.hurting.hit--;
-			let h = _item.char.hurting.hit;
-			if (h >= 3) {
-				// İlk şok
-				_color = 'rgba(255,255,255,1)';
-			}
-			else if (h === 2) {
-				// Heat flash
-				_color = 'rgba(255,230,150,0.85)';
-			}
-			else if (h === 1) {
-				// Burn fade
-				_color = 'rgba(255,110,40,0.55)';
-			}
-			_item.char.hurting.hit--;
-		} else {
-			const base = _col ?? _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
-			if (base.startsWith('#') && base.length >= 7) {
-				let r = parseInt(base.slice(1, 3), 16);
-				let g = parseInt(base.slice(3, 5), 16);
-				let b = parseInt(base.slice(5, 7), 16);
-				if(base.length === 9)
-					_opc = parseInt(base.slice(7, 9), 16) / 255;
-				_color = `rgba(${r},${g},${b},${_force ? MathRound(_opc * 10) / 10 : 1})`;
-			} else
-				_color = base;
-		}
-		const _key1 = 'i' + _item.char.id;
-		const _key2 = 'a' + _item.animation;
-		const _key3 = 
-			'c' + _color + 'l' + _item.spriteX + 't' + _item.spriteY +
-			'w' + _item.spriteWidth + 'h' + _item.spriteHeight;
-		const _key = _key1 + _key2 + _key3;
-		if(_key === _item.char.lastHurtSpriteKey)
-			return _item.char.lastHurtSprite;
-		let _hs = this.hurtSprites[_key1]?.[_key2]?.[_key3];
-		if(!_hs) {
-			this._colorizeCanvas = document.createElement('canvas');
-			const _osc = this._colorizeCanvas;
-			_osc.width = MathRound(_item.spriteWidth);
-			_osc.height = MathRound(_item.spriteHeight);
-			const ctx = _osc.getContext('2d');
-			if(_osc.imageSmoothingEnabled != false)
-				_osc.imageSmoothingEnabled = false;
-			ctx.clearRect(0, 0, _osc.width, _osc.height);
-			ctx.drawImage(_item.sprite,
-				_item.spriteX,
-				_item.spriteY,
-				_item.spriteWidth,
-				_item.spriteHeight,
-				0, 0,
-				_osc.width,
-				_osc.height
-			);
-			ctx.globalCompositeOperation = 'source-atop';
-			ctx.fillStyle = _color;
-			ctx.fillRect(0, 0, _osc.width, _osc.height);
-			ctx.globalCompositeOperation = 'source-over';
-			if(!this.hurtSprites[_key1])
-				this.hurtSprites[_key1] = {};
-			if(!this.hurtSprites[_key1][_key2])
-				this.hurtSprites[_key1][_key2] = {};
-			this.hurtSprites[_key1][_key2][_key3] = _hs = _osc;
-		}
-		if (_hs) {
-			_item.char.lastHurtSprite = _hs;
-			_item.char.lastHurtSpriteKey = _key;
-			return _hs;
-		}
-		else 	
-			_item.char.lastHurtSprite = _item.char.lastHurtSpriteKey = undefined;
-		if (_item.char?.hurting?.count <= 0)
-			delete _item.char.hurtColor;
-		return null;
-	};
-	this.colorizeRelSprite4 = function (_item, _col, _animationKey) {
-		let _opc = .01;
-		let _color;
-		const base = _col;
-		if (base.startsWith('#') && base.length >= 7) {
-			let r = parseInt(base.slice(1, 3), 16);
-			let g = parseInt(base.slice(3, 5), 16);
-			let b = parseInt(base.slice(5, 7), 16);
-			if(base.length === 9)
-				_opc = parseInt(base.slice(7, 9), 16) / 255;
-			_color = `rgba(${r},${g},${b},1)`;
-		} 
+
+	// =====================
+	// COLOR CACHE
+	// =====================
+	if (!this._colorCache)
+		this._colorCache = Object.create(null);
+
+	let _opc = 1;
+	let _color;
+
+	// =====================
+	// HIT FLASH (AYNI)
+	// =====================
+	if (_item?.char?.hurting?.hit) {
+		const h = _item.char.hurting.hit;
+		if (h >= 3)
+			_color = 'rgba(255,255,255,1)';
+		else if (h === 2)
+			_color = 'rgba(255,230,150,0.85)';
 		else
-			_color = base;
+			_color = 'rgba(255,110,40,0.55)';
 
-		const _key = _animationKey ?? (
-			_item.animation + 'id' + _item.char.id +
-			'c' + _color + 'l' + _item.spriteX + 't' + _item.spriteY +
-			'w' + _item.spriteWidth + 'h' + _item.spriteHeight
-		);
-		if(_key === _item.char.lastHurtRelSpriteKey)
-			return _item.char.lastHurtRelSprite;
-		let _hs =this.hurtRelSprites[_key];
-		if(!_hs) {
+		_item.char.hurting.hit--;
+	}
+	else {
+		const base = _col ?? _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
+
+		_color = this._colorCache[base];
+		if (!_color) {
+			if (base.startsWith('#') && base.length >= 7) {
+				const r = parseInt(base.slice(1, 3), 16);
+				const g = parseInt(base.slice(3, 5), 16);
+				const b = parseInt(base.slice(5, 7), 16);
+				if (base.length === 9)
+					_opc = parseInt(base.slice(7, 9), 16) / 255;
+
+				_color = `rgba(${r},${g},${b},${_force ? Math.round(_opc * 10) / 10 : 1})`;
+			}
+			else {
+				_color = base;
+			}
+			this._colorCache[base] = _color;
+		}
+	}
+
+	// =====================
+	// KEY (AYNI MANTIK)
+	// =====================
+	const _key1 = 'i' + _item.char.id;
+	const _key2 = 'a' + _item.animation;
+	const _key3 =
+		'c' + _color +
+		'l' + _item.spriteX +
+		't' + _item.spriteY +
+		'w' + _item.spriteWidth +
+		'h' + _item.spriteHeight;
+
+	const _key = _key1 + _key2 + _key3;
+
+	if (_key === _item.char.lastHurtSpriteKey)
+		return _item.char.lastHurtSprite;
+
+	let _hs = this.hurtSprites[_key1]?.[_key2]?.[_key3];
+
+	if (!_hs) {
+
+		// =====================
+		// SHARED WORK CANVAS
+		// =====================
+		if (!this._colorizeCanvas)
 			this._colorizeCanvas = document.createElement('canvas');
-			const _osc = this._colorizeCanvas;
-			_osc.width = MathRound(_item.spriteWidth);
-			_osc.height = MathRound(_item.spriteHeight);
-			const ctx = _osc.getContext('2d');
-			if(_osc.imageSmoothingEnabled != false)
-				_osc.imageSmoothingEnabled = false;
-			ctx.clearRect(0, 0, _osc.width, _osc.height);
-			ctx.drawImage(_item.sprite,
-				_item.spriteX,
-				_item.spriteY,
-				_item.spriteWidth,
-				_item.spriteHeight,
-				0, 0,
-				_osc.width,
-				_osc.height
-			);
-			ctx.globalCompositeOperation = 'source-atop';
-			ctx.fillStyle = _color;
-			ctx.fillRect(0, 0, _osc.width, _osc.height);
-			ctx.globalCompositeOperation = 'source-over';
-			this.hurtRelSprites[_key] = _hs = _osc;
-		}
 
-		if (_hs) {
-			_item.char.lastHurtRelSprite = _hs;
-			_item.char.lastHurtRelSpriteKey = _key;
-			return _hs;
-		}
-		else 	
-			_item.char.lastHurtRelSprite = _item.char.lastHurtRelSpriteKey = undefined;
-		return null;
-	};
+		const _osc = this._colorizeCanvas;
+		_osc.width = _item.spriteWidth;
+		_osc.height = _item.spriteHeight;
+
+		const ctx = _osc.getContext('2d');
+		if (ctx.imageSmoothingEnabled)
+			ctx.imageSmoothingEnabled = false;
+
+		ctx.clearRect(0, 0, _osc.width, _osc.height);
+
+		ctx.drawImage(
+			_item.sprite,
+			_item.spriteX,
+			_item.spriteY,
+			_item.spriteWidth,
+			_item.spriteHeight,
+			0, 0,
+			_osc.width,
+			_osc.height
+		);
+
+		ctx.globalCompositeOperation = 'source-atop';
+		ctx.fillStyle = _color;
+		ctx.fillRect(0, 0, _osc.width, _osc.height);
+		ctx.globalCompositeOperation = 'source-over';
+
+		// =====================
+		// CLONE (CACHE SAFE)
+		// =====================
+		const out = document.createElement('canvas');
+		out.width = _osc.width;
+		out.height = _osc.height;
+		if(_osc.width > 0)
+			out.getContext('2d').drawImage(_osc, 0, 0);
+
+		if (!this.hurtSprites[_key1]) this.hurtSprites[_key1] = {};
+		if (!this.hurtSprites[_key1][_key2]) this.hurtSprites[_key1][_key2] = {};
+
+		this.hurtSprites[_key1][_key2][_key3] = _hs = out;
+	}
+
+	_item.char.lastHurtSprite = _hs;
+	_item.char.lastHurtSpriteKey = _key;
+
+	if (_item.char?.hurting?.count <= 0)
+		delete _item.char.hurtColor;
+
+	return _hs;
+};
+
+	// this.colorizeRelSprite4 = function (_item, _col, _animationKey) {
+	// 	let _opc = .01;
+	// 	let _color;
+	// 	const base = _col;
+	// 	if (base.startsWith('#') && base.length >= 7) {
+	// 		let r = parseInt(base.slice(1, 3), 16);
+	// 		let g = parseInt(base.slice(3, 5), 16);
+	// 		let b = parseInt(base.slice(5, 7), 16);
+	// 		if(base.length === 9)
+	// 			_opc = parseInt(base.slice(7, 9), 16) / 255;
+	// 		_color = `rgba(${r},${g},${b},1)`;
+	// 	} 
+	// 	else
+	// 		_color = base;
+
+	// 	const _key = _animationKey ?? (
+	// 		_item.animation + 'id' + _item.char.id +
+	// 		'c' + _color + 'l' + _item.spriteX + 't' + _item.spriteY +
+	// 		'w' + _item.spriteWidth + 'h' + _item.spriteHeight
+	// 	);
+	// 	if(_key === _item.char.lastHurtRelSpriteKey)
+	// 		return _item.char.lastHurtRelSprite;
+	// 	let _hs =this.hurtRelSprites[_key];
+	// 	if(!_hs) {
+	// 		this._colorizeCanvas = document.createElement('canvas');
+	// 		const _osc = this._colorizeCanvas;
+	// 		_osc.width = MathRound(_item.spriteWidth);
+	// 		_osc.height = MathRound(_item.spriteHeight);
+	// 		const ctx = _osc.getContext('2d');
+	// 		if(_osc.imageSmoothingEnabled != false)
+	// 			_osc.imageSmoothingEnabled = false;
+	// 		ctx.clearRect(0, 0, _osc.width, _osc.height);
+	// 		ctx.drawImage(_item.sprite,
+	// 			_item.spriteX,
+	// 			_item.spriteY,
+	// 			_item.spriteWidth,
+	// 			_item.spriteHeight,
+	// 			0, 0,
+	// 			_osc.width,
+	// 			_osc.height
+	// 		);
+	// 		ctx.globalCompositeOperation = 'source-atop';
+	// 		ctx.fillStyle = _color;
+	// 		ctx.fillRect(0, 0, _osc.width, _osc.height);
+	// 		ctx.globalCompositeOperation = 'source-over';
+	// 		this.hurtRelSprites[_key] = _hs = _osc;
+	// 	}
+
+	// 	if (_hs) {
+	// 		_item.char.lastHurtRelSprite = _hs;
+	// 		_item.char.lastHurtRelSpriteKey = _key;
+	// 		return _hs;
+	// 	}
+	// 	else 	
+	// 		_item.char.lastHurtRelSprite = _item.char.lastHurtRelSpriteKey = undefined;
+	// 	return null;
+	// };
 	// this.spriteWorker = new Worker('./js/worker.js');
 	// this.spriteWorker.onmessage = (e) => {
 	// 	const { key, result } = e.data;
@@ -2871,6 +3026,101 @@ function map(_m) {
 	// 		delete _item.char.hurtColor;
 	// 	return null;
 	// }
+	this.colorizeRelSprite4 = function (_item, _col, _animationKey) {
+
+	// =====================
+	// COLOR CACHE
+	// =====================
+	if (!this._colorCache)
+		this._colorCache = Object.create(null);
+
+	let _color = this._colorCache[_col];
+	let _opc = 1;
+
+	if (!_color) {
+		const base = _col;
+		if (base.startsWith('#') && base.length >= 7) {
+			const r = parseInt(base.slice(1, 3), 16);
+			const g = parseInt(base.slice(3, 5), 16);
+			const b = parseInt(base.slice(5, 7), 16);
+			if (base.length === 9)
+				_opc = parseInt(base.slice(7, 9), 16) / 255;
+
+			_color = `rgba(${r},${g},${b},1)`;
+		} else {
+			_color = base;
+		}
+		this._colorCache[_col] = _color;
+	}
+
+	// =====================
+	// KEY
+	// =====================
+	const _key = _animationKey ?? (
+		_item.animation + ':' +
+		_item.char.id + ':' +
+		_color + ':' +
+		_item.spriteX + ',' +
+		_item.spriteY + ',' +
+		_item.spriteWidth + ',' +
+		_item.spriteHeight
+	);
+
+	if (_key === _item.char.lastHurtRelSpriteKey)
+		return _item.char.lastHurtRelSprite;
+
+	let _hs = this.hurtRelSprites[_key];
+	if (!_hs) {
+
+		// =====================
+		// OFFSCREEN CANVAS (REUSE)
+		// =====================
+		if (!this._colorizeCanvas)
+			this._colorizeCanvas = document.createElement('canvas');
+
+		const _osc = this._colorizeCanvas;
+		_osc.width = _item.spriteWidth;
+		_osc.height = _item.spriteHeight;
+
+		const ctx = _osc.getContext('2d');
+
+		if (ctx.imageSmoothingEnabled)
+			ctx.imageSmoothingEnabled = false;
+
+		ctx.clearRect(0, 0, _osc.width, _osc.height);
+
+		ctx.drawImage(
+			_item.sprite,
+			_item.spriteX,
+			_item.spriteY,
+			_item.spriteWidth,
+			_item.spriteHeight,
+			0, 0,
+			_osc.width,
+			_osc.height
+		);
+
+		ctx.globalCompositeOperation = 'source-atop';
+		ctx.fillStyle = _color;
+		ctx.fillRect(0, 0, _osc.width, _osc.height);
+		ctx.globalCompositeOperation = 'source-over';
+
+		// ⚠️ CLONE CANVAS
+		// çünkü shared canvas reuse ediliyor
+		const out = document.createElement('canvas');
+		out.width = _osc.width;
+		out.height = _osc.height;
+		if(_osc.width > 0)
+			out.getContext('2d').drawImage(_osc, 0, 0);
+
+		this.hurtRelSprites[_key] = _hs = out;
+	}
+
+	_item.char.lastHurtRelSprite = _hs;
+	_item.char.lastHurtRelSpriteKey = _key;
+	return _hs;
+};
+
 	const _maxSort = 200000000, _yTol = 7 * __zoom;
 	this.getPerspectiveRate = function(_char, _force, _animation) {
 		if(_char.lastYPosition === _char.yPosition)
@@ -2904,6 +3154,8 @@ function map(_m) {
 		  const list = _item.char.spawnDusts;
     if (!list || list.length === 0) return;
 
+	const prevAlpha = offCtx.globalAlpha;
+	const prevFill = offCtx.fillStyle;
     for (let d of list) {
 
         // local wobble ve ilerleme etkilerini WORLD pozisyonuna uygula:
@@ -2940,31 +3192,35 @@ function map(_m) {
         // ----------------------------
         // 2) İZLERİ ÇİZ (izleri world->cam çevir)
         // ----------------------------
-        for (let i = d.trails.length - 1; i >= 0; i--) {
-			const t = d.trails[i];
-            t.alpha *= 0.85;     // yavaşça sönsün
-            t.size *= 1.03;     // genişleyerek flu görünüm
-			if(t.alpha < .1)
-				break;
-            offCtx.save();
-            offCtx.globalAlpha = t.alpha;
-            offCtx.fillStyle = "#c7b8a3";
 
-            offCtx.beginPath();
-            // t.worldX -> kameraya çevir
-            offCtx.ellipse(
-                t.worldX, t.y,
-                t.size * 1.3, t.size * 0.75,
-                0, 0, Math.PI * 2
-            );
-            offCtx.fill();
-            offCtx.restore();
-        }
+		offCtx.fillStyle = "#c7b8a3";
+
+		for (let i = d.trails.length - 1; i >= 0; i--) {
+			const t = d.trails[i];
+
+			t.alpha *= 0.85;
+			t.size  *= 1.03;
+
+			if (t.alpha < 0.1)
+				break;
+
+			offCtx.globalAlpha = t.alpha;
+
+			offCtx.beginPath();
+			offCtx.ellipse(
+				t.worldX, t.y,
+				t.size * 1.3, t.size * 0.75,
+				0, 0, Math.PI * 2
+			);
+			offCtx.fill();
+		}
+
+
 
         // ----------------------------
         // 3) ASIL PARTİKÜLÜ ÇİZ
         // ----------------------------
-        offCtx.save();
+        //offCtx.save();
         offCtx.globalAlpha = alpha;
         offCtx.fillStyle = "#d6c7b4";
 
@@ -2975,11 +3231,12 @@ function map(_m) {
             0, 0, Math.PI * 2
         );
         offCtx.fill();
-        offCtx.restore();
-
+        //offCtx.restore();
+		
         d.progress += 0.1;
     }
-
+	offCtx.globalAlpha = prevAlpha;
+	offCtx.fillStyle   = prevFill;
     // Ömür dolunca partikülleri sil
     _item.char.spawnDusts = list.filter(d => d.progress < 1);
 	return;
@@ -3013,26 +3270,67 @@ function map(_m) {
 			_item.char.spawnDusts = _item.char.spawnDusts.filter(g => g.alpha > 0);
 		}
 	}
-	this.drawCharacterGhost = function (_item, _sprite, _x,_y,_w,_h) {
-		if (_item.char.chargeProperties && _item.char.ghostData) {
-			let _blur = _item.char.ghostData.length;
-			for (let g of _item.char.ghostData) {
-				offCtx.save();
-				offCtx.globalAlpha = g.alpha;
-				offCtx.filter = 'blur(' + this.H(_blur) + 'px)';
-				offCtx.drawImage(
-					g.sprite,
-					g.left - ((_item.reversed ? -1 : 1) * (platformX - g.p)), g.top,
-					g.width, g.height
-				);
-				offCtx.filter = 'none';
-				offCtx.restore();
-				g.alpha -= 0.12;
-				_blur--;
-			}
-			_item.char.ghostData = _item.char.ghostData.filter(g => g.alpha > 0);
+	// this.drawCharacterGhost = function (_item, _sprite, _x,_y,_w,_h) {
+	// 	if (_item.char.chargeProperties && _item.char.ghostData) {
+	// 		let _blur = _item.char.ghostData.length;
+	// 		const _ga = offCtx.globalAlpha;
+	// 		for (let g of _item.char.ghostData) {
+	// 			//offCtx.save();
+	// 			offCtx.globalAlpha = g.alpha;
+	// 			//offCtx.filter = 'blur(' + this.H(_blur) + 'px)';
+	// 			// offCtx.drawImage(
+	// 			// 	g.sprite,
+	// 			// 	g.left - ((_item.reversed ? -1 : 1) * (platformX - g.p)), g.top,
+	// 			// 	g.width, g.height
+	// 			// );
+	// 			 offCtx.drawImage(
+	// 			g.sprite,
+	// 			g.left - ((_item.reversed ? -1 : 1) * (platformX - g.p)),
+	// 			g.top,
+	// 			g.width * scale,
+	// 			g.height * scale
+	// 			);
+	// 			offCtx.filter = '';
+	// 			//offCtx.restore();
+	// 			g.alpha -= 0.12;
+	// 			_blur--;
+	// 		}
+	// 		offCtx.globalAlpha = _ga;
+	// 		_item.char.ghostData = _item.char.ghostData.filter(g => g.alpha > 0);
+	// 	}
+	// }
+	this.drawCharacterGhost = function (_item) {
+		const gd = _item.char.ghostData;
+		if (!_item.char.chargeProperties || !gd) return;
+
+		let blur = gd.length;
+
+		const baseAlpha = offCtx.globalAlpha;
+
+		for (let i = 0; i < gd.length; i++) {
+			const g = gd[i];
+
+			offCtx.globalAlpha = g.alpha;
+
+			const scale = 1 + blur * 0.02;
+
+			offCtx.drawImage(
+			g.sprite,
+			g.left - ((_item.reversed ? -1 : 1) * (platformX - g.p)),
+			g.top,
+			g.width * scale,
+			g.height * scale
+			);
+
+			g.alpha -= 0.12;
+			blur--;
 		}
-	}
+
+		offCtx.globalAlpha = baseAlpha;
+
+		_item.char.ghostData = gd.filter(g => g.alpha > 0);
+	};
+
 	this.H = function(v) {
 		return v * (episode.cHeight / 768);
 	}
@@ -3308,21 +3606,11 @@ function map(_m) {
 			cGore.clearRect(0, 0, this.cWidth, this.cHeight);
 			offGoreCtx.clearRect(0, 0, this.cWidth, this.cHeight);
 		}
-		let _hasDmg, _hasLeftEnemy, _hasRightEnemy, _shadowItems;
+		let _hasDmg, _shadowItems;
 		for (var _item of _queue) {
-			if(_item.char.autoTarget && !_item.char.invulnerable && !_item.char.friendly && !_item.char.puppetMode && (_item.unseen || _item.char.unseen) && _item.char.enemy && _item.char.class !== __spell && _item.char.class !== 'object' && !_item.char.isDead() && 
-		_item.char.autoTarget === mainCharacter)
-			{
-				if(mainCharacter.EXACTLEFT > _item.char.EXACTLEFT)
-				{
-					if(!_hasLeftEnemy)
-						_hasLeftEnemy = 1;
-				}
-				else if(!_hasRightEnemy)
-					_hasRightEnemy = 1;
-			}
-			if(_item.unseen || _item.char.out || _item.char.unseen)
+			if(_item.unseen || _item.char.out || _item.char.unseen){
 				continue;
+			}
 			if(!_hasDmg && (_item.char.hurting?.count > 0 || _item.skinColor))
 				_hasDmg = true;
 			if (!_item.unseen && _item.char?.shadow && !_item.char.unseen) {
@@ -3541,13 +3829,20 @@ function map(_m) {
 									// 	_item.char.spawnDusts = [];
 									const _trails = (_item.char.relatedObjects.filter(x => x.key === 'trail2')?.length ?? 0);
 									const _scale = 1.5 - (_trails * 0.085);
-									_item.char.addObject({
-										key: 'trail2',
-										position: 'behind-feet',
-										xGap: 100 - (_trails * 10),
-										scale: _scale,
-										yGap: -5
-									});
+									// char init
+									if (_item.char.trailTick === undefined)
+										_item.char.trailTick = 0;
+
+									_item.char.trailTick++;
+
+									if ((_item.char.trailTick & 1) === 0)
+										_item.char.addObject({
+											key: 'trail2',
+											position: 'behind-feet',
+											xGap: 100 - (_trails * 10),
+											scale: _scale,
+											yGap: -5
+										});
 									// _item.char.spawnDusts.push({
 									// 	worldX: _x,
 									// 	y: _y + _h - 2,
@@ -3675,7 +3970,7 @@ function map(_m) {
 				}
 			}
 		}
-		this.checkUnseenEnemyPointer(_hasLeftEnemy, _hasRightEnemy);
+		this.checkUnseenEnemyPointer();
 		this.checkSceneActions();
 	}
 	this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 3) {
@@ -3707,9 +4002,11 @@ function map(_m) {
 		ctx.drawImage(image, x, y);
 		ctx.restore();
 	}
-	this.checkUnseenEnemyPointer = function(_l, _r) {
+	this.checkUnseenEnemyPointer = function() {
 		if((_gameTick - 500) < this.enemyArrowsShown)
 			return;
+		const _l = mainCharacter?.hasLeftEnemy;
+		const _r = mainCharacter?.hasRightEnemy;
 		if(!this.enemyLeftArrow)
 			this.enemyLeftArrow = document.querySelector('.enemy-left-arrow');
 		else { 
@@ -3991,74 +4288,140 @@ function map(_m) {
 	this.healthBarCache = this.healthBarCache ?? new Map();
 this.w100 = MathRound(this.cWidth / 100);
 this.VH3 = MathRound(window.innerHeight / 33);
-this.drawMobHealthBar = function(cofftx, _item, x, y, w) {
+// this.drawMobHealthBar = function(cofftx, _item, x, y, w) {
+// 	const _char = _item.char;
+// 	const h = MathRound(w * (26 / 124));
+//     // HP Ratio
+//     let ratio = Math.max(0, Math.min(1, _char.health / _char.MAXHP));
+
+//     // İlk tick ise previousHPRatio yok → oluştur
+//     if (_char.previousHPRatio === undefined) {
+//         _char.previousHPRatio = ratio;
+//         _char.damageFlash = 0; 
+//     }
+
+//     // HP düştüyse flash tetikle
+//     if (ratio < _char.previousHPRatio) {
+//         _char.damageFlash = 1; 
+//     }
+
+//     // Flash zamanla sönsün
+//     if (_char.damageFlash > 0) {
+//         _char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
+//     }
+
+//     // Yeni HP değerini sakla
+//     _char.previousHPRatio = ratio;
+// 	const _rev = offCtx.reversed;
+// 	if(offCtx.reversed)
+// 		offCtx.restore();
+
+//     // --- 1. ÇERÇEVEYİ ÇİZ ---
+//     cofftx.drawImage(this.HBMob, x, y, w, h);
+
+
+//     // --- 2. INNER BAR MARGIN ---
+// 	let padX = w * .06;
+// 	let padY = h * .225;
+//     let innerX = x + padX;
+//     let innerY = y + padY;
+//     let innerW = w - padX * 2;
+//     let innerH = h - padY * 2;
+
+//     // --- 3. HEALTH COLOR (yeşil → kırmızı) ---
+//     let r = Math.floor(255 * (1 - ratio));
+//     let g = Math.floor(255 * ratio);
+//     let color = `rgb(${r},${g},0)`;
+
+//     // Bar genişliği
+//     let barW = innerW * ratio;
+
+//     // Health bar'ı çiz
+//     cofftx.save();
+//     cofftx.fillStyle = color;
+//     cofftx.fillRect(innerX, innerY, barW, innerH);
+//     //cofftx.restore();
+
+
+//     // --- 4. DAMAGE FLASH (otomatik) ---
+//     if (_char.damageFlash > 0) {
+//         //cofftx.save();
+//         cofftx.globalAlpha = _char.damageFlash;
+//         cofftx.fillStyle = "white";
+//         cofftx.fillRect(innerX, innerY, innerW, innerH);
+//         //cofftx.restore();
+//     }
+// 	cofftx.restore();
+// 	if(_rev) {
+// 		offCtx.save();
+// 		offCtx.scale(-1, 1);
+// 	}
+// }
+this.drawMobHealthBar = function (ctx, _item, x, y, w) {
 	const _char = _item.char;
 	const h = MathRound(w * (26 / 124));
-    // HP Ratio
-    let ratio = Math.max(0, Math.min(1, _char.health / _char.MAXHP));
 
-    // İlk tick ise previousHPRatio yok → oluştur
-    if (_char.previousHPRatio === undefined) {
-        _char.previousHPRatio = ratio;
-        _char.damageFlash = 0; 
-    }
+	let ratio = _char.health / _char.MAXHP;
+	if (ratio < 0) ratio = 0;
+	else if (ratio > 1) ratio = 1;
 
-    // HP düştüyse flash tetikle
-    if (ratio < _char.previousHPRatio) {
-        _char.damageFlash = 1; 
-    }
-
-    // Flash zamanla sönsün
-    if (_char.damageFlash > 0) {
-        _char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
-    }
-
-    // Yeni HP değerini sakla
-    _char.previousHPRatio = ratio;
-	const _rev = offCtx.reversed;
-	if(offCtx.reversed)
-		offCtx.restore();
-
-    // --- 1. ÇERÇEVEYİ ÇİZ ---
-    cofftx.drawImage(this.HBMob, x, y, w, h);
-
-
-    // --- 2. INNER BAR MARGIN ---
-	let padX = w * .06;
-	let padY = h * .225;
-    let innerX = x + padX;
-    let innerY = y + padY;
-    let innerW = w - padX * 2;
-    let innerH = h - padY * 2;
-
-    // --- 3. HEALTH COLOR (yeşil → kırmızı) ---
-    let r = Math.floor(255 * (1 - ratio));
-    let g = Math.floor(255 * ratio);
-    let color = `rgb(${r},${g},0)`;
-
-    // Bar genişliği
-    let barW = innerW * ratio;
-
-    // Health bar'ı çiz
-    cofftx.save();
-    cofftx.fillStyle = color;
-    cofftx.fillRect(innerX, innerY, barW, innerH);
-    cofftx.restore();
-
-
-    // --- 4. DAMAGE FLASH (otomatik) ---
-    if (_char.damageFlash > 0) {
-        cofftx.save();
-        cofftx.globalAlpha = _char.damageFlash;
-        cofftx.fillStyle = "white";
-        cofftx.fillRect(innerX, innerY, innerW, innerH);
-        cofftx.restore();
-    }
-	if(_rev) {
-		offCtx.save();
-		offCtx.scale(-1, 1);
+	if (_char.previousHPRatio === undefined) {
+		_char.previousHPRatio = ratio;
+		_char.damageFlash = 0;
 	}
-}
+
+	if (ratio < _char.previousHPRatio)
+		_char.damageFlash = 1;
+
+	if (_char.damageFlash > 0)
+		_char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
+
+	_char.previousHPRatio = ratio;
+
+	// 🔑 WORLD-SPACE FIX
+	const drawX = ctx.reversed ? (-x - w) : x;
+
+	// --- FRAME ---
+	ctx.drawImage(this.HBMob, drawX, y, w, h);
+
+	const padX = w * 0.06;
+	const padY = h * 0.225;
+
+	const innerX = drawX + padX;
+	const innerY = y + padY;
+	const innerW = w - padX * 2;
+	const innerH = h - padY * 2;
+
+	const barW = innerW * ratio;
+
+	const r = (255 * (1 - ratio)) | 0;
+	const g = (255 * ratio) | 0;
+
+	ctx.save();
+	ctx.fillStyle = `rgb(${r},${g},0)`;
+
+	// 🔥 YÖN FIX (ASIL MESELE)
+	ctx.fillRect(
+		ctx.reversed ? (innerX + innerW) : innerX,
+		innerY,
+		ctx.reversed ? -barW : barW,
+		innerH
+	);
+
+	if (_char.damageFlash > 0) {
+		ctx.globalAlpha = _char.damageFlash;
+		ctx.fillStyle = "#fff";
+		ctx.fillRect(
+			ctx.reversed ? (innerX + innerW) : innerX,
+			innerY,
+			ctx.reversed ? -innerW : innerW,
+			innerH
+		);
+	}
+
+	ctx.restore();
+};
+
 
 this.drawBossName = function(cofftx, _char, x, y, w, padX) {
 

@@ -2353,7 +2353,7 @@ const relatedObjectImages = {
 		return getImage('./images/related/trail.png?x=2')
 	},
 	trail2: function () {
-		return getImage('./images/related/trail.png?x=2')
+		return getImage('./images/related/trail2.png')
 	},
 	shockwave2: function () {
 		return getImage('./images/related/shockwave2.png')
@@ -31842,7 +31842,7 @@ const cssAnimations = {
 		}
 		else {
 			_gamePad.style.transformOrigin = x + 'px ' + y + 'px';
-			if((_gameTick - cssAnimationProps.zoom2x.start) > (_ms ?? 2000)) {
+			if(__switchingMap || (_gameTick - cssAnimationProps.zoom2x.start) > (_ms ?? 2000)) {
 				removeClass(_gamePad, 'zoom2x');
 				_gamePad.style.transformOrigin = 'unset';
 				delete cssAnimationProps.zoom2x;

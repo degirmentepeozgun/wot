@@ -60,8 +60,8 @@ function animateStart(_failed) {
 				const _leadersList = document.querySelector('.leaderboards-list');
 				if(!_leadersList)
 					return;
-				_leaderboardsHTML = `<div class="w-100 flex flex-ai-end victory-header">${getLangData('Leaderboard')}</div>
-					<div class="quickplay-leaderboards flex flex-ai-start"><div class="full char slide-right">`;
+				_leaderboardsHTML = `<div class="w-100 fade-me flex flex-ai-end victory-header">${getLangData('Leaderboard')}</div>
+					<div class="quickplay-leaderboards flex fade-me flex-ai-start"><div class="full char slide-right">`;
 				for(let _player of _leadersData)
 					_leaderboardsHTML += `<div class="flex leaderboard-item${_player.me ? ' selected' : ''}">
 					<div class="flex flex-jc-start w-50 leaderboard-item-left">
@@ -109,8 +109,13 @@ function animateStart(_failed) {
 				const _child = document.getElementById(btnId);
 				if(action && _child?.onexactclick)
 					_child.onexactclick();
-				else if(!action)
+				else if(!action){
 					removeClass(_child, 'inactivated');
+					removeClass(_child, 'gray');
+					const _elem = document.getElementById('stage-result-order');
+					if(_elem)
+						_elem.innerHTML = '';
+				}
 				return;
 			}
 			if(_nextStageCounter > 2)
@@ -158,8 +163,8 @@ function animateStart(_failed) {
 					+ //_firstFinishRewardsHtml +
 				`</div>
 				<div class="flex w-100 ms2000 op-none" style="height: 10%">
-					<div id="quit-stage-btn" class="w-33 flex inactivated${_hasNext ? ' d-none' : ''}" onexactclick="playClick();hideMyModalPopUp(1);createPromoScreen();detachModule()" style="padding: 1%;height: 100%">
-						<div style="height:74%!important" class="btn animate-me-500 flex">${getLangData('QUIT')}</div>
+					<div class="w-33 flex${_hasNext ? ' d-none' : ''}" style="padding: 1%;height: 100%">
+						<div onexactclick="playClick();hideMyModalPopUp(1);createPromoScreen();detachModule()" id="quit-stage-btn" style="height:74%!important" class="btn inactivated gray animate-me-500 flex">${getLangData('QUIT')}</div>
 					</div>
 					<div id="next-stage-btn" class="w-33 flex${!_hasNext ? ' d-none' : ''}" style="padding: 1%;height: 100%" onexactclick="playClick();hideMyModalPopUp(1);checkStoryFinish(1, ${__stories.find(x => !x.passive && x.order > __story.order)?.id}, null, null, null, 1)">
 						<div style="height:74%!important" class="btn animate-me-500 flex">${getLangData('NEXT')}</div>

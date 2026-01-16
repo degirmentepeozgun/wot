@@ -70580,6 +70580,494 @@ const _allEnemies = {
 			buffs: []
 		};
 	},
+	enemy113: function () {
+		return {
+			animations: {
+				before: {
+					key: 'before',
+					next: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40 - 135,
+							sound: { range: true, key:'portalopen', volume:.5 },
+							zoom: .1,
+							speed: 4
+						},
+						{
+							spriteLeft: 188,
+							spriteTop: 0,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40 - 120,
+							zoom: .2,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 2,
+							spriteTop: 0,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40 - 105,
+							zoom: .3,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 3,
+							spriteTop: 0,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40 - 90,
+							zoom: .4,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 4,
+							spriteTop: 0,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40 - 75,
+							zoom: .5,
+							speed: 4
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 315,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40 - 60,
+							zoom: .6,
+							speed: 4
+						},
+						{
+							spriteLeft: 188,
+							spriteTop: 315,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40 - 45,
+							zoom: .7,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 2,
+							spriteTop: 315,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40 - 30,
+							zoom: .8,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 3,
+							spriteTop: 315,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40 - 15,
+							zoom: .9,
+							speed: 4
+						}
+					]
+				},
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 188 * 4,
+							spriteTop: 315,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 315 * 2,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							props: {
+								touchDead: true,
+								deadAnimationKey: 'after'
+							},
+							speed: 4
+						},
+						{
+							spriteLeft: 188,
+							spriteTop: 315 * 2,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 2,
+							spriteTop: 315 * 2,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 3,
+							spriteTop: 315 * 2,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 4,
+							spriteTop: 315 * 2,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 315 * 3,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188,
+							spriteTop: 315 * 3,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 2,
+							spriteTop: 315 * 3,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 3,
+							spriteTop: 315 * 3,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188,
+							spriteTop: 0,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 2,
+							spriteTop: 0,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 3,
+							spriteTop: 0,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 4,
+							spriteTop: 0,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 315,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188,
+							spriteTop: 315,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 2,
+							spriteTop: 315,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 3,
+							spriteTop: 315,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						}
+					]
+				},
+				after: {
+					key: 'idle', // bu çok önemli
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 188 * 4,
+							spriteTop: 315,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 315 * 2,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188,
+							spriteTop: 315 * 2,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 2,
+							spriteTop: 315 * 2,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 3,
+							spriteTop: 315 * 2,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 4,
+							spriteTop: 315 * 2,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 315 * 3,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188,
+							spriteTop: 315 * 3,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 2,
+							spriteTop: 315 * 3,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed:4
+						},
+						{
+							spriteLeft: 188 * 3,
+							spriteTop: 315 * 3,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188,
+							spriteTop: 0,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 2,
+							spriteTop: 0,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 3,
+							spriteTop: 0,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 4,
+							spriteTop: 0,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 315,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188,
+							spriteTop: 315,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						},
+						{
+							spriteLeft: 188 * 2,
+							spriteTop: 315,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed:4
+						},
+						{
+							spriteLeft: 188 * 3,
+							spriteTop: 315,
+							spriteWidth: 188,
+							spriteHeight: 315,
+							spriteOrigin: 94,
+							bottomGap: -40,
+							speed: 4
+						}
+					]
+				}
+			},
+			key: 'portalhd-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 20,
+			id: 113,
+			skipHealthBar: true,
+			name: 'Portal',
+			class: 'object',
+			level: 1,
+			direction: 'right',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1,
+			height: 315,
+			width: 188,
+			stepX: 0,
+			maxHP: 1,
+			weight: 1000,
+			stepXRate: 0,
+			immobilize: true,
+			hasShadow: true,
+			noDirection: true,
+			noLoot: true,
+			still: true,
+			solid: true,
+			invulnerable: true,
+			src: './images/sprites/ep106/',
+			buffs: []
+		};
+	},
 	enemy178: function () {
 		return {
 			animations: {

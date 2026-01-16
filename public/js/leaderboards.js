@@ -117,7 +117,7 @@ function leaderboards() {
 				signature: _signature
 			}
 			webClient.post('leaderboards/edit', _payload, function(_resp) {
-				_self.updateScore(_missionKey, _score, _resp.data.newRecord, _func);
+				_self.updateScore(_missionKey, _score, _resp.data?.isNewRecord, _func);
 			}, function() {	
 				//internete bağlanamazsa burası çalışır
 				PlaySound({key:'nointernet',volume:1});

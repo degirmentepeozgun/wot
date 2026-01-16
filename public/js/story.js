@@ -6699,7 +6699,7 @@ const __stories = [
 				minLevel: 1,
 				maps: [201],
 				timer: {
-					ms: 3000,
+					ms: 1000,
 					after: function() {
 						episode.timerFailed = 1;
 						episode.phase = 98;
@@ -6720,9 +6720,10 @@ const __stories = [
 				minLevel: 1,
 				maps: [11],
 				timer: {
-					ms: 5000, //150000
+					ms: 5000,
 					after: function() {
 						if(episode.boss && !episode.boss.isDead()) {
+							episode.timerFailed = 1;
 							episode.phase = 200;
 						}
 					}
@@ -7029,9 +7030,13 @@ const __stories = [
 							}
 							// __storyPlaying = false;
 							// installStoryFinish();
-							
-							const _portal = summonMob(112, 
-								MathRound((mainCharacter.left + platformX + (mainCharacter.WIDTH * (mainCharacter.direction === __left ? -1 : 1))) / __zoom), 
+							episode.pauseBgMusic(1);
+							let _x = MathRound((mainCharacter.left + platformX + (mainCharacter.WIDTH * (mainCharacter.direction === __left ? -1 : 1))) / __zoom);
+							const _maxX = MathRound((episode.width - (episode.cWidth * .5)) / __zoom);
+							if(_x > _maxX)
+								_x = _maxX;
+							const _portal = summonMob(113, 
+								_x, 
 								MathRound(groundheight * .5), 1);
 							setTimeout(() => {
 								_portal.animations.after.frames.forEach(x => {
@@ -7041,8 +7046,8 @@ const __stories = [
 										x.bottomGap += MathRound(x.spriteHeight / 20);
 										PlaySound({key:'portalclose', volume:.3 });
 										if(_e.toucher) {
-											_e.toucher.standBy();
 											_e.toucher.yPosition = _e.yPosition - 1;
+											_e.toucher.standBy();
 											_e.toucher.updateVariables();
 											const _oldLeft = _e.toucher.left;
 											_e.toucher.left = _e.left - MathRound((_e.toucher.WIDTH - _e.WIDTH) / 2) - platformX;
@@ -7051,20 +7056,26 @@ const __stories = [
 											else if(_e.toucher.left > _oldLeft && _e.toucher.direction === __left)
 												_e.toucher.direction = __right;
 											_portal.animations.after.frames.forEach(y => delete y.do);
-											mainCharacter.addObject(
+											if(_e.toucher.relatedObjects)
+												_e.toucher.relatedObjects.length = 0;
+											// let _platX = _e.left - (episode.cWidth * .25);
+											// if(_platX < 0)
+											// 	_platX = 0;
+											// platformX = _platX;
+											_e.toucher.addObject(
 											{ 
 												key: 'zoom2x', 
 												position: 'css', 
-												p1: 1.5, 
+												p1: 1.3, 
 												p2: 10000
 											});
-											__storyPlaying = false;
-											installStoryFinish();
 											setTimeout(() => {
 												//_e.toucher.remove = true;
-												requestAnimationFrame(() => {
+												//requestAnimationFrame(() => {
 													//switchStoryScene();
-												});
+													__storyPlaying = false;
+													installStoryFinish();
+												//});
 											}, 250);
 										}
 									}
@@ -7154,16 +7165,16 @@ const __stories = [
 						hp:60,
 						experience: 250
 					},
-					{
-						id: 1,
-						minX: 1580,
-						maxX: 4800,
-						count: 1,
-						sight: 1000,
-						spawn: 1,
-						hp:60,
-						experience: 250
-					}
+					// {
+					// 	id: 1,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 1,
+					// 	sight: 1000,
+					// 	spawn: 1,
+					// 	hp:60,
+					// 	experience: 250
+					// }
 				]
 			},
 			{
@@ -7417,10 +7428,11 @@ const __stories = [
 									requestAnimationFrame(() => {
 										episode.phase = 101;
 									});
-									// episode.pauseAmbianceMusic();
-									// episode.pauseBgMusic(1);
-									// episode.createBgMusic(null, null, null, 'cyclops-battle', .5);
-									// episode.playBgMusic();
+
+									episode.pauseAmbianceMusic();
+									episode.pauseBgMusic(1);
+									episode.createBgMusic(null, null, null, 'boss-fight-1', .5);
+									episode.playBgMusic();
 								}, 1000);
 								takeQuest(2, null, null, 'progress', 1);
 							}, 4000);
