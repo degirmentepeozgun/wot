@@ -56,7 +56,7 @@ function animateStart(_failed) {
 	let _hasNext = _failed ? false : __storySceneOrder < __story.scenes.length;
 	if(!_hasNext) {
 		__story.leaderBoards.set(function() {
-			__story.leaderBoards.get(function(_leadersData) {
+			const _stageResult = __story.leaderBoards.get(function(_leadersData) {
 				const _leadersList = document.querySelector('.leaderboards-list');
 				if(!_leadersList)
 					return;
@@ -73,13 +73,10 @@ function animateStart(_failed) {
 				</div>`;
 				_leaderboardsHTML += '</div></div>';
 				_leadersList.innerHTML = _leaderboardsHTML;
-				const _orderElem = document.getElementById('stage-result-order');
-				if(_orderElem) {
-					let _html = `<div>
-					
-					</div>`;
-				}
 			});
+			if(!_stageResult) 
+				_leaderboardsHTML = `<div class="w-100 flex op-none defeat-header ms250">${getLangData(_failed ? 'DEFEAT' : 'VICTORY')}</div>
+			<img src="./images/main/${(episode.realClass ?? mainCharacter.class) + '/' + (_failed ? 'loose' : 'finish') + '-concept.png'}" class="char slide-right"/>`;
 		});
 	}
 	let _orderHTML = '', btnId, action;
@@ -128,7 +125,7 @@ function animateStart(_failed) {
 	let _missionTitle = getLangData('Stage') + ' ' + __storySceneOrder;
 	const _template = `<div data-module='stagefinish' id="story-finish" class="finish flex d-none${_hasNext ? ' bg-none' : ''}">
 		<div class="w-50 side-left flex flex-jc-start flex-ai-start leaderboards-list op-none ms250" style="height:100% !important;width:55%;flex-direction:column">`
-			+ 
+			+ _leaderboardsHTML +
 		`</div>
 		<div class="w-50 container side-right flex flex-ai-start" style="height:90%;width:45%${_hasNext ? ';padding:.5% 0 3.5% 0!important' : ''}">
 			<div class="full stage-results-screen-middle${_hasNext ? ' final-screen-before-next' : ''}" style="position:relative;z-index:2;margin: 0 13.5% 0 1.5%;width:85%">

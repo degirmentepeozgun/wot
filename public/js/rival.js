@@ -41651,7 +41651,7 @@ const _allEnemies = {
 							do: function(_char) {
 								if(episode?.realTime)
 									return;
-								const _others = episode.enemies.filter(x => x.fps !== 6 && x.enemy && x !== _char);
+								const _others = episode.enemies.filter(x => x.fps !== 6 && x !== _char);
 								if(_others?.[0])
 									for(let _o of _others)
 										_o.fps = (_o.alp || _o.villain) ? 2 : 6;
@@ -76671,7 +76671,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: _arr[3],
-				speed: 3
+				speed: 4
 			},
 			{
 				spriteLeft: _sprite1.spriteLeft,
@@ -76701,7 +76701,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: _arr[6],
-				speed: 4
+				speed: 5
 			},
 			{
 				spriteLeft: _sprite1.spriteLeft,
@@ -76711,7 +76711,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: _arr[7],
-				speed: 4
+				speed: 5
 			},
 			{
 				spriteLeft: _sprite1.spriteLeft,
@@ -76741,7 +76741,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: _arr[7],
-				speed: 4
+				speed: 3
 			},
 			{
 				spriteLeft: _sprite1.spriteLeft,
@@ -76801,7 +76801,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: _arr[1],
-				speed: 2
+				speed: 1
 			},
 			{
 				spriteLeft: _sprite1.spriteLeft,
@@ -76811,7 +76811,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: _arr[0],
-				speed: 2
+				speed: 1
 			},
 			{
 				spriteLeft: _sprite2.spriteLeft,

@@ -125,6 +125,7 @@ function leaderboards() {
 				_self.updateScore(_missionKey, _score, 1, _func);
 			});
 		});
+		return true;
 	}
 	this.data = _self.getData();
 }

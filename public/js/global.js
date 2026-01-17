@@ -1140,7 +1140,31 @@ const __quickTips = [
 	{ id:7, desc: {
 		en: 'Leap attack knocks the opponent into the air, severely breaks skill',
 		tr: 'Sersemleten saldırı rakibin yeteneğini yüksek oranda kırarak onu havaya atar'
-	}, skills: ['ground2'], descDir: 'bottom'}
+	}, skills: ['ground2'], descDir: 'bottom'},
+	{ id:11, desc: {
+		en: 'Try to break open the hanging beehive',
+		tr: 'Asılı duran arı kovanını parçalamaya çalışın'
+	}, skills: [], descDir: 'bottom'},
+	{ id:12, desc: {
+		en: 'Try to complete the quest before the time runs out',
+		tr: 'Görevi süre bitmeden tamamlamaya çalışın'
+	}, skills: [], descDir: 'bottom'},
+	{ id:13, desc: {
+		en: 'You should be wary of enemies who don\'t like you attacking the hive',
+		tr: 'Kovana saldırmanızdan hoşlanmayan düşmanlara dikkat etmelisiniz'
+	}, skills: [], descDir: 'bottom'},
+	{ id:14, desc: {
+		en: 'The hive will drop equipment as it takes damage. Equip this equipment',
+		tr: 'Kovan hasar aldıkça ekipmanlar düşürecek. Bu ekipmanları kuşanın'
+	}, skills: [], descDir: 'bottom'},
+	{ id:17, desc: {
+		en: 'During this time, you must be very careful of poison traps',
+		tr: 'Bu esnada zehirli tuzaklara çok dikkat etmelisiniz'
+	}, skills: [], descDir: 'bottom'},
+	{ id:16, desc: {
+		en: 'Defeat the final boss you encounter if you survive the time limit',
+		tr: 'Süre zarfında hayatta kaldığınızda karşılaşacağınız yaratığı yenin'
+	}, skills: [], descDir: 'bottom'},
 ]
 const _npcQuests = [
 	{
@@ -3018,6 +3042,7 @@ const storySoundFiles = {
 const soundFiles = {
 	nointernet: './images/sounds/no-internet.mp3',
 	newrecord: './images/sounds/new-record.mp3',
+	goldground: './images/sounds/gold-ground.mp3',
 	portalclose: './images/sounds/portal-close.mp3',
 	portalopen: './images/sounds/portal-open.mp3',
 	itemweared: './images/sounds/item-weared.mp3',

@@ -2430,6 +2430,7 @@ function enemy(_e) {
 					spriteOrigin: _origin,
 					extraStepXRate: -.075 * _xRate,
 					bottomGap: -15 / _rate,
+					sound: _type === 'gold' ? { key: 'goldground', volume: .5 } : undefined,
 					speed: 3
 				},
 				{
@@ -4706,7 +4707,7 @@ function enemy(_e) {
 											_e.lastHitSkill = _tr.animation;
 											if(_e.isDead())
 											{
-												if(_f.atk.hurt.smashIfDead) {
+												if(_t.tag || _f.atk.hurt.smashIfDead) {
 													_e.smash(_t, _f);
 													return {smashed: true};
 												}

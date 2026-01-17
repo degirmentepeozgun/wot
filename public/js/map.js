@@ -2866,17 +2866,21 @@ function map(_m) {
 			ctx.imageSmoothingEnabled = false;
 
 		ctx.clearRect(0, 0, _osc.width, _osc.height);
-
-		ctx.drawImage(
-			_item.sprite,
-			_item.spriteX,
-			_item.spriteY,
-			_item.spriteWidth,
-			_item.spriteHeight,
-			0, 0,
-			_osc.width,
-			_osc.height
-		);
+		const _cropped = this.getCroppedSprite(_item.spriteX, _item.spriteY, _item.spriteWidth, _item.spriteHeight, 
+								_item.char, _item.sprite.relativeSrc, _item.frameKey);
+		if(_cropped)
+			ctx.drawImage(_cropped, 0, 0, _osc.width, _osc.height);
+		else
+			ctx.drawImage(
+				_item.sprite,
+				_item.spriteX,
+				_item.spriteY,
+				_item.spriteWidth,
+				_item.spriteHeight,
+				0, 0,
+				_osc.width,
+				_osc.height
+			);
 
 		ctx.globalCompositeOperation = 'source-atop';
 		ctx.fillStyle = _color;
@@ -3961,6 +3965,21 @@ function map(_m) {
 				mainCharacter.platformX = platformX;
 				if(mainCharacter.left <= centerMinX){
 					mainCharacter.direction = __right;
+					delete this.cameraMoveStep;
+					mainCharacter.disableKeyboard = mainCharacter.immobilize = false;
+					if(this.cameraMoveEndFunc) {
+						this.cameraMoveEndFunc();
+						delete this.cameraMoveEndFunc;
+					}
+				}
+			}
+			else {
+				prevPlatformX = platformX;
+				platformX -= this.cameraMoveStep;
+				mainCharacter.left += this.cameraMoveStep;
+				mainCharacter.platformX = platformX;
+				if(mainCharacter.left >= centerMinX){
+					mainCharacter.direction = __left;
 					delete this.cameraMoveStep;
 					mainCharacter.disableKeyboard = mainCharacter.immobilize = false;
 					if(this.cameraMoveEndFunc) {

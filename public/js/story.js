@@ -6699,7 +6699,7 @@ const __stories = [
 				minLevel: 1,
 				maps: [201],
 				timer: {
-					ms: 1000,
+					ms: 150000,
 					after: function() {
 						episode.timerFailed = 1;
 						episode.phase = 98;
@@ -6720,7 +6720,7 @@ const __stories = [
 				minLevel: 1,
 				maps: [11],
 				timer: {
-					ms: 5000,
+					ms: 150000,
 					after: function() {
 						if(episode.boss && !episode.boss.isDead()) {
 							episode.timerFailed = 1;
@@ -6819,7 +6819,7 @@ const __stories = [
 					mainCharacter.level = 0;
 					mainCharacter.experience = 0;
 					mainCharacter.maxExperience = 833;
-					setCharacterLevel(11, null, 1);
+					setCharacterLevel(1, null, 1);
 					//setCharacterLevel(8, null, 1);
 					addClass(_gameUI, 'demo-playing');
 					episode.pauseBgMusic(1);
@@ -6940,7 +6940,7 @@ const __stories = [
 											atk: mainCharacter.atk,
 											grade: 4
 										});
-										_boss.health = _boss.maxHP = 1;
+										//_boss.health = _boss.maxHP = 1;
 										_boss.class = 'boss';
 										_boss.experience = 0;
 										_boss.setDifficulty(__account.difficulty - 1);
@@ -7035,6 +7035,11 @@ const __stories = [
 							const _maxX = MathRound((episode.width - (episode.cWidth * .5)) / __zoom);
 							if(_x > _maxX)
 								_x = _maxX;
+							else {
+								const _minX = MathRound((episode.cWidth * .5) / __zoom);
+								if(_x < _minX)
+									_x = _minX;
+							}
 							const _portal = summonMob(113, 
 								_x, 
 								MathRound(groundheight * .5), 1);
@@ -7069,14 +7074,18 @@ const __stories = [
 												p1: 1.3, 
 												p2: 10000
 											});
-											setTimeout(() => {
-												//_e.toucher.remove = true;
-												//requestAnimationFrame(() => {
-													//switchStoryScene();
-													__storyPlaying = false;
-													installStoryFinish();
-												//});
-											}, 250);
+											episode.moveCamera(function() {
+												__storyPlaying = false;
+												installStoryFinish();
+											}, 3, 1);
+											// setTimeout(() => {
+											// 	//_e.toucher.remove = true;
+											// 	//requestAnimationFrame(() => {
+											// 		//switchStoryScene();
+											// 		__storyPlaying = false;
+											// 		installStoryFinish();
+											// 	//});
+											// }, 250);
 										}
 									}
 								});
@@ -7264,7 +7273,7 @@ const __stories = [
 					resetSkill('tag', mainCharacter);
 					//PlaySound({key:'conquer', volume:.6});
 					//episode.lastItemDropTime = _gameTick;
-					takeQuest(1, 1, null, null, 1);
+					//takeQuest(1, 1, null, null, 1);
 					episode.boss = episode.enemies.find(x => x.id === 111);
 					episode.phase = episode.boss.grade;
 					removeClass(_gameUI, 'disable-ui');
@@ -7272,30 +7281,22 @@ const __stories = [
 					// 	const url = _img.toDataURL();
 					// 	warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
 					// });
-					// const _desc = document.createElement('div');
-					// _desc.className = 'flex show-ui full quick-play-desc-container fade-me';
-					// let _html = '';
-					// for(let i = 0; i < 6; i++) {
-					// 	const _tip = __quickTips[i];
-					// 	let _skillHtml = '';
-					// 	for(let _sk of _tip.skills) {
-					// 		if(_skillHtml !== '')
-					// 			_skillHtml += '<img src="./images/icons/swap-right.png" class="quick-play-desc-skill-swap" />';
-					// 		_skillHtml += '<div class="quick-play-desc-skill-icon" style="background-image:url(./images/main/skill-icons/warrior/' + _sk + '.png);background-size:cover"></div>';
-					// 	}
-					// 	_skillHtml = `<div class="quick-play-desc-skill-icons flex">` + _skillHtml + '</div>';
-					// 	_html += `<div class="quick-play-desc-item quick-play-desc-item${_tip.id}">`
-					// 		+ _skillHtml +
-					//  		`<div class="quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
-					//    </div>`;
-					// }
-					// _desc.innerHTML = _html +
-					//    `<div onexactclick="skipQuickPlayTutorial()" class="quick-play-desc-skip flex glow">&lt;&nbsp;${getLangData('UNDERSTOOD')}&nbsp;&gt;</div>`;
-					// addClass(_gameUI, 'disable-ui');
-					// requestAnimationFrame(() => {
-					// 	_game.suspended = true;
-					// });
-					// _gameUI.appendChild(_desc);
+					const _desc = document.createElement('div');
+					_desc.className = 'flex show-ui full quick-play-desc-container fade-me';
+					let _html = '';
+					for(let i = 6; i < 12; i++) {
+						const _tip = __quickTips[i];
+						_html += `<div style="background-image:url(./images/ui/full-border-vert.png), url(./images/quicktips/${_tip.id}.png) !important;background-size: 100% auto !important;background-repeat: no-repeat !important" class="quick-play-desc-item quick-play-desc-item${_tip.id}">
+									<div class="quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
+								</div>`;
+					}
+					_desc.innerHTML = _html +
+					   `<div onexactclick="takeQuest(1, 1, null, null, 1);skipQuickPlayTutorial()" class="quick-play-desc-skip flex glow">&lt;&nbsp;${getLangData('UNDERSTOOD')}&nbsp;&gt;</div>`;
+					addClass(_gameUI, 'disable-ui');
+					requestAnimationFrame(() => {
+						_game.suspended = true;
+					});
+					_gameUI.appendChild(_desc);
 				},
 				actions: [
 					{
@@ -7413,7 +7414,7 @@ const __stories = [
 											zoom: .66,
 											grade: 5
 										});
-										_boss.health = _boss.maxHP = 1;
+										//_boss.health = _boss.maxHP = 1;
 										_boss.class = 'boss';
 										_boss.experience = 0;
 										_boss.setDifficulty(__account.difficulty - 1);
