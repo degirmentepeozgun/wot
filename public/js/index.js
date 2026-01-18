@@ -1,15 +1,31 @@
 ﻿"use strict"
-function setFps(_val) {
-	fps = _val;
-	if (fps > _defaultFPS)
-		fps = _defaultFPS;
-	msPerFrame = 900 / fps;
-	if (fps === _defaultFPS)
-		return;
-	setTimeout(function () {
-		setFps(MathRound(fps + (_defaultFPS / 15)));
-	}, 200);
-}
+const setFps = (function () {
+
+	let _timer = null;
+
+	return function (_val, _step) {
+
+		if (_timer) {
+			clearTimeout(_timer);
+			_timer = null;
+		}
+
+		fps = _val;
+
+		if (fps <= 0) fps = 1;
+		if (fps > _defaultFPS) fps = _defaultFPS;
+
+		msPerFrame = 900 / fps;
+
+		if (fps === _defaultFPS)
+			return;
+
+		_timer = setTimeout(function () {
+			setFps(MathRound(fps + (_defaultFPS / (_step ?? 15))), _step);
+		}, 200);
+	};
+
+})();
 var _gameTick, _extraTick = 0;
 function animate(_tick) {
 	if (!_startAnimate) {

@@ -3040,6 +3040,7 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	deadimpact: './images/sounds/dead-impact.mp3',
 	nointernet: './images/sounds/no-internet.mp3',
 	newrecord: './images/sounds/new-record.mp3',
 	goldground: './images/sounds/gold-ground.mp3',
@@ -31576,16 +31577,19 @@ const cssAnimations = {
 		}
 		return true;
 	},
-	slowMotion: function (_char, _ms, _arg1, _arg2, _rate) {
-		if (fps < _defaultFPS || episode?.realTime)
+	slowMotion: function (_char, _ms, _arg1, _arg2, _rate, _forceStep) {
+		if ((fps < _defaultFPS || episode?.realTime) && !_forceStep)
 			return;
-		if(!cssAnimationProps.slowMotion){
-			setFps(MathRound(_defaultFPS / (_rate ?? 2)));
+		if(!cssAnimationProps.slowMotion || _forceStep){
+			setFps(MathRound(_defaultFPS / (_rate ?? 2)), _forceStep);
 			addClass(_css, 'dark-blur-canvas');
-			// setTimeout(function () {
-			// 	removeClass(_css, 'dark-blur-canvas');
-			// }, 1000);
-			cssAnimationProps.slowMotion = { start: _gameTick, p1: _char, p2: _ms, p5: _rate};
+			if(!cssAnimationProps.slowMotion)
+				cssAnimationProps.slowMotion = { start: _gameTick, p1: _char, p2: _ms, p5: _rate};
+			else
+			{
+				cssAnimationProps.slowMotion.start = _gameTick;
+				cssAnimationProps.slowMotion.p2 = _ms;
+			}
 		}
 		else if((_gameTick - cssAnimationProps.slowMotion.start) > (_ms ?? 1000)) {
 			removeClass(_css, 'dark-blur-canvas');

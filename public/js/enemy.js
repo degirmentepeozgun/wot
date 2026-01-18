@@ -4205,6 +4205,8 @@ function enemy(_e) {
 	}
 	this.talk = function() {
 		if(!__storyCutScenePlaying && this.talkCount && (_gameTick - (this.lastTalkTime ?? 0) > 10000)) {
+			if(this.animation.startsWith('counter'))
+				return;
 			this.lastTalkTime = _gameTick;
 			let _talkId;
 			while(true) {
@@ -5680,7 +5682,7 @@ function enemy(_e) {
 			&& !this.autoTarget.isDead() && isObjectsInTouch(this, this.autoTarget, 100)?.touch)
 			_noXRate = 1;
 		const _fps = this.getFps();
-		if (_fps > 1 && !this.animations[this.animation].hurt)
+		if (_fps > 1 && !_anima.hurt)
 			_speedRate /= _fps;
 		this.extraStepYRate = this.stop ? 0 : (this.extraStepYRate ?? 0) + (_speedRate * (_frame.extraStepYRate ?? 0));
 		let _stepY = this.puppetMode ? 0 : MathRound(this.extraStepYRate * (episode.cHeight / 100));

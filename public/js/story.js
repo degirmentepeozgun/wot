@@ -7244,12 +7244,11 @@ const __stories = [
 						'belt', 'gloves', 'bracers', 'helmet', 'leggings',
 						'necklace', 'chest', 'ring', 'boots', 'weapon'
 					];
-					clearAudioCache(loadedSounds);
 					removeCoopCharacter();
 					setCharacterLevel(12, null, 1);
 					//setCharacterLevel(8, null, 1);
 					addClass(_gameUI, 'demo-playing');
-					episode.pauseBgMusic(1);
+					//episode.pauseBgMusic(1);
 					//episode.createBgMusic(null, null, null, 'training');
 					//episode.playBgMusic();
 					const _es = episode.enemies.filter(x => x.enemy);
@@ -7375,10 +7374,21 @@ const __stories = [
 					},
 					{
 						when: function() {
-							return episode.phase === 101 && !episode.enemies.filter(x => x.class === 'boss')?.length;
+							return episode.phase === 101 && episode.enemies.find(x => x.class === 'boss' && x.health <= 0);
 						},
 						do: function() {
 							episode.phase = 102;
+							PlaySound({ key:'deadimpact', volume: 1 });
+							if(mainCharacter)
+								cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
+						}
+					},
+					{
+						when: function() {
+							return episode.phase === 102 && !episode.enemies.filter(x => x.class === 'boss')?.length;
+						},
+						do: function() {
+							episode.phase = 103;
 							updateQuestArea();
 							__storyPlaying = false;
 							installStoryFinish();

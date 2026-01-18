@@ -54628,6 +54628,21 @@ const _allEnemies = {
 						spriteOrigin: 100,
 					}
 				, { key: 'cyclopshurt1,cyclopshurt2', reset: true, volume: .35 }),
+				hurtair: createHurtAir(
+					{
+						spriteLeft: 37,
+						spriteTop: 36,
+						spriteWidth: 200,
+						spriteHeight: 268,
+						spriteOrigin: 93,
+					},{
+						spriteLeft: 37,
+						spriteTop: 36,
+						spriteWidth: 200,
+						spriteHeight: 268,
+						spriteOrigin: 93,
+					},
+				 { key: 'cyclopshurt1,cyclopshurt2', reset: true, volume: .35 }, './images/sprites/ep47/air.png'),
 				dead: {
 					key: 'dead',
 					type: 'skill',
