@@ -3040,6 +3040,11 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	bonusscore: './images/sounds/bonus-score.mp3',
+	bigbodydrop: './images/sounds/body-drop-big.mp3',
+	giantbodydrop: './images/sounds/giant-body-drop.mp3',
+	bodydrop: './images/sounds/body-drop.mp3',
+	deepimpact: './images/sounds/deep-impact.mp3',
 	deadimpact: './images/sounds/dead-impact.mp3',
 	nointernet: './images/sounds/no-internet.mp3',
 	newrecord: './images/sounds/new-record.mp3',
@@ -3052,7 +3057,8 @@ const soundFiles = {
 	hivehurt1: './images/sounds/hivehurt1.mp3',
 	hivehurt2: './images/sounds/hivehurt2.mp3',
 	hivelurk: './images/sounds/hivelurk.mp3',
-	hiaaa: './images/sounds/hia.mp3',
+	hiaaa: './images/sounds/hea2.mp3',
+	cash: './images/sounds/cash.mp3',
 	tiktak: './images/sounds/tiktak.mp3',
 	bell: './images/sounds/bell.mp3',
 	bonusactive: './images/sounds/bonus-active.mp3',

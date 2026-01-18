@@ -34,6 +34,7 @@ function animateStart(_failed) {
 	let _achievementsHtml = '', _totalAchScore = _calc.score;
 	if(_totalAchScore < 0)
 		_totalAchScore = 0;
+	const _oldScore = __story.point ?? 0;
 	__story.point += _totalAchScore;
 	let _achMS = 250;
 	for(let _rs of _achievements) {
@@ -93,7 +94,7 @@ function animateStart(_failed) {
 						 <div class="flex w-100">${getLangData('After the countdown, action will be active')}</div><span id="next-stage-counter">8</span>
 					</div>`;
 	}
-	let _nextStageTimer, _nextStageCounter = 0;
+	let _nextStageTimer, _nextStageCounter = 0, _playTicks;
 	_nextStageTimer = setInterval(() => {
 		const _cd = document.getElementById('next-stage-counter');
 		if(!_cd){
@@ -115,7 +116,7 @@ function animateStart(_failed) {
 				}
 				return;
 			}
-			if(_nextStageCounter > 2)
+			if((_playTicks || _hasNext) && _nextStageCounter > 2)
 				PlaySound({key:'tiktak', volume:.5, reset: true});
 			_nextStageCounter++;
 			_cd.innerText = parseInt(_cd.innerText) - 1;
@@ -145,16 +146,16 @@ function animateStart(_failed) {
 								${_totalAchScore.formatWithDots()}
 							</div>
 						</div>
-						<div class="w-100 flex flex-jc-start stage-achievement-item${__story.point > _totalAchScore ? '' : ' d-none'}" style="height:50%">
+						<div class="w-100 flex flex-jc-start stage-achievement-item${!_hasNext ? '' : ' d-none'}" style="height:50%">
 							<div class="w-50 flex flex-jc-start stage-achievement-item-left" style="height:100%">
 								${getLangData('Final Score')}
 							</div>
-							<div class="w-50 flex flex-jc-end stage-achievement-item-right" style="height:100%">
-								${__story.point.formatWithDots()}
+							<div id="final-quickplay-score" class="w-50 flex flex-jc-end stage-achievement-item-right" style="height:100%">
+								${_hasNext ? __story.point.formatWithDots() : ''}
 							</div>
 						</div>
 					</div>
-					<div id="stage-result-order" class="header-content w-100 flex ms2000 op-none" style="height:20%">`
+					<div id="stage-result-order" class="header-content w-100 flex ms${_hasNext ? '2000' : '4000'} op-none" style="height:20%">`
 						+ _orderHTML +
 					'</div>'
 					+ //_firstFinishRewardsHtml +
@@ -183,7 +184,7 @@ function animateStart(_failed) {
 		PlaySound({key:'storyfinish', volume:1});
 		if(_failed)
 			PlaySound({key:'defeat', volume:1});
-		const fade = function(_selector, _ms, _play) {
+		const fade = function(_selector, _ms, _play, _func) {
 			setTimeout(function () {
 				const _elems = document.querySelectorAll(_selector);
 				_elems?.forEach(x => {
@@ -193,14 +194,102 @@ function animateStart(_failed) {
 				});
 				if(_play)
 					PlaySound({key:'ironx1', volume:1, reset: true});
+				if(_func)
+					_func();
 			}, _ms ?? 0);
 		}
 		fade('#story-finish .ms250', 500);
 		fade('#story-finish .ms500', 750, 1);
 		fade('#story-finish .ms750', 1000, 1);
 		fade('#story-finish .ms1000', 1250,1);
-		fade('#story-finish .ms1500', 2000);
+		fade('#story-finish .ms1500', 2000, null, function() {
+			if(!_hasNext)
+				animateScore('final-quickplay-score', _oldScore, __story.point, 2000);
+		});
 		fade('#story-finish .ms2000', 2500);
 		fade('#story-finish .ms2500', 3000);
+		fade('#story-finish .ms4000', 4500, null, function() { _playTicks = 1; });
 	}, 100);
+}
+
+function animateScore(containerId, currentScore, targetScore, duration) {
+
+    let el = document.getElementById(containerId);
+    if (!el) return;
+
+    targetScore = Math.max(0, Math.floor(targetScore));
+
+    PlaySound({key:'bonusscore', loop:true, volume:1});
+    //const endSound = new Audio("final_chime.mp3");
+
+    //endSound.volume = 0.9;
+
+    let startTime = null;
+    let lastValue = 0;
+    let rafId = null;
+    let cancelled = false;
+
+    el.textContent = (currentScore ?? 0).formatWithDots();
+
+    //tickSound.play().catch(()=>{});
+
+    function stopAll() {
+
+        cancelled = true;
+
+        if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        }
+		
+		window.SoundManager.stop('bonusscore');
+        // tickSound.pause();
+        // tickSound.currentTime = 0;
+    }
+
+    function update(timestamp) {
+
+        // 🔥 DOM silindiyse otomatik stop
+        el = document.getElementById(containerId);
+        if (!el) {
+            stopAll();
+            return;
+        }
+
+        if (cancelled) return;
+
+        if (!startTime) startTime = timestamp;
+
+        const elapsed = timestamp - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        const eased = 1 - Math.pow(1 - progress, 3);
+
+        const currentValue = Math.floor(eased * targetScore);
+
+        if (currentValue !== lastValue) {
+            el.textContent = currentValue.formatWithDots();
+            lastValue = currentValue;
+        }
+
+        if (progress < 1) {
+            rafId = requestAnimationFrame(update);
+        } else {
+
+            //tickSound.pause();
+            //tickSound.currentTime = 0;
+			window.SoundManager.stop('bonusscore');
+            el.textContent = targetScore.formatWithDots();
+    		PlaySound({key:'cash', volume:.66});
+            //endSound.currentTime = 0;
+            //endSound.play().catch(()=>{});
+        }
+    }
+
+    rafId = requestAnimationFrame(update);
+
+    // ⛔ dışarıdan manuel iptal için geri dönüş
+    return {
+        stop: stopAll
+    };
 }

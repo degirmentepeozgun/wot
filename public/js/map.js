@@ -2231,42 +2231,83 @@ function map(_m) {
 
 		}
 	}
+	// this.pauseBgMusic = function (_force) {
+	// 	if(!this.bgMusic || this.bgMusicTimer)
+	// 		return;
+	// 	if(this.bgMusic && this.bgMusic.paused && !_force)
+	// 		return;
+	// 	try {
+	// 		if(this.bgMusic && _force) {
+	// 			if(this.bgMusicTimer)
+	// 				clearInterval(this.bgMusicTimer);
+	// 			if(this.bgMusic){
+	// 				if(!this.bgMusic.paused)
+	// 					this.bgMusic.pause();
+	// 				this.bgMusic = null;
+	// 			}
+	// 			return;
+	// 		}
+	// 		this.bgMusic.volume = this.bgMusicVolume ?? (this.minBgMusicVolume ?? .1);
+	// 		if(this.bgMusicTimer) {
+	// 			clearInterval(episode.bgMusicTimer);
+	// 			delete episode.bgMusicTimer;
+	// 		}
+	// 		this.bgMusicTimer = setInterval(function() {
+	// 			if(!episode.bgMusic || episode.bgMusic.volume <= (episode.bgMusicVolume ?? .01)) {
+	// 				clearInterval(episode.bgMusicTimer);
+	// 				delete episode.bgMusicTimer;
+	// 				if(!episode.bgMusic)
+	// 					return;
+	// 				episode.bgMusic.pause();
+	// 				delete episode.bgMusic.playRequestSent;
+	// 				return;
+	// 			}
+	// 			episode.bgMusic.volume -= .01;
+	// 		}, 100);
+	// 	} catch (e) {
+
+	// 	}
+	// }
 	this.pauseBgMusic = function (_force) {
-		if(!this.bgMusic || this.bgMusicTimer)
+
+		if (!this.bgMusic) return;
+
+		if (_force) {
+			if(this.bgMusicTimer)
+				clearInterval(this.bgMusicTimer);
+			this.bgMusic.pause();
+			this.bgMusic = null;
 			return;
-		if(this.bgMusic && this.bgMusic.paused && !_force)
-			return;
-		try {
-			if(this.bgMusic && _force) {
+		}
+
+		if(this.bgMusicTimer) {
+			clearInterval(this.bgMusicTimer);
+			this.bgMusicTimer = null;
+		}
+		const fadeSpeed = 0.005; // daha yumuşak
+		const interval = 16; // ~60fps
+
+		this.bgMusicTimer = setInterval(() => {
+
+			if (!this.bgMusic) {
 				if(this.bgMusicTimer)
 					clearInterval(this.bgMusicTimer);
-				if(this.bgMusic){
-					if(!this.bgMusic.paused)
-						this.bgMusic.pause();
-					this.bgMusic = null;
-				}
+				this.bgMusicTimer = null;
 				return;
 			}
-			this.bgMusic.volume = this.bgMusicVolume ?? (this.minBgMusicVolume ?? .1);
-			if(this.bgMusicTimer) {
-				clearInterval(episode.bgMusicTimer);
-				delete episode.bgMusicTimer;
-			}
-			this.bgMusicTimer = setInterval(function() {
-				if(!episode.bgMusic || episode.bgMusic.volume <= (episode.bgMusicVolume ?? .01)) {
-					clearInterval(episode.bgMusicTimer);
-					delete episode.bgMusicTimer;
-					if(!episode.bgMusic)
-						return;
-					episode.bgMusic.pause();
-					delete episode.bgMusic.playRequestSent;
-					return;
-				}
-				episode.bgMusic.volume -= .01;
-			}, 100);
-		} catch (e) {
 
-		}
+			if (this.bgMusic.volume <= 0.01) {
+				this.bgMusic.volume = 0;
+				this.bgMusic.pause();
+
+				clearInterval(this.bgMusicTimer);
+				this.bgMusicTimer = null;
+				return;
+			}
+
+			this.bgMusic.volume = Math.max(0, this.bgMusic.volume - fadeSpeed);
+
+		}, interval);
 	}
 	this.pauseAmbianceMusic = function() {
 		if(this.bgSound)
@@ -4627,7 +4668,7 @@ this.drawHealthBar2 = function (_item) {
 		const _hTop = MathRound(
 			(this.cHeight + _extraTop)
 			- _hHeight
-			- ((_item.char.healtbarGap ?? 0))
+			- ((_item.hbGap ?? 0))
 			- _item.char.yPosition
 			- _item.char.HEIGHT
 			- (_item.yGap ?? 0)
@@ -4691,11 +4732,10 @@ this.drawHealthBar2 = function (_item) {
 	let _hHeight = this.cHeight / 75;
 	if (_item.char.healthBarHeightRate)
 		_hHeight *= _item.char.healthBarHeightRate;
-
 	const _hTop = MathRound(
 		(this.cHeight + _extraTop)
 		- _hHeight
-		- ((_item.char.healtbarGap ?? 0))
+		- ((_item.hbGap ?? 0))
 		- _item.char.yPosition
 		- _item.char.HEIGHT
 		- (_item.yGap ?? 0)

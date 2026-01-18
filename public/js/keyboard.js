@@ -841,7 +841,7 @@ window.addEventListener('keydown', (e) => {
   // Ghost engelleme (çok hızlı basılıp bırakılmış gibi olaylar)
   if (now - lastUpTime < antiGhostMs)
     return;
-
+  pressSkill(e);
   lastDown[kRaw] = now;
   physicalKeys.add(kRaw);
 });
@@ -1161,4 +1161,20 @@ function activateTouchPad() {
 
 	document.addEventListener('touchend', e => handleTouchEndOrCancel(e), { passive: false });
 	document.addEventListener('touchcancel', e => handleTouchEndOrCancel(e, true), { passive: false });
+}
+
+function pressSkill(e) {
+	if(e.repeat)
+		return;
+	let key = formatKeyName(e).toLowerCase();
+	const slot = document.querySelector('[data-key="' + key + '"]:not(.v-none)');
+	if(!slot)
+		return;
+	 if (hasClass(slot, "skill-pressed")) return;
+
+    addClass(slot, 'skill-pressed');
+
+    slot.addEventListener("animationend", () => {
+    	removeClass(slot, 'skill-pressed');
+    }, { once:true });
 }

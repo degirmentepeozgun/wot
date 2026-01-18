@@ -1846,8 +1846,8 @@ function createCharacter(_settings) {
 								spriteOrigin: 75,
 								extraStepXRate: .8,
 								extraStepYRate: 1.5,
-								speed: 1,
 								sound: { key: 'hiaaa', volume: .5 },
+								speed: 1,
 								objects: [
 									{
 										key: 'cloudground',
@@ -52797,6 +52797,7 @@ const _allEnemies = {
 							spriteOrigin: 378 / 2,
 							knockback: true,
 							speed: 1,
+							healtbarGap: -90,
 							objects: [{ key: 'slowMotion', position: 'css' }],
 							atk: {
 								yRange: 15,
@@ -52826,6 +52827,7 @@ const _allEnemies = {
 							spriteOrigin: 378 / 2,
 							knockback: true,
 							speed: 2,
+							healtbarGap: -90,
 							sound: { key:'cyclopsshout', volume: .5 },
 							atk: {
 								yRange: 15,
@@ -52856,6 +52858,7 @@ const _allEnemies = {
 							spriteOrigin: 378 / 2,
 							knockback: true,
 							speed: 3,
+							healtbarGap: -90,
 							atk: {
 								yRange: 15,
 								rate: 2,
@@ -52885,6 +52888,7 @@ const _allEnemies = {
 							spriteOrigin: 378 / 2,
 							knockback: true,
 							speed: 3,
+							healtbarGap: -90,
 							atk: {
 								yRange: 15,
 								rate: 2,
@@ -52914,6 +52918,7 @@ const _allEnemies = {
 							spriteOrigin: 378 / 2,
 							knockback: true,
 							speed: 3,
+							healtbarGap: -90,
 							atk: {
 								yRange: 15,
 								rate: 2,
@@ -52943,6 +52948,7 @@ const _allEnemies = {
 							spriteOrigin: 378 / 2,
 							knockback: true,
 							speed: 3,
+							healtbarGap: -90,
 							atk: {
 								yRange: 15,
 								rate: 2,
@@ -52972,6 +52978,7 @@ const _allEnemies = {
 							spriteOrigin: 378 / 2,
 							knockback: true,
 							speed: 3,
+							healtbarGap: -90,
 							atk: {
 								yRange: 15,
 								rate: 2,
@@ -53126,6 +53133,7 @@ const _allEnemies = {
 							spriteHeight: 600 / 2,
 							spriteOrigin: 378 / 2,
 							speed: 1,
+							healtbarGap: -90,
 							objects: [{ key: 'slowMotion', position: 'css' }],
 							def: {
 								iframe: true
@@ -53139,6 +53147,7 @@ const _allEnemies = {
 							spriteOrigin: 378 / 2,
 							knockback: true,
 							speed: 2,
+							healtbarGap: -90,
 							atk: {
 								yRange: 15,
 								rate: 2,
@@ -53163,6 +53172,7 @@ const _allEnemies = {
 							spriteHeight: 600 / 2,
 							spriteOrigin: 378 / 2,
 							speed: 2,
+							healtbarGap: -90,
 							def: {
 								iframe: true
 							}
@@ -53174,6 +53184,7 @@ const _allEnemies = {
 							spriteHeight: 600 / 2,
 							spriteOrigin: 378 / 2,
 							speed: 1,
+							healtbarGap: -90,
 							objects: [
 								{
 									key: 'cloudground',
@@ -53193,6 +53204,7 @@ const _allEnemies = {
 							spriteOrigin: 378 / 2,
 							knockback: true,
 							speed: 3,
+							healtbarGap: -90,
 							objects: [
 								{
 									key: 'cloudground2',
@@ -53222,6 +53234,7 @@ const _allEnemies = {
 							spriteHeight: 600 / 2,
 							spriteOrigin: 378 / 2,
 							speed: 3,
+							healtbarGap: -90,
 							def: {
 								iframe: true
 							}
@@ -53233,6 +53246,7 @@ const _allEnemies = {
 							spriteHeight: 600 / 2,
 							spriteOrigin: 378 / 2,
 							speed: 3,
+							healtbarGap: -90,
 							def: {
 								iframe: true
 							}
@@ -53244,6 +53258,7 @@ const _allEnemies = {
 							spriteHeight: 600 / 2,
 							spriteOrigin: 378 / 2,
 							speed: 3,
+							healtbarGap: -90,
 							def: {
 								iframe: true
 							}
@@ -54692,6 +54707,7 @@ const _allEnemies = {
 							spriteWidth: 590/ 2,
 							spriteHeight: 194/ 2,
 							spriteOrigin: 126/ 2,
+							sound: { key: 'bigbodydrop', volume:.8 },
 							speed: 12
 						},
 						{
@@ -69973,7 +69989,7 @@ const _allEnemies = {
 						{
 							spriteLeft: 1049,
 							spriteTop: 0,
-							spriteWidth: 580,
+							spriteWidth: 581,
 							spriteHeight: 1240,
 							spriteOrigin: 323 - 33,
 							speed: 360
@@ -70032,36 +70048,66 @@ const _allEnemies = {
 				hurtground1: function() { 
 					const _x = createHurtGround(
 					{
-						spriteLeft: 2099,
+						spriteLeft: 2999,
 						spriteTop: 0,
 						spriteWidth: 571,
 						spriteHeight: 1240,
+						bottomGap: -130,
+						healtbarGap: -60,
 						spriteOrigin: 173 - 33,
+						src: './images/sprites/ep104/hurt.png'
 					},
 					{
-						spriteLeft: 1049,
+						spriteLeft:2027,
 						spriteTop: 0,
-						spriteWidth: 581,
+						spriteWidth: 573,
 						spriteHeight: 1240,
-						spriteOrigin: 323 - 33
+						bottomGap: -130,
+						healtbarGap: -60,
+						spriteOrigin: 2239 - 2027,
+						src: './images/sprites/ep104/hurt.png'
 					},
-					null, {key:'hivehurt1,hivehurt2', reset: true, volume:1}
+					{
+						spriteLeft: 996,
+						spriteTop: 0,
+						spriteWidth: 624,
+						spriteHeight: 1240,
+						bottomGap: -130,
+						healtbarGap: -60,
+						spriteOrigin: 439 - 96,
+						src: './images/sprites/ep104/hurt.png'
+					}, {key:'hivehurt1,hivehurt2', reset: true, volume:1}
 					);
 					const _y = createHurtGround({
 						spriteLeft: 49,
 						spriteTop: 0,
 						spriteWidth: 710,
 						spriteHeight: 1240,
+						bottomGap: -130,
+						healtbarGap: -60,
 						spriteOrigin: 472 - 49 - 33,
+						src: './images/sprites/ep104/hurt.png'
 					},
 					{
-						spriteLeft: 1049,
+						spriteLeft: 996,
 						spriteTop: 0,
-						spriteWidth: 581,
+						spriteWidth: 624,
 						spriteHeight: 1240,
-						spriteOrigin: 323 - 33
+						bottomGap: -130,
+						healtbarGap: -60,
+						spriteOrigin: 439 - 96,
+						src: './images/sprites/ep104/hurt.png'
 					},
-					null, {key:'hivehurt1,hivehurt2', reset: true, volume:1});
+					{
+						spriteLeft:2027,
+						spriteTop: 0,
+						spriteWidth: 573,
+						spriteHeight: 1240,
+						bottomGap: -130,
+						healtbarGap: -60,
+						spriteOrigin: 2239 - 2027,
+						src: './images/sprites/ep104/hurt.png'
+					}, {key:'hivehurt1,hivehurt2', reset: true, volume:1});
 					_x.alternateFrames = [
 						{ rate: 1, when: function(_e) {
 								return _e.attacker?.direction === __left;
@@ -74488,6 +74534,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				src: (_redSprite ?? _sprite1).src,
 				bottomGap: ((_redSprite ?? _sprite1).bottomGap ?? 0),
 				do: (_redSprite ?? _sprite1).do,
+				healtbarGap: (_redSprite ?? _sprite1).healtbarGap,
 				invisibleWhenLay: (_redSprite ?? _sprite1).invisibleWhenLay,
 				zoom: .95,
 				objects: (_redSprite ?? _sprite1).objects,
@@ -74505,6 +74552,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteOrigin: (_redSprite ?? _sprite1).spriteOrigin - MathRound(_shakeDist / 2),
 				src: (_redSprite ?? _sprite1).src,
 				bottomGap: ((_redSprite ?? _sprite1).bottomGap ?? 0) + MathRound(_r * .075),
+				healtbarGap: (_redSprite ?? _sprite1).healtbarGap,
 				sound: _sound,
 				invisibleWhenLay: (_redSprite ?? _sprite1).invisibleWhenLay,
 				zoom: .95,
@@ -74522,6 +74570,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 3),
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + MathRound(_r * .125),
+				healtbarGap: _sprite1.healtbarGap,
 				objects: _sprite1.objects,
 				invisibleWhenLay: _sprite1.invisibleWhenLay,
 				chain: [
@@ -74537,6 +74586,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 4),
 				bottomGap: (_sprite1.bottomGap ?? 0) + MathRound(_r * .15),
+				healtbarGap: _sprite1.healtbarGap,
 				src: _sprite1.src,
 				objects: _sprite1.objects,
 				invisibleWhenLay: _sprite1.invisibleWhenLay,
@@ -74554,6 +74604,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 5),
 				bottomGap: (_sprite1.bottomGap ?? 0) + MathRound(_r * .065),
 				src: _sprite1.src,
+				healtbarGap: _sprite1.healtbarGap,
 				invisibleWhenLay: _sprite1.invisibleWhenLay,
 				objects: _sprite1.objects,
 				chain: [
@@ -74569,6 +74620,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 6),
 				bottomGap: _sprite1.bottomGap,
+				healtbarGap: _sprite1.healtbarGap,
 				src: _sprite1.src,
 				invisibleWhenLay: _sprite1.invisibleWhenLay,
 				objects: _sprite1.objects,
@@ -74585,6 +74637,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 7),
 				bottomGap: (_sprite1.bottomGap ?? 0) - MathRound(_r * .065),
+				healtbarGap: _sprite1.healtbarGap,
 				src: _sprite1.src,
 				invisibleWhenLay: _sprite1.invisibleWhenLay,
 				objects: _sprite1.objects,
@@ -74601,6 +74654,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 7),
 				bottomGap: (_sprite1.bottomGap ?? 0) - MathRound(_r * .0375),
+				healtbarGap: _sprite1.healtbarGap,
 				invisibleWhenLay: _sprite1.invisibleWhenLay,
 				src: _sprite1.src,
 				objects: _sprite1.objects,
@@ -74617,6 +74671,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 7),
 				bottomGap: (_sprite1.bottomGap ?? 0) + MathRound(_r * .025),
+				healtbarGap: _sprite1.healtbarGap,
 				invisibleWhenLay: _sprite1.invisibleWhenLay,
 				src: _sprite1.src,
 				objects: _sprite1.objects,
@@ -74634,6 +74689,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteOrigin: _sprite1.spriteOrigin,
 				invisibleWhenLay: _sprite1.invisibleWhenLay,
 				bottomGap: _sprite1.bottomGap,
+				healtbarGap: _sprite1.healtbarGap,
 				src: _sprite1.src,
 				objects: _sprite1.objects,
 				chain: [
@@ -74650,6 +74706,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteOrigin: (_sprite2 ?? _sprite1).spriteOrigin,
 				objects: (_sprite2 ?? _sprite1).objects,
 				bottomGap: (_sprite2 ?? _sprite1).bottomGap,
+				healtbarGap: (_sprite2 ?? _sprite1).healtbarGap,
 				invisibleWhenLay: (_sprite2 ?? _sprite1).invisibleWhenLay,
 				src: (_sprite2 ?? _sprite1).src,
 				chain: [
@@ -74666,6 +74723,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteOrigin: (_sprite3 ?? _sprite2 ?? _sprite1).spriteOrigin,
 				objects: (_sprite3 ?? _sprite2 ?? _sprite1).objects,
 				bottomGap: (_sprite3 ?? _sprite2 ?? _sprite1).bottomGap,
+				healtbarGap: (_sprite3 ?? _sprite2 ?? _sprite1).healtbarGap,
 				invisibleWhenLay: (_sprite3 ?? _sprite2 ?? _sprite1).invisibleWhenLay,
 				src: (_sprite3 ?? _sprite2 ?? _sprite1).src,
 				chain: [

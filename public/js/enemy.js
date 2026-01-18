@@ -1008,7 +1008,7 @@ function enemy(_e) {
 	this.setDirection = function(_dir, _force) {
 		if(this.enemy && this.lastTurnTime > (_gameTick - 500))
 			return;
-		if(this.direction === _dir)
+		if(this.noDirection || this.direction === _dir)
 			return;
 		if(this.enemy)
 			this.lastTurnTime = _gameTick;
@@ -1408,6 +1408,7 @@ function enemy(_e) {
 				if(x.health < x.MAXHP)
 					x.setHealth(x.MAXHP);
 				x.resetFatique();
+				x.fps = 1;
 			});
 			this.immobilize = this.oldProps.immobilize;
 			delete this.deadDramaStart;
@@ -3178,7 +3179,7 @@ function enemy(_e) {
 		const _w = MathRound((_frame.spriteWidth + rightGap) * zoom);
 		if(_w !== this.WIDTH)
 			this.WIDTH = _w;
-		const reversed = this.direction !== this.defaultDirection;
+		const reversed = this.reversed || (!this.noDirection && this.direction !== this.defaultDirection);
 		const offset = (this.main ? this.left : this.left - platformX);
 		const originPx = spriteOrigin * zoom;
 		const leftGapPx = leftGap * zoom;
@@ -5824,7 +5825,8 @@ function enemy(_e) {
 							frameKey: _frame.frameKey,
 							objects: this.stop ? this.relatedObjects?.filter(x => x.totalFrames === 1) ?? [] : this.relatedObjects,
 							char: this,
-							animation: this.animation
+							animation: this.animation,
+							hbGap: this.healtbarGap + (_frame.healtbarGap ?? 0)
 						});
 						let _cutSpriteWidth = _cutX > 0 ? _cutX : _frame.spriteWidth;
 						let _cutSpriteHeight = _cutY > 0 ? _cutY : _frame.spriteHeight;
@@ -5857,7 +5859,8 @@ function enemy(_e) {
 							reversed: _reversed,
 							frameKey: _frame.frameKey,
 							char: this,
-							animation: this.animation
+							animation: this.animation,
+							hbGap: this.healtbarGap + (_frame.healtbarGap ?? 0)
 						});
 					}
 					else
@@ -5883,7 +5886,8 @@ function enemy(_e) {
 							frameKey: _frame.frameKey,
 							objects: this.stop ? this.relatedObjects?.filter(x => x.totalFrames === 1) ?? [] : this.relatedObjects,
 							char: this,
-							animation: this.animation
+							animation: this.animation,
+							hbGap: this.healtbarGap + (_frame.healtbarGap ?? 0)
 						});
 				}
 			}

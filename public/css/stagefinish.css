@@ -218,3 +218,9 @@
 	pointer-events: none !important;
 	opacity: .7;
 }
+#final-quickplay-score {
+	color: #FFD84A !important;
+	text-shadow:
+	0 0 1px #FFB300,
+	0 0 2px rgba(255,180,0,0.7);
+}

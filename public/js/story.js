@@ -4921,7 +4921,7 @@ const __stories = [
 					ms: 60000,
 					after: function() {
 						episode.phase = 99;
-						episode.enemies.filter(x => !x.main && !x.friendly).forEach(x => {
+						episode.enemies.filter(x => !x.main && !x.tag && !x.friendly).forEach(x => {
 							x.stopSpawn();
 							x.health = x.experience = 0;
 							x.dead = x.dying = true;
@@ -6431,7 +6431,7 @@ const __stories = [
 				timer: {
 					ms: 120000,
 					after: function() {
-						episode.enemies.filter(x => !x.main && !x.friendly && x.class !== 'object').forEach(x => {
+						episode.enemies.filter(x => !x.main && !x.tag && !x.friendly && x.class !== 'object').forEach(x => {
 							x.stopSpawn();
 							x.health = x.experience = 0;
 							x.dead = x.dying = true;
@@ -6699,8 +6699,10 @@ const __stories = [
 				minLevel: 1,
 				maps: [201],
 				timer: {
-					ms: 150000,
+					ms: 160000,
 					after: function() {
+						if(episode.phase > 98)
+							return;
 						episode.timerFailed = 1;
 						episode.phase = 98;
 					}
@@ -6722,6 +6724,8 @@ const __stories = [
 				timer: {
 					ms: 150000,
 					after: function() {
+						if(episode.phase > 99)
+							return;
 						if(episode.boss && !episode.boss.isDead()) {
 							episode.timerFailed = 1;
 							episode.phase = 200;
@@ -6874,7 +6878,9 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 99;
-							episode.enemies.filter(x => !x.main && !x.friendly && x.class !== 'object').forEach(x => {
+							if(__account?.questStatus?.quest?.timer)
+								delete __account.questStatus.quest.timer;
+							episode.enemies.filter(x => !x.main && !x.tag && !x.friendly && x.class !== 'object').forEach(x => {
 								x.stopSpawn();
 								x.health = x.experience = 0;
 								x.dead = x.dying = true;
@@ -7238,7 +7244,7 @@ const __stories = [
 				],
 				startsWith: 1,
 				save: true,
-				loadingCharacterIds: [47],
+				loadingCharacterIds: [47, 111, 33, 35, 2, 7],
 				start: function() {
 					episode.itemDropOrder = [ 
 						'belt', 'gloves', 'bracers', 'helmet', 'leggings',
@@ -7378,7 +7384,8 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 102;
-							PlaySound({ key:'deadimpact', volume: 1 });
+							episode.pauseBgMusic();
+							PlaySound({ key:'deepimpact', volume: 1 });
 							if(mainCharacter)
 								cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
 						}
@@ -7401,8 +7408,10 @@ const __stories = [
 						do: function() {
 							episode.phase = 100;
 							delete episode.boss;
-							episode.enemies.filter(x => !x.main && !x.friendly).forEach(x => {
-									x.stopSpawn();
+							if(__account?.questStatus?.quest?.timer)
+								delete __account.questStatus.quest.timer;
+							episode.enemies.filter(x => !x.main && !x.tag && !x.friendly).forEach(x => {
+								x.stopSpawn();
 								x.health = x.experience = 0;
 								x.dead = x.dying = true;
 								x.animate('dead', 1);
@@ -7420,7 +7429,7 @@ const __stories = [
 										const _boss = summonMobWithJson({
 											id: _b,
 											level: 13,
-											atk: mainCharacter.atk,
+											atk: mainCharacter.atk * 4,
 											zoom: .66,
 											grade: 5
 										});
@@ -7468,15 +7477,6 @@ const __stories = [
 							return MathRound(groundheight * .5);
 						}
 					},
-					// {
-					// 	id: 112,
-					// 	minX: 3580,
-					// 	maxX: 3580,
-					// 	count: 1,
-					// 	yPosition: function() {
-					// 		return MathRound(groundheight * .5);
-					// 	}
-					// },
 					{
 						id: 35,
 						minX: 1580,
@@ -8097,6 +8097,8 @@ function switchStoryScene(_func, _newOrder) {
 					}
 					removeFocus();
 					__account.commonInventory = [];
+					if(mainCharacter)
+						mainCharacter.disableCommonInventory();
 					removeClass(_gameUI, 'demo-playing');
 					if(__storyScene.start)
 						__storyScene.start();
