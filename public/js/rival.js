@@ -19776,7 +19776,6 @@ const _allEnemies = {
 			atk: 100,
 			def: 100,
 			health: 1,
-			noLoot: 1,
 			noCC: 1,
 			skipHealthBar: true,
 			enemy: true,

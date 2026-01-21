@@ -770,6 +770,18 @@ function approveCTFSelection(_id) {
 }
 const _missions = [
 	{
+		key: 'ph',
+		storyId: 114,
+		titles: {
+			en: 'Pinata Party',
+			tr: 'Pinyata Partisi'
+		},
+		descriptions: {
+			en: "With bandits all around, your goal in this section is to destroy the beehive hanging in the middle. If you do it before time runs out, you'll be rewarded with extra loot.",
+			tr: "Haydutlar ortalıkta cirit atarken bu bölümde amacın ortada asılı duran kovanı parçalamak. Vaktin dolmadan bunu yaparsan ganimet ile ödüllendirileceksin."
+		}
+	},
+	{
 		key: 'ad',
 		storyId: 113,
 		titles: {
@@ -3042,7 +3054,6 @@ const storySoundFiles = {
 const soundFiles = {
 	bonusscore: './images/sounds/bonus-score.mp3',
 	bigbodydrop: './images/sounds/body-drop-big.mp3',
-	giantbodydrop: './images/sounds/giant-body-drop.mp3',
 	bodydrop: './images/sounds/body-drop.mp3',
 	deepimpact: './images/sounds/deep-impact.mp3',
 	deadimpact: './images/sounds/dead-impact.mp3',

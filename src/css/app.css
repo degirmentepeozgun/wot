@@ -10980,18 +10980,11 @@ pointer-events: "auto";
 	background:none !important
 }
 .skill-pressed {
-    animation: pressFlash 120ms ease-out,
-               skillPop 120ms cubic-bezier(.2,.8,.3,1);
+    animation: pressFlash 120ms ease-out
 }
 
 @keyframes pressFlash {
     0%   { filter: brightness(1); }
     40%  { filter: brightness(1.8); }
     100% { filter: brightness(1); }
-}
-@keyframes skillPop {
-    0%   { transform: scale(1); }
-    40%  { transform: scale(.92); }
-    70%  { transform: scale(1.08); }
-    100% { transform: scale(1); }
 }

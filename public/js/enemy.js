@@ -373,8 +373,8 @@ function enemy(_e) {
 				return;
 			}
 		}
-		const _enemies = episode.getAvailableEnemies(this)?.filter(x => x.health > 0 && !x.invulnerable);
-		if (!_enemies?.[0]) {
+		const _enemies = episode.getAvailableEnemies(this)?.find(x => x.health > 0 && !x.invulnerable);
+		if (!_enemies) {
 			this.upcomingAnimation = 'idle';
 			return;
 		}
@@ -388,8 +388,6 @@ function enemy(_e) {
 		// 		return 0;
 		// 	return -1;
 		// }).map(x => x.key);
-		shuffle(_theChar.attackKeys);
-		const _keys = _theChar.attackKeys;
 		let _immunities;
 		if (this.autoTarget && !this.autoTarget.isDead() && this.autoTarget.immunities)
 			_immunities = this.autoTarget.immunities;
@@ -421,7 +419,9 @@ function enemy(_e) {
 				return;
 			}
 		}
-		if(!_chosenKey)
+		if(!_chosenKey) {
+			shuffle(_theChar.attackKeys);
+			const _keys = _theChar.attackKeys;
 			for (var _key of _keys) {
 				let _k = _key, _itIsOk;
 				if(this.ultimate && !_k.endsWith('modified') && this.animations[_k + 'modified'] &&
@@ -488,6 +488,7 @@ function enemy(_e) {
 					_chosenKey = _k;
 				}
 			}
+		}
 		if(!_chosenKey && _useLastAttack && !_hasRange)
 			_chosenKey = this.lastAttack;
 		if (_chosenKey || _immuneKey) {
@@ -2431,7 +2432,7 @@ function enemy(_e) {
 					spriteOrigin: _origin,
 					extraStepXRate: -.075 * _xRate,
 					bottomGap: -15 / _rate,
-					sound: _type === 'gold' ? { key: 'goldground', volume: .5 } : undefined,
+					sound: _type === 'gold' ? { key: 'goldground', volume: 1 } : undefined,
 					speed: 3
 				},
 				{
@@ -2746,7 +2747,7 @@ function enemy(_e) {
 								else if(_inv.type === 'gold') {
 									const _ch = mainCharacter;
 									if (_ch) {
-										const _maxAmount = _ch.level * 400;
+										const _maxAmount = _ch.level * 100;
 										const _minAmount = .25 * _maxAmount;
 										const _goldAmount = getRandomValue(_minAmount, _maxAmount);
 										updateGold(_goldAmount, _ch);
@@ -3254,50 +3255,115 @@ function enemy(_e) {
 		return _props.value;
 	}
 	this.updateVariables();
-	this.hasEnemyNear = function (_range, _direction) {
-		const _enemies = episode.getAvailableEnemies(this);
-		if (_enemies?.[0]) {
-			for (var _enemy of _enemies) {
-				if (MathAbs(_enemy.yPosition - this.yPosition) > 10)
-					continue;
-				if (_enemy.invulnerable)
-					continue;
-				if (MathAbs(this.LEFT - _enemy.LEFT) > (this.WIDTH / 3))
-					continue;
-				const _t = isObjectsInTouch(_enemy, this);
-				if (_t.originDiff <= _range)
-					return _enemy;
-			}
-		}
-		return false;
-	}
-	this.getClosestAttackers = function (_count, _range, _func) {
-		const _enemies = episode.getAvailableEnemies(this, _func) ?? [];
-		_count = _count ?? 10;
-		_range *= episode.w100;
-		let _arr = [];
-		if (_enemies?.[0]) {
-			for (var _enemy of _enemies) {
-				if (_enemy.invulnerable || _enemy.autoTarget !== this || _enemy.class === __spell)
-					continue;
-				if (_func && !_func(_enemy))
-					continue;
-				const _t = isObjectsInTouch(_enemy, this);
-				if (_t.touch)
-					_arr.push({range:0, enemy:_enemy});
-				else if(_t.originDiff <= _range)
-					_arr.push({range:_t.originDiff, enemy:_enemy});
-				if(_arr.length === _count)
-					break;
-			}
-			if (_arr.length > _count)
-				return _arr.sort((a, b) => a.range - b.range);
-		}
-		return _arr;
-	}
+	// this.getClosestAttackers = function (_count, _range, _func) {
+	// 	const _enemies = episode.getAvailableEnemies(this, _func) ?? [];
+	// 	_count = _count ?? 10;
+	// 	_range *= episode.w100;
+	// 	let _arr = [];
+	// 	if (_enemies?.[0]) {
+	// 		for (var _enemy of _enemies) {
+	// 			if (_enemy.invulnerable || _enemy.autoTarget !== this || _enemy.class === __spell)
+	// 				continue;
+	// 			if (_func && !_func(_enemy))
+	// 				continue;
+	// 			const _t = isObjectsInTouch(_enemy, this);
+	// 			if (_t.touch)
+	// 				_arr.push({range:0, enemy:_enemy});
+	// 			else if(_t.originDiff <= _range)
+	// 				_arr.push({range:_t.originDiff, enemy:_enemy});
+	// 			if(_arr.length === _count)
+	// 				break;
+	// 		}
+	// 		if (_arr.length > _count)
+	// 			return _arr.sort((a, b) => a.range - b.range);
+	// 	}
+	// 	return _arr;
+	// }
+	// this.getClosestEnemy = function (_range, _direction, _func, _yRange, _tolerance, _force) {
+	// // if(this.autoTarget && ...) → açık değilse şimdilik dokunmuyoruz
+	// // if (!_force && ...) → önbellek kısmı kapalıysa dokunmuyoruz
+
+	// 	let _best = undefined;
+	// 	let _bestPriority = undefined;
+	// 	let _minDist = Infinity;
+	// 	let _minYDiff = Infinity;
+
+	// 	let _enemies = episode.getAvailableEnemies(this, _func);
+	// 	if (!_enemies?.length) return;
+
+	// 	_range = _range ? episode.w100 * _range : 0;
+	// 	const _yRangeAbs = (_yRange ?? 5) * (getGroundHeight() / 100);
+	// 	const _checkYRange = _yRange >= 100 ? false : true;
+
+	// 	for (let i = 0; i < _enemies.length; i++) {
+	// 		const _enemy = _enemies[i];
+
+	// 		if (_enemy.invulnerable || _enemy.class === __spell) continue;
+
+	// 		if (!_enemy.targetPriority && _direction) {
+	// 			if ((this.ORIGINLEFT > _enemy.ORIGINLEFT && _direction !== __left) ||
+	// 				(_enemy.ORIGINLEFT > this.ORIGINLEFT && _direction !== __right)) {
+	// 				continue;
+	// 			}
+	// 		}
+
+	// 		if (_func && !_func(_enemy)) continue;
+			
+	// 		const _touch = isObjectsInTouch(_enemy, this, _yRange, _tolerance);
+	// 		const _yDiff = MathAbs(this.yPosition - _enemy.yPosition);
+
+	// 		if (_touch.touch) {
+	// 			// Öncelikli hedef varsa direkt yaz ama en yakınını tut
+	// 			if (_enemy.targetPriority) {
+	// 				if (!_bestPriority || _touch.originDiff < _minDist) {
+	// 					_bestPriority = {
+	// 						enemy: _enemy,
+	// 						range: _touch.originDiff,
+	// 						yDiff: _yDiff,
+	// 						targetPriority: true
+	// 					};
+	// 					_minDist = _touch.originDiff;
+	// 					_minYDiff = _yDiff;
+	// 				}
+	// 			} else if (!_bestPriority && (!_best || _touch.originDiff < _minDist)) {
+	// 				_best = {
+	// 					enemy: _enemy,
+	// 					range: _touch.originDiff,
+	// 					yDiff: _yDiff
+	// 				};
+	// 				_minDist = _touch.originDiff;
+	// 				_minYDiff = _yDiff;
+	// 			}
+	// 		}
+	// 		else if (_touch.originDiff <= _range) {
+	// 			if (_checkYRange && _yDiff > _yRangeAbs) continue;
+
+	// 			if (_enemy.targetPriority) {
+	// 				if (!_bestPriority || _touch.originDiff < _minDist) {
+	// 					_bestPriority = {
+	// 						enemy: _enemy,
+	// 						range: _touch.originDiff,
+	// 						yDiff: _yDiff,
+	// 						targetPriority: true
+	// 					};
+	// 					_minDist = _touch.originDiff;
+	// 					_minYDiff = _yDiff;
+	// 				}
+	// 			} else if (!_bestPriority && (!_best || _touch.originDiff < _minDist)) {
+	// 				_best = {
+	// 					enemy: _enemy,
+	// 					range: _touch.originDiff,
+	// 					yDiff: _yDiff
+	// 				};
+	// 				_minDist = _touch.originDiff;
+	// 				_minYDiff = _yDiff;
+	// 			}
+	// 		}
+	// 	}
+	// 	// Önce targetPriority varsa onu döndür
+	// 	return _bestPriority ?? _best;
+	// }
 	this.getClosestEnemy = function (_range, _direction, _func, _yRange, _tolerance, _force) {
-	// if(this.autoTarget && ...) → açık değilse şimdilik dokunmuyoruz
-	// if (!_force && ...) → önbellek kısmı kapalıysa dokunmuyoruz
 
 		let _best = undefined;
 		let _bestPriority = undefined;
@@ -3311,26 +3377,48 @@ function enemy(_e) {
 		const _yRangeAbs = (_yRange ?? 5) * (getGroundHeight() / 100);
 		const _checkYRange = _yRange >= 100 ? false : true;
 
-		for (let i = 0; i < _enemies.length; i++) {
-			const _enemy = _enemies[i];
+		// 🔥 CHEAP DATA CACHE (loop dışı)
+		const _myX = this.ORIGINLEFT;
+		const _myY = this.yPosition;
 
+		for (let i = 0; i < _enemies.length; i++) {
+
+			const _enemy = _enemies[i];
 			if (_enemy.invulnerable || _enemy.class === __spell) continue;
 
+			// Direction filtresi aynen kalıyor
 			if (!_enemy.targetPriority && _direction) {
-				if ((this.ORIGINLEFT > _enemy.ORIGINLEFT && _direction !== __left) ||
-					(_enemy.ORIGINLEFT > this.ORIGINLEFT && _direction !== __right)) {
+				if ((_myX > _enemy.ORIGINLEFT && _direction !== __left) ||
+					(_enemy.ORIGINLEFT > _myX && _direction !== __right)) {
 					continue;
 				}
 			}
 
 			if (_func && !_func(_enemy)) continue;
 
+			// ===============================
+			// 🚀 CHEAP CHECK BAŞLIYOR
+			// ===============================
+
+			const _dx = MathAbs(_myX - _enemy.ORIGINLEFT);
+
+			// Range dışındaysa pahalı hesaba sokma
+			if (_range && _dx > _range) continue;
+
+			const _yDiff = MathAbs(_myY - _enemy.yPosition);
+
+			if (_checkYRange && _yDiff > _yRangeAbs) continue;
+
+			// ===============================
+			// Artık GERÇEKTEN yakın olanlar kaldı
+			// ===============================
+
 			const _touch = isObjectsInTouch(_enemy, this, _yRange, _tolerance);
-			const _yDiff = MathAbs(this.yPosition - _enemy.yPosition);
 
 			if (_touch.touch) {
-				// Öncelikli hedef varsa direkt yaz ama en yakınını tut
+
 				if (_enemy.targetPriority) {
+
 					if (!_bestPriority || _touch.originDiff < _minDist) {
 						_bestPriority = {
 							enemy: _enemy,
@@ -3338,23 +3426,28 @@ function enemy(_e) {
 							yDiff: _yDiff,
 							targetPriority: true
 						};
+
 						_minDist = _touch.originDiff;
 						_minYDiff = _yDiff;
 					}
+
 				} else if (!_bestPriority && (!_best || _touch.originDiff < _minDist)) {
+
 					_best = {
 						enemy: _enemy,
 						range: _touch.originDiff,
 						yDiff: _yDiff
 					};
+
 					_minDist = _touch.originDiff;
 					_minYDiff = _yDiff;
 				}
+
 			}
 			else if (_touch.originDiff <= _range) {
-				if (_checkYRange && _yDiff > _yRangeAbs) continue;
 
 				if (_enemy.targetPriority) {
+
 					if (!_bestPriority || _touch.originDiff < _minDist) {
 						_bestPriority = {
 							enemy: _enemy,
@@ -3362,23 +3455,28 @@ function enemy(_e) {
 							yDiff: _yDiff,
 							targetPriority: true
 						};
+
 						_minDist = _touch.originDiff;
 						_minYDiff = _yDiff;
 					}
+
 				} else if (!_bestPriority && (!_best || _touch.originDiff < _minDist)) {
+
 					_best = {
 						enemy: _enemy,
 						range: _touch.originDiff,
 						yDiff: _yDiff
 					};
+
 					_minDist = _touch.originDiff;
 					_minYDiff = _yDiff;
 				}
 			}
 		}
-		// Önce targetPriority varsa onu döndür
+
 		return _bestPriority ?? _best;
-	}
+	};
+
 	this.throwAroundEnemies = function (_range, _attacker, _yRange) {
 		const _oldEnemyState =  this.enemy;
 		this.enemy = !this.enemy;
@@ -3501,30 +3599,96 @@ function enemy(_e) {
 		};
 		//showBorders(_x.left, _x.top, _x.width, _x.height);
 	}
-	this.getEnemiesInTouch = function (_anima, _frame, _tolerance, _func, _force) {
-		const _enemies = episode.getAvailableEnemies(this, _func, _force);
-		if (_enemies?.[0]) {
-			const _aoe = MathRound((_frame.atk?.aoe ?? 0) * this.ZOOM);
-			const cl = this.getClone(_aoe);
-			const hb = this.getHitBox();
-			const _closestEnemies = [];
-			let _t;
-			for (var _enemy of _enemies) {
-				_t = isObjectsInTouch(_enemy, _aoe > 0 ? cl : hb, (_frame.atk?.yRange ?? 0), 0);
-				if (_t.touch) {
-					if (_aoe > 0)
-						_enemy.aoe = true;
-					_closestEnemies.push({ enemy: _enemy, dist: _t.originDiff });
-				}
-				else if (_enemy.attackingOnlyBy === this.key)
-					_closestEnemies.push({ enemy: _enemy, dist: 1 });
-			}
-			if (_closestEnemies.length > 1)
-				_closestEnemies.sort((a, b) => a.dist - b.dist);
-			return _closestEnemies;
+	// this.getEnemiesInTouch = function (_anima, _frame, _tolerance, _func, _force) {
+	// 	const _enemies = episode.getAvailableEnemies(this, _func, _force);
+	// 	if (_enemies?.[0]) {
+	// 		const _aoe = MathRound((_frame.atk?.aoe ?? 0) * this.ZOOM);
+	// 		const cl = this.getClone(_aoe);
+	// 		const hb = this.getHitBox();
+	// 		const _closestEnemies = [];
+	// 		let _t;
+	// 		for (var _enemy of _enemies) {
+	// 			_t = isObjectsInTouch(_enemy, _aoe > 0 ? cl : hb, (_frame.atk?.yRange ?? 0), 0);
+	// 			if (_t.touch) {
+	// 				if (_aoe > 0)
+	// 					_enemy.aoe = true;
+	// 				_closestEnemies.push({ enemy: _enemy, dist: _t.originDiff });
+	// 			}
+	// 			else if (_enemy.attackingOnlyBy === this.key)
+	// 				_closestEnemies.push({ enemy: _enemy, dist: 1 });
+	// 		}
+	// 		if (_closestEnemies.length > 1)
+	// 			_closestEnemies.sort((a, b) => a.dist - b.dist);
+	// 		return _closestEnemies;
+	// 	}
+	// 	return undefined;
+	// }
+		this.getEnemiesInTouch = function (_anima, _frame, _tolerance, _func, _force) {
+
+	const _enemies = episode.getAvailableEnemies(this, _func, _force);
+	if (!_enemies?.length) return;
+
+	const _aoe = MathRound((_frame.atk?.aoe ?? 0) * this.ZOOM);
+	const cl = _aoe > 0 ? this.getClone(_aoe) : null;
+	const hb = this.getHitBox();
+
+	const _src = _aoe > 0 ? cl : hb;
+
+	const _myX = _src.ORIGINLEFT;
+	const _maxRange = (_frame.atk?.range ?? 10) * this.ZOOM;
+
+	const _closestEnemies = [];
+	let _enemy, _dx, _t;
+
+	for (let i = 0; i < _enemies.length; i++) {
+
+		_enemy = _enemies[i];
+
+		// ===== HARD FILTERS =====
+		if (_enemy === this) continue;
+		if (_enemy.dead) continue;
+
+		// ===== CHEAP X DIST CHECK =====
+		_dx = MathAbs(_myX - _enemy.ORIGINLEFT);
+
+		if (_dx > _maxRange && _enemy.attackingOnlyBy !== this.key)
+			continue;
+
+		// ===== EXPENSIVE TOUCH CHECK =====
+		_t = isObjectsInTouch(
+			_enemy,
+			_src,
+			(_frame.atk?.yRange ?? 0),
+			0
+		);
+
+		if (_t.touch) {
+
+			if (_aoe > 0)
+				_enemy.aoe = true;
+
+			_closestEnemies.push({
+				enemy: _enemy,
+				dist: _t.originDiff
+			});
+
 		}
-		return undefined;
+		else if (_enemy.attackingOnlyBy === this.key) {
+
+			_closestEnemies.push({
+				enemy: _enemy,
+				dist: 1
+			});
+		}
 	}
+
+	if (_closestEnemies.length > 1)
+		_closestEnemies.sort((a, b) => a.dist - b.dist);
+
+	return _closestEnemies;
+}
+
+
 	this.charge2 = function (_anima, _frame) {
 		if (this.immobilize)
 			return;
@@ -4122,18 +4286,56 @@ function enemy(_e) {
 				this.targetedTime = undefined;
 		}
 	}
+	// this.getEnemyKillingBy = function () {
+	// 	if(this.onlyTarget)
+	// 	{
+	// 		const _ot = episode.seenEnemies.find(x => x.key ===  this.onlyTarget);
+	// 		if(_ot)
+	// 			return [{enemy:_ot}];
+	// 	}
+	// 	if(!this.finishTarget)
+	// 		return undefined;
+	// 	const _kb = episode.seenEnemies.find(x => x == this.finishTarget && !x.dead && x.health > 0);
+	// 	if (_kb)
+	// 		return [{ enemy: _kb }];
+	// 	return undefined;
+	// }
 	this.getEnemyKillingBy = function () {
-		if(this.onlyTarget)
-		{
-			const _ot = episode.seenEnemies.find(x => x.key ===  this.onlyTarget);
-			if(_ot)
-				return [{enemy:_ot}];
+		const _enemies = episode.seenEnemies;
+		if (!_enemies?.length) return;
+
+		let _onlyTarget = this.onlyTarget;
+		let _finishTarget = this.finishTarget;
+
+		let _ot = null;
+		let _kb = null;
+
+		for (let i = 0; i < _enemies.length; i++) {
+
+			const e = _enemies[i];
+
+			// ===== ONLY TARGET =====
+			if (_onlyTarget && e.key === _onlyTarget) {
+				_ot = e;
+				break; // priority en yüksek → direkt çık
+			}
+
+			// ===== FINISH TARGET =====
+			if (!_kb && e === _finishTarget && !e.dead && e.health > 0) {
+				_kb = e;
+				// break yok → belki onlyTarget aşağıda vardır
+			}
 		}
-		const _kb = episode.seenEnemies.find(x => x == this.finishTarget && !x.dead && x.health > 0);
+
+		if (_ot)
+			return [{ enemy: _ot }];
+
 		if (_kb)
 			return [{ enemy: _kb }];
+
 		return undefined;
-	}
+	};
+
 	this.respawn = function() {
 		this.animations.respawn = {
 			key: 'respawn',
@@ -5347,42 +5549,98 @@ function enemy(_e) {
 		}
 	}
 	this.setAutoTarget = function (_e, _skipShare, _num) {
+
+		// START SOUND
 		if (!this.autoTarget && _e && this.startSound) {
-			if(!this.startSound.async) {
+
+			if (!this.startSound.async) {
 				this.upcomingAnimation = undefined;
 				this.noAttack = true;
-				const _s = this;
+
+				const self = this;
 				this.startSound.end = function () {
-					_s.noAttack = false;
-				}
+					self.noAttack = false;
+				};
 			}
+
 			PlaySound(this.startSound);
 		}
-		// if (this.hasStation && ((_e.related ?? _e) !== this.autoTarget)) {
-		// 	const _diff = { at: (_e.related ?? _e).socketId, sy: 1 };
-		// 	this.setDefaultMessage(_diff);
-		// 	sendMessage(JSON.stringify(_diff));
-		// }
-		const _shareWithGroup = !_skipShare && this.groupId && !this.autoTarget;
-		let _trgt = 1;
-		if(this.onlyTarget)
-		{
-			this.autoTarget = episode.enemies.find(x=> x.key === this.onlyTarget);
-			if(this.autoTarget) {
-				this.autoTarget.targetedBy = this.key;
-				_trgt = undefined;
+
+		const shareWithGroup = !_skipShare && this.groupId && !this.autoTarget;
+
+		let trg = _e ? (_e.related || _e) : null;
+
+		// ONLY TARGET
+		if (this.onlyTarget) {
+
+			const enemies = episode.enemies;
+			for (let i = 0; i < enemies.length; i++) {
+				if (enemies[i].key === this.onlyTarget) {
+					this.autoTarget = enemies[i];
+					this.autoTarget.targetedBy = this.key;
+					trg = null;
+					break;
+				}
 			}
 		}
-		if(_trgt && !(_e.related ?? _e)?.invulnerable){
-			this.autoTarget = _e.related ?? _e;
-			if(this.autoTarget)
-				this.autoTarget.targetedBy = this.key;
+
+		// NORMAL TARGET
+		if (trg && !trg.invulnerable) {
+			this.autoTarget = trg;
+			trg.targetedBy = this.key;
 		}
-		if(_shareWithGroup)
-			episode.enemies.filter(x => x.groupId === this.groupId).forEach(x => {
-				x.setAutoTarget(_e, 1);
-			});
-	}
+
+		// GROUP SHARE (filter + forEach yerine tek loop)
+		if (shareWithGroup) {
+
+			const enemies = episode.enemies;
+
+			for (let i = 0; i < enemies.length; i++) {
+				const e = enemies[i];
+				if (e.groupId === this.groupId) {
+					e.setAutoTarget(_e, 1);
+				}
+			}
+		}
+	};
+
+	// this.setAutoTarget = function (_e, _skipShare, _num) {
+	// 	if (!this.autoTarget && _e && this.startSound) {
+	// 		if(!this.startSound.async) {
+	// 			this.upcomingAnimation = undefined;
+	// 			this.noAttack = true;
+	// 			const _s = this;
+	// 			this.startSound.end = function () {
+	// 				_s.noAttack = false;
+	// 			}
+	// 		}
+	// 		PlaySound(this.startSound);
+	// 	}
+	// 	// if (this.hasStation && ((_e.related ?? _e) !== this.autoTarget)) {
+	// 	// 	const _diff = { at: (_e.related ?? _e).socketId, sy: 1 };
+	// 	// 	this.setDefaultMessage(_diff);
+	// 	// 	sendMessage(JSON.stringify(_diff));
+	// 	// }
+	// 	const _shareWithGroup = !_skipShare && this.groupId && !this.autoTarget;
+	// 	let _trgt = 1;
+	// 	if(this.onlyTarget)
+	// 	{
+	// 		this.autoTarget = episode.enemies.find(x=> x.key === this.onlyTarget);
+	// 		if(this.autoTarget) {
+	// 			this.autoTarget.targetedBy = this.key;
+	// 			_trgt = undefined;
+	// 		}
+	// 	}
+	// 	if(_trgt && !(_e.related ?? _e)?.invulnerable){
+	// 		this.autoTarget = _e.related ?? _e;
+	// 		if(this.autoTarget)
+	// 			this.autoTarget.targetedBy = this.key;
+	// 	}
+	// 	if(_shareWithGroup)
+	// 		episode.enemies.filter(x => x.groupId === this.groupId).forEach(x => {
+	// 			x.setAutoTarget(_e, 1);
+	// 		});
+	// }
 	this.throwSpell = function (_frame, _parent, _target) {
 		const _sp = _frame.spell ?? _frame.atk?.spell;
 		// if(Array.isArray(_sp)) {
@@ -5517,111 +5775,237 @@ function enemy(_e) {
 		return MathRound((((_clone.width * _clone.zoom) - this.WIDTH) / 2) + (
 				(XGAP ?? 0) * __zoom * (_o.zoom ?? 1)));
 	}
-	this.tryUseRelatedObject = function (_o, _z) {
-		//this.relatedObjects = this.relatedObjects?.filter(x => !x.remove) ?? [];
-		const _obj = relatedObjects?.find(x => x.id === _o.key);
-		if (_obj) {
-			if(_o.remove) {
-				this.relatedObjects = this.relatedObjects.filter(x => x.key !== _o.key);
-				return undefined;
-			}
-			const _clone = structuredClone2(_obj);
-			let _anima = this.getCurrentAnimation();
-			if(_anima.hurt)
-				_clone.limit = 5;
-			_clone.sprite = relatedObjectImages[_o.key]();
-			if(_o.yGapMin && _o.yGapMax)
-				_o.yGap = getRandomValue2(_o.yGapMin, _o.yGapMax);
-			if (!_clone.zoom)
-				_clone.zoom = 1;
-			_clone.zoom *= __zoom;
-			if (_o.scale)
-				_clone.zoom *= _o.scale;
-			if (_o.yGap)
-				_clone.yGap = _o.yGap * _clone.zoom * __scale;
-			const _xg = this.getObjectXGap(_clone, _o);
-			if(_clone.xGap)
-				_clone.xGap += _xg;
-			else
-				_clone.xGap = _xg;
-			if (_clone.multiUse || _o.multiUse){
-				_clone.id = _clone.id + Math.random().toString();
-				if(!_clone.multiUse)
-					_clone.multiUse;
-			}
-			if (this.relatedObjects.find(x => x.top === _clone.top && x.id === _clone.id && !x.remove))
-				return _clone;
-			let _arr = this.relatedObjects.filter(x => !x.remove && x.key === _o.key && !x.multiUse);
-			const _length = _arr?.length ?? 0;
-			if (!_length || _o.multiUse) {
-				this.relatedObjects.push(_clone);
-				// if(this.relatedObjects.length > 4) {
-				// 	const _rels = (this.relatedObjects.filter(x => !x.remove));
-				// 	if(_rels.length > 4)
-				// 		this.relatedObjects = this.relatedObjects.sort((a,b) => (b.pushDate - a.pushDate)).slice(0, 4).reverse();
-				// }
+	// this.tryUseRelatedObject = function (_o, _z) {
+	// 	//this.relatedObjects = this.relatedObjects?.filter(x => !x.remove) ?? [];
+	// 	const _obj = relatedObjects?.find(x => x.id === _o.key);
+	// 	if (_obj) {
+	// 		if(_o.remove) {
+	// 			this.relatedObjects = this.relatedObjects.filter(x => x.key !== _o.key);
+	// 			return undefined;
+	// 		}
+	// 		const _clone = structuredClone2(_obj);
+	// 		let _anima = this.getCurrentAnimation();
+	// 		if(_anima.hurt)
+	// 			_clone.limit = 5;
+	// 		_clone.sprite = relatedObjectImages[_o.key]();
+	// 		if(_o.yGapMin && _o.yGapMax)
+	// 			_o.yGap = getRandomValue2(_o.yGapMin, _o.yGapMax);
+	// 		if (!_clone.zoom)
+	// 			_clone.zoom = 1;
+	// 		_clone.zoom *= __zoom;
+	// 		if (_o.scale)
+	// 			_clone.zoom *= _o.scale;
+	// 		if (_o.yGap)
+	// 			_clone.yGap = _o.yGap * _clone.zoom * __scale;
+	// 		const _xg = this.getObjectXGap(_clone, _o);
+	// 		if(_clone.xGap)
+	// 			_clone.xGap += _xg;
+	// 		else
+	// 			_clone.xGap = _xg;
+	// 		if (_clone.multiUse || _o.multiUse){
+	// 			_clone.id = _clone.id + Math.random().toString();
+	// 			if(!_clone.multiUse)
+	// 				_clone.multiUse;
+	// 		}
+	// 		if (this.relatedObjects.find(x => x.top === _clone.top && x.id === _clone.id && !x.remove))
+	// 			return _clone;
+	// 		let _arr = this.relatedObjects.filter(x => !x.remove && x.key === _o.key && !x.multiUse);
+	// 		const _length = _arr?.length ?? 0;
+	// 		if (!_length || _o.multiUse) {
+	// 			this.relatedObjects.push(_clone);
+	// 			// if(this.relatedObjects.length > 4) {
+	// 			// 	const _rels = (this.relatedObjects.filter(x => !x.remove));
+	// 			// 	if(_rels.length > 4)
+	// 			// 		this.relatedObjects = this.relatedObjects.sort((a,b) => (b.pushDate - a.pushDate)).slice(0, 4).reverse();
+	// 			// }
 
-				_clone.pushDate = _gameTick;
-			}
-			else if(_length && (_o.xGapMin || _o.yGapMin)) {
-				this.relatedObjects = this.relatedObjects.filter(x => x !== _arr[0]);
-				this.relatedObjects.push(_clone);
-				_clone.pushDate = _gameTick;
-			}
-			else {
-				const _current = _arr[0];
-				_current.top = _clone.top;
-				_current.xGap = _clone.xGap;
-				_current.alpha = _clone.alpha;
-				_current.pushDate = _gameTick;
-				if (!_current.singleton || _current.reset)
-					_current.start = _current.frame = 0;
-				else if (_o.reset)
-					_current.zoom = _clone.zoom;
-				return _current;
-			}
-			if (_clone.limit) {
-				let _coIndex = -1, count = 0, _removeClone;
-				const _removeId = this.id + _clone.key + _gameTick;
-				for(let i = 0; i < episode.limitedEffects.length; i++) {
-					const _ef = episode.limitedEffects[i];
-					if(_ef.removeId === _removeId)
-						return _clone;
-					if(_ef.key === _clone.key) {
-						if(_coIndex === -1)
-							_coIndex = i;
-						count++;
-						if(count === _clone.limit) {
-							_removeClone = 1;
-							break;
-						}
-					}
-				}
-				if(_removeClone && _coIndex !== -1){
-					episode.limitedEffects[_coIndex].remove = true;
-					episode.limitedEffects.splice(_coIndex, 1);
-				}
+	// 			_clone.pushDate = _gameTick;
+	// 		}
+	// 		else if(_length && (_o.xGapMin || _o.yGapMin)) {
+	// 			this.relatedObjects = this.relatedObjects.filter(x => x !== _arr[0]);
+	// 			this.relatedObjects.push(_clone);
+	// 			_clone.pushDate = _gameTick;
+	// 		}
+	// 		else {
+	// 			const _current = _arr[0];
+	// 			_current.top = _clone.top;
+	// 			_current.xGap = _clone.xGap;
+	// 			_current.alpha = _clone.alpha;
+	// 			_current.pushDate = _gameTick;
+	// 			if (!_current.singleton || _current.reset)
+	// 				_current.start = _current.frame = 0;
+	// 			else if (_o.reset)
+	// 				_current.zoom = _clone.zoom;
+	// 			return _current;
+	// 		}
+	// 		if (_clone.limit) {
+	// 			let _coIndex = -1, count = 0, _removeClone;
+	// 			const _removeId = this.id + _clone.key + _gameTick;
+	// 			for(let i = 0; i < episode.limitedEffects.length; i++) {
+	// 				const _ef = episode.limitedEffects[i];
+	// 				if(_ef.removeId === _removeId)
+	// 					return _clone;
+	// 				if(_ef.key === _clone.key) {
+	// 					if(_coIndex === -1)
+	// 						_coIndex = i;
+	// 					count++;
+	// 					if(count === _clone.limit) {
+	// 						_removeClone = 1;
+	// 						break;
+	// 					}
+	// 				}
+	// 			}
+	// 			if(_removeClone && _coIndex !== -1){
+	// 				episode.limitedEffects[_coIndex].remove = true;
+	// 				episode.limitedEffects.splice(_coIndex, 1);
+	// 			}
 				
-				_clone.removeId = _removeId;
-				episode.limitedEffects.push(_clone);
+	// 			_clone.removeId = _removeId;
+	// 			episode.limitedEffects.push(_clone);
 
-				// let _clones = [];
-				// for (var _en of episode.enemies)
-				// 	if (_en.relatedObjects)
-				// 		for (var _ro of _en.relatedObjects) {
-				// 			if (_ro.key === _clone.key && !_ro.remove)
-				// 				_clones.push(_ro);
-				// 		}
-				// if (_clones.length > _clone.limit) {
-				// 	_clones = _clones.sort((a, b) => a.pushDate - b.pushDate);
-				// 	for (var i = 0; i < _clones.length - _clone.limit; i++)
-				// 		_clones[i].remove = true;
-				// }
-			}
-			return _clone;
+	// 			// let _clones = [];
+	// 			// for (var _en of episode.enemies)
+	// 			// 	if (_en.relatedObjects)
+	// 			// 		for (var _ro of _en.relatedObjects) {
+	// 			// 			if (_ro.key === _clone.key && !_ro.remove)
+	// 			// 				_clones.push(_ro);
+	// 			// 		}
+	// 			// if (_clones.length > _clone.limit) {
+	// 			// 	_clones = _clones.sort((a, b) => a.pushDate - b.pushDate);
+	// 			// 	for (var i = 0; i < _clones.length - _clone.limit; i++)
+	// 			// 		_clones[i].remove = true;
+	// 			// }
+	// 		}
+	// 		return _clone;
+	// 	}
+	// 	return null;
+	// }
+	this.tryUseRelatedObject = function (_o, _z) {
+
+	const rel = this.relatedObjects;
+	const list = relatedObjects;
+	if (!list || !list.length) return null;
+
+	// FIND yerine for
+	let baseObj = null;
+	for (let i = 0; i < list.length; i++) {
+		if (list[i].id === _o.key) {
+			baseObj = list[i];
+			break;
 		}
-		return null;
 	}
+	if (!baseObj) return null;
+
+	if (_o.remove) {
+		for (let i = rel.length - 1; i >= 0; i--) {
+			if (rel[i].key === _o.key)
+				rel.splice(i, 1);
+		}
+		return;
+	}
+
+	// Structured clone yerine hızlı shallow copy
+	const _clone = Object.assign({}, baseObj);
+
+	let _anima = this.getCurrentAnimation();
+	if (_anima?.hurt) _clone.limit = 5;
+
+	_clone.sprite = relatedObjectImages[_o.key]();
+
+	if (_o.yGapMin && _o.yGapMax)
+		_o.yGap = getRandomValue2(_o.yGapMin, _o.yGapMax);
+
+	_clone.zoom = (_clone.zoom || 1) * __zoom;
+
+	if (_o.scale)
+		_clone.zoom *= _o.scale;
+
+	if (_o.yGap)
+		_clone.yGap = _o.yGap * _clone.zoom * __scale;
+
+	const _xg = this.getObjectXGap(_clone, _o);
+	_clone.xGap = (_clone.xGap || 0) + _xg;
+
+	if (_clone.multiUse || _o.multiUse) {
+		_clone.id = _clone.id + _gameTick; // random yerine deterministic
+	}
+
+	// duplicate kontrol
+	for (let i = 0; i < rel.length; i++) {
+		const r = rel[i];
+		if (r.top === _clone.top && r.id === _clone.id && !r.remove)
+			return _clone;
+	}
+
+	// same key count
+	let firstIndex = -1;
+	let count = 0;
+
+	for (let i = 0; i < rel.length; i++) {
+		const r = rel[i];
+		if (!r.remove && r.key === _o.key && !r.multiUse) {
+			if (firstIndex === -1) firstIndex = i;
+			count++;
+		}
+	}
+
+	if (!count || _o.multiUse) {
+		_clone.pushDate = _gameTick;
+		rel.push(_clone);
+	}
+	else if (_o.xGapMin || _o.yGapMin) {
+		rel.splice(firstIndex, 1);
+		_clone.pushDate = _gameTick;
+		rel.push(_clone);
+	}
+	else {
+		const cur = rel[firstIndex];
+		cur.top = _clone.top;
+		cur.xGap = _clone.xGap;
+		cur.alpha = _clone.alpha;
+		cur.pushDate = _gameTick;
+
+		if (!cur.singleton || cur.reset)
+			cur.start = cur.frame = 0;
+		else if (_o.reset)
+			cur.zoom = _clone.zoom;
+
+		return cur;
+	}
+
+	// LIMIT EFFECT
+	if (_clone.limit) {
+
+		const lim = episode.limitedEffects;
+		let count = 0;
+		let removeIndex = -1;
+
+		const removeId = this.id + _clone.key;
+
+		for (let i = 0; i < lim.length; i++) {
+			const e = lim[i];
+
+			if (e.removeId === removeId)
+				return _clone;
+
+			if (e.key === _clone.key) {
+				if (removeIndex === -1)
+					removeIndex = i;
+				count++;
+			}
+		}
+
+		if (count >= _clone.limit && removeIndex !== -1) {
+			lim.splice(removeIndex, 1);
+		}
+
+		_clone.removeId = removeId;
+		lim.push(_clone);
+	}
+
+	return _clone;
+};
+
 	this.isRelative = function () {
 		if (this.main)
 			return true;
@@ -6042,181 +6426,298 @@ function enemy(_e) {
 		//}
 		return false;
 	}
-	this.isRunningAgainstSolidObject = function() {
-		if(!episode.hasSolid)
-			return false;
-		if(this.action?.y)
-			return {
-				moveX : 1,
-				moveY : this.moveDirection === 'up' ? -1  : (this.moveDirection === 'down' ? 1 : 0)
-			};
-		else if(this.puppetMode)
-			return {
-				moveX : 1,
-				moveY : 0
-			};
-		if(!this.animations.run && !this.animations.walk)
-			return false;
-		if(this.animation !== 'run' && this.animation !== 'walk')
-			return false;
-		const _solids = episode.seenEnemies.filter(x => (x.solid 
-			/*|| (x.enemy && this.enemy && x.autoMode !== 0 && this.autoMode !== 0 && this.class !== 'object' && x.class !== 'object')*/
-		) && !x.remove && !x.isDead() && x !== this);
-		if(_solids?.[0]) {
-			const _thisDir = { to: this.getCenterSolid(), from: this.centerSolid};
-			for(const _solid of _solids)
-				if(isObjectsPassingOver(this, _solid) && this.centerSolid && _solid.centerSolid) {
-					const _solidDir = _solid.centerSolid;
-					let _moveX = 1, _moveY = 0;
-					switch(this.moveDirection) {
-						// Eğer soldan sağa giderken çarptıysam
-						case __right:
-							//TO.l+TO.w >= l && FROM.l + FROM.w < l MoveX = 0 
-							if((_thisDir.to.l + _thisDir.to.w) >= _solidDir.l 
-								&& (_thisDir.to.l + _thisDir.to.w) < (_solidDir.l + _thisDir.to.l)
-								//&& (_thisDir.from.l + _thisDir.from.w) < _solidDir.l
-							) {
-								_moveX = 0;
-								const _y = this.getKeyboardYMove();
-								switch(_y) {
-									case 'up':
-										_moveY = -1;
-										break;
-									case 'down':
-										_moveY = 1;
-										break;
-									default:
-										if(_thisDir.to.y < _solidDir.y)
-											_moveY = -1;
-										else
-											_moveY = 1;
-										break;
-								}
+	// this.isRunningAgainstSolidObject = function() {
+	// 	if(!episode.hasSolid)
+	// 		return false;
+	// 	if(this.action?.y)
+	// 		return {
+	// 			moveX : 1,
+	// 			moveY : this.moveDirection === 'up' ? -1  : (this.moveDirection === 'down' ? 1 : 0)
+	// 		};
+	// 	else if(this.puppetMode)
+	// 		return {
+	// 			moveX : 1,
+	// 			moveY : 0
+	// 		};
+	// 	if(!this.animations.run && !this.animations.walk)
+	// 		return false;
+	// 	if(this.animation !== 'run' && this.animation !== 'walk')
+	// 		return false;
+	// 	const _solids = episode.seenEnemies.filter(x => (x.solid 
+	// 		/*|| (x.enemy && this.enemy && x.autoMode !== 0 && this.autoMode !== 0 && this.class !== 'object' && x.class !== 'object')*/
+	// 	) && !x.remove && !x.isDead() && x !== this);
+	// 	if(_solids?.[0]) {
+	// 		const _thisDir = { to: this.getCenterSolid(), from: this.centerSolid};
+	// 		for(const _solid of _solids)
+	// 			if(isObjectsPassingOver(this, _solid) && this.centerSolid && _solid.centerSolid) {
+	// 				const _solidDir = _solid.centerSolid;
+	// 				let _moveX = 1, _moveY = 0;
+	// 				switch(this.moveDirection) {
+	// 					// Eğer soldan sağa giderken çarptıysam
+	// 					case __right:
+	// 						//TO.l+TO.w >= l && FROM.l + FROM.w < l MoveX = 0 
+	// 						if((_thisDir.to.l + _thisDir.to.w) >= _solidDir.l 
+	// 							&& (_thisDir.to.l + _thisDir.to.w) < (_solidDir.l + _thisDir.to.l)
+	// 							//&& (_thisDir.from.l + _thisDir.from.w) < _solidDir.l
+	// 						) {
+	// 							_moveX = 0;
+	// 							const _y = this.getKeyboardYMove();
+	// 							switch(_y) {
+	// 								case 'up':
+	// 									_moveY = -1;
+	// 									break;
+	// 								case 'down':
+	// 									_moveY = 1;
+	// 									break;
+	// 								default:
+	// 									if(_thisDir.to.y < _solidDir.y)
+	// 										_moveY = -1;
+	// 									else
+	// 										_moveY = 1;
+	// 									break;
+	// 							}
 
-							}
-							//If y yönde hareket varsa o yönde gitsin else
-							//If TO.y < y ise MoveY = -1 else MoveY = 1
+	// 						}
+	// 						//If y yönde hareket varsa o yönde gitsin else
+	// 						//If TO.y < y ise MoveY = -1 else MoveY = 1
 
-							break;
-							// Eğer sağdan sola giderken çarptıysam
-						case __left:
-							//TO.l <= l+w && FROM.l > l+w MoveX = 0 
-							if(_thisDir.to.l <= (_solidDir.l + _solidDir.w) 
-								&& _thisDir.to.l > _solidDir.l
-								//&& _thisDir.from.l > (_solidDir.l + _solidDir.w)
-							) {
-								_moveX = 0;
-								const _y = this.getKeyboardYMove();
-								switch(_y) {
-									case 'up':
-										_moveY = -1;
-										break;
-									case 'down':
-										_moveY = 1;
-										break;
-									default:
-										if(_thisDir.to.y < _solidDir.y)
-											_moveY = -1;
-										else
-											_moveY = 1;
-										break;
-								}
+	// 						break;
+	// 						// Eğer sağdan sola giderken çarptıysam
+	// 					case __left:
+	// 						//TO.l <= l+w && FROM.l > l+w MoveX = 0 
+	// 						if(_thisDir.to.l <= (_solidDir.l + _solidDir.w) 
+	// 							&& _thisDir.to.l > _solidDir.l
+	// 							//&& _thisDir.from.l > (_solidDir.l + _solidDir.w)
+	// 						) {
+	// 							_moveX = 0;
+	// 							const _y = this.getKeyboardYMove();
+	// 							switch(_y) {
+	// 								case 'up':
+	// 									_moveY = -1;
+	// 									break;
+	// 								case 'down':
+	// 									_moveY = 1;
+	// 									break;
+	// 								default:
+	// 									if(_thisDir.to.y < _solidDir.y)
+	// 										_moveY = -1;
+	// 									else
+	// 										_moveY = 1;
+	// 									break;
+	// 							}
 
-							}
-							//If y yönde hareket varsa o yönde gitsin else
-							//If TO.y < y ise MoveY = -1 else MoveY = 1
+	// 						}
+	// 						//If y yönde hareket varsa o yönde gitsin else
+	// 						//If TO.y < y ise MoveY = -1 else MoveY = 1
 
-							break;
-						case 'down':
-							_moveX = 0;
-							if(this.yPosition < _solid.yPosition) {
-								_moveX = 0;
-								_moveY = 1;
-							}
-							//TO.t+TO.h >= t && FROM.t + FROM.h < t MoveY = 0 
-							//aşağı yönde giderken
-							//bizim sonraki adımımızın bottom noktası >= objenin şuanki ayak TOP değeri
-							//ve bizim sonraki adımımızın top değeri < (objenin bottom değeri)
-							else if((_thisDir.to.t + _thisDir.to.h) >= _solidDir.t 
-							&& _thisDir.to.t < (_solidDir.t + _solidDir.h)) {
-							//&& (_thisDir.from.t + _thisDir.from.h) < _solidDir.t) {
-								_moveY = 0;
-								_moveX = 1;
-							}
-							else
-								_moveY = 1;
-							//If y yönde hareket varsa o yönde gitsin else
-							//If TO.y < y ise MoveY = -1 else MoveY = 1
+	// 						break;
+	// 					case 'down':
+	// 						_moveX = 0;
+	// 						if(this.yPosition < _solid.yPosition) {
+	// 							_moveX = 0;
+	// 							_moveY = 1;
+	// 						}
+	// 						//TO.t+TO.h >= t && FROM.t + FROM.h < t MoveY = 0 
+	// 						//aşağı yönde giderken
+	// 						//bizim sonraki adımımızın bottom noktası >= objenin şuanki ayak TOP değeri
+	// 						//ve bizim sonraki adımımızın top değeri < (objenin bottom değeri)
+	// 						else if((_thisDir.to.t + _thisDir.to.h) >= _solidDir.t 
+	// 						&& _thisDir.to.t < (_solidDir.t + _solidDir.h)) {
+	// 						//&& (_thisDir.from.t + _thisDir.from.h) < _solidDir.t) {
+	// 							_moveY = 0;
+	// 							_moveX = 1;
+	// 						}
+	// 						else
+	// 							_moveY = 1;
+	// 						//If y yönde hareket varsa o yönde gitsin else
+	// 						//If TO.y < y ise MoveY = -1 else MoveY = 1
 
-							break;
-						case 'up':
-							_moveX = 0;
-							if(this.yPosition > _solid.yPosition) {
-								_moveX = 0;
-								_moveY = -1;
-							}
-							//TO.t+TO.h >= t && FROM.t + FROM.h < t MoveY = 0 
-							else if(_thisDir.to.t <= (_solidDir.t + _solidDir.h) &&
-							(_thisDir.to.t + _thisDir.to.h) > _solidDir.t) {
-							//_thisDir.from.t > (_solidDir.t + _solidDir.h)) {
-								_moveY = 0;
-								_moveX = 1;
-							}
-							else
-								_moveY = -1;
-							//If y yönde hareket varsa o yönde gitsin else
-							//If TO.y < y ise MoveY = -1 else MoveY = 1
+	// 						break;
+	// 					case 'up':
+	// 						_moveX = 0;
+	// 						if(this.yPosition > _solid.yPosition) {
+	// 							_moveX = 0;
+	// 							_moveY = -1;
+	// 						}
+	// 						//TO.t+TO.h >= t && FROM.t + FROM.h < t MoveY = 0 
+	// 						else if(_thisDir.to.t <= (_solidDir.t + _solidDir.h) &&
+	// 						(_thisDir.to.t + _thisDir.to.h) > _solidDir.t) {
+	// 						//_thisDir.from.t > (_solidDir.t + _solidDir.h)) {
+	// 							_moveY = 0;
+	// 							_moveX = 1;
+	// 						}
+	// 						else
+	// 							_moveY = -1;
+	// 						//If y yönde hareket varsa o yönde gitsin else
+	// 						//If TO.y < y ise MoveY = -1 else MoveY = 1
 
-							break;
-						default:
-							_moveX = 0;
-							break;
-					}
-					// Eğer yukardan aşağı giderken çarptıysam
-					//TO.t+TO.h >= t && FROM.t + FROM.h < t MoveY = 0 
-					//MoveX = 1
+	// 						break;
+	// 					default:
+	// 						_moveX = 0;
+	// 						break;
+	// 				}
+	// 				// Eğer yukardan aşağı giderken çarptıysam
+	// 				//TO.t+TO.h >= t && FROM.t + FROM.h < t MoveY = 0 
+	// 				//MoveX = 1
 					
-					// Eğer aşağıdan yukarı giderken çarptıysam
-					//TO.t <= t+h && FROM.t > t+h MoveY = 0 
-					//MoveX = 1
-					// if(this.moveDirection === __left || this.moveDirection === __right) {
-					// 	if((this.direction === __right) && (_thisDir.to.l > (_solidDir.l + _solidDir.w)))
-					// 		_moveX = 1;
-					// 	else if((this.direction === __left) && (_thisDir.to.l + _thisDir.to.w) < _solidDir.l)
-					// 		_moveX = 1;
-					// 	else {
-					// 		if(_thisDir.to.y > _solidDir.y)
-					// 			_moveY = -1;
-					// 		else
-					// 			_moveY = 1;
-					// 	}
-					// }
-					// else {
-					// 	//yukardan aşağı direk iniyosa
-					// 	if(this.moveDirection === 'down' && ((_thisDir.from.t + _thisDir.from.h) < _solidDir.t)
-					// 		&& ((_thisDir.to.t + _thisDir.to.h) >= _solidDir.t))
-					// 		_moveX = 1;
-					// 		//aşağıdan yukarıya ise
-					// 	else if(this.moveDirection === 'up' && (_thisDir.from.t > (_solidDir.t + _solidDir.h))
-					// 		&& (_thisDir.to.t <= (_solidDir.t + _solidDir.h)))
-					// 		_moveX = 1;
-					// }
-					if(_moveY === 2) {
-						this.limitYPosition();
-						_moveY = 0;
-					}
-					if(_moveY && this.enemy && !this.solidOne)
-						this.solidOne = _moveY;
-					return {
-						moveX : _moveX,
-						moveY : this.solidOne ?? _moveY
-					}
-				}
-			}
-		if(this.solidOne)
-			delete this.solidOne;
-		return false;
-	}
+	// 				// Eğer aşağıdan yukarı giderken çarptıysam
+	// 				//TO.t <= t+h && FROM.t > t+h MoveY = 0 
+	// 				//MoveX = 1
+	// 				// if(this.moveDirection === __left || this.moveDirection === __right) {
+	// 				// 	if((this.direction === __right) && (_thisDir.to.l > (_solidDir.l + _solidDir.w)))
+	// 				// 		_moveX = 1;
+	// 				// 	else if((this.direction === __left) && (_thisDir.to.l + _thisDir.to.w) < _solidDir.l)
+	// 				// 		_moveX = 1;
+	// 				// 	else {
+	// 				// 		if(_thisDir.to.y > _solidDir.y)
+	// 				// 			_moveY = -1;
+	// 				// 		else
+	// 				// 			_moveY = 1;
+	// 				// 	}
+	// 				// }
+	// 				// else {
+	// 				// 	//yukardan aşağı direk iniyosa
+	// 				// 	if(this.moveDirection === 'down' && ((_thisDir.from.t + _thisDir.from.h) < _solidDir.t)
+	// 				// 		&& ((_thisDir.to.t + _thisDir.to.h) >= _solidDir.t))
+	// 				// 		_moveX = 1;
+	// 				// 		//aşağıdan yukarıya ise
+	// 				// 	else if(this.moveDirection === 'up' && (_thisDir.from.t > (_solidDir.t + _solidDir.h))
+	// 				// 		&& (_thisDir.to.t <= (_solidDir.t + _solidDir.h)))
+	// 				// 		_moveX = 1;
+	// 				// }
+	// 				if(_moveY === 2) {
+	// 					this.limitYPosition();
+	// 					_moveY = 0;
+	// 				}
+	// 				if(_moveY && this.enemy && !this.solidOne)
+	// 					this.solidOne = _moveY;
+	// 				return {
+	// 					moveX : _moveX,
+	// 					moveY : this.solidOne ?? _moveY
+	// 				}
+	// 			}
+	// 		}
+	// 	if(this.solidOne)
+	// 		delete this.solidOne;
+	// 	return false;
+	// }
+	this.isRunningAgainstSolidObject = function () {
+
+    if (!episode.hasSolid) return false;
+
+    if (this.action?.y) {
+        return {
+            moveX: 1,
+            moveY: this.moveDirection === 'up' ? -1 : (this.moveDirection === 'down' ? 1 : 0)
+        };
+    }
+
+    if (this.puppetMode) {
+        return { moveX: 1, moveY: 0 };
+    }
+
+    if ((!this.animations.run && !this.animations.walk) ||
+        (this.animation !== 'run' && this.animation !== 'walk'))
+        return false;
+
+    const enemies = episode.seenEnemies;
+    const thisCenter = this.centerSolid;
+    const thisNext = this.getCenterSolid();
+
+    if (!thisCenter || !thisNext) return false;
+
+    for (let i = 0; i < enemies.length; i++) {
+
+        const solid = enemies[i];
+
+        // ===== CHEAP FILTER =====
+        if (!solid.solid ||
+            solid.remove ||
+            solid === this ||
+            solid.isDead())
+            continue;
+
+        if (!solid.centerSolid) continue;
+
+        // ===== HEAVY CHECK SONRA =====
+        if (!isObjectsPassingOver(this, solid))
+            continue;
+
+        const s = solid.centerSolid;
+        let moveX = 1;
+        let moveY = 0;
+
+        switch (this.moveDirection) {
+
+            case __right:
+                if ((thisNext.l + thisNext.w) >= s.l &&
+                    (thisNext.l + thisNext.w) < (s.l + thisNext.l)) {
+
+                    moveX = 0;
+
+                    const y = this.getKeyboardYMove();
+                    moveY = y === 'up' ? -1 :
+                            y === 'down' ? 1 :
+                            (thisNext.y < s.y ? -1 : 1);
+                }
+                break;
+
+            case __left:
+                if (thisNext.l <= (s.l + s.w) &&
+                    thisNext.l > s.l) {
+
+                    moveX = 0;
+
+                    const y = this.getKeyboardYMove();
+                    moveY = y === 'up' ? -1 :
+                            y === 'down' ? 1 :
+                            (thisNext.y < s.y ? -1 : 1);
+                }
+                break;
+
+            case 'down':
+                if ((thisNext.t + thisNext.h) >= s.t &&
+                    thisNext.t < (s.t + s.h)) {
+
+                    moveY = 0;
+                    moveX = 1;
+                } else {
+                    moveY = 1;
+                }
+                break;
+
+            case 'up':
+                if (thisNext.t <= (s.t + s.h) &&
+                    (thisNext.t + thisNext.h) > s.t) {
+
+                    moveY = 0;
+                    moveX = 1;
+                } else {
+                    moveY = -1;
+                }
+                break;
+        }
+
+        if (moveY === 2) {
+            this.limitYPosition();
+            moveY = 0;
+        }
+
+        if (moveY && this.enemy && !this.solidOne)
+            this.solidOne = moveY;
+
+        return {
+            moveX: moveX,
+            moveY: this.solidOne ?? moveY
+        };
+    }
+
+    if (this.solidOne)
+        delete this.solidOne;
+
+    return false;
+};
+
 	this.setNewStatus = function (_diff) {
 		return;
 		for (var _k of Object.keys(_diff))

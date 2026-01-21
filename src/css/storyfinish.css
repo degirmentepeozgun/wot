@@ -187,7 +187,7 @@
 }
 #story-finish .btn.inactivated {
 	pointer-events: none !important;
-	background:linear-gradient(90deg, transparent, #f3f4f580, #f3f4f580, transparent), radial-gradient(#9d987f, transparent);
+	opacity: .7;
 }
 #story-finish.flex,
 #story-finish .flex{

@@ -54,7 +54,7 @@ function dungeon() {
 			}
 			_html += `<div data-key="${item.id}" onexactclick="getRef('dungeon')?.selectDungeon(${item.id})" class="skill-card dungeon-card flex animate-me${(item.id === _id && !_noSelect) ? ' selected' : ''}">
 				<div class="skill-icon-wrapper flex">
-					<img src="./images/mission/icons/${item.mission}/icon.png" />
+					<img${item.bgColor ? ' style="background:radial-gradient(' + item.bgColor + ', #000)"' : ''} src="./images/mission/icons/${item.mission}/icon.png" />
 				</div>
 				<div class="flex" style="flex:1;height:100%;padding:1vh 0">
 					<div class="flex flex-jc-start skill-card-title w-100" style="height:40%">${item.title[getLang()]}</div>

@@ -5130,7 +5130,7 @@ this.drawHealthBar2 = function (_item) {
 	}
 
 	this.getAvailableEnemies = function (_char, _func, _force) {
-		if(!_force && (_char.lastAvailableEnemyPickDate > (_gameTick - 100)))
+		if(!_force && (_char.lastAvailableEnemyPickDate > (_gameTick - 200)))
 			return  _char.lastAvailableEnemies;
 		_char.lastAvailableEnemyPickDate = _gameTick;
 		const _enemies = this.pvp ? this.enemies : this.seenEnemies;
@@ -5154,7 +5154,11 @@ this.drawHealthBar2 = function (_item) {
 		// const activeEnemies = this.seenEnemies?.filter(x =>
 		// 	!x.dead && x.class !== __spell);
 		const _iv = !(_char.main && _char.autoMode === 2);
-		const _x = [];
+		if(!_char._enemyBuffer)
+  			_char._enemyBuffer = [];
+		else
+			_char._enemyBuffer.length = 0;
+		const _x = _char._enemyBuffer;
 		const _ff = _char.friendlyFire && (_char.enemy !== mainCharacter.enemy);
 		for(let x of _enemies) {
 			if(x.attackingOnlyBy && x.attackingOnlyBy === _char.key && 

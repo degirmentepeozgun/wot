@@ -202,8 +202,8 @@ function getLobbyScene() {
 							_br.updateVariables();
 						}
 					};
-					_e.animations.run.frames.forEach(x => x.color = '#507b82');
-					_e.animations.run.alternateFrames[0].frames.forEach(x => x.color = '#507b82');
+					//_e.animations.run.frames.forEach(x => x.color = '#507b82');
+					//_e.animations.run.alternateFrames[0].frames.forEach(x => x.color = '#507b82');
 				}
 			})
 		});
@@ -4945,10 +4945,11 @@ const __stories = [
 								if(episode?.id !== 201)
 									return;
 								episode.phase = 100;
-								const installBoss = function(_b) {
+								const installBoss = function(_b, _name) {
 									const _boss = summonMobWithJson({
 										id: _b,
 										level: 13,
+										name: _name,
 										atk: mainCharacter.atk,
 										grade: 4
 									});
@@ -4959,9 +4960,9 @@ const __stories = [
 									_boss.acceptChanges();
 									_boss.pickNewTarget();
 								}
-								installBoss(37);
+								installBoss(37, 'Yecüc');
 								requestAnimationFrame(() => {
-									installBoss(38);
+									installBoss(38, 'Mecüc');
 								});
 								mainCharacter.maxHP = mainCharacter.MAXHP =
 								mainCharacter.maxHP * 1;
@@ -6647,6 +6648,207 @@ const __stories = [
 		]
 	},
 	{
+		id:114,
+		disableWorldMap: true,
+		order:114,
+		act:1,
+		bgColor: '#a9f010',
+		mission: 'ph',
+		daily:2,
+		minLevel:10,
+		ticket: 0,
+		perfectFinishRewards: [{ key: 'chest', grade: 2 }],
+		title: {
+			en: 'Pinata Party',
+			tr: 'Pinyata Partisi'
+		},
+		description: {
+			en: "With bandits all around, your goal in this section is to destroy the beehive hanging in the middle. If you do it before time runs out, you'll be rewarded with extra loot.",
+			tr: "Haydutlar ortalıkta cirit atarken bu bölümde amacın ortada asılı duran kovanı parçalamak. Vaktin dolmadan bunu yaparsan ganimet ile ödüllendirileceksin."
+		},
+		resultStars: [
+			{ id: 1, title: 'Clear mission', when: function() {
+				return !mainCharacter.isDead();
+			}},
+			{ id: 2, key: 'time', value: 3 * 60000, title: 'Finish in time',
+				when: function(_item) {
+					//return !isMissionFailed(0) && !isMissionFailed(2) &&
+					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
+			}},
+			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
+				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
+			}}
+		],
+		rewards: [
+			{ key: 'misc', type: 'ticket-random', count:1 },
+			{ key: 'gem', grade: 1, type: 'random', count:1 },
+			{ key: 'gold', count: 10000 },
+			{ key: 'exp', count: 2200 }
+		],
+		quests: [
+			{
+				id: 1,
+				descriptions: {
+					en: 'Hive smashed',
+					tr: 'Kovan parçalandı'
+				},
+				names: {
+					en: 'Smash The Hive',
+					tr: 'Kovanı Parçala'
+				},
+				owner: 'system',
+				minLevel: 1,
+				maps: [11],
+				timer: {
+					ms: 120000,
+					after: function() {
+						if(episode.phase < 100)
+							episode.timerFailed = 1;
+						episode.phase = 101;
+					}
+				}
+			}
+		],
+		scenes: [
+			{
+				map: 11,
+				startsWith: 1,
+				save: true,
+				loadingCharacterIds: [111, 33, 35, 2, 7],
+				start: function() {
+					removeCoopCharacter();
+					addClass(_gameUI, 'demo-playing');
+					mainCharacter.direction = __right;
+					takeQuest(0, 1, null, null, 1);
+					episode.boss = episode.enemies.find(x => x.id === 111);
+					episode.phase = episode.boss.grade;
+					removeClass(_gameUI, 'disable-ui');
+				},
+				actions: [
+					{
+						when: function() {
+							return (episode.boss?.gradeLeft + 1) < episode.phase && episode.phase < 100;
+						},
+						do: function() {
+							if(episode.boss) {
+								delete episode.boss.looted;
+								episode.loot = {
+									enemy: episode.boss,
+									loots: [
+										
+									]
+								};
+								episode.phase--;
+								for(let i = 0; i < (episode.boss.grade - episode.phase); i++)
+									episode.loot.loots.push({type:'gold'});
+							}
+						}
+					},
+					{
+						when: function() {
+							return episode.phase === 101;
+						},
+						do: function() {
+							episode.phase = 103;
+							__storyPlaying = false;
+							installStoryFinish(1);
+						}
+					},
+					{
+						when: function() {
+							return episode.phase === 102 && !(episode.enemies?.find(x => x.id === 111));
+						},
+						do: function() {
+							episode.phase = 103;
+							updateQuestArea();
+							__storyPlaying = false;
+							installStoryFinish();
+						}
+					},
+					{
+						when: function() {
+							return (episode.boss?.health <= 0 && episode.phase < 10);
+						},
+						do: function() {
+							delete episode.boss;
+							if(__account?.questStatus?.quest?.timer)
+								delete __account.questStatus.quest.timer;
+							episode.enemies.filter(x => !x.main && !x.tag && !x.friendly).forEach(x => {
+								x.stopSpawn();
+								x.health = x.experience = 0;
+								x.dead = x.dying = true;
+								x.animate('dead', 1);
+							});
+							episode.mobs = episode.respawners = [];
+							episode.phase = 102;
+							episode.pauseBgMusic();
+							episode.pauseAmbianceMusic();
+							PlaySound({ key:'deepimpact', volume: 1 });
+							if(mainCharacter)
+								cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
+						}
+					}
+				],
+				mobs: [
+					{
+						id: 111,
+						minX: 2580,
+						maxX: 2580,
+						count: 1,
+						sight: 1000,
+						grade: 11,
+						hp: 10000,
+						zoom: .34,
+						yPosition: function() {
+							return MathRound(groundheight * .5);
+						}
+					},
+					{
+						id: 35,
+						minX: 1580,
+						maxX: 4800,
+						count: 4,
+						sight: 1000,
+						spawn: 10,
+						hp:3000,
+						experience: 0
+					},
+					{
+						id: 7,
+						minX: 2000,
+						maxX: 3200,
+						count: 2,
+						sight: 1000,
+						spawn: 10,
+						hp:2000,
+						experience: 0
+					},
+					{
+						id: 2,
+						minX: 1580,
+						maxX: 4800,
+						count: 6,
+						sight: 1000,
+						spawn: 10,
+						hp:2500,
+						experience: 0
+					},
+					{
+						id: 33,
+						minX: 1580,
+						maxX: 4800,
+						count: 2,
+						sight: 1000,
+						spawn: 10,
+						hp:2200,
+						experience: 0
+					}
+				]
+			},
+			getLobbyScene()
+		]
+	},
+	{
 		id:200,
 		disableWorldMap: true,
 		order:200,
@@ -7009,13 +7211,17 @@ const __stories = [
 					},
 					{
 						when: function() {
-							if(episode.phase !== 100)
+							if(episode.phase !== 100 || episode.oneBossDown)
 								return false;
 							const _bosses = episode.enemies.filter(x => x.class === 'boss');
 							const _result = _bosses?.length === 1;
 							if(_result) {
-								__storyScene.bossQuest.kills.find(x => x.enemy[0] !== _bosses[0].id).count = 1;
-								updateQuestArea(null, __storyScene.bossQuest);
+								episode.oneBossDown = 1;
+								const _counter = __storyScene.bossQuest.kills.find(x => x.enemy[0] !== _bosses[0].id);
+								if(_counter && _counter.count !== 1) {
+									_counter.count = 1;
+									updateQuestArea(null, __storyScene.bossQuest);
+								}
 							}
 							return _result;
 						},
@@ -7029,9 +7235,11 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 101;
-							const _counter = __storyScene.bossQuest.kills.find(x => x.count !== 1);
-							if(_counter) {
-								_counter.count = 1;
+							const _counters = __storyScene.bossQuest.kills.filter(x => x.count !== 1);
+							if(_counters?.[0]) {
+								_counters.forEach(x => {
+									x.count = 1;
+								});
 								updateQuestArea(null, __storyScene.bossQuest);
 							}
 							// __storyPlaying = false;
@@ -8963,7 +9171,9 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 	return _html;
 }
 function checkStoryBonusAchievement(_story, _isRealPlay) {
-	const _rs = __account.storyResults.find(x => x.id === _story.id);
+	let _rs = __account.storyResults.find(x => x.id === _story.id);
+	if(!_rs)
+		return;
 	_rs.count = _rs.count > 0 ? _rs.count + 1 : 1;
 	if(!_rs.bonusAchievements)
 		_rs.bonusAchievements = [];
@@ -9010,6 +9220,14 @@ function getStoryRewardsResultHtml(_story, _bonus, _pass, _looseGain, _isRealPla
 		parseInt(_bonus.split('*')[1]) : __account.act ?? 1, _bonus.split('*')[0]);
 	}
 	const _arr = _looseGain ? (Array.isArray(_looseGain) ? _looseGain : [_looseGain]) : _story.rewards ?? [];
+	if(episodeGold > 0) {
+		const _goldItem = _arr.find(x => x.key === 'gold');
+		if(_goldItem)
+			_goldItem.count += episodeGold;
+		else
+			_arr.push({key:'gold', count:episodeGold});
+		episodeGold = 0;
+	}
 	for(let r of _arr)
 	{
 		if(r.chance && getRandomValue2(1, 100) > r.chance)
