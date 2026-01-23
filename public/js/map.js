@@ -24,12 +24,12 @@ function map(_m) {
 	this.season = _m.season;
 	const _mapSprite = mapSprites.find(x => x.id == this.season);
 	this.still = _mapSprite.still;
-	this.width = MathRound((_mapSprite.width ?? _m.width) * __zoom);
-	if(this.width < _canvas.width)
-		this.width = _canvas.width;
-	_canvasR.width = _canvasS.width = (this.width);
+	// this.width = MathRound((_mapSprite.width ?? _m.width) * __zoom);
+	// if(this.width < _canvas.width)
+	// 	this.width = _canvas.width;
+	// _canvasR.width = _canvasS.width = (this.width);
 	//_canvasR.style.width = _canvasS.style.width = (this.width) + 'px';
-	_canvasS.style.width = (this.width * __scale) + 'px';
+	//_canvasS.style.width = (this.width * __scale) + 'px';
 	this.missionRoadRate = 1;
 	cc = document.getElementById('constant-obj');
 	c3 = document.getElementById('droad');
@@ -50,16 +50,17 @@ function map(_m) {
 	}
 	this.after = _mapSprite.after;
 	this.menu = _mapSprite.menu;
-	this.height = _m.height;
+	//this.height = _m.height;
 	this.hitCount = 0;
 	this.limitedEffects = [];
-	this.distance = (__globalDistance ? parseFloat(__globalDistance) / 100 : undefined) ?? (_mapSprite.distance ?? .5);
+	//this.distance = (__globalDistance ? parseFloat(__globalDistance) / 100 : undefined) ?? (_mapSprite.distance ?? .5);
 	this.sprites = _m.sprites;
 	this.status = _m.status ?? 'loading';
 	this.loadObjects = _m.loadObjects;
 	this.loadEnemies = _m.loadEnemies;
 	this.enemies = [];
 	this.seenEnemies = [];
+	this.activeSpells = [];
 	this.lastUnseenCheck = Date.now() - 200;
 	this.type = _m.type ?? 'mission';
 	this.enemyCounts = _m.enemyCounts;
@@ -82,7 +83,7 @@ function map(_m) {
 	this.backgroundSrc = this.assetPath;
 	this.totalObjectCount = _m.totalObjectCount;
 	this.ground = _mapSprite.ground;
-	this.zoom = __zoom * (this.ground.zoom ?? 1);
+	//this.zoom = __zoom * (this.ground.zoom ?? 1);
 	this.id = _mapSprite.id;
 	this.mobs = _mapSprite.mobs;
 	this.mobs.forEach(x => {
@@ -95,21 +96,20 @@ function map(_m) {
 	this.itemGrade = _mapSprite.itemGrade ?? 0;
 	this.equipmentDropRates = _mapSprite.equipmentDropRates;
 	this.artifacts = [];
-	this.cHeight = _canvas.height;
-	this.cUIHeight = _canvas.height * __scale;
-	this.cWidth = _canvas.width;
-	this.cUIWidth = _canvas.width * __scale;
-	this.dmgFrameHeight = this.cHeight / 20;
-	this.dmgFrameTopBoundary = MathRound(this.cHeight * .15);
-	this.defaultHealthBarHeight = MathRound(this.cHeight / 75);
-	this.RECT = { 
-		left: 0, 
-		right: this.cWidth,
-		top: 0, 
-		bottom: this.cHeight, 
-		width: this.cWidth, 
-		realWidth: this.cWidth 
-	};
+	// this.cHeight = _canvas.height;
+	// this.cUIHeight = _canvas.height * __scale;
+	// this.cWidth = _canvas.width;
+	// this.cUIWidth = _canvas.width * __scale;
+	// this.dmgFrameHeight = this.cHeight / 20;
+	// this.dmgFrameTopBoundary = MathRound(this.cHeight * .15);
+	// this.RECT = { 
+	// 	left: 0, 
+	// 	right: this.cWidth,
+	// 	top: 0, 
+	// 	bottom: this.cHeight, 
+	// 	width: this.cWidth, 
+	// 	realWidth: this.cWidth 
+	// };
 	// this.damages = [];
 	// for(let i = 0; i < 5; i++){
 	// 	const _textElem = document.createElement('div');
@@ -262,7 +262,6 @@ function map(_m) {
 		}
 	}
 	this.setRepeat(_mapSprite);
-	const self = this;
 	let _canvasAreas = document.querySelectorAll('.canvas');
 	for (var _ca of _canvasAreas)
 		_ca.innerHTML = '';
@@ -276,19 +275,19 @@ function map(_m) {
 		pvpCounter.remove();
 	if (this.ground) {
 		this.ground.src = './images/texture/' + this.assetPath + '-ground.png';
-		if (this.ground.yRate)
-			groundheight = MathRound(idealground_height * this.ground.yRate);
-		else
-			groundheight = idealground_height;
-		minPositionY = this.ground.bottomGap ? MathRound(this.ground.bottomGap * __zoom) : 1;
-		minLeft = this.ground.leftGap ? MathRound(this.ground.leftGap * __zoom) : 0;
-		maxLeft = this.ground.rightGap ? MathRound(this.ground.rightGap * __zoom) : 0;
+		// if (this.ground.yRate)
+		// 	groundheight = MathRound(idealground_height * this.ground.yRate);
+		// else
+		// 	groundheight = idealground_height;
+		// minPositionY = this.ground.bottomGap ? MathRound(this.ground.bottomGap * __zoom) : 1;
+		// minLeft = this.ground.leftGap ? MathRound(this.ground.leftGap * __zoom) : 0;
+		// maxLeft = this.ground.rightGap ? MathRound(this.ground.rightGap * __zoom) : 0;
 	}
-	else
-		groundheight = idealground_height;
+	// else
+	// 	groundheight = idealground_height;
 	
-	this.XStep = MathRound(getGroundHeight() / 4);
-	this.YStep = MathRound(getGroundHeight() / 5);
+	// this.XStep = MathRound(getGroundHeight() / 4);
+	// this.YStep = MathRound(getGroundHeight() / 5);
 	this.moveCamera = function(_endFunc, speed, force) {
 		if(!mainCharacter)
 			return;
@@ -445,7 +444,6 @@ function map(_m) {
 				_lay.src = './images/texture/' + (_lay.theme ?? this.assetPath) + '-' + _lay.name + '.png?z=' + _lay.zoom;
 				
 	}
-	this.loadLayers();
 	this.floor = _mapSprite.floor;
 	this.bgAnimations = _mapSprite.bgAnimations;
 	if (this.bgAnimations)
@@ -531,16 +529,7 @@ function map(_m) {
 			return _object;
 		}
 	}
-	if (this.loadObjects) {
-		const _objects = _mapSprite.objects ?? [];
-		let _arr;
-		if(this.artifacts?.length > 0)
-			_arr = _objects.concat(this.artifacts);
-		else
-			_arr = _objects;
-		for (var _obj of _arr)
-			this.loadObject(_obj);
-	}
+	
 	this.checkTowerResult = function(_timeIsUp, _diff) {
 		let _end;
 		if(mainCharacter.isDead()) {
@@ -1692,7 +1681,7 @@ function map(_m) {
 			this.lastUnseenCheck = _gameTick;
 			this.seenEnemies.length = 0;
 		}
-		this.limitedEffects.length = 0;
+		this.limitedEffects.length = this.activeSpells.length = 0;
 		if(mainCharacter)
 			mainCharacter.hasLeftEnemy = mainCharacter.hasRightEnemy = undefined;
 		if (_len)
@@ -1760,8 +1749,11 @@ function map(_m) {
 								mainCharacter.hasRightEnemy = 1;
 						}
 				}
-				if(!sprite.unseen && updateUnseen && !sprite.remove)
+				if(!sprite.unseen && updateUnseen && !sprite.remove){
 					this.seenEnemies.push(sprite);
+					if(sprite.class === __spell)
+						this.activeSpells.push(sprite);
+				}
 				if (sprite.autoMode > 0)
 					sprite.started = true;
 				else if (sprite.autoMode === 0 && sprite.dmgTaken)
@@ -2558,12 +2550,8 @@ function map(_m) {
 					_node.remove();
 			}
 			let _quest = __story?.quests.find(x => x.id === __account.questStatus.order);
-			if (!_quest){
+			if (!_quest)
 				return;
-				_quest = __story?.quests.find(x => x.id === __account.questStatus.quest?.id);
-				if(!_quest)
-					return;
-			}
 			let _status; //1 başlamadı, 2 alındı, 3 devam ediyor, 4 bitti git ödülü al
 			switch (__account.questStatus.state) {
 				case 'begin':
@@ -2594,56 +2582,11 @@ function map(_m) {
 					});
 				sprite.frame = 1;
 				sprite.start = 0;
-				continue;
-				const _id =sprite.class+ '-quest-mark';
-				let _imgQuest = document.getElementById(_id);
-				if(_imgQuest && _unseen)
-					addClass(_imgQuest, 'v-none');
-				if(!_unseen){
-					if(!_imgQuest) {
-						const _w = 0;//MathRound(sprite.WIDTH >= 0 ? sprite.WIDTH : sprite.width);
-						const _l = MathRound((sprite.LEFT >= __minLeft ? sprite.LEFT + platformX : sprite.left));
-						const _t = MathRound((sprite.TOP >= 0 ? sprite.TOP : sprite.top));
-						const _c = sprite.rate == .9 ? _canvasAnimated90 : cc;
-						_imgQuest = document.createElement('img');
-						_imgQuest.id = _id;
-						const _questMarkHeight = MathRound(this.cUIHeight / 16);
-						const _left = MathRound(_l + (((_w - (sprite.rightGap ?? 0)) - _questMarkHeight) / 2));
-						_imgQuest.left = _left;
-						_imgQuest.oldStatus = _status;
-						_imgQuest.src = "./images/icons/quest-" + (_status < 3 ? 'start' : 'progress') + ".png";
-						_imgQuest.style.left = _left + 'px';
-						_imgQuest.style.height = _imgQuest.style.width = _questMarkHeight + 'px';
-						_imgQuest.style.top = MathRound(_t - _questMarkHeight - (sprite.topGap ?? 0)) + 'px';
-						_imgQuest.style.position = 'absolute';
-						_imgQuest.className = 'quest-sign';
-						if ((_status % 2) === 0)
-							_imgQuest.className += ' glow-dark';
-						else
-							_imgQuest.className += ' gray';
-						_c.appendChild(_imgQuest);
-					}
-					else
-					{
-						if(_imgQuest.oldStatus !== _status) {
-							_imgQuest.src = "./images/icons/quest-" + (_status < 3 ? 'start' : 'progress') + ".png";
-							if ((_status % 2) === 0) {
-								removeClass(_imgQuest, 'gray');
-								addClass(_imgQuest, 'glow-dark');
-							}
-							else {
-								addClass(_imgQuest, 'gray');
-								removeClass(_imgQuest, 'glow-dark');
-							}
-						}
-						//_imgQuest.style.left = (_imgQuest.left - platformX) + 'px';
-						removeClass(_imgQuest, 'v-none');
-					}
-				}
 			}
 		}
 	}
 	this.resetSideQuests = function (_sprite, _unseen) {
+		return;
 		const sprites = _sprite ? [_sprite] : this.sprites?.filter(x => x.frames && x.npc);
 		if (sprites?.[0]) {
 			if(!_sprite) {
@@ -3166,7 +3109,8 @@ function map(_m) {
 	return _hs;
 };
 
-	const _maxSort = 200000000, _yTol = 7 * __zoom;
+	const _maxSort = 200000000;
+	let _yTol = 7 * __zoom;
 	this.getPerspectiveRate = function(_char, _force, _animation) {
 		if(_char.lastYPosition === _char.yPosition)
 			return _char.lastPerspectiveRate;
@@ -4190,6 +4134,7 @@ function map(_m) {
         ctx.lineWidth = lineWidth;
 		ctx.strokeRect(x,y,width,height);
     }
+	
 	// this.drawHealthBar2 = function (_item) {
 	// 	if(__batterySaveMode || _item.unseen || _item.char.skipHealthBar || _item.char.remove || _item.char.health <= 0 || _item.char.dead)
 	// 		return;
@@ -4346,427 +4291,335 @@ function map(_m) {
 	// 	}
 	// }
 	this.healthBarCache = this.healthBarCache ?? new Map();
-this.w100 = MathRound(this.cWidth / 100);
-this.VH3 = MathRound(window.innerHeight / 33);
-// this.drawMobHealthBar = function(cofftx, _item, x, y, w) {
-// 	const _char = _item.char;
-// 	const h = MathRound(w * (26 / 124));
-//     // HP Ratio
-//     let ratio = Math.max(0, Math.min(1, _char.health / _char.MAXHP));
+	this.w100 = MathRound(this.cWidth / 100);
+	this.VH3 = MathRound(window.innerHeight / 33);
+	// this.drawMobHealthBar = function(cofftx, _item, x, y, w) {
+	// 	const _char = _item.char;
+	// 	const h = MathRound(w * (26 / 124));
+	//     // HP Ratio
+	//     let ratio = Math.max(0, Math.min(1, _char.health / _char.MAXHP));
 
-//     // İlk tick ise previousHPRatio yok → oluştur
-//     if (_char.previousHPRatio === undefined) {
-//         _char.previousHPRatio = ratio;
-//         _char.damageFlash = 0; 
-//     }
+	//     // İlk tick ise previousHPRatio yok → oluştur
+	//     if (_char.previousHPRatio === undefined) {
+	//         _char.previousHPRatio = ratio;
+	//         _char.damageFlash = 0; 
+	//     }
 
-//     // HP düştüyse flash tetikle
-//     if (ratio < _char.previousHPRatio) {
-//         _char.damageFlash = 1; 
-//     }
+	//     // HP düştüyse flash tetikle
+	//     if (ratio < _char.previousHPRatio) {
+	//         _char.damageFlash = 1; 
+	//     }
 
-//     // Flash zamanla sönsün
-//     if (_char.damageFlash > 0) {
-//         _char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
-//     }
+	//     // Flash zamanla sönsün
+	//     if (_char.damageFlash > 0) {
+	//         _char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
+	//     }
 
-//     // Yeni HP değerini sakla
-//     _char.previousHPRatio = ratio;
-// 	const _rev = offCtx.reversed;
-// 	if(offCtx.reversed)
-// 		offCtx.restore();
+	//     // Yeni HP değerini sakla
+	//     _char.previousHPRatio = ratio;
+	// 	const _rev = offCtx.reversed;
+	// 	if(offCtx.reversed)
+	// 		offCtx.restore();
 
-//     // --- 1. ÇERÇEVEYİ ÇİZ ---
-//     cofftx.drawImage(this.HBMob, x, y, w, h);
-
-
-//     // --- 2. INNER BAR MARGIN ---
-// 	let padX = w * .06;
-// 	let padY = h * .225;
-//     let innerX = x + padX;
-//     let innerY = y + padY;
-//     let innerW = w - padX * 2;
-//     let innerH = h - padY * 2;
-
-//     // --- 3. HEALTH COLOR (yeşil → kırmızı) ---
-//     let r = Math.floor(255 * (1 - ratio));
-//     let g = Math.floor(255 * ratio);
-//     let color = `rgb(${r},${g},0)`;
-
-//     // Bar genişliği
-//     let barW = innerW * ratio;
-
-//     // Health bar'ı çiz
-//     cofftx.save();
-//     cofftx.fillStyle = color;
-//     cofftx.fillRect(innerX, innerY, barW, innerH);
-//     //cofftx.restore();
+	//     // --- 1. ÇERÇEVEYİ ÇİZ ---
+	//     cofftx.drawImage(this.HBMob, x, y, w, h);
 
 
-//     // --- 4. DAMAGE FLASH (otomatik) ---
-//     if (_char.damageFlash > 0) {
-//         //cofftx.save();
-//         cofftx.globalAlpha = _char.damageFlash;
-//         cofftx.fillStyle = "white";
-//         cofftx.fillRect(innerX, innerY, innerW, innerH);
-//         //cofftx.restore();
-//     }
-// 	cofftx.restore();
-// 	if(_rev) {
-// 		offCtx.save();
-// 		offCtx.scale(-1, 1);
-// 	}
-// }
-this.drawMobHealthBar = function (ctx, _item, x, y, w) {
-	const _char = _item.char;
-	const h = MathRound(w * (26 / 124));
+	//     // --- 2. INNER BAR MARGIN ---
+	// 	let padX = w * .06;
+	// 	let padY = h * .225;
+	//     let innerX = x + padX;
+	//     let innerY = y + padY;
+	//     let innerW = w - padX * 2;
+	//     let innerH = h - padY * 2;
 
-	let ratio = _char.health / _char.MAXHP;
-	if (ratio < 0) ratio = 0;
-	else if (ratio > 1) ratio = 1;
+	//     // --- 3. HEALTH COLOR (yeşil → kırmızı) ---
+	//     let r = Math.floor(255 * (1 - ratio));
+	//     let g = Math.floor(255 * ratio);
+	//     let color = `rgb(${r},${g},0)`;
 
-	if (_char.previousHPRatio === undefined) {
+	//     // Bar genişliği
+	//     let barW = innerW * ratio;
+
+	//     // Health bar'ı çiz
+	//     cofftx.save();
+	//     cofftx.fillStyle = color;
+	//     cofftx.fillRect(innerX, innerY, barW, innerH);
+	//     //cofftx.restore();
+
+
+	//     // --- 4. DAMAGE FLASH (otomatik) ---
+	//     if (_char.damageFlash > 0) {
+	//         //cofftx.save();
+	//         cofftx.globalAlpha = _char.damageFlash;
+	//         cofftx.fillStyle = "white";
+	//         cofftx.fillRect(innerX, innerY, innerW, innerH);
+	//         //cofftx.restore();
+	//     }
+	// 	cofftx.restore();
+	// 	if(_rev) {
+	// 		offCtx.save();
+	// 		offCtx.scale(-1, 1);
+	// 	}
+	// }
+	this.drawMobHealthBar = function (ctx, _item, x, y, w) {
+		const _char = _item.char;
+		const h = MathRound(w * (26 / 124));
+
+		let ratio = _char.health / _char.MAXHP;
+		if (ratio < 0) ratio = 0;
+		else if (ratio > 1) ratio = 1;
+
+		if (_char.previousHPRatio === undefined) {
+			_char.previousHPRatio = ratio;
+			_char.damageFlash = 0;
+		}
+
+		if (ratio < _char.previousHPRatio)
+			_char.damageFlash = 1;
+
+		if (_char.damageFlash > 0)
+			_char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
+
 		_char.previousHPRatio = ratio;
-		_char.damageFlash = 0;
-	}
 
-	if (ratio < _char.previousHPRatio)
-		_char.damageFlash = 1;
+		// 🔑 WORLD-SPACE FIX
+		const drawX = ctx.reversed ? (-x - w) : x;
 
-	if (_char.damageFlash > 0)
-		_char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
+		// --- FRAME ---
+		ctx.drawImage(this.HBMob, drawX, y, w, h);
 
-	_char.previousHPRatio = ratio;
+		const padX = w * 0.06;
+		const padY = h * 0.225;
 
-	// 🔑 WORLD-SPACE FIX
-	const drawX = ctx.reversed ? (-x - w) : x;
+		const innerX = drawX + padX;
+		const innerY = y + padY;
+		const innerW = w - padX * 2;
+		const innerH = h - padY * 2;
 
-	// --- FRAME ---
-	ctx.drawImage(this.HBMob, drawX, y, w, h);
+		const barW = innerW * ratio;
 
-	const padX = w * 0.06;
-	const padY = h * 0.225;
+		const r = (255 * (1 - ratio)) | 0;
+		const g = (255 * ratio) | 0;
 
-	const innerX = drawX + padX;
-	const innerY = y + padY;
-	const innerW = w - padX * 2;
-	const innerH = h - padY * 2;
+		ctx.save();
+		ctx.fillStyle = `rgb(${r},${g},0)`;
 
-	const barW = innerW * ratio;
-
-	const r = (255 * (1 - ratio)) | 0;
-	const g = (255 * ratio) | 0;
-
-	ctx.save();
-	ctx.fillStyle = `rgb(${r},${g},0)`;
-
-	// 🔥 YÖN FIX (ASIL MESELE)
-	ctx.fillRect(
-		ctx.reversed ? (innerX + innerW) : innerX,
-		innerY,
-		ctx.reversed ? -barW : barW,
-		innerH
-	);
-
-	if (_char.damageFlash > 0) {
-		ctx.globalAlpha = _char.damageFlash;
-		ctx.fillStyle = "#fff";
+		// 🔥 YÖN FIX (ASIL MESELE)
 		ctx.fillRect(
 			ctx.reversed ? (innerX + innerW) : innerX,
 			innerY,
-			ctx.reversed ? -innerW : innerW,
+			ctx.reversed ? -barW : barW,
 			innerH
 		);
-	}
 
-	ctx.restore();
-};
-
-
-this.drawBossName = function(cofftx, _char, x, y, w, padX) {
-
-    const name = _char.displayName ?? _char.name ?? "BOSS";
-
-    // Font ölçeklemesi (her çözünürlükte temiz)
-    let fontSize = MathRound(w * 0.12); // genişliğe göre ayarlanır
-
-    cofftx.save();
-
-    cofftx.font = `${fontSize}px 'Cinzel', serif`;
-    cofftx.textBaseline = "top";
-    cofftx.textAlign = "left";
-
-    // Stroke kalınlığı (dinamik)
-    cofftx.lineWidth = fontSize * 0.15;
-
-    // --- OUTLINE ---
-    cofftx.strokeStyle = "black";
-    cofftx.strokeText(name, x, y - fontSize);
-
-    // --- FILL ---
-    cofftx.fillStyle = "#F2F2F2"; // okunabilir kirli beyaz
-    cofftx.fillText(name, x, y - fontSize);
-	if(_char.gradeLeft > 0) {
-		const gradeText = "x" + (_char.gradeLeft + 1);
-		cofftx.strokeText(gradeText, x + w + padX, y);
-		cofftx.fillText(gradeText, x + w + padX, y);
-	}
-    cofftx.restore();
-};
-this.drawBossHealthBar = function(cofftx, _item, x, y, w) {
-
-	const _char = _item.char;
-	const h = MathRound(w * (26 / 252)); // boss bar aspect ratio
-
-	// HP Ratio
-	let ratio = Math.max(0, Math.min(1, _char.health / _char.MAXHP));
-
-	// Init
-	if (_char.previousHPRatio === undefined) {
-		_char.previousHPRatio = ratio;
-		_char.damageFlash = 0;
-	}
-
-	// Flash trigger
-	if (ratio < _char.previousHPRatio) {
-		_char.damageFlash = 1;
-	}
-
-	// Fade flash
-	if (_char.damageFlash > 0) {
-		_char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
-	}
-
-	_char.previousHPRatio = ratio;
-
-	// Reverse fix
-	const _rev = offCtx.reversed;
-	if (_rev) offCtx.restore();
-
-	// --- 1. ÇERÇEVE ---
-	cofftx.drawImage(this.HBBoss, x, y, w, h);
-
-	// --- 2. INNER BAR MARGIN ---
-	let padX = w * .03;
-	let padY = h * .225;
-	let innerX = x + padX;
-	let innerY = y + padY;
-	let innerW = w - padX * 2;
-	let innerH = h - padY * 2;
-
-	// --- 3. Renkler (daha parlak DF paleti) ---
-	const fantasy = [
-		"#C62828",
-		"#2ECC71",
-		"#2874A6",
-		"#E67E22",
-		"#8E44AD",
-		"#F1C40F",
-		'#1FA6A0',
-		'#7CB342',
-		'#C13A4A',
-		'#7470bbff',
-		'#C7CCD6',
-		'#3d354b'
-	];
-
-	let mainColor = fantasy[_char.gradeLeft + 1];
-	let underColor = fantasy[_char.gradeLeft];
-
-	// Bar width
-	let barW = innerW * ratio;
-
-	// --- 4. GradeLeft = 0 → Mob mantığı ---
-	if (_char.gradeLeft === 0) {
-
-		// arka plan yok (transparan)
-		// sadece ratio'lu ön bar var
-
-		if (ratio >= 0.5) {
-			// mob yeşil
-			mainColor = "#3CA64C";
-		} else {
-			// mob kırmızı
-			mainColor = "#B22222";
+		if (_char.damageFlash > 0) {
+			ctx.globalAlpha = _char.damageFlash;
+			ctx.fillStyle = "#fff";
+			ctx.fillRect(
+				ctx.reversed ? (innerX + innerW) : innerX,
+				innerY,
+				ctx.reversed ? -innerW : innerW,
+				innerH
+			);
 		}
 
+		ctx.restore();
+	};
+
+
+	this.drawBossName = function(cofftx, _char, x, y, w, padX) {
+
+		const name = _char.displayName ?? _char.name ?? "BOSS";
+
+		// Font ölçeklemesi (her çözünürlükte temiz)
+		let fontSize = MathRound(w * 0.12); // genişliğe göre ayarlanır
+
 		cofftx.save();
-		cofftx.fillStyle = mainColor;
-		cofftx.fillRect(innerX, innerY, barW, innerH);
+
+		cofftx.font = `${fontSize}px 'Cinzel', serif`;
+		cofftx.textBaseline = "top";
+		cofftx.textAlign = "left";
+
+		// Stroke kalınlığı (dinamik)
+		cofftx.lineWidth = fontSize * 0.15;
+
+		// --- OUTLINE ---
+		cofftx.strokeStyle = "black";
+		cofftx.strokeText(name, x, y - fontSize);
+
+		// --- FILL ---
+		cofftx.fillStyle = "#F2F2F2"; // okunabilir kirli beyaz
+		cofftx.fillText(name, x, y - fontSize);
+		if(_char.gradeLeft > 0) {
+			const gradeText = "x" + (_char.gradeLeft + 1);
+			cofftx.strokeText(gradeText, x + w + padX, y);
+			cofftx.fillText(gradeText, x + w + padX, y);
+		}
 		cofftx.restore();
+	};
+	this.drawBossHealthBar = function(cofftx, _item, x, y, w) {
 
-	} else {
+		const _char = _item.char;
+		const h = MathRound(w * (26 / 252)); // boss bar aspect ratio
 
-		// --- 5. GradeLeft > 0 → Çift katmanlı boss bar ---
+		// HP Ratio
+		let ratio = Math.max(0, Math.min(1, _char.health / _char.MAXHP));
 
-		// Arka katman (gradeLeft)
-		cofftx.save();
-		cofftx.fillStyle = underColor;
-		cofftx.fillRect(innerX, innerY, innerW, innerH);
-		cofftx.restore();
+		// Init
+		if (_char.previousHPRatio === undefined) {
+			_char.previousHPRatio = ratio;
+			_char.damageFlash = 0;
+		}
 
-		// Üst katman (grade)
-		cofftx.save();
-		cofftx.fillStyle = mainColor;
-		cofftx.fillRect(innerX, innerY, barW, innerH);
-		cofftx.restore();
-	}
+		// Flash trigger
+		if (ratio < _char.previousHPRatio) {
+			_char.damageFlash = 1;
+		}
 
-	// --- 6. DAMAGE FLASH ---
-	if (_char.damageFlash > 0) {
-		cofftx.save();
-		cofftx.globalAlpha = _char.damageFlash;
-		cofftx.fillStyle = "white";
-		cofftx.fillRect(innerX, innerY, innerW, innerH);
-		cofftx.restore();
-	}
-	
-	this.drawBossName(cofftx, _item.char, x + padX, y, w, MathRound(padX * .5));
-	// Reverse geri al
-	if (_rev) {
-		offCtx.save();
-		offCtx.scale(-1, 1);
-	}
-};
+		// Fade flash
+		if (_char.damageFlash > 0) {
+			_char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
+		}
 
-this.drawHealthBar2 = function (_item) {
-	const _isPvp = !this.gold && ((this.pvp || this.war) || _item.char.flagCapturer);
-	if(__batterySaveMode || _item.char.skipHealthBar || _item.char.health <= 0 || _item.char.dead)
-		return;
+		_char.previousHPRatio = ratio;
 
-	// if(!(_item.char.grade > 1))
-	// 	return;
+		// Reverse fix
+		const _rev = offCtx.reversed;
+		if (_rev) offCtx.restore();
 
-	if (_item.char.main || (_isPvp && _item.char.alp)) {
-		this.drawBuffs(_item.char, 'big');
-		if(!_isPvp)
-			return;
-	}
-	if(!_isPvp) {
-		const _pass = (_item.char.class !== 'boss' && _item.char.phased == undefined);
-		if (!_item.char.key || (!_item.char.hpDropped && _pass) || _item.char.MAXHP <= 1 || _item.char.class === __spell || _item.animation === 'respawn')
-			return;
+		// --- 1. ÇERÇEVE ---
+		cofftx.drawImage(this.HBBoss, x, y, w, h);
 
-		if (_pass && _item.char.hpDropped < mainCharacter.attackedUnitTime)
-			return;
-	}
-	else{
-		const _isBoss = _item.char.class === 'boss';
+		// --- 2. INNER BAR MARGIN ---
+		let padX = w * .03;
+		let padY = h * .225;
+		let innerX = x + padX;
+		let innerY = y + padY;
+		let innerW = w - padX * 2;
+		let innerH = h - padY * 2;
 
-		let _hWidth = MathRound((this.cWidth / 100) * (_isBoss ? 10 : 4));
-		if (_item.char.healthBarWidthRate)
-			_hWidth = MathRound(_item.char.healthBarWidthRate * _hWidth);
+		// --- 3. Renkler (daha parlak DF paleti) ---
+		const fantasy = [
+			"#C62828",
+			"#2ECC71",
+			"#2874A6",
+			"#E67E22",
+			"#8E44AD",
+			"#F1C40F",
+			'#1FA6A0',
+			'#7CB342',
+			'#C13A4A',
+			'#7470bbff',
+			'#C7CCD6',
+			'#3d354b'
+		];
 
-		const _xGap = MathRound((_item.char.WIDTH - _hWidth) / 2);
-		const _hLeft = MathRound(_item.char.EXACTLEFT + _xGap);
-		const isWarPlayer = _item.char.enemy;
-		const _extraTop = isWarPlayer ? MathRound(-40 * __zoom * __scale) : MathRound(-10 * __zoom * __scale);
-		let _hHeight = this.cHeight / 75;
-		if (_item.char.healthBarHeightRate)
-			_hHeight *= _item.char.healthBarHeightRate;
+		let mainColor = fantasy[_char.gradeLeft + 1];
+		let underColor = fantasy[_char.gradeLeft];
 
-		const _hTop = MathRound(
-			(this.cHeight + _extraTop)
-			- _hHeight
-			- ((_item.hbGap ?? 0))
-			- _item.char.yPosition
-			- _item.char.HEIGHT
-			- (_item.yGap ?? 0)
-			- ((_item.char.yGap ?? 0))
-		);
-		const c = document.createElement('canvas');
-		const _ch = _hHeight * 2;
-		c.width = _hWidth;
-		c.height = _ch;
-		const ctx = c.getContext('2d');
-		ctx.imageSmoothingEnabled = false;
+		// Bar width
+		let barW = innerW * ratio;
 
-		// Üçgenin noktaları
-		const x1 = MathRound(_hWidth * .25), y1 = 0;   // sol üst
-		const x2 = MathRound(_hWidth * .75), y2 = 0;  // sağ üst
-		const x3 = MathRound(_hWidth * .5), y3 = _ch; // alt orta (uç)
+		// --- 4. GradeLeft = 0 → Mob mantığı ---
+		if (_char.gradeLeft === 0) {
 
-		// Çizim
-		ctx.beginPath();
-		ctx.moveTo(x1, y1);
-		ctx.lineTo(x2, y2);
-		ctx.lineTo(x3, y3);
-		ctx.closePath();
+			// arka plan yok (transparan)
+			// sadece ratio'lu ön bar var
 
-		// Dolgu rengi
-		ctx.fillStyle = _item.char.main ? "orange" : "red";
-		ctx.fill();
+			if (ratio >= 0.5) {
+				// mob yeşil
+				mainColor = "#3CA64C";
+			} else {
+				// mob kırmızı
+				mainColor = "#B22222";
+			}
 
-		// Çerçeve (opsiyonel)
-		ctx.strokeStyle = "black";
-		ctx.lineWidth = MathCeil(episode.cHeight / 500);
-		ctx.stroke();
-		if(offCtx.reversed)
-			offCtx.restore();
-		offCtx.drawImage(c, _hLeft, _hTop);
-		if(offCtx.reversed) {
+			cofftx.save();
+			cofftx.fillStyle = mainColor;
+			cofftx.fillRect(innerX, innerY, barW, innerH);
+			cofftx.restore();
+
+		} else {
+
+			// --- 5. GradeLeft > 0 → Çift katmanlı boss bar ---
+
+			// Arka katman (gradeLeft)
+			cofftx.save();
+			cofftx.fillStyle = underColor;
+			cofftx.fillRect(innerX, innerY, innerW, innerH);
+			cofftx.restore();
+
+			// Üst katman (grade)
+			cofftx.save();
+			cofftx.fillStyle = mainColor;
+			cofftx.fillRect(innerX, innerY, barW, innerH);
+			cofftx.restore();
+		}
+
+		// --- 6. DAMAGE FLASH ---
+		if (_char.damageFlash > 0) {
+			cofftx.save();
+			cofftx.globalAlpha = _char.damageFlash;
+			cofftx.fillStyle = "white";
+			cofftx.fillRect(innerX, innerY, innerW, innerH);
+			cofftx.restore();
+		}
+		
+		this.drawBossName(cofftx, _item.char, x + padX, y, w, MathRound(padX * .5));
+		// Reverse geri al
+		if (_rev) {
 			offCtx.save();
 			offCtx.scale(-1, 1);
 		}
-		return;
-	}
-	const _hpRate = _item.char.healthRate;
+	};
 
-	// === 4'lü gruba dönüştür ===
-	let hpGroupRate;
-	if (_hpRate >= 70) hpGroupRate = 100;
-	else if (_hpRate >= 50) hpGroupRate = 75;
-	else if (_hpRate >= 30) hpGroupRate = 50;
-	else hpGroupRate = 25;
+	this.drawHealthBar2 = function (_item) {
+		const _isPvp = !this.gold && ((this.pvp || this.war) || _item.char.flagCapturer);
+		if(__batterySaveMode || _item.char.skipHealthBar || _item.char.health <= 0 || _item.char.dead)
+			return;
 
-	const _isBoss = _item.char.class === 'boss';
+		// if(!(_item.char.grade > 1))
+		// 	return;
 
-	let _hWidth = MathRound((this.cWidth / 100) * (_isBoss ? 10 : 4));
-	if (_item.char.healthBarWidthRate)
-		_hWidth = MathRound(_item.char.healthBarWidthRate * _hWidth);
+		if (_item.char.main || (_isPvp && _item.char.alp)) {
+			this.drawBuffs(_item.char, 'big');
+			if(!_isPvp)
+				return;
+		}
+		if(!_isPvp) {
+			const _pass = (_item.char.class !== 'boss' && _item.char.phased == undefined);
+			if (!_item.char.key || (!_item.char.hpDropped && _pass) || _item.char.MAXHP <= 1 || _item.char.class === __spell || _item.animation === 'respawn')
+				return;
 
-	const _xGap = MathRound((_item.char.WIDTH - _hWidth) / 2);
-	const _hLeft = MathRound(_item.char.EXACTLEFT + _xGap);
-	const isWarPlayer = _item.char.enemy && _isPvp;
-	const _extraTop = isWarPlayer ? MathRound(-40 * __zoom * __scale) : MathRound(-10 * __zoom * __scale);
-	let _hHeight = this.cHeight / 75;
-	if (_item.char.healthBarHeightRate)
-		_hHeight *= _item.char.healthBarHeightRate;
-	const _hTop = MathRound(
-		(this.cHeight + _extraTop)
-		- _hHeight
-		- ((_item.hbGap ?? 0))
-		- _item.char.yPosition
-		- _item.char.HEIGHT
-		- (_item.yGap ?? 0)
-		- ((_item.char.yGap ?? 0))
-	);
-	_hHeight = MathCeil(_hHeight);
-	if(!(_item.char.grade > 1))
-		this.drawMobHealthBar(offCtx, _item, _hLeft, _hTop, _hWidth);
-	else 
-		this.drawBossHealthBar(offCtx, _item, _hLeft, _hTop, _hWidth);
-	return;
-	const _hpBG = !_item.char.gradeLeft ? '#B2BEB5' : getGradeBGColor(_item.char.gradeLeft + 1);
-	let _bg = 'yellow';
-	if (hpGroupRate === 100 || hpGroupRate === 75)
-		_bg = _item.char.grade < 2 ? '#0BDA51' : getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
-	else if(_item.char.gradeLeft)
-		_bg = getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
-	// === Cache'e bak ===
-	const cacheKey = _isPvp ? `group-${_item.char.groupId}` : `group-${hpGroupRate}-${_hWidth}x${_hHeight}-${_bg}`;
-	let cached = this.healthBarCache.get(cacheKey);
+			if (_pass && _item.char.hpDropped < mainCharacter.attackedUnitTime)
+				return;
+		}
+		else{
+			const _isBoss = _item.char.class === 'boss';
 
-	if (!cached) {
-		
-		
-		// let _border = '#E97451';
-		// if(_item.char.hurting?.count === 2) _border = '#f3f4f5';
-		// else if (!_item.char.autoMode) _border = '#36454F';
-		// else if (_item.char.autoMode === 2) _border = '#C41E3A';
+			let _hWidth = MathRound((this.cWidth / 100) * (_isBoss ? 10 : 4));
+			if (_item.char.healthBarWidthRate)
+				_hWidth = MathRound(_item.char.healthBarWidthRate * _hWidth);
 
-		const c = document.createElement('canvas');
-		if(_isPvp) {
+			const _xGap = MathRound((_item.char.WIDTH - _hWidth) / 2);
+			const _hLeft = MathRound(_item.char.EXACTLEFT + _xGap);
+			const isWarPlayer = _item.char.enemy;
+			const _extraTop = isWarPlayer ? MathRound(-40 * __zoom * __scale) : MathRound(-10 * __zoom * __scale);
+			let _hHeight = this.cHeight / 75;
+			if (_item.char.healthBarHeightRate)
+				_hHeight *= _item.char.healthBarHeightRate;
+
+			const _hTop = MathRound(
+				(this.cHeight + _extraTop)
+				- _hHeight
+				- ((_item.hbGap ?? 0))
+				- _item.char.yPosition
+				- _item.char.HEIGHT
+				- (_item.yGap ?? 0)
+				- ((_item.char.yGap ?? 0))
+			);
+			const c = document.createElement('canvas');
 			const _ch = _hHeight * 2;
 			c.width = _hWidth;
 			c.height = _ch;
@@ -4793,42 +4646,134 @@ this.drawHealthBar2 = function (_item) {
 			ctx.strokeStyle = "black";
 			ctx.lineWidth = MathCeil(episode.cHeight / 500);
 			ctx.stroke();
-		}
-		else {
-			const _isGradedChar = _item.char.grade > 1 && _item.char.gradeLeft > 0;
-			const _maxTextHeight = _isGradedChar ? (_hHeight * 2) : _hHeight;
-			const _maxTextWidth = (_isGradedChar ? (_maxTextHeight * ((_item.char.gradeLeft + 1).toString().length + 1)) + (this.cWidth / 100) : 0);
-			c.width = MathRound(_hWidth + _maxTextWidth);
-			c.height = _maxTextHeight;
-			const ctxY = MathFloor((_maxTextHeight - _hHeight) / 2);
-			const ctx = c.getContext('2d');
-			ctx.imageSmoothingEnabled = false;
-			this.fillRoundedRect(ctx, _hpBG, 0, ctxY, _hWidth, _hHeight);
-			this.fillRoundedRect(ctx, _bg, 0, ctxY, MathCeil(_hWidth * (hpGroupRate / 100)), _hHeight);
-			//this.drawRoundedRect(ctx, '#C41E3A', 1, 0, ctxY, _hWidth, _height);
-			if(_isGradedChar){
-				ctx.fillStyle = '#262626';
-				ctx.font = 'bold ' + _maxTextHeight + 'px "Courier New", monospace';
-				const _txt = 'x' + (_item.char.gradeLeft + 1);
-				const metrics = ctx.measureText(_txt);
-				ctx.fillRect(_hWidth, 0, metrics.width + this.w100, _maxTextHeight);
-				ctx.fillStyle = '#f3f4f5';
-				ctx.textBaseline = 'middle';
-				ctx.fillText(_txt, 
-					_hWidth + MathRound(this.w100 / 2), _hHeight);
+			if(offCtx.reversed)
+				offCtx.restore();
+			offCtx.drawImage(c, _hLeft, _hTop);
+			if(offCtx.reversed) {
+				offCtx.save();
+				offCtx.scale(-1, 1);
 			}
+			return;
 		}
-		this.healthBarCache.set(cacheKey, c);
-		cached = c;
-	}
-	if(offCtx.reversed)
-		offCtx.restore();
-	offCtx.drawImage(cached, _hLeft, _hTop);
-	if(offCtx.reversed) {
-		offCtx.save();
-		offCtx.scale(-1, 1);
-	}
-};
+		const _hpRate = _item.char.healthRate;
+
+		// === 4'lü gruba dönüştür ===
+		let hpGroupRate;
+		if (_hpRate >= 70) hpGroupRate = 100;
+		else if (_hpRate >= 50) hpGroupRate = 75;
+		else if (_hpRate >= 30) hpGroupRate = 50;
+		else hpGroupRate = 25;
+
+		const _isBoss = _item.char.class === 'boss';
+
+		let _hWidth = MathRound((this.cWidth / 100) * (_isBoss ? 10 : 4));
+		if (_item.char.healthBarWidthRate)
+			_hWidth = MathRound(_item.char.healthBarWidthRate * _hWidth);
+
+		const _xGap = MathRound((_item.char.WIDTH - _hWidth) / 2);
+		const _hLeft = MathRound(_item.char.EXACTLEFT + _xGap);
+		const isWarPlayer = _item.char.enemy && _isPvp;
+		const _extraTop = isWarPlayer ? MathRound(-40 * __zoom * __scale) : MathRound(-10 * __zoom * __scale);
+		let _hHeight = this.cHeight / 75;
+		if (_item.char.healthBarHeightRate)
+			_hHeight *= _item.char.healthBarHeightRate;
+		const _hTop = MathRound(
+			(this.cHeight + _extraTop)
+			- _hHeight
+			- ((_item.hbGap ?? 0))
+			- _item.char.yPosition
+			- _item.char.HEIGHT
+			- (_item.yGap ?? 0)
+			- ((_item.char.yGap ?? 0))
+		);
+		_hHeight = MathCeil(_hHeight);
+		if(!(_item.char.grade > 1))
+			this.drawMobHealthBar(offCtx, _item, _hLeft, _hTop, _hWidth);
+		else 
+			this.drawBossHealthBar(offCtx, _item, _hLeft, _hTop, _hWidth);
+		return;
+		const _hpBG = !_item.char.gradeLeft ? '#B2BEB5' : getGradeBGColor(_item.char.gradeLeft + 1);
+		let _bg = 'yellow';
+		if (hpGroupRate === 100 || hpGroupRate === 75)
+			_bg = _item.char.grade < 2 ? '#0BDA51' : getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
+		else if(_item.char.gradeLeft)
+			_bg = getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
+		// === Cache'e bak ===
+		const cacheKey = _isPvp ? `group-${_item.char.groupId}` : `group-${hpGroupRate}-${_hWidth}x${_hHeight}-${_bg}`;
+		let cached = this.healthBarCache.get(cacheKey);
+
+		if (!cached) {
+			
+			
+			// let _border = '#E97451';
+			// if(_item.char.hurting?.count === 2) _border = '#f3f4f5';
+			// else if (!_item.char.autoMode) _border = '#36454F';
+			// else if (_item.char.autoMode === 2) _border = '#C41E3A';
+
+			const c = document.createElement('canvas');
+			if(_isPvp) {
+				const _ch = _hHeight * 2;
+				c.width = _hWidth;
+				c.height = _ch;
+				const ctx = c.getContext('2d');
+				ctx.imageSmoothingEnabled = false;
+
+				// Üçgenin noktaları
+				const x1 = MathRound(_hWidth * .25), y1 = 0;   // sol üst
+				const x2 = MathRound(_hWidth * .75), y2 = 0;  // sağ üst
+				const x3 = MathRound(_hWidth * .5), y3 = _ch; // alt orta (uç)
+
+				// Çizim
+				ctx.beginPath();
+				ctx.moveTo(x1, y1);
+				ctx.lineTo(x2, y2);
+				ctx.lineTo(x3, y3);
+				ctx.closePath();
+
+				// Dolgu rengi
+				ctx.fillStyle = _item.char.main ? "orange" : "red";
+				ctx.fill();
+
+				// Çerçeve (opsiyonel)
+				ctx.strokeStyle = "black";
+				ctx.lineWidth = MathCeil(episode.cHeight / 500);
+				ctx.stroke();
+			}
+			else {
+				const _isGradedChar = _item.char.grade > 1 && _item.char.gradeLeft > 0;
+				const _maxTextHeight = _isGradedChar ? (_hHeight * 2) : _hHeight;
+				const _maxTextWidth = (_isGradedChar ? (_maxTextHeight * ((_item.char.gradeLeft + 1).toString().length + 1)) + (this.cWidth / 100) : 0);
+				c.width = MathRound(_hWidth + _maxTextWidth);
+				c.height = _maxTextHeight;
+				const ctxY = MathFloor((_maxTextHeight - _hHeight) / 2);
+				const ctx = c.getContext('2d');
+				ctx.imageSmoothingEnabled = false;
+				this.fillRoundedRect(ctx, _hpBG, 0, ctxY, _hWidth, _hHeight);
+				this.fillRoundedRect(ctx, _bg, 0, ctxY, MathCeil(_hWidth * (hpGroupRate / 100)), _hHeight);
+				//this.drawRoundedRect(ctx, '#C41E3A', 1, 0, ctxY, _hWidth, _height);
+				if(_isGradedChar){
+					ctx.fillStyle = '#262626';
+					ctx.font = 'bold ' + _maxTextHeight + 'px "Courier New", monospace';
+					const _txt = 'x' + (_item.char.gradeLeft + 1);
+					const metrics = ctx.measureText(_txt);
+					ctx.fillRect(_hWidth, 0, metrics.width + this.w100, _maxTextHeight);
+					ctx.fillStyle = '#f3f4f5';
+					ctx.textBaseline = 'middle';
+					ctx.fillText(_txt, 
+						_hWidth + MathRound(this.w100 / 2), _hHeight);
+				}
+			}
+			this.healthBarCache.set(cacheKey, c);
+			cached = c;
+		}
+		if(offCtx.reversed)
+			offCtx.restore();
+		offCtx.drawImage(cached, _hLeft, _hTop);
+		if(offCtx.reversed) {
+			offCtx.save();
+			offCtx.scale(-1, 1);
+		}
+	};
 	this.drawRelatedObjects = function (_item, _arr) {
 		if(!_arr?.[0] || this.disposing || __batterySaveMode || _item.alpha)
 			return;
@@ -5254,6 +5199,46 @@ this.drawHealthBar2 = function (_item) {
 		if(episode.dialogs?.[0])
 			episode.dialogs = [];
 	}
+	this.initLightRadiusLayer = function() {
+
+		const container = document.getElementById('css-canvas-foreground');
+
+		const scale = 1;
+
+		const canvas = document.createElement('canvas');
+
+		canvas.width = container.clientWidth * scale;
+		canvas.height = container.clientHeight * scale;
+
+		const ctx = canvas.getContext('2d');
+		//ctx.scale(scale, scale);
+
+		container.appendChild(canvas);
+
+		this.lightradius2 = {
+			canvas: canvas,
+			ctx: ctx
+		};
+	}
+	this.disposeLightRadiusLayer = function() {
+
+		const lr = this.lightradius2;
+
+		if (!lr) return;
+
+		// DOM'dan kaldır
+		if (lr.canvas && lr.canvas.parentNode) {
+			lr.canvas.parentNode.removeChild(lr.canvas);
+		}
+
+		// GPU context referansını bırak
+		lr.ctx = null;
+		lr.canvas = null;
+
+		// Objeyi sil
+		this.lightradius2 = null;
+	}
+
 	this.dispose = function() {
 		if(this.challangeStarted)
 			delete this.challangeStarted;
@@ -5323,6 +5308,81 @@ this.drawHealthBar2 = function (_item) {
 		stopWeather();
 		this.seenEnemies.length = 0;
 		window.SoundManager.clearLoops();
+		this.disposeLightRadiusLayer();
 	}
 	setBusyState(!(this.menu || this.lobby));
+	this.initLightRadiusLayer();
+	this.resize = function() {
+		const _ms = mapSprites.find(x => x.id == this.season);
+		this.width = MathRound((_ms.width) * __zoom);
+		if(this.width < _canvas.width)
+			this.width = _canvas.width;
+		_canvasR.width = _canvasS.width = (this.width);
+		_canvasS.style.width = (this.width * __scale) + 'px';
+		for(let _c of _cArr) {
+			_c.innerHTML = '';
+			_c.style.transform = 'translateX(0)';
+			_c.style.setProperty('-webkit-transform', 'translateX(0)');
+			_c.backgroundSet = undefined;
+		}
+		this.height = _canvas.height;
+		this.distance = (__globalDistance ? parseFloat(__globalDistance) / 100 : undefined) ?? (_ms.distance ?? .5);
+		this.zoom = __zoom * (this.ground.zoom ?? 1);
+		this.cHeight = _canvas.height;
+		this.cUIHeight = _canvas.height * __scale;
+		this.cWidth = _canvas.width;
+		this.cUIWidth = _canvas.width * __scale;
+		this.dmgFrameHeight = this.cHeight / 20;
+		this.dmgFrameTopBoundary = MathRound(this.cHeight * .15);
+		this.RECT = { 
+			left: 0, 
+			right: this.cWidth,
+			top: 0, 
+			bottom: this.cHeight, 
+			width: this.cWidth, 
+			realWidth: this.cWidth 
+		};
+		if (this.ground) {
+			if (this.ground.yRate)
+				groundheight = MathRound(idealground_height * this.ground.yRate);
+			else
+				groundheight = idealground_height;
+			minPositionY = this.ground.bottomGap ? MathRound(this.ground.bottomGap * __zoom) : 1;
+			minLeft = this.ground.leftGap ? MathRound(this.ground.leftGap * __zoom) : 0;
+			maxLeft = this.ground.rightGap ? MathRound(this.ground.rightGap * __zoom) : 0;
+		}
+		else
+			groundheight = idealground_height;
+		
+		this.loadLayers();
+		if (this.loadObjects) {
+			const _objects = _mapSprite.objects ?? [];
+			let _arr;
+			if(this.artifacts?.length > 0 && !this.artifactLocated) {
+				_arr = _objects.concat(this.artifacts);
+				this.artifactLocated = 1;
+			}
+			else
+				_arr = _objects;
+			for (var _obj of _arr)
+				this.loadObject(_obj);
+		}
+		this.XStep = MathRound(getGroundHeight() / 4);
+		this.YStep = MathRound(getGroundHeight() / 5);
+		_yTol = 7 * __zoom;
+		this.offCanvas.width = this.cWidth;
+		this.offCanvas.height = this.cHeight;
+		this.offGoreCanvas.width = this.cWidth;
+		this.offGoreCanvas.height = this.cHeight;
+		this.offDmgCanvas.width = this.cWidth;
+		this.offDmgCanvas.height = this.cHeight;
+		this.w100 = MathRound(this.cWidth / 100);
+		this.VH3 = MathRound(window.innerHeight / 33);
+		this.spritesDrawnBackGround = this.spritesDrawnForeGround = false;
+		this.layersDrawn = 0;
+		prevPlatformX = -1;
+		this.drawSpriteObjects2();
+		this.drawLayers();
+	}
+	this.resize();
 }

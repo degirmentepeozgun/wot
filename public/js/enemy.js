@@ -177,13 +177,25 @@ function enemy(_e) {
 	this.getMaxRageCount = function() {
 		return this.maxRageCount ?? __maxRageCount;
 	}
+	// this.getCurrentAnimation = function () {
+	// 	const _x = this.animations[this.animation];
+	// 	if(!_x){
+	// 		this.animation = 'idle';
+	// 		return this.animations[this.animation];
+	// 	}
+	// 	return _x;
+	// }
 	this.getCurrentAnimation = function () {
-		const _x = this.animations[this.animation];
-		if(!_x){
-			this.animation = 'idle';
-			return this.animations[this.animation];
+		if(this.lastUsedAnimation !== this.animation) {
+			let _x = this.animations[this.animation];
+			if(!_x){
+				this.animation = 'idle';
+				_x = this.animations[this.animation];
+			}
+			this.CURRENT_ANIMA = _x;
+			this.lastUsedAnimation = this.animation;
 		}
-		return _x;
+		return this.CURRENT_ANIMA;
 	}
 	this.getZoom = function () {
 		return this.zoom * __zoom; // * (1 + ((getGroundHeight() - this.yPosition) / getGroundHeight()) * .25);
@@ -348,8 +360,23 @@ function enemy(_e) {
 			}
 		}
 	}
+	// this.getCurrentFrame = function () {
+	// 	return this.getCurrentAnimation()?.frames?.[this.frame];
+	// }
 	this.getCurrentFrame = function () {
-		return this.getCurrentAnimation()?.frames?.[this.frame];
+		const anima = this.getCurrentAnimation();
+		if (!anima) return undefined;
+
+		if (
+			this._cachedFrameIndex !== this.frame ||
+			this._cachedAnimation !== anima
+		) {
+			this.CURRENT_FRAME = anima.frames?.[this.frame];
+			this._cachedFrameIndex = this.frame;
+			this._cachedAnimation = anima;
+		}
+
+		return this.CURRENT_FRAME;
 	}
 	this.getNextFrame = function () {
 		return this.animations[this.animation]?.frames?.[this.frame + 1];
@@ -420,7 +447,10 @@ function enemy(_e) {
 			}
 		}
 		if(!_chosenKey) {
-			shuffle(_theChar.attackKeys);
+			if((this.animationKeysShuffledTime + 1000) < _gameTick) {
+				shuffle(_theChar.attackKeys);
+				this.animationKeysShuffledTime = _gameTick;
+			}
 			const _keys = _theChar.attackKeys;
 			for (var _key of _keys) {
 				let _k = _key, _itIsOk;
@@ -7413,6 +7443,8 @@ function enemy(_e) {
 									addClass(_useBtn, 'v-none');
 									episode.sprites.filter(x => x.animation.id === this.action.id).forEach(x => x.remove = true);
 									applyBonusStats();
+									if(episode.artifacts?.length > 0)
+										episode.artifacts.length = 0;
 								}
 								else {
 									__account.questStatus.side.state = 'end';

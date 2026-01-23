@@ -32175,29 +32175,29 @@ const cssAnimations = {
 		const _width = (_char.width ? MathRound(_char.width * _char.ZOOM * _rate) : _char.WIDTH) * __scale;
 		let _top = MathRound(episode.cHeight - _h - (_char.yPosition - (_hwg / 2))) * __scale;
 		//_top += MathRound(_width / 2);
-
 		if(!cssAnimationProps.lightradius2){
-			const _elem = document.querySelector('#css-canvas-foreground');
-			const _c = document.createElement('canvas');
-			const ctx = _c.getContext('2d');
-			_c.width = _elem.clientWidth;
-			_c.height = _elem.clientHeight;
-			_elem.appendChild(_c);
 			_gamePad.lastZoomTime = _gameTick;
-			cssAnimationProps.lightradius2 = { start: _gameTick, p1: _char, p2: _rate, p3: ctx };
+			cssAnimationProps.lightradius2 = { start: _gameTick, p1: _char, p2: _rate };
 		}
 		if(_char.main) {
-			ligthenGradient(_left, _top, _width, cssAnimationProps.lightradius2.p3 ?? _ctx);
-			const _spells = episode.seenEnemies.filter(x => x.class === __spell && (x.owner ?? x.related)?.main);
-			if(_spells?.[0])
-				_spells.forEach(x => cssAnimations.lightradius2(x, (cssAnimationProps.lightradius2.p2 ?? _rate) / 2, cssAnimationProps.lightradius2.p3 ?? _ctx, 1));
+			ligthenGradient(_left, _top, _width, episode.lightradius2.ctx);
+			const _spells = episode.activeSpells;
+			for(let i = 0; i < _spells.length; i++) {
+				const _spell = _spells[i];
+				if((_spell.owner ?? _spell.related)?.main) {
+					if(_spell._lightTick !== _gameTick) {
+						_spell._lightTick = _gameTick;
+						cssAnimations.lightradius2(_spell, 
+							(cssAnimationProps.lightradius2.p2 ?? _rate) / 2, episode.lightradius2.ctx, 1);
+					}
+				}
+			}
 		}
 		else{
-			ligthenGradientColored(_left, _top, _width, cssAnimationProps.lightradius2.p3 ?? _ctx, 
+			ligthenGradientColored(_left, _top, _width, episode.lightradius2.ctx, 
 			adjustColorForIntensity(_char.lightColor ?? '#0000FF10', __maxFreqCount));
 		}
 	}
-
 }
 
 const __maxFreqCount = 3;

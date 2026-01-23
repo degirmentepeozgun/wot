@@ -903,32 +903,10 @@ function openGame() {
 		const _isHEDevice = await isHighEndDevice();
 		if(!_isHEDevice)
 			__scale = 2;
-		//alert((__scale === 2 ? 'Low' : 'High') + '-end device detected');
-		const __r = document.querySelector(':root');
-		//const __rs = getComputedStyle(__r);
 		if(_openingSound)
 			_closeOpeningMusic = 1;
-		_canvas.width = _canvas1.width = _canvasB.width = _canvasGore.width = _canvasSPB.width = _canvas3.width = _canvas5.width = 
-		_canvasF.width = _canvasS.width = _canvasDMG.width = _canvasR.width = MathRound(_gamePad.offsetWidth / __scale);
-		const root = document.querySelector(':root');
-		root.style.setProperty('--scale', __scale);
-		root.style.setProperty('--canvas-width', (_canvas.width * __scale)+ "px");
-
-		document.getElementById('game-pad-left').style.width =
-		document.getElementById('game-pad-right').style.width =
-		'calc((100vw - ' + (_canvas.width * __scale) + 'px) / 2)';
-		_canvas.height = _canvasDMG.height = _canvasB.height = _canvas3.height = _canvasGore.height = _canvas5.height = 
-		_canvasS.height = _canvasSPB.height = _canvasF.height = _canvasR.height = MathRound(_gamePad.offsetHeight / __scale);
-		
-		__zoom = _canvas.width / 2048;
-		__dmgFrameDistance = MathRound(100 * __zoom);
-		groundheight = MathRound(200 * __zoom);
-		idealground_height = groundheight;
-		_canvas1.height = _canvas.height - getGroundHeight();
-		__r.style.setProperty('--ground-height', getGroundHeight() + 'px');
-		__r.style.setProperty('--use-progress-time', ((2 / __scale) * (165 / getGroundHeight())) + 's');
-		centerMinX = MathFloor(_canvas.width * 0.36);
-		centerMaxX = MathFloor(_canvas.width * 0.64);
+		//alert((__scale === 2 ? 'Low' : 'High') + '-end device detected');
+		setWindowVariables();
 		// switchMap(testMap ?? 1, null, function () {
 		// 	for (var i = 1; i <= Object.keys(chainSkills).length; i++)
 		// 		addClass(chainSkills['skill' + i], 'd-none');

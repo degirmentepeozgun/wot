@@ -17,7 +17,9 @@
     <allow-navigation href="*" />
 <platform name="electron">
     	<preference name="ElectronSettingsFilePath" value="res/electron/settings.json" />
-	<icon src="res/icon/electron/icon.png" />	
+	<icon src="res/icon/electron/icon.png" />
+        <preference name="ElectronDevTools" value="false" />
+        <preference name="ElectronNodeIntegration" value="false" />
 </platform>
     <platform name="android">
 	<preference name="StatusBarOverlaysWebView" value="false" />
