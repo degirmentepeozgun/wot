@@ -2206,6 +2206,9 @@ function organizeScreenResize() {
 	let oldWidth = _gamePad.offsetWidth;
 
 	function resizeCanvas() {
+		const newWidth = _gamePad.offsetWidth;
+		if((newWidth ?? 0) <= 0)
+			return;
 		setWindowVariables();
 		if(episode)
 			episode.resize();
@@ -2213,8 +2216,6 @@ function organizeScreenResize() {
 			_store.minPosX = -1 * MathRound((mainCharacter.width / 2) * __zoom);
 			_store.maxPosX = _canvas.width - MathRound((mainCharacter.width / 2) * __zoom);
 		}
-		const newWidth = _gamePad.offsetWidth;
-
 		// Oran hesapla
 		const scaleX = newWidth / oldWidth;
 
@@ -2222,13 +2223,11 @@ function organizeScreenResize() {
 		platformX *= scaleX;
 		if(episode)
 			episode.enemies?.forEach(x => {
-				if(x.platformX)
-					x.platformX *= scaleX;
-				const _ol = x.left;
 				x.left *= scaleX;
-				console.log(_ol + ' ' + x.left);
 				x.yPosition *= scaleX;
+				x.limitYPosition();
 				x.updateVariables();
+				x.yGap *= scaleX;
 				if(x.relatedObjects?.[0])
 					x.relatedObjects.forEach(y => {
 				 		y.remove = true;

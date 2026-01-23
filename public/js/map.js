@@ -53,6 +53,7 @@ function map(_m) {
 	//this.height = _m.height;
 	this.hitCount = 0;
 	this.limitedEffects = [];
+	this.lastSortedTime = 0;
 	//this.distance = (__globalDistance ? parseFloat(__globalDistance) / 100 : undefined) ?? (_mapSprite.distance ?? .5);
 	this.sprites = _m.sprites;
 	this.status = _m.status ?? 'loading';
@@ -3345,120 +3346,120 @@ function map(_m) {
 		// 3 - Sonucu ana canvasa aktar
 		_can.drawImage(temp, x, y);
 	}
-	this.drawHitParticles = function(_char, x, y, direction, color, strength, reversed, _key) {
-	if (!_char.particles) _char.particles = [];
+// 	this.drawHitParticles = function(_char, x, y, direction, color, strength, reversed, _key) {
+// 	if (!_char.particles) _char.particles = [];
 
-	if (x) {
+// 	if (x) {
 
-		strength = Math.max(1, Math.min(3, strength - 1));
-		let _countRate = 1;
-		if(strength >= 2 && strength < 3)
-			_countRate = getRandomValue2(100, 300) / 100;
-		else if(strength >= 3)
-			_countRate = 4;
-		if(_char.particles.length > 0 && _countRate < 4)
-			return;
-		const count = (16 + _countRate) + strength * _countRate * ((_char.width * _char.ZOOM) / 30);
-		const spread = (20 + _countRate) + strength * 20;
-		const baseSpeed = (getRandomValue2(25, 45) / 10) + _countRate * ((_char.width * _char.ZOOM) / (60 + (_countRate * 15)));
+// 		strength = Math.max(1, Math.min(3, strength - 1));
+// 		let _countRate = 1;
+// 		if(strength >= 2 && strength < 3)
+// 			_countRate = getRandomValue2(100, 300) / 100;
+// 		else if(strength >= 3)
+// 			_countRate = 4;
+// 		if(_char.particles.length > 0 && _countRate < 4)
+// 			return;
+// 		const count = (16 + _countRate) + strength * _countRate * ((_char.width * _char.ZOOM) / 30);
+// 		const spread = (20 + _countRate) + strength * 20;
+// 		const baseSpeed = (getRandomValue2(25, 45) / 10) + _countRate * ((_char.width * _char.ZOOM) / (60 + (_countRate * 15)));
 
-		// 2.5D için kontrollü aşağı eğim
-		let downwardBias = 18 + Math.random() * 6;
-		for (let i = 0; i < count; i++) {
+// 		// 2.5D için kontrollü aşağı eğim
+// 		let downwardBias = 18 + Math.random() * 6;
+// 		for (let i = 0; i < count; i++) {
 
-			const angle =
-				direction +
-				downwardBias +
-				(Math.random() * spread - spread / 2);
+// 			const angle =
+// 				direction +
+// 				downwardBias +
+// 				(Math.random() * spread - spread / 2);
 			
-			const rad = angle * Math.PI / 180;
+// 			const rad = angle * Math.PI / 180;
 
-			// HER PARTİKÜL FARKLI HAREKET PROFİLİ ALIR
-			let speedVariance = Math.random();
-			let speed =
-				baseSpeed *
-				(0.6 + speedVariance * speedVariance * 1.6);
+// 			// HER PARTİKÜL FARKLI HAREKET PROFİLİ ALIR
+// 			let speedVariance = Math.random();
+// 			let speed =
+// 				baseSpeed *
+// 				(0.6 + speedVariance * speedVariance * 1.6);
 
-			let vx = Math.cos(rad) * speed;
-			let vy = Math.sin(rad) * speed;
-			if (_key === 'slam')
-				vy -= speed * 0.8;
+// 			let vx = Math.cos(rad) * speed;
+// 			let vy = Math.sin(rad) * speed;
+// 			if (_key === 'slam')
+// 				vy -= speed * 0.8;
 
-			// Mikro yön bozulması (robotik hissi öldürür)
-			vx += (Math.random() - 0.5) * 0.6;
-			vy += (Math.random() - 0.5) * 0.4;
+// 			// Mikro yön bozulması (robotik hissi öldürür)
+// 			vx += (Math.random() - 0.5) * 0.6;
+// 			vy += (Math.random() - 0.5) * 0.4;
 
-			_char.particles.push({
-				x,
-				y,
-				vx,
-				vy,
-				p: platformX,
-				radius: 1.5 + Math.random() * 3.2,
-				life: getRandomValue2(80, 110) / 100,
-				decay: 0.035 + Math.random() * 0.05,
-				frame: 0,
-				gravity: 0.28 + Math.random() * 0.5,
-				wobble: Math.random() * 2,
-				color: randomShade(color)
-			});
-		}
-	}
+// 			_char.particles.push({
+// 				x,
+// 				y,
+// 				vx,
+// 				vy,
+// 				p: platformX,
+// 				radius: 1.5 + Math.random() * 3.2,
+// 				life: getRandomValue2(80, 110) / 100,
+// 				decay: 0.035 + Math.random() * 0.05,
+// 				frame: 0,
+// 				gravity: 0.28 + Math.random() * 0.5,
+// 				wobble: Math.random() * 2,
+// 				color: randomShade(color)
+// 			});
+// 		}
+// 	}
 
-	const oldAlpha = offCtx.globalAlpha;
-	const _reversed = (offCtx.reversed && !reversed) || (!offCtx.reversed && reversed);
-	for (let i = _char.particles.length - 1; i >= 0; i--) {
-		const p = _char.particles[i];
+// 	const oldAlpha = offCtx.globalAlpha;
+// 	const _reversed = (offCtx.reversed && !reversed) || (!offCtx.reversed && reversed);
+// 	for (let i = _char.particles.length - 1; i >= 0; i--) {
+// 		const p = _char.particles[i];
 
-		// Agresif başlangıç
-		let speedMultiplier = p.frame < 2 ? 2.5 : 1;
-		let sizeMultiplier  = p.frame < 2 ? 1.5 : 1;
+// 		// Agresif başlangıç
+// 		let speedMultiplier = p.frame < 2 ? 2.5 : 1;
+// 		let sizeMultiplier  = p.frame < 2 ? 1.5 : 1;
 
-		// Organik jitter (çizgi hissini yok eder)
-		p.x += p.vx * speedMultiplier + Math.sin(p.frame + p.wobble) * 0.4;
-		p.y += p.vy * speedMultiplier;
+// 		// Organik jitter (çizgi hissini yok eder)
+// 		p.x += p.vx * speedMultiplier + Math.sin(p.frame + p.wobble) * 0.4;
+// 		p.y += p.vy * speedMultiplier;
 
-		p.vy += p.gravity;
-		p.vx *= 0.96; // hafif sürtünme
+// 		p.vy += p.gravity;
+// 		p.vx *= 0.96; // hafif sürtünme
 
-		p.life -= p.decay;
-		p.frame++;
+// 		p.life -= p.decay;
+// 		p.frame++;
 
-		offCtx.globalAlpha = p.life;
-		offCtx.beginPath();
-		offCtx.fillStyle = p.color;
-		offCtx.ellipse(
-			p.x - ((_reversed ? -1 : 1) * (platformX - p.p)),
-			p.y,
-			p.radius * sizeMultiplier * (getRandomValue2(8, 24) / 10),
-			p.radius * sizeMultiplier * (getRandomValue2(8, 12) / 10),
-			0,
-			0,
-			Math.PI * 2
-		);
-		offCtx.fill();
+// 		offCtx.globalAlpha = p.life;
+// 		offCtx.beginPath();
+// 		offCtx.fillStyle = p.color;
+// 		offCtx.ellipse(
+// 			p.x - ((_reversed ? -1 : 1) * (platformX - p.p)),
+// 			p.y,
+// 			p.radius * sizeMultiplier * (getRandomValue2(8, 24) / 10),
+// 			p.radius * sizeMultiplier * (getRandomValue2(8, 12) / 10),
+// 			0,
+// 			0,
+// 			Math.PI * 2
+// 		);
+// 		offCtx.fill();
 
-		if (p.life <= 0)
-			_char.particles.splice(i, 1);
-	}
+// 		if (p.life <= 0)
+// 			_char.particles.splice(i, 1);
+// 	}
 
-	offCtx.globalAlpha = oldAlpha;
+// 	offCtx.globalAlpha = oldAlpha;
 
-	if (_char.particles.length === 0)
-		delete _char.particles;
+// 	if (_char.particles.length === 0)
+// 		delete _char.particles;
 
-	function randomShade(hex) {
-		let r = parseInt(hex.substr(1,2),16);
-		let g = parseInt(hex.substr(3,2),16);
-		let b = parseInt(hex.substr(5,2),16);
+// 	function randomShade(hex) {
+// 		let r = parseInt(hex.substr(1,2),16);
+// 		let g = parseInt(hex.substr(3,2),16);
+// 		let b = parseInt(hex.substr(5,2),16);
 
-		r += Math.random() * 35 - 15;
-		g += Math.random() * 25 - 10;
-		b += Math.random() * 20 - 5;
+// 		r += Math.random() * 35 - 15;
+// 		g += Math.random() * 25 - 10;
+// 		b += Math.random() * 20 - 5;
 
-		return `rgb(${r|0},${g|0},${b|0})`;
-	}
-}
+// 		return `rgb(${r|0},${g|0},${b|0})`;
+// 	}
+// }
 
 // 	this.drawHitParticles = function(_char, x, y, direction, color, strength, reversed) {
 // 	if (!_char.particles) _char.particles = [];
@@ -3573,6 +3574,167 @@ function map(_m) {
 // 		return `rgb(${r|0},${g|0},${b|0})`;
 // 	}
 // }
+const SIN_LUT = new Float32Array(360);
+for (let i = 0; i < 360; i++)
+ SIN_LUT[i] = Math.sin(i * Math.PI / 180);
+this.drawHitParticles = function(_char, x, y, direction, color, strength, reversed, _key) {
+
+ if (!_char.particles) _char.particles = [];
+
+ // ---------------- SPAWN ----------------
+
+ if (x) {
+
+  strength = Math.max(1, Math.min(3, strength - 1));
+
+  let _countRate = 1;
+  if (strength >= 2 && strength < 3)
+    _countRate = getRandomValue2(100, 300) / 100;
+  else if (strength >= 3)
+    _countRate = 4;
+
+  if (_char.particles.length > 0 && _countRate < 4)
+    return;
+
+  const sizeFactor = (_char.width * _char.ZOOM) / 30;
+
+  const count =
+    (16 + _countRate) +
+    strength * _countRate * sizeFactor;
+
+  const spread =
+    (20 + _countRate) +
+    strength * 20;
+
+  const baseSpeed =
+    (getRandomValue2(25, 45) / 10) +
+    _countRate * (sizeFactor / (2 + _countRate));
+
+  const downwardBias = 18 + Math.random() * 6;
+  const radMul = Math.PI / 180;
+
+  for (let i = 0; i < count; i++) {
+
+    const angle =
+      direction +
+      downwardBias +
+      (Math.random() * spread - spread * 0.5);
+
+    const rad = angle * radMul;
+
+    const speedVariance = Math.random();
+    const speed =
+      baseSpeed *
+      (0.6 + speedVariance * speedVariance * 1.6);
+
+    let vx = Math.cos(rad) * speed;
+    let vy = Math.sin(rad) * speed;
+
+    if (_key === 'slam')
+      vy -= speed * 0.8;
+
+    vx += (Math.random() - 0.5) * 0.6;
+    vy += (Math.random() - 0.5) * 0.4;
+
+    _char.particles.push({
+      x,
+      y,
+      vx,
+      vy,
+      p: platformX,
+
+      radius: 1.5 + Math.random() * 3.2,
+
+      rx: (getRandomValue2(8, 24) / 10),
+      ry: (getRandomValue2(8, 12) / 10),
+
+      life: getRandomValue2(80, 110) / 100,
+      decay: 0.035 + Math.random() * 0.05,
+
+      frame: 0,
+      gravity: 0.28 + Math.random() * 0.5,
+      wobble: Math.random() * 360 | 0,
+
+      color: randomShade(color)
+    });
+  }
+ }
+
+ // ---------------- UPDATE + DRAW ----------------
+
+ const arr = _char.particles;
+
+ const oldAlpha = offCtx.globalAlpha;
+ const _reversed = (offCtx.reversed && !reversed) || (!offCtx.reversed && reversed);
+
+ let lastColor = null;
+ let lastAlpha = -1;
+
+ for (let i = arr.length - 1; i >= 0; i--) {
+
+  const p = arr[i];
+
+  const fast = p.frame < 2;
+  const speedMul = fast ? 2.5 : 1;
+  const sizeMul  = fast ? 1.5 : 1;
+
+  p.x += p.vx * speedMul + SIN_LUT[(p.frame + p.wobble) % 360] * 0.4;
+  p.y += p.vy * speedMul;
+
+  p.vy += p.gravity;
+  p.vx *= 0.96;
+
+  p.life -= p.decay;
+  p.frame++;
+
+  if (p.life <= 0) {
+    arr[i] = arr[arr.length - 1];
+    arr.pop();
+    continue;
+  }
+
+  if (p.life !== lastAlpha) {
+    offCtx.globalAlpha = p.life;
+    lastAlpha = p.life;
+  }
+
+  if (p.color !== lastColor) {
+    offCtx.fillStyle = p.color;
+    lastColor = p.color;
+  }
+
+  offCtx.beginPath();
+  offCtx.ellipse(
+    p.x - ((_reversed ? -1 : 1) * (platformX - p.p)),
+    p.y,
+    p.radius * sizeMul * p.rx,
+    p.radius * sizeMul * p.ry,
+    0, 0, Math.PI * 2
+  );
+  offCtx.fill();
+ }
+
+ offCtx.globalAlpha = oldAlpha;
+
+ if (arr.length === 0)
+  delete _char.particles;
+
+
+ // ---------------- COLOR ----------------
+
+ function randomShade(hex) {
+
+  let r = parseInt(hex.substr(1,2),16);
+  let g = parseInt(hex.substr(3,2),16);
+  let b = parseInt(hex.substr(5,2),16);
+
+  r += Math.random() * 35 - 15;
+  g += Math.random() * 25 - 10;
+  b += Math.random() * 20 - 5;
+
+  return `rgb(${r|0},${g|0},${b|0})`;
+ }
+}
 
 	this.drawCharacterQueue = function (_queue) {
 		if (this.disposing || !_queue?.[0]){
@@ -3581,14 +3743,17 @@ function map(_m) {
 			return;
 		}
 		this.checkSceneActions(1);
-		for(let a of _queue)
-			a.sortOrder = _maxSort - MathFloor((MathRound((a.drawPriority >= 10 ? 
-				0 : a.char.yPosition) / _yTol)
-			* 100000) + 
-			(a.drawPriority * 10000)
-			+ ((999 - (a.char.drawOrder ?? 0)))
-			);
-		_queue = radixSortLSD(_queue, a => a.sortOrder);
+		if((this.lastSortedTime + 100) < _gameTick) {
+			for(let a of _queue)
+				a.char.sortOrder = _maxSort - MathFloor((MathRound((a.drawPriority >= 10 ? 
+					0 : a.char.yPosition) / _yTol)
+				* 100000) + 
+				(a.drawPriority * 10000)
+				+ ((999 - (a.char.drawOrder ?? 0)))
+				);
+			this.lastSortedTime = _gameTick;
+		}
+		_queue = radixSortLSD(_queue, a => a.char.sortOrder);
 		c10.clearRect(0, 0, this.cWidth, this.cHeight);
 		offCtx.clearRect(0, 0, this.cWidth, this.cHeight);
 		if(__account.options.gore){

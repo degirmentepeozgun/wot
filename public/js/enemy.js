@@ -6334,7 +6334,7 @@ function enemy(_e) {
 		}
 	}
 	this.getMaxYPosition = function() {
-		return getGroundHeight() - (this.yGap * this.ZOOM);
+		return getGroundHeight() - this.yGap;
 	}
 	this.limitYPosition = function() {
 		if(this.positionable)
