@@ -2350,7 +2350,7 @@ const relatedObjects = [
 	},
 	{
 		id: 'throw', key: 'throw',
-		width: 140, height: 31, col:1, zoom: 1.2,
+		width: 140, height: 31, col:1, zoom: 1.5,
 		totalFrames: 6, speed: 4, singleton: true, still: true
 	}
 ];
@@ -5610,7 +5610,7 @@ const mapSprites = [
 	{
 		id: 201, minLevel: 1, public: 1,
 		coords: { left: '33%', top: '52%', title: 'Training', key:'training' }, 
-		theme: __scale >= 2 ? 'plainsmobile' : 'plains', distance: 1, width: MathFloor(6144 * 1.06),
+		theme: 'plains', distance: 1, width: MathFloor(6144 * 1.06),
 		mobs: [
 			// {
 			// 	id: 30, //31,

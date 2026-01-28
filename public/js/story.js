@@ -7072,6 +7072,7 @@ const __stories = [
 						_game.suspended = true;
 					});
 					_gameUI.appendChild(_desc);
+					episode.hasSkippableScreen = 1;
 				},
 				actions: [
 					{
@@ -7309,7 +7310,7 @@ const __stories = [
 				],
 				mobs: [
 					{
-						id: 24,
+						id: 619,
 						minX: 1580,
 						maxX: 4800,
 						count: 1,
@@ -7319,7 +7320,7 @@ const __stories = [
 						experience: 250
 					},
 					{
-						id: 19,
+						id: 24,
 						minX: 1580,
 						maxX: 4800,
 						count: 1,
@@ -7338,16 +7339,6 @@ const __stories = [
 						hp:60,
 						experience: 250
 					},
-					// {
-					// 	id: 66,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 1,
-					// 	sight: 1000,
-					// 	spawn: 1,
-					// 	hp:60,
-					// 	experience: 250
-					// },
 					{
 						id: 28,
 						minX: 1580,
@@ -7387,17 +7378,7 @@ const __stories = [
 						sight: 1000,
 						hp:60,
 						experience: 250
-					},
-					// {
-					// 	id: 1,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 1,
-					// 	sight: 1000,
-					// 	spawn: 1,
-					// 	hp:60,
-					// 	experience: 250
-					// }
+					}
 				]
 			},
 			{
@@ -7510,6 +7491,7 @@ const __stories = [
 						_game.suspended = true;
 					});
 					_gameUI.appendChild(_desc);
+					episode.hasSkippableScreen = 1;
 				},
 				actions: [
 					{
@@ -8722,6 +8704,7 @@ function portTo(_id) {
 	}
 }
 function skipQuickPlayTutorial() {
+	delete episode.hasSkippableScreen;
 	const _cont = document.querySelector('.quick-play-desc-container');
 	if(_cont) {
 		playClick();

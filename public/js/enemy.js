@@ -575,8 +575,11 @@ function enemy(_e) {
 			}
 			if (_anima.totalRange <= 0 && xRangePX > 0 && this.getMaxRunRange() < xRangePX)
 				_anima.totalRange = MathFloor(((xRangePX - this.getMaxRunRange()) / episode.cWidth) * 100);
-			else if(_anima.chargeDistance && xRangePX > 0)
+			else if(_anima.chargeDistance && xRangePX > 0){
 				_anima.normalRange = MathFloor(((xRangePX * this.ZOOM) / episode.cWidth) * 100);
+				if(_anima.normalRange < (_anima.chargeDistance.value / 3))
+					_anima.normalRange = MathFloor(_anima.chargeDistance.value / 3);
+			}
 		}
 	}
 	this.pickNewTarget = function () {
@@ -1643,6 +1646,8 @@ function enemy(_e) {
 					_anima.frames?.forEach(x => {
 						if(!x.def)
 							x.def = {};
+						if(_knockDead && !x.important)
+							x.speed = MathRound(x.speed * 1.3);
 						if(!x.def.iframe)
 							x.def.iframe = true;
 						if(!_knockDead)
@@ -4150,7 +4155,7 @@ function enemy(_e) {
 				const _enemyFrame = _e.getCurrentFrame();
 				if(_enemyFrame.def?.iframe)
 					continue;
-				const _skillName = (_e.isDead() && this.alp && _e.animations.deadfly && _e.animation !== 'deadfly') ? 'deadfly' : 'knockback' + ((_enemyFrame.hurt && !_f.atk?.hurt?.reset) ? _enemyFrame.hurt : (_f.atk?.hurt?.type ?? 'air'));
+				let _skillName = (_e.isDead() && this.alp && _e.animations.deadfly && _e.animation !== 'deadfly') ? 'deadfly' : 'knockback' + ((_enemyFrame.hurt && !_f.atk?.hurt?.reset) ? _enemyFrame.hurt : (_f.atk?.hurt?.type ?? 'air'));
 				if(_skillName === 'deadfly') {
 					_e.animate(_skillName);
 					(this.owner ?? this).talk();
@@ -4161,7 +4166,10 @@ function enemy(_e) {
 					continue;
 				}
 				else if (_knocker.start <= 2 || _enemy) {
-					_e.animate(_skillName);
+					if(_skillName.startsWith('knockbackground') && _e.animation.startsWith('hurtair') && _e.animations.knockbackair)
+						_skillName = 'knockbackair';
+					if(!_e.animation.startsWith('knockback') && _skillName.startsWith('knockback'))
+						_e.animate(_skillName);
 					(this.owner ?? this).talk();
 					_e.direction = _knocker.direction === __right ? __left : __right;
 					if (_e.dying)
@@ -5709,11 +5717,7 @@ function enemy(_e) {
 			const _spell = structuredClone2(spl);
 			const _dmgTypes = _spell.animations.idle.frames.
 			filter(x => x.atk?.type && x.atk.type !== 'common')?.map(x => x.atk.type);
-			const _animKeys = Object.keys(spl.animations);
-			for(let _key of _animKeys)
-				if(spl.animations[_key].frames.find(x => x.do))
-					for(let _i = 0; _i < spl.animations[_key].frames.length; _i++)
-						_spell.animations[_key].frames[_i].do = spl.animations[_key].frames[_i].do;
+			
 			let _enemy;
 			if (_spell.autoAim) {
 				_enemy = _target ? { enemy: _target } : this.getClosestEnemy(_spell.autoAim, this.direction);
@@ -5740,6 +5744,11 @@ function enemy(_e) {
 			else
 				_spell.top = episode.cHeight - (_enemy ?? this).yPosition - ((_enemy ?? this).ZOOM * ((_enemy ?? this).yGap)) - (_enemy ?? this).HEIGHT;
 			const _en = new enemy(_spell);
+			const _animKeys = _en._animationKeys;
+			for(let _key of _animKeys)
+				if(spl.animations[_key].frames.find(x => x.do))
+					for(let _i = 0; _i < spl.animations[_key].frames.length; _i++)
+						_spell.animations[_key].frames[_i].do = spl.animations[_key].frames[_i].do;
 			_en.spellKey = _sp.key;
 			if(_sp.harmless)
 				_en.harmless = true;
@@ -8372,9 +8381,9 @@ function enemy(_e) {
 			if(_totalFrameSpeed < 8)
 				_blockFrames[_blockFrames.length - 1].speed += (8 - _totalFrameSpeed);
 		}
-		const _animationKeys = Object.keys(this.animations);
+		this._animationKeys = Object.keys(this.animations);
 		let i = 1;
-		for(var _ak of _animationKeys) {
+		for(var _ak of this._animationKeys) {
 			const _aks = this.animations[_ak];
 			_aks.id = i;
 			i++;
@@ -8553,7 +8562,7 @@ function enemy(_e) {
 		this.swapAnimation('idle');
 	if(_e.syncCanvas) {
 		let _maxFront = 0;
-		const _keys = Object.keys(this.animations);
+		const _keys = this._animationKeys;
 		for(let _key of _keys) {
 			let _a = this.animations[_key];
 			for(let _f of _a.frames ?? [])

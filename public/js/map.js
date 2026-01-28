@@ -1877,6 +1877,101 @@ function map(_m) {
 		else if(letItSnow)
 			letItSnow.drawSnowFlakes();
 	}
+	this.drawLayers7 = async function () {
+
+	if (this.disposing || __batterySaveMode)
+		return;
+
+	const layers = this.layers;
+	const scale = __scale;
+	const zoom = __zoom;
+	const platX = platformX;
+
+	let firstDraw = !this.layersDrawn;
+
+	for (let i = 0, len = layers.length; i < len; i++) {
+
+		const _lay = layers[i];
+
+		// -------- TARGET CONTAINER --------
+
+		let _c;
+
+		if (_lay.foreground)
+			_c = c9;
+		else if (_lay.rate >= .9)
+			_c = c90;
+		else if (_lay.rate >= .75)
+			_c = c85;
+		else if (_lay.rate <= .5)
+			_c = c50;
+		else
+			_c = c3;
+
+		// -------- PARALLAX POSITION --------
+
+		const rate = _lay.rate || 1;
+		const p = MathRound(platX * rate * scale);
+
+		// -------- FIRST LOAD --------
+
+		if (firstDraw) {
+
+			let _img = _lay._cachedImg;
+
+			if (!_img) {
+
+				const srcImg = await getImagePromise(_lay.src);
+				if (!srcImg) return;
+
+				if (_lay.new) {
+
+					const copyc = document.createElement('canvas');
+					copyc.width = srcImg.width;
+					copyc.height = srcImg.height;
+
+					const copyctx = copyc.getContext("2d");
+					copyctx.imageSmoothingEnabled = false;
+					copyctx.drawImage(srcImg, 0, 0);
+
+					_img = copyc;
+
+				} else {
+
+					_img = srcImg;
+				}
+
+				// ---------- STATIC STYLE ONCE ----------
+
+				if (_lay.marginTop || _lay.marginLeft) {
+
+					_img.style.position = 'absolute';
+
+					if (_lay.marginTop)
+						_img.style.top =
+							MathFloor(_lay.marginTop * scale * zoom * _lay.zoom) + 'px';
+
+					if (_lay.marginLeft)
+						_img.style.left =
+							MathFloor(_lay.marginLeft * scale * zoom * _lay.zoom) + 'px';
+
+					_img.style.width = MathRound(_img.width * scale) + 'px';
+					_img.style.height = MathRound(_img.height * scale) + 'px';
+				}
+
+				_lay._cachedImg = _img;
+				_c.appendChild(_img);
+			}
+		}
+
+		// -------- FAST TRANSFORM --------
+
+		_c.style.transform = `translate3d(${-p}px,0,0)`;
+	}
+
+	this.layersDrawn = 1;
+};
+
 	// this.drawLayers5 = function () {
 	// 	for (let _lay of this.layers) {
 	// 		const p = MathRound(platformX * (_lay.rate ?? 1));
@@ -1906,58 +2001,58 @@ function map(_m) {
 	// 			});
 	// 	}
 	// }
-	this.drawLayers7 = async function () {
-		if(this.disposing || __batterySaveMode)
-			return;
-		let i = 0;
-		for (let _lay of this.layers) {
-			let _c;// = _lay.foreground ? c9 : (_lay.rate == .9 ? c90 : (_lay.rate == .85 ? c85 : (_lay.rate == .5 ? c50 : c3)));
-			if(_lay.foreground)
-				_c = c9;
-			else if(_lay.rate >= .75 && _lay.rate < .9)
-				_c = c85;
-			else if(_lay.rate >= .9 && _lay.rate < 1)
-				_c = c90;
-			else if(_lay.rate <= .5)
-				_c = c50;
-			else
-				_c = c3;
-			const p = MathRound(platformX * (_lay.rate ?? 1) * __scale);
-			if(!this.layersDrawn)
-			{
-				const _i = await getImagePromise(_lay.src);
-				let _img;
-				if(_lay.new) {
-					const copyc = document.createElement('canvas');
-					copyc.width = _i.width;
-					copyc.height = _i.height;
-					const copyctx = copyc.getContext("2d");
-					copyc.imageSmoothingEnabled = false;
-					copyctx.drawImage(_i, 0, 0);
-					_img = copyc;
-				}
-				else 
-					_img = _i; //bitmapToCanvas(_i); // _i;
-				if(!_img)
-					return;
-				if(_lay.marginTop)
-					_img.style.top = MathFloor(_lay.marginTop * __scale * __zoom * _lay.zoom) + 'px';
-				if(_lay.marginLeft)
-					_img.style.left = MathFloor(_lay.marginLeft * __scale * __zoom * _lay.zoom) + 'px';
-				if(_lay.marginTop || _lay.marginLeft) {
-					_img.style.position = 'absolute';
-					_img.style.setProperty('width', MathRound(_img.width * __scale) + 'px', 'important');
-					_img.style.setProperty('height', MathRound(_img.height * __scale) + 'px', 'important');
-				}
-				_c.appendChild(_img);
-			}	
-			_c.style.transform = 'translateX(-' + p + 'px)';
-			_c.style.setProperty('-webkit-transform', _c.style.transform);
-			i++;
-		}
-		if(!this.layersDrawn)
-			this.layersDrawn = 1;
-	}
+	// this.drawLayers7 = async function () {
+	// 	if(this.disposing || __batterySaveMode)
+	// 		return;
+	// 	let i = 0;
+	// 	for (let _lay of this.layers) {
+	// 		let _c;// = _lay.foreground ? c9 : (_lay.rate == .9 ? c90 : (_lay.rate == .85 ? c85 : (_lay.rate == .5 ? c50 : c3)));
+	// 		if(_lay.foreground)
+	// 			_c = c9;
+	// 		else if(_lay.rate >= .75 && _lay.rate < .9)
+	// 			_c = c85;
+	// 		else if(_lay.rate >= .9 && _lay.rate < 1)
+	// 			_c = c90;
+	// 		else if(_lay.rate <= .5)
+	// 			_c = c50;
+	// 		else
+	// 			_c = c3;
+	// 		const p = MathRound(platformX * (_lay.rate ?? 1) * __scale);
+	// 		if(!this.layersDrawn)
+	// 		{
+	// 			const _i = await getImagePromise(_lay.src);
+	// 			let _img;
+	// 			if(_lay.new) {
+	// 				const copyc = document.createElement('canvas');
+	// 				copyc.width = _i.width;
+	// 				copyc.height = _i.height;
+	// 				const copyctx = copyc.getContext("2d");
+	// 				copyc.imageSmoothingEnabled = false;
+	// 				copyctx.drawImage(_i, 0, 0);
+	// 				_img = copyc;
+	// 			}
+	// 			else 
+	// 				_img = _i; //bitmapToCanvas(_i); // _i;
+	// 			if(!_img)
+	// 				return;
+	// 			if(_lay.marginTop)
+	// 				_img.style.top = MathFloor(_lay.marginTop * __scale * __zoom * _lay.zoom) + 'px';
+	// 			if(_lay.marginLeft)
+	// 				_img.style.left = MathFloor(_lay.marginLeft * __scale * __zoom * _lay.zoom) + 'px';
+	// 			if(_lay.marginTop || _lay.marginLeft) {
+	// 				_img.style.position = 'absolute';
+	// 				_img.style.setProperty('width', MathRound(_img.width * __scale) + 'px', 'important');
+	// 				_img.style.setProperty('height', MathRound(_img.height * __scale) + 'px', 'important');
+	// 			}
+	// 			_c.appendChild(_img);
+	// 		}	
+	// 		_c.style.transform = 'translateX(-' + p + 'px)';
+	// 		_c.style.setProperty('-webkit-transform', _c.style.transform);
+	// 		i++;
+	// 	}
+	// 	if(!this.layersDrawn)
+	// 		this.layersDrawn = 1;
+	// }
 	
 	this.drawSpriteObjects2 = function (_forceId, _reset) {
 		if(this.disposing)
@@ -4753,10 +4848,11 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 				return;
 		}
 		if(!_isPvp) {
+			if(_item.char.hpDropped < (_gameTick - 4000))
+				return;
 			const _pass = (_item.char.class !== 'boss' && _item.char.phased == undefined);
 			if (!_item.char.key || (!_item.char.hpDropped && _pass) || _item.char.MAXHP <= 1 || _item.char.class === __spell || _item.animation === 'respawn')
 				return;
-
 			if (_pass && _item.char.hpDropped < mainCharacter.attackedUnitTime)
 				return;
 		}
@@ -5445,8 +5541,21 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 		this.removeLocationHand();
 		for(let _elem of document.querySelectorAll('.dmg'))
 			_elem.remove();
-		if(this.offCanvas)
-			delete this.offCanvas;
+		if(this.offCanvas) {
+			this.offCanvas.width = 0;
+			this.offCanvas.height = 0;
+			this.offCanvas = null;
+		}
+		if(this.offDmgCanvas) {
+			this.offDmgCanvas.width = 0;
+			this.offDmgCanvas.height = 0;
+			this.offDmgCanvas = null;
+		}
+		if(this.offGoreCanvas) {
+			this.offGoreCanvas.width = 0;
+			this.offGoreCanvas.height = 0;
+			this.offGoreCanvas = null;
+		}
 		for(let _sp of this.sprites)
 			if(_sp.animation.sprites?.[0])
 				for(let _asp of _sp.animation.sprites)
@@ -5467,7 +5576,7 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			}
 		addClass(this.enemyRightArrow, 'v-none');
 		addClass(this.enemyLeftArrow, 'v-none');
-		this.layersDrawn = false;
+		this.layersDrawn = 0;
 		const _wrappers = document.querySelectorAll('.wrapper-3d');
 		_wrappers?.forEach(x => x.remove());
 		stopWeather();
@@ -5529,8 +5638,12 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			}
 			else
 				_arr = _objects;
-			for (var _obj of _arr)
+			for (var _obj of _arr) {
+				const _clone = this.sprites.find(x => x.id === _obj.id);
+				if(_clone)
+					this.sprites = this.sprites.filter(x => x !== _clone);
 				this.loadObject(_obj);
+			}
 		}
 		this.XStep = MathRound(getGroundHeight() / 4);
 		this.YStep = MathRound(getGroundHeight() / 5);

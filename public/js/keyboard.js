@@ -819,6 +819,10 @@ const directionKeys = new Set(['w','a','s','d','arrowleft','arrowright','arrowup
 
 window.addEventListener('keydown', (e) => {
   const kRaw = e.key?.toLowerCase?.();
+  if(kRaw === ' ' && episode?.hasSkippableScreen) {
+		skipQuickPlayTutorial();
+		return;
+  }
   if(e.repeat) {
 	if(!physicalKeys.has(kRaw))
 		return;

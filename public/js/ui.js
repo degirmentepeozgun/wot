@@ -2203,12 +2203,11 @@ requestAnimationFrame(() => {
 
 }
 function organizeScreenResize() {
-	let oldWidth = _gamePad.offsetWidth;
-
 	function resizeCanvas() {
 		const newWidth = _gamePad.offsetWidth;
 		if((newWidth ?? 0) <= 0)
 			return;
+		const _oldZoom = __zoom ?? 1;
 		setWindowVariables();
 		if(episode)
 			episode.resize();
@@ -2217,7 +2216,7 @@ function organizeScreenResize() {
 			_store.maxPosX = _canvas.width - MathRound((mainCharacter.width / 2) * __zoom);
 		}
 		// Oran hesapla
-		const scaleX = newWidth / oldWidth;
+		const scaleX = __zoom / _oldZoom;
 
 		// Pozisyonları ölçekle
 		platformX *= scaleX;
@@ -2228,14 +2227,14 @@ function organizeScreenResize() {
 				x.limitYPosition();
 				x.updateVariables();
 				x.yGap *= scaleX;
+				if(x.healtbarGap)
+					x.healtbarGap *= x.getZoom();
 				if(x.relatedObjects?.[0])
 					x.relatedObjects.forEach(y => {
 				 		y.remove = true;
 					});
 			});
-		prevPlatformX = undefined;
-
-		oldWidth = newWidth;
+		prevPlatformX = -1;
 	}
 
 	window.addEventListener("resize", resizeCanvas);
