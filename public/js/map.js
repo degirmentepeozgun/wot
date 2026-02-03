@@ -5079,8 +5079,10 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 				_rel.stillLeft = _rel.stillReversed = undefined;
 			}
 			if (_rel.totalFrames) {
-				if (_rel.start === undefined)
+				if (_rel.start === undefined){
 					_rel.start = 0;
+					_item.char.calculateRelatedTop(_rel, _rel.position);
+				}
 				if (_rel.frame === undefined)
 					_rel.frame = 0;
 				if (_rel.start > 0 && ((_rel.start % (_rel.speed * (/*_item.char.fps ??*/ 1))) === 0)) {

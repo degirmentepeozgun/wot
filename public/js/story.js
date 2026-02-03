@@ -1403,7 +1403,7 @@ const __stories = [
 										if(_e.isDead())
 											return;
 										if(!_e.animations.hurtfeet)
-											_e.animations.hurtfeet = new animation(createHurtFeet(_e.zoom));
+											_e.animations.hurtfeet = new animation(createHurtFeet(_e.zoom, _e.bloodColor));
 										_e.animate('hurtfeet', 1);
 									}
 									mainCharacter.animate('roll', 1);
@@ -7316,69 +7316,79 @@ const __stories = [
 						count: 1,
 						sight: 1000,
 						spawn: 1,
-						hp:60,
+						hp:160,
 						experience: 250
 					},
 					{
-						id: 24,
+						id: 620,
 						minX: 1580,
 						maxX: 4800,
-						count: 1,
+						count: 4,
 						sight: 1000,
 						spawn: 1,
-						hp:60,
+						hp:160,
 						experience: 250
 					},
-					{
-						id: 20,
-						minX: 1580,
-						maxX: 4800,
-						count: 1,
-						sight: 1000,
-						spawn: 1,
-						hp:60,
-						experience: 250
-					},
-					{
-						id: 28,
-						minX: 1580,
-						maxX: 4800,
-						count: 1,
-						sight: 1000,
-						spawn: 1,
-						hp:60,
-						experience: 250
-					},
-					{
-						id: 30,
-						minX: 1580,
-						maxX: 4800,
-						count: 1,
-						sight: 1000,
-						spawn: 1,
-						hp:60,
-						experience: 250
-					},
-					{
-						id: 23,
-						minX: 1580,
-						maxX: 4800,
-						count: 1,
-						sight: 1000,
-						spawn: 1,
-						hp:60,
-						experience: 250
-					},
-					{
-						id: 7,
-						minX: 1580,
-						maxX: 4800,
-						count: 1,
-						spawn: 1,
-						sight: 1000,
-						hp:60,
-						experience: 250
-					}
+					// {
+					// 	id: 24,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 1,
+					// 	sight: 1000,
+					// 	spawn: 1,
+					// 	hp:60,
+					// 	experience: 250
+					// },
+					// {
+					// 	id: 20,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 1,
+					// 	sight: 1000,
+					// 	spawn: 1,
+					// 	hp:60,
+					// 	experience: 250
+					// },
+					// {
+					// 	id: 28,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 1,
+					// 	sight: 1000,
+					// 	spawn: 1,
+					// 	hp:60,
+					// 	experience: 250
+					// },
+					// {
+					// 	id: 30,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 1,
+					// 	sight: 1000,
+					// 	spawn: 1,
+					// 	hp:60,
+					// 	experience: 250
+					// },
+					// {
+					// 	id: 23,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 1,
+					// 	sight: 1000,
+					// 	spawn: 1,
+					// 	hp:60,
+					// 	experience: 250
+					// },
+					// {
+					// 	id: 7,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 1,
+					// 	spawn: 1,
+					// 	sight: 1000,
+					// 	hp:60,
+					// 	experience: 250
+					// }
 				]
 			},
 			{

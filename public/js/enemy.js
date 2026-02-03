@@ -25,6 +25,10 @@ function enemy(_e) {
 	this.gender = _e.gender;
 	this.finishableWith = _e.finishableWith;
 	this.finishAfter = _e.finishAfter;
+	if(_e.finishWhen)
+		this.finishWhen = function() { 
+			return _e.finishWhen(this); 
+		};
 	this.moveDirection = undefined;
 	this.experience = 0; // _e.experience ?? 500;
 	this.healtbarGap = _e.healtbarGap;
@@ -3225,6 +3229,7 @@ function enemy(_e) {
 				? offset - this.WIDTH + originPx - leftGapPx
 				: offset - originPx + leftGapPx
 		);
+		this.PREVLEFT = this.left;
 		if(_l !== this.LEFT)
 			this.LEFT = _l;
 		const _sl = this.left - (this.main ? 0 : platformX);
@@ -3754,7 +3759,8 @@ function enemy(_e) {
 					if(this.charging && !this.chargeProperties)
 						this.charging = undefined;
 					if(!_result.range)
-						_result.range = MathAbs(_result.enemy.ORIGINLEFT - this.ORIGINLEFT);
+						_result.range = MathAbs(_result.enemy.ORIGINLEFT - (this.ORIGINLEFT + ((this.direction === __left ? -1 : 1) * (this.WIDTH - this.ORIGINDIST))));
+					
 					if (this.start <= 1 && this.frame === 0 && !this.charging){
 						this.charging = true;
 						// this.addObject({
@@ -4109,8 +4115,8 @@ function enemy(_e) {
 					(this.getHeightWithoutGap(1) - MathRound((_o.height * _o.zoom)));
 				break;
 			case 'middle':
-				_o.top = this.TOP + MathRound(this.getHeightWithoutGap() / 2) -
-					MathRound((_o.height * _o.zoom) / 2) - ((_obj.bottom ?? 0) * _o.zoom) - ((_o.bottom ?? 0) * _o.zoom);
+				_o.top = (this.TOP + MathRound(this.getHeightWithoutGap() / 2)) -
+					(MathRound((_o.height * _o.zoom) / 2) + ((_obj.bottom ?? 0) * _o.zoom) + ((_o.bottom ?? 0) * _o.zoom));
 				break;
 			case 'middle-front':
 				_o.top = this.TOP + MathRound(this.getHeightWithoutGap() / 2) -
@@ -4264,7 +4270,11 @@ function enemy(_e) {
 			}
 		}
 	}
-	
+	this.canFinish = function() {
+		if(this.finishWhen && !this.finishWhen())
+			return false;
+		return ((this.health * (100 / (this.finishAfter ?? __finishingMoveHPPercent))) <= this.MAXHP);
+	}
 	this.checkFinishingMoveAvailable = function (_anima) {
 		if(!this.main)
 			return;
@@ -4278,7 +4288,7 @@ function enemy(_e) {
 		});
 		const _enemy = _close?.enemy;
 		if (_enemy && !_enemy.gradeLeft && !_enemy.invulnerable && (_enemy.health > 0 || _enemy.readyForFatality) && 
-		(_enemy.readyForFatality || ((_enemy.health * (100 / (_enemy.finishAfter ?? __finishingMoveHPPercent))) <= _enemy.MAXHP))) {
+		(_enemy.readyForFatality || _enemy.canFinish())) {
 			const _f = this.upcomingFinishingMove ?? _enemy.finishingMoves[getRandomValue(0, _enemy.finishingMoves.length - 1)];
 			const _finishAnima = this.animations['finish' + _f];
 			if(_finishAnima && (!_finishAnima.when || _finishAnima.when(_enemy, this))) {
@@ -4462,13 +4472,34 @@ function enemy(_e) {
 			PlaySound({path:'./images/talks/' + this.class + '/' + _talkId + '.mp3', volume: 1 });
 		}
 	}
+	this.installHurtFeet = function(_f) {
+		this.animations.hurtfeet = new animation(_f.atk?.hurt?.burn ? createHurtFeetAndBurn(this.zoom) : (_f.atk?.hurt?.knockback ? createHurtFeetWithKnockback(this.zoom, this.bloodColor, _f.atk.hurt.knockback) : createHurtFeet(this.zoom, this.bloodColor, null, _f.bottomGap, _f.atk?.type)));
+	}
 	this.smash = function(_t, _f) {
 		_f = _f ?? this.getCurrentFrame();
 		this.smasher = _t.owner ?? _t;
-		if(!this.animations.hurtfeet)
-			this.animations.hurtfeet = new animation(_f.atk.hurt.burn ? createHurtFeetAndBurn(this.zoom) : (_f.atk.hurt.knockback ? createHurtFeetWithKnockback(this.zoom, this.bloodColor, _f.atk.hurt.knockback) : createHurtFeet(this.zoom, this.bloodColor, null, _f.bottomGap, _f.atk.type)));
+		//if(!this.animations.hurtfeet)
+		this.installHurtFeet(_f);
 		this.animate('hurtfeet', 1);
 		this.smasher.talk();
+	}
+	this.bringItFront = function(_attacker) {
+		if(_attacker.direction === __left){
+			const _originDiff = _attacker.ORIGINLEFT - this.ORIGINLEFT;
+			if(this.PREVLEFT < this.left)
+				this.left = this.PREVLEFT;
+			if(_originDiff < (_attacker.WIDTH - _attacker.ORIGINDIST))
+				this.left -= ((_attacker.WIDTH - _attacker.ORIGINDIST) - _originDiff);
+			_attacker.left = _attacker.PREVLEFT;
+		}
+		else {
+			const _originDiff = this.ORIGINLEFT - _attacker.ORIGINLEFT;
+			if(this.PREVLEFT > this.left)
+				this.left = this.PREVLEFT;
+			if(_originDiff < _attacker.ORIGINDIST)
+				this.left += (_attacker.ORIGINDIST - _originDiff);
+			_attacker.left = _attacker.PREVLEFT;
+		}
 	}
 	this.attack = function (_anima, _frame) {
 		const trt = (this.related ?? this);
@@ -4596,6 +4627,8 @@ function enemy(_e) {
 								else
 									PlaySound({ key: _e.class + _f.atk.hurt.sound, owner: _e }, [_f.atk.hurt.sound]);
 							});
+						else if(_e.bleed)
+							PlaySound({key:'fleshhurt' + getRandomValue2(1,6), volume:.7, owner: _e});
 						if (_f.atk.hurt.props) {
 							const _dying = _e.dying;
 							_e.setProps(_f.atk.hurt.props);
@@ -4820,7 +4853,7 @@ function enemy(_e) {
 								removeClass(_gamePad, 'zoom');
 							if (_f.atk.rate) {
 								if(_f.atk.hurt?.hitZoom)
-									_ef.hitZoom = _f.atk.hurt?.hitZoom;
+									_e.setHitZoom(_ef, _f.atk.hurt?.hitZoom);//_ef.hitZoom = _f.atk.hurt?.hitZoom;
 								if (!_f.atk.hurt.dead) {
 									let _hasEffect;
 									if ((_t.class === __spell || _t.start <= 1) && (_e.health > 0 && !_e.finishing)) {
@@ -4857,7 +4890,7 @@ function enemy(_e) {
 										// }, getRandomValue2(20, 35));
 										const _newDmg = _t.calculateElementalDmg(_dmg, _e);
 										let _dmgEffect;
-										if((((_newDmg > _dmg) && (_t.main && !_t.villain)) || (_newDmg >= _dmg)) || (_f.atk.type && _f.atk.type !== 'common')) {
+										if(_newDmg > _dmg && (_f.atk.type && _f.atk.type !== 'common')) {
 											_dmgEffect = _t.getElementalEffect(_e);
 											_dmg = _newDmg;
 											_hasEffect = 1;
@@ -4914,7 +4947,7 @@ function enemy(_e) {
 											_e.decreaseHealth(_dmg, _t.related ?? _t);
 											_e.lastDamage = _dmg;
 											if(_f.atk.hitZoom)
-												_f.hitZoom = _f.atk.hitZoom;
+												_t.setHitZoom(_f, _f.atk.hitZoom);//_f.hitZoom = _f.atk.hitZoom;
 											if(_e.main && _critHitTaken && _cced){
 												_e.addObject({
 													position: 'css',
@@ -4987,13 +5020,15 @@ function enemy(_e) {
 										for (var _o of _f.objects)
 											if (_o.hurt){
 												_e.addObject(_o);
-												if(!_hasEffect)
-													_hasEffect = 1;
+												// if(!_hasEffect)
+												// 	_hasEffect = 1;
 											}
 									if(_charged){
 										_e.addObject({key:'sparkcharge', position: 'middle'});
 										if(_e.isDead())
 											_e.chargeDead = 1;
+										else 
+											_e.bringItFront(_t);
 										PlaySound({key:'chargehit1', reset: true, volume:.4});
 										episode.skipTinyCameraMove = 10;
 									}
@@ -5001,7 +5036,7 @@ function enemy(_e) {
 										setTimeout(() => {
 											if(_t.criticalHit) {
 												//buraya crit spark
-												_e.addObject({key:'sparkcrit', position: 'middle'});
+												_e.addObject({ key:'sparkcrit', position: 'middle'});
 												_e.addObject({ key: 'deadspark' + (_e.bloodColor ?? 'red'), position: 'middle' });
 											}
 											else {
@@ -5010,16 +5045,19 @@ function enemy(_e) {
 												if(_f.atk.rate < 1) {
 													//ufak
 													_e.addObject({key:'shine', position: 'middle'});
+													console.log(1);
 													_e.addObject({key:'sparkhitsmall', position: 'middle'});
 												}
 												else if(_f.atk.rate < 2) {
 													//orta
 													_e.addObject({key:'shine', scale:1.1, position: 'middle'});
+													console.log(2);
 													_e.addObject({key:'sparkhitmedium', position: 'middle'});
 												}
 												else {
 													//büyük
 													_e.addObject({key:'shine', scale:1.2, position: 'middle'});
+													console.log(3);
 													_e.addObject({key:'sparkhitbig', position: 'middle'});
 												}
 											}
@@ -6091,6 +6129,12 @@ function enemy(_e) {
 			return 1 + ((_zoom - 1) / 2);
 		else
 			return 1 - ((1 - _zoom) / 2);
+	}
+	this.setHitZoom = function(_f, _z) {
+		if((_gameTick - this.lastHitZoomTime) < 500)
+			return;
+		_f.hitZoom = _z;
+		this.lastHitZoomTime = _gameTick;
 	}
 	this.render = function (_frame, _queue) {
 		if(this.noDirection && (this.direction !== this.defaultDirection))
@@ -7839,9 +7883,14 @@ function enemy(_e) {
 				//this.animation = 'finish' + getRandomValue(1, i);
 				this.finishTarget = _finishTarget;
 				if (!this.finishTarget.dying) {
-					if(this.animation !== 'hurtair')
+					const _fr = this.finishTarget.getCurrentFrame();
+					const _isLaying = _fr?.lay;
+					if(this.animation !== 'hurtair' && !_isLaying) {
 						this.finishTarget.animate('idle', 1, null, 5);
-					this.finishTarget.idle.imediateBreak = false;
+						this.finishTarget.idle.imediateBreak = false;
+					}
+					else if(_isLaying)
+						_fr.speed = 999;
 					this.finishTarget.iframe = this.finishTarget.hurting =
 						this.finishTarget.targeted = false;
 					this.finishTarget.immobilize = this.finishTarget.interactive = true;
@@ -8581,6 +8630,9 @@ function enemy(_e) {
 					_f.spriteWidth = _f.spriteOrigin + _maxFront;
 			}
 	}
-	if(this.finishableWith)
+	if(this.finishableWith) {
 		this.finishingMoves = this.finishableWith.split(',');
+		if(this.finishingMoves.indexOf('feet') !== -1)
+			this.installHurtFeet(this.getCurrentFrame());
+	}
 }
