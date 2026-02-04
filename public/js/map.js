@@ -5368,7 +5368,11 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			_char._enemyBuffer.length = 0;
 		const _x = _char._enemyBuffer;
 		const _ff = _char.friendlyFire && (_char.enemy !== mainCharacter.enemy);
+		if(_char.name.startsWith('Electric'))
+			console.log('ASD');
 		for(let x of _enemies) {
+			if(_ff && x.enemy && _char.enemy)
+				continue;
 			if(x.attackingOnlyBy && x.attackingOnlyBy === _char.key && 
 			x != _char && x.enemy != undefined && !x.dead && !(x.knockbacking && x.dying) && 
 			(_ff || x.enemy !== _char.enemy) && isObjectInVisibleRectangle(x))
@@ -5378,7 +5382,6 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 				_x.push(x);
 				break;
 			}
-
 			if(x.dead || x.class === __spell)
 				continue;
 			if (x === _char || x.enemy == undefined) 

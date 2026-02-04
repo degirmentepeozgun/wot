@@ -367,6 +367,9 @@ function enemy(_e) {
 	// this.getCurrentFrame = function () {
 	// 	return this.getCurrentAnimation()?.frames?.[this.frame];
 	// }
+	this.getPreviousFrame = function() {
+		return this.PREV_FRAME;
+	}
 	this.getCurrentFrame = function () {
 		const anima = this.getCurrentAnimation();
 		if (!anima) return undefined;
@@ -375,6 +378,7 @@ function enemy(_e) {
 			this._cachedFrameIndex !== this.frame ||
 			this._cachedAnimation !== anima
 		) {
+			this.PREV_FRAME = this.CURRENT_FRAME;
 			this.CURRENT_FRAME = anima.frames?.[this.frame];
 			this._cachedFrameIndex = this.frame;
 			this._cachedAnimation = anima;
@@ -901,16 +905,20 @@ function enemy(_e) {
 								}
 								else {
 									let _wait;
+									if(!this.upcomingAnimation)
+										this.pickRandomAttack(null, null, 1);
 									if(this.upcomingAnimation) {
 										const _ua = this.animations[this.upcomingAnimation];
 										if(_ua && _ua.totalRange && _enemy.range && _ua.totalRange >= ((_enemy.range / episode.cWidth) * 100))
 											_wait = 1;
 									}
-									this.upcomingAnimation = undefined;
+									
 									if(_wait)
 										this.idle(95);
-									else
+									else {
+										this.upcomingAnimation = undefined;
 										this.run(_anima, _dir, null, 3);
+									}
 								}
 							}
 							this.autoAttacking = false;

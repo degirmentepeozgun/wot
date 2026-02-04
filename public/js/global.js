@@ -28595,436 +28595,594 @@ const spells = {
 		}
 	}
 }
+
 function addSlingStoneSpells() {
-	const _spellEffects = ['common','fire','ice','shadow','lightning','toxic'];
-	const _colors = ['#808080cc', '#ff0000cc', '#0000ffcc', '#ff00ffcc', '#ffff00cc', '#00ff00cc'];
-	for(let i=1; i < 7; i++) {
-		spells['slingstone' + i] = {
-			defaultDirection: __right,
-			defaultAnimationKey: 'run',
-			zoom: 1,
-			src: './images/sprites/ep620/sapantas' + i + '.png',
-			invulnerable: true,
-			extraStepXRate: 1,
-			class: __spell,
-			lightColor: _colors[i - 1],
-			name: 'SlingStone' + i,
-			animations: {
-				dead: {
-					key: "dead",
-					type: 'skill',
-					frames: [
-						{
-							spriteLeft: 0,
-							spriteTop: 0,
-							spriteWidth: 0,
-							spriteHeight: 0,
-							spriteOrigin: 0,
-							sound:{key:'confetti', volume:1},
-							props: {
-								remove: true
-							},
-							speed: 24
-						}
-					]
-				},
-				idle: {
-					key: "idle",
-					type: 'skill',
-					move: true,
-					frames: [
-						{
-							spriteLeft: 0,
-							spriteTop: 0,
-							spriteWidth: 60,
-							spriteHeight: 60,
-							spriteOrigin: 30,
-							bottomGap: -120,
-							extraStepXRate: 1,
-							speed: 1,
-							do: function(_e) {
-								//cssAnimations.lightradius3(_e, 3);
-							},
-							// objects: _colors[i - 1] ? [
-							// 	{ key: 'glow', position: 'canvas', p1: { x:0, y:0, r: 120, speed:8, from: _colors[i - 1] + '70', to: _colors[i - 1] + '40' } },
-							// ] : undefined,
-							atk: {
-								yRange: 10,
-								rate: 2,
-								reset: true,
-								hurt: {
-									objects: [
-										{ key: 'stars', position:'middle' }
-									],
-									key: 'hurtground1',
-									type: 'ground'
-								},
-								type: _spellEffects[i - 1]
-							}
-						},
-						{
-							spriteLeft: 0,
-							spriteTop: 0,
-							spriteWidth: 60,
-							spriteHeight: 60,
-							spriteOrigin: 30,
-							bottomGap: -120,
-							extraStepXRate: 1,
-							speed: 5,
-							atk: {
-								yRange: 10,
-								rate: 2,
-								reset: true,
-								hurt: {
-									objects: [
-										{ key: 'stars', position:'middle' }
-									],
-									key: 'hurtground1',
-									type: 'ground'
-								},
-								type: _spellEffects[i - 1]
-							}
-						},
-						{
-							spriteLeft: 60,
-							spriteTop: 0,
-							spriteWidth: 60,
-							spriteHeight: 60,
-							spriteOrigin: 30,
-							bottomGap: -90,
-							extraStepXRate: 1,
-							speed: 6,
-							atk: {
-								yRange: 10,
-								rate: 2,
-								reset: true,
-								hurt: {
-									objects: [
-										{ key: 'stars', position:'middle' }
-									],
-									key: 'hurtground1',
-									type: 'ground'
-								},
-								type: _spellEffects[i - 1]
-							}
-						},
-						{
-							spriteLeft: 120,
-							spriteTop: 0,
-							spriteWidth: 60,
-							spriteHeight: 60,
-							spriteOrigin: 30,
-							bottomGap: -60,
-							extraStepXRate: 1,
-							speed: 6,
-							atk: {
-								yRange: 10,
-								rate: 2,
-								reset: true,
-								hurt: {
-									objects: [
-										{ key: 'stars', position:'middle' }
-									],
-									key: 'hurtground1',
-									type: 'ground'
-								},
-								type: _spellEffects[i - 1]
-							}
-						},
-						{
-							spriteLeft: 180,
-							spriteTop: 0,
-							spriteWidth: 60,
-							spriteHeight: 60,
-							spriteOrigin: 30,
-							bottomGap: -30,
-							extraStepXRate: .8,
-							sound:{key:'rockhit', volume:1, reset:true},
-							speed: 6,
-							atk: {
-								yRange: 10,
-								rate: 2,
-								reset: true,
-								hurt: {
-									objects: [
-										{ key: 'stars', position:'middle' }
-									],
-									key: 'hurtground1',
-									type: 'ground'
-								},
-								type: _spellEffects[i - 1]
-							}
-						},
-						{
-							spriteLeft: 0,
-							spriteTop: 0,
-							spriteWidth: 60,
-							spriteHeight: 60,
-							spriteOrigin: 30,
-							bottomGap: 0,
-							extraStepXRate: .8,
-							speed: 6,
-							objects:[{
-								key: 'throwwhite',
-								position: 'under-feet',
-								yGap:10
-							}],
-							atk: {
-								yRange: 10,
-								rate: 2,
-								reset: true,
-								hurt: {
-									objects: [
-										{ key: 'stars', position:'middle' }
-									],
-									key: 'hurtground1',
-									type: 'ground'
-								},
-								type: _spellEffects[i - 1]
-							}
-						},
-						{
-							spriteLeft: 60,
-							spriteTop: 0,
-							spriteWidth: 60,
-							spriteHeight: 60,
-							spriteOrigin: 30,
-							bottomGap: -20,
-							extraStepXRate: .8,
-							speed: 6,
-							atk: {
-								yRange: 10,
-								rate: 2,
-								reset: true,
-								hurt: {
-									objects: [
-										{ key: 'stars', position:'middle' }
-									],
-									key: 'hurtground1',
-									type: 'ground'
-								},
-								type: _spellEffects[i - 1]
-							}
-						},
-						{
-							spriteLeft: 120,
-							spriteTop: 0,
-							spriteWidth: 60,
-							spriteHeight: 60,
-							spriteOrigin: 30,
-							bottomGap: -40,
-							extraStepXRate: .6,
-							speed: 6,
-							atk: {
-								yRange: 10,
-								rate: 2,
-								reset: true,
-								hurt: {
-									objects: [
-										{ key: 'stars', position:'middle' }
-									],
-									key: 'hurtground1',
-									type: 'ground'
-								},
-								type: _spellEffects[i - 1]
-							}
-						},
-						{
-							spriteLeft: 180,
-							spriteTop: 0,
-							spriteWidth: 60,
-							spriteHeight: 60,
-							spriteOrigin: 30,
-							bottomGap: -60,
-							extraStepXRate: .6,
-							speed: 6,
-							atk: {
-								yRange: 10,
-								rate: 2,
-								reset: true,
-								hurt: {
-									objects: [
-										{ key: 'stars', position:'middle' }
-									],
-									key: 'hurtground1',
-									type: 'ground'
-								},
-								type: _spellEffects[i - 1]
-							}
-						},
-						{
-							spriteLeft: 0,
-							spriteTop: 0,
-							spriteWidth: 60,
-							spriteHeight: 60,
-							spriteOrigin: 30,
-							bottomGap: -80,
-							extraStepXRate: .6,
-							speed: 6,
-							atk: {
-								yRange: 10,
-								rate: 2,
-								reset: true,
-								hurt: {
-									objects: [
-										{ key: 'stars', position:'middle' }
-									],
-									key: 'hurtground1',
-									type: 'ground'
-								},
-								type: _spellEffects[i - 1]
-							}
-						},
-						{
-							spriteLeft: 60,
-							spriteTop: 0,
-							spriteWidth: 60,
-							spriteHeight: 60,
-							spriteOrigin: 30,
-							bottomGap: -70,
-							extraStepXRate: .5,
-							speed: 6,
-							atk: {
-								yRange: 10,
-								rate: 2,
-								reset: true,
-								hurt: {
-									objects: [
-										{ key: 'stars', position:'middle' }
-									],
-									key: 'hurtground1',
-									type: 'ground'
-								},
-								type: _spellEffects[i - 1]
-							}
-						},
-						{
-							spriteLeft: 120,
-							spriteTop: 0,
-							spriteWidth: 60,
-							spriteHeight: 60,
-							spriteOrigin: 30,
-							bottomGap: -35,
-							extraStepXRate: .5,
-							sound:{key:'rockhit', volume:.8, reset:true},
-							speed: 6,
-							atk: {
-								yRange: 10,
-								rate: 2,
-								reset: true,
-								hurt: {
-									objects: [
-										{ key: 'stars', position:'middle' }
-									],
-									key: 'hurtground1',
-									type: 'ground'
-								},
-								type: _spellEffects[i - 1]
-							}
-						},
-						{
-							spriteLeft: 180,
-							spriteTop: 0,
-							spriteWidth: 60,
-							spriteHeight: 60,
-							spriteOrigin: 30,
-							bottomGap: 0,
-							objects:[{
-								key: 'throwwhite',
-								position: 'under-feet',
-								yGap:10
-							}],
-							extraStepXRate: .5,
-							speed: 6,
-							atk: {
-								yRange: 10,
-								rate: 2,
-								reset: true,
-								hurt: {
-									objects: [
-										{ key: 'stars', position:'middle' }
-									],
-									key: 'hurtground1',
-									type: 'ground'
-								},
-								type: _spellEffects[i - 1]
-							}
-						},
-						{
-							spriteLeft: 0,
-							spriteTop: 0,
-							spriteWidth: 60,
-							spriteHeight: 60,
-							spriteOrigin: 30,
-							bottomGap: -15,
-							extraStepXRate: .4,
-							speed: 6,
-							atk: {
-								yRange: 10,
-								rate: 2,
-								reset: true,
-								hurt: {
-									objects: [
-										{ key: 'stars', position:'middle' }
-									],
-									key: 'hurtground1',
-									type: 'ground'
-								},
-								type: _spellEffects[i - 1]
-							}
-						},
-						{
-							spriteLeft: 60,
-							spriteTop: 0,
-							spriteWidth: 60,
-							spriteHeight: 60,
-							spriteOrigin: 30,
-							bottomGap: -30,
-							extraStepXRate: .4,
-							speed: 6,
-							atk: {
-								yRange: 10,
-								rate: 2,
-								reset: true,
-								hurt: {
-									objects: [
-										{ key: 'stars', position:'middle' }
-									],
-									key: 'hurtground1',
-									type: 'ground'
-								},
-								type: _spellEffects[i - 1]
-							}
-						},
-						{
-							spriteLeft: 120,
-							spriteTop: 0,
-							spriteWidth: 60,
-							spriteHeight: 60,
-							spriteOrigin: 30,
-							bottomGap: -45,
-							extraStepXRate: .4,
-							speed: 6,
-							atk: {
-								yRange: 10,
-								rate: 2,
-								reset: true,
-								hurt: {
-									objects: [
-										{ key: 'stars', position:'middle' }
-									],
-									key: 'hurtground1',
-									type: 'ground'
-								},
-								type: _spellEffects[i - 1]
-							}
-						}
-					]
-				}
-			}
-		};
+    const _spellEffects = ['common', 'fire', 'ice', 'shadow', 'lightning', 'toxic'];
+    const _colors = ['#808080cc', '#ff0000cc', '#0000ffcc', '#ff00ffcc', '#ffff00cc', '#00ff00cc'];
+    const _bottomGaps = {
+        common: [-120, -90, -60, -30, 0, -20, -40, -60, -80, -70, -35, 0, -15, -30, -45],
+        fire: [-120, -100, -75, -45, 0, -40, -70, -90, -105, -95, -80, -60, -35, 0, -30],
+        ice: [-120, -110, -90, -80, -70, -55, -30, 0, -25, -50, -70, -85, -95, -100, -90],
+        shadow: [-120, -90, -60, -30, 0, -20, -40, -60, -80, -70, -35, 0, -15, -30, -45],
+        lightning: [-110, -100, -90, -80, -65, -50, -35, -20, 0, -20, -35, -50, -65, -80, -90],
+        toxic: [-130, -100, -70, -35, 0, -25, -50, -70, -80, -70, -40, 0, -20, -40, -55],
+    };
+    const _xCoords = {
+        common: [1, 1, 1, .8, .8, .8, .6, .6, .6, .5, .5, .5, .4, .4, .4],
+        fire: [.9, .9, .9, .8, .8, .8, .7, .7, .7, .6, .6, .5, .5, .4, .4],
+        ice: [1.2, 1.2, 1.1, 1, 1, .9, .8, .7, .6, .5, .4, .3, .2, .1, .1],
+        shadow: [1.1, 1.1, 1, .1, .9, .8, .7, .6, .6, .5, .5, .5, .4, .4, .4],
+        lightning: [1.2, 1.2, 1.2, 1.1, 1.1, 1.1, 1, 1, 1, .9, .9, .9, .8, .8, .8],
+        toxic: [1, 1, .9, .9, .8, .8, .7, .7, .6, .6, .5, .4, .3, .1, .1],
+    };
+	const _stoneReverse = function(_e) {
+		const _prev = _e.getPreviousFrame();
+		if(!_prev)
+			return;
+		const _fr = _e.animations.dead.frames;
+		_fr[0].bottomGap = _prev.bottomGap ?? 0;
+		_fr[0].extraStepXRate = -_prev.extraStepXRate;
+		_fr[1].bottomGap = MathRound((_prev.bottomGap ?? 0) / 2);
+		_fr[1].extraStepXRate = MathRound(-_prev.extraStepXRate * .8);
+		_fr[2].extraStepXRate = MathRound(-_prev.extraStepXRate * .5);
+		_fr[3].extraStepXRate = MathRound(-_prev.extraStepXRate * .2);
 	}
+    for (let i = 1; i < 7; i++) {
+        spells['slingstone' + i] = {
+            defaultDirection: __right,
+            defaultAnimationKey: 'run',
+            zoom: 1,
+            src: './images/sprites/ep620/sapantas' + i + '.png',
+            invulnerable: true,
+            extraStepXRate: 1,
+            class: __spell,
+            lightColor: _colors[i - 1],
+            name: 'SlingStone' + i,
+            animations: {
+                dead: {
+                    key: "dead",
+                    type: 'skill',
+                    frames: [
+						{
+							do: function(_e) {
+								_stoneReverse(_e);
+							},
+                            spriteLeft: 180,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: -80,
+                            extraStepXRate: -1,
+                            objects: [{
+                                key: 'stars',
+                                position: 'middle'
+                            }],
+                            sound: {
+                                key: 'confetti',
+                                volume: 1
+                            },
+                            speed: 6
+                        },
+						{
+                            spriteLeft: 120,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: -40,
+							sound: {
+                                key: 'rockhit',
+                                volume: 1,
+                                reset: true
+                            },
+                            extraStepXRate: -.9,
+                            speed: 6
+                        },
+						{
+                            spriteLeft: 60,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: 0,
+							objects: [{
+                                key: 'throwwhite',
+                                position: 'under-feet',
+                                yGap: 10
+                            }],
+                            extraStepXRate: -.7,
+                            speed: 6
+                        },
+							{
+                            spriteLeft: 0,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: 0,
+                            extraStepXRate: -.5,
+                            speed: 6
+                        },
+                        {
+                            spriteLeft: 0,
+                            spriteTop: 0,
+                            spriteWidth: 0,
+                            spriteHeight: 0,
+                            spriteOrigin: 0,
+                            props: {
+                                remove: true
+                            },
+                            speed: 1
+                        }
+                    ]
+                },
+                idle: {
+                    key: "idle",
+                    type: 'skill',
+                    move: true,
+                    frames: [{
+                            spriteLeft: 0,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][0],
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][0],
+                            speed: 1,
+                            atk: {
+                                yRange: 10,
+                                rate: 2,
+                                reset: true,
+                                hurt: {
+                                    key: 'hurtground1',
+                                    type: 'ground'
+                                },
+                                type: _spellEffects[i - 1]
+                            }
+                        },
+                        {
+                            spriteLeft: 0,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][0],
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][0],
+                            speed: 5,
+                            atk: {
+                                yRange: 10,
+                                rate: 2,
+                                reset: true,
+                                hurt: {
+                                    key: 'hurtground1',
+                                    type: 'ground'
+                                },
+                                type: _spellEffects[i - 1]
+                            }
+                        },
+                        {
+                            spriteLeft: 60,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][1],
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][1],
+                            sound: _bottomGaps[2] === 0 ? {
+                                key: 'rockhit',
+                                volume: 1,
+                                reset: true
+                            } : null,
+                            objects: _bottomGaps[1] === 0 ? [{
+                                key: 'throwwhite',
+                                position: 'under-feet',
+                                yGap: 10
+                            }] : null,
+                            speed: 6,
+                            atk: {
+                                yRange: 10,
+                                rate: 2,
+                                reset: true,
+                                hurt: {
+                                    key: 'hurtground1',
+                                    type: 'ground'
+                                },
+                                type: _spellEffects[i - 1]
+                            }
+                        },
+                        {
+                            spriteLeft: 120,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][2],
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][2],
+                            speed: 6,
+                            sound: _bottomGaps[3] === 0 ? {
+                                key: 'rockhit',
+                                volume: 1,
+                                reset: true
+                            } : null,
+                            objects: _bottomGaps[2] === 0 ? [{
+                                key: 'throwwhite',
+                                position: 'under-feet',
+                                yGap: 10
+                            }] : null,
+                            atk: {
+                                yRange: 10,
+                                rate: 2,
+                                reset: true,
+                                hurt: {
+                                    key: 'hurtground1',
+                                    type: 'ground'
+                                },
+                                type: _spellEffects[i - 1]
+                            }
+                        },
+                        {
+                            spriteLeft: 180,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][3],
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][3],
+                            sound: _bottomGaps[4] === 0 ? {
+                                key: 'rockhit',
+                                volume: 1,
+                                reset: true
+                            } : null,
+                            speed: 6,
+                            objects: _bottomGaps[3] === 0 ? [{
+                                key: 'throwwhite',
+                                position: 'under-feet',
+                                yGap: 10
+                            }] : null,
+                            atk: {
+                                yRange: 10,
+                                rate: 2,
+                                reset: true,
+                                hurt: {
+                                    key: 'hurtground1',
+                                    type: 'ground'
+                                },
+                                type: _spellEffects[i - 1]
+                            }
+                        },
+                        {
+                            spriteLeft: 0,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][4],
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][4],
+                            speed: 6,
+                            sound: _bottomGaps[5] === 0 ? {
+                                key: 'rockhit',
+                                volume: 1,
+                                reset: true
+                            } : null,
+                            objects: _bottomGaps[4] === 0 ? [{
+                                key: 'throwwhite',
+                                position: 'under-feet',
+                                yGap: 10
+                            }] : null,
+                            atk: {
+                                yRange: 10,
+                                rate: 2,
+                                reset: true,
+                                hurt: {
+                                    key: 'hurtground1',
+                                    type: 'ground'
+                                },
+                                type: _spellEffects[i - 1]
+                            }
+                        },
+                        {
+                            spriteLeft: 60,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][5],
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][5],
+                            sound: _bottomGaps[6] === 0 ? {
+                                key: 'rockhit',
+                                volume: 1,
+                                reset: true
+                            } : null,
+                            objects: _bottomGaps[5] === 0 ? [{
+                                key: 'throwwhite',
+                                position: 'under-feet',
+                                yGap: 10
+                            }] : null,
+                            speed: 6,
+                            atk: {
+                                yRange: 10,
+                                rate: 2,
+                                reset: true,
+                                hurt: {
+                                    key: 'hurtground1',
+                                    type: 'ground'
+                                },
+                                type: _spellEffects[i - 1]
+                            }
+                        },
+                        {
+                            spriteLeft: 120,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][6],
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][6],
+                            speed: 6,
+                            sound: _bottomGaps[7] === 0 ? {
+                                key: 'rockhit',
+                                volume: 1,
+                                reset: true
+                            } : null,
+                            objects: _bottomGaps[6] === 0 ? [{
+                                key: 'throwwhite',
+                                position: 'under-feet',
+                                yGap: 10
+                            }] : null,
+                            atk: {
+                                yRange: 10,
+                                rate: 2,
+                                reset: true,
+                                hurt: {
+                                    key: 'hurtground1',
+                                    type: 'ground'
+                                },
+                                type: _spellEffects[i - 1]
+                            }
+                        },
+                        {
+                            spriteLeft: 180,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][7],
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][7],
+                            speed: 6,
+                            sound: _bottomGaps[8] === 0 ? {
+                                key: 'rockhit',
+                                volume: 1,
+                                reset: true
+                            } : null,
+                            objects: _bottomGaps[7] === 0 ? [{
+                                key: 'throwwhite',
+                                position: 'under-feet',
+                                yGap: 10
+                            }] : null,
+                            atk: {
+                                yRange: 10,
+                                rate: 2,
+                                reset: true,
+                                hurt: {
+                                    key: 'hurtground1',
+                                    type: 'ground'
+                                },
+                                type: _spellEffects[i - 1]
+                            }
+                        },
+                        {
+                            spriteLeft: 0,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][8],
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][8],
+                            speed: 6,
+                            sound: _bottomGaps[9] === 0 ? {
+                                key: 'rockhit',
+                                volume: 1,
+                                reset: true
+                            } : null,
+                            objects: _bottomGaps[8] === 0 ? [{
+                                key: 'throwwhite',
+                                position: 'under-feet',
+                                yGap: 10
+                            }] : null,
+                            atk: {
+                                yRange: 10,
+                                rate: 2,
+                                reset: true,
+                                hurt: {
+                                    key: 'hurtground1',
+                                    type: 'ground'
+                                },
+                                type: _spellEffects[i - 1]
+                            }
+                        },
+                        {
+                            spriteLeft: 60,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][9],
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][9],
+                            speed: 6,
+                            sound: _bottomGaps[10] === 0 ? {
+                                key: 'rockhit',
+                                volume: 1,
+                                reset: true
+                            } : null,
+                            objects: _bottomGaps[9] === 0 ? [{
+                                key: 'throwwhite',
+                                position: 'under-feet',
+                                yGap: 10
+                            }] : null,
+                            atk: {
+                                yRange: 10,
+                                rate: 2,
+                                reset: true,
+                                hurt: {
+                                    key: 'hurtground1',
+                                    type: 'ground'
+                                },
+                                type: _spellEffects[i - 1]
+                            }
+                        },
+                        {
+                            spriteLeft: 120,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][10],
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][10],
+                            sound: _bottomGaps[11] === 0 ? {
+                                key: 'rockhit',
+                                volume: 1,
+                                reset: true
+                            } : null,
+                            objects: _bottomGaps[10] === 0 ? [{
+                                key: 'throwwhite',
+                                position: 'under-feet',
+                                yGap: 10
+                            }] : null,
+                            speed: 6,
+                            atk: {
+                                yRange: 10,
+                                rate: 2,
+                                reset: true,
+                                hurt: {
+                                    key: 'hurtground1',
+                                    type: 'ground'
+                                },
+                                type: _spellEffects[i - 1]
+                            }
+                        },
+                        {
+                            spriteLeft: 180,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][11],
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][11],
+                            sound: _bottomGaps[12] === 0 ? {
+                                key: 'rockhit',
+                                volume: 1,
+                                reset: true
+                            } : null,
+                            objects: _bottomGaps[11] === 0 ? [{
+                                key: 'throwwhite',
+                                position: 'under-feet',
+                                yGap: 10
+                            }] : null,
+                            speed: 6,
+                            atk: {
+                                yRange: 10,
+                                rate: 2,
+                                reset: true,
+                                hurt: {
+                                    key: 'hurtground1',
+                                    type: 'ground'
+                                },
+                                type: _spellEffects[i - 1]
+                            }
+                        },
+                        {
+                            spriteLeft: 0,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][12],
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][12],
+                            speed: 6,
+                            sound: _bottomGaps[13] === 0 ? {
+                                key: 'rockhit',
+                                volume: 1,
+                                reset: true
+                            } : null,
+                            objects: _bottomGaps[12] === 0 ? [{
+                                key: 'throwwhite',
+                                position: 'under-feet',
+                                yGap: 10
+                            }] : null,
+                            atk: {
+                                yRange: 10,
+                                rate: 2,
+                                reset: true,
+                                hurt: {
+                                    key: 'hurtground1',
+                                    type: 'ground'
+                                },
+                                type: _spellEffects[i - 1]
+                            }
+                        },
+                        {
+                            spriteLeft: 60,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][13],
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][13],
+                            speed: 6,
+                            sound: _bottomGaps[14] === 0 ? {
+                                key: 'rockhit',
+                                volume: 1,
+                                reset: true
+                            } : null,
+                            objects: _bottomGaps[13] === 0 ? [{
+                                key: 'throwwhite',
+                                position: 'under-feet',
+                                yGap: 10
+                            }] : null,
+                            atk: {
+                                yRange: 10,
+                                rate: 2,
+                                reset: true,
+                                hurt: {
+                                    key: 'hurtground1',
+                                    type: 'ground'
+                                },
+                                type: _spellEffects[i - 1]
+                            }
+                        },
+                        {
+                            spriteLeft: 120,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][14],
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][14],
+                            objects: _bottomGaps[14] === 0 ? [{
+                                key: 'throwwhite',
+                                position: 'under-feet',
+                                yGap: 10
+                            }] : null,
+                            speed: 6,
+                            atk: {
+                                yRange: 10,
+                                rate: 2,
+                                reset: true,
+                                hurt: {
+                                    key: 'hurtground1',
+                                    type: 'ground'
+                                },
+                                type: _spellEffects[i - 1]
+                            }
+                        }
+                    ]
+                }
+            }
+        };
+    }
 }
+
 addSlingStoneSpells();
 function getExistingImage(src, _isnew) {
 	const _img = loadedEpisodeImages[src] ?? loadedImages[src];
