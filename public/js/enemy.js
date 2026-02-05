@@ -25,6 +25,7 @@ function enemy(_e) {
 	this.gender = _e.gender;
 	this.finishableWith = _e.finishableWith;
 	this.finishAfter = _e.finishAfter;
+	this.animationKeysShuffledTime = _gameTick;
 	if(_e.finishWhen)
 		this.finishWhen = function() { 
 			return _e.finishWhen(this); 
@@ -460,6 +461,7 @@ function enemy(_e) {
 				this.animationKeysShuffledTime = _gameTick;
 			}
 			const _keys = _theChar.attackKeys;
+			let _chosenRange;
 			for (var _key of _keys) {
 				let _k = _key, _itIsOk;
 				if(this.ultimate && !_k.endsWith('modified') && this.animations[_k + 'modified'] &&
@@ -498,14 +500,15 @@ function enemy(_e) {
 						continue;
 					}
 				if (_hasRange || (_anima.minRange && !_anima.interactive)) {
-					if(_anima.minRange) {
-						if(_minRange <= _anima.totalRange && this.autoTarget && _anima.minRange <= this.getRangeBetween(this.autoTarget)) {
+					if(_anima.minRange && this.autoTarget) {
+						if(_anima.minRange <= this.getRangeBetween(this.autoTarget)) {
 							if(this.lastAttack && _k === this.lastAttack)
 							{
 								_useLastAttack = 1;
 								continue;
 							}
 							_chosenKey = _k;
+							_chosenRange = _anima.totalRange;
 						}
 					}
 					else if (_minRange <= _anima.totalRange) {
@@ -515,6 +518,11 @@ function enemy(_e) {
 							continue;
 						}
 						_chosenKey = _k;
+						_chosenRange = _anima.totalRange;
+					}
+					else if(this.ranged && this.autoTarget) {
+						if(this.getRangeBetween(this.autoTarget) > _anima.totalRange)
+							continue;
 					}
 				}
 				else {
@@ -523,7 +531,10 @@ function enemy(_e) {
 						_useLastAttack = 1;
 						continue;
 					}
+					if(_chosenKey && this.ranged && _chosenRange > _anima.totalRange)
+						continue;
 					_chosenKey = _k;
+					_chosenRange = _anima.totalRange;
 				}
 			}
 		}
@@ -882,7 +893,7 @@ function enemy(_e) {
 					if (!_isEnemyClose) {
 					
 						if (this.animationFinished || this.animation === 'walk') {
-							if (this.animation === 'walk' && !this.animationFinished
+							if (this.animation === 'walk' && !this.animationFinished && !this.ranged
 								&& this.frame < this.animations.run.frames.length - 1) {
 								const _oldStart = this.start;
 								const _oldFrame = this.frame;
@@ -5053,19 +5064,16 @@ function enemy(_e) {
 												if(_f.atk.rate < 1) {
 													//ufak
 													_e.addObject({key:'shine', position: 'middle'});
-													console.log(1);
 													_e.addObject({key:'sparkhitsmall', position: 'middle'});
 												}
 												else if(_f.atk.rate < 2) {
 													//orta
 													_e.addObject({key:'shine', scale:1.1, position: 'middle'});
-													console.log(2);
 													_e.addObject({key:'sparkhitmedium', position: 'middle'});
 												}
 												else {
 													//büyük
 													_e.addObject({key:'shine', scale:1.2, position: 'middle'});
-													console.log(3);
 													_e.addObject({key:'sparkhitbig', position: 'middle'});
 												}
 											}
@@ -7795,7 +7803,7 @@ function enemy(_e) {
 			if(this.lastAttackTime && this.class !== __spell)
 				this.lastAttackTime = undefined;
 		}
-		this.upcomingAnimation = undefined;
+		//this.upcomingAnimation = undefined; //YENİ
 		if (!anima) {
 			if(!this.phased && _skill === 'dead')
 				this.setHealth(this.MAXHP, null, null, 7);

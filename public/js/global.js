@@ -1713,8 +1713,8 @@ const relatedObjects = [
 		totalFrames: 8, speed: 7, singleton: true
 	},
 	{
-		id: 'stun', key: 'stun', type: 'hurt', width: 102, height: 48, zoom: .75, repeat: true, bottom: 20 * __zoom,
-		totalFrames: 20, skip: 2, speed: 4, stillOnChar: true, singleton: true, effect: 'stun', limit: 5, bind: true
+		id: 'stun', key: 'stun', type: 'hurt', width: 102, height: 48, zoom: .75, repeat: true, bottom: 20,
+		totalFrames: 20, skip: 2, speed: 4, still: true, singleton: true, effect: 'stun', limit: 5, bind: true
 	},
 	{ id: 'glow', key: 'glow', width: 250, height: 250, totalFrames: 4, speed: 2, zoom: .8, still: true, singleton: true },
 	{ id: 'shadow', key: 'shadow', width: 128, height: 19, top: 0, zoom: 1, bottom: 0 },
@@ -3068,7 +3068,10 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	slingmelee: './images/sounds/sling-melee.mp3',
 	rockhit: './images/sounds/rock-hit.mp3',
+	rockhit2: './images/sounds/rock-hit2.mp3',
+	rockhit3: './images/sounds/rock-hit3.mp3',
 	bonusscore: './images/sounds/bonus-score.mp3',
 	bigbodydrop: './images/sounds/body-drop-big.mp3',
 	bodydrop: './images/sounds/body-drop.mp3',
@@ -28597,11 +28600,11 @@ const spells = {
 }
 
 function addSlingStoneSpells() {
-    const _spellEffects = ['common', 'fire', 'ice', 'shadow', 'lightning', 'toxic'];
+    const _spellEffects = ['common', 'fire', 'ice', 'shadow', 'lightning', 'toxic', 'common'];
     const _colors = ['#808080cc', '#ff0000cc', '#0000ffcc', '#ff00ffcc', '#ffff00cc', '#00ff00cc'];
     const _bottomGaps = {
         common: [-120, -90, -60, -30, 0, -20, -40, -60, -80, -70, -35, 0, -15, -30, -45],
-        fire: [-120, -100, -75, -45, 0, -40, -70, -90, -105, -95, -80, -60, -35, 0, -30],
+        fire: [-120, -135, -119, -100, -75, -45, 0, -40, -70, -90, -105, -95, -80, -60, -35],
         ice: [-120, -110, -90, -80, -70, -55, -30, 0, -25, -50, -70, -85, -95, -100, -90],
         shadow: [-120, -90, -60, -30, 0, -20, -40, -60, -80, -70, -35, 0, -15, -30, -45],
         lightning: [-110, -100, -90, -80, -65, -50, -35, -20, 0, -20, -35, -50, -65, -80, -90],
@@ -28615,19 +28618,32 @@ function addSlingStoneSpells() {
         lightning: [1.2, 1.2, 1.2, 1.1, 1.1, 1.1, 1, 1, 1, .9, .9, .9, .8, .8, .8],
         toxic: [1, 1, .9, .9, .8, .8, .7, .7, .6, .6, .5, .4, .3, .1, .1],
     };
-	const _stoneReverse = function(_e) {
+	const _stoneReverse = function(_e, _dir) {
+		const _reversed = !_dir;
+		_dir = _dir ?? -1;
+		const _fr = _e.animations.dead.frames;
+		if(!_reversed) {
+			delete _fr[0].objects;
+			delete _fr[0].sound;
+		}
+		else {
+			_fr[0].objects = [{
+                                key: 'stars',
+                                position: 'middle'
+                            }];
+			_fr[0].sound = { key: 'confetti', volume: 1 };
+		}
 		const _prev = _e.getPreviousFrame();
 		if(!_prev)
 			return;
-		const _fr = _e.animations.dead.frames;
 		_fr[0].bottomGap = _prev.bottomGap ?? 0;
-		_fr[0].extraStepXRate = -_prev.extraStepXRate;
+		_fr[0].extraStepXRate = _dir * _prev.extraStepXRate;
 		_fr[1].bottomGap = MathRound((_prev.bottomGap ?? 0) / 2);
-		_fr[1].extraStepXRate = MathRound(-_prev.extraStepXRate * .8);
-		_fr[2].extraStepXRate = MathRound(-_prev.extraStepXRate * .5);
-		_fr[3].extraStepXRate = MathRound(-_prev.extraStepXRate * .2);
+		_fr[1].extraStepXRate = MathRound(_dir * _prev.extraStepXRate * (_reversed ? .5 : .8));
+		_fr[2].extraStepXRate = MathRound(_dir * _prev.extraStepXRate * (_reversed ? .35 : .5));
+		_fr[3].extraStepXRate = MathRound(_dir * _prev.extraStepXRate * (_reversed ? .15 : .2));
 	}
-    for (let i = 1; i < 7; i++) {
+    for (let i = 1; i < 8; i++) {
         spells['slingstone' + i] = {
             defaultDirection: __right,
             defaultAnimationKey: 'run',
@@ -28644,9 +28660,6 @@ function addSlingStoneSpells() {
                     type: 'skill',
                     frames: [
 						{
-							do: function(_e) {
-								_stoneReverse(_e);
-							},
                             spriteLeft: 180,
                             spriteTop: 0,
                             spriteWidth: 60,
@@ -28654,14 +28667,6 @@ function addSlingStoneSpells() {
                             spriteOrigin: 30,
                             bottomGap: -80,
                             extraStepXRate: -1,
-                            objects: [{
-                                key: 'stars',
-                                position: 'middle'
-                            }],
-                            sound: {
-                                key: 'confetti',
-                                volume: 1
-                            },
                             speed: 6
                         },
 						{
@@ -28671,11 +28676,6 @@ function addSlingStoneSpells() {
                             spriteHeight: 60,
                             spriteOrigin: 30,
                             bottomGap: -40,
-							sound: {
-                                key: 'rockhit',
-                                volume: 1,
-                                reset: true
-                            },
                             extraStepXRate: -.9,
                             speed: 6
                         },
@@ -28686,15 +28686,15 @@ function addSlingStoneSpells() {
                             spriteHeight: 60,
                             spriteOrigin: 30,
                             bottomGap: 0,
-							objects: [{
-                                key: 'throwwhite',
-                                position: 'under-feet',
-                                yGap: 10
-                            }],
+							sound: {
+                                key: 'rockhit3',
+                                volume: 1,
+                                reset: true
+                            },
                             extraStepXRate: -.7,
                             speed: 6
                         },
-							{
+						{
                             spriteLeft: 0,
                             spriteTop: 0,
                             spriteWidth: 60,
@@ -28730,6 +28730,9 @@ function addSlingStoneSpells() {
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][0],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][0],
                             speed: 1,
+							do: function(_e) {
+								_stoneReverse(_e);
+							},
                             atk: {
                                 yRange: 10,
                                 rate: 2,
@@ -28769,12 +28772,12 @@ function addSlingStoneSpells() {
                             spriteOrigin: 30,
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][1],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][1],
-                            sound: _bottomGaps[2] === 0 ? {
-                                key: 'rockhit',
+                            sound: _bottomGaps[_spellEffects[i - 1]][1] === 0 ? {
+                                key: 'rockhit3',
                                 volume: 1,
                                 reset: true
                             } : null,
-                            objects: _bottomGaps[1] === 0 ? [{
+                            objects: _bottomGaps[_spellEffects[i - 1]][0] === 0 ? [{
                                 key: 'throwwhite',
                                 position: 'under-feet',
                                 yGap: 10
@@ -28800,12 +28803,12 @@ function addSlingStoneSpells() {
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][2],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][2],
                             speed: 6,
-                            sound: _bottomGaps[3] === 0 ? {
-                                key: 'rockhit',
+                            sound: _bottomGaps[_spellEffects[i - 1]][2] === 0 ? {
+                                key: 'rockhit3',
                                 volume: 1,
                                 reset: true
                             } : null,
-                            objects: _bottomGaps[2] === 0 ? [{
+                            objects: _bottomGaps[_spellEffects[i - 1]][1] === 0 ? [{
                                 key: 'throwwhite',
                                 position: 'under-feet',
                                 yGap: 10
@@ -28829,13 +28832,13 @@ function addSlingStoneSpells() {
                             spriteOrigin: 30,
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][3],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][3],
-                            sound: _bottomGaps[4] === 0 ? {
-                                key: 'rockhit',
+                            sound: _bottomGaps[_spellEffects[i - 1]][3] === 0 ? {
+                                key: 'rockhit3',
                                 volume: 1,
                                 reset: true
                             } : null,
                             speed: 6,
-                            objects: _bottomGaps[3] === 0 ? [{
+                            objects: _bottomGaps[_spellEffects[i - 1]][2] === 0 ? [{
                                 key: 'throwwhite',
                                 position: 'under-feet',
                                 yGap: 10
@@ -28860,12 +28863,12 @@ function addSlingStoneSpells() {
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][4],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][4],
                             speed: 6,
-                            sound: _bottomGaps[5] === 0 ? {
-                                key: 'rockhit',
+                            sound: _bottomGaps[_spellEffects[i - 1]][4] === 0 ? {
+                                key: 'rockhit3',
                                 volume: 1,
                                 reset: true
                             } : null,
-                            objects: _bottomGaps[4] === 0 ? [{
+                            objects: _bottomGaps[_spellEffects[i - 1]][3] === 0 ? [{
                                 key: 'throwwhite',
                                 position: 'under-feet',
                                 yGap: 10
@@ -28889,12 +28892,12 @@ function addSlingStoneSpells() {
                             spriteOrigin: 30,
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][5],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][5],
-                            sound: _bottomGaps[6] === 0 ? {
-                                key: 'rockhit',
+                            sound: _bottomGaps[_spellEffects[i - 1]][5] === 0 ? {
+                                key: 'rockhit3',
                                 volume: 1,
                                 reset: true
                             } : null,
-                            objects: _bottomGaps[5] === 0 ? [{
+                            objects: _bottomGaps[_spellEffects[i - 1]][4] === 0 ? [{
                                 key: 'throwwhite',
                                 position: 'under-feet',
                                 yGap: 10
@@ -28920,12 +28923,12 @@ function addSlingStoneSpells() {
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][6],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][6],
                             speed: 6,
-                            sound: _bottomGaps[7] === 0 ? {
-                                key: 'rockhit',
+                            sound: _bottomGaps[_spellEffects[i - 1]][6] === 0 ? {
+                                key: 'rockhit3',
                                 volume: 1,
                                 reset: true
                             } : null,
-                            objects: _bottomGaps[6] === 0 ? [{
+                            objects: _bottomGaps[_spellEffects[i - 1]][5] === 0 ? [{
                                 key: 'throwwhite',
                                 position: 'under-feet',
                                 yGap: 10
@@ -28950,12 +28953,12 @@ function addSlingStoneSpells() {
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][7],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][7],
                             speed: 6,
-                            sound: _bottomGaps[8] === 0 ? {
-                                key: 'rockhit',
+                            sound: _bottomGaps[_spellEffects[i - 1]][7] === 0 ? {
+                                key: 'rockhit3',
                                 volume: 1,
                                 reset: true
                             } : null,
-                            objects: _bottomGaps[7] === 0 ? [{
+                            objects: _bottomGaps[_spellEffects[i - 1]][6] === 0 ? [{
                                 key: 'throwwhite',
                                 position: 'under-feet',
                                 yGap: 10
@@ -28980,12 +28983,12 @@ function addSlingStoneSpells() {
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][8],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][8],
                             speed: 6,
-                            sound: _bottomGaps[9] === 0 ? {
-                                key: 'rockhit',
+                            sound: _bottomGaps[_spellEffects[i - 1]][8] === 0 ? {
+                                key: 'rockhit3',
                                 volume: 1,
                                 reset: true
                             } : null,
-                            objects: _bottomGaps[8] === 0 ? [{
+                            objects: _bottomGaps[_spellEffects[i - 1]][7] === 0 ? [{
                                 key: 'throwwhite',
                                 position: 'under-feet',
                                 yGap: 10
@@ -29010,12 +29013,12 @@ function addSlingStoneSpells() {
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][9],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][9],
                             speed: 6,
-                            sound: _bottomGaps[10] === 0 ? {
-                                key: 'rockhit',
+                            sound: _bottomGaps[_spellEffects[i - 1]][9] === 0 ? {
+                                key: 'rockhit3',
                                 volume: 1,
                                 reset: true
                             } : null,
-                            objects: _bottomGaps[9] === 0 ? [{
+                            objects: _bottomGaps[_spellEffects[i - 1]][8] === 0 ? [{
                                 key: 'throwwhite',
                                 position: 'under-feet',
                                 yGap: 10
@@ -29039,12 +29042,12 @@ function addSlingStoneSpells() {
                             spriteOrigin: 30,
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][10],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][10],
-                            sound: _bottomGaps[11] === 0 ? {
-                                key: 'rockhit',
+                            sound: _bottomGaps[_spellEffects[i - 1]][10] === 0 ? {
+                                key: 'rockhit3',
                                 volume: 1,
                                 reset: true
                             } : null,
-                            objects: _bottomGaps[10] === 0 ? [{
+                            objects: _bottomGaps[_spellEffects[i - 1]][9] === 0 ? [{
                                 key: 'throwwhite',
                                 position: 'under-feet',
                                 yGap: 10
@@ -29069,12 +29072,12 @@ function addSlingStoneSpells() {
                             spriteOrigin: 30,
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][11],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][11],
-                            sound: _bottomGaps[12] === 0 ? {
-                                key: 'rockhit',
+                            sound: _bottomGaps[_spellEffects[i - 1]][11] === 0 ? {
+                                key: 'rockhit3',
                                 volume: 1,
                                 reset: true
                             } : null,
-                            objects: _bottomGaps[11] === 0 ? [{
+                            objects: _bottomGaps[_spellEffects[i - 1]][10] === 0 ? [{
                                 key: 'throwwhite',
                                 position: 'under-feet',
                                 yGap: 10
@@ -29100,12 +29103,12 @@ function addSlingStoneSpells() {
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][12],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][12],
                             speed: 6,
-                            sound: _bottomGaps[13] === 0 ? {
-                                key: 'rockhit',
+                            sound: _bottomGaps[_spellEffects[i - 1]][12] === 0 ? {
+                                key: 'rockhit3',
                                 volume: 1,
                                 reset: true
                             } : null,
-                            objects: _bottomGaps[12] === 0 ? [{
+                            objects: _bottomGaps[_spellEffects[i - 1]][11] === 0 ? [{
                                 key: 'throwwhite',
                                 position: 'under-feet',
                                 yGap: 10
@@ -29130,12 +29133,12 @@ function addSlingStoneSpells() {
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][13],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][13],
                             speed: 6,
-                            sound: _bottomGaps[14] === 0 ? {
-                                key: 'rockhit',
+                            sound: _bottomGaps[_spellEffects[i - 1]][13] === 0 ? {
+                                key: 'rockhit3',
                                 volume: 1,
                                 reset: true
                             } : null,
-                            objects: _bottomGaps[13] === 0 ? [{
+                            objects: _bottomGaps[_spellEffects[i - 1]][12] === 0 ? [{
                                 key: 'throwwhite',
                                 position: 'under-feet',
                                 yGap: 10
@@ -29159,7 +29162,12 @@ function addSlingStoneSpells() {
                             spriteOrigin: 30,
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][14],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][14],
-                            objects: _bottomGaps[14] === 0 ? [{
+                            sound: _bottomGaps[_spellEffects[i - 1]][14] === 0 ? {
+                                key: 'rockhit3',
+                                volume: 1,
+                                reset: true
+                            } : null,
+                            objects: _bottomGaps[_spellEffects[i - 1]][13] === 0 ? [{
                                 key: 'throwwhite',
                                 position: 'under-feet',
                                 yGap: 10
@@ -29175,6 +29183,19 @@ function addSlingStoneSpells() {
                                 },
                                 type: _spellEffects[i - 1]
                             }
+                        },
+                        {
+                            spriteLeft: 120,
+                            spriteTop: 0,
+                            spriteWidth: 60,
+                            spriteHeight: 60,
+                            spriteOrigin: 30,
+                            extraStepXRate: _xCoords[_spellEffects[i - 1]][14],
+                            bottomGap: _bottomGaps[_spellEffects[i - 1]][14],
+                            do: function(_e) {
+								_stoneReverse(_e, 1);
+							},
+                            speed: 1
                         }
                     ]
                 }

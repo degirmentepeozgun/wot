@@ -5051,7 +5051,7 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 				_left = _item.char.LEFT;
 			}
 			_draw = _item.char.main;
-			if (_rel.bind === _item.animation)
+			if (_rel.bind === _item.char.animation)
 				_draw = true;
 			else if (_rel.bind) {
 				_rel.remove = true;
