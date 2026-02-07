@@ -259,8 +259,6 @@ function renderTextElement2(_settings) {
 					return;
 				}
 				const _spriteWidth = (_sim.width *  _spriteHeight) / _sim.height;
-				if(_settings.images.find(x => x.img))
-					console.log(_sim.height);
 				let _sWidth = _spriteWidth;//  MathRound(_spriteWidth * _settings.frame.zoom);
 				episode.offDmgCtx.drawImage(_sim, 
 					(_l + (_settings.frame.platformX - platformX)) - MathRound(i * (_spriteHeight / 5)) - MathRound((_sWidth - _spriteWidth) / 2),

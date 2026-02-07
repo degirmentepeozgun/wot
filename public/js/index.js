@@ -660,6 +660,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 	getMapAssets(episode, function () {
 		startGame(function (_connectingToGame) {
 			loadUI();
+			warmUpDmgFrames();
 			if(episode.still) {
 				mainCharacter.left = MathRound(_canvas.width / (_map.enterDirection === __left ? 5 : 2));
 				mainCharacter.direction = __right;
@@ -806,6 +807,25 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 			}, 2000);
 		});
 	});
+ }
+ function warmUpDmgFrames() {
+	const _types = ['common', 'hurt', 'fire', 'shadow', 'lightning', 'ice', 'toxic'];
+	for(let _type of _types)
+		addDmgFrame({
+			atkType: _type,
+			val: 1234567890,
+			x: -1000,
+			y: 0
+		});
+	const _texts = ['1234567890', 'plus-hp', 'minus-hp', 'immune', 'block', 'miss', 'level-up'];
+	for(let _text of _texts)
+		addDmgFrame({
+			text: _text,
+			x: -1000,
+			y: 0
+		});
+	drawDmgFrames();
+	dmgFrames.length = 0;
  }
 _allEnemies.enemy10001 = function () { return createCharacter(getCharacterJSON('wrr')); };
 _allEnemies.enemy10002 = function () { return createCharacter(getCharacterJSON('arc')); };

@@ -1,4 +1,4 @@
-﻿'use strict';
+﻿﻿﻿'use strict';
 const __attackTolerance = 2;
 
 function enemy(_e) {
@@ -5742,7 +5742,12 @@ function enemy(_e) {
 		if (_sp) {
 			if(!_sp.reset && this.lastSpellThrown?.time > (_gameTick - 300) && this.lastSpellThrown.key === _sp.key && this.lastSpellThrown.count >= 2)
 				return false;
-			const spl = spells[_sp.key];
+			let _spKey = _sp.key;
+			if(_spKey.indexOf(',') !== -1) {
+				const _keys = _spKey.split(',');
+				_spKey = _keys[getRandomValue2(0,_keys.length - 1)];
+			}
+			const spl = spells[_spKey];
 			if (_parent && spl.bounce) {
 				//const _parentKey = _parent.parent ?? _parent.key;
 				//if (this.lastSpellTakenKey !== _parentKey) {
@@ -5803,7 +5808,7 @@ function enemy(_e) {
 				if(spl.animations[_key].frames.find(x => x.do))
 					for(let _i = 0; _i < spl.animations[_key].frames.length; _i++)
 						_spell.animations[_key].frames[_i].do = spl.animations[_key].frames[_i].do;
-			_en.spellKey = _sp.key;
+			_en.spellKey = _spKey;
 			if(_sp.harmless)
 				_en.harmless = true;
 			if (_spell.push)
@@ -5853,10 +5858,10 @@ function enemy(_e) {
 				_en.bounce = true;
 			episode.enemies.push(_en);
 			_en.updateVariables();
-			if(this.lastSpellThrown?.time > (_gameTick - 300) && this.lastSpellThrown.key === _sp.key)
+			if(this.lastSpellThrown?.time > (_gameTick - 300) && this.lastSpellThrown.key === _spKey)
 				this.lastSpellThrown.count++;
 			else
-				this.lastSpellThrown = { time: _gameTick, count: 1, key:_sp.key };
+				this.lastSpellThrown = { time: _gameTick, count: 1, key:_spKey };
 			return true;
 		}
 		return false;

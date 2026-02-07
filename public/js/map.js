@@ -1,4 +1,4 @@
-﻿'use strict';
+﻿﻿'use strict';
 const _borderRates = [
 	1.06, 1.06, 1.06, 
 	1.05, 1.05, 1.05, 1.05,
@@ -176,6 +176,7 @@ function map(_m) {
 		}
 		if(_char.lastSprite)
 			_char.lastSprite = _char.lastSpriteKey = undefined;
+		console.log(_key + ' sprite bulunamadı');
 		return undefined;
 	}
 	this.loadCharacterSprites = async function(_func, _extraIds, _kk, _excludeMain, _useCurrentEnemies) {
@@ -208,8 +209,15 @@ function map(_m) {
 				}
 				if(_anim.frames?.[0]){
 					for(let _f of _anim.frames) {
-						if(_f.spell?.key && _spls.indexOf(_f.spell.key) === -1)
-							_spls.push(_f.spell.key);
+						if(_f.spell?.key && _spls.indexOf(_f.spell.key) === -1) {
+							if(_f.spell.key.indexOf(',') !== -1) {
+								const _keys = _f.spell.key.split(',');
+								for(let _kk of _keys)
+									_spls.push(_kk);
+							}
+							else
+								_spls.push(_f.spell.key);
+						}
 						const _cKey = 'l' + _f.spriteLeft + 't' + _f.spriteTop + 'w' + _f.spriteWidth + 'h' + _f.spriteHeight;
 						let _src = _f.src ?? _anim.src ?? _e.src;
 						if(!_src)
@@ -1595,7 +1603,7 @@ function map(_m) {
 			this.skipTinyCameraMove--;
 			return false;
 		}
-		if(!mainCharacter || this?.still || this.ultimateTimeStop || __storyCutScenePlaying || mainCharacter.animation === 'run')
+		if(!mainCharacter || mainCharacter.hitStop || this?.still || this.ultimateTimeStop || __storyCutScenePlaying || mainCharacter.animation === 'run')
 			return false;
 		const _deadLeft = mainCharacter.direction === __left ? this.cWidth * .55 : this.cWidth * .35;
 		const _deadRight = mainCharacter.direction === __left ? this.cWidth * .65 : this.cWidth * .45;
@@ -2773,7 +2781,9 @@ function map(_m) {
 					sprite.width, sprite.height);
 		}
 	}
-	this.hurtSprites = {}, this.hurtRelSprites = {};
+	this.hurtSprites = {}; 
+	this.hurtRelSprites = {};
+	this.hurtFlashSprites = {};
 	// this.colorizeSprite4 = function (_item, _col, _force) {
 	// 	let _opc = .01;
 	// 	// switch (_item?.char?.hurting?.count) {
@@ -2873,7 +2883,7 @@ function map(_m) {
 		this._colorCache = Object.create(null);
 
 	let _opc = 1;
-	let _color;
+	let _color, _isHurtFlash;
 
 	// =====================
 	// HIT FLASH (AYNI)
@@ -2888,6 +2898,7 @@ function map(_m) {
 			_color = 'rgba(255,110,40,0.55)';
 
 		_item.char.hurting.hit--;
+		_isHurtFlash = 1;
 	}
 	else {
 		const base = _col ?? _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
@@ -2923,29 +2934,39 @@ function map(_m) {
 		'h' + _item.spriteHeight;
 
 	const _key = _key1 + _key2 + _key3;
-
 	if (_key === _item.char.lastHurtSpriteKey)
 		return _item.char.lastHurtSprite;
-
-	let _hs = this.hurtSprites[_key1]?.[_key2]?.[_key3];
+	const _arr = _isHurtFlash ? this.hurtFlashSprites : this.hurtSprites;
+	let _hs = _arr[_key1]?.[_key2]?.[_key3];
 
 	if (!_hs) {
 
 		// =====================
 		// SHARED WORK CANVAS
 		// =====================
-		if (!this._colorizeCanvas)
-			this._colorizeCanvas = document.createElement('canvas');
 
+		if (!this._colorizeCanvas) {
+			this._colorizeCanvas = document.createElement('canvas');
+			this._colorizeCtx = this._colorizeCanvas.getContext('2d');
+			this._colorizeCtx.imageSmoothingEnabled = false;
+		}
 		const _osc = this._colorizeCanvas;
+		const ctx = this._colorizeCtx;
 		_osc.width = _item.spriteWidth;
 		_osc.height = _item.spriteHeight;
-
-		const ctx = _osc.getContext('2d');
-		if (ctx.imageSmoothingEnabled)
-			ctx.imageSmoothingEnabled = false;
-
 		ctx.clearRect(0, 0, _osc.width, _osc.height);
+		// if (!this._colorizeCanvas)
+		// 	this._colorizeCanvas = document.createElement('canvas');
+
+		// const _osc = this._colorizeCanvas;
+		//_osc.width = _item.spriteWidth;
+		//_osc.height = _item.spriteHeight;
+
+		//const ctx = _osc.getContext('2d');
+		//if (ctx.imageSmoothingEnabled)
+			//ctx.imageSmoothingEnabled = false;
+
+		//ctx.clearRect(0, 0, _osc.width, _osc.height);
 		const _cropped = this.getCroppedSprite(_item.spriteX, _item.spriteY, _item.spriteWidth, _item.spriteHeight, 
 								_item.char, _item.sprite.relativeSrc, _item.frameKey);
 		if(_cropped)
@@ -2976,10 +2997,11 @@ function map(_m) {
 		if(_osc.width > 0)
 			out.getContext('2d').drawImage(_osc, 0, 0);
 
-		if (!this.hurtSprites[_key1]) this.hurtSprites[_key1] = {};
-		if (!this.hurtSprites[_key1][_key2]) this.hurtSprites[_key1][_key2] = {};
-
-		this.hurtSprites[_key1][_key2][_key3] = _hs = out;
+		if (!_arr[_key1]) 
+			_arr[_key1] = Object.create(null);
+		if (!_arr[_key1][_key2]) _arr[_key1][_key2] = Object.create(null);
+		//_hs = _osc;
+		_arr[_key1][_key2][_key3] = _hs = out;
 	}
 
 	_item.char.lastHurtSprite = _hs;
@@ -3749,7 +3771,7 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
       frame: 0,
       gravity: 0.28 + Math.random() * 0.5,
       wobble: Math.random() * 360 | 0,
-
+	  airTime: (_key === 'heavy' || _key === 'slam') ? 6 : 0,
       color: randomShade(color)
     });
   }
@@ -3764,19 +3786,28 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 
  let lastColor = null;
  let lastAlpha = -1;
-
+const hitSlow = _char.hitStop ? 0.5 : 1;
  for (let i = arr.length - 1; i >= 0; i--) {
 
   const p = arr[i];
-
+  
   const fast = p.frame < 2;
   const speedMul = fast ? 2.5 : 1;
   const sizeMul  = fast ? 1.5 : 1;
 
-  p.x += p.vx * speedMul + SIN_LUT[(p.frame + p.wobble) % 360] * 0.4;
-  p.y += p.vy * speedMul;
+//   p.x += p.vx * speedMul + SIN_LUT[(p.frame + p.wobble) % 360] * 0.4;
+//   p.y += p.vy * speedMul;
+p.x += (p.vx * speedMul) * hitSlow
+     + SIN_LUT[(p.frame + p.wobble) % 360] * 0.4 * hitSlow;
 
+p.y += (p.vy * speedMul) * hitSlow;
+
+ // p.vy += p.gravity;
+ if (p.airTime > 0) {
+  p.airTime--;
+} else {
   p.vy += p.gravity;
+}
   p.vx *= 0.96;
 
   p.life -= p.decay;
@@ -3964,7 +3995,8 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 					_wDiff = (offCtx.reversed ? -1 : 1) * ((_item.width - (_item.width * (_item.zoom ?? 1))) / 2);
 					_hDiff = (_item.height - (_item.height * (_item.zoom ?? 1)));
 					if(!__batterySaveMode) {
-						_hurted = !(_item.char.readyForFatality && _item.animation === 'hurtground1') && (_hurt || _item.skinColor);// && (_item.char.frame + _item.char.start) > 0;
+						_hurted = !(_item.char.readyForFatality && _item.animation === 'hurtground1') && 
+						(_hurt || _item.skinColor);// && (_item.char.frame + _item.char.start) > 0;
 						if(!_hurted && !_item.char.dead && _shadowItems?.[0]) {
 							let _shadowItemOrder = 55;
 							for(let _shadowItem of _shadowItems) {
@@ -3994,7 +4026,7 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 						// _zoomedTop = MathRound(_zoomedHeight - _item.height);
 						//_colorized = false;
 						let _drawParticles = 1;
-						if((_hurted && _item.char.frame < 2 && (_hurtedCount < 4 || _item.char.main)) || _item.skinColor) {
+						if((_hurted && _anim.hurt && _item.char.frame < 2 && (_hurtedCount < 4 || _item.char.main)) || _item.skinColor) {
 							//if(!_item.char.colorized) {
 								//_item.char.colorized = _colorized = true;
 								const _hurtSprite = this.colorizeSprite4(_item, null, _item.skinColor ? 1 : null);
@@ -5237,8 +5269,12 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			}
 			if(_rel.remove && !shouldRemove)
 				shouldRemove = 1;
-			if (_rel.start >= 0)
-				_rel.start++;
+			if (_rel.start >= 0){
+				if(!_rel.delayedByHitStop && _item.char.hitStop)
+					_rel.delayedByHitStop = 1;
+				else
+					_rel.start++;
+			}
 		}
 		if(shouldRemove) {
 			if(removeIds?.[0])
@@ -5368,8 +5404,6 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			_char._enemyBuffer.length = 0;
 		const _x = _char._enemyBuffer;
 		const _ff = _char.friendlyFire && (_char.enemy !== mainCharacter.enemy);
-		if(_char.name.startsWith('Electric'))
-			console.log('ASD');
 		for(let x of _enemies) {
 			if(_ff && x.enemy && _char.enemy)
 				continue;

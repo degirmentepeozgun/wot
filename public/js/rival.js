@@ -1,4 +1,4 @@
-﻿'use strict';
+﻿﻿'use strict';
 
 function createMainCharacter(_x) {
 	if (_x?.class)
@@ -34702,22 +34702,10 @@ const _allEnemies = {
 							spriteWidth: 212,
 							spriteHeight: 204,
 							spriteOrigin: 63,
-							do: function(_e) {
-								const _anima = _e.getCurrentAnimation();
-								const _frame = _anima.frames[_anima.frames.length - 1];
-								_frame.spell = {
-									key: 'slingstone' + getRandomValue2(1,5)
-								}
+							spell: {
+								key: 'slingstone1,slingstone2,slingstone3,slingstone4,slingstone5,slingstone6'
 							},
-							speed: 1
-						},
-						{
-							spriteLeft: 1587,
-							spriteTop: 396,
-							spriteWidth: 212,
-							spriteHeight: 204,
-							spriteOrigin: 63,
-							speed: 11
+							speed: 12
 						}
 					]
 				},
@@ -76427,7 +76415,10 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 		_arr = [2,3,2,2,3,2,2,3];
 	if(_rate > 2)
 		_rate = 2;
-	const _shakeDist = getRandomValue2(10, 15);
+	const _shakeDist = getRandomValue2(
+		MathRound((_redSprite ?? _sprite1).spriteWidth / 24), 
+		MathRound((_redSprite ?? _sprite1).spriteWidth / 12)
+	);
 	const _r = window.innerWidth * .01;
 	var result = {
 		key: 'hurtground1',
@@ -76439,44 +76430,63 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteTop: (_redSprite ?? _sprite1).spriteTop,
 				spriteWidth: (_redSprite ?? _sprite1).spriteWidth + _shakeDist,
 				spriteHeight: (_redSprite ?? _sprite1).spriteHeight + (_rate * 1),
-				spriteOrigin: (_redSprite ?? _sprite1).spriteOrigin - _shakeDist,
+				spriteOrigin: (_redSprite ?? _sprite1).spriteOrigin + _shakeDist,
 				src: (_redSprite ?? _sprite1).src,
 				bottomGap: ((_redSprite ?? _sprite1).bottomGap ?? 0),
 				do: (_redSprite ?? _sprite1).do,
 				healtbarGap: (_redSprite ?? _sprite1).healtbarGap,
 				invisibleWhenLay: (_redSprite ?? _sprite1).invisibleWhenLay,
-				zoom: .95,
+				zoom: .98,
 				objects: (_redSprite ?? _sprite1).objects,
 				chain: [
 					{ key: 'escape', num: 1 },
 					{ key: 'counterstun', num: 4 },
 				],
-				speed: 1
+				speed: 4
 			},
 			{
 				spriteLeft: (_redSprite ?? _sprite1).spriteLeft,
 				spriteTop: (_redSprite ?? _sprite1).spriteTop,
-				spriteWidth: (_redSprite ?? _sprite1).spriteWidth + MathRound(_shakeDist / 2),
+				spriteWidth: (_redSprite ?? _sprite1).spriteWidth + _shakeDist,
 				spriteHeight: (_redSprite ?? _sprite1).spriteHeight + (_rate * 1),
-				spriteOrigin: (_redSprite ?? _sprite1).spriteOrigin - MathRound(_shakeDist / 2),
+				spriteOrigin: (_redSprite ?? _sprite1).spriteOrigin + _shakeDist,
+				src: (_redSprite ?? _sprite1).src,
+				bottomGap: ((_redSprite ?? _sprite1).bottomGap ?? 0),
+				do: (_redSprite ?? _sprite1).do,
+				healtbarGap: (_redSprite ?? _sprite1).healtbarGap,
+				invisibleWhenLay: (_redSprite ?? _sprite1).invisibleWhenLay,
+				zoom: 1.01,
+				objects: (_redSprite ?? _sprite1).objects,
+				chain: [
+					{ key: 'escape', num: 1 },
+					{ key: 'counterstun', num: 4 },
+				],
+				speed: 6
+			},
+			{
+				spriteLeft: (_redSprite ?? _sprite1).spriteLeft,
+				spriteTop: (_redSprite ?? _sprite1).spriteTop,
+				spriteWidth: (_redSprite ?? _sprite1).spriteWidth + MathRound(_shakeDist / 3),
+				spriteHeight: (_redSprite ?? _sprite1).spriteHeight + (_rate * 1),
+				spriteOrigin: (_redSprite ?? _sprite1).spriteOrigin + MathRound(_shakeDist / 3),
 				src: (_redSprite ?? _sprite1).src,
 				bottomGap: ((_redSprite ?? _sprite1).bottomGap ?? 0) + MathRound(_r * .075),
 				healtbarGap: (_redSprite ?? _sprite1).healtbarGap,
 				sound: _sound,
 				invisibleWhenLay: (_redSprite ?? _sprite1).invisibleWhenLay,
-				zoom: .95,
+				zoom: .99,
 				chain: [
 					{ key: 'escape', num: 1 },
 					{ key: 'counterstun', num: 4 },
 				],
-				speed: _arr[0] - 1
+				speed: _arr[0]
 			},
 			{
 				spriteLeft: _sprite1.spriteLeft,
 				spriteTop: _sprite1.spriteTop,
 				spriteWidth: _sprite1.spriteWidth + MathRound(_shakeDist / 3),
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 3),
+				spriteOrigin: _sprite1.spriteOrigin + MathRound(_shakeDist / 3),
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + MathRound(_r * .125),
 				healtbarGap: _sprite1.healtbarGap,
@@ -76491,9 +76501,9 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 			{
 				spriteLeft: _sprite1.spriteLeft,
 				spriteTop: _sprite1.spriteTop,
-				spriteWidth: _sprite1.spriteWidth + MathRound(_shakeDist / 4),
+				spriteWidth: _sprite1.spriteWidth + MathRound(_shakeDist / 3),
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 4),
+				spriteOrigin: _sprite1.spriteOrigin + MathRound(_shakeDist / 3),
 				bottomGap: (_sprite1.bottomGap ?? 0) + MathRound(_r * .15),
 				healtbarGap: _sprite1.healtbarGap,
 				src: _sprite1.src,
@@ -76510,7 +76520,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteTop: _sprite1.spriteTop,
 				spriteWidth: _sprite1.spriteWidth + MathRound(_shakeDist / 5),
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 5),
+				spriteOrigin: _sprite1.spriteOrigin + MathRound(_shakeDist / 5),
 				bottomGap: (_sprite1.bottomGap ?? 0) + MathRound(_r * .065),
 				src: _sprite1.src,
 				healtbarGap: _sprite1.healtbarGap,
@@ -76525,9 +76535,9 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 			{
 				spriteLeft: _sprite1.spriteLeft,
 				spriteTop: _sprite1.spriteTop,
-				spriteWidth: _sprite1.spriteWidth + MathRound(_shakeDist / 6),
+				spriteWidth: _sprite1.spriteWidth + MathRound(_shakeDist / 5),
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 6),
+				spriteOrigin: _sprite1.spriteOrigin + MathRound(_shakeDist / 5),
 				bottomGap: _sprite1.bottomGap,
 				healtbarGap: _sprite1.healtbarGap,
 				src: _sprite1.src,
@@ -76542,9 +76552,9 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 			{
 				spriteLeft: _sprite1.spriteLeft,
 				spriteTop: _sprite1.spriteTop,
-				spriteWidth: _sprite1.spriteWidth + MathRound(_shakeDist / 7),
+				spriteWidth: _sprite1.spriteWidth + MathRound(_shakeDist / 5),
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 7),
+				spriteOrigin: _sprite1.spriteOrigin + MathRound(_shakeDist / 5),
 				bottomGap: (_sprite1.bottomGap ?? 0) - MathRound(_r * .065),
 				healtbarGap: _sprite1.healtbarGap,
 				src: _sprite1.src,
@@ -76561,7 +76571,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteTop: _sprite1.spriteTop,
 				spriteWidth: _sprite1.spriteWidth + MathRound(_shakeDist / 7),
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 7),
+				spriteOrigin: _sprite1.spriteOrigin + MathRound(_shakeDist / 7),
 				bottomGap: (_sprite1.bottomGap ?? 0) - MathRound(_r * .0375),
 				healtbarGap: _sprite1.healtbarGap,
 				invisibleWhenLay: _sprite1.invisibleWhenLay,
@@ -76578,7 +76588,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				spriteTop: _sprite1.spriteTop,
 				spriteWidth: _sprite1.spriteWidth + MathRound(_shakeDist / 7),
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin - MathRound(_shakeDist / 7),
+				spriteOrigin: _sprite1.spriteOrigin + MathRound(_shakeDist / 7),
 				bottomGap: (_sprite1.bottomGap ?? 0) + MathRound(_r * .025),
 				healtbarGap: _sprite1.healtbarGap,
 				invisibleWhenLay: _sprite1.invisibleWhenLay,
@@ -76590,23 +76600,23 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 				],
 				speed: _arr[7]
 			},
-			{
-				spriteLeft: _sprite1.spriteLeft,
-				spriteTop: _sprite1.spriteTop,
-				spriteWidth: _sprite1.spriteWidth,
-				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin,
-				invisibleWhenLay: _sprite1.invisibleWhenLay,
-				bottomGap: _sprite1.bottomGap,
-				healtbarGap: _sprite1.healtbarGap,
-				src: _sprite1.src,
-				objects: _sprite1.objects,
-				chain: [
-					{ key: 'escape', num: 1 },
-					{ key: 'counterstun', num: 4 },
-				],
-				speed: 10
-			},
+			// {
+			// 	spriteLeft: _sprite1.spriteLeft,
+			// 	spriteTop: _sprite1.spriteTop,
+			// 	spriteWidth: _sprite1.spriteWidth,
+			// 	spriteHeight: _sprite1.spriteHeight,
+			// 	spriteOrigin: _sprite1.spriteOrigin,
+			// 	invisibleWhenLay: _sprite1.invisibleWhenLay,
+			// 	bottomGap: _sprite1.bottomGap,
+			// 	healtbarGap: _sprite1.healtbarGap,
+			// 	src: _sprite1.src,
+			// 	objects: _sprite1.objects,
+			// 	chain: [
+			// 		{ key: 'escape', num: 1 },
+			// 		{ key: 'counterstun', num: 4 },
+			// 	],
+			// 	speed: 8
+			// },
 			{
 				spriteLeft: (_sprite2 ?? _sprite1).spriteLeft,
 				spriteTop: (_sprite2 ?? _sprite1).spriteTop,

@@ -1,4 +1,4 @@
-﻿'use strict';
+﻿﻿'use strict';
 
 console.log('global');
 const __locations = [
@@ -1713,7 +1713,7 @@ const relatedObjects = [
 		totalFrames: 8, speed: 7, singleton: true
 	},
 	{
-		id: 'stun', key: 'stun', type: 'hurt', width: 102, height: 48, zoom: .75, repeat: true, bottom: 20,
+		id: 'stun', key: 'stun', type: 'hurt', width: 102, height: 48, zoom: .75, repeat: true, bottom: 10,
 		totalFrames: 20, skip: 2, speed: 4, still: true, singleton: true, effect: 'stun', limit: 5, bind: true
 	},
 	{ id: 'glow', key: 'glow', width: 250, height: 250, totalFrames: 4, speed: 2, zoom: .8, still: true, singleton: true },
@@ -2360,8 +2360,8 @@ const relatedObjects = [
 	},
 	{
 		id: 'throwwhite', key: 'throwwhite',
-		width: 140, height: 31, col:1, zoom: 1.5,
-		totalFrames: 6, speed: 4, singleton: true, still: true
+		width: 140, height: 35, col:1, zoom: 1.5, frame:1,
+		totalFrames: 20, skip:3, speed: 3, singleton: true, still: true
 	}
 ];
 function setRelatedObjectSpeed() {
@@ -28774,7 +28774,7 @@ function addSlingStoneSpells() {
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][1],
                             sound: _bottomGaps[_spellEffects[i - 1]][1] === 0 ? {
                                 key: 'rockhit3',
-                                volume: 1,
+                                volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][0]) / 50,
                                 reset: true
                             } : null,
                             objects: _bottomGaps[_spellEffects[i - 1]][0] === 0 ? [{
@@ -28805,7 +28805,7 @@ function addSlingStoneSpells() {
                             speed: 6,
                             sound: _bottomGaps[_spellEffects[i - 1]][2] === 0 ? {
                                 key: 'rockhit3',
-                                volume: 1,
+                                volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][1]) / 50,
                                 reset: true
                             } : null,
                             objects: _bottomGaps[_spellEffects[i - 1]][1] === 0 ? [{
@@ -28834,7 +28834,7 @@ function addSlingStoneSpells() {
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][3],
                             sound: _bottomGaps[_spellEffects[i - 1]][3] === 0 ? {
                                 key: 'rockhit3',
-                                volume: 1,
+                                volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][2]) / 50,
                                 reset: true
                             } : null,
                             speed: 6,
@@ -28865,7 +28865,7 @@ function addSlingStoneSpells() {
                             speed: 6,
                             sound: _bottomGaps[_spellEffects[i - 1]][4] === 0 ? {
                                 key: 'rockhit3',
-                                volume: 1,
+                                volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][3]) / 50,
                                 reset: true
                             } : null,
                             objects: _bottomGaps[_spellEffects[i - 1]][3] === 0 ? [{
@@ -28894,7 +28894,7 @@ function addSlingStoneSpells() {
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][5],
                             sound: _bottomGaps[_spellEffects[i - 1]][5] === 0 ? {
                                 key: 'rockhit3',
-                                volume: 1,
+                                volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][4]) / 50,
                                 reset: true
                             } : null,
                             objects: _bottomGaps[_spellEffects[i - 1]][4] === 0 ? [{
@@ -28925,7 +28925,7 @@ function addSlingStoneSpells() {
                             speed: 6,
                             sound: _bottomGaps[_spellEffects[i - 1]][6] === 0 ? {
                                 key: 'rockhit3',
-                                volume: 1,
+                                volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][5]) / 50,
                                 reset: true
                             } : null,
                             objects: _bottomGaps[_spellEffects[i - 1]][5] === 0 ? [{
@@ -28955,7 +28955,7 @@ function addSlingStoneSpells() {
                             speed: 6,
                             sound: _bottomGaps[_spellEffects[i - 1]][7] === 0 ? {
                                 key: 'rockhit3',
-                                volume: 1,
+                                volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][6]) / 50,
                                 reset: true
                             } : null,
                             objects: _bottomGaps[_spellEffects[i - 1]][6] === 0 ? [{
@@ -28985,7 +28985,7 @@ function addSlingStoneSpells() {
                             speed: 6,
                             sound: _bottomGaps[_spellEffects[i - 1]][8] === 0 ? {
                                 key: 'rockhit3',
-                                volume: 1,
+                                volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][7]) / 50,
                                 reset: true
                             } : null,
                             objects: _bottomGaps[_spellEffects[i - 1]][7] === 0 ? [{
@@ -29015,7 +29015,7 @@ function addSlingStoneSpells() {
                             speed: 6,
                             sound: _bottomGaps[_spellEffects[i - 1]][9] === 0 ? {
                                 key: 'rockhit3',
-                                volume: 1,
+                                volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][8]) / 50,
                                 reset: true
                             } : null,
                             objects: _bottomGaps[_spellEffects[i - 1]][8] === 0 ? [{
@@ -29044,7 +29044,7 @@ function addSlingStoneSpells() {
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][10],
                             sound: _bottomGaps[_spellEffects[i - 1]][10] === 0 ? {
                                 key: 'rockhit3',
-                                volume: 1,
+                                volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][9]) / 50,
                                 reset: true
                             } : null,
                             objects: _bottomGaps[_spellEffects[i - 1]][9] === 0 ? [{
@@ -29074,7 +29074,7 @@ function addSlingStoneSpells() {
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][11],
                             sound: _bottomGaps[_spellEffects[i - 1]][11] === 0 ? {
                                 key: 'rockhit3',
-                                volume: 1,
+                                volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][10]) / 50,
                                 reset: true
                             } : null,
                             objects: _bottomGaps[_spellEffects[i - 1]][10] === 0 ? [{
@@ -29105,7 +29105,7 @@ function addSlingStoneSpells() {
                             speed: 6,
                             sound: _bottomGaps[_spellEffects[i - 1]][12] === 0 ? {
                                 key: 'rockhit3',
-                                volume: 1,
+                                volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][11]) / 50,
                                 reset: true
                             } : null,
                             objects: _bottomGaps[_spellEffects[i - 1]][11] === 0 ? [{
@@ -29135,7 +29135,7 @@ function addSlingStoneSpells() {
                             speed: 6,
                             sound: _bottomGaps[_spellEffects[i - 1]][13] === 0 ? {
                                 key: 'rockhit3',
-                                volume: 1,
+                                volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][12]) / 50,
                                 reset: true
                             } : null,
                             objects: _bottomGaps[_spellEffects[i - 1]][12] === 0 ? [{
@@ -29164,7 +29164,7 @@ function addSlingStoneSpells() {
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][14],
                             sound: _bottomGaps[_spellEffects[i - 1]][14] === 0 ? {
                                 key: 'rockhit3',
-                                volume: 1,
+                                volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][13]) / 50,
                                 reset: true
                             } : null,
                             objects: _bottomGaps[_spellEffects[i - 1]][13] === 0 ? [{

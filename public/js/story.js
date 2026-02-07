@@ -7013,7 +7013,7 @@ const __stories = [
 				],
 				startsWith: 1,
 				save: true,
-				loadingCharacterIds: [37,38],
+				loadingCharacterIds: [37,38, 619, 620],
 				start: function() {
 					clearAudioCache(loadedSounds);
 					removeCoopCharacter();
@@ -7310,16 +7310,6 @@ const __stories = [
 				],
 				mobs: [
 					{
-						id: 619,
-						minX: 1580,
-						maxX: 4800,
-						count: 1,
-						sight: 1000,
-						spawn: 1,
-						hp:160,
-						experience: 250
-					},
-					{
 						id: 620,
 						minX: 1580,
 						maxX: 4800,
@@ -7329,6 +7319,16 @@ const __stories = [
 						hp:160,
 						experience: 250
 					},
+					// {
+					// 	id: 620,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 2,
+					// 	sight: 1000,
+					// 	spawn: 1,
+					// 	hp:160,
+					// 	experience: 250
+					// },
 					// {
 					// 	id: 24,
 					// 	minX: 1580,

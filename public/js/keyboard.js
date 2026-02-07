@@ -1175,6 +1175,7 @@ function pressSkill(e) {
 	if(!slot)
 		return;
 	 if (hasClass(slot, "skill-pressed")) return;
+	 if (hasClass(slot, "locked")) return;
 
     addClass(slot, 'skill-pressed');
 
