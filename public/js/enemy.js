@@ -1338,7 +1338,7 @@ function enemy(_e) {
 							//text: '<p data-text="1 x ' + _qkey + '">1 x ' + _qkey + '</p>',
 							//class: 'dmg dmg-orange',
 							x: this.LEFT,
-								from: this.key,
+							from: this,
 							y: episode.cHeight - this.yPosition - this.HEIGHT
 						});
 					}
@@ -2813,7 +2813,7 @@ function enemy(_e) {
 										addDmgFrame({
 											item: { key: 'gold' },
 											val: _goldAmount,
-											from: _ch.key,
+											from: _ch,
 											x: _ch.LEFT,
 											y: episode.cHeight - _ch.yPosition - _ch.HEIGHT
 										});
@@ -2875,7 +2875,7 @@ function enemy(_e) {
 											item: { key: _q.key, quest: 1 },
 											//text: '<p data-text="1 x ' + _qkey+ '">1 x ' + _qkey + '</p>' ,
 											//class: 'dmg dmg-orange',
-											from: _char.key,
+											from: _char,
 											x: _char.LEFT,
 											y: episode.cHeight - _char.yPosition - _char.HEIGHT
 										});
@@ -2956,7 +2956,7 @@ function enemy(_e) {
 						//text: '+HP',
 						text: 'plus-hp',
 						//class: 'effect-steal',
-								from: this.key,
+						from: this,
 						x: this.LEFT,
 						y: episode.cHeight - this.yPosition - this.HEIGHT
 					});
@@ -2973,7 +2973,7 @@ function enemy(_e) {
 					//text: _decresement,
 					//class: 'effect-dmg-taken',
 					text: 'minus-hp',
-					from: this.key,
+					from: this,
 					x: this.LEFT,
 					y: episode.cHeight - this.yPosition - this.HEIGHT
 				});
@@ -4519,6 +4519,15 @@ function enemy(_e) {
 				this.left += (_attacker.ORIGINDIST - _originDiff);
 			_attacker.left = _attacker.PREVLEFT;
 		}
+		this.updateVariables();
+		_attacker.updateVariables();
+		for(let _rel of this.relatedObjects)
+			if(_rel.stillLeft !== undefined)
+				_rel.stillLeft = undefined;
+		for(let _rel of _attacker.relatedObjects)
+			if(_rel.stillLeft !== undefined)
+				_rel.stillLeft = undefined;
+		_attacker.chargeStarted = undefined;
 	}
 	this.attack = function (_anima, _frame) {
 		const trt = (this.related ?? this);
@@ -4580,7 +4589,7 @@ function enemy(_e) {
 								//text: '<p data-text="IMMUNE">IMMUNE</p>',
 								//class: 'dmg dmg-orange effect-immune',
 								text: 'immune',
-								from: _t.key,
+								from: _t,
 								x: _e.LEFT,
 								y: episode.cHeight - _e.yPosition - _e.HEIGHT
 							});
@@ -4598,7 +4607,7 @@ function enemy(_e) {
 								_e.autoAttacking = true;
 								_e.setAutoTarget(_t, null, 5);
 								addDmgFrame({
-									from: _e.key,
+									from: _e,
 									text: 'block',
 									x: _t.LEFT,
 									y: episode.cHeight - _e.yPosition - _e.HEIGHT
@@ -4704,7 +4713,7 @@ function enemy(_e) {
 								//text: '<p data-text="REFLECT">REFLECT</p>',
 								//class: 'dmg dmg-orange effect-reflect',
 								text: 'reflect',
-								from: _t.key,
+								from: _t,
 								x: _e.LEFT,
 								y: episode.cHeight - _e.yPosition - _e.HEIGHT
 							});
@@ -4861,11 +4870,11 @@ function enemy(_e) {
 							if(_e.size === 'big')
 								_e.hurting.count = MathCeil(_e.hurting.count / 2);
 							if(_charged && _t.main){
-								_t.addObject({ key: 'impact', position: 'css', p2: _t.direction });
+								requestAnimationFrame(function() { _t.addObject({ key: 'impact', position: 'css', p2: _t.direction });});
 								_t.talk();
 							}
 							if (!_e.noCC && !_e.still && !_e.finishing && _cced && !_erelease && (_hurtType ?? (_e.animations[_e.cc]?.hurt ?? _f.atk.hurt?.type)) === 'ground')
-								_e.addObject({ key: 'stun', position: 'middle-head', yGap: -25 });
+								requestAnimationFrame(function() { _e.addObject({ key: 'stun', position: 'middle-head', yGap: -25 }); });
 							if (_cced && _e.casting)
 								_e.cancelCast();
 							if(_cced && _e.main) 
@@ -4929,7 +4938,7 @@ function enemy(_e) {
 												crit: _t.criticalHit,
 												heavy: _charged || _f.atk?.hurt?.slam || _f.atk.rate > 2 || _t.criticalHit,
 												x: _e.LEFT,
-												from:_t.key,
+												from:_t,
 												y: episode.cHeight - _e.yPosition - _e.HEIGHT
 											});
 										else
@@ -4937,7 +4946,7 @@ function enemy(_e) {
 												atkType: 'hurt',
 												val: _dmg,
 												x: _e.LEFT,
-												from:_t.key,
+												from:_t,
 												y:episode.cHeight - _e.yPosition - _e.HEIGHT
 											});
 										if (!_e.dmgTaken) {
@@ -5043,7 +5052,7 @@ function enemy(_e) {
 												// 	_hasEffect = 1;
 											}
 									if(_charged){
-										_e.addObject({key:'sparkcharge', position: 'middle'});
+										requestAnimationFrame(function() { _e.addObject({key:'sparkcharge', position: 'middle'});});
 										if(_e.isDead())
 											_e.chargeDead = 1;
 										else 
@@ -5393,7 +5402,7 @@ function enemy(_e) {
 			addDmgFrame({
 				text: 'plus-hp',
 				x: this.LEFT,
-				from:this.key,
+				from:this,
 				y:episode.cHeight - this.yPosition - this.HEIGHT
 			});
 			_alreadyStolen = 1;
@@ -5406,7 +5415,7 @@ function enemy(_e) {
 				addDmgFrame({
 					text: 'plus-hp',
 					x: this.LEFT,
-					from:this.key,
+					from:this,
 					y: episode.cHeight - this.yPosition - this.HEIGHT
 				});
 			}
@@ -5530,7 +5539,7 @@ function enemy(_e) {
 						addDmgFrame({
 							text: 'plus-hp',
 							x: this.LEFT,
-							from:this.key,
+							from:this,
 							y: episode.cHeight - this.yPosition - this.HEIGHT
 						});
 					}

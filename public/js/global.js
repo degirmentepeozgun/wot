@@ -1630,7 +1630,7 @@ function drinkPot(_char, _gifter, _event) {
 		text: 'plus-hp',
 		//class: 'effect-steal',
 		x: _ch.LEFT,
-		from:_ch.key,
+		from:_ch,
 		y: _canvas.height - _ch.yPosition - _ch.HEIGHT
 	});
 	if(episodePot > 0)

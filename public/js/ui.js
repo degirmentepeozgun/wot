@@ -95,7 +95,7 @@ function addDmgFrame(_item) {
 	if(dmgFrames?.[0]){
 		let _found;
 		for(let df of dmgFrames)
-			if(df.from === _item.from && df.startTime > (_gameTick - 100)) {
+			if(df === _item && df.startTime > (_gameTick - 100)) {
 				if(_item.item?.key && df.item?.key === _item.item.key && 
 					(!_item.val || _item.val === df.val))
 					_found = 1;
@@ -192,6 +192,7 @@ function renderText(_frame, _i) {
 		x: _frame.x,
 		crit: _frame.text === 'crit',
 		frame: _frame,
+		from: _frame.from,
 		images: getDmgFrameNumbers2(_frame),
 		ms: 1000
 	});
@@ -266,6 +267,8 @@ function renderTextElement2(_settings) {
 				_l += _spriteWidth;
 				i++;
 			}
+		if(_settings.from?.hitStop)
+			return;
 		if (_settings.frame.zoom > 1) {
 			if (!_settings.frame.start)
 				_settings.frame.start = 0;
@@ -1223,7 +1226,7 @@ function updateExperience(_value, _levelup, _char, _noWarn) {
 			if(!_noWarn && !episode?.menu)
 				addDmgFrame({
 					text: 'level-up',
-					from:mainCharacter.key,
+					from:mainCharacter,
 					//class: 'effect-gain level-up-pop',
 					x: mainCharacter.LEFT,
 					y: _canvas.height - mainCharacter.yPosition - mainCharacter.HEIGHT

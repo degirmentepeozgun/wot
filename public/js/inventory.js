@@ -1468,7 +1468,7 @@ function wearStatusItem(_id, _power) {
         val: _power,
         img: './images/icons/power-up.png',
         x: mainCharacter.LEFT,
-        from:mainCharacter.key,
+        from:mainCharacter,
         y: episode.cHeight - mainCharacter.yPosition - mainCharacter.HEIGHT
     });
 	mainCharacter.addObject({ key: 'hit', position: 'middle', scale:1.2 });

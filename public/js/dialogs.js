@@ -858,7 +858,7 @@ function createPotDialog(_class) {
 							addDmgFrame({
 								item: { key: 'pot' },
 								val: 1,
-								from: mainCharacter.key,
+								from: mainCharacter,
 								x: mainCharacter.LEFT,
 								y: _canvas.height - mainCharacter.yPosition - mainCharacter.HEIGHT
 							});
