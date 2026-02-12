@@ -1,4 +1,4 @@
-﻿﻿'use strict';
+﻿﻿﻿'use strict';
 
 console.log('global');
 const __locations = [
@@ -1714,7 +1714,7 @@ const relatedObjects = [
 	},
 	{
 		id: 'stun', key: 'stun', type: 'hurt', width: 102, height: 48, zoom: .75, repeat: true, bottom: 10,
-		totalFrames: 20, skip: 2, speed: 4, still: true, singleton: true, effect: 'stun', limit: 5, bind: true
+		totalFrames: 20, skip: 2, speed: 4, stillOnChar: true, singleton: true, effect: 'stun', limit: 5, bind: 'hurtground'
 	},
 	{ id: 'glow', key: 'glow', width: 250, height: 250, totalFrames: 4, speed: 2, zoom: .8, still: true, singleton: true },
 	{ id: 'shadow', key: 'shadow', width: 128, height: 19, top: 0, zoom: 1, bottom: 0 },
@@ -2362,6 +2362,11 @@ const relatedObjects = [
 		id: 'throwwhite', key: 'throwwhite',
 		width: 140, height: 35, col:1, zoom: 1.5, frame:1,
 		totalFrames: 20, skip:3, speed: 3, singleton: true, still: true
+	},
+	{
+		id: 'chargeimpact', key: 'chargeimpact',
+		width: 1280/4, height: 1182/6, col:4, zoom: 1, frame:1, bind: true,
+		totalFrames: 23, speed: 3, singleton: true, stillOnChar: true
 	}
 ];
 function setRelatedObjectSpeed() {
@@ -2371,6 +2376,9 @@ function setRelatedObjectSpeed() {
 }
 setRelatedObjectSpeed();
 const relatedObjectImages = {
+	chargeimpact: function () {
+		return getImage('./images/related/charge-impact.png')
+	},
 	stars: function () {
 		return getImage('./images/related/stars.png')
 	},
@@ -3068,6 +3076,7 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	punchcartoon: './images/sounds/punch-cartoon.mp3',
 	slingmelee: './images/sounds/sling-melee.mp3',
 	rockhit: './images/sounds/rock-hit.mp3',
 	rockhit2: './images/sounds/rock-hit2.mp3',

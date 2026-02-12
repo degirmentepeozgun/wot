@@ -7310,7 +7310,7 @@ const __stories = [
 				],
 				mobs: [
 					{
-						id: 619,
+						id: 621,
 						minX: 1580,
 						maxX: 4800,
 						count: 1,

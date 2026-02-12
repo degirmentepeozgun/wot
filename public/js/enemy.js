@@ -1,4 +1,4 @@
-﻿﻿﻿'use strict';
+﻿﻿﻿﻿'use strict';
 const __attackTolerance = 2;
 
 function enemy(_e) {
@@ -3758,7 +3758,7 @@ function enemy(_e) {
 					this.chargeProperties = undefined;
 				return;
 			}
-		if (_anima.chargeDistance && (this.frame <= (_anima.chargeDistance.untilFrame ?? 0))) {
+		if (_anima.chargeDistance && (this.frame <= (_anima.chargeDistance.untilFrame ?? 0)) && !this.chargeProperties?.stop) {
 			const _y = this.yPosition;
 			const _dir = this.getKeyboardXMove() ?? this.direction;
 			let _result = this.chargeProperties?.enemy ? undefined : this.getClosestEnemy(_anima.normalRange ?? 0, _dir, function (_e) {
@@ -3777,8 +3777,19 @@ function enemy(_e) {
 				if (_result?.enemy) {
 					if(this.charging && !this.chargeProperties)
 						this.charging = undefined;
-					if(!_result.range)
-						_result.range = MathAbs(_result.enemy.ORIGINLEFT - (this.ORIGINLEFT + ((this.direction === __left ? -1 : 1) * (this.WIDTH - this.ORIGINDIST))));
+
+
+					//if(!_result.range) //bunu iptal ettim ki dinamik range hesaplansın
+					const _attackerLeft = this.main ? this.left + platformX : this.left;
+					const _victimLeft = _result.enemy.main ? _result.enemy.left + platformX : _result.enemy.left;
+					_result.range = this.direction === __left ? _attackerLeft - (_victimLeft + _result.enemy.WIDTH) :
+						_victimLeft - (_attackerLeft + this.WIDTH);
+					if(_result.range <= 0) {
+						if(this.chargeProperties)
+							this.chargeProperties.stop = true;
+						_result.range = 0;
+					}
+					//MathAbs(_result.enemy.ORIGINLEFT - (this.ORIGINLEFT + ((this.direction === __left ? -1 : 1) * (this.WIDTH - this.ORIGINDIST))));
 					
 					if (this.start <= 1 && this.frame === 0 && !this.charging){
 						this.charging = true;
@@ -3804,7 +3815,18 @@ function enemy(_e) {
 							stepX: MathFloor((_result.range - (_result.enemy.WIDTH / 2)) / (_speed < 2 ? _speed : _speed - 1))//(_speed - this.start))
 						};
 					}
+					else if(this.chargeProperties) { //bu da dinamik hesaplıyo
+
+						this.chargeProperties.stepX = MathFloor(_result.range / (_speed < 2 ? _speed : _speed - 1));
+						if(this.chargeProperties.stepX <= 0)
+						{
+							this.chargeProperties.stepX = 0;
+							if(!this.chargeProperties.stop)
+								this.chargeProperties.stop = true;
+						}
+					}
 					if(this.chargeProperties) {
+						this.chargeProperties.speed--;
 						if(this.chargeProperties.dir !== this.direction)
 							this.direction = this.chargeProperties.dir;
 						if (MathAbs(this.chargeProperties.enemy.yPosition - this.yPosition) < 3)
@@ -4079,7 +4101,7 @@ function enemy(_e) {
 			_o.bind = _obj.bind;
 		else if (_obj.bind !== undefined)
 			_o.bind = _obj.bind ? this.animation : undefined;
-		else if (_o?.bind || _obj.bind)
+		else if (_o?.bind === true || _obj.bind === true)
 			_o.bind = this.animation;
 		return _o;
 	}
@@ -4503,6 +4525,8 @@ function enemy(_e) {
 		this.smasher.talk();
 	}
 	this.bringItFront = function(_attacker) {
+		_attacker.chargeStarted = undefined;
+		return;
 		if(_attacker.direction === __left){
 			const _originDiff = _attacker.ORIGINLEFT - this.ORIGINLEFT;
 			if(this.PREVLEFT < this.left)

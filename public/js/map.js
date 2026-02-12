@@ -1,4 +1,4 @@
-﻿﻿'use strict';
+﻿﻿﻿'use strict';
 const _borderRates = [
 	1.06, 1.06, 1.06, 
 	1.05, 1.05, 1.05, 1.05,
@@ -5075,7 +5075,7 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 				_left = _item.char.LEFT;
 			}
 			_draw = _item.char.main;
-			if (_rel.bind === _item.char.animation)
+			if (_rel.bind && _item.char.animation.startsWith(_rel.bind))
 				_draw = true;
 			else if (_rel.bind) {
 				_rel.remove = true;
