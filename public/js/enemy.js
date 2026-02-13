@@ -1186,6 +1186,8 @@ function enemy(_e) {
 	}
 	this.finishAnimation = function () {
 		let _anima = this.animations[this.animation];
+		if(_anima.chargeStarted)
+			_anima.chargeStarted = undefined;
 		if(this.animation.startsWith('counter') || _anima.ultimate){
 			this.newBlocked = -1 * counterAttackTolerance;
 			this.comfortStarted = _gameTick;
@@ -3777,53 +3779,44 @@ function enemy(_e) {
 				if (_result?.enemy) {
 					if(this.charging && !this.chargeProperties)
 						this.charging = undefined;
-
-
-					//if(!_result.range) //bunu iptal ettim ki dinamik range hesaplansın
-					const _attackerLeft = this.main ? this.left + platformX : this.left;
-					const _victimLeft = _result.enemy.main ? _result.enemy.left + platformX : _result.enemy.left;
-					_result.range = this.direction === __left ? _attackerLeft - (_victimLeft + _result.enemy.WIDTH) :
-						_victimLeft - (_attackerLeft + this.WIDTH);
-					if(_result.range <= 0) {
-						if(this.chargeProperties)
-							this.chargeProperties.stop = true;
+					//if(!_result.range)
+					const _left = this.LEFT;
+					const _enemyLeft = _result.enemy.LEFT;
+					const _right = _left + this.WIDTH;
+					const _enemyRight = _enemyLeft + _result.enemy.WIDTH;
+					_result.range = this.direction === __left ? _left - _enemyRight 
+						: _enemyLeft - _right;
+					if(_result.range < 0) {
 						_result.range = 0;
+						this.chargeProperties.stop = 1;
 					}
-					//MathAbs(_result.enemy.ORIGINLEFT - (this.ORIGINLEFT + ((this.direction === __left ? -1 : 1) * (this.WIDTH - this.ORIGINDIST))));
-					
 					if (this.start <= 1 && this.frame === 0 && !this.charging){
 						this.charging = true;
-						// this.addObject({
-						// 	key: 'charge',
-						// 	position: 'behind-feet'
-						// })
 						PlaySound({ key: 'charge', volume: .5, owner: this });
 					}
 					let _speed = this.chargeProperties?.speed ?? 0;
 					if (!this.chargeProperties && this.charging) {
 						this.charging = (_anima.chargeDistance.value * .66) < 
 						(100 * (_result.range / episode.cWidth)) ? 1 : 0;
-						//PlaySound({key: 'impact'});
 						if(!_speed)
 							for (var i = 0; i <= _anima.chargeDistance.untilFrame ?? 0; i++)
 								_speed += _anima.frames[i].speed;
 						this.chargeStarted = _gameTick;
+						_anima.chargeStarted = _gameTick;
 						this.chargeProperties = {
 							enemy: _result.enemy,
 							dir: _dir,
 							speed: _speed,
-							stepX: MathFloor((_result.range - (_result.enemy.WIDTH / 2)) / (_speed < 2 ? _speed : _speed - 1))//(_speed - this.start))
+							stepX: MathCeil(_result.range / (_speed < 2 ? 1 : _speed))
 						};
 					}
-					else if(this.chargeProperties) { //bu da dinamik hesaplıyo
-
-						this.chargeProperties.stepX = MathFloor(_result.range / (_speed < 2 ? _speed : _speed - 1));
-						if(this.chargeProperties.stepX <= 0)
-						{
+					else if(this.chargeProperties) {
+						if(this.chargeProperties.stop)
 							this.chargeProperties.stepX = 0;
-							if(!this.chargeProperties.stop)
-								this.chargeProperties.stop = true;
-						}
+						else
+							this.chargeProperties.stepX =
+								MathCeil((_result.range/* - (_result.enemy.WIDTH / 2)*/) 
+								/ (_speed < 2 ? 1 : _speed));
 					}
 					if(this.chargeProperties) {
 						this.chargeProperties.speed--;
@@ -4524,34 +4517,598 @@ function enemy(_e) {
 		this.animate('hurtfeet', 1);
 		this.smasher.talk();
 	}
-	this.bringItFront = function(_attacker) {
-		_attacker.chargeStarted = undefined;
-		return;
-		if(_attacker.direction === __left){
-			const _originDiff = _attacker.ORIGINLEFT - this.ORIGINLEFT;
-			if(this.PREVLEFT < this.left)
-				this.left = this.PREVLEFT;
-			if(_originDiff < (_attacker.WIDTH - _attacker.ORIGINDIST))
-				this.left -= ((_attacker.WIDTH - _attacker.ORIGINDIST) - _originDiff);
-			_attacker.left = _attacker.PREVLEFT;
+	this.resolveOverlap = function(_attacker) {
+		const _left = this.left + (this.main ? platformX : 0);
+		const _attackerLeft = _attacker.left + (_attacker.main ? platformX : 0);
+		const _right = _left + this.WIDTH;
+		const _attackerRight = _attackerLeft + _attacker.WIDTH;
+	}
+	this.hurtEnemy = function(_anima, _f, _e, _ef, _ea, _tp, _ep) {
+		const _t = this;
+		if(_t.attackedUnitCount > (_anima.maxAttackedCount ?? __maxAttackedCount))
+			return false;
+		if((_gameTick - _e.comfortStarted) < 500)
+			return false;
+		if (_ea.key.startsWith('dead') || _ea.key === 'release')
+			return false;
+		if (_f.atk?.buffs)
+			_f.atk.buffs.forEach(x => _e.addBuff(x, _gameTick));
+		if (_f.atk.rate > 0)
+			(_t?.owner ?? _t?.related ?? _t).increaseHitCount();
+		else
+			return false;
+		// if(!episode.pvp && episode.enemies?.filter(x => x.autoTarget === _e && x.attacked && x.animations[x.animation].attack)?.length > __maxAttackedCount)
+		// 	return false;
+		if(_t.parentKey === _e.key || _e === _t.related)
+			return false;
+		let _critHitTaken = false;
+		const _prevAutoMode = _e.autoMode;
+		if (_e.autoMode !== 2 && !_e.main && !_e.friendly && !_e.socketId) {
+			if (_e.groupId)
+				episode.enemies.filter(x => x.groupId === _e.groupId).forEach(x => {
+					x.setAutoMode(2);
+				});
+			else
+				_e.setAutoMode(2);
 		}
+		if (_e.immunities?.[0])
+			if (!_f.atk.type || _e.immunities.indexOf(_f.atk.type) !== -1) {
+				addDmgFrame({
+					//text: '<p data-text="IMMUNE">IMMUNE</p>',
+					//class: 'dmg dmg-orange effect-immune',
+					text: 'immune',
+					from: _t,
+					x: _e.LEFT,
+					y: episode.cHeight - _e.yPosition - _e.HEIGHT
+				});
+				return false;
+			}
+		if (_prevAutoMode === 2 && !_e.keyboard && _e.animations.block && _e.fatique >= fatiqueDecreasement) {
+			if (_e.animation === 'run' || _e.animation === 'walk' ||
+				_e.animation === 'idle' || _e.animation === 'hurtblock') {
+				if (_e.checkBlock(_t)) {
+					if(_e.animations.hurtblock)
+						_e.animate('hurtblock', 1);
+					else
+						_e.animate('block', 1);
+					_e.decreaseFatique(_t, _f.atk?.rate);
+					_e.autoAttacking = true;
+					_e.setAutoTarget(_t, null, 5);
+					addDmgFrame({
+						from: _e,
+						text: 'block',
+						x: _t.LEFT,
+						y: episode.cHeight - _e.yPosition - _e.HEIGHT
+					});
+					return false;
+				}
+			}
+		}
+		else if (_prevAutoMode === 2 && !_e.keyboard && _e.animations.roll && (_e.animations.roll.charge > 0 || _e.animations.roll.charge === undefined)
+			&& (!_e.animations.roll.rate || (getRandomValue(1, 100) <= _e.animations.roll.rate))) {
+			if (_e.animation === 'run' || _e.animation === 'walk' ||
+				_e.animation === 'idle') {
+				_e.animate('roll', 1);
+				_e.setAutoTarget(_t, null, 6);
+				_e.autoAttacking = true;
+				return false;
+			}
+		}
+		else if (_e.animation === 'dodge' || (_prevAutoMode === 2 && !_e.keyboard && _e.animations.dodge && !(_e.animations.dodge.coolDownLeft > 0) && 
+		(!_e.animations.dodge.rate || (getRandomValue(1, 100) <= _e.animations.dodge.rate)))) {
+			if (_e.animation === 'run' || _e.animation === 'walk' || _e.animation === 'idle'){
+				_e.animate('dodge', 1);
+				_e.setAutoTarget(_t, null, 7);
+				_e.autoAttacking = true;
+				return false;
+			}
+		}
+		if (_f.atk.hurt) {
+			let _decreaseHP;
+			_e.removeBuffByKey('invisibility');
+			if(_e.sleep) {
+				_e.removeBuffByKey('sleep');
+				delete _e.sleep;
+			}
+			if(_f.atk.hurt.do)
+				_f.atk.hurt.do(_f, _t, _e);
+			if (!_e.alp && _f.atk.hurt.catch === 'back' && _e.direction !== _t.direction)
+				_e.direction = _e.direction === __left ? __right : __left;
+			else if (!_e.alp && _f.atk.hurt.catch === 'front' && _e.direction === _t.direction)
+				_e.direction = _e.direction === __left ? __right : __left;
+			if (_f.atk.hurt.sound)
+				requestAnimationFrame(() => {
+					if(_f.atk.hurt.sound.key)
+						PlaySound(_f.atk.hurt.sound);
+					else
+						PlaySound({ key: _e.class + _f.atk.hurt.sound, owner: _e }, [_f.atk.hurt.sound]);
+				});
+			else if(_e.bleed)
+				PlaySound({key:'fleshhurt' + getRandomValue2(1,6), volume:.7, owner: _e});
+			if (_f.atk.hurt.props) {
+				const _dying = _e.dying;
+				_e.setProps(_f.atk.hurt.props);
+				if (!_dying && _e.dying)
+					_e.killingBy = _t.key;
+			}
+			const _isSmashable = _e.isSmashable();
+			if(_f.atk.hurt.smash && _isSmashable) {
+				_e.smash(_t, _f);
+				return { smashed:true };
+			}
+			else if(_e.phased) {
+				let _phaseDropped;
+				if(_f.atk.hurt.smash)
+					_e.phased = 0;
+				else{
+					_e.phased--;
+					_phaseDropped = 1;
+				}
+				if(_e.phased > 0) {
+					let _hurtAnim = _e.animations['phase' + _e.phased];
+					if(_phaseDropped && _hurtAnim?.when && !_hurtAnim.when(_e)){
+						_e.phased++;
+						_decreaseHP = 1;
+					}
+					else {
+						_decreaseHP = 1;
+						const _src = _hurtAnim.frames[0].src ?? _hurtAnim.src;
+						if(_src) {
+							_e.animations.idle.src = _src;
+							if(_e.animations.idle.resetImage)
+								_e.animations.idle.resetImage();
+						}
+						_e.animations.idle.frames = [{
+							speed: 999,
+							spriteLeft: _hurtAnim.frames[0].spriteLeft,
+							spriteTop: _hurtAnim.frames[0].spriteTop,
+							bottomGap: _hurtAnim.frames[0].bottomGap,
+							spriteWidth: _hurtAnim.frames[0].spriteWidth,
+							spriteHeight: _hurtAnim.frames[0].spriteHeight,
+							spriteOrigin: _hurtAnim.frames[0].spriteOrigin
+						}];
+						_e.animations.hurtground1 = _hurtAnim;
+						_e.animations.hurtground1.key = 'hurtground1';
+						_e.animate('hurtground1', 1);
+					}
+				}
+				else
+					_e.animate('dead', 1);
+			}
+			const _hasReflect = _e.reflect;
+			if(_hasReflect)
+				addDmgFrame({
+					//text: '<p data-text="REFLECT">REFLECT</p>',
+					//class: 'dmg dmg-orange effect-reflect',
+					text: 'reflect',
+					from: _t,
+					x: _e.LEFT,
+					y: episode.cHeight - _e.yPosition - _e.HEIGHT
+				});
+			if (!_e.hurting?.count) {
+				if (_f.atk.hurt.spells)
+					for (var _fsp of _f.atk.hurt.spells)
+						_t.throwSpell({ spell: _fsp }, _t.parent ?? _t);
+				_f.atk.hitTaken ??= 1;
+				if (_f.atk.hitTaken > 0) {
+					if (_ea.hurt) {
+						if (_e.hitTakenCount === undefined)
+							_e.hitTakenCount = 0;
+						_e.hitTakenCount += _f.atk.hitTaken;
+						// if(!_t.attackedUnitCount)
+						// 	_e.increaseRage(_f.atk.hitTaken);
+					}
+					else
+						_e.hitTakenCount = _f.atk.hitTaken;
+				}
+				let _erelease;
+				if (!_e.isDead() && !_e.still && _e.hitTakenCount > _e.releaseAfter && _e.class !== 'object')
+				{
+					_erelease = true;
+					if(_e.animations.release?.reversed) {
+						if(_e.EXACTLEFT< _t.EXACTLEFT)
+							_e.direction = __right;
+						else
+							_e.direction = __left;
+					}
+				}
+				let _hurtType;
+				if (!_erelease && _ea.hurt) {
+					_e.cc = _ea.key;
+					if (_f.atk.hurt.key) {
+						if (_f.atk.hurt.imediateBreak)
+							_e.cc = _f.atk.hurt.key;
+						else if (_ea.hurt) {// && _e.animations[_f.atk.hurt.key]?.hurt === _ea.hurt)
+							if(_e.cc !== 'hurtair' && _e.cc !== _f.atk.hurt.key)
+								_e.cc = _f.atk.hurt.key;
+						}
+						else if (_e.animations[_f.atk.hurt.key]?.reset || _f.atk.hurt.reset){
+							_e.cc = _f.atk.hurt.key;
+						}
+						else if (!_e.animations[_f.atk.hurt.key]) {
+							if (_f.atk.hurt.type === 'air' && _e.animations['hurtground1']) {
+								_hurtType = 'ground';
+								_e.cc = 'hurtground1';
+							}
+							else if (_f.atk.hurt.type === 'ground' && _e.animations['hurtground1']) {
+								_hurtType = 'ground';
+								_e.cc = 'hurtground1';
+							}
+							else if (_f.atk.hurt.type === 'ground' && _e.animations['hurtair']) {
+								_hurtType = 'air';
+								_e.cc = 'hurtair';
+							}
+						}
+					}
+				}
+				if (!_ea.hurt || _erelease) {
+					_e.cc = _e.attacker = undefined;
+					_e.hitTakenCount = _e.extraStepXRate = 0;
+				}
+				_e.attacker = _t?.related ?? _t;
+				if(_t.related)
+					_e.realAttacker = _t;
+				else
+					_e.realAttacker = undefined;
+				_e.attackerRange  = _e.getZRangeBetween(_t);
+				_t.attacked = 1;
+				if(_t.class === 'object')
+					_e.attackedByObject = 1;
+				else if(_e.attackedByObject)
+					delete _e.attackedByObject;
+				if (_t?.related)
+					_f.atk.hurt.objects?.forEach(x => _e.addObject(x));
+				const _cced = _f.atk.hurt.type !== 'common' && (!_ep || _tp < _ep) ;
+				const _charged = _anima.chargeDistance && (_t.charging || ((_gameTick - _t.chargeStarted) < 999));
+				let _animateSkill;
+				if ((_erelease || _f.atk.hurt.key) && _cced) {
+						_animateSkill = _e.cc ?? _f.atk.hurt.key;
+						if (!_e.animations[_animateSkill])
+							_animateSkill = 'hurtground1';
+					if (!_erelease) {
+						//if (!_e.animations[_animateSkill]?.frames?.find(x => x.sound))
+						//	PlaySound({ owner: _e, key: (_e.main ? _e.class : _e.name.toLowerCase()) + (_e.main ? _animateSkill : 'hurt') }, ['hurt']);
+						if (_animateSkill.startsWith('hurt') && !_e.noCC){
+							if(_animateSkill === 'hurtair' && _e.animations.hurtair2)
+							{
+								let airPoss;
+								for(airPoss = 2; airPoss > 1; airPoss++) {
+									if(!_e.animations['hurtair' + (airPoss + 1)])
+										break;
+								}
+								airPoss = getRandomValue(1, airPoss);
+								if(airPoss > 1)
+									_animateSkill += airPoss.toString();
+							}
+							if(_animateSkill.startsWith('hurtground') && _e.groundHurtKeys.length > 1)
+								_animateSkill = _e.groundHurtKeys[getRandomValue2(0, _e.groundHurtKeys.length - 1)];
+							else if(_animateSkill.startsWith('hurtair') && _e.airHurtKeys.length > 1)
+								_animateSkill = _e.airHurtKeys[getRandomValue2(0, _e.airHurtKeys.length - 1)];
+							if(_t.animations[_t.animation].uncounterable)
+								_e.noCounter = 1;
+							if(_f.atk.hurt?.airFlow)
+								_e.airFlow = _f.atk.hurt.airFlow; 
+							_e.animate(_animateSkill);
+							_e.addObject({
+								position: 'css',
+								key: 'zoomdynamic',
+								p1: _t.direction,
+								p2: (_t.criticalHit ? 1 : 0) + _f.atk.rate
+							});
+							// if(_t.class !== __spell){
+							// 	let distortMS;
+							// 	if(_f.atk.rate < 1)
+							// 		distortMS = 80;
+							// 	else if(_f.atk.rate <=2)
+							// 		distortMS = 100;
+							// 	else
+							// 		distortMS = 120;
+							// 	_e.addObject({
+							// 		position:'canvas',
+							// 		key:'distortion',
+							// 		p1: {
+							// 			after:true,
+							// 			rX: MathRound(episode.cWidth / (getRandomValue2(80,100) / 10)),
+							// 			rY: MathRound(episode.cWidth / (getRandomValue2(80,100) / 10)),
+							// 			ms:distortMS
+							// 		}
+							// 	});
+							// }
+							//Enemy cced
+							if(_e.alp) {
+								const _pstv = _e.getTalentValue('passive-stun');
+								if(_pstv) {
+									if(getRandomValue2(1, 100) <= _pstv) {
+										_e.throwSpell({
+											key: 'electricboltsmall'
+										});
+										_e.throwSpell({
+											key: 'electricboltsmall',
+											reversed: true
+										});
+									}
+								}
+							}
+						}
+					}
+				}
+				_e.hurting = { hit: 4 };
+				_e.hurtColor = _f.atk.type === 'fire' ? '#E25822' : (_f.atk.type === 'toxic' ? '#66cc1a' : '#ffffff');
+				_e.hurting.count = _e.hurtColor ? ((_f.atk.type === 'fire' || _f.atk.type === 'ice' || _f.atk.type === 'toxic') ? 3 : 4) : 3; // _e.getCurrentFrame().speed;
+				if(_e.size === 'big')
+					_e.hurting.count = MathCeil(_e.hurting.count / 2);
+				if(_charged && _t.main){
+					requestAnimationFrame(function() { _t.addObject({ key: 'impact', position: 'css', p2: _t.direction });});
+					_t.talk();
+				}
+				if (!_e.noCC && !_e.still && !_e.finishing && _cced && !_erelease && (_hurtType ?? (_e.animations[_e.cc]?.hurt ?? _f.atk.hurt?.type)) === 'ground')
+					requestAnimationFrame(function() { 
+						_e.addObject({ key: 'stun', position: 'middle-head', yGap: -25 }); 
+					});
+				if (_cced && _e.casting)
+					_e.cancelCast();
+				if(_cced && _e.main) 
+					removeClass(_gamePad, 'zoom');
+				if (_f.atk.rate) {
+					if(_f.atk.hurt?.hitZoom)
+						_e.setHitZoom(_ef, _f.atk.hurt?.hitZoom);//_ef.hitZoom = _f.atk.hurt?.hitZoom;
+					if (!_f.atk.hurt.dead) {
+						let _hasEffect;
+						if ((_t.class === __spell || _t.start <= 1) && (_e.health > 0 && !_e.finishing)) {
+							if (_f.atk.hurt.buffs)
+								_f.atk.hurt.buffs.forEach(x => _e.addBuff(x, _gameTick));
+							let _dmg = _t.getAtkRate(); 
+							if(_f.atk.rate)
+								_dmg *= (_t.alp ? _t.getSkillRate() : 1) * _f.atk.rate;
+							if (_dmg < 1)
+								_dmg = 1;
+							const _tr = (_t.related ?? _t);
+							var _calculatedCrit = (((_t.coopWith ?? _t).critRate) * ((100 - ((_e.coopWith ?? _e).critResistRate ?? 0))/100) * 100);
+							if (getRandomValue2(0, 10000) <= _calculatedCrit) {
+								_dmg *= (2 + ((_t.critDmgRate ?? 0) / 100));
+								if((_e.coopWith ?? _e).critDmgResistRate)
+									_dmg *= ((100 - (_e.coopWith ?? _e).critDmgResistRate) / 100);
+								_t.criticalHit = _critHitTaken = true;
+								if(_tr.alp)
+								{
+									const _rstp = _tr.getTalentPoint('passive-atk-speed');
+									if(_rstp > 0)
+										_tr.addBuff({ key: 'dance', level: _rstp });
+								}
+								if (episode.pvp) {
+									if (_t.dmgGiven === undefined)
+										_t.dmgGiven = 0;
+									_t.dmgGiven += _dmg;
+								}
+							}
+							else
+								_t.criticalHit = false;
+							// setTimeout(function() {
+							// 	_t.randomShake(_e, _anima, _f, _dmg, _t.criticalHit);
+							// }, getRandomValue2(20, 35));
+							const _newDmg = _t.calculateElementalDmg(_dmg, _e);
+							let _dmgEffect;
+							if(_newDmg > _dmg && (_f.atk.type && _f.atk.type !== 'common')) {
+								_dmgEffect = _t.getElementalEffect(_e);
+								_dmg = _newDmg;
+								_hasEffect = 1;
+							}
+							_dmg = _t.calculateDmgReduce(_dmg, _e, _f.atk.ignoreDef);
+							if(!_f.atk.ignoreDef && _ef.def?.rate)
+								_dmg *= (1 - _ef.def.rate);
+							_dmg = MathCeil(_dmg);
+							if(episode.war)
+								_dmg *= 2;
+							//_dmg = 1;
+							_tr.checkSteal(_dmg, _e);
+							if (!_e.main)
+								addDmgFrame({
+									atkType: _f.atk?.type ?? _dmgEffect ?? 'common',
+									val: _dmg,
+									crit: _t.criticalHit,
+									heavy: _charged || _f.atk?.hurt?.slam || _f.atk.rate > 2 || _t.criticalHit,
+									x: _e.LEFT,
+									from:_t,
+									y: episode.cHeight - _e.yPosition - _e.HEIGHT
+								});
+							else
+								addDmgFrame({
+									atkType: 'hurt',
+									val: _dmg,
+									x: _e.LEFT,
+									from:_t,
+									y:episode.cHeight - _e.yPosition - _e.HEIGHT
+								});
+							if (!_e.dmgTaken) {
+								_e.dmgTaken = 0;
+								if (_e.autoMode >= 0 && !_tr.invulnerable) {
+									if (_e.enemy)
+										_e.setAutoMode(2);
+									if(!_t.invulnerable)
+										_e.setAutoTarget(_t, null, 8);
+								}
+							}
+							_e.dmgTaken += _dmg;
+							if(!_e.inCombat)
+								_e.inCombat = 1;
+							if(_hasReflect)
+								_tr.decreaseHealth(_dmg, _e);
+							else if(!_e.phased || _decreaseHP){
+								if(_e.realTime && (_t.main || (_t.related ?? _t.owner)?.main))
+									setTransferMessage([{
+										t: _e.socketId,
+										s: _tr.socketId,
+										k: _dmg
+									}]);
+								if(_f.atk.hurt?.skipTinyCameraMove)
+									episode.skipTinyCameraMove = _f.atk.hurt.skipTinyCameraMove;
+								_e.decreaseHealth(_dmg, _t.related ?? _t);
+								_e.lastDamage = _dmg;
+								if(_f.atk.hitZoom)
+									_t.setHitZoom(_f, _f.atk.hitZoom);//_f.hitZoom = _f.atk.hitZoom;
+								if(_e.main && _critHitTaken && _cced){
+									_e.addObject({
+										position: 'css',
+										key: 'criteffect'
+									});
+									_e.soundVolumeRate = 2;
+								}
+								_e.increaseRage(_f.atk.hitTaken * (_t.criticalHit ? 2 : 1), null, 1);
+								let _canStop = false;
+								if(_t.class !== __spell && !_t.hitStop && (_anima.hitStop || _f.atk.hitStop)) {
+									let _stopAdd = -1;
+									if(!_t.criticalHit) {
+										if(_f.atk.rate < 1)
+											_stopAdd = -2;
+										else if(_f.atk.rate >= 2)
+											_stopAdd = 0;
+									}
+									else
+										_stopAdd = 1;
+									const _stopMe = (_f.atk.hitStop ?? _anima.hitStop) + _stopAdd;
+									if(_e.class !== __spell && !_e.hitStop) {
+										if(!_f.hitStopTime || (_gameTick - _f.hitStopTime) > 500)
+										{
+											_e.hitStop = 2;
+											_t.hitStop = _stopMe;
+											_f.hitStopTime = _gameTick;
+											_canStop = 1;
+										}
+									}
+								}
+								//_e.addObject({key:'hit' + getRandomValue2(1,5), position: 'middle'});
+								//successfull hit
+								_e.lastHitSkill = _tr.animation;
+								if(_e.isDead())
+								{
+									if(_t.tag || _f.atk.hurt.smashIfDead) {
+										_e.smash(_t, _f);
+										return {smashed: true, criticalHit: _critHitTaken};
+									}
+									if((_f.knockback || _charged || (_f.push && typeof _f.push === 'number'))) {
+										_e.critDead = _t.criticalHit ? 3: 2;
+										let _knockbacked;
+										if(_hurtType === 'air' && _e.animations.knockbackair){
+											_e.animations.knockbackair.next = 'dead';
+											_e.animate('knockbackair', 1);
+											_knockbacked = 1;
+										}
+										else if(_e.animations.knockbackground){
+											_e.animations.knockbackground.next = 'dead';
+											_e.animate('knockbackground', 1);
+											_knockbacked = 1;
+										}
+										if(_knockbacked) {
+											PlaySound({key:'deadeffect2', volume:.2});
+											_e.knockDead = 1;
+										}
+									}
+								}
+								if(_canStop && _e.animation.startsWith('hurt')) {
+									if(_e.hitStop)
+										_e.start -= _e.hitStop;
+									if(_t.hitStop)
+										_t.start -= _t.hitStop;
+								}
+							}
+							if(_e.isDead())
+								_e.relatedObjects = _e.relatedObjects.filter(x => x.key !== 'stun');
+						}
+						if (_f.objects)
+							for (var _o of _f.objects)
+								if (_o.hurt){
+									_e.addObject(_o);
+									// if(!_hasEffect)
+									// 	_hasEffect = 1;
+								}
+						if(_charged){
+							requestAnimationFrame(function() { _e.addObject({key:'sparkcharge', position: 'middle'});});
+							if(_e.isDead())
+								_e.chargeDead = 1;
+							else 
+								_e.resolveOverlap(_t);
+							PlaySound({key:'chargehit1', reset: true, volume:.4});
+							episode.skipTinyCameraMove = 10;
+						}
+						else if(!_hasEffect && _animateSkill?.startsWith('hurtground')) {
+							setTimeout(() => {
+								if(_t.criticalHit) {
+									//buraya crit spark
+									_e.addObject({ key:'sparkcrit', position: 'middle'});
+									_e.addObject({ key: 'deadspark' + (_e.bloodColor ?? 'red'), position: 'middle' });
+								}
+								else {
+									//_e.addObject({key:'hitwhite', position: 'middle'});
+									//buraya normal spark
+									if(_f.atk.rate < 1) {
+										//ufak
+										_e.addObject({key:'shine', position: 'middle'});
+										_e.addObject({key:'sparkhitsmall', position: 'middle'});
+									}
+									else if(_f.atk.rate < 2) {
+										//orta
+										_e.addObject({key:'shine', scale:1.1, position: 'middle'});
+										_e.addObject({key:'sparkhitmedium', position: 'middle'});
+									}
+									else {
+										//büyük
+										_e.addObject({key:'shine', scale:1.2, position: 'middle'});
+										_e.addObject({key:'sparkhitbig', position: 'middle'});
+									}
+								}
+							}, getRandomValue2(8,20));
+						}
+					}
+				}
+				if(!_e.isDead() && _erelease) {
+					PlaySound({ key: 'release', volume: .3});
+					_e.addObject({key:'hurtsteal2', position: 'middle'});
+					if(_e.animations.release)
+						_e.animate('release', 1);
+					else
+						_e.addBuff({ key: 'release', level: 3, ms: 3000 });
+				}
+				if(_e.bleed || _e.bleed == undefined) {
+					if(_f.atk?.hurt?.slam)
+						_e.hurtingStrength = 'slam';
+					else
+						_e.hurtingStrength = _f.atk.rate + (_charged ? 2 : 0);
+				}
+				if (__account.options.gore && _f.atk?.type === 'common' && (_e.bleed || _e.bleed == undefined)) {
+					_e.addObject({
+						key: 'bloodfx' + (_e.bloodColor ?? '') + getRandomValue(1, 8),
+						reset: true,
+						pushObject: true,
+						position: 'middle'
+					});
+					if(__account.options.sound) {
+						const _bloodSound = getSound(null, 'blood');
+						if(_bloodSound && !(_bloodSound.lastUsed > (_gameTick - 100))) {
+							if (!_bloodSound.paused)
+								_bloodSound.pause();
+							if (_bloodSound.currentTime > 0)
+								_bloodSound.currentTime = 0;
+							if(_bloodSound.crossOrigin !== 'anonymous')
+								_bloodSound.crossOrigin = 'anonymous';
+							if(_bloodSound.volume !== .05)
+								_bloodSound.volume = .05;
+							_bloodSound.lastUsed = _gameTick;
+							_bloodSound.play();
+						}
+					}
+					_e.setBleedEffect(_f, _anima, _t);
+				}
+			}
+			if (_t.knockback || _f.knockback)
+				_t.knockBackEnemies(_f, _e);
+		}
+		if(_t.attackedUnitTime === _gameTick)
+			_t.attackedUnitCount++;
 		else {
-			const _originDiff = this.ORIGINLEFT - _attacker.ORIGINLEFT;
-			if(this.PREVLEFT > this.left)
-				this.left = this.PREVLEFT;
-			if(_originDiff < _attacker.ORIGINDIST)
-				this.left += (_attacker.ORIGINDIST - _originDiff);
-			_attacker.left = _attacker.PREVLEFT;
+			_t.attackedUnitTime = _gameTick;
+			_t.attackedUnitCount = 1;
 		}
-		this.updateVariables();
-		_attacker.updateVariables();
-		for(let _rel of this.relatedObjects)
-			if(_rel.stillLeft !== undefined)
-				_rel.stillLeft = undefined;
-		for(let _rel of _attacker.relatedObjects)
-			if(_rel.stillLeft !== undefined)
-				_rel.stillLeft = undefined;
-		_attacker.chargeStarted = undefined;
+		return {criticalHit: _critHitTaken};
 	}
 	this.attack = function (_anima, _frame) {
 		const trt = (this.related ?? this);
@@ -4581,590 +5138,12 @@ function enemy(_e) {
 					continue;
 				_critHitTaken = false;
 				const _enemyAnima = _enemy.getCurrentAnimation();
-				const hurtEnemy = function (_t, _f, _e, _ef, _ea, _tp, _ep) {
-					if(_t.attackedUnitCount > (_anima.maxAttackedCount ?? __maxAttackedCount))
-						return false;
-					if((_gameTick - _e.comfortStarted) < 500)
-						return false;
-					if (_ea.key.startsWith('dead') || _ea.key === 'release')
-						return false;
-					if (_f.atk?.buffs)
-						_f.atk.buffs.forEach(x => _e.addBuff(x, _gameTick));
-					if (_f.atk.rate > 0)
-						(_t?.owner ?? _t?.related ?? _t).increaseHitCount();
-					else
-						return false;
-					// if(!episode.pvp && episode.enemies?.filter(x => x.autoTarget === _e && x.attacked && x.animations[x.animation].attack)?.length > __maxAttackedCount)
-					// 	return false;
-					if(_t.parentKey === _e.key || _e === _t.related)
-						return false;
-					const _prevAutoMode = _e.autoMode;
-					if (_e.autoMode !== 2 && !_e.main && !_e.friendly && !_e.socketId) {
-						if (_e.groupId)
-							episode.enemies.filter(x => x.groupId === _e.groupId).forEach(x => {
-								x.setAutoMode(2);
-							});
-						else
-							_e.setAutoMode(2);
-					}
-					if (_e.immunities?.[0])
-						if (!_f.atk.type || _e.immunities.indexOf(_f.atk.type) !== -1) {
-							addDmgFrame({
-								//text: '<p data-text="IMMUNE">IMMUNE</p>',
-								//class: 'dmg dmg-orange effect-immune',
-								text: 'immune',
-								from: _t,
-								x: _e.LEFT,
-								y: episode.cHeight - _e.yPosition - _e.HEIGHT
-							});
-							return false;
-						}
-					if (_prevAutoMode === 2 && !_e.keyboard && _e.animations.block && _e.fatique >= fatiqueDecreasement) {
-						if (_e.animation === 'run' || _e.animation === 'walk' ||
-							_e.animation === 'idle' || _e.animation === 'hurtblock') {
-							if (_e.checkBlock(_t)) {
-								if(_e.animations.hurtblock)
-									_e.animate('hurtblock', 1);
-								else
-									_e.animate('block', 1);
-								_e.decreaseFatique(_t, _f.atk?.rate);
-								_e.autoAttacking = true;
-								_e.setAutoTarget(_t, null, 5);
-								addDmgFrame({
-									from: _e,
-									text: 'block',
-									x: _t.LEFT,
-									y: episode.cHeight - _e.yPosition - _e.HEIGHT
-								});
-								return false;
-							}
-						}
-					}
-					else if (_prevAutoMode === 2 && !_e.keyboard && _e.animations.roll && (_e.animations.roll.charge > 0 || _e.animations.roll.charge === undefined)
-						&& (!_e.animations.roll.rate || (getRandomValue(1, 100) <= _e.animations.roll.rate))) {
-						if (_e.animation === 'run' || _e.animation === 'walk' ||
-							_e.animation === 'idle') {
-							_e.animate('roll', 1);
-							_e.setAutoTarget(_t, null, 6);
-							_e.autoAttacking = true;
-							return false;
-						}
-					}
-					else if (_e.animation === 'dodge' || (_prevAutoMode === 2 && !_e.keyboard && _e.animations.dodge && !(_e.animations.dodge.coolDownLeft > 0) && 
-					(!_e.animations.dodge.rate || (getRandomValue(1, 100) <= _e.animations.dodge.rate)))) {
-						if (_e.animation === 'run' || _e.animation === 'walk' || _e.animation === 'idle'){
-							_e.animate('dodge', 1);
-							_e.setAutoTarget(_t, null, 7);
-							_e.autoAttacking = true;
-							return false;
-						}
-					}
-					if (_f.atk.hurt) {
-						let _decreaseHP;
-						_e.removeBuffByKey('invisibility');
-						if(_e.sleep) {
-							_e.removeBuffByKey('sleep');
-							delete _e.sleep;
-						}
-						if(_f.atk.hurt.do)
-							_f.atk.hurt.do(_f, _t, _e);
-						if (!_e.alp && _f.atk.hurt.catch === 'back' && _e.direction !== _t.direction)
-							_e.direction = _e.direction === __left ? __right : __left;
-						else if (!_e.alp && _f.atk.hurt.catch === 'front' && _e.direction === _t.direction)
-							_e.direction = _e.direction === __left ? __right : __left;
-						if (_f.atk.hurt.sound)
-							requestAnimationFrame(() => {
-								if(_f.atk.hurt.sound.key)
-									PlaySound(_f.atk.hurt.sound);
-								else
-									PlaySound({ key: _e.class + _f.atk.hurt.sound, owner: _e }, [_f.atk.hurt.sound]);
-							});
-						else if(_e.bleed)
-							PlaySound({key:'fleshhurt' + getRandomValue2(1,6), volume:.7, owner: _e});
-						if (_f.atk.hurt.props) {
-							const _dying = _e.dying;
-							_e.setProps(_f.atk.hurt.props);
-							if (!_dying && _e.dying)
-								_e.killingBy = _t.key;
-						}
-						const _isSmashable = _e.isSmashable();
-						if(_f.atk.hurt.smash && _isSmashable) {
-							_e.smash(_t, _f);
-							return { smashed:true };
-						}
-						else if(_e.phased) {
-							let _phaseDropped;
-							if(_f.atk.hurt.smash)
-								_e.phased = 0;
-							else{
-								_e.phased--;
-								_phaseDropped = 1;
-							}
-							if(_e.phased > 0) {
-								let _hurtAnim = _e.animations['phase' + _e.phased];
-								if(_phaseDropped && _hurtAnim?.when && !_hurtAnim.when(_e)){
-									_e.phased++;
-									_decreaseHP = 1;
-								}
-								else {
-									_decreaseHP = 1;
-									const _src = _hurtAnim.frames[0].src ?? _hurtAnim.src;
-									if(_src) {
-										_e.animations.idle.src = _src;
-										if(_e.animations.idle.resetImage)
-											_e.animations.idle.resetImage();
-									}
-									_e.animations.idle.frames = [{
-										speed: 999,
-										spriteLeft: _hurtAnim.frames[0].spriteLeft,
-										spriteTop: _hurtAnim.frames[0].spriteTop,
-										bottomGap: _hurtAnim.frames[0].bottomGap,
-										spriteWidth: _hurtAnim.frames[0].spriteWidth,
-										spriteHeight: _hurtAnim.frames[0].spriteHeight,
-										spriteOrigin: _hurtAnim.frames[0].spriteOrigin
-									}];
-									_e.animations.hurtground1 = _hurtAnim;
-									_e.animations.hurtground1.key = 'hurtground1';
-									_e.animate('hurtground1', 1);
-								}
-							}
-							else
-								_e.animate('dead', 1);
-						}
-						const _hasReflect = _e.reflect;
-						if(_hasReflect)
-							addDmgFrame({
-								//text: '<p data-text="REFLECT">REFLECT</p>',
-								//class: 'dmg dmg-orange effect-reflect',
-								text: 'reflect',
-								from: _t,
-								x: _e.LEFT,
-								y: episode.cHeight - _e.yPosition - _e.HEIGHT
-							});
-						if (!_e.hurting?.count) {
-							if (_f.atk.hurt.spells)
-								for (var _fsp of _f.atk.hurt.spells)
-									_t.throwSpell({ spell: _fsp }, _t.parent ?? _t);
-							_f.atk.hitTaken ??= 1;
-							if (_f.atk.hitTaken > 0) {
-								if (_ea.hurt) {
-									if (_e.hitTakenCount === undefined)
-										_e.hitTakenCount = 0;
-									_e.hitTakenCount += _f.atk.hitTaken;
-									// if(!_t.attackedUnitCount)
-									// 	_e.increaseRage(_f.atk.hitTaken);
-								}
-								else
-									_e.hitTakenCount = _f.atk.hitTaken;
-							}
-							let _erelease;
-							if (!_e.isDead() && !_e.still && _e.hitTakenCount > _e.releaseAfter && _e.class !== 'object')
-							{
-								_erelease = true;
-								if(_e.animations.release?.reversed) {
-									if(_e.EXACTLEFT< _t.EXACTLEFT)
-										_e.direction = __right;
-									else
-										_e.direction = __left;
-								}
-							}
-							let _hurtType;
-							if (!_erelease && _ea.hurt) {
-								_e.cc = _ea.key;
-								if (_f.atk.hurt.key) {
-									if (_f.atk.hurt.imediateBreak)
-										_e.cc = _f.atk.hurt.key;
-									else if (_ea.hurt) {// && _e.animations[_f.atk.hurt.key]?.hurt === _ea.hurt)
-										if(_e.cc !== 'hurtair' && _e.cc !== _f.atk.hurt.key)
-											_e.cc = _f.atk.hurt.key;
-									}
-									else if (_e.animations[_f.atk.hurt.key]?.reset || _f.atk.hurt.reset){
-										_e.cc = _f.atk.hurt.key;
-									}
-									else if (!_e.animations[_f.atk.hurt.key]) {
-										if (_f.atk.hurt.type === 'air' && _e.animations['hurtground1']) {
-											_hurtType = 'ground';
-											_e.cc = 'hurtground1';
-										}
-										else if (_f.atk.hurt.type === 'ground' && _e.animations['hurtground1']) {
-											_hurtType = 'ground';
-											_e.cc = 'hurtground1';
-										}
-										else if (_f.atk.hurt.type === 'ground' && _e.animations['hurtair']) {
-											_hurtType = 'air';
-											_e.cc = 'hurtair';
-										}
-									}
-								}
-							}
-							if (!_ea.hurt || _erelease) {
-								_e.cc = _e.attacker = undefined;
-								_e.hitTakenCount = _e.extraStepXRate = 0;
-							}
-							_e.attacker = _t?.related ?? _t;
-							if(_t.related)
-								_e.realAttacker = _t;
-							else
-								_e.realAttacker = undefined;
-							_e.attackerRange  = _e.getZRangeBetween(_t);
-							_t.attacked = 1;
-							if(_t.class === 'object')
-								_e.attackedByObject = 1;
-							else if(_e.attackedByObject)
-								delete _e.attackedByObject;
-							if (_t?.related)
-								_f.atk.hurt.objects?.forEach(x => _e.addObject(x));
-							const _cced = _f.atk.hurt.type !== 'common' && (!_ep || _tp < _ep) ;
-							const _charged = _anima.chargeDistance && (_t.charging || ((_gameTick - _t.chargeStarted) < 999));
-							let _animateSkill;
-							if ((_erelease || _f.atk.hurt.key) && _cced) {
-									_animateSkill = _e.cc ?? _f.atk.hurt.key;
-									if (!_e.animations[_animateSkill])
-										_animateSkill = 'hurtground1';
-								if (!_erelease) {
-									//if (!_e.animations[_animateSkill]?.frames?.find(x => x.sound))
-									//	PlaySound({ owner: _e, key: (_e.main ? _e.class : _e.name.toLowerCase()) + (_e.main ? _animateSkill : 'hurt') }, ['hurt']);
-									if (_animateSkill.startsWith('hurt') && !_e.noCC){
-										if(_animateSkill === 'hurtair' && _e.animations.hurtair2)
-										{
-											let airPoss;
-											for(airPoss = 2; airPoss > 1; airPoss++) {
-												if(!_e.animations['hurtair' + (airPoss + 1)])
-													break;
-											}
-											airPoss = getRandomValue(1, airPoss);
-											if(airPoss > 1)
-												_animateSkill += airPoss.toString();
-										}
-										if(_animateSkill.startsWith('hurtground') && _e.groundHurtKeys.length > 1)
-											_animateSkill = _e.groundHurtKeys[getRandomValue2(0, _e.groundHurtKeys.length - 1)];
-										else if(_animateSkill.startsWith('hurtair') && _e.airHurtKeys.length > 1)
-											_animateSkill = _e.airHurtKeys[getRandomValue2(0, _e.airHurtKeys.length - 1)];
-										if(_t.animations[_t.animation].uncounterable)
-											_e.noCounter = 1;
-										if(_f.atk.hurt?.airFlow)
-											_e.airFlow = _f.atk.hurt.airFlow; 
-										_e.animate(_animateSkill);
-										_e.addObject({
-											position: 'css',
-											key: 'zoomdynamic',
-											p1: _t.direction,
-											p2: (_t.criticalHit ? 1 : 0) + _f.atk.rate
-										});
-										// if(_t.class !== __spell){
-										// 	let distortMS;
-										// 	if(_f.atk.rate < 1)
-										// 		distortMS = 80;
-										// 	else if(_f.atk.rate <=2)
-										// 		distortMS = 100;
-										// 	else
-										// 		distortMS = 120;
-										// 	_e.addObject({
-										// 		position:'canvas',
-										// 		key:'distortion',
-										// 		p1: {
-										// 			after:true,
-										// 			rX: MathRound(episode.cWidth / (getRandomValue2(80,100) / 10)),
-										// 			rY: MathRound(episode.cWidth / (getRandomValue2(80,100) / 10)),
-										// 			ms:distortMS
-										// 		}
-										// 	});
-										// }
-										//Enemy cced
-										if(_e.alp) {
-											const _pstv = _e.getTalentValue('passive-stun');
-											if(_pstv) {
-												if(getRandomValue2(1, 100) <= _pstv) {
-													_e.throwSpell({
-														key: 'electricboltsmall'
-													});
-													_e.throwSpell({
-														key: 'electricboltsmall',
-														reversed: true
-													});
-												}
-											}
-										}
-									}
-								}
-							}
-							_e.hurting = { hit: 4 };
-							_e.hurtColor = _f.atk.type === 'fire' ? '#E25822' : (_f.atk.type === 'toxic' ? '#66cc1a' : '#ffffff');
-							_e.hurting.count = _e.hurtColor ? ((_f.atk.type === 'fire' || _f.atk.type === 'ice' || _f.atk.type === 'toxic') ? 3 : 4) : 3; // _e.getCurrentFrame().speed;
-							if(_e.size === 'big')
-								_e.hurting.count = MathCeil(_e.hurting.count / 2);
-							if(_charged && _t.main){
-								requestAnimationFrame(function() { _t.addObject({ key: 'impact', position: 'css', p2: _t.direction });});
-								_t.talk();
-							}
-							if (!_e.noCC && !_e.still && !_e.finishing && _cced && !_erelease && (_hurtType ?? (_e.animations[_e.cc]?.hurt ?? _f.atk.hurt?.type)) === 'ground')
-								requestAnimationFrame(function() { _e.addObject({ key: 'stun', position: 'middle-head', yGap: -25 }); });
-							if (_cced && _e.casting)
-								_e.cancelCast();
-							if(_cced && _e.main) 
-								removeClass(_gamePad, 'zoom');
-							if (_f.atk.rate) {
-								if(_f.atk.hurt?.hitZoom)
-									_e.setHitZoom(_ef, _f.atk.hurt?.hitZoom);//_ef.hitZoom = _f.atk.hurt?.hitZoom;
-								if (!_f.atk.hurt.dead) {
-									let _hasEffect;
-									if ((_t.class === __spell || _t.start <= 1) && (_e.health > 0 && !_e.finishing)) {
-										if (_f.atk.hurt.buffs)
-											_f.atk.hurt.buffs.forEach(x => _e.addBuff(x, _gameTick));
-										let _dmg = _t.getAtkRate(); 
-										if(_f.atk.rate)
-											_dmg *= (_t.alp ? _t.getSkillRate() : 1) * _f.atk.rate;
-										if (_dmg < 1)
-											_dmg = 1;
-										const _tr = (_t.related ?? _t);
-										var _calculatedCrit = (((_t.coopWith ?? _t).critRate) * ((100 - ((_e.coopWith ?? _e).critResistRate ?? 0))/100) * 100);
-										if (getRandomValue2(0, 10000) <= _calculatedCrit) {
-											_dmg *= (2 + ((_t.critDmgRate ?? 0) / 100));
-											if((_e.coopWith ?? _e).critDmgResistRate)
-												_dmg *= ((100 - (_e.coopWith ?? _e).critDmgResistRate) / 100);
-											_t.criticalHit = _critHitTaken = true;
-											if(_tr.alp)
-											{
-												const _rstp = _tr.getTalentPoint('passive-atk-speed');
-												if(_rstp > 0)
-													_tr.addBuff({ key: 'dance', level: _rstp });
-											}
-											if (episode.pvp) {
-												if (_t.dmgGiven === undefined)
-													_t.dmgGiven = 0;
-												_t.dmgGiven += _dmg;
-											}
-										}
-										else
-											_t.criticalHit = false;
-										// setTimeout(function() {
-										// 	_t.randomShake(_e, _anima, _f, _dmg, _t.criticalHit);
-										// }, getRandomValue2(20, 35));
-										const _newDmg = _t.calculateElementalDmg(_dmg, _e);
-										let _dmgEffect;
-										if(_newDmg > _dmg && (_f.atk.type && _f.atk.type !== 'common')) {
-											_dmgEffect = _t.getElementalEffect(_e);
-											_dmg = _newDmg;
-											_hasEffect = 1;
-										}
-										_dmg = _t.calculateDmgReduce(_dmg, _e, _f.atk.ignoreDef);
-										if(!_f.atk.ignoreDef && _ef.def?.rate)
-											_dmg *= (1 - _ef.def.rate);
-										_dmg = MathCeil(_dmg);
-										if(episode.war)
-											_dmg *= 2;
-										//_dmg = 1;
-										_tr.checkSteal(_dmg, _e);
-										if (!_e.main)
-											addDmgFrame({
-												atkType: _f.atk?.type ?? _dmgEffect ?? 'common',
-												val: _dmg,
-												crit: _t.criticalHit,
-												heavy: _charged || _f.atk?.hurt?.slam || _f.atk.rate > 2 || _t.criticalHit,
-												x: _e.LEFT,
-												from:_t,
-												y: episode.cHeight - _e.yPosition - _e.HEIGHT
-											});
-										else
-											addDmgFrame({
-												atkType: 'hurt',
-												val: _dmg,
-												x: _e.LEFT,
-												from:_t,
-												y:episode.cHeight - _e.yPosition - _e.HEIGHT
-											});
-										if (!_e.dmgTaken) {
-											_e.dmgTaken = 0;
-											if (_e.autoMode >= 0 && !_tr.invulnerable) {
-												if (_e.enemy)
-													_e.setAutoMode(2);
-												if(!_t.invulnerable)
-													_e.setAutoTarget(_t, null, 8);
-											}
-										}
-										_e.dmgTaken += _dmg;
-										if(!_e.inCombat)
-											_e.inCombat = 1;
-										if(_hasReflect)
-											_tr.decreaseHealth(_dmg, _e);
-										else if(!_e.phased || _decreaseHP){
-											if(_e.realTime && (_t.main || (_t.related ?? _t.owner)?.main))
-												setTransferMessage([{
-													t: _e.socketId,
-													s: _tr.socketId,
-													k: _dmg
-												}]);
-											if(_f.atk.hurt?.skipTinyCameraMove)
-												episode.skipTinyCameraMove = _f.atk.hurt.skipTinyCameraMove;
-											_e.decreaseHealth(_dmg, _t.related ?? _t);
-											_e.lastDamage = _dmg;
-											if(_f.atk.hitZoom)
-												_t.setHitZoom(_f, _f.atk.hitZoom);//_f.hitZoom = _f.atk.hitZoom;
-											if(_e.main && _critHitTaken && _cced){
-												_e.addObject({
-													position: 'css',
-													key: 'criteffect'
-												});
-												_e.soundVolumeRate = 2;
-											}
-											_e.increaseRage(_f.atk.hitTaken * (_t.criticalHit ? 2 : 1), null, 1);
-											let _canStop = false;
-											if(_t.class !== __spell && !_t.hitStop && (_anima.hitStop || _f.atk.hitStop)) {
-												let _stopAdd = -1;
-												if(!_t.criticalHit) {
-													if(_f.atk.rate < 1)
-														_stopAdd = -2;
-													else if(_f.atk.rate >= 2)
-														_stopAdd = 0;
-												}
-												else
-													_stopAdd = 1;
-												const _stopMe = (_f.atk.hitStop ?? _anima.hitStop) + _stopAdd;
-												if(_e.class !== __spell && !_e.hitStop) {
-													if(!_f.hitStopTime || (_gameTick - _f.hitStopTime) > 500)
-													{
-														_e.hitStop = 2;
-														_t.hitStop = _stopMe;
-														_f.hitStopTime = _gameTick;
-														_canStop = 1;
-													}
-												}
-											}
-											//_e.addObject({key:'hit' + getRandomValue2(1,5), position: 'middle'});
-											//successfull hit
-											_e.lastHitSkill = _tr.animation;
-											if(_e.isDead())
-											{
-												if(_t.tag || _f.atk.hurt.smashIfDead) {
-													_e.smash(_t, _f);
-													return {smashed: true};
-												}
-												if((_f.knockback || _charged || (_f.push && typeof _f.push === 'number'))) {
-													_e.critDead = _t.criticalHit ? 3: 2;
-													let _knockbacked;
-													if(_hurtType === 'air' && _e.animations.knockbackair){
-														_e.animations.knockbackair.next = 'dead';
-														_e.animate('knockbackair', 1);
-														_knockbacked = 1;
-													}
-													else if(_e.animations.knockbackground){
-														_e.animations.knockbackground.next = 'dead';
-														_e.animate('knockbackground', 1);
-														_knockbacked = 1;
-													}
-													if(_knockbacked) {
-														PlaySound({key:'deadeffect2', volume:.2});
-														_e.knockDead = 1;
-													}
-												}
-											}
-											if(_canStop && _e.animation.startsWith('hurt')) {
-												if(_e.hitStop)
-													_e.start -= _e.hitStop;
-												if(_t.hitStop)
-													_t.start -= _t.hitStop;
-											}
-										}
-										if(_e.isDead())
-											_e.relatedObjects = _e.relatedObjects.filter(x => x.key !== 'stun');
-									}
-									if (_f.objects)
-										for (var _o of _f.objects)
-											if (_o.hurt){
-												_e.addObject(_o);
-												// if(!_hasEffect)
-												// 	_hasEffect = 1;
-											}
-									if(_charged){
-										requestAnimationFrame(function() { _e.addObject({key:'sparkcharge', position: 'middle'});});
-										if(_e.isDead())
-											_e.chargeDead = 1;
-										else 
-											_e.bringItFront(_t);
-										PlaySound({key:'chargehit1', reset: true, volume:.4});
-										episode.skipTinyCameraMove = 10;
-									}
-									else if(!_hasEffect && _animateSkill?.startsWith('hurtground')) {
-										setTimeout(() => {
-											if(_t.criticalHit) {
-												//buraya crit spark
-												_e.addObject({ key:'sparkcrit', position: 'middle'});
-												_e.addObject({ key: 'deadspark' + (_e.bloodColor ?? 'red'), position: 'middle' });
-											}
-											else {
-												//_e.addObject({key:'hitwhite', position: 'middle'});
-												//buraya normal spark
-												if(_f.atk.rate < 1) {
-													//ufak
-													_e.addObject({key:'shine', position: 'middle'});
-													_e.addObject({key:'sparkhitsmall', position: 'middle'});
-												}
-												else if(_f.atk.rate < 2) {
-													//orta
-													_e.addObject({key:'shine', scale:1.1, position: 'middle'});
-													_e.addObject({key:'sparkhitmedium', position: 'middle'});
-												}
-												else {
-													//büyük
-													_e.addObject({key:'shine', scale:1.2, position: 'middle'});
-													_e.addObject({key:'sparkhitbig', position: 'middle'});
-												}
-											}
-										}, getRandomValue2(8,20));
-									}
-								}
-							}
-							if(!_e.isDead() && _erelease) {
-								PlaySound({ key: 'release', volume: .3});
-								_e.addObject({key:'hurtsteal2', position: 'middle'});
-								if(_e.animations.release)
-									_e.animate('release', 1);
-								else
-									_e.addBuff({ key: 'release', level: 3, ms: 3000 });
-							}
-							if(_e.bleed || _e.bleed == undefined) {
-								if(_f.atk?.hurt?.slam)
-									_e.hurtingStrength = 'slam';
-								else
-									_e.hurtingStrength = _f.atk.rate + (_charged ? 2 : 0);
-							}
-							if (__account.options.gore && _f.atk?.type === 'common' && (_e.bleed || _e.bleed == undefined)) {
-								_e.addObject({
-									key: 'bloodfx' + (_e.bloodColor ?? '') + getRandomValue(1, 8),
-									reset: true,
-									pushObject: true,
-									position: 'middle'
-								});
-								if(__account.options.sound) {
-									const _bloodSound = getSound(null, 'blood');
-									if(_bloodSound && !(_bloodSound.lastUsed > (_gameTick - 100))) {
-										if (!_bloodSound.paused)
-											_bloodSound.pause();
-										if (_bloodSound.currentTime > 0)
-											_bloodSound.currentTime = 0;
-										if(_bloodSound.crossOrigin !== 'anonymous')
-											_bloodSound.crossOrigin = 'anonymous';
-										if(_bloodSound.volume !== .05)
-											_bloodSound.volume = .05;
-										_bloodSound.lastUsed = _gameTick;
-										_bloodSound.play();
-									}
-								}
-								_e.setBleedEffect(_f, _anima, _t);
-							}
-						}
-						if (_t.knockback || _f.knockback)
-							_t.knockBackEnemies(_f, _e);
-					}
-					if(_t.attackedUnitTime === _gameTick)
-						_t.attackedUnitCount++;
-					else {
-						_t.attackedUnitTime = _gameTick;
-						_t.attackedUnitCount = 1;
-					}
-					return true;
-				}
-				let _enemyPriority = _enemyFrame.priority ?? _enemyAnima.priority, _thisPriority = _frame.priority ?? _anima.priority;
+				let _enemyPriority = _enemyFrame.priority ?? _enemyAnima.priority;
+				let _thisPriority = _frame.priority ?? _anima.priority;
+				if(_thisPriority > 1 && _anima.chargeStarted === this.chargeStarted)
+					_thisPriority--;
+				if(_enemyPriority > 1 && _enemyAnima.chargeStarted === _enemy.chargeStarted)
+					_enemyPriority--;
 				if (_enemyFrame?.atk) {
 					if (_enemyPriority === _thisPriority) {
 						if (this.class !== __spell && _enemy.class !== __spell && _enemy.direction !== this.direction && !this.friendly && !_enemy.friendly && getRandomValue(1, 10) === 1) {
@@ -5195,7 +5174,7 @@ function enemy(_e) {
 					if (_thisPriority < (_enemyPriority ?? 10)) {
 						if(_enemyPriority)
 							(this.owner ?? trt).talk();
-						_enemyHurted = hurtEnemy(this, _frame, _enemy, _enemyFrame, _enemyAnima);
+						_enemyHurted = this.hurtEnemy(_anima, _frame, _enemy, _enemyFrame, _enemyAnima);
 						if (this.class === __spell && (!this.pierce) && this.animation !== 'dead')
 							this.animate('dead', null, null, 6);
 					}
@@ -5231,7 +5210,7 @@ function enemy(_e) {
 					_enemy.animate('hurtblock');
 					const _decreased = _enemy.decreaseFatique(this, _frame.atk?.rate);
 					if (!_decreased) {
-						_enemyHurted = hurtEnemy(this, _frame, _enemy, _enemyFrame, _enemyAnima);
+						_enemyHurted = this.hurtEnemy(_anima, _frame, _enemy, _enemyFrame, _enemyAnima);
 						if (_enemy.animation.endsWith('block')){
 							this.addObject({
 								key: 'glow',
@@ -5242,14 +5221,14 @@ function enemy(_e) {
 					}
 				}
 				else if ((!_enemy.dying || (_enemy.dying && this.key == _enemy.killingBy)) && (_thisPriority < (_enemyPriority ?? 10))) {
-					_enemyHurted = hurtEnemy(this, _frame, _enemy, _enemyFrame, _enemyAnima);
+					_enemyHurted = this.hurtEnemy(_anima, _frame, _enemy, _enemyFrame, _enemyAnima);
 					if (this.class === __spell && (!this.pierce) && this.animation !== 'dead')
 						this.animate('dead', null, null, 8);
 				}
 				else if (this.class === __spell && (!this.pierce) && this.animation !== 'dead')
 					this.animate('dead', null, null, 9);
 				else
-					_enemyHurted = hurtEnemy(this, _frame, _enemy, _enemyFrame, _enemyAnima, _thisPriority ?? 10, _enemyPriority ?? 10);
+					_enemyHurted = this.hurtEnemy(_anima, _frame, _enemy, _enemyFrame, _enemyAnima, _thisPriority ?? 10, _enemyPriority ?? 10);
 				if (_enemy.direction === this.direction && !this.friendlyFire && !this.pushingBy && (_enemy.autoMode || (_enemyHurted || _enemy.hurting || _enemy.blocked))) {
 					if (_enemy.class !== __spell && !_enemy.dying && !_enemy.dead && !_enemy.release) {
 						if(_enemy.enemy && !episode.pvp) {
@@ -5265,7 +5244,7 @@ function enemy(_e) {
 					}
 				}
 				if (_enemyHurted && !_enemy.isDead())
-					(this.owner ?? trt).increaseRage(_frame.atk.rate, _critHitTaken);
+					(this.owner ?? trt).increaseRage(_frame.atk.rate, _enemyHurted.criticalHit);
 				if(_enemyHurted && !_enemyHurted.smashed && _frame.atk?.hurt?.next)
 					_frame.nextAndRemove = _frame.atk.hurt.next;
 			}
