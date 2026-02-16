@@ -1,4 +1,4 @@
-﻿﻿﻿﻿'use strict';
+﻿﻿﻿﻿﻿﻿'use strict';
 const __attackTolerance = 2;
 
 function enemy(_e) {
@@ -27,8 +27,8 @@ function enemy(_e) {
 	this.finishAfter = _e.finishAfter;
 	this.animationKeysShuffledTime = _gameTick;
 	if(_e.finishWhen)
-		this.finishWhen = function() { 
-			return _e.finishWhen(this); 
+		this.finishWhen = function() {
+			return _e.finishWhen(this);
 		};
 	this.moveDirection = undefined;
 	this.experience = 0; // _e.experience ?? 500;
@@ -39,7 +39,7 @@ function enemy(_e) {
 		this.healthBarWidthRate = _e.healthBarWidthRate;
 	this.colorized = ((this.divider % 2) === 0);
 	this.attackedUnitCount = 0;
-	this.maxAttackerCount = getRandomValue2((6 - __account.difficulty), (5 - __account.difficulty) * (6 - __account.difficulty)); 
+	this.maxAttackerCount = getRandomValue2((6 - __account.difficulty), (5 - __account.difficulty) * (6 - __account.difficulty));
 	this.relatedObjects = [];
 	if(_e.deadAnimationKey)
 		this.deadAnimationKey = _e.deadAnimationKey;
@@ -210,6 +210,12 @@ function enemy(_e) {
 	if(this.healtbarGap)
 		this.healtbarGap *= this.getZoom();
 	this.startZoom = this.getZoom();
+	this._HURTBOX = {
+		w: MathRound(this.width * this.getZoom()),
+		h: MathRound(this.height * this.getZoom())
+	};
+	this.HURTWIDTH = this._HURTBOX.w;
+	this._HURTBOX_half = MathRound(this._HURTBOX.w / 2);
 	this.setAutoMode = function (_mode, _force) {
 		if(episode.realTime && this.alp)
 			return;
@@ -329,7 +335,7 @@ function enemy(_e) {
 					if((cfc.src ?? '') === '') {
 						if ((_chainCD >= 0) && _skill.coolDownStart2)
 							cfc.src= './images/main/skill-icons/' + this.class + '/' + _c.key + '.png';
-						else 
+						else
 							cfc.src = './images/main/skill-icons/' + this.class + '/' + _c.key + '.png';
 					}
 				}
@@ -342,13 +348,13 @@ function enemy(_e) {
 					if ((_chainCD >= 0) && _skill.coolDownStart2) {
 						const _cs = chainSkills['skill' + _c.num];
 						if(!_cs.cdStart || ((_gameTick - _cs.cdStart) > 1000)) {
-							_cs.cdStart = _gameTick; 
+							_cs.cdStart = _gameTick;
 							let _csCounter = _cs.querySelector('.counter');
 							if(!_csCounter){
 								_csCounter = document.createElement('div');
 								_csCounter.className = 'counter flex';
 								_cs.appendChild(_csCounter);
-							} 
+							}
 							const _co = MathFloor(_chainCD / 1000);
 							if(_csCounter.innerText !== _co.toString())
 								_csCounter.innerText = _co;
@@ -546,7 +552,7 @@ function enemy(_e) {
 			this.upcomingAnimation = _chosenKey;
 			return _chosenKey;
 		}
-		else 
+		else
 			this.upcomingAnimation = (!this.animationFinished && (this.animation === 'run' || this.animation === 'walk')) ? this.animation : 'idle';
 	}
 	this.getMaxRunRange = function () {
@@ -758,7 +764,7 @@ function enemy(_e) {
 			}
 			return;
 		}
-		else 
+		else
 			this.upcomingAnimation = undefined;
 		if(_anima.hurt && this.hasChain && !this.noCounter && !this.animationFinished){
 			this.pickRandomAttack(null, null, 1);
@@ -825,7 +831,7 @@ function enemy(_e) {
 			return;
 		//EĞER ATAK Yapmıyorsa, ölmediyse, release olmuyorsa vs ve skill atacağı veya vuracağı mesafede
 		//düşman yoksa buraya gelir
-		//Burada hedefinde düşman varsa düşman seçilir yoksa görüş alanında düşman var mı diye bakılır y 100 alınır 
+		//Burada hedefinde düşman varsa düşman seçilir yoksa görüş alanında düşman var mı diye bakılır y 100 alınır
 		const _sight = (!this.dmgTaken || this.friendly || episode.pvp) && this.sight ? this.sight : (this.dmgTaken ? 100 : /*MathCeil(_canvas.width / (this.sight ?? 100))*/ this.sight ?? 100);
 		if (!_enemy?.enemy)
 			_enemy = this.autoTarget ? {
@@ -869,7 +875,7 @@ function enemy(_e) {
 		}
 		if (_enemy?.enemy && this.health > 0) {
 			//düşman var yaşıyor ve hedef seçilmemiş ise onu hedef seç
-			if (!this.dmgTaken && this.autoMode === 2 && !this.autoTarget && 
+			if (!this.dmgTaken && this.autoMode === 2 && !this.autoTarget &&
 				!(_enemy.enemy.related ?? _enemy.enemy).invulnerable) {
 				this.setAutoTarget(_enemy.enemy, null, 4);
 				if (this.enemy)
@@ -891,7 +897,7 @@ function enemy(_e) {
 					}
 					let _enm = _enemy.enemy;
 					if (!_isEnemyClose) {
-					
+
 						if (this.animationFinished || this.animation === 'walk') {
 							if (this.animation === 'walk' && !this.animationFinished && !this.ranged
 								&& this.frame < this.animations.run.frames.length - 1) {
@@ -923,7 +929,7 @@ function enemy(_e) {
 										if(_ua && _ua.totalRange && _enemy.range && _ua.totalRange >= ((_enemy.range / episode.cWidth) * 100))
 											_wait = 1;
 									}
-									
+
 									if(_wait)
 										this.idle(95);
 									else {
@@ -988,7 +994,7 @@ function enemy(_e) {
 							var _up = this.yPosition >= _enm.yPosition, _verticalStep;
 							// const _isTargetRunning = this.autoTarget?.animation === 'run' ||
 							// 	this.autoTarget?.animation === 'walk';
-							// const _hasPassed = _isTargetRunning ? 
+							// const _hasPassed = _isTargetRunning ?
 							// 	(this.lastYPositionSync + 200) < _gameTick : true;
 							//const _run = this.getRandom(20) > 5;
 							if (getRandomValue(1, 2) < 2 && MathAbs(this.yPosition - _enm.yPosition) < MathCeil(getGroundHeight() / 150))
@@ -1009,7 +1015,7 @@ function enemy(_e) {
 								this.yPosition = _enm.yPosition;
 						}
 					}
-					else 
+					else
 						this.autoStepXRate = this.autoStepYRate = undefined;
 				}
 				else if (!this.chargimg && this.getCurrentFrame()?.directionChangeEnabled)
@@ -1032,7 +1038,7 @@ function enemy(_e) {
 				if (!this.still || (this.still && _isEnemyClose) || (this.still && this.ranged && _enemy?.enemy)) {
 					this.setDirection(_dir);
 					this.moveDirection = _dir;
-					
+
 					this.pickRandomAttack(null, null, 1);
 					if (this.upcomingAnimation) {
 						_enemy = this.getClosestEnemy(0, this.direction, function (_e) {
@@ -1224,11 +1230,11 @@ function enemy(_e) {
 		if(this.animations[this.animation]?.alternateFrames)
 			this.swapAnimation(this.animation);
 		if(this.attackerCount)
-			this.maxAttackerCount = getRandomValue2((6 - __account.difficulty), (5 - __account.difficulty) * (6 - __account.difficulty)); 
+			this.maxAttackerCount = getRandomValue2((6 - __account.difficulty), (5 - __account.difficulty) * (6 - __account.difficulty));
 		// if(this.socketDirPressed)
 		// 	this.socketDirPressed = undefined;
-		this.hurting = this.chargeProperties = this.chargimg = this.attackerCount = this.noCounter = 
-		this.lastSpellTakenKey = this.attacked = this.attacking = this.upcomingAnimation = 
+		this.hurting = this.chargeProperties = this.chargimg = this.attackerCount = this.noCounter =
+		this.lastSpellTakenKey = this.attacked = this.attacking = this.upcomingAnimation =
 		this.randomStep = this.soundPlaying = undefined;
 		//this.relatedObjects?.filter(x => x.bind === this.animation && !x.remove)?.forEach(x => x.remove = true);
 		if(this.keyboard) {
@@ -1238,7 +1244,7 @@ function enemy(_e) {
 		}
 		if(_anima?.after)
 			_anima.after(this);
-		if(this.realTime) { 
+		if(this.realTime) {
 			if(!this.main && !this.rivalMove && !_anima.hold)
 				this.animation = 'idle';
 			if(_anima.rivalXMove)
@@ -1323,7 +1329,7 @@ function enemy(_e) {
 						x.relatedEnemy.remove = true;
 					if(!__account.questStatus.quest.after)
 						x.remove = true;
-					if(x.do) 
+					if(x.do)
 						x.do(x);
 				});
 				const _q = __account.questStatus.quest.loots?.find(x => x.object.indexOf(this.action.key) >= 0);
@@ -1364,9 +1370,9 @@ function enemy(_e) {
 				useProgress.inProgress = false;
 				addClass(useProgress, 'v-none');
 				if(this.actionSound?.stop)
-					this.actionSound.stop();	
+					this.actionSound.stop();
 			}
-			
+
 		}
 	}
 	this.checkBoss = function () {
@@ -1405,17 +1411,17 @@ function enemy(_e) {
 		return;
 		if(!this.main)
 			return;
-		if(!this.isInFinishingMove() && 
-			episode.enemies.find(x => x.enemy && 
-				x.class !== 'object' && 
-				!x.remove && !x.isDead() && 
-				(x.autoTarget === this || 
-					x.inCombat || 
-					x.realAutoMode !== x.autoMode || 
-					x.attacker === this || 
-					x.dmgTaken || 
-					x.amimation === 'release' || 
-					x.release || 
+		if(!this.isInFinishingMove() &&
+			episode.enemies.find(x => x.enemy &&
+				x.class !== 'object' &&
+				!x.remove && !x.isDead() &&
+				(x.autoTarget === this ||
+					x.inCombat ||
+					x.realAutoMode !== x.autoMode ||
+					x.attacker === this ||
+					x.dmgTaken ||
+					x.amimation === 'release' ||
+					x.release ||
 					x.buffs?.find(b => b.key === 'release'))
 				)
 			)
@@ -1485,7 +1491,7 @@ function enemy(_e) {
 	// 	}
 	// 	let _sound = await PlaySound({
 	// 		reset: _sf.reset,
-	// 		key: (!this.main ? this.name.toLowerCase() : this.class) + 
+	// 		key: (!this.main ? this.name.toLowerCase() : this.class) +
 	// 		(typeof _sf === 'string' ? _sf : (_sf?.key ?? this.animation)),
 	// 		volume:_sf.volume,
 	// 		volumeRate: _volumeRate,
@@ -1523,7 +1529,7 @@ function enemy(_e) {
 		_volumeRate = _volumeRate * (getRandomValue2(92,104) / 100);
 		let _sound = await PlaySound({
 			reset: _sf.reset,
-			key: (!this.main ? this.name.toLowerCase() : this.class) + 
+			key: (!this.main ? this.name.toLowerCase() : this.class) +
 			(typeof _sf === 'string' ? _sf : (_sf?.key ?? this.animation)),
 			volume:_sf.volume,
 			loop: _sf.loop,
@@ -1554,11 +1560,11 @@ function enemy(_e) {
 			let volume = _sound.startVolume;
 			if(r > MAX_RANGE)
 				volume *= .1;
-			else 
+			else
 				volume *= (1 - (r / MAX_RANGE));
 			volume = Math.max(volume, minAudible);
 			_sound.gain.value = volume;
-			
+
 			// PAN (ekran referanslı)
 			const dx = this.ORIGINLEFT - mainCharacter.ORIGINLEFT;
 
@@ -1659,7 +1665,7 @@ function enemy(_e) {
 			this.checkActions();
 		this.start++;
 		let _anima = this.getCurrentAnimation();
-		if(this.isDead() && !episode.fatality && !this.remove && !this.finishing && 
+		if(this.isDead() && !episode.fatality && !this.remove && !this.finishing &&
 		!this.attackingOnlyBy && !_anima.interactive && !this.animation.startsWith('dead')){
 			if(this.hurting && this.class !== 'object' && !this.phased && !this.still) {
 				delete this.hurting;
@@ -1682,7 +1688,7 @@ function enemy(_e) {
 					if(this.frame >= _fLen && _fLen > 0)
 						this.frame = _anima.frames.length - 1;
 					if(_fLen > 1) {
-						_anima.frames[0].color = _anima.frames[1].color = 
+						_anima.frames[0].color = _anima.frames[1].color =
 						this.skinColor = this.hurtColor = (this.chargeDead ? '#FFFFFF' : '#7C3030');
 						this.hitStop = this.knockDead ? getRandomValue2(3,4) : getRandomValue2(5,6);
 					}
@@ -1700,7 +1706,7 @@ function enemy(_e) {
 					setTimeout(() => {
 						try{
 							this.addObject({ key: 'hit2v3', position: 'middle', scale:1.2 });
-							this.addObject({ key: 'death', position: 'middle' });	
+							this.addObject({ key: 'death', position: 'middle' });
 						}catch(cex){}
 					}, getRandomValue2(1,3) * (this.animation.startsWith('hurtair') ? 150 : 50));
 				}
@@ -1727,7 +1733,7 @@ function enemy(_e) {
 		let _removeEnemy = false;
 		this.updateVariables();
 		this.render(_frame, _queue);
-		
+
 		let _goOn;
 		if (this.autoMode) {
 			if (!this.isDead()) {
@@ -1740,7 +1746,7 @@ function enemy(_e) {
 					//if(_arr?.length >= __maxAttackedCount) {
 						// if(this.animation === 'walk' || this.animation === 'run')
 						// {
-							
+
 						// }
 						// else
 						let _mod = this.getRandom(10);
@@ -2142,7 +2148,7 @@ function enemy(_e) {
 				this.heartbeat.play();
 			}
 		}
-		else 
+		else
 			this.stopHeartBeatSound();
 	}
 	this.checkDialog = function (_f) {
@@ -2753,7 +2759,7 @@ function enemy(_e) {
 				}
 			}
 		}
-	
+
 		if(_loots?.[0])
 			for(let _loot of _loots) {
 				_key = _loot?.key;
@@ -2784,7 +2790,7 @@ function enemy(_e) {
 						_availSkills = commonSkills.filter(x => !x.forEnemy);
 					const _commonItem = (_key && _key !== 'random') ? _availSkills.find(x => x.key === _key) :
 						_availSkills[getRandomValue(0, _availSkills.length - 1)];
-					if(_commonItem)	
+					if(_commonItem)
 						_char.dropItem('common', _commonItem.key, _commonItem.type);
 				}
 				if (_loot?.enemy)
@@ -3190,7 +3196,7 @@ function enemy(_e) {
 	// 	if (this.extraStepYRate)
 	// 		_stepY = MathRound(this.extraStepYRate * (_canvas.height / 100));
 	// 	this.TOP = MathRound((_canvas.height - this.yPosition - this.HEIGHT)) - _stepY;
-	
+
 	// 	if(!_frame)
 	// 		console.log(this.id + ' - ' + this.animation + ' - ' + this.frame);
 	// 	this.WIDTH = MathRound((_frame.spriteWidth + (_frame.rightGap ?? 0)) * this.ZOOM);
@@ -3200,7 +3206,7 @@ function enemy(_e) {
 	// 		this.LEFT = MathRound(_left - this.WIDTH + (_frame.spriteOrigin * this.ZOOM) - ((_frame.leftGap ?? 0) * this.ZOOM));
 	// 	else
 	// 		this.LEFT = MathRound(_left - (_frame.spriteOrigin * this.ZOOM) + ((_frame.leftGap ?? 0) * this.ZOOM));
-		
+
 	// 	this.SCREENLEFT = this.left - (this.main ? 0 : platformX);
 	// 	if (this.direction !== this.defaultDirection)
 	// 		this.ORIGINDIST = this.WIDTH - (_frame.spriteOrigin * this.ZOOM);
@@ -3213,13 +3219,13 @@ function enemy(_e) {
 	this.updateVariables = function () {
 		const _char = this.coopWith ?? this;
 		let _hp = _char.maxHP;
-		if (_char.hpRate > 0) 
+		if (_char.hpRate > 0)
 			_hp *= ((100 + _char.hpRate) / 100);
 		let _mhp = this.coopWith ? MathCeil(_hp / 2) : MathRound(_hp);
 		if(_mhp !== this.MAXHP)
 			this.MAXHP = _mhp;
 		const _frame = this.getCurrentFrame();
-		if (!_frame) 
+		if (!_frame)
 			return console.warn(this.key + ' missing frame');
 		const zoom = this.getZoom();
 		if(zoom !== this.ZOOM)
@@ -3249,6 +3255,11 @@ function enemy(_e) {
 			reversed
 				? offset - this.WIDTH + originPx - leftGapPx
 				: offset - originPx + leftGapPx
+		);
+		this.HURTLEFT = MathRound(
+			reversed
+				? offset - this._HURTBOX_half - leftGapPx
+				: offset - this._HURTBOX_half + leftGapPx
 		);
 		this.PREVLEFT = this.left;
 		if(_l !== this.LEFT)
@@ -3369,7 +3380,7 @@ function enemy(_e) {
 	// 		}
 
 	// 		if (_func && !_func(_enemy)) continue;
-			
+
 	// 		const _touch = isObjectsInTouch(_enemy, this, _yRange, _tolerance);
 	// 		const _yDiff = MathAbs(this.yPosition - _enemy.yPosition);
 
@@ -3579,8 +3590,8 @@ function enemy(_e) {
 	}
 	// this.getClosestEnemy = function (_range, _direction, _func, _yRange, _tolerance, _force) {
 	// 	// if(this.autoTarget && this.autoTarget.health > 0 && this.autoTarget.targetPriority)
-	// 	// 	return { 
-	// 	// 		enemy: this.autoTarget, 
+	// 	// 	return {
+	// 	// 		enemy: this.autoTarget,
 	// 	// 		range: isObjectsInTouch(this.autoTarget, this, _yRange, _tolerance)?.originDiff,
 	// 	// 		yDiff: MathAbs(this.yPosition - this.autoTarget.yPosition)
 	// 	// 	};
@@ -3646,10 +3657,24 @@ function enemy(_e) {
 			direction: this.direction
 		};
 	}
+	// this.getHitBox = function() {
+	// 	const _gap = MathRound(this.ORIGINDIST);
+	// 	return {
+	// 		left: (this.main ? this.left : this.left - platformX) -
+	// 			(this.direction === this.defaultDirection ? 0 : _gap),
+	// 		width: (this.direction === this.defaultDirection ? (this.WIDTH - _gap) : _gap),
+	// 		height: this.HEIGHT,
+	// 		top: this.TOP,
+	// 		yPosition: this.yPosition,
+	// 		direction: this.direction,
+	// 		yGap: this.yGap
+	// 	};
+	// 	//showBorders(_x.left, _x.top, _x.width, _x.height);
+	// }
 	this.getHitBox = function() {
 		const _gap = MathRound(this.ORIGINDIST);
 		return {
-			left: (this.main ? this.left : this.left - platformX) - 
+			left: (this.main ? this.left : this.left - platformX) -
 				(this.direction === this.defaultDirection ? 0 : _gap),
 			width: (this.direction === this.defaultDirection ? (this.WIDTH - _gap) : _gap),
 			height: this.HEIGHT,
@@ -3717,8 +3742,8 @@ function enemy(_e) {
 
 		// ===== EXPENSIVE TOUCH CHECK =====
 		_t = isObjectsInTouch(
-			_enemy,
 			_src,
+			_enemy,
 			(_frame.atk?.yRange ?? 0),
 			0
 		);
@@ -3772,23 +3797,36 @@ function enemy(_e) {
 					return MathAbs(_e.yPosition - _y) < (getGroundHeight() / 3) && _e.health > 0;
 				}, 33, null, 1);
 				if(!_result?.enemy && this.autoTarget && !this.main && _anima.chargeDistance.value)
-					_result = { 
-						enemy: this.autoTarget, 
+					_result = {
+						enemy: this.autoTarget,
 						range: _anima.chargeDistance.value * episode.w100
 					};
 				if (_result?.enemy) {
 					if(this.charging && !this.chargeProperties)
 						this.charging = undefined;
 					//if(!_result.range)
-					const _left = this.LEFT;
-					const _enemyLeft = _result.enemy.LEFT;
-					const _right = _left + this.WIDTH;
-					const _enemyRight = _enemyLeft + _result.enemy.WIDTH;
-					_result.range = this.direction === __left ? _left - _enemyRight 
+					const _left = this.HURTLEFT + platformX;
+					let _enemyLeft = _result.enemy.HURTLEFT + platformX;
+					const _right = _left + this.HURTWIDTH;
+					let _enemyRight = _enemyLeft + _result.enemy.HURTWIDTH;
+					if(this.chargeProperties?.additionalRange){
+						if(this.direction === __left) {
+							if(_enemyRight < this.chargeProperties.additionalRange)
+								_enemyRight = this.chargeProperties.additionalRange;
+						}
+						else {
+							if(_enemyLeft > this.chargeProperties.additionalRange)
+								_enemyLeft = this.chargeProperties.additionalRange;
+						}
+					}
+					_result.range = this.direction === __left ? _left - _enemyRight
 						: _enemyLeft - _right;
-					if(_result.range < 0) {
+					if(_result.range <= 0) {
 						_result.range = 0;
-						this.chargeProperties.stop = 1;
+						if(this.chargeProperties)
+							this.chargeProperties.stop = 1;
+						else
+							return;
 					}
 					if (this.start <= 1 && this.frame === 0 && !this.charging){
 						this.charging = true;
@@ -3796,16 +3834,24 @@ function enemy(_e) {
 					}
 					let _speed = this.chargeProperties?.speed ?? 0;
 					if (!this.chargeProperties && this.charging) {
-						this.charging = (_anima.chargeDistance.value * .66) < 
+						this.charging = (_anima.chargeDistance.value * .66) <
 						(100 * (_result.range / episode.cWidth)) ? 1 : 0;
 						if(!_speed)
 							for (var i = 0; i <= _anima.chargeDistance.untilFrame ?? 0; i++)
 								_speed += _anima.frames[i].speed;
+						const _addRange = _result.range * .2;
+						let _additionalRange;
+						if(this.direction === __left)
+							_additionalRange = _enemyRight - _addRange;
+						else
+							_additionalRange = _enemyLeft + _addRange;
 						this.chargeStarted = _gameTick;
 						_anima.chargeStarted = _gameTick;
+						//burada %10 tölerans da verelim eğer rakip kaçarsa geriye %10 daha ileri gidelim
 						this.chargeProperties = {
 							enemy: _result.enemy,
 							dir: _dir,
+							additionalRange: _additionalRange,
 							speed: _speed,
 							stepX: MathCeil(_result.range / (_speed < 2 ? 1 : _speed))
 						};
@@ -3815,7 +3861,7 @@ function enemy(_e) {
 							this.chargeProperties.stepX = 0;
 						else
 							this.chargeProperties.stepX =
-								MathCeil((_result.range/* - (_result.enemy.WIDTH / 2)*/) 
+								MathCeil((_result.range/* - (_result.enemy.WIDTH / 2)*/)
 								/ (_speed < 2 ? 1 : _speed));
 					}
 					if(this.chargeProperties) {
@@ -4200,7 +4246,7 @@ function enemy(_e) {
 					_e.animate(_skillName);
 					(this.owner ?? this).talk();
 					continue;
-				} 
+				}
 				else if (_knocker.start < 2 && !_enemy) {
 					_e.iframe = false;
 					continue;
@@ -4321,13 +4367,13 @@ function enemy(_e) {
 			return _e.finishableWith && !_e.release;
 		});
 		const _enemy = _close?.enemy;
-		if (_enemy && !_enemy.gradeLeft && !_enemy.invulnerable && (_enemy.health > 0 || _enemy.readyForFatality) && 
+		if (_enemy && !_enemy.gradeLeft && !_enemy.invulnerable && (_enemy.health > 0 || _enemy.readyForFatality) &&
 		(_enemy.readyForFatality || _enemy.canFinish())) {
 			const _f = this.upcomingFinishingMove ?? _enemy.finishingMoves[getRandomValue(0, _enemy.finishingMoves.length - 1)];
 			const _finishAnima = this.animations['finish' + _f];
 			if(_finishAnima && (!_finishAnima.when || _finishAnima.when(_enemy, this))) {
 				_close.range = (_close.range / episode.cWidth) * 100;
-				if(((_finishAnima.minRange??0) > _close.range) 
+				if(((_finishAnima.minRange??0) > _close.range)
 					|| ((_finishAnima.maxRange??30) < _close.range))
 				{
 					if(episode?.fatalityAvailable)
@@ -4429,8 +4475,8 @@ function enemy(_e) {
 					spriteWidth: 0,
 					spriteOrigin: 0,
 					spriteHeight: this.HEIGHT,
-					objects: [{ 
-						key:'respawn', 
+					objects: [{
+						key:'respawn',
 						position: 'middle',
 						scale: (this.height * this.zoom) / 100
 					}],
@@ -4594,7 +4640,7 @@ function enemy(_e) {
 				return false;
 			}
 		}
-		else if (_e.animation === 'dodge' || (_prevAutoMode === 2 && !_e.keyboard && _e.animations.dodge && !(_e.animations.dodge.coolDownLeft > 0) && 
+		else if (_e.animation === 'dodge' || (_prevAutoMode === 2 && !_e.keyboard && _e.animations.dodge && !(_e.animations.dodge.coolDownLeft > 0) &&
 		(!_e.animations.dodge.rate || (getRandomValue(1, 100) <= _e.animations.dodge.rate)))) {
 			if (_e.animation === 'run' || _e.animation === 'walk' || _e.animation === 'idle'){
 				_e.animate('dodge', 1);
@@ -4787,7 +4833,7 @@ function enemy(_e) {
 							if(_t.animations[_t.animation].uncounterable)
 								_e.noCounter = 1;
 							if(_f.atk.hurt?.airFlow)
-								_e.airFlow = _f.atk.hurt.airFlow; 
+								_e.airFlow = _f.atk.hurt.airFlow;
 							_e.animate(_animateSkill);
 							_e.addObject({
 								position: 'css',
@@ -4842,12 +4888,12 @@ function enemy(_e) {
 					_t.talk();
 				}
 				if (!_e.noCC && !_e.still && !_e.finishing && _cced && !_erelease && (_hurtType ?? (_e.animations[_e.cc]?.hurt ?? _f.atk.hurt?.type)) === 'ground')
-					requestAnimationFrame(function() { 
-						_e.addObject({ key: 'stun', position: 'middle-head', yGap: -25 }); 
+					requestAnimationFrame(function() {
+						_e.addObject({ key: 'stun', position: 'middle-head', yGap: -25 });
 					});
 				if (_cced && _e.casting)
 					_e.cancelCast();
-				if(_cced && _e.main) 
+				if(_cced && _e.main)
 					removeClass(_gamePad, 'zoom');
 				if (_f.atk.rate) {
 					if(_f.atk.hurt?.hitZoom)
@@ -4857,7 +4903,7 @@ function enemy(_e) {
 						if ((_t.class === __spell || _t.start <= 1) && (_e.health > 0 && !_e.finishing)) {
 							if (_f.atk.hurt.buffs)
 								_f.atk.hurt.buffs.forEach(x => _e.addBuff(x, _gameTick));
-							let _dmg = _t.getAtkRate(); 
+							let _dmg = _t.getAtkRate();
 							if(_f.atk.rate)
 								_dmg *= (_t.alp ? _t.getSkillRate() : 1) * _f.atk.rate;
 							if (_dmg < 1)
@@ -5025,7 +5071,7 @@ function enemy(_e) {
 							requestAnimationFrame(function() { _e.addObject({key:'sparkcharge', position: 'middle'});});
 							if(_e.isDead())
 								_e.chargeDead = 1;
-							else 
+							else
 								_e.resolveOverlap(_t);
 							PlaySound({key:'chargehit1', reset: true, volume:.4});
 							episode.skipTinyCameraMove = 10;
@@ -5074,30 +5120,30 @@ function enemy(_e) {
 					else
 						_e.hurtingStrength = _f.atk.rate + (_charged ? 2 : 0);
 				}
-				if (__account.options.gore && _f.atk?.type === 'common' && (_e.bleed || _e.bleed == undefined)) {
-					_e.addObject({
-						key: 'bloodfx' + (_e.bloodColor ?? '') + getRandomValue(1, 8),
-						reset: true,
-						pushObject: true,
-						position: 'middle'
-					});
-					if(__account.options.sound) {
-						const _bloodSound = getSound(null, 'blood');
-						if(_bloodSound && !(_bloodSound.lastUsed > (_gameTick - 100))) {
-							if (!_bloodSound.paused)
-								_bloodSound.pause();
-							if (_bloodSound.currentTime > 0)
-								_bloodSound.currentTime = 0;
-							if(_bloodSound.crossOrigin !== 'anonymous')
-								_bloodSound.crossOrigin = 'anonymous';
-							if(_bloodSound.volume !== .05)
-								_bloodSound.volume = .05;
-							_bloodSound.lastUsed = _gameTick;
-							_bloodSound.play();
-						}
-					}
-					_e.setBleedEffect(_f, _anima, _t);
-				}
+				// if (__account.options.gore && _f.atk?.type === 'common' && (_e.bleed || _e.bleed == undefined)) {
+				// 	_e.addObject({
+				// 		key: 'bloodfx' + (_e.bloodColor ?? '') + getRandomValue(1, 8),
+				// 		reset: true,
+				// 		pushObject: true,
+				// 		position: 'middle'
+				// 	});
+				// 	if(__account.options.sound) {
+				// 		const _bloodSound = getSound(null, 'blood');
+				// 		if(_bloodSound && !(_bloodSound.lastUsed > (_gameTick - 100))) {
+				// 			if (!_bloodSound.paused)
+				// 				_bloodSound.pause();
+				// 			if (_bloodSound.currentTime > 0)
+				// 				_bloodSound.currentTime = 0;
+				// 			if(_bloodSound.crossOrigin !== 'anonymous')
+				// 				_bloodSound.crossOrigin = 'anonymous';
+				// 			if(_bloodSound.volume !== .05)
+				// 				_bloodSound.volume = .05;
+				// 			_bloodSound.lastUsed = _gameTick;
+				// 			_bloodSound.play();
+				// 		}
+				// 	}
+				// 	_e.setBleedEffect(_f, _anima, _t);
+				// }
 			}
 			if (_t.knockback || _f.knockback)
 				_t.knockBackEnemies(_f, _e);
@@ -5140,9 +5186,9 @@ function enemy(_e) {
 				const _enemyAnima = _enemy.getCurrentAnimation();
 				let _enemyPriority = _enemyFrame.priority ?? _enemyAnima.priority;
 				let _thisPriority = _frame.priority ?? _anima.priority;
-				if(_thisPriority > 1 && _anima.chargeStarted === this.chargeStarted)
+				if(_thisPriority > 1 && this.chargeStarted && _anima.chargeStarted === this.chargeStarted)
 					_thisPriority--;
-				if(_enemyPriority > 1 && _enemyAnima.chargeStarted === _enemy.chargeStarted)
+				if(_enemyPriority > 1 && _enemy.chargeStarted && _enemyAnima.chargeStarted === _enemy.chargeStarted)
 					_enemyPriority--;
 				if (_enemyFrame?.atk) {
 					if (_enemyPriority === _thisPriority) {
@@ -5227,8 +5273,9 @@ function enemy(_e) {
 				}
 				else if (this.class === __spell && (!this.pierce) && this.animation !== 'dead')
 					this.animate('dead', null, null, 9);
-				else
+				else {
 					_enemyHurted = this.hurtEnemy(_anima, _frame, _enemy, _enemyFrame, _enemyAnima, _thisPriority ?? 10, _enemyPriority ?? 10);
+				}
 				if (_enemy.direction === this.direction && !this.friendlyFire && !this.pushingBy && (_enemy.autoMode || (_enemyHurted || _enemy.hurting || _enemy.blocked))) {
 					if (_enemy.class !== __spell && !_enemy.dying && !_enemy.dead && !_enemy.release) {
 						if(_enemy.enemy && !episode.pvp) {
@@ -5392,7 +5439,7 @@ function enemy(_e) {
 			}
 			return _max.key;
 		}
-		else 
+		else
 			return null;
 	}
 	this.checkSteal = function(_dmg, _enemy) {
@@ -5788,7 +5835,7 @@ function enemy(_e) {
 			const _spell = structuredClone2(spl);
 			const _dmgTypes = _spell.animations.idle.frames.
 			filter(x => x.atk?.type && x.atk.type !== 'common')?.map(x => x.atk.type);
-			
+
 			let _enemy;
 			if (_spell.autoAim) {
 				_enemy = _target ? { enemy: _target } : this.getClosestEnemy(_spell.autoAim, this.direction);
@@ -5969,7 +6016,7 @@ function enemy(_e) {
 	// 				episode.limitedEffects[_coIndex].remove = true;
 	// 				episode.limitedEffects.splice(_coIndex, 1);
 	// 			}
-				
+
 	// 			_clone.removeId = _removeId;
 	// 			episode.limitedEffects.push(_clone);
 
@@ -6177,7 +6224,7 @@ function enemy(_e) {
 		let _anima = this.getCurrentAnimation();
 		let _speedRate = _anima.attack ? this.getSpeedRate() : 1;
 		let _noXRate;
-		if(this.friendly && this.autoTarget && this.autoTarget.isDead()) 
+		if(this.friendly && this.autoTarget && this.autoTarget.isDead())
 			this.autoTarget = undefined;
 		if(this.action?.command !== 'move' && this.autoMode > 0 && !_frame.extraStepXRate && (this.animation === 'run' || this.animation === 'walk') && this.autoTarget
 			&& !this.autoTarget.isDead() && isObjectsInTouch(this, this.autoTarget, 100)?.touch)
@@ -6193,7 +6240,7 @@ function enemy(_e) {
 			_anima = this.getCurrentAnimation();
 			_frame = this.getCurrentFrame();
 		}
-		if (_anima.mobilityY && !this.still) 
+		if (_anima.mobilityY && !this.still)
 			this.limitYPosition();
 		let _xRate = 0, _extraX = ((this.extraStepXRate ? this.extraStepXRate : (_solidity?.moveX ? this.calculateMoveXStep() : 0)) ?? 0) * _speedRate;
 		if (this.turned)
@@ -6237,7 +6284,7 @@ function enemy(_e) {
 				this.left = (episode.width - MathCeil(yy * maxLeft));
 		}
 		const _xDiff = ((_reversed ? -1 : 1) * (this.ZOOM * (_frame.leftGap ?? 0))) + ((_reversed ? 1 : -1) * (_frame.spriteOrigin * this.ZOOM));
-		
+
 		let _left = this.left + _xDiff;
 		const _top = (episode.cHeight - (_frame.spriteHeight * this.ZOOM) +
 		MathRound((_frame.bottomGap ?? 0) * this.ZOOM)) - _stepY - this.yPosition;
@@ -6452,7 +6499,7 @@ function enemy(_e) {
 			_points.push({linc: _stepX, l: this.centerSolid.l + _stepX, x:this.centerSolid.x + _stepX, t: this.centerSolid.t, y: this.centerSolid.y, tinc: 0});
 			_points.push({linc: _stepX, l: this.centerSolid.l + _stepX, x:this.centerSolid.x + _stepX, t: this.centerSolid.t + _stepY, y: this.centerSolid.y + _stepY, tinc: _stepY});
 			//const _enemies = episode.enemies.filter(x => x.centerSolid && x !== this && x.solid && !x.isDead() && !x.remove);
-			
+
 			for(const _solid of _solids)
 				if(this.centerSolid) {
 					let _len = _points.length;
@@ -6479,13 +6526,13 @@ function enemy(_e) {
 				return { l:0, t:0 };
 			}
 			else if(_targetCenter){
-				_points = _points.sort((a, b) => 
+				_points = _points.sort((a, b) =>
 					(Math.sqrt(Math.pow(MathAbs(a.x - _targetCenter.x), 2) + Math.pow(MathAbs(a.y - _targetCenter.y), 2))) -
 					(Math.sqrt(Math.pow(MathAbs(b.x - _targetCenter.x), 2) + Math.pow(MathAbs(b.y - _targetCenter.y), 2)))
 				);
 				_point = _points[0];
 			}
-			else 
+			else
 				_point = _points[getRandomValue(0, _points.length - 1)];
 			if(_point)
 				this.nextPoint = {
@@ -6497,7 +6544,7 @@ function enemy(_e) {
 		// if(this.nextPoint)
 		// 	console.log((this.nextPoint.t + this.nextPoint.h) - this.getHeight(1));
 		return this.nextPoint ? {
-			l: this.nextPoint.l, 
+			l: this.nextPoint.l,
 			t: (this.nextPoint.t + this.nextPoint.h) - this.HEIGHT
 		} : { l:0, t:0 };
 	}
@@ -6516,7 +6563,7 @@ function enemy(_e) {
 					h: _pHeight,
 					l: _point.l,
 					t: _point.t
-				}, 
+				},
 				{
 					w: _e.WIDTH,
 					l: _e.nextPoint.l,
@@ -6531,13 +6578,13 @@ function enemy(_e) {
 					h: _pHeight,
 					l: _point.l,
 					t: _point.t
-				}, 
+				},
 				{
 					w: _e.centerSolid.w,
 					l: _e.centerSolid.l,
 					t: _e.centerSolid.t,
 					h: _e.centerSolid.h
-				})) 
+				}))
 					return true;
 		//}
 		return false;
@@ -6559,7 +6606,7 @@ function enemy(_e) {
 	// 		return false;
 	// 	if(this.animation !== 'run' && this.animation !== 'walk')
 	// 		return false;
-	// 	const _solids = episode.seenEnemies.filter(x => (x.solid 
+	// 	const _solids = episode.seenEnemies.filter(x => (x.solid
 	// 		/*|| (x.enemy && this.enemy && x.autoMode !== 0 && this.autoMode !== 0 && this.class !== 'object' && x.class !== 'object')*/
 	// 	) && !x.remove && !x.isDead() && x !== this);
 	// 	if(_solids?.[0]) {
@@ -6571,8 +6618,8 @@ function enemy(_e) {
 	// 				switch(this.moveDirection) {
 	// 					// Eğer soldan sağa giderken çarptıysam
 	// 					case __right:
-	// 						//TO.l+TO.w >= l && FROM.l + FROM.w < l MoveX = 0 
-	// 						if((_thisDir.to.l + _thisDir.to.w) >= _solidDir.l 
+	// 						//TO.l+TO.w >= l && FROM.l + FROM.w < l MoveX = 0
+	// 						if((_thisDir.to.l + _thisDir.to.w) >= _solidDir.l
 	// 							&& (_thisDir.to.l + _thisDir.to.w) < (_solidDir.l + _thisDir.to.l)
 	// 							//&& (_thisDir.from.l + _thisDir.from.w) < _solidDir.l
 	// 						) {
@@ -6600,8 +6647,8 @@ function enemy(_e) {
 	// 						break;
 	// 						// Eğer sağdan sola giderken çarptıysam
 	// 					case __left:
-	// 						//TO.l <= l+w && FROM.l > l+w MoveX = 0 
-	// 						if(_thisDir.to.l <= (_solidDir.l + _solidDir.w) 
+	// 						//TO.l <= l+w && FROM.l > l+w MoveX = 0
+	// 						if(_thisDir.to.l <= (_solidDir.l + _solidDir.w)
 	// 							&& _thisDir.to.l > _solidDir.l
 	// 							//&& _thisDir.from.l > (_solidDir.l + _solidDir.w)
 	// 						) {
@@ -6633,11 +6680,11 @@ function enemy(_e) {
 	// 							_moveX = 0;
 	// 							_moveY = 1;
 	// 						}
-	// 						//TO.t+TO.h >= t && FROM.t + FROM.h < t MoveY = 0 
+	// 						//TO.t+TO.h >= t && FROM.t + FROM.h < t MoveY = 0
 	// 						//aşağı yönde giderken
 	// 						//bizim sonraki adımımızın bottom noktası >= objenin şuanki ayak TOP değeri
 	// 						//ve bizim sonraki adımımızın top değeri < (objenin bottom değeri)
-	// 						else if((_thisDir.to.t + _thisDir.to.h) >= _solidDir.t 
+	// 						else if((_thisDir.to.t + _thisDir.to.h) >= _solidDir.t
 	// 						&& _thisDir.to.t < (_solidDir.t + _solidDir.h)) {
 	// 						//&& (_thisDir.from.t + _thisDir.from.h) < _solidDir.t) {
 	// 							_moveY = 0;
@@ -6655,7 +6702,7 @@ function enemy(_e) {
 	// 							_moveX = 0;
 	// 							_moveY = -1;
 	// 						}
-	// 						//TO.t+TO.h >= t && FROM.t + FROM.h < t MoveY = 0 
+	// 						//TO.t+TO.h >= t && FROM.t + FROM.h < t MoveY = 0
 	// 						else if(_thisDir.to.t <= (_solidDir.t + _solidDir.h) &&
 	// 						(_thisDir.to.t + _thisDir.to.h) > _solidDir.t) {
 	// 						//_thisDir.from.t > (_solidDir.t + _solidDir.h)) {
@@ -6673,11 +6720,11 @@ function enemy(_e) {
 	// 						break;
 	// 				}
 	// 				// Eğer yukardan aşağı giderken çarptıysam
-	// 				//TO.t+TO.h >= t && FROM.t + FROM.h < t MoveY = 0 
+	// 				//TO.t+TO.h >= t && FROM.t + FROM.h < t MoveY = 0
 	// 				//MoveX = 1
-					
+
 	// 				// Eğer aşağıdan yukarı giderken çarptıysam
-	// 				//TO.t <= t+h && FROM.t > t+h MoveY = 0 
+	// 				//TO.t <= t+h && FROM.t > t+h MoveY = 0
 	// 				//MoveX = 1
 	// 				// if(this.moveDirection === __left || this.moveDirection === __right) {
 	// 				// 	if((this.direction === __right) && (_thisDir.to.l > (_solidDir.l + _solidDir.w)))
@@ -6925,9 +6972,9 @@ function enemy(_e) {
 		for (var _k of _keys)
 			switch (_k) {
 				case 'b':
-					this.buffs = _diff.b?.map(x => 
-					({ 
-						time: x.s, 
+					this.buffs = _diff.b?.map(x =>
+					({
+						time: x.s,
 						key: getBuffKeyById(x.k),
 						level: x.l,
 					})) ?? [];
@@ -7101,9 +7148,9 @@ function enemy(_e) {
 			buffs: this.buffs,
 			health: this.health,
 			fatique: this.fatique,
-			flag: (this.release ? 1 : 0) + (this.remove ? 2 : 0) + 
+			flag: (this.release ? 1 : 0) + (this.remove ? 2 : 0) +
 				(this.sleep ? 4 : 0) + (this.invisible ? 8 : 0) + (this.immobilize ? 16 : 0)
-				+ (this.charging ? 32 : 0) + (_anima.useExtraStepXRate ? 64 : 0) 
+				+ (this.charging ? 32 : 0) + (_anima.useExtraStepXRate ? 64 : 0)
 				+ (this.pull ? 128 : 0) + (this.invulnerable ? 256 : 0),
 			maxHP: this.MAXHP,
 			dir: this.convertMDAndDirectionData(this.moveDirection, this.direction),
@@ -7132,7 +7179,7 @@ function enemy(_e) {
 		if (this.oldStatus?.u !== _status.keyboardDirection)
 			_diff.u = _status.keyboardDirection;
 		if(this.oldStatus?.q?.e !== _status.chargeProperties?.enemy?.socketId){
-			_diff.q = _status.chargeProperties ? 
+			_diff.q = _status.chargeProperties ?
 				{
 					e:_status.chargeProperties.enemy.socketId,
 					d:_status.chargeProperties.dir === __left ? 1 : 0,
@@ -7731,7 +7778,7 @@ function enemy(_e) {
 			oldAnima = this.animations.idle ?? this.animations[Object.keys(this.animations)[0]];
 		let _sk = this.animations[_skill];
 		if (!_force) {
-			try {		
+			try {
 				if ((_sk.coolDownLeft > 0 && !_sk.charge) || _sk.charge <= 0) {
 					if(_sk.before && _skill !== this.animation &&
 						!this.skills[_sk.before].locked
@@ -7799,7 +7846,7 @@ function enemy(_e) {
 			const _fr = this.getCurrentFrame();
 			const _frn = this.animations?.[_skill]?.frames?.[0];
 			if(_fr && _frn) {
-				const _diff = (_fr.spriteWidth - _fr.spriteOrigin) - 
+				const _diff = (_fr.spriteWidth - _fr.spriteOrigin) -
 				(_frn.spriteWidth - _frn.spriteOrigin);
 				if(_diff > 0) {
 					if(this.direction === __left)
@@ -7935,7 +7982,7 @@ function enemy(_e) {
 					if (this.main) {
 						let _ts = 0;
 						if(this.finishingMoveVisible)
-							addClass(_finishingMove, 'v-none');	
+							addClass(_finishingMove, 'v-none');
 						anima.frames.forEach(x => _ts += x.speed);
 						this.finishTarget.addObject({ key: 'zoom', position: 'css', p1: 1.5, p2: _ts * (900 / fps) });
 					}
@@ -8023,7 +8070,7 @@ function enemy(_e) {
 		if(this.autoTarget && (this.animation === 'run' || this.animation === 'walk')) {
 			const _fr = this.getCurrentFrame();
 			const _frn = this.animations[_key].frames[0];
-			const _diff = (_fr.spriteWidth - _fr.spriteOrigin) - 
+			const _diff = (_fr.spriteWidth - _fr.spriteOrigin) -
 			(_frn.spriteWidth - _frn.spriteOrigin);
 			if(_diff > 0) {
 				if(this.direction === __left)
@@ -8243,7 +8290,7 @@ function enemy(_e) {
 			this.addObject({key:'sparkblocksmall', position: 'middle', xGap: -_gap});
 		else if(_r < 2)
 			this.addObject({key:'sparkblockmedium', position: 'middle', xGap: -_gap});
-		else 
+		else
 			this.addObject({key:'sparkblockbig', position: 'middle', xGap: -_gap});
 		return true;
 	}
@@ -8361,12 +8408,12 @@ function enemy(_e) {
 					}
 					if (counter)
 						counter.remove();
-					//_skill.coolDownStart = 
+					//_skill.coolDownStart =
 					_skill.coolDownLeft = undefined;
 					delete _skill.coolDownStart2;
 				}
 			}
-			if(_skill.before && !_skill.beforeOrder && 
+			if(_skill.before && !_skill.beforeOrder &&
 				(_skill.coolDownLeft <= 1000) //&& _hasCD
 				&& ((_skill.coolDownStart2 > 0) && ((_gameTick - _skill.coolDownStart2 >= 600)))){
 				resetSkill(_skill.key, this, 2);
@@ -8420,7 +8467,7 @@ function enemy(_e) {
 		const _keys = Object.keys(this.animations);
 		for(const _key of _keys) {
 			const _anima = this.animations[_key];
-			if(!_anima.alreadyDisabled && (_anima.order || _anima.ultimate || _anima.chainOrder || _anima.beforeOrder || _anima.skillOrder))				
+			if(!_anima.alreadyDisabled && (_anima.order || _anima.ultimate || _anima.chainOrder || _anima.beforeOrder || _anima.skillOrder))
 			{
 				if(!this.skills?.[_anima.key]?.locked)
 					delete _anima.disabled;

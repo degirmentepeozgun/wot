@@ -371,9 +371,8 @@ function resizeOuterWindow(_keyboardHeight) {
 	else
 		_gameUI.style.top = keyboardHeight = 0;
 }
+let _lastGameTick;
 function loadUI() {
-	_client.setCharacterValues();
-	_navbar.innerHTML = avatarTemplate(mainCharacter);
 	if (!modalEventsSet) {
 		modalEventsSet = true;
 		document.querySelectorAll('.my-pop-up-wrapper').forEach(x => x.onexactclick = function (e) {
@@ -412,9 +411,21 @@ function loadUI() {
 		useProgress = document.getElementById('use-progress');
 		_enemyProfile = document.querySelector('.enemy-profile');
 		_gameMenu = document.getElementById('game-menu');
-		let _lastGameTick;
 		initialHeight = window.visualViewport?.height ?? window.innerHeight;
-		window.addEventListener('keyboardDidShow', (e) => {
+	}
+	const icons = __holoMenuItems.map(m => `./images/ui/menu-icons/${m.icon}.png`);
+  
+	icons.forEach(src => {
+		const link = document.createElement("link");
+		link.rel = "preload";
+		link.as = "image";
+		link.href = src;
+		document.head.appendChild(link);
+	});
+	organizeScreenResize();
+}
+function loadWindowEvents() {
+	window.addEventListener('keyboardDidShow', (e) => {
 			keyboardHeight = e.keyboardHeight;
 			resizeOuterWindow(e.keyboardHeight);
 		});
@@ -430,38 +441,10 @@ function loadUI() {
 			keyboardHeight = 0;
 			resizeOuterWindow();
 		});
-		//
-		// if(window.visualViewport)
-		// 	window.visualViewport?.addEventListener('resize', () => {
-		// 		const newHeight = window.visualViewport?.height ?? window.innerHeight;
-		// 		const heightDiff = initialHeight - newHeight;
-		// 		let _minKeyboardHeight = (_canvas.width * __scale) / 4;
-		// 		if(_minKeyboardHeight > 150)
-		// 			_minKeyboardHeight = 150;
-		// 		if (heightDiff > _minKeyboardHeight) {
-		// 			resizeOuterWindow(heightDiff);
-		// 		} else {
-		// 			resizeOuterWindow();
-		// 		}
-		// 	});
-		// else
-		// 	window.addEventListener("resize", () => {
-		// 		const newHeight = window.visualViewport?.height ?? window.innerHeight;
-		// 		const heightDiff = initialHeight - newHeight;
-		// 		let _minKeyboardHeight = (_canvas.width * __scale) / 4;
-		// 		if(_minKeyboardHeight > 150)
-		// 			_minKeyboardHeight = 150;
-		// 		if (heightDiff > _minKeyboardHeight) {
-		// 			//moveInput(initialHeight / newHeight);
-		// 			resizeOuterWindow(heightDiff);
-		// 		} else {
-		// 			//moveInput();
-		// 			resizeOuterWindow();
-		// 		}
-		// 	});
 		document.addEventListener("visibilitychange", () => {
 			try 
-				{if (document.hidden) {
+				{
+					if (document.hidden || document.visibilityState === 'hidden') {
 					if(_gameTick)
 						_lastGameTick = Date.now();
 					if(_openingSound){
@@ -580,18 +563,8 @@ function loadUI() {
 
 			}
 		});
-	}
-	const icons = __holoMenuItems.map(m => `./images/ui/menu-icons/${m.icon}.png`);
-  
-	icons.forEach(src => {
-		const link = document.createElement("link");
-		link.rel = "preload";
-		link.as = "image";
-		link.href = src;
-		document.head.appendChild(link);
-	});
-	organizeScreenResize();
 }
+loadWindowEvents();
 function openChatPage() {
 	showMyModalPopUp('game-menu');
 	switchBookPage(12);

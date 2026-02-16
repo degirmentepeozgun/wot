@@ -659,6 +659,8 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 	const _f = _force;
 	getMapAssets(episode, function () {
 		startGame(function (_connectingToGame) {
+			_client.setCharacterValues();
+			_navbar.innerHTML = avatarTemplate(mainCharacter);
 			loadUI();
 			warmUpDmgFrames();
 			if(episode.still) {
@@ -2210,7 +2212,7 @@ function floatDusts() {
 }
 var _openingSound;
 function playOpeningMusic() {
-	if(episodeVisibilityHidden)
+	if(episodeVisibilityHidden || document.hidden)
 		return;
 	_openingSound = document.createElement("audio");
 	_openingSound.crossOrigin = 'anonymous';

@@ -3725,7 +3725,8 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 
 		const downwardBias = 18 + Math.random() * 6;
 		const radMul = Math.PI / 180;
-
+		_char.particleSpeed = 1.5;
+		console.log('particles + ' + Math.random());
 		for (let i = 0; i < count; i++) {
 			const angle =
 				direction +
@@ -3780,7 +3781,11 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 
 	let lastColor = null;
 	let lastAlpha = -1;
-	const hitSlow = _char.hitStop ? 0.5 : 1;
+	const hitSlow = _char.hitStop ? 0.9 : _char.particleSpeed;
+	if(_char.particleSpeed > 1)
+		_char.particleSpeed -= .1;
+	else if(_char.particleSpeed < 1)
+		_char.particleSpeed += .1;
 	for (let i = arr.length - 1; i >= 0; i--) {
 
 		const p = arr[i];
@@ -4018,6 +4023,7 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 						// _zoomedTop = MathRound(_zoomedHeight - _item.height);
 						//_colorized = false;
 						let _drawParticles = 1;
+						let _w, _x, _h, _y, _coordsSet;
 						if((_hurted && _anim.hurt && _item.char.frame < 2 && (_hurtedCount < 4 || _item.char.main)) || _item.skinColor) {
 							//if(!_item.char.colorized) {
 								//_item.char.colorized = _colorized = true;
@@ -4078,10 +4084,11 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 									MathRound(_item.width * (_item.zoom ?? 1)),
 									MathRound(_item.height * (_item.zoom ?? 1)));
 							else if(_cropped.width > 0) {
-								const _x = MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff));
-								const _y = MathRound(_item.top + _hDiff);
-								const _w = MathRound(_item.width * (_item.zoom ?? 1));
-								const _h = MathRound(_item.height * (_item.zoom ?? 1));
+								_x = MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff));
+								_y = MathRound(_item.top + _hDiff);
+								_w = MathRound(_item.width * (_item.zoom ?? 1));
+								_h = MathRound(_item.height * (_item.zoom ?? 1));
+								_coordsSet = 1;
 								this.drawCharacterGhost(_item,_cropped,_x,_y,_w,_h);
 								offCtx.drawImage(_cropped,_x,_y,_w,_h);
 								if(_item.char.chargeProperties) {
@@ -4136,20 +4143,27 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 										_item.char.relatedObjects = _item.char.relatedObjects.filter(x => x.key !== 'trail2');
 									}
 								}
-								if(_item.char.hurtingStrength) {
-									const _knockback = _item.char.animation.startsWith('knockback');
-									let _hs = _item.char.hurtingStrength;
-									if(typeof _hs === 'string')
-										_hs = 4;
-									else 
-										_hs += (_knockback ? 2 : (_item.particleColor ? 3 : 0));
-									this.drawHitParticles(_item.char, _x + MathRound(_w / 2),
-									_y + MathRound(_h / 2), getRandomValue2(150, 190), _item.char.bloodColor === 'green' ? '#1f6f2e' : '#880808', 
-									_hs, _knockback, _item.char.hurtingStrength);
-									delete _item.char.hurtingStrength;
-									_drawParticles = 0;
-								}
 							}
+						}
+						if(_item.char.hurtingStrength) {
+							if(!_coordsSet) {
+								_x = MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff));
+								_y = MathRound(_item.top + _hDiff);
+								_w = MathRound(_item.width * (_item.zoom ?? 1));
+								_h = MathRound(_item.height * (_item.zoom ?? 1));
+							}
+							const _knockback = _item.char.animation.startsWith('knockback');
+							let _hs = _item.char.hurtingStrength;
+							if(typeof _hs === 'string')
+								_hs = 4;
+							else 
+								_hs += (_knockback ? 2 : (_item.particleColor ? 3 : 0));
+							this.drawHitParticles(_item.char, _x + MathRound(_w / 2),
+							_y + MathRound(_h / 2), getRandomValue2(150, 190), 
+							_item.char.bloodColor === 'green' ? '#1f6f2e' : '#880808', 
+							_hs, _knockback, _item.char.hurtingStrength);
+							delete _item.char.hurtingStrength;
+							_drawParticles = 0;
 						}
 						if(_drawParticles && _item.char.particles)
 							this.drawHitParticles(_item.char);
@@ -5170,8 +5184,10 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 						_rel.stillXGap = _rel.xGap + ((_item.reversed ? 1 : -1) * (_rel.stillLeft === undefined ? 0 : _rel.stillLeft - _left));
 						_rel.stillReversed = _reversed;
 					}
-					if(_rel.stillTop !== _rel.top)
-						_rel.stillTop = _rel.top;
+					if(_rel.stillTop !== _rel.top) {
+						if(!_rel.stillY || _rel.stillTop === undefined)
+							_rel.stillTop = _rel.top;
+					}
 				}
 				let _relLeft = (_rel.stillLeft !== undefined ? _rel.stillLeft + (_rel.stillPlatformX - platformX) :
 					_left);

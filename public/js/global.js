@@ -1714,7 +1714,7 @@ const relatedObjects = [
 	},
 	{
 		id: 'stun', key: 'stun', type: 'hurt', width: 102, height: 48, zoom: .75, repeat: true, bottom: 10,
-		totalFrames: 20, skip: 2, speed: 4, stillOnChar: true, singleton: true, effect: 'stun', limit: 5, bind: 'hurtground'
+		totalFrames: 20, skip: 2, speed: 4, stillOnChar: true, stillY: true, singleton: true, effect: 'stun', limit: 5, bind: 'hurtground'
 	},
 	{ id: 'glow', key: 'glow', width: 250, height: 250, totalFrames: 4, speed: 2, zoom: .8, still: true, singleton: true },
 	{ id: 'shadow', key: 'shadow', width: 128, height: 19, top: 0, zoom: 1, bottom: 0 },
@@ -3092,6 +3092,11 @@ const soundFiles = {
 	portalclose: './images/sounds/portal-close.mp3',
 	portalopen: './images/sounds/portal-open.mp3',
 	itemweared: './images/sounds/item-weared.mp3',
+	wooshfilm: './images/sounds/woosh-film.mp3',
+	kick: './images/sounds/kick.mp3',
+	slam: './images/sounds/slam.mp3',
+	singlekick: './images/sounds/single-kick.mp3',
+	woosh: './images/sounds/woosh.mp3',
 	waterfall: './images/sounds/waterfall2.mp3',
 	hivedeath: './images/sounds/hivedeath.mp3',
 	hivehurt1: './images/sounds/hivehurt1.mp3',
@@ -29438,10 +29443,10 @@ function isObjectsInTouch(obj1, obj2, yRange, _tolerance) {
 		}
 	if(obj1.class === __spell || obj2.class === __spell)
 		_tolerance = 0;
-	let obj1Left = obj1.LEFT >= __minLeft ? obj1.LEFT : obj1.left;
-	let obj2Left = obj2.LEFT >= __minLeft ? obj2.LEFT : obj2.left;
-	let _originX1 = obj1Left + (obj1.ORIGINDIST ?? ((obj1.WIDTH >= 0 ? obj1.WIDTH : obj1.width) / 2));
-	let _originX2 = obj2Left + (obj2.ORIGINDIST ?? ((obj2.WIDTH >= 0 ? obj2.WIDTH : obj2.width) / 2));
+	let obj1Left = obj1.HURTLEFT >= __minLeft ? obj1.HURTLEFT : obj1.left;
+	let obj2Left = obj2.HURTLEFT >= __minLeft ? obj2.HURTLEFT : obj2.left;
+	let _originX1 = obj1Left + (obj1.ORIGINDIST ?? ((obj1.HURTWIDTH >= 0 ? obj1.HURTWIDTH : obj1.width) / 2));
+	let _originX2 = obj2Left + (obj2.ORIGINDIST ?? ((obj2.HURTWIDTH >= 0 ? obj2.HURTWIDTH : obj2.width) / 2));
 	let obj1Direction, obj2Direction, touch = false;
 	if (_originX1 > _originX2) {
 		obj1Direction = __right;
@@ -29451,10 +29456,10 @@ function isObjectsInTouch(obj1, obj2, yRange, _tolerance) {
 		obj1Direction = __left;
 		obj2Direction = __right;
 	}
-	// if (true) {
-	// 	showBorders(obj1Left, _gamePad.clientHeight - obj1.yPosition, obj1.getWidth ? obj1.getWidth() : obj1.width, obj1.getTop ? obj1.getTop() : obj1.top, 'red');
-	//  	showBorders(obj2Left, _gamePad.clientHeight - obj2.yPosition, obj2.getWidth ? obj2.getWidth() : obj2.width, obj2.getTop ? obj2.getTop() : obj2.top, 'green');
-	// }
+	if (true) {
+		showBorders(obj1Left, _gamePad.clientHeight - obj1.yPosition, obj1.HURTWIDTH, obj1.getTop ? obj1.getTop() : obj1.top, 'red');
+	 	showBorders(obj2Left, _gamePad.clientHeight - obj2.yPosition, obj2.HURTWIDTH, obj2.getTop ? obj2.getTop() : obj2.top, 'green');
+	}
 	if (isObjectInVisibleRectangle(obj1, obj2, null, _tolerance))
 		touch = true;
 	let _checkVertical = true;
