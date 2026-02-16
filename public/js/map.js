@@ -3726,7 +3726,6 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 		const downwardBias = 18 + Math.random() * 6;
 		const radMul = Math.PI / 180;
 		_char.particleSpeed = 1.5;
-		console.log('particles + ' + Math.random());
 		for (let i = 0; i < count; i++) {
 			const angle =
 				direction +

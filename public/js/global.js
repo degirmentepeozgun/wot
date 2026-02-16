@@ -29445,8 +29445,8 @@ function isObjectsInTouch(obj1, obj2, yRange, _tolerance) {
 		_tolerance = 0;
 	let obj1Left = obj1.HURTLEFT >= __minLeft ? obj1.HURTLEFT : obj1.left;
 	let obj2Left = obj2.HURTLEFT >= __minLeft ? obj2.HURTLEFT : obj2.left;
-	let _originX1 = obj1Left + (obj1.ORIGINDIST ?? ((obj1.HURTWIDTH >= 0 ? obj1.HURTWIDTH : obj1.width) / 2));
-	let _originX2 = obj2Left + (obj2.ORIGINDIST ?? ((obj2.HURTWIDTH >= 0 ? obj2.HURTWIDTH : obj2.width) / 2));
+	let _originX1 = obj1Left + (obj1._HURTBOX_half ?? ((obj1.HURTWIDTH >= 0 ? obj1.HURTWIDTH : obj1.width) / 2));
+	let _originX2 = obj2Left + (obj2._HURTBOX_half ?? ((obj2.HURTWIDTH >= 0 ? obj2.HURTWIDTH : obj2.width) / 2));
 	let obj1Direction, obj2Direction, touch = false;
 	if (_originX1 > _originX2) {
 		obj1Direction = __right;
@@ -29457,8 +29457,8 @@ function isObjectsInTouch(obj1, obj2, yRange, _tolerance) {
 		obj2Direction = __right;
 	}
 	if (true) {
-		showBorders(obj1Left, _gamePad.clientHeight - obj1.yPosition, obj1.HURTWIDTH, obj1.getTop ? obj1.getTop() : obj1.top, 'red');
-	 	showBorders(obj2Left, _gamePad.clientHeight - obj2.yPosition, obj2.HURTWIDTH, obj2.getTop ? obj2.getTop() : obj2.top, 'green');
+		showBorders(obj1Left, _gamePad.clientHeight - obj1.yPosition, obj1.HURTWIDTH ?? obj1.width, obj1.getTop ? obj1.getTop() : obj1.top, obj1.main ? 'green' : 'red');
+	 	showBorders(obj2Left, _gamePad.clientHeight - obj2.yPosition, obj2.HURTWIDTH ?? obj2.width, obj2.getTop ? obj2.getTop() : obj2.top, obj2.main ? 'green' : 'red');
 	}
 	if (isObjectInVisibleRectangle(obj1, obj2, null, _tolerance))
 		touch = true;

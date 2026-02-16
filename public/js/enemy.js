@@ -3450,18 +3450,18 @@ function enemy(_e) {
 		const _checkYRange = _yRange >= 100 ? false : true;
 
 		// 🔥 CHEAP DATA CACHE (loop dışı)
-		const _myX = this.ORIGINLEFT;
+		const _myX = this.HURTLEFT + this._HURTBOX_half;
 		const _myY = this.yPosition;
 
 		for (let i = 0; i < _enemies.length; i++) {
 
 			const _enemy = _enemies[i];
 			if (_enemy.invulnerable || _enemy.class === __spell) continue;
-
+			const _enemyOL = _enemy.HURTLEFT + _enemy._HURTBOX_half;
 			// Direction filtresi aynen kalıyor
 			if (!_enemy.targetPriority && _direction) {
-				if ((_myX > _enemy.ORIGINLEFT && _direction !== __left) ||
-					(_enemy.ORIGINLEFT > _myX && _direction !== __right)) {
+				if ((_myX > _enemyOL && _direction !== __left) ||
+					(_enemyOL > _myX && _direction !== __right)) {
 					continue;
 				}
 			}
@@ -3472,14 +3472,14 @@ function enemy(_e) {
 			// 🚀 CHEAP CHECK BAŞLIYOR
 			// ===============================
 
-			const _dx = MathAbs(_myX - _enemy.ORIGINLEFT);
+			// const _dx = MathAbs(_myX - _enemyOL) - this._HURTBOX_half - _enemy._HURTBOX_half;
 
-			// Range dışındaysa pahalı hesaba sokma
-			if (_range && _dx > _range) continue;
+			// // Range dışındaysa pahalı hesaba sokma
+			// if (_range !== undefined && _dx > _range) continue;
 
 			const _yDiff = MathAbs(_myY - _enemy.yPosition);
 
-			if (_checkYRange && _yDiff > _yRangeAbs) continue;
+			// if (_checkYRange && _yDiff > _yRangeAbs) continue;
 
 			// ===============================
 			// Artık GERÇEKTEN yakın olanlar kaldı
@@ -3819,8 +3819,8 @@ function enemy(_e) {
 								_enemyLeft = this.chargeProperties.additionalRange;
 						}
 					}
-					_result.range = this.direction === __left ? _left - _enemyRight
-						: _enemyLeft - _right;
+					_result.range = (this.direction === __left ? _left - _enemyRight
+						: _enemyLeft - _right) + 1;
 					if(_result.range <= 0) {
 						_result.range = 0;
 						if(this.chargeProperties)
@@ -4563,12 +4563,6 @@ function enemy(_e) {
 		this.animate('hurtfeet', 1);
 		this.smasher.talk();
 	}
-	this.resolveOverlap = function(_attacker) {
-		const _left = this.left + (this.main ? platformX : 0);
-		const _attackerLeft = _attacker.left + (_attacker.main ? platformX : 0);
-		const _right = _left + this.WIDTH;
-		const _attackerRight = _attackerLeft + _attacker.WIDTH;
-	}
 	this.hurtEnemy = function(_anima, _f, _e, _ef, _ea, _tp, _ep) {
 		const _t = this;
 		if(_t.attackedUnitCount > (_anima.maxAttackedCount ?? __maxAttackedCount))
@@ -5071,8 +5065,6 @@ function enemy(_e) {
 							requestAnimationFrame(function() { _e.addObject({key:'sparkcharge', position: 'middle'});});
 							if(_e.isDead())
 								_e.chargeDead = 1;
-							else
-								_e.resolveOverlap(_t);
 							PlaySound({key:'chargehit1', reset: true, volume:.4});
 							episode.skipTinyCameraMove = 10;
 						}
