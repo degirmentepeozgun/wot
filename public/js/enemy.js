@@ -3479,7 +3479,7 @@ function enemy(_e) {
 
 			const _yDiff = MathAbs(_myY - _enemy.yPosition);
 
-			// if (_checkYRange && _yDiff > _yRangeAbs) continue;
+			 if (_checkYRange && _yDiff > _yRangeAbs) continue;
 
 			// ===============================
 			// Artık GERÇEKTEN yakın olanlar kaldı
@@ -4988,8 +4988,14 @@ function enemy(_e) {
 									_t.setHitZoom(_f, _f.atk.hitZoom);//_f.hitZoom = _f.atk.hitZoom;
 								if(_e.main && _critHitTaken && _cced){
 									_e.addObject({
-										position: 'css',
-										key: 'criteffect'
+										// position: 'css',
+										// key: 'criteffect'
+										position: 'canvas',
+										key: 'crit',
+										p1: {
+											startTime: undefined,
+											critTime:0
+										} 
 									});
 									_e.soundVolumeRate = 2;
 								}

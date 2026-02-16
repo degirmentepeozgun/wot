@@ -34572,50 +34572,50 @@ const _allEnemies = {
 					priority: 5,
 					frames: [
 						{
-							spriteLeft: 47,
+							spriteLeft: 51,
 							spriteTop: 98,
-							spriteWidth: 202,
+							spriteWidth: 198,
 							spriteHeight: 202,
-							spriteOrigin: 103,
+							spriteOrigin: 99,
 							speed:6
 						},
 						{
-							spriteLeft: 365,
-							spriteTop: 100,
-							spriteWidth: 177,
-							spriteHeight: 200,
-							spriteOrigin: 85,
-							speed:6
+							spriteLeft: 364,
+							spriteTop: 81,
+							spriteWidth: 173,
+							spriteHeight: 219,
+							spriteOrigin: 86,
+							speed:9
 						},
 						{
-							spriteLeft: 654,
+							spriteLeft: 684,
 							spriteTop: 95,
-							spriteWidth: 188,
-							spriteHeight: 206,
-							spriteOrigin: 96,
+							spriteWidth: 158,
+							spriteHeight: 205,
+							spriteOrigin: 66,
 							speed:6
 						},
 						{
-							spriteLeft: 939,
+							spriteLeft: 952,
 							spriteTop: 98,
-							spriteWidth: 204,
-							spriteHeight: 203,
-							spriteOrigin: 111,
+							spriteWidth: 191,
+							spriteHeight: 202,
+							spriteOrigin: 98,
 							speed:6
 						},
 						{
-							spriteLeft: 1280,
-							spriteTop: 94,
-							spriteWidth: 164,
-							spriteHeight: 208,
-							spriteOrigin: 70,
-							speed:6
+							spriteLeft: 1263,
+							spriteTop: 63,
+							spriteWidth: 181,
+							spriteHeight: 237,
+							spriteOrigin: 87,
+							speed:9
 						},
 						{
 							spriteLeft: 1554,
 							spriteTop: 95,
 							spriteWidth: 190,
-							spriteHeight: 207,
+							spriteHeight: 205,
 							spriteOrigin: 96,
 							speed:6
 						}

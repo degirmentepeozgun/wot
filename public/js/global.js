@@ -29389,13 +29389,13 @@ function isObjectsVerticallyInTouch(obj1, obj2) {
 }
 function isObjectsVerticallyInSameOrder(obj1, obj2) {
 	return isObjectInVisibleRectangle({
-		left:obj1.SCREENLEFT,
-		width:obj1.WIDTH, 
+		left:obj1.HURTLEFT,
+		width:obj1.HURTWIDTH, 
 		height: episode.cHeight,
 		top:0
 	}, {
-		left:obj2.SCREENLEFT,
-		width:obj2.WIDTH, 
+		left:obj2.HURTLEFT,
+		width:obj2.HURTWIDTH, 
 		height: episode.cHeight,
 		top:0
 	});
@@ -30911,7 +30911,7 @@ const canvasAnimations =  {
 
 //     _ctx.putImageData(dst, minX, minY);
 // },
-	distortionhit: function(_char, _params, _canv) {
+	distortionhit01: function(_char, _params, _canv) {
 
     if (episode.distorting && episode.distorting !== _char.key) {
         _char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit');
@@ -31068,6 +31068,78 @@ const canvasAnimations =  {
 
     // ana canvas'a geri bas
     _ctx.drawImage(fxC, minX, minY);
+},
+distortionhit: function(_char, _params, _canv) {
+
+    if (episode.distorting && episode.distorting !== _char.key) {
+        _char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit');
+        return;
+    }
+
+    const _ms = _params.ms;
+    const _ctx = _canv ?? c10;
+    if (!_ctx?.canvas) return;
+
+    if (!_params.start) {
+        episode.distorting = _char.key;
+        _params.start = _gameTick;
+        return;
+    }
+
+    const elapsed = _gameTick - _params.start;
+
+    if (elapsed >= _ms) {
+        delete episode.distorting;
+        delete _params.start;
+        _char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit');
+        return;
+    }
+
+    const t = elapsed / _ms;
+    const ease = 1 - t;
+
+    const cx = _params.cx ?? (_params.cx = _char.ORIGINLEFT);
+    const cy = _params.cy ?? (_params.cy = MathRound(
+        _char.TOP + (_char.HEIGHT / 2) - ((_params.yGap ?? 0) * _char.ZOOM)
+    ));
+
+    const strength = _params.strength ?? 0.2;
+
+    const pulse = 1 + (strength * 0.4 * ease);
+
+    // === SHOCKWAVE SCALE WARP ===
+    _ctx.save();
+    _ctx.translate(cx, cy);
+    _ctx.scale(pulse, pulse);
+    _ctx.translate(-cx, -cy);
+    _ctx.globalAlpha = 0.25 * ease;
+    _ctx.drawImage(_ctx.canvas, 0, 0);
+    _ctx.restore();
+
+    // === CHROMATIC GHOST ===
+    const ghostOffset = 4 * ease * strength;
+
+    _ctx.save();
+    _ctx.globalAlpha = 0.15 * ease;
+    _ctx.globalCompositeOperation = "lighter";
+    _ctx.drawImage(_ctx.canvas, ghostOffset, 0);
+    _ctx.drawImage(_ctx.canvas, -ghostOffset, 0);
+    _ctx.restore();
+
+    // === FLASH RING ===
+    const radius = (_params.rX ?? episode.cWidth / 10) * (1 + t * 1.2);
+
+    const g = _ctx.createRadialGradient(cx, cy, radius * 0.4, cx, cy, radius);
+    g.addColorStop(0, "rgba(255,255,255,0.4)");
+    g.addColorStop(1, "rgba(255,255,255,0)");
+
+    _ctx.save();
+    _ctx.globalAlpha = 0.6 * ease;
+    _ctx.fillStyle = g;
+    _ctx.beginPath();
+    _ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    _ctx.fill();
+    _ctx.restore();
 },
 
 distortionhit2: function(_char, _params, _canv) {
@@ -31518,7 +31590,61 @@ distortion: function(_char, _params, _canv) {
     }
 
     _ctx.putImageData(dst, minX, minY);
+},
+crit: function(_char, _params, _canv) {
+
+	if(!_char.main){
+		_char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'crit');
+		return; 
+	}
+
+	const ctx = _canv ?? c10;
+	const _can = ctx?.canvas;
+	if (!_can) return;
+
+	if(!_params.startTime){
+		_params.startTime = _gameTick;
+	}
+
+	const elapsed = _gameTick - _params.startTime;
+	const duration = 1000;
+
+	if(elapsed < duration){
+
+		const t = elapsed / duration;
+		const alpha = 1 - t; // güçlü başlasın
+
+		const cx = _can.width / 2;
+		const cy = _can.height / 2;
+		const maxRadius = Math.max(_can.width, _can.height);
+
+		ctx.save();
+
+		ctx.globalAlpha = alpha;
+		ctx.globalCompositeOperation = "source-over";
+
+		const gradient = ctx.createRadialGradient(
+			cx, cy, 0,
+			cx, cy, maxRadius
+		);
+
+		// Kenar yoğunluğu arttırıldı
+		gradient.addColorStop(0.35, "rgba(255,0,0,0)");
+		gradient.addColorStop(0.65, "rgba(255,0,0,0.8)");
+		gradient.addColorStop(0.85, "rgba(200,0,0,1)");
+		gradient.addColorStop(1,    "rgba(120,0,0,1)");
+
+		ctx.fillStyle = gradient;
+		ctx.fillRect(0, 0, _can.width, _can.height);
+
+		ctx.restore();
+		return;
+	}
+
+	_char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'crit');
+	_params.startTime = undefined;
 }
+
 }
 
 
