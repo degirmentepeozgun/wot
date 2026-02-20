@@ -214,6 +214,8 @@ function enemy(_e) {
 		w: MathRound(this.width * this.getZoom()),
 		h: MathRound(this.height * this.getZoom())
 	};
+	if(this._HURTBOX.w % 2 > 0)
+		this._HURTBOX.w += 1;
 	this.HURTWIDTH = this._HURTBOX.w;
 	this._HURTBOX_half = MathRound(this._HURTBOX.w / 2);
 	this.setAutoMode = function (_mode, _force) {
@@ -1069,12 +1071,14 @@ function enemy(_e) {
 		this.pickRandomAttack(null, null, 1);
 	}
 	this.setDirection = function(_dir, _force) {
-		if(this.enemy && this.lastTurnTime > (_gameTick - 500))
+		if(!this.lastTurnTime && this.enemy)
+			this.lastTurnTime = _gameTick - getRandomValue2(0, 350);
+		if(this.enemy && this.lastTurnTime > (_gameTick - 700))
 			return;
 		if(this.noDirection || this.direction === _dir)
 			return;
 		if(this.enemy)
-			this.lastTurnTime = _gameTick;
+			this.lastTurnTime = undefined;
 		this.direction = _dir;
 		if(!_force && this.animation !== 'idle' && this.animation !== 'run' && this.animation !== 'walk')
 			return;
@@ -1823,7 +1827,8 @@ function enemy(_e) {
 				else if(this.owner && !this.autoTarget)
 					this.pickNewTarget();
 				//else //if(this.animationFinished)
-					this.autoCommand();
+				
+				this.autoCommand();
 				// _anima = this.getCurrentAnimation();
 				// _frame = this.getCurrentFrame();
 			}
@@ -4270,8 +4275,8 @@ function enemy(_e) {
 						PlaySound({key:'bonecrack', volume:1});
 					_e.pushingBy = _knocker;
 					_e.pushback = true;
-					const _eo = _e.SCREENLEFT;
-					const _to = _knocker.SCREENLEFT;
+					const _eo = _e.HURTLEFT + _e._HURTBOX_half;
+					const _to = _knocker.HURTLEFT + _knocker._HURTBOX_half;
 					if (this.push === 'front')
 						_e.pushDirection = this.direction;
 					else if (this.push === 'back')
@@ -4499,9 +4504,11 @@ function enemy(_e) {
 					continue;
 				if ((_enemy.knockbacking && _enemy.dying) || _enemy.dead || _enemy.release || _enemy.invulnerable || _enemy.iframe)
 					continue;
-				if (!_enemy.attackingOnlyBy === this.key && !_enemy.aoe && this.direction === __left && _enemy.SCREENLEFT > this.SCREENLEFT)
+				const _eo = _enemy.HURTLEFT + _enemy._HURTBOX_half;
+				const _to = this.HURTLEFT + this._HURTBOX_half;
+				if (!_enemy.attackingOnlyBy === this.key && !_enemy.aoe && this.direction === __left && _eo > _to)
 					continue;
-				if (!_enemy.attackingOnlyBy === this.key && !_enemy.aoe && this.direction === __right && _enemy.SCREENLEFT < this.SCREENLEFT)
+				if (!_enemy.attackingOnlyBy === this.key && !_enemy.aoe && this.direction === __right && _eo < _to)
 					continue;
 				units.push(_en);
 			}
@@ -5277,8 +5284,8 @@ function enemy(_e) {
 				if (_enemy.direction === this.direction && !this.friendlyFire && !this.pushingBy && (_enemy.autoMode || (_enemyHurted || _enemy.hurting || _enemy.blocked))) {
 					if (_enemy.class !== __spell && !_enemy.dying && !_enemy.dead && !_enemy.release) {
 						if(_enemy.enemy && !episode.pvp) {
-							const _enemyOrigin = _enemy.SCREENLEFT;
-							const _thisOrigin = this.SCREENLEFT;
+							const _enemyOrigin = _enemy.HURTLEFT + _enemy._HURTBOX_half;
+							const _thisOrigin = this.HURTLEFT + this._HURTBOX_half;
 							if (_enemyOrigin > _thisOrigin)
 								_enemy.direction = __left;
 							else
@@ -8016,6 +8023,7 @@ function enemy(_e) {
 			this.idle();
 			return;
 		}
+		console.log(_order);
 		this.organizeRelatedObjects('run');
 		if(this.puppetMode && !_move)
 			_move = this.moveDirection;
@@ -8713,4 +8721,5 @@ function enemy(_e) {
 		if(this.finishingMoves.indexOf('feet') !== -1)
 			this.installHurtFeet(this.getCurrentFrame());
 	}
-}
+}// e.g. inside dungeon.js / global.js where you load a stage
+const combatDirector = new CombatDirector({ maxSlots: 2 });
