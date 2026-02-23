@@ -29371,11 +29371,16 @@ function isObjectInVisibleRectangle(obj, rect, _leftRate, _tolerance) {
 	_leftRate = _leftRate ?? 1;
 	if (!rect)
 		rect =episode.RECT;
-	const _left = ((obj.LEFT >= __minLeft ? obj.LEFT : obj.left) / _leftRate) - ((_tolerance ? (_tolerance / 2) : 0) * episode.w100);
-	const _width = (obj.WIDTH >= 0 ? obj.WIDTH : (obj.realWidth ?? obj.width)) + ((_tolerance ?? 0) * episode.w100);
+	const _l = obj.HURTLEFT ?? obj.LEFT;
+	const _w = obj.HURTWIDTH ?? obj.WIDTH;
+	const _rl = rect.HURTLEFT ?? rect.LEFT;
+	const _rw = rect.HURTWIDTH ?? rect.WIDTH;
+	const _left = ((_l >= __minLeft ? _l : obj.left) / _leftRate) - 
+		((_tolerance ? (_tolerance / 2) : 0) * episode.w100);
+	const _width = (_w >= 0 ? _w : (obj.realWidth ?? obj.width)) + ((_tolerance ?? 0) * episode.w100);
 	const _objRight = _left + _width;
-	const _rectWidth = (rect.WIDTH >= 0 ? rect.WIDTH : (rect.realWidth ?? rect.width));// + (_tolerance ?? 0);
-	const _rectLeft = (rect.LEFT >= __minLeft ? rect.LEFT : rect.left);// - (_tolerance ? (_tolerance / 2) : 0);
+	const _rectWidth = (_rw >= 0 ? _rw : (rect.realWidth ?? rect.width));// + (_tolerance ?? 0);
+	const _rectLeft = (_rl >= __minLeft ? _rl : rect.left);// - (_tolerance ? (_tolerance / 2) : 0);
 	return (_objRight > _rectLeft) && (_left < (_rectLeft + _rectWidth));
 }
 function isObjectsVerticallyInTouch(obj1, obj2) {

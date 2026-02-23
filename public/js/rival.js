@@ -35673,7 +35673,7 @@ const _allEnemies = {
 							spriteLeft: 484,
 							spriteTop: 78,
 							spriteWidth: 251,
-							spriteHeight: 224,
+							spriteHeight: 222,
 							spriteOrigin: 116,
 							speed:12
 						},
@@ -35681,7 +35681,7 @@ const _allEnemies = {
 							spriteLeft: 884,
 							spriteTop: 79,
 							spriteWidth: 253,
-							spriteHeight: 223,
+							spriteHeight: 221,
 							spriteOrigin: 116,
 							speed: 12
 						},
@@ -35689,7 +35689,7 @@ const _allEnemies = {
 							spriteLeft: 484,
 							spriteTop: 78,
 							spriteWidth: 251,
-							spriteHeight: 224,
+							spriteHeight: 222,
 							spriteOrigin: 116,
 							speed: 12
 						}

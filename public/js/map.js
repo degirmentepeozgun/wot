@@ -404,7 +404,6 @@ function map(_m) {
 			}
 			if(_mob.pick)
 				_enemy.pickNewTarget();
-			createRetroEnemyAI(_enemy, combatDirector);
 			if (_return)
 				return _enemy;
 		}

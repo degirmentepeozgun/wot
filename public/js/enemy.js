@@ -667,6 +667,294 @@ function enemy(_e) {
 		this.start = this.frame = 0;
 		this.enableSkills();
 	}
+	this.assignSlots = function() {
+		if(!this.dirtySlots || this.dirtySlots.length === 0)
+			return;
+
+		const _centerX = this.HURTLEFT + this._HURTBOX_half;
+
+		const _enemies = episode
+			.getAvailableEnemies(this)
+			?.filter(x => x.autoTarget === this && !x.slot);
+
+		if(!_enemies || _enemies.length === 0)
+			return;
+
+		const _stillDirty = [];
+
+		for(let _slot of this.dirtySlots) {
+
+			const _isLeft = _slot.xGap < 0;
+
+			let _bestSameSide = null;
+			let _bestSameSideDist = Infinity;
+
+			let _bestAnySide = null;
+			let _bestAnyDist = Infinity;
+
+			for(let _enemy of _enemies) {
+				if(_enemy.slot)
+					continue;
+				const _enemyOriginX = _enemy.HURTLEFT + _enemy._HURTBOX_half;
+				const _isEnemyLeft = _enemyOriginX < _centerX;
+				const _distance = Math.abs(_enemyOriginX - _centerX);
+
+				if(_isLeft === _isEnemyLeft) {
+					if(_distance < _bestSameSideDist) {
+						_bestSameSideDist = _distance;
+						_bestSameSide = _enemy;
+					}
+				}
+
+				if(_distance < _bestAnyDist) {
+					_bestAnyDist = _distance;
+					_bestAnySide = _enemy;
+				}
+			}
+
+			let _chosen, _sameSide;
+			if(_bestSameSide) {
+				_chosen = _bestSameSide;
+				_sameSide = true;
+			} else {
+				_chosen = _bestAnySide;
+				_sameSide = false;
+			}	
+
+			if(_chosen) {
+				_slot.occupied = true;
+				_slot.target = _chosen;
+				_slot.mustCross = !_sameSide;
+				_slot.owner = this;
+				_chosen.slot = _slot;
+				//_chosen.solid = true;
+			}
+			else {
+				// assign edilemediyse dirty kalmaya devam
+				_stillDirty.push(_slot);
+			}
+		}
+
+		this.dirtySlots = _stillDirty;
+	}
+	this.createSlots = function() {
+		if(!this.solid)
+			this.solid = true;
+		this.slots = [
+			{
+				type:'front',
+				xGap: MathRound(this._HURTBOX_half * 1.5),
+				yGap: 0,
+				occupied: false,
+				target: null
+			},
+			{
+				type:'back',
+				xGap: MathRound(this._HURTBOX_half * -1.5),
+				yGap: 0,
+				occupied: false,
+				target: null
+			}
+		];
+		this.dirtySlots = [this.slots[0], this.slots[1]];
+	}
+	this.getSlotCoords = function() {
+		if(!this.slot)
+			return undefined;
+		const _slot = this.slot;
+		const _owner = this.slot.owner;
+		//burada owner bizim saldıracağımız karakter ve slotun xGap ve yGap değerlerini
+		//ownerın origin noktasına xGap ekleyerek ve yPosition değerine yGap ekleyerek koordinat bulunup geri döndürülür
+		const _ownerOriginX = _owner.HURTLEFT + _owner._HURTBOX_half;
+		const _x = _ownerOriginX + _slot.xGap;
+		const _y = _owner.yPosition + _slot.yGap;
+		return { x: _x, y: _y };
+	}
+	this.autoCommand2 = function () { 
+		if (this.keyboard || this.harmless || (episode.realTime && this.alp))
+			return;
+		if(!this.animationFinished && this.animations[this.animation]?.attack)
+			return;
+		if(!this.autoTarget || this.autoTarget.isDead())
+			this.pickNewTarget();
+		if(!this.autoTarget)
+		{
+			if(this.animation !== 'idle')
+				this.idle();
+			return;
+		}
+		if(!this.autoTarget.slots){
+			this.autoTarget.createSlots();
+		}
+		if(this.slot && (this.slot.owner?.isDead?.() || this.slot.owner !== this.autoTarget)){
+			this.slot.owner.dirtySlots.push(this.slot);
+			this.slot.occupied = false;
+			this.slot.mustCross = false;
+			this.slot.target = null;
+			delete this.slot;
+		}
+		if(!this.ranged) {
+			//eğer bir slot varsa isObjectsInTouch için 2. parametremiz bu slotun koordinatı olmalı eğer yok ise this.autoTarget olmalı
+			let _target;
+			if (this.slot) {
+
+				const _slot = this.slot;
+				const _owner = _slot.owner;
+
+				const coords = this.getSlotCoords();
+
+				if (coords) {
+
+					const slotLine = coords.x;
+					const myCenter = this.HURTLEFT + this._HURTBOX_half;
+
+					// === MUST CROSS RESET ===
+					if (_slot.mustCross) {
+
+						const passed =
+							(_slot.xGap < 0 && myCenter < slotLine) ||
+							(_slot.xGap > 0 && myCenter > slotLine);
+
+						if (passed) {
+
+							_slot.mustCross = false;
+
+							// --- YÖNÜ TARGET'A ÇEVİR ---
+							const targetCenter =
+								this.autoTarget.HURTLEFT +
+								this.autoTarget._HURTBOX_half;
+
+							this.direction =
+								(myCenter < targetCenter)
+									? __right
+									: __left;
+						}
+					}
+
+					// === SLOT BOZULMA ===
+					else {
+
+						const wrongSide =
+							(_slot.xGap < 0 && myCenter > slotLine) ||
+							(_slot.xGap > 0 && myCenter < slotLine);
+
+						if (wrongSide) {
+							_owner.dirtySlots.push(_slot);
+							_slot.occupied = false;
+							_slot.target = null;
+							console.log('Slot lost by ' + this.key);
+							delete this.slot;
+						}
+					}
+
+					_target = {
+						HURTLEFT: coords.x + (_slot.mustCross ? (_slot.xGap < 0 ? -this.HURTWIDTH : this.HURTWIDTH) : 0),
+						HURTWIDTH: 1,
+						TOP: this.autoTarget.TOP,
+						HEIGHT: this.autoTarget.HEIGHT,
+						_HURTBOX_half: .5,
+						yPosition: coords.y,
+						yGap: 1
+					};
+				}
+			}
+			_target = _target ?? this.autoTarget;
+			const _touch = isObjectsInTouch(this, _target);
+			if(_touch.touch && this.lookingAtTarget) {
+				if(this.animation !== 'idle')
+					this.idle();
+			}
+			else {
+				if(this.lookingAtTarget)
+					this.lookingAtTarget = false;	
+				const _anima = this.getCurrentAnimation();
+				if(isObjectsVerticallyInSameOrder(this, _target)) {
+					if(this.animation !== 'walk')
+						this.animate('walk', 1);
+					if(this.yPosition < _target.yPosition && this.moveDirection !== 'up')
+						this.moveDirection = 'up';
+					else if(this.yPosition > _target.yPosition && this.moveDirection !== 'down')
+						this.moveDirection = 'down';
+					else
+						this.moveDirection = undefined;
+					if (MathAbs(_target.yPosition - this.yPosition) <= 2) {
+						this.lookingAtTarget = true;
+					}
+				}
+				else {
+					const _thisOrigin = this.HURTLEFT + this._HURTBOX_half;
+					const _targetOrigin = _target.HURTLEFT + _target._HURTBOX_half;
+					if(_thisOrigin < _targetOrigin && this.direction !== __right)
+						this.direction = __right;
+					else if(_thisOrigin > _targetOrigin && this.direction !== __left)
+						this.direction = __left;
+					this.run(_anima, this.direction);
+
+					const diffX = Math.abs(_targetOrigin - _thisOrigin);
+					const diffY = _target.yPosition - this.yPosition;
+
+					// X mesafesine göre Y düzeltme gücü
+					// Yaklaştıkça daha hassas, uzakken daha serbest
+					const maxInfluenceDistance = 400; // sahneye göre ayarlayabilirsin
+					const distanceFactor = Math.max(0, 1 - (diffX / maxInfluenceDistance));
+
+					// Dalgalı hareket için zaman tabanlı sin
+					const time = (_gameTick ?? Date.now()) * 0.005;
+
+					let _mod = this.getRandom(200);
+					const wave =
+						Math.sin(time + _mod) * 0.6 +   // ana dalga
+						Math.sin(time * 0.5 + _mod) * 0.4; // yumuşatma
+
+					// Random mikro jitter
+					const jitter = (Math.random() - 0.5) * 0.3;
+
+					// Toplam Y düzeltme gücü
+					const baseAdjust = 0.6 * distanceFactor; // yaklaştıkça azalır
+
+					const yStep =
+						(diffY * 0.04) +            // hedefe yaklaşma eğilimi
+						(wave * baseAdjust) +       // doğal dalga
+						jitter;                     // mikro kaos
+
+
+					// Çok küçük fark varsa titreşmesin
+					if (Math.abs(diffY) > 2) {
+						this.yPosition += yStep;
+						this.limitYPosition();
+					}
+					else
+					{
+						this.lookingAtTarget = true;
+					}
+				}
+			}
+		}
+	}
+	this.adjustYPosition = function(target) {
+
+		const diffY = target.yPosition - this.yPosition;
+
+		if (Math.abs(diffY) <= 2)
+			return;
+
+		const diffX = Math.abs(
+			(target.HURTLEFT + target._HURTBOX_half) -
+			(this.HURTLEFT + this._HURTBOX_half)
+		);
+
+		const maxInfluenceDistance = 400;
+		const distanceFactor = Math.max(0, 1 - (diffX / maxInfluenceDistance));
+
+		const step = diffY * 0.04 * distanceFactor;
+
+		this.yPosition += step;
+
+		if (this.yPosition < 0)
+			this.yPosition = 0;
+		else if (this.yPosition > getGroundHeight())
+			this.yPosition = getGroundHeight();
+	};
 	this.autoCommand = function () {
 		if (this.keyboard || this.harmless || (episode.realTime && this.alp))
 			return;
@@ -1656,6 +1944,7 @@ function enemy(_e) {
 			this.checkCommonSkills();
 			checkTimedQuest();
 			this.checkUseProgress();
+			this.assignSlots();
 		}
 		else
 			this.checkBoss();
@@ -1737,102 +2026,106 @@ function enemy(_e) {
 		let _removeEnemy = false;
 		this.updateVariables();
 		this.render(_frame, _queue);
-
+		
+		
 		let _goOn;
-		if (this.autoMode) {
-			if (!this.isDead()) {
-				if(this.autoTarget && (_anima.type === 'move' || _anima.key === 'idle') && !this.keyboard && this.animationFinished && this.class !== __spell) {
-					const _range = this.getRangeBetween(this.autoTarget);
-					// const _arr = this.autoTarget.getClosestAttackers(__maxAttackedCount, _range, function(_e) {
-					// 	const _a = _e.getCurrentAnimation();
-					// 	return (_a.attack || _a.type === 'move') && _e !== this;
-					// });
-					//if(_arr?.length >= __maxAttackedCount) {
-						// if(this.animation === 'walk' || this.animation === 'run')
-						// {
+		if (this.autoMode && !this.isDead() && !this.keyboard && this.class !== __spell)
+			this.autoCommand2();
+		//
+		// if (this.autoMode) {
+		// 	if (!this.isDead()) {
+		// 		if(this.autoTarget && (_anima.type === 'move' || _anima.key === 'idle') && !this.keyboard && this.animationFinished && this.class !== __spell) {
+		// 			const _range = this.getRangeBetween(this.autoTarget);
+		// 			// const _arr = this.autoTarget.getClosestAttackers(__maxAttackedCount, _range, function(_e) {
+		// 			// 	const _a = _e.getCurrentAnimation();
+		// 			// 	return (_a.attack || _a.type === 'move') && _e !== this;
+		// 			// });
+		// 			//if(_arr?.length >= __maxAttackedCount) {
+		// 				// if(this.animation === 'walk' || this.animation === 'run')
+		// 				// {
 
-						// }
-						// else
-						let _mod = this.getRandom(10);
-						if(_mod === 1)
-						{
-							if(this.autoTarget.yPosition > this.yPosition)
-								_mod = 5;
-							else if(this.autoTarget.yPosition < this.yPosition)
-								_mod = 2;
-							else
-								_mod = 9;
-						}
-						switch(_mod)
-						{
-							case 0:
-								this.idle(79);
-								break;
-							case 1:
-								this.lastDirection = this.direction;
-								this.moveDirection = this.yPosition > this.autoTarget.yPosition ? 'down' : 'up';
-								_anima = this.getCurrentAnimation();
-								this.run(_anima, this.direction, true, 4);
-								if (this.socketId)
-									this.animationChanged = true;
-								break;
-							case 2:
-							case 3:
-							case 4:
-								if(isObjectsInTouch(this, this.autoTarget)?.touch || this.still)
-									this.idle(89);
-								else {
-									if(_range > 66)
-										this.autoStepYRate = (getRandomValue(55,70) / 100);
-									else if(_range > 33)
-										this.autoStepYRate = (getRandomValue(70,85) / 100);
-									else
-										this.autoStepYRate = undefined;
-									this.lastDirection = this.direction;
-									this.moveDirection = 'down';
-									_anima = this.getCurrentAnimation();
-									this.animate('walk', 1);
-									if (this.socketId)
-										this.animationChanged = true;
-								}
-								break;
-							case 5:
-							case 6:
-							case 7:
-								if(isObjectsInTouch(this, this.autoTarget)?.touch || this.still)
-									this.idle(99);
-								else {
-									if(_range > 66)
-										this.autoStepYRate = (getRandomValue(55,70) / 100);
-									else if(_range > 33)
-										this.autoStepYRate = (getRandomValue(70,85) / 100);
-									else
-										this.autoStepYRate = undefined;
-									this.lastDirection = this.direction;
-									this.moveDirection = 'up';
-									_anima = this.getCurrentAnimation();
-									this.animate('walk', 1);
-									if (this.socketId)
-										this.animationChanged = true;
-								}
-								break;
-							default:
-								_goOn = 1;
-								break;
-						}
-					//}
-					// else
-					// 	this.autoCommand();
-				}
-				else if(this.owner && !this.autoTarget)
-					this.pickNewTarget();
-				//else //if(this.animationFinished)
+		// 				// }
+		// 				// else
+		// 				let _mod = this.getRandom(10);
+		// 				if(_mod === 1)
+		// 				{
+		// 					if(this.autoTarget.yPosition > this.yPosition)
+		// 						_mod = 5;
+		// 					else if(this.autoTarget.yPosition < this.yPosition)
+		// 						_mod = 2;
+		// 					else
+		// 						_mod = 9;
+		// 				}
+		// 				switch(_mod)
+		// 				{
+		// 					case 0:
+		// 						this.idle(79);
+		// 						break;
+		// 					case 1:
+		// 						this.lastDirection = this.direction;
+		// 						this.moveDirection = this.yPosition > this.autoTarget.yPosition ? 'down' : 'up';
+		// 						_anima = this.getCurrentAnimation();
+		// 						this.run(_anima, this.direction, true, 4);
+		// 						if (this.socketId)
+		// 							this.animationChanged = true;
+		// 						break;
+		// 					case 2:
+		// 					case 3:
+		// 					case 4:
+		// 						if(isObjectsInTouch(this, this.autoTarget)?.touch || this.still)
+		// 							this.idle(89);
+		// 						else {
+		// 							if(_range > 66)
+		// 								this.autoStepYRate = (getRandomValue(55,70) / 100);
+		// 							else if(_range > 33)
+		// 								this.autoStepYRate = (getRandomValue(70,85) / 100);
+		// 							else
+		// 								this.autoStepYRate = undefined;
+		// 							this.lastDirection = this.direction;
+		// 							this.moveDirection = 'down';
+		// 							_anima = this.getCurrentAnimation();
+		// 							this.animate('walk', 1);
+		// 							if (this.socketId)
+		// 								this.animationChanged = true;
+		// 						}
+		// 						break;
+		// 					case 5:
+		// 					case 6:
+		// 					case 7:
+		// 						if(isObjectsInTouch(this, this.autoTarget)?.touch || this.still)
+		// 							this.idle(99);
+		// 						else {
+		// 							if(_range > 66)
+		// 								this.autoStepYRate = (getRandomValue(55,70) / 100);
+		// 							else if(_range > 33)
+		// 								this.autoStepYRate = (getRandomValue(70,85) / 100);
+		// 							else
+		// 								this.autoStepYRate = undefined;
+		// 							this.lastDirection = this.direction;
+		// 							this.moveDirection = 'up';
+		// 							_anima = this.getCurrentAnimation();
+		// 							this.animate('walk', 1);
+		// 							if (this.socketId)
+		// 								this.animationChanged = true;
+		// 						}
+		// 						break;
+		// 					default:
+		// 						_goOn = 1;
+		// 						break;
+		// 				}
+		// 			//}
+		// 			// else
+		// 			// 	this.autoCommand();
+		// 		}
+		// 		else if(this.owner && !this.autoTarget)
+		// 			this.pickNewTarget();
+		// 		//else //if(this.animationFinished)
 				
-				this.autoCommand();
-				// _anima = this.getCurrentAnimation();
-				// _frame = this.getCurrentFrame();
-			}
-		}
+		// 		this.autoCommand2();
+		// 		// _anima = this.getCurrentAnimation();
+		// 		// _frame = this.getCurrentFrame();
+		// 	}
+		// }
 		if ((!this.autoMode || !this.autoTarget || _goOn) && !this.keyboard && !this.realTime && !this.finishing && this.enemy && this.class !== __spell && this.animationFinished) {
 			if (!this.animations.run || this.immobilize)
 				this.idle(6);
@@ -6194,13 +6487,17 @@ function enemy(_e) {
 		const _moveY = this.solidOne ?? _solidity?.moveY;
 		if ((this.moveDirection === 'up' || (_solidity && _moveY === -1)) && _moveY !== 1){
 			this.yPosition += this.verticalStep;
-			if(!this.main && this.autoTarget && this.yPosition > this.autoTarget.yPosition)
-				this.yPosition = this.autoTarget.yPosition;
+			// if(!this.main && this.autoTarget && this.yPosition > this.autoTarget.yPosition){
+			// 	this.yPosition = this.autoTarget.yPosition;
+			// 	console.log('Eşit 1');
+			// }
 		}
 		else if ((this.moveDirection === 'down' || (_solidity && _moveY === 1)) && _moveY !== -1){
 			this.yPosition -= this.verticalStep;
-			if(!this.main && this.autoTarget && this.yPosition < this.autoTarget.yPosition)
-				this.yPosition = this.autoTarget.yPosition;
+			// if(!this.main && this.autoTarget && this.yPosition < this.autoTarget.yPosition){
+			// 	this.yPosition = this.autoTarget.yPosition;
+			// 	console.log('Eşit 2');
+			// }
 		}
 	}
 	this.setDifficulty = function(_dif) {
@@ -6231,9 +6528,9 @@ function enemy(_e) {
 		let _noXRate;
 		if(this.friendly && this.autoTarget && this.autoTarget.isDead())
 			this.autoTarget = undefined;
-		if(this.action?.command !== 'move' && this.autoMode > 0 && !_frame.extraStepXRate && (this.animation === 'run' || this.animation === 'walk') && this.autoTarget
-			&& !this.autoTarget.isDead() && isObjectsInTouch(this, this.autoTarget, 100)?.touch)
-			_noXRate = 1;
+		// if(this.action?.command !== 'move' && this.autoMode > 0 && !_frame.extraStepXRate && (this.animation === 'run' || this.animation === 'walk') && this.autoTarget
+		// 	&& !this.autoTarget.isDead() && isObjectsInTouch(this, this.autoTarget, 100)?.touch)
+		// 	_noXRate = 1;
 		const _fps = this.getFps();
 		if (_fps > 1 && !_anima.hurt)
 			_speedRate /= _fps;
@@ -8023,7 +8320,6 @@ function enemy(_e) {
 			this.idle();
 			return;
 		}
-		console.log(_order);
 		this.organizeRelatedObjects('run');
 		if(this.puppetMode && !_move)
 			_move = this.moveDirection;
@@ -8721,5 +9017,4 @@ function enemy(_e) {
 		if(this.finishingMoves.indexOf('feet') !== -1)
 			this.installHurtFeet(this.getCurrentFrame());
 	}
-}// e.g. inside dungeon.js / global.js where you load a stage
-const combatDirector = new CombatDirector({ maxSlots: 2 });
+}
