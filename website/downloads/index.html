@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>Warriors Of Tengri</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta property="og:title" content="Warriors Of Tengri" />
+    <meta property="og:image" content="https://www.warriorsoftengri.com/assets/images/icons/sign.png?v=3" />
+    <meta property="og:description" content="2.5D Side Scroller Retro Mythologic Action MMORPG" />
+    <meta property="og:url" content="https://www.warriorsoftengri.com/" />
+    <meta property="og:type" content="website" />
+    <meta name="title" content="Warriors Of Tengri">
+    <meta name="description" content="2.5D Side Scroller Retro Mythologic Action MMORPG">
+    <link rel="icon" type="image/x-icon" href="../assets/images/favicon.ico">
+    <link href="../css/reset.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/socializer.css">
+    <link href="../css/common.css?v=32" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="../css/responsive.css?v=32" rel="stylesheet" />
+    <script src="../js/common.js"></script>
+    <script defer src="../js/data.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.2/css/all.css?ver=7.5">
+    <!--<script src="https://kit.fontawesome.com/62b69e0e27.js" crossorigin="anonymous"></script>-->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css">
+
+    <script src="../js/jquery.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <style>
+        .accordion { 
+            width: 100%; 
+            border-radius: 6px; 
+        } 
+        .accordion-item { 
+            border-bottom: 1px solid #f3f4f505; 
+        } 
+        .accordion-header { 
+            cursor: pointer; 
+            padding: 2vh; 
+            font-weight: bold; 
+            font-size:3.2vh !important;
+            line-height: 4vh !important;
+            transition: all 0.2s ease; 
+            user-select: none; 
+            background:#f3f4f500
+        } 
+        .accordion-header .accordion-header-title {
+            color:#f3f4f5dd
+        }
+        .accordion-content { 
+            max-height: 0; 
+            overflow: hidden; 
+            transition: max-height 0.3s ease; 
+        } 
+        .accordion-content ul { 
+            margin: 0;
+            list-style-type: disc;
+            list-style-position: inside;
+        } 
+        .accordion-content li { 
+            padding:1vh 2vh;
+            color:#9d987f !important
+        }
+        .content {
+            margin-top:calc(70px + 2vh) !important;
+            width:80% !important;
+            overflow-y:auto !important;
+            height: calc(100vh - (70px + 2vh)) !important;
+            margin:0 auto;
+            padding-bottom: 2vh;
+            background:radial-gradient(#ffffff30, #000)
+        }
+        .accordion-header-title {
+            transition: color .3s ease
+        }
+        .accordion-header-date {
+            transition: opacity .3s ease;
+            will-change: opacity;
+            opacity: .75
+        }
+        .accordion-content.open + .accordion-header-title, 
+        .accordion-header:has(+ .accordion-content.open) .accordion-header-title { 
+	        color:var(--selection-color) !important;
+        }
+        .accordion-content.open + .accordion-header-date, 
+        .accordion-header:has(+ .accordion-content.open) .accordion-header-date { 
+	        opacity: 1
+        }
+        .top-menu .menu-item:last-child  {
+            background:var(--selection-color)
+        }
+        .top-menu .menu-item:last-child a  {
+            border: 1px solid #A27C16;
+            margin: 3px;
+            height: calc(100% - 6px);
+            min-width: 120px;
+            color: #333;
+            font-weight: 600
+        }
+        @media screen and (orientation: portrait) { 
+           .content {
+                width:100% !important;
+                height: calc(100vh - (70px + 2vh)) !important;
+                min-height: 0 !important;
+            }
+            .accordion-header { 
+                padding: 3vw 4vw
+            } 
+            .accordion-header-title { 
+                font-size:4vw !important;
+                line-height: 5vw !important;
+            } 
+            .accordion-item {
+                padding:1.8vw 3vw !important
+            }
+            .date {
+                font-size: 3vw !important;
+                line-height: 5vw !important;
+                margin-left:3vw;
+            }
+            .accordion-content li { 
+               line-height: 6vw !important;
+               padding:1.2vw 3.6vw !important
+            }
+            .accordion-content ul { 
+                padding: 0 3vw; 
+            } 
+        }
+        ul {
+            list-style: none !important;      /* tarayıcının bullet'ını kaldır */
+            padding: 0 3vh !important;
+            margin: 0 !important
+        }
+
+        li {
+            position: relative;
+            text-indent: 0 !important;
+            padding-left: 1.5em !important    /* tüm satırlar için boşluk */
+        }
+
+        li::before {
+            content: "•";           /* bullet karakteri */
+            position: absolute;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <noscript></noscript>
+    <div class="wrapper">
+        <div class="header" style="background: none;">
+            <div class="full flex">
+                <a href="/" class="logo flex">
+                    <img src="../assets/images/icons/logo.png" />
+                </a>
+                <div class="top-menu flex">
+                    <div class="menu-item flex">
+                        <a href="/" class="top-menu-link flex">Home</a>
+                    </div>
+                    <div class="menu-item flex">
+                        <a href="/?focus=1" class="top-menu-link flex">Engine</a>
+                    </div>
+                    <div class="menu-item flex">
+                        <a href="/?focus=2" class="top-menu-link flex">Characters</a>
+                    </div>
+                    <div class="menu-item selected flex">
+                        <a href="#" class="top-menu-link flex">Updates</a>
+                    </div>
+                    <div class="menu-item flex">
+                        <a href="/?focus=5" class="top-menu-link flex">Features</a>
+                    </div>
+                    <div class="menu-item flex">
+                        <a href="/?focus=6" class="top-menu-link flex">Wishlist</a>
+                    </div>
+                </div>
+                <a href="/?focus=6" class="download flex">
+                    <img src="../assets/images/icons/bf.png" />
+                </a>
+            </div>
+        </div>
+        <div class="content">
+			<div class="accordion"> 
+               
+            </div>
+            <script>
+                function formatDateEnglish(date) { 
+                    const options = { 
+                        day: "2-digit", 
+                        month: "short", 
+                        year: "numeric" 
+                    }; 
+                    return date.toLocaleDateString("en-GB", options).replace(",", ""); 
+                }
+                const _data = [
+                    {
+                        version: '1.021',
+                        date: new Date(2025, 9, 14),
+                        notes: [
+                            'Common skills and potion usage cooldown added',
+                            'New common skill added: Corpse Explosion',
+                            'Shadow skill icons added',
+                            'Sprite draw process optimized',
+                            'Quick Play enemy count increased',
+                            'Animation added on opening screen',
+                            'Music added on opening screen',
+                            'Cyclops walking bombs interaction increased',
+                            'PC bugs about mouse/keyboard fixed',
+                        ]
+                    },
+                    {
+                        version: '1.020',
+                        date: new Date(2025, 8, 15),
+                        notes: [
+                            'The application has been made adaptable to PC',
+                            'Keyboard keys introduction screen added',
+                            'ESC key functionality added',
+                            'Warning icons replaced',
+                            'Quick Play enemy hurt animations modified',
+                            'Some warnings disabled in Quick Play',
+                            'Quick Play boss enemies\' power nerfed',
+                            'Tag skill option added on Quick Play'
+                        ]
+                    },
+                    {
+                        version: 1.019,
+                        date: new Date(2025, 7, 14),
+                        notes: [
+                            'Dungeon system added',
+                            'Improved AI mechanics based on enemy difficulty levels',
+                            '1st Dungeon (Area Defense) added',
+                            'Switch between main / coop characters option added',
+                            'Selecting supporter system added',
+                            'Engineer goblin enemy added',
+                            'Thief character animations modified',
+                            'Mob respawn system updated'
+                        ]
+                    },
+                    {
+                        version: 1.018,
+                        date: new Date(2025, 6, 15),
+                        notes: [
+                            'Real-time Duel system added',
+                            'Online users screen added as "Friends" in menu',
+                            'Do not disturb & busy status options for users added',
+                            'Sending / Receving Duel Request Added',
+                            'A socket infrastructure was established to ensure minimum and secure data transfer',
+                            'Added 5 playable characters for Duel',
+                            'Character hurt sounds modified',
+                            'Charge & Knockback mechanics updated',
+                            'Socket transfer iscData transfer isolation between users is achieved',
+                            'Disconnect status detection added'
+                        ]
+                    },
+                    {
+                        version: '1.017',
+                        date: new Date(2025, 5, 15),
+                        notes: [
+                            '3v3 AI PvP Added',
+                            '3v3 PvP Honor Rewards integrated',
+                            'Thief character added',
+                            'PvP musics updated',
+                            'A fair character matching system has been established',
+                            'Honor Items Market descriptions updated',
+                            'Items in store updated',
+                            'New global quests added for PvP',
+                            'Killing Spree options and sound effects added',
+                            'Ghost mode after death in middle of PvP added'
+                        ]
+                    },
+                    {
+                        version: '1.016',
+                        date: new Date(2025, 4, 14),
+                        notes: [
+                            'Tag skill system added',
+                            'Fragments menu ui changed',
+                            'Random fragments added into chest reward options',
+                            'The rewards given at the end of the story chapters have been adjusted to give fragments in some chapters',
+                            'The fragment reward given at the end of the 9th story chapter will be determined by the player\'s choice',
+                            'Fragments swap system added',
+                            'Character sounds added when using tag skill',
+                            'Players will now be able to see a brief preview of what the page in the menu they are on is for',
+                            'Added the story mission played with the archer character connected to main story',
+                            'New objects added and some enemies modified for new map',
+                            'New map added: Snowshield City',
+                            'Modified fatality effects to last longer'
+                        ]
+                    },
+                    {
+                        version: '1.015',
+                        date: new Date(2025, 3, 13),
+                        notes: [
+                            'Gem system added',
+                            'Gem combination (MELT) system added',
+                            'Equipment with sockets added',
+                            'Remove socket option added',
+                            'Warning for players during melt operation about combination chances added',
+                            'Grade 1 & Grade 2 Gems added',
+                            'Grade 3 items added',
+                            'Global quests updated',
+			    'Added a feature to guide the user by dimming the screen and focusing on a specific area and a narrative introduction',
+                            'Gem rewards added as final rewards of some story missions by chance',
+                            'Random gems added into chest reward options',
+                            'Daily rewards & lottery rewards modified'
+                        ]
+                    },
+                    {
+                        version: '1.014',
+                        date: new Date(2025, 2, 15),
+                        notes: [
+                            'AI 1v1 PvP Added',
+                            'PvP global order and league logic added',
+                            'Honor shop added',
+                            'Honor rewards added as "PvP Arena Win Reward"',
+                            'Musics added fo PvP Arena',
+                            'Game tips and loading screen added',
+                            'Feedback, "Rate Us" and "Join Our Community" screens added',
+                            'Global quests updated',
+                            'Talent tree option added for playable characters',
+                            'Talent tree reset option added',
+                            'A talent point earning and distribution system has been created'
+                        ]
+                    },
+                    {
+                        version: '1.013',
+                        date: new Date(2025, 1, 14),
+                        notes: [
+                            'Equipment option change logic integrated',
+                            'Equipment selection ticket material added',
+                            'Dice material for random equipment option change material added',
+                            'Ticket system for story missions integrated',
+                            'A system has been added to automatically complete the story section and require a ticket',
+                            'Mission repeat option added',
+			    'Added Portal material that allows players to play through story chapters',
+			    'The system has been modified to give portal materials to players at a certain time',
+			    'A warning system has been created if the player\'s strength is low before the content, and guiding menus have been added on how to strengthen or collect loot',
+                            'Lobby screen created',
+                            'Chat screen to send message between players added',
+                            'System messagesChat screen adjusted to show system and private messages differently',
+                            'A mailbox system has been created to easily make announcements or send rewards to players'
+                        ]
+                    },
+                    {
+                        version: '1.012',
+                        date: new Date(2025, 0, 14),
+                        notes: [
+                            'Lobby slider menu added',
+                            'Menu icons updated',
+                            'The old user interface has been replaced with the new one. All buttons and modals have been redesigned to reflect the new interface',
+                            'World map added',
+                            'Act system created and 4 acts planned',
+                            'Act 1 story and missions created',
+                            'Act 1 bonus missions created',
+                            'Global quests updated',
+                            'Act 1 map & story locations created',
+                            'Skip option added on cutscenes',
+                            'Skip option added on storytelling screens',
+                            'Trainin Ground location added in Act 1 Map',
+                            'Stay Online event added'
+                        ]
+                    },
+                    {
+                        version: '1.011',
+                        date: new Date(2024, 11, 15),
+                        notes: [
+                            'Settings page added',
+                            'Multilanguage support added for English and Turkish',
+                            'Daily Lottery system added for free daily rewards',
+                            'Fatalities with key combination added',
+                            'Character choice screen added',
+                            'Final fight boss choice screen added',
+                            'Npc and quest system added',
+                            'Npc concepts created for quest dialogs',
+                            'Backgrounds created for quest dialogs',
+                            'Many different quest styles have been added',
+                            'A system of overhead speech bubbles has been created to indicate that characters are speaking',
+                            'Hit count and combo system added',
+                            'Added a feature to the background music that adapts to the number of character hit combos'
+                        ]
+                    },
+                    {
+                        version: '1.010',
+                        date: new Date(2024, 10, 15),
+                        notes: [
+                            'Warrior character added as playable character',
+                            'Archer character added as playable character',
+                            'Thief character added as playable character',
+                            'Cyclops character added as playable character',
+                            'Gökbörü character added as playable character',
+                            'Right Time Block & Counter system added',
+                            'Artifact collections added for players gather and gain set bonus stats',
+                            'Inventory system added',
+                            'Equipment wear/update/sell system added',
+                            'Added bulk equipment sales feature',
+                            'Added auto-wear best equipments option',
+                            'Grade 1-2-3-4 equipments added',
+                            'Localstorage designed to store data',
+                            'Dmg/Critical Dmg/Dmg Reduce algoritms added',
+                            'Damage frames added',
+                            'Rage mode added',
+                            'Modified skills added for rage mode'
+                        ]
+                    },
+                    {
+                        version: '1.000',
+                        date: new Date(2024, 9, 15),
+                        notes: [
+                            'Counter-Attack / dodge / block system created',
+                            'Integrated a single-use skill system that players can find during the game',
+                            'User warning and information message system added',
+                            'Level-up system created',
+                            'Total power & gear score calculation algoritms added',
+                            'Ranged skill auto-target and pierce system added',
+                            'Parry mechanics when units attack each other at the same time added',
+                            'Several bugs fixed',
+                            'The game is optimized to draw over 100 enemies within the frame without slowing down performance even on low-end devices',
+                            'Created our own touch-pad system for mobile users',
+                            'Detailed character information screen added',
+                            'Dodge usage has been adjusted to allow a maximum of 3 consecutive uses.',
+                            'Skill update system added',
+                            'Elemental damage logic added',
+                            'Elemental effects added',
+                            'Battery Save Mode added',
+                            'Auto-Play system added'
+                        ]
+                    }
+                ];
+                let _html = '';
+                for(let _d of _data)
+                    _html += `<div class="accordion-item animate__animated animate__fadeIn" style="margin-bottom:20px;background:#00000080;border:1px solid #ffffff40;padding:1.5vh 2.5vh 2.5vh 2.5vh"> 
+                                <div data-version="${_d.version}" class="accordion-header card-header flex flex-jc-start" style="display:flex;justify-content:space-between;padding-bottom:8px">
+                                    <div class="accordion-header-title w-50 flex flex-jc-start">Update&nbsp;${_d.version}</div>
+                                    <div class="accordion-header-date w-50 flex flex-jc-end" style="color:#f3f4f5bf!important;font-size:small">${formatDateEnglish(_d.date)}</div>
+                                </div> 
+                                <div class="accordion-content w-100 flex flex-ai-start"> 
+                                    <div class="flex flex-jc-start w-100" style="color:#ffffff99;text-indent: 3vh">
+                                        <ul class="w-100">` 
+                                        + _d.notes.map(x => '<li>' + x + '</li>').join('') +
+                                        `</ul> 
+                                    </div>
+                                </div> 
+                            </div>`;
+                document.querySelector('.accordion').innerHTML = _html;
+            </script>
+            <script> 
+                const headers = document.querySelectorAll(".accordion-header"); 
+                headers.forEach(header => { 
+                    header.addEventListener("click", () => { 
+                        const content = header.nextElementSibling; 
+                        const openContent = document.querySelector(".accordion-content[style*='max-height']"); 
+                        document.querySelectorAll(".accordion-content").forEach(c => { 
+                            if (c !== content) { 
+                                c.style.maxHeight = null; 
+                                c.classList.remove("open"); 
+                            } 
+                        }); 
+                        if (content.style.maxHeight) { 
+                            content.style.maxHeight = null; 
+                            content.classList.remove("open"); 
+                        } 
+                        else { 
+                            content.style.maxHeight = content.scrollHeight + "px"; 
+                            content.classList.add("open"); 
+                        } 
+                    }); 
+                }); 
+                const params = new URLSearchParams(window.location.search);
+                let version = params.get("version");
+                if(version) {
+                    if(!isNaN(Number(version)))
+                        document.querySelector('.accordion-header[data-version="' + version + '"]')?.click?.();
+                }
+            </script>
+        </div>
+    </div>
+</body>

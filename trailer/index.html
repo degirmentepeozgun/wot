@@ -1,0 +1,343 @@
+<html>
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+            .flex {
+                display: flex;
+                justify-content: space-evenly;
+                align-items: center;
+                flex-wrap: wrap
+            }
+            .fade-in {
+    animation: none;
+    opacity:1;
+            }
+            .full {
+                width:100%;
+                height:100%;
+            }
+            .text {
+                position:absolute;
+                inset:0;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                background: radial-gradient(circle at center, rgba(0,0,0,0.7), #000 75%);
+            }
+            .video {
+                background-color: #000;
+                width:100%;height:100%;position:absolute;top:0;left:0
+            }
+            .video video {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                background-color: #000;
+                display: block;
+            }
+            .no-video video {
+                display: none !important;
+            }
+            @keyframes fadein {
+                0% {
+                    opacity: 0;
+                }
+                100% {
+                    opacity: 1;
+                }
+            }
+                        
+      @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap');
+      .no-video {
+        background-color: green !important;
+        width:100%;
+        height:100%;
+        color:#dfe6f0;
+        font-family: 'Cinzel', serif;
+        font-size: clamp(4vh, 5vh, 6vh);
+        letter-spacing: 0.35em;
+        font-weight: 400;
+      }
+.trailer-title-layer {
+  position: absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  inset: 0;
+  background-color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.trailer-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(4vh, 5vh, 6vh);
+  letter-spacing: 0.35em;
+  font-weight: 400;
+  color: #dfe6f0;
+  text-transform: uppercase;
+  will-change: transform opacity;
+  position: relative;
+  opacity: 0; 
+  visibility: hidden; /* başta gizli */
+  transform: scale(0.7) translateY(2vh);
+
+  /* Pseudo shadow ile scale bağımsız */
+  filter: drop-shadow(0 0 6px rgba(80,120,160,0.5))
+          drop-shadow(0 8px 20px rgba(0,0,0,0.7));
+  animation-name: cinematicPop;
+  animation-duration: 6s; /* 3000ms */
+  animation-timing-function: cubic-bezier(.25,.8,.25,1);
+  animation-fill-mode: forwards;
+  animation-delay: 0s;
+}
+@keyframes cinematicPop {
+  0% {
+    opacity: 1;
+    transform: scale(0.7) translateY(4vh);
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1.4) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.1) translateY(0);
+  }
+}
+
+.no-animate {
+    animation:none !important;
+    opacity: 1 !important;
+    transform: scale(1) translateY(0vh) !important
+}
+#scr,
+.trailer-title-layer,
+.video {
+  transform: translateZ(0) !important;
+  backface-visibility: hidden;
+  will-change: opacity, transform;
+}
+#scr {
+  perspective: 1000px;
+  overflow: hidden;
+}
+.v-none {
+    visibility: hidden !important
+}
+        </style>
+    </head>
+    <body style="margin:0;height:100%;width:100%;background:#000">
+        <div id="scr" class="flex" style="width:100%;height:100%;position:absolute;top:0;left:0">
+            <input type="button" value="başlat" onclick="run(); this.remove();" />
+        </div>
+        <script>
+            const videoCache = new Map();
+
+            function preloadVideos(data) {
+                const videos = data.filter(x => x.src).map(x => x.src);
+                const unique = [...new Set(videos)];
+
+                let loaded = 0;
+
+                return new Promise(resolve => {
+                    unique.forEach(src => {
+                    const v = document.createElement('video');
+
+                    v.src = src;
+                    v.preload = 'auto';
+                    v.muted = true;
+                    v.playsInline = true; 
+                    v.style.display = 'none';
+
+                    v.oncanplaythrough  = () => {
+                        loaded++;
+                        videoCache.set(src, true);
+
+                        if (loaded === unique.length)
+                        resolve();
+                    };
+
+                    document.body.appendChild(v);
+                    });
+                });
+            }
+            let _startMS = 0; //0
+            async function run() {
+            const btn = document.querySelector('input');
+            btn.value = 'Yükleniyor...';
+            btn.disabled = true;
+            const _data = [
+                {ms:500, title: 'Dare to face the evil', src:'evil.mp4', speed:1.5},
+                {ms:2900, title: 'Yapay Zeka Video', src: 'yz1.mp4'},
+                {ms:6500, title: 'Ready To Challange?', src:'title2.mp4', speed:1.5},
+                {ms:8900, title: 'Shaman Boss Fight', src: 'shaman.mp4', nomute:.2},
+                {ms:12600, title: 'Execute Endless Combos', src:'title3.mp4', speed:1.6},
+                {ms:14000, title: 'Quick Play Combo', src: 'combo.mp4'},
+                //{ms:15750, title: 'Quick Play Combo Devam'},
+                {ms:18500, title: 'Play As A Boss', src:'title4.mp4', speed:1.6},
+                {ms:19850, title: 'Cyclops ile Gökbörü Fight', src:'boss6.mp4'},
+                {ms:24400, title: 'Discover the Deep Story', src:'title10.mp4', speed:1.6},
+                {ms:25850, src: 'story.mp4', time:350},
+                //{ms:27300, src: 'story2.mp4'},
+                //{ms:23350, title: 'Al Karısı', src:'boss7.mp4'},
+                //{ms:28000, title: 'Yapay Zeka Video', src: 'yz2.mp4', speed:1.2},
+                {ms:30700, title: 'Powerup & Dominate', src:'title5.mp4', speed:1.5},
+                {ms:31900, title: 'Skill Tree',src:'upgrade1.mp4', time:200},
+                {ms:33500, title: 'Item Updates',src:'upgrade2.mp4', speed:1.2},
+                {ms:36750, title: 'Unleash Fatalities', src:'title6.mp4', speed:1.6},
+                {ms:38250, title: 'Fare Öldür', src: 'fatality1.mp4', nomute:.75, time:100},
+                {ms:39750, title: 'Kurtu Cama Yapıştır', src: 'fatality2.mp4', nomute:.75, time:350},
+                {ms:42750, title: 'Co-op Missions', src:'title7.mp4', speed:1.5},
+                {ms:44250, title: 'Bayrak Kapmaca', src:'coop.mp4'},
+                //{ms:45750, title: 'Bayrak Kapmacaya Devam'},
+                {ms:48750, title: 'Real-time PvP Contents', src:'title8.mp4', speed:1.7},
+                {ms:50250, title: '1 v 1', src:'pvp1.mp4'},
+                {ms:51750, title: '3 v 3', src:'war.mp4', speed:1.2},
+                {ms:55000, title: 'Logo', src:'title9.mp4', speed:1},
+                {ms:59000, text: `<div style="width:100%;height:40%;align-items:flex-end" class="flex"><div class="flex"><img src="steam.png" style="width:8%;margin:1%" /> <span style="text-decoration:underline">steam/warriors-of-tengri</span></div></div>
+                <div style="width:100%;height:20%;color:#f3f4f5" class="flex"><div class="flex"><img src="tick.png" style="margin:2vh 4vh;background: #f3f4f5;border-radius: 100%;padding: .5vh;height: 6vh;width:6vh" />Wishlist Now!</div></div> <div style="width:100%;height:40%;align-items:flex-end;padding-bottom:4vh;font-size:2vh" class="flex">COMING SOON</div>`, noanimate: true}
+            ];
+            await preloadVideos(_data);
+
+            btn.value = 'Başlat';
+            btn.disabled = false;
+            setTimeout(() => {
+                const _music = new Audio('t.mp3');
+                let _dataOrder = _startMS > 0 ? _data.findIndex(x => x.ms > _startMS) ?? 0 : 0;
+                if(_dataOrder > 0)
+                {
+                    _dataOrder--;
+                    _startMS = _data[_dataOrder].ms;
+                }
+                if(_startMS > 0)
+                    _music.currentTime = _startMS / 1000;
+                let _zIndex = 1;
+                _music.oncanplay = function() {
+                    _music.play();
+                    const _start = Date.now() - _startMS;
+                    const _scr = document.getElementById('scr');
+                    const animate = function(_tick) {
+                        const _now = Date.now();
+                        const _item = _data[_dataOrder];
+                        if(_now - _start > _item.ms) {
+                            if(_item.text) {
+                                const _textBg = document.createElement('div');
+                                _textBg.className = 'trailer-title-layer full flex';
+                                _textBg.style.opacity = '0';
+                                _textBg.style.transition = 'opacity 600ms ease';
+                                const _title = document.createElement('div');
+                                _title.className = 'trailer-title';
+                                if(_item.noanimate)
+                                    _title.className += ' no-animate';
+                                _title.style.visibility = 'hidden';
+                                _title.innerHTML = _item.text;
+                                _textBg.style.zIndex = _zIndex;
+                                _textBg.appendChild(_title);
+                                _scr.appendChild(_textBg);
+                                requestAnimationFrame(() => {
+                                    _textBg.style.opacity = '1';   // FADE BAŞLAR
+                                });
+
+                                setTimeout(() => {
+                                    const _children = Array.from(_scr.children).filter(x => x !== _textBg);
+                                    _children.forEach(x => x.remove());
+                                }, 700);
+                                // _textBg.onanimationend = function(e) {
+                                //     if(e.animationName === 'fadein'){
+                                //         const _children = Array.from(_scr.children).filter(x => x !== this && x !== _title);
+                                //         _children.forEach(x => {
+                                //             x.style.position = 'absolute';
+                                //             x.style.zIndex = -1;
+                                //             x.style.pointerEvents = 'none';
+                                //         });
+
+                                //         requestAnimationFrame(() => {
+                                //             requestAnimationFrame(() => {
+                                //                 _children.forEach(x => x.remove());
+                                //             });
+                                //         });
+                                //     }
+                                // }
+                                requestAnimationFrame(() => {
+                                    _title.style.visibility = 'visible';
+                                });
+                            }
+                            else {
+                                 const _mediaBg = document.createElement('div');
+                                _mediaBg.className = 'full video';
+                                _mediaBg.style.opacity = '0';
+                                _mediaBg.style.transition = 'opacity 600ms ease';
+                                _mediaBg.style.filter = 'brightness(0.9) saturate(1.1)';
+                                const video = document.createElement('video');
+                                if(_item.src)
+                                    video.src = _item.src;
+                                else {
+                                    _mediaBg.className += ' no-video flex';
+                                    _mediaBg.innerHTML = _item.title ?? '';
+                                }
+                                if(_item.time)
+                                    video.currentTime = _item.time / 1000;
+                                if(_item.speed)
+                                    video.playbackRate = _item.speed;
+                                video.autoplay = true;
+                                if(!_item.nomute)
+                                    video.muted = true;
+                                else if(typeof _item.nomute === 'number')
+                                    video.volume = _item.nomute;
+                                video.loop = true;
+                                video.playsInline = true;
+                                video.preload = 'auto';
+                                if(_item.src)
+                                    _mediaBg.appendChild(video);
+                                _mediaBg.style.zIndex = _zIndex;
+                                _scr.appendChild(_mediaBg);
+                                requestAnimationFrame(() => {
+                                    _mediaBg.style.opacity = '1';   // FADE BAŞLAR
+                                });
+
+                                setTimeout(() => {
+                                    _mediaBg.addEventListener('transitionend', () => {
+                                        _mediaBg.style.visibility = 'hidden';
+                                    }, { once: true });
+                                    const _children = Array.from(_scr.children).filter(x => x !== _mediaBg);
+                                    _children.forEach(x => x.remove());
+                                }, 700);
+                                // _mediaBg.onanimationend = function(e) {
+                                //     if(e.animationName === 'fadein'){
+                                //         const _children = Array.from(_scr.children).filter(x => x !== this && x !== video);
+                                //        _children.forEach(x => {
+                                //             x.style.position = 'absolute';
+                                //             x.style.zIndex = -1;
+                                //             x.style.pointerEvents = 'none';
+                                //         });
+
+                                //         requestAnimationFrame(() => {
+                                //             requestAnimationFrame(() => {
+                                //                 _children.forEach(x => x.remove());
+                                //             });
+                                //         });
+                                //     }
+                                // }
+                            }
+                            _dataOrder++;
+                            _zIndex++;
+                        }
+                        requestAnimationFrame(animate);
+                    }
+                    requestAnimationFrame(animate);
+                }
+            }, 1500);
+        }
+        </script>
+    </body>
+</html>

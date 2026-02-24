@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>Warriors Of Tengri</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta property="og:title" content="Warriors Of Tengri" />
+    <meta property="og:image" content="https://www.warriorsoftengri.com/assets/images/icons/sign.png?v=3" />
+    <meta property="og:description" content="2.5D Side Scroller Retro Mythologic Action MMORPG" />
+    <meta property="og:url" content="https://www.warriorsoftengri.com/" />
+    <meta property="og:type" content="website" />
+    <meta name="title" content="Warriors Of Tengri">
+    <meta name="description" content="2.5D Side Scroller Retro Mythologic Action MMORPG">
+    <link rel="icon" type="image/x-icon" href="../assets/images/favicon.ico">
+    <link href="../css/reset.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/socializer.css">
+    <link href="../css/common.css?v=32" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="../css/responsive.css?v=32" rel="stylesheet" />
+    <script src="../js/common.js"></script>
+    <script defer src="../js/data.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.2/css/all.css?ver=7.5">
+    <!--<script src="https://kit.fontawesome.com/62b69e0e27.js" crossorigin="anonymous"></script>-->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css">
+
+    <script src="../js/jquery.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+</head>
+<body>
+    <noscript></noscript>
+    <div class="wrapper desktop-only">
+        <div class="header" style="background: none;">
+            <div class="full flex">
+                <div class="logo flex">
+                    <img src="../assets/images/icons/logo.png" />
+                </div>
+                <div class="top-menu flex">
+                    <div class="menu-item selected flex">
+                        <a onclick="slideMenu(0,0)" href="#" class="top-menu-link flex">Home</a>
+                    </div>
+                    <div class="menu-item flex">
+                        <a onclick="slideMenu(1,1)" href="#" class="top-menu-link flex">Engine</a>
+                    </div>
+                    <div class="menu-item flex">
+                        <a onclick="slideMenu(2,2)" href="#" class="top-menu-link flex">Characters</a>
+                    </div>
+                    <div class="menu-item flex">
+                        <a onclick="slideMenu(3,4)" href="#" class="top-menu-link flex">News</a>
+                    </div>
+                    <div class="menu-item flex">
+                        <a onclick="slideMenu(4,5)" href="#" class="top-menu-link flex">Features</a>
+                    </div>
+                    <div class="menu-item flex">
+                        <a onclick="slideMenu(5,6)" href="#" class="top-menu-link flex">Wishlist</a>
+                    </div>
+                </div>
+                <div class="download flex">
+                    <img src="../assets/images/icons/bf.png" />
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div id="container" class="w-100">
+                
+            </div>
+            <div class="w-100 flex char-nav">
+                <div onclick="selectChar(0)" class="flex char-nav-item animate-me selected">
+                    Ok ikonu
+                </div>
+                <div onclick="selectChar(1)" class="flex char-nav-item animate-me">
+                    Kılıç İkonu
+                </div>
+                <div onclick="selectChar(2)" class="flex char-nav-item animate-me">
+                    Göz ikonu
+                </div>
+                <div onclick="selectChar(3)" class="flex char-nav-item animate-me">
+                    Yaprak İkonu
+                </div>
+                <div onclick="selectChar(4)" class="flex char-nav-item animate-me">
+                    Kopuz İkonu
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const _chars = [
+            {
+                conceptPath: '../assets/images/char/a.png',
+				story: ['With golden hair and eyes that mirror the forest’s heart, the Ranger is more than just an archer — she is nature’s chosen guardian. Standing at 1.70 meters tall, her agile and graceful presence allows her to move like a whisper among the trees. Her bond with animals is not just spiritual; it’s magical. Bears, eagles, foxes — they answer her call and fight by her side, united by an ancient harmony. Though she lived in a quiet village near the kingdom, her solitary walks into the woods made her a mystery.',
+					'One day, she was captured by royal soldiers for reasons unknown and imprisoned deep within the king’s dungeon. But fate intervened. During the chaos of the Cyclops attack, she escaped alongside the Berserker, returning to her village with a deeper connection to the wild. Her eyes now burn not just with a will to protect, but to avenge. She is not merely an archer — she is a warrior who hears the voice of the earth, commands beasts, and strikes with the silent fury of the forest.'],
+				skills: [
+					{
+                        iconPath: '',
+                        title: 'Arrow Rain',
+						description: 'Main arrows fall from sky through enemy targets for 2 seconds'
+					}
+                ],
+                stats: [
+                    {
+                        title: 'Attack',
+                        description: '8 / 10'
+                    },
+					{
+						title: 'Defense',
+						description: '6 / 10'
+                    },
+					{
+						title: 'Health',
+						description: '7 / 10'
+                    },
+					{
+						title: 'Crit',
+						description: '7 / 10'
+					},
+					{
+						title: 'Pierce',
+						description: '6 / 10'
+					}
+                ],
+				background: 'linear-gradient(45deg, #000, #A27C16, yellow, white, orange, white, yellow, #A27C16, #000)',
+                name: 'ALKİN',
+                class: 'Ranger',
+                type: 'Ranged'
+            },
+            {
+				story: ['Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum',
+					'Story detail'],
+				skills: [
+					{
+						iconPath: '',
+						title: '',
+						description: ''
+					}
+				],
+				stats: [
+					{
+						title: 'Attack',
+						description: '8 / 10'
+					},
+					{
+						title: 'Defense',
+						description: '6 / 10'
+					},
+					{
+						title: 'Health',
+						description: '7 / 10'
+					},
+					{
+						title: 'Crit',
+						description: '7 / 10'
+					},
+					{
+						title: 'Pierce',
+						description: '6 / 10'
+					}
+				],
+				conceptPath: '../assets/images/char/b.png',
+				description: 'Lorem ipsum',
+				name: 'TOYGAR',
+				class: 'Berserker',
+				type: 'Melee',
+				background: 'linear-gradient(45deg, #000, red, orange, #880808, #000, red, #000)'
+            },
+            {
+				story: ['Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum',
+					'Story detail'],
+				skills: [
+					{
+						iconPath: '',
+						title: '',
+						description: ''
+					}
+				],
+				stats: [
+					{
+						title: 'Attack',
+						description: '8 / 10'
+					},
+					{
+						title: 'Defense',
+						description: '6 / 10'
+					},
+					{
+						title: 'Health',
+						description: '7 / 10'
+					},
+					{
+						title: 'Crit',
+						description: '7 / 10'
+					},
+					{
+						title: 'Pierce',
+						description: '6 / 10'
+					}
+				],
+				conceptPath: '../assets/images/char/c.png',
+				name: 'CYCLOPS',
+				class: 'Monster',
+				type: 'Ranged',
+				description: 'Lorem ipsum',
+				background: 'linear-gradient(45deg, #000, #000, red, #191970, #301934, #000)'
+            },
+            {
+				story: ['Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum',
+                        'Story detail'],
+				skills: [
+					{
+						iconPath: '',
+						title: '',
+						description: ''
+					}
+				],
+				stats: [
+					{
+						title: 'Attack',
+						description: '8 / 10'
+					},
+					{
+						title: 'Defense',
+						description: '6 / 10'
+					},
+					{
+						title: 'Health',
+						description: '7 / 10'
+					},
+					{
+						title: 'Crit',
+						description: '7 / 10'
+					},
+					{
+						title: 'Pierce',
+						description: '6 / 10'
+					}
+				],
+				conceptPath: '../assets/images/char/d.png?x=2',
+				description: 'Lorem ipsum',
+				name: 'VARGAS',
+				class: 'Druid',
+				type: 'Ranged',
+				background: 'linear-gradient(45deg, transparent, green, yellow, white, green, transparent)'
+            },
+            {
+				story: ['Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum',
+					'Story detail'],
+				skills: [
+					{
+						iconPath: '',
+						title: '',
+						description: ''
+					}
+				],
+				stats: [
+					{
+						title: 'Attack',
+						description: '8 / 10'
+					},
+					{
+						title: 'Defense',
+						description: '6 / 10'
+					},
+					{
+						title: 'Health',
+						description: '7 / 10'
+					},
+					{
+						title: 'Crit',
+						description: '7 / 10'
+					},
+					{
+						title: 'Pierce',
+						description: '6 / 10'
+					}
+				],
+				conceptPath: '../assets/images/char/w.png',
+				description: 'Lorem ipsum',
+				name: 'DEDE KORKUT',
+				class: 'Bard',
+				type: 'Ranged',
+				background: 'linear-gradient(45deg, transparent, orange, #A42A04, white, orange, transparent)'
+			}
+		]
+		function switchTab(_index, _charIndex) {
+			$('.char-tab.selected').removeClass('selected');
+			$($('.char-tab')[_index ?? 0]).addClass('selected');
+			const _container = $('#char-desc-container');
+			const _c = _chars[_charIndex ?? 0];
+			if(_c)
+				switch (_index) {
+					case 2:
+						{
+							let _html = '';
+							for (let _item of _c.stats)
+								_html += `<div class="char-stat w-100 flex animate__animated animate__fadeIn">
+									<div class="stat-title flex w-50 flex-jc-start">
+										${_item.title}
+									</div>
+									<div class="stat-text flex w-50 flex-jc-end">
+										${_item.description}
+									</div>
+								</div>`;
+							_container.html(_html);
+							break;
+						}
+					case 1:
+						{
+							let _html = '';
+							for (let _i of _c.skills)
+								_html += `<div class="skill-item w-100 flex animate__animated animate__fadeIn">
+									<div class="skill-icon-wrapper flex">
+										<div class="flex skill-icon">
+											<img src="${_i.iconPath}" />
+										</div>
+									</div>
+									<div class="skill-text flex flex-jc-start">
+										<div class="skill-title flex w-100 flex-jc-start">${_i.title}</div>
+										<div class="skill-desc flex w-100 flex-jc-start">${_i.description}</div>
+									</div>
+								</div>`;
+							_container.html(_html);
+							break;
+						}
+					default:
+						{
+							let _html = '';
+							for (let _i of _c.story)
+								_html += `<div class="char-p animate__animated animate__fadeIn">
+									${_i}</div>`;
+							_container.html(_html);
+							break;
+						}
+						break;
+				}
+		}
+		function selectChar(_index) {
+			$('.char-nav-item.selected').removeClass('selected');
+			$($('.char-nav-item')[_index ?? 0]).addClass('selected');
+            const _container = $('#container');
+            const _c = _chars[_index ?? 0];
+			_container.html(`<div class="character-item-info full">
+                    <div class="character-item-info-wrapper full flex portrait animate__animated animate__fadeIn" style="background:${_c.background}">
+                        <div class="flex flex-ai-end portrait animate__animated animate__fadeIn" style="aspect-ratio:1 / 1;height:100%">
+                            <img src="${_c.conceptPath}" />
+                        </div>
+                        <div class="flex character-item-info-text animate__animated animate__slideInRight">
+                            <div class="character-name w-100 flex flex-jc-start">
+                                 ${_c.name}
+                            </div>
+                            <div class="character-class w-100 flex flex-jc-start">
+                                ${_c.class} (${_c.type})
+                            </div>
+                            <div class="char-desc-wrapper flex flex-jc-start w-100">
+                                <div class="flex flex-jc-start char-tabs w-100">
+                                    <div onclick="switchTab(0, ${_index})" class="char-tab flex animate-me selected">
+                                        Story
+                                    </div>
+                                    <div onclick="switchTab(1, ${_index})" class="char-tab flex animate-me">
+                                        Skill
+                                    </div>
+                                    <div onclick="switchTab(2, ${_index})" class="char-tab flex animate-me">
+                                        Stats
+                                    </div>
+                                </div>
+                                <div id="char-desc-container" class="w-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`);
+			switchTab(0, _index);
+        }
+        selectChar(0);
+    </script>
+    <style>
+		.char-tabs {
+			height: 10%;
+			padding: 0 1.5vh;
+			border-bottom: 1px solid #9d987f50
+		}
+		.char-tab {
+			height: 100%;
+			padding: 0 4vh;
+			border: 1px solid #9d987f50;
+			border-bottom: none !important;
+			cursor: pointer
+		}
+        .char-tab.selected {
+            background:#A27C16 !important;
+            color:#000 !important;
+            border:none !important
+        }
+		.char-desc-wrapper {
+            flex:1;
+            flex-direction:column;
+			overflow:hidden
+		}
+		#char-desc-container {
+			height: 92%;
+			overflow-y: auto;
+            flex:1;
+            padding:2vh
+		}
+		.char-p {
+			text-indent: 4vh;
+			padding: 2vh 0
+		}
+		.character-item-info-wrapper {
+			padding: 0 5%;
+			box-shadow: inset 0 0 2vh #000;
+			overflow: hidden
+		}
+		.character-item-info-text {
+			flex-direction: column;
+			flex: 1;
+			height: 90%;
+			width: 92%;
+			margin: 0 4%;
+			color: #f3f4f5ab;
+			padding: 2vh;
+			background: radial-gradient(#262626, #000);
+			border: 1px solid #A27C1680
+		}
+		.portrait img {
+			height: 100% !important;
+			width: 100% !important;
+			filter: drop-shadow(0 0 2vh #000)
+		}
+		.content {
+			padding-top: 70px
+		}
+		#container {
+			height: calc(100vh - 140px)
+		}
+        .char-nav {
+            height:70px
+        }
+		.char-nav-item {
+			border: 2px solid #000 !important;
+			color: #f3f4f5ab !important;
+			flex: 1;
+			height: 100%;
+			cursor: pointer
+		}
+		.char-nav-item.selected {
+            border:2px solid #A27C16 !important;
+            color:#f3f4f5 !important;
+			background:#000
+		}
+		.character-name {
+			padding: 2vh 4vh 0 2vh;
+			font-size: 40px;
+			color: #A27C16;
+			font-weight: bold
+		}
+		.character-class {
+			color: #9d987fcc!important;
+			padding:0 4vh 3vh 2vh
+		}
+		.char-stat {
+			height:6vh !important
+		}
+		.stat-title {
+			color:#9d987f !important
+		}
+		.stat-text {
+			color: #f3f4f5cc !important
+		}
+		.skill-icon-wrapper {
+			padding:1vh
+		}
+		.skill-icon {
+			width:8vh;
+			height:8vh;
+			border:1px solid #f3f4f5cc;
+			border-radius:100%;
+			overflow:hidden
+		}
+		.skill-item {
+			height:10vh
+		}
+		.skill-text {
+			flex: 1;
+			height:8vh
+		}
+		.skill-title {
+			color:#9d987f !important;
+			height: 4vh;
+			padding: 0 2vh
+		}
+		.skill-desc {
+			color: #f3f4f580 !important;
+			height: 4vh;
+			padding:0 2vh
+		}
+		.w-50 {
+			width:50%
+		}
+		.animate-me {
+			transition:all .3s ease;
+			-webkit-transition:all .3s ease
+		}
+    </style>
+</body>

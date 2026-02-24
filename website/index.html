@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>Warriors Of Tengri</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta property="og:title" content="Warriors Of Tengri"/>
+    <meta property="og:image" content="https://www.warriorsoftengri.com/assets/images/icons/sign.png?v=3"/>
+    <meta property="og:description" content="2.5D Side Scroller Retro Mythologic Action MMORPG"/>
+    <meta property="og:url" content="https://www.warriorsoftengri.com/" />
+    <meta property="og:type" content="website" />
+    <meta name="title" content="Warriors Of Tengri">
+    <meta name="description" content="2.5D Side Scroller Retro Mythologic Action MMORPG">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link href="css/reset.css" rel="stylesheet"/>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/socializer.css">
+    <link href="css/common.css?v=35" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="css/responsive.css?v=33" rel="stylesheet"/>
+    <script src="js/common.js"></script>
+	<script defer src="js/data.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.2/css/all.css?ver=7.5">
+    <!--<script src="https://kit.fontawesome.com/62b69e0e27.js" crossorigin="anonymous"></script>-->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css">
+    
+	<script defer src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<script defer src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        let _lastSlideOrder = 0, _scrolling, _scroller, _lastScrollTop;
+        function slideMenu(_order, _verticalOrder) {
+            selectTopMenu(_order);
+            slide(_verticalOrder);
+        }
+        function selectTopMenu(_order) {
+            const _navs = document.querySelectorAll('.desktop-only  .menu-item');
+            _navs.forEach(x => removeClass(x, 'selected'));
+            addClass(_navs[_order], 'selected');
+        }
+	function showScroll(e) {
+		const myDiv = e.target ?? e.srcElement;
+    		let _scrollIcon = document.getElementById('scroll-icon');
+  		if ((myDiv.clientHeight + myDiv.scrollTop) >= myDiv.scrollHeight) {
+			removeClass(_scrollIcon, 'animate__fadeIn');
+			addClass(_scrollIcon, 'animate__fadeOut');
+  		}
+		else {
+			removeClass(_scrollIcon, 'animate__fadeOut');
+			addClass(_scrollIcon, 'animate__fadeIn');
+		}
+	}
+        function slide(_order, _topMenuOrder) {
+            if(_topMenuOrder >= 0)
+                selectTopMenu(_topMenuOrder);
+            if(!_scroller)
+                _scroller = document.querySelector('.desktop-only .scroller');
+            _scroller.style.top = '-' + (_order * 100).toString() + '%';
+            const _navs = document.querySelectorAll('.desktop-only .section-nav');
+            _navs.forEach(x => removeClass(x, 'selected'));
+            addClass(_navs[_order], 'selected');
+            _lastSlideOrder = _order;
+            let _aElems = document.querySelectorAll('.desktop-only  #section' + (_order + 1) + ' .animate__animated');
+            _aElems.forEach(el => {
+                el.style.animation = 'none';
+                el.offsetHeight;
+                el.style.animation = null; 
+            });
+        }
+        function slideHorizontal(_order, _color) {
+            if(_scrolling)
+                return;
+            const _items = document.querySelectorAll('.desktop-only  .horizontal-slider-item');
+            if(hasClass(_items[_order], 'selected'))
+                return;
+            _scrolling = 1;
+            document.querySelector('.desktop-only #section6').className = 'section ' + _color;
+            // var r = document.querySelector(':root');
+            // r.style.setProperty('--bg-light', _color);
+            //document.getElementById('section5').style.background = 'radial-gradient(#ffffff30, #000, ' + _color + ')';
+            for(let i = 0; i < _items.length; i++)
+            {
+                const _item = _items[i];
+                if(i === _order)
+                    addClass(_item, 'selected');
+                else
+                    removeClass(_item, 'selected');    
+                _item.ontransitionend = function() {
+                    _scrolling = undefined;
+                }
+            }
+        }
+        var _engine = [
+            [
+                {img:'assets/images/ss/parallax1.png', title:"Parallax Cave"},
+                //{img:'assets/images/ss/parallax2.png', title:"Parallax Forest"}
+                {text:'We use 1 front, 1 ground and 4 different parallax bacground layers. Each layers can include animation or static textures which can be looped. We also can declare the gaming area and some special effect layers'}
+            ],
+            [
+                {img:'assets/images/ss/object.jpg', title:"Traps & Enemies"}, 
+                {text:'We enrich the playing field with glowing lights, objects that your character can interact with. With using these objects, you can find more rewards or get injured by falling into traps.'}
+            ],
+            [
+                {img:'assets/images/ss/enemy1.png', title:"Enemies Around"},
+                {img:'assets/images/ss/enemy2.png', title:"Enemies Around"}
+            ],
+            [
+                {video:'https://www.youtube.com/embed/mMcA39UEMBc?si=C4iXJIpbprdKzicC'},
+                {img:'assets/images/ss/rt.png'},
+            ],
+            [
+                {img:'assets/images/ss/cc.gif', title:"Sleep Crowd Control"},
+                {text:'We are using many crowd control mechanisms such as stun, daze, sleep, slow, weakness, poison, burn, freeze, throwing air, knockback, immoblize and many others. Depends on your character choice, you will be able to apply these effects on your enemies'}
+            ],
+            [
+                {img:'assets/images/ss/dialog.png', title:"Quest Taking Dialog Scene"},
+                {img:'assets/images/ss/cs.png', title:"Cutscene Sample In A Tent"}
+            ],
+            [
+                {img:'assets/images/ss/weather.png', title:"Weather Effects"},
+                {text:'We designed a special layer for weather effects. Sun shines, autumn leaves, fogs, rainy storms and snow falls will accompany you on this magnificent adventure.'}
+            ],
+            [
+                {img:'assets/images/ss/sprite1.png', title:"A Hit Sprite Sample 1"},
+                {img:'assets/images/ss/sprite2.png', title:"A Hit Sprite Sample 2"}
+            ],
+            [
+                {img:'assets/images/ss/item2.png', title:"Items & Inventory"},
+                {img:'assets/images/ss/item.png', title:"Arena Items"}
+            ],
+            [
+                {img:'assets/images/ss/settings2.png', title:"Settings"},
+                {img:'assets/images/ss/settings.png', title:"Battery Save Mode"}
+            ],
+            [
+                {video:'https://www.youtube.com/embed/D8dY01GJ88s?si=pG4mFWLOTsIC7KP4', 
+            title: 'Sample of a boss phases'},
+                {img:'assets/images/ss/boss.png', title:"Boss Fight"}
+            ],
+            [
+                {img:'assets/images/ss/upgrade.png', title:"Skill Upgrades"},
+                {text: 'Each level increasement of your character may unlock a new skill which you can upgrade and boost its power. With extra artifact bonus powers and common skill packs you can create a long combo with damage boost.'}
+            ],
+            [
+                {img:'assets/images/ss/lottery.gif', title:"Login Gift Roulette"},
+                {text: 'You can use chest drops and draw random gifts in lottery when it is enabled for you. These rewards has high chance to bring you farm materials, items, buffs or gold to power up your heroes as soon as possible'}
+            ],
+            [
+                {img:'assets/images/ss/ticket.png', title:"Item Ticket Item"},
+                {text: 'Your account has a equipment drop and gold find chance, you can increase chance with ticket. Tickets can be found from rewards. They double your change for an hour. Use that hourly tickets and farm in maps that mobs respawns frequently. Kill more and farm more!'}
+            ],
+            [
+                {img:'assets/images/ss/power.gif', title:"Smash Effect 1"},
+                {img:'assets/images/ss/smash.gif', title:"Smash Effect 2"}
+            ],
+            [
+                {img:'assets/images/ss/map2.png', title:"World Map"},
+                {img:'assets/images/ss/map.gif', title:"Waypoint Info"}
+            ],
+            [
+                {img:'assets/images/ss/story.jpg', title:"Story Creation"},
+                {text: 'You will be able to create your own stage. Choose any map you need, write your own dialogs to character, use their animations to add realistic cutscenes, use objects, traps, enemies, coop characters if you want and locate them. Push play & record your gaming experience'}
+            ],
+        ]
+        function createIframe(_src, _title, _border) {
+            const _div2 = document.createElement('div');
+            _div2.style = 'background:url(assets/images/bg/videoframe' + (_border ?? 'g') + '.png);background-position:center;background-size:cover;aspect-ratio: 457 / 274;width:100%;position: relative;padding:1.2vh';
+            
+            const _div3 = document.createElement('div');
+            _div3.className = 'phone-inner flex';
+            _div3.style = "overflow:hidden;position: relative";
+            
+            const _div4 = document.createElement('div');
+            _div4.className = 'full flex';
+            _div4.style = "position: absolute;top:0;left:0";
+
+            const _img = document.createElement('img');
+            _img.className = 'lazy lazy-video';
+            _img.src = "assets/images/icons/loading.gif";
+            _div4.appendChild(_img);
+            _div3.appendChild(_div4);
+
+            const _iframe = document.createElement('iframe');
+            _iframe.width = '100%';
+            _iframe.style = "opacity:0;aspect-ratio:560 / 315;max-width:100%;max-height:100%";
+            _iframe.src = _src;
+            _iframe.title = _title ?? '';
+            _iframe.frameBorder="0";
+            _iframe.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+            _iframe.referrerPolicy="strict-origin-when-cross-origin";
+            _iframe.allowFullScreen = 'true';
+            _div3.appendChild(_iframe);
+            _div2.appendChild(_div3);
+            _iframe.onload = function() {
+                _iframe.className = 'animate__animated animate__fadeIn';
+            }
+            return _div2;
+        }
+        function lazyLoadIFrames() {
+            const _frames = document.querySelectorAll('iframe.lazy');
+            _frames.forEach(x => x.replaceWith(createIframe(x.src, x.title, x.getAttribute('data-border'))));
+        }
+        function viewEngine(_order, _isMobile) {
+            const _items = document.querySelectorAll((_isMobile ? '.mobile' : '.desktop') + '-only .engine-item');
+            if(hasClass(_items[_order], 'selected'))
+                return;
+            _items.forEach(x => removeClass(x, 'selected'));
+            addClass(_items[_order], 'selected');
+            let _e;
+            if(_isMobile) {
+                const _all = document.querySelectorAll('.engine-preview-mobile');
+                _all.forEach(x => {
+                    if(hasClass(x, 'expanded')){
+                        addClass(x, 'collapsing');
+                        x.onanimationend = function() {
+                            removeClass(x, 'expanded');
+                            removeClass(x, 'collapsing');
+                            x.innerHTML = '';
+                            x.onanimationend = undefined;
+                        }
+                    }
+                });
+                _e = _all[_order];
+            }
+            else{
+                _e = document.querySelector('.desktop-only #engine-preview');
+                _e.innerHTML = '';
+            }
+            const _props = _engine[_order];
+            for(let _p of _props){
+                const _div = document.createElement('div');
+                _div.className = 'card-video flex';
+                _div.style = "height:45%;background:none";
+                if(_p.img) {
+                    _div.style = "height:50%";
+                    const _imgBg = document.createElement('div');
+                    _imgBg.style = "border:2px solid var(--selection-color40);position:relative;background:#000;aspect-ratio: 457 / 274;height:100%;overflow:hidden";
+                    _imgBg.className = "flex";
+                    const _img = document.createElement('img');
+                    _img.setAttribute('data-item', 'gallery');
+                    _img.src = "assets/images/icons/loading.gif";
+                    const _preImg = new Image();
+                    _preImg.onload = function() {
+                        removeClass(_img, 'lazy');
+                        _img.style.height = 'revert';
+                        _img.src = _preImg.src;
+                        _img.style.animation = 'none';
+                        _img.offsetHeight;
+                        _img.style.animation = null; 
+                    }
+                    _preImg.src = _p.img;
+                    _img.title = _p.title ?? '';
+                    _img.className = 'lazy animate__animated animate__fadeIn';
+                    _img.style = 'border:5px solid #000 !important;border-radius:5px;box-shadow:0 0 5px #000';
+                    _imgBg.appendChild(_img);
+                    const _div2 = document.createElement('div');
+                    _div2.className = 'full';
+                    _div2.style = 'box-shadow:inset 0 0 2vh #00000080, inset 0 0 4vh #00000080, inset 0 0 6vh #00000080, inset 0 0 8vh #00000080;background:url(assets/images/bg/imgframe-gold.png);background-size:100% 100%;position:absolute;top:0;left:0';
+                    _imgBg.appendChild(_div2);
+                    _div.appendChild(_imgBg);
+                }
+                else if(_p.text) {
+                    const _div2 = document.createElement('div');
+                    _div2.className = "full";
+                    _div2.style = 'padding:2vh 0';
+                    const _div3 = document.createElement('div');
+                    _div3.className = "cp flex";
+                    _div3.innerText = _p.text;
+                    _div2.appendChild(_div3);
+                    _div.appendChild(_div2);
+                }
+                else
+                    _div.appendChild(createIframe(_p.video, _p.title));
+                _e.appendChild(_div);
+            }
+            if(_isMobile) {
+                document.documentElement.style.setProperty("--engine-slide-height-old", document.documentElement.style.getPropertyValue('--engine-slide-height'));
+                document.documentElement.style.setProperty("--engine-slide-height", (_e.children[0].clientHeight + _e.children[1].clientHeight) + 'px');
+                addClass(_e, 'expanded');
+            }
+        }
+        function addScroll() {
+            _scroller = document.querySelector('.desktop-only .scroller');
+            _scroller.addEventListener("transitionend", function() {
+                _scrolling = undefined;
+            }, false);
+            document.body.addEventListener("scroll", function(){ // or window.addEventListener("scroll"....
+                const st = window.pageYOffset || document.documentElement.scrollTop; // Credits: "https://github.com/qeremy/so/blob/master/so.dom.js#L426"
+                if (st > _lastScrollTop) {
+                    if(_scrolling || _lastSlideOrder >= 6)
+                        return;
+                    else
+                        slide(_lastSlideOrder + 1);
+                } else if (st < _lastScrollTop) {
+                    if(_scrolling || _lastSlideOrder <= 0)
+                        return;
+                    else
+                        slide(_lastSlideOrder - 1);
+                } // else was horizontal scroll
+                _lastScrollTop = st <= 0 ? 0 : st; // For Mobile or negative scrolling
+            }, false);
+        }
+        function saveMyEmail(_elem, _isMobile) {
+			var _emailInput = document.querySelector('.' + (_isMobile ? 'mobile' : 'desktop') + '-only .subs-email');
+            var _email = _emailInput.value;
+            if(_email)
+                _email = _email.trim();
+            else
+                return;
+            addClass(_elem, 'disabled');
+			toastr.options = {
+  				"closeButton": false,
+  				"debug": false,
+  				"newestOnTop": false,
+  				"progressBar": false,
+  				"positionClass": "toast-bottom-right",
+  				"preventDuplicates": false,
+  				"onclick": null,
+  				"showDuration": "300",
+  				"hideDuration": "1000",
+  				"timeOut": "3000",
+  				"extendedTimeOut": "1000",
+  				"showEasing": "swing",
+  				"hideEasing": "linear",
+  				"showMethod": "fadeIn",
+  				"hideMethod": "fadeOut"
+			};
+			webClient.post('subscription/edit', { id: _email }, 
+			function(_json) {	
+				_emailInput.value = '';
+				toastr["success"](_json?.alert ?? "Subscription Succeed");
+                removeClass(_elem, 'disabled');
+			}, 
+			function(_json) {
+				toastr["error"](_json?.message ?? "Subscription Failed");
+                removeClass(_elem, 'disabled');
+			});
+		}
+
+        function share(social) {
+            let url = "https://warriorsoftengri.com";
+            if (social == "facebook") {
+                const navUrl = "https://www.facebook.com/sharer/sharer.php?u=" + url;
+                window.open(navUrl, "_blank");
+                return;
+            }
+
+            if (social == "twitter") {
+                const navUrl = "https://twitter.com/intent/tweet?text=" + url;
+                window.open(navUrl, "_blank");
+                return;
+            }
+
+            if (social == "linkedin") {
+                const navUrl = "https://www.linkedin.com/sharing/share-offsite/?url=" + url;
+                window.open(navUrl, "_blank");
+                return;
+            }
+
+            // if (social == "copy") {
+            //     navigator.clipboard.writeText(url).then(() => {
+            //         alert("Link Copied.");
+            //     });
+            //     return;
+            // }
+
+            alert("social name does not exist.");
+        }
+    </script>
+</head>
+<body onload="addScroll()">
+    <noscript></noscript>
+    <div class="wrapper mobile-only">
+        <div class="content" style="position: relative;">
+            <div class="header" style="height: 8vh;background:#000000cc;position: relative !important;top:0;left:0;width:100%;">
+                <div class="full flex">
+                    <div class="w-50 logo flex">
+                        <img src="assets/images/icons/bf.png" style="height:6vh" />
+                    </div>
+                </div>
+            </div>
+            <div class="scroller">
+                <div id="section1" class="section" style="position:relative;background:url(assets/images/bg/1.jpeg);background-position: center;background-size: auto 100% !important;">
+                   
+                    <div style="background:url(assets/images/bg/videoframew.png);background-position:center;background-size:cover;top:10vh;aspect-ratio: 457 / 274;position: absolute;padding:3%;width: calc(30vh*(457 / 274));left: calc((100vw - (30vh*(457 / 274))) / 2);top:25vh;max-width:92vw;transform:translate(-50%,-50%);left:50%">
+                        <!-- <img src="assets/images/bg/phone.png" style="object-fit: cover;" /> -->
+                        <div class="phone-inner flex" style="overflow:hidden">
+                            <div style="position: absolute;top:0;left:0" class="flex full">
+                                <img class="lazy" src="assets/images/icons/loading.gif" />
+                            </div>
+                            <iframe id="trailer-frame-mobile" style="opacity:0;aspect-ratio:560 / 315;width:100%" src="https://www.youtube.com/embed/OoF6RFdpwRw?si=BT9koB3rjKlTQZeI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <script>
+                                const _frameMobile = document.getElementById('trailer-frame-mobile');
+                                _frameMobile.onload = function() {
+                                    _frameMobile.className = 'animate__animated animate__fadeIn';
+                                }
+                            </script>
+                        </div>
+                    </div>
+
+                    <div class="download-links flex animate__animated animate__slideInUp">
+                        <div style="width:50%">
+                            <div class="download-link flex" style="width:100%;padding:20px;box-shadow: none;">
+                                <img src="assets/images/icons/g.png" />
+                            </div>
+                            <div class="download-link flex" style="width:100%;padding:20px;box-shadow: none;">
+                                <img src="assets/images/icons/i.png" />
+                            </div>
+                        </div>
+                        <div style="width:50%">
+                            <div class="download-link flex" style="width:100%;padding:20px;box-shadow: none;">
+                                <img src="assets/images/icons/s.png" />
+                            </div>
+                            <div class="download-link flex" style="width:100%;padding:20px;box-shadow: none;">
+                                <img src="assets/images/icons/w.png" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="section2" class="section" style="height:auto;background:url(assets/images/bg/3.jpeg)">
+                    <div class="full flex">
+                        <div class="full flex" style="justify-content: center">
+                            <div style="border:none !important;padding:0;margin:0;width:100%;height:auto" class="card no-hover animate__animated animate__fadeIn">
+                                <div class="card-inner flex" style="height:auto;background: linear-gradient(90deg, #000, #00000099, #000);
+    background-size: contain !important;">
+                                    <div class="w-100" style="height:auto">
+                                        <div class="card-header" style="padding:0">
+                                            <div class="section-header flex flex-jc-start" style="margin-bottom:2vh;background:linear-gradient(90deg,#000, #fff, #000);height:8vh">
+                                                <span class="flex full" style="display: flex;background: #000;height:calc(100% - 2px)">
+                                                   About Our Game Engine
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="card-content" style="padding:1.5vh">
+                                            <div class="cp">
+                                                A javascript-based game engine was built from scratch and combined with hand-drawn characters.
+                                                Here are some capabilities of our game engine:
+                                            </div>
+                                            <div class="cp" style="padding:2vh 0">
+                                                <div onclick="viewEngine(0, 1)" class="one-line engine-item">
+                                                    <img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>Place Background & Foregrounds as Parallax
+                                                </div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <div onclick="viewEngine(1, 1)" class="one-line engine-item"><img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>Place Traps, Objects as Solid or Phantom</div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <div onclick="viewEngine(2, 1)" class="one-line engine-item"><img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>Place Enemy, Friendly or NPC Units</div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <div onclick="viewEngine(3, 1)" class="one-line engine-item"><img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>Real-time Socket Data Transfer</div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <div onclick="viewEngine(4, 1)" class="one-line engine-item"><img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>Add Crowd Control Effects</div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <div onclick="viewEngine(5, 1)" class="one-line engine-item"><img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>Add Quests, Dialogs & Cutscenes</div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <div onclick="viewEngine(6, 1)" class="one-line engine-item"><img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>Declare Weather Effects</div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <div onclick="viewEngine(7, 1)" class="one-line engine-item"><img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>Declare Hitbox & Iframes</div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <div onclick="viewEngine(8, 1)" class="one-line engine-item"><img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>Inventory & Crafting System</div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <div onclick="viewEngine(9, 1)" class="one-line engine-item"><img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>Multilanguage, Settings & Battery Save Mode</div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <div onclick="viewEngine(10, 1)" class="one-line engine-item"><img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>Declare Boss Grade & Phases</div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <div onclick="viewEngine(11, 1)" class="one-line engine-item"><img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>Skill Upgrade, Artifact Bonus & Buff System</div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <div onclick="viewEngine(12, 1)" class="one-line engine-item"><img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>Chest & Lottery Reward System</div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <div onclick="viewEngine(13, 1)" class="one-line engine-item"><img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>Ticket & Farm System</div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <div onclick="viewEngine(14, 1)" class="one-line engine-item"><img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>Feel The Power!</div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <div onclick="viewEngine(15, 1)" class="one-line engine-item"><img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>World Map & Waypoints</div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <div onclick="viewEngine(16, 1)" class="one-line engine-item"><img src="https://cdn-icons-png.flaticon.com/512/5343/5343115.png"
+                                                    class="engine-item-icon"/>Write Your Own Story</div>
+                                                <div class="w-100 engine-preview-mobile flex flex-ai-start">
+                                                    
+                                                </div>
+                                                <script>
+                                                    viewEngine(0, 1);
+                                                </script>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="section3" class="section flex flex-ai-start" style="height:auto;background:url(assets/images/bg/2.jpeg);background-position: center;background-size: auto 100% !important;">
+                    <div class="section-header flex flex-jc-start" style="margin-bottom:2vh;background:linear-gradient(90deg,#000, #fff, #000);height:8vh">
+                        <span class="flex full" style="display: flex;background: #000;height:calc(100% - 2px)">
+                           Characters
+                        </span>
+                    </div>
+                    <div class="w-100 flex">
+                        <div class="card animate__animated animate__fadeInLeft">
+                            <div class="card-inner" style="background: url(assets/images/char/b.png);">
+                                <div class="card-title one-line flex" style="padding:5%">
+                                    <div class="one-line">Toygar</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card animate__animated animate__fadeInLeft">
+                            <div class="card-inner" style="background: url(assets/images/char/a.png);">
+                                <div class="card-title one-line flex" style="padding:5%">
+                                    <div class="one-line">Alkin</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card animate__animated animate__fadeInRight">
+                            <div class="card-inner" style="background: url(assets/images/char/r.png);">
+                                <div class="card-title one-line flex" style="padding:5%">
+                                    <div class="one-line">Karayel</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card animate__animated animate__fadeInRight">
+                            <div class="card-inner" style="background: url(assets/images/char/tg.png?v=2);">
+                                <div class="card-title one-line flex" style="padding:5%">
+                                    <div class="one-line">Tepegöz</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card animate__animated animate__fadeInLeft">
+                            <div class="card-inner"  style="background: url(assets/images/char/w.png);">
+                                <div class="card-title one-line flex" style="padding:5%">
+                                    <div class="one-line">Dede Korkut</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card animate__animated animate__fadeInLeft">
+                            <div class="card-inner" style="background: url(assets/images/char/d.png?x=2);">
+                                <div class="card-title one-line flex" style="padding:5%">
+                                    <div class="one-line">Vargas</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card animate__animated animate__fadeInRight">
+                            <div class="card-inner" style="background: url(assets/images/char/f.png);">
+                                <div class="card-title one-line flex" style="padding:5%">
+                                    <div class="one-line">Temir Han</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card animate__animated animate__fadeInRight">
+                            <div class="card-inner" style="background: url(assets/images/char/t.png);">
+                                <div class="card-title one-line flex" style="padding:5%">
+                                    <div class="one-line">Deli Dumrul</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card animate__animated animate__fadeInRight">
+                            <div class="card-inner" style="background: url(assets/images/char/erlik.png);">
+                                <div class="card-title one-line flex" style="padding:5%">
+                                    <div class="one-line">Erlik Han</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card animate__animated animate__fadeInRight">
+                            <div class="card-inner" style="background: url(assets/images/char/al.png);">
+                                <div class="card-title one-line flex" style="padding:5%">
+                                    <div class="one-line">Al Karısı</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card animate__animated animate__fadeInRight">
+                            <div class="card-inner" style="background: url(assets/images/char/gb.png);">
+                                <div class="card-title one-line flex" style="padding:5%">
+                                    <div class="one-line">Gökbörü</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card animate__animated animate__fadeInRight">
+                            <div class="card-inner" style="background: url(assets/images/char/sm.png);">
+                                <div class="card-title one-line flex" style="padding:5%">
+                                    <div class="one-line">Stable Master</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="section4" class="section" style="height:auto;background:url(assets/images/bg/3.jpeg)">
+                    <div class="full flex">
+                        <div class="full flex" style="justify-content: center">
+                            <div style="padding:0;border:none;margin:0;width:100%;height:auto" class="card no-hover animate__animated animate__fadeIn">
+                                <div class="card-inner flex" style="height:auto">
+                                    <div class="w-100" style="height:auto">
+                                        <div class="card-header" style="padding:0">
+                                            <div class="section-header flex flex-jc-start" style="margin-bottom:2vh;background:linear-gradient(90deg,#000, #fff, #000);height:8vh">
+                                                <span class="flex full" style="display: flex;background: #000;height:calc(100% - 2px)">
+                                                   How Did We Start?
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="card-content" style="padding:1.5vh">
+                                            <div class="card-content">
+                                                <div class="cp" style="text-align: justify">We are big fan of 2D Side Scroller RPG games.
+                                                    We played a lot of them but because of low population and insufficient support, they closed one by one.
+                                                    You already know that RPG category is filled with %99 similar games that has no interesting content. Thats why users delete right after first try.
+                                                    So Mehmet and I started a long journey to build the mechanics of our dreams with a custom engine on July 2023 and it turned into a serious game. Hope you like it.
+                                                </div>
+                                                <div class="cp" style="text-align: justify">
+                                                    In general we inspired from old games like Golden Axe, Moon Stone, Blaz Blue, Dungeon & Fighter.
+                                                    About mechanics: Dragon Nest, Otherworld Legends, KOF All Star and HiT.
+                                                    About the time and characters: Various mythologies and Mehmet CANPOLAT's noval named Norad.
+                                                    We created a horror / medieval / caotic atmosphere with tension filled moments by blood & sound effects.
+                                                </div>
+                                                <div class="cp" style="text-align: justify">
+                                                    And of course, after seeing success stories like this, we thought we had taken the right step.
+                                                    <span style="color:var(--selection-color)"><a style="color:#F4BB44 !important" target="_blank" href="https://vgsales.fandom.com/wiki/Dungeon_Fighter_Online">You can see the revenue of Dungeon Fighter Online</a></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="w-100 flex">
+                                        <div class="card-video flex" style="width:92vw">
+                                            <iframe class="lazy" data-border="w" width="100%" style="aspect-ratio:560 / 315" src="https://www.youtube.com/embed/4-r7m8SYQEE?si=-b3ho_3iHjzTD0ou" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                            <div class="cp">
+                                                This is our first try on the week we start after digging some simple mechanics
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="section5" class="section" style="height:auto;background:radial-gradient(#ffffff30, #000)">
+                    <div class="section-header flex flex-jc-start" style="margin-bottom:2vh;background:linear-gradient(90deg,#000, #fff, #000);height:8vh">
+                        <span class="flex full" style="display: flex;background: #000;height:calc(100% - 2px)">
+                           Latest Updates
+                        </span>
+                    </div>
+                    <div class="flex" style="padding:0;height:calc(90% - 70px);width:100%;overflow-y:auto">
+                         
+                        
+                        <div style="width:90vw;margin-bottom:40px;background:#00000080;border:1px solid #ffffff40;padding:.5vh 2.5vh 1.5vh 2.5vh" class="animate__animated animate__fadeIn">
+                            <div class="card-header flex" style="display:flex;justify-content:space-between;padding-bottom:8px">
+                                <span>Update 1.021</span>
+                                <span style="opacity: .35;font-size:small">14 Sept 2025</span>
+                            </div>
+                            <div class="w-100 flex flex-ai-start">
+                                <div class="flex flex-jc-start w-100" style="color:#ffffff99;text-indent: 3vh">
+                                    <ul style="width:100%;list-style-type: disc; list-style-position: inside">
+                                        <li class="one-line">New common skill added: Corpse Explosion</li>
+                                        <li class="one-line">Common skills and potion usage cooldown added</li>
+                                    </ul>
+                                    <div class="w-100 flex flex-jc-end" style="padding:.5vh 2vh 0 2vh">
+                                        <a style="color:var(--selection-color)" class="engine-item update-notes" href="downloads/?version=1.021">See Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="width:90vw;margin-bottom:40px;background:#00000080;border:1px solid #ffffff40;padding:.5vh 2.5vh 1.5vh 2.5vh" class="animate__animated animate__fadeIn">
+                            <div class="card-header flex" style="display:flex;justify-content:space-between;padding-bottom:8px">
+                                <span>Update 1.020</span>
+                                <span style="opacity: .35;font-size:small">15 Sept 2025</span>
+                            </div>
+                            <div class="w-100 flex flex-ai-start">
+                                <div class="flex flex-jc-start w-100" style="color:#ffffff99;text-indent: 3vh">
+                                    <ul style="width:100%;list-style-type: disc; list-style-position: inside">
+                                        <li class="one-line">The application has been made adaptable to PC</li>
+                                        <li class="one-line">Keyboard keys introduction screen added</li>
+                                    </ul>
+                                    <div class="w-100 flex flex-jc-end" style="padding:.5vh 2vh 0 2vh">
+                                        <a style="color:var(--selection-color)" class="engine-item update-notes" href="downloads/?version=1.020">See Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="width:90vw;margin-bottom:40px;background:#00000080;border:1px solid #ffffff40;padding:.5vh 2.5vh 1.5vh 2.5vh" class="animate__animated animate__fadeIn">
+                            <div class="card-header flex" style="display:flex;justify-content:space-between;padding-bottom:8px">
+                                <span>Update 1.019</span>
+                                <span style="opacity: .35;font-size:small">14 Aug 2025</span>
+                            </div>
+                            <div class="w-100 flex flex-ai-start">
+                                <div class="flex flex-jc-start w-100" style="color:#ffffff99;text-indent: 3vh">
+                                    <ul style="width:100%;list-style-type: disc; list-style-position: inside">
+                                        <li class="one-line">Dungeon system added</li>
+                                        <li class="one-line">Improved AI mechanics based on enemy difficulty levels</li>
+                                    </ul>
+                                    <div class="w-100 flex flex-jc-end" style="padding:.5vh 2vh 0 2vh">
+                                        <a style="color:var(--selection-color)" class="engine-item update-notes" href="downloads/?version=1.019">See Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="section6" class="section" style="height:auto">
+                    <div class="section-header flex flex-jc-start" style="background:linear-gradient(90deg,#000, #fff, #000);height:8vh">
+                        <span class="flex full" style="display: flex;background: #000;height:calc(100% - 2px)">
+                           Content
+                        </span>
+                    </div>
+                    <div class="full flex" style="height:auto">
+                        <div class="card no-hover animate__animated animate__fadeIn" style="border:none;padding:0;margin:0;width:100%;height:auto;aspect-ratio: unset;background:radial-gradient(rgb(126, 53, 23), transparent)">
+                            <div class="card-inner flex" style="border:none">
+                                
+                                <div class="feature-card-wrapper w-100 flex flex-ai-end flex-jc-start" style="padding:2vh">
+                                    <div class="feature-card" style="background: radial-gradient(#000000, #00000020);">
+                                        <div class="card-header">
+                                            Control The Boss
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="cp">Boss characters are also controllable in game. Gather fragments and be able to summon & control them in some contents.
+                                            </div>
+                                            <iframe class="lazy" data-border="w" width="100%" style="margin-top:20px;aspect-ratio: 560 / 315;" src="https://www.youtube.com/embed/qjvLVG6pPhI?si=W3KKDFqoSi0MRBdQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card no-hover animate__animated animate__fadeIn" style="border:none;height:auto;aspect-ratio:unset;padding:0;margin:0;width:100%;background:radial-gradient(rgba(65, 105, 225, .3), transparent)">
+                            <div class="card-inner flex"  style="border:none">
+                                
+                                <div class="feature-card-wrapper w-100 flex flex-jc-start" style="padding:2vh">
+                                    <div class="feature-card" style="background: radial-gradient(#000000, #00000020);">
+                                        <div class="card-header">
+                                            Brutal Fatalities
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="cp">Several fatality options depends on your distance to mob, class of mob, health status and last animation status like if mob is in air or on ground.
+                                            </div>
+                                            <iframe class="lazy" data-border="w" width="100%" style="margin-top:20px;aspect-ratio: 560 / 315;" src="https://www.youtube.com/embed/F6RnBxgPNMI?si=v55z7ODwSenEOg3t" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card no-hover animate__animated animate__fadeIn" style="border:none;height:auto;aspect-ratio:unset;padding:0;margin:0;width:100%;background:radial-gradient(rgba(127, 0, 255, .3), transparent)">
+                            <div class="card-inner flex flex-jc-start"  style="border:none">
+                                <div class="feature-card-wrapper w-100 flex flex-jc-start" style="padding:2vh">
+                                    <div class="feature-card" style="background: radial-gradient(#000000, #00000020);">
+                                        <div class="card-header">
+                                            Smart Enemies
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="cp">
+                                                There are 4 difficulties to increase enemy acting & decision speed, also enemies can calculate the range and use skill that can be applied from that range.
+                                            </div>
+                                            <iframe class="lazy" data-border="w" width="100%" style="margin-top:20px;aspect-ratio: 560 / 315;" src="https://www.youtube.com/embed/QHsM6dwkw24?si=f8lqf_9S53x0hm61" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                        </div>                                      
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card no-hover animate__animated animate__fadeIn" style="border:none;padding:0;margin:0;width:100%;height:auto;aspect-ratio: unset;background:radial-gradient(rgba(255, 191, 0, .3), transparent)">
+                            <div class="card-inner flex"  style="border:none">
+                                <div class="feature-card-wrapper w-100 flex flex-ai-end flex-jc-start" style="padding:2vh">
+                                    <div class="feature-card" style="background: radial-gradient(#000000, #00000020);">
+                                        <div class="card-header">
+                                            PVP & Coop
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="cp">
+                                                Real-time & AI pvp is one of content in game. you can play with your friends as rival in Pvp Arena or as team member on each stories and dungeons.
+                                            </div>
+                                            <iframe class="lazy" data-border="w" width="100%" style="margin-top:20px; aspect-ratio: 560 / 315;" src="https://www.youtube.com/embed/-lcXI9wBnuw?si=IYct-5q1w3xV0rg0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card no-hover animate__animated animate__fadeIn" style="border:none;padding:0;margin:0;width:100%;height:auto;aspect-ratio: unset;background:radial-gradient(rgba(138, 154, 91, .6), transparent)">
+                            <div class="card-inner flex"  style="border:none">
+                                <div class="feature-card-wrapper w-100 flex flex-ai-end flex-jc-start" style="padding:2vh">
+                                    <div class="feature-card" style="background: radial-gradient(#000000, #00000020);">
+                                        <div class="card-header">
+                                            Never Heard Stories
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="cp">
+                                                We inspire our stories from Dede Korkut stories. The characters are personally inspired from the people, heroes or demons mentioned in these stories.  
+                                            </div>
+                                            <img style="border:1px solid #ffffff40 !important;aspect-ratio: 517 / 275;width:100%"
+                                                src="assets/images/char/ultimate.gif"/>
+                                            <div class="flex w-100" style="color:var(--selection-color);margin-top:1vh">
+                                                It Barak
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="section7" class="section" style="height:auto;background:radial-gradient(#ffffff30, #000)">
+                    <div class="section-header flex flex-jc-start" style="background:linear-gradient(90deg,#000, #fff, #000);height:8vh">
+                        <span class="flex full" style="display: flex;background: #000;height:calc(100% - 2px)">
+                           About Us
+                        </span>
+                    </div>
+                    <div class="flex" style="padding:0;height:auto;width:100%">
+                        <div style="width:92vw;height:auto;margin-bottom:4vh;background:#00000080" class="animate__animated animate__fadeIn flex flex-ai-start">
+                            <div class="w-100 flex flex-ai-start" style="padding:0;height:auto;background:url(assets/images/icons/sign.png);background-position: center;background-repeat: no-repeat;background-size: contain;">
+                                <div class="card-header w-100 flex" style="background: #00000080;padding:3vh 2vh 1vh 2vh;text-align: center;">
+                                    Our Team
+                                </div>
+                                <div class="team flex flex-jc-start" style="text-align:center;background:linear-gradient(#00000080, transparent);padding:0 2vh 4vh 2vh">
+                                    <div style="padding:4px" class="w-100"><span><b>Özgün Değirmentepe</b> - Developer</span></div>
+                                    <div style="padding:4px" class="w-100"><span><b>Mehmet Canpolat</b> - Art Director</span></div>
+                                    <div style="padding:4px" class="w-100"><span><b>Buğra Güven Günbatı</b> - Marketing Manager</span></div>
+                                    <div style="padding:4px" class="w-100"><span><b>Ricky Kasady</b> - Trailer & Cinematics Designer</span></div>
+                                    <div style="padding:4px" class="w-100"><span><b>Theon James</b> - Parallax Map Designer</span></div>
+                                    <div style="padding:4px" class="w-100"><span><b>Robert Pinero</b> - Character Designs</span></div>
+                                    <div style="padding:4px" class="w-100"><span><b>Murat Ergün</b> - Tester</span></div>
+                                    <div style="padding:4px" class="w-100"><span><b>Hasan Yanılmaz</b> - Tester</span></div>
+                                </div>
+                            </div>
+                            <div class="w-100 flex flex-ai-start" style="padding:2vh 0;height:auto">
+                                <div class="w-100 card-header flex" style="text-align: center;margin-bottom:2vh">
+                                    Wishlist
+                                </div>
+                                <div class="w-100" style="margin-bottom:2vh">
+                                    <div class="w-100 flex">
+                                        <input class="subs-email glow-yellow" style="padding:1.15vh 1.75vh;border-color:#ffffff80;border-width:2px" type="text" inputmode="email" placeholder="Enter your email" />
+                                    </div>
+                                    <div class="w-100 flex" style="margin-top:1vh;padding:2vh">
+                                        <div class="button" onclick="saveMyEmail(this, 1)" style="border-width: 2px;">Add to wishlist</div>
+                                    </div>
+                                </div>
+                                <div class="card-header w-100 flex" style="text-align: center;margin-bottom:2vh">
+                                    Support Us
+                                </div>
+                                <div id="footer-social" style="width:100%;padding:2vh" class="flex">
+                                    <a title="instagram - warriors of tengri" target="_blank" href="https://www.instagram.com/warriors.of.tengri/"><img style="height:5.6vh" src="./assets/images/icons/insta.png"></a>
+                                    <a title="youtube - warriors of tengri" target="_blank" href="https://www.youtube.com/@warriorsoftengri"><img style="height:5.6vh" src="./assets/images/icons/yt.png"></a>
+                                    <a title="product hunt - warriors of tengri" target="_blank" href="https://www.producthunt.com/products/wot-warriors-of-tengri"><img style="height:5.6vh" src="./assets/images/icons/p.svg"></a>
+                                </div>
+                                <div id="footer-social" style="width:100%;padding:2vh" class="flex">
+                                    <a title="discord - warriors of tengri" target="_blank" href="https://discord.com/invite/N7yTkjjXte"><img style="height:5.6vh" src="./assets/images/icons/discord.png"></a>
+                                    <a title="twitter - warriors of tengri" target="_blank" href="https://x.com/warrioroftengri"><img style="height:5.6vh" src="./assets/images/icons/tw.png"></a>
+                                    <a title="gmail - warriors of tengri" target="_blank" href="mailto:warriorsoftengri@gmail.com"><img style="height:5.6vh" src="./assets/images/icons/gm.png"></a>
+                                </div>
+                            </div>
+                            <div class="w-100 card-header flex" style="text-align: center;margin:4vh 0 2vh 0">
+                                #Share Us
+                            </div>
+                            <div class="flex w-100">
+                                <div class="hey socializer w-100 flex" data-features="32px,icon-light,bg-white,circle,pad" data-sites="facebook,twitter,linkedin,reddit" data-text="no"></div>
+                                <div class="hey socializer w-100 flex" data-features="32px,icon-light,bg-white,circle,pad" data-sites="pinterest,whatsapp,wechat,telegram" data-text="no"></div>    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="wrapper desktop-only">
+        <div class="header" style="background: none;">
+            <div class="full flex">
+                <div class="logo flex">
+                    <img src="assets/images/icons/logo.png" />
+                </div>
+                <div class="top-menu flex">
+                    <div class="menu-item selected flex">
+                        <a onclick="slideMenu(0,0)" href="#" class="top-menu-link flex">Home</a>
+                    </div>
+                    <div class="menu-item flex">
+                        <a onclick="slideMenu(1,1)" href="#" class="top-menu-link flex">Engine</a>
+                    </div>
+                    <div class="menu-item flex">
+                        <a onclick="slideMenu(2,2)" href="#" class="top-menu-link flex">Characters</a>
+                    </div>
+                    <div class="menu-item flex">
+                        <a onclick="slideMenu(3,4)" href="#" class="top-menu-link flex">Updates</a>
+                    </div>
+                    <div class="menu-item flex">
+                        <a onclick="slideMenu(4,5)" href="#" class="top-menu-link flex">Features</a>
+                    </div>
+                    <div class="menu-item flex">
+                        <a onclick="slideMenu(5,6)" href="#" class="top-menu-link flex">Wishlist</a>
+                    </div>
+                </div>
+                <div class="download flex">
+                    <img src="assets/images/icons/bf.png" />
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="scroller">
+                <div id="section1" class="section" style="background:url(assets/images/bg/1.jpeg);background-position: center;">
+                    <div class="download-links flex animate__animated animate__fadeInUp" style="max-height: 25vh;">
+                        <div style="width:20%">
+                            <div class="download-link flex" style="width:100%;padding:20px;box-shadow: none;">
+                                <img src="assets/images/icons/g.png" />
+                            </div>
+                            <div class="download-link flex" style="width:100%;padding:20px;box-shadow: none;">
+                                <img src="assets/images/icons/i.png" />
+                            </div>
+                        </div>
+                        <div style="background:url(assets/images/bg/videoframew.png);background-position:center;background-size:cover;aspect-ratio: 457 / 274;width:40%;position: relative;padding:1.2vh">
+                            <div class="phone-inner flex" style="overflow:hidden;position: relative;">
+                                <div style="position: absolute;top:0;left:0" class="flex full">
+                                    <img class="lazy" src="assets/images/icons/loading.gif" />
+                                </div>
+                                <iframe id="trailer-frame" style="opacity:0;aspect-ratio:560 / 315;height:100%" src="https://www.youtube.com/embed/OoF6RFdpwRw?si=BT9koB3rjKlTQZeI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                <script>
+                                    const _frame = document.getElementById('trailer-frame');
+                                    _frame.onload = function() {
+                                        _frame.className = 'animate__animated animate__fadeIn';
+                                    }
+                                </script>
+                            </div>
+                        </div>
+                        <div style="width:20%">
+                            <div class="download-link flex" style="width:100%;padding:20px;box-shadow: none;">
+                                <img src="assets/images/icons/s.png" />
+                            </div>
+                            <div class="download-link flex" style="width:100%;padding:20px;box-shadow: none;">
+                                <img src="assets/images/icons/w.png" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="section2" class="section">
+                    <div class="full flex" style="padding:4% 0 4% 4%">
+                        <div class="full flex" style="justify-content: center">
+                            <div class="card no-hover" style="background: linear-gradient(90deg, #000, #00000099, #000), url(https://img.freepik.com/premium-photo/abstract-background-texture-rusty-metal-surface-with-cracks-scratches-nature-medieval-texture-background-medieval-background-textures-ai-generated_538213-8844.jpg);background-size: cover !important;">
+                                <div class="card-inner flex">
+                                    <div class="w-50 animate__animated animate__fadeInDown" style="overflow-y:auto">
+                                        <div class="card-header">
+                                            About Our Game Engine
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="cp">
+                                                A javascript-based game engine was built from scratch and combined with hand-drawn characters.
+                                                Here are some capabilities of our game engine:
+                                            </div>
+                                            <div class="cp">
+                                                <div onclick="viewEngine(0)" class="one-line engine-item"><span>&gt;</span>&nbsp;Place Background & Foregrounds as Parallax</div>
+                                                <div onclick="viewEngine(1)" class="one-line engine-item"><span>&gt;</span>&nbsp;Place Traps, Objects as Solid or Phantom</div>
+                                                <div onclick="viewEngine(2)" class="one-line engine-item"><span>&gt;</span>&nbsp;Place Enemy, Friendly or NPC Units</div>
+                                                <div onclick="viewEngine(3)" class="one-line engine-item"><span>&gt;</span>&nbsp;Real-time Socket Data Transfer</div>
+                                                <div onclick="viewEngine(4)" class="one-line engine-item"><span>&gt;</span>&nbsp;Add Crowd Control Effects</div>
+                                                <div onclick="viewEngine(5)" class="one-line engine-item"><span>&gt;</span>&nbsp;Add Quests, Dialogs & Cutscenes</div>
+                                                <div onclick="viewEngine(6)" class="one-line engine-item"><span>&gt;</span>&nbsp;Declare Weather Effects</div>
+                                                <div onclick="viewEngine(7)" class="one-line engine-item"><span>&gt;</span>&nbsp;Declare Hitbox & Iframes</div>
+                                                <div onclick="viewEngine(8)" class="one-line engine-item"><span>&gt;</span>&nbsp;Inventory & Crafting System</div>
+                                                <div onclick="viewEngine(9)" class="one-line engine-item"><span>&gt;</span>&nbsp;Multilanguage, Settings & Battery Save Mode</div>
+                                                <div onclick="viewEngine(10)" class="one-line engine-item"><span>&gt;</span>&nbsp;Declare Boss Grade & Phases</div>
+                                                <div onclick="viewEngine(11)" class="one-line engine-item"><span>&gt;</span>&nbsp;Skill Upgrade, Artifact Bonus & Buff System</div>
+                                                <div onclick="viewEngine(12)" class="one-line engine-item"><span>&gt;</span>&nbsp;Chest & Lottery Reward System</div>
+                                                <div onclick="viewEngine(13)" class="one-line engine-item"><span>&gt;</span>&nbsp;Ticket & Farm System</div>
+                                                <div onclick="viewEngine(14)" class="one-line engine-item"><span>&gt;</span>&nbsp;Feel The Power!</div>
+                                                <div onclick="viewEngine(15)" class="one-line engine-item"><span>&gt;</span>&nbsp;World Map & Waypoints</div>
+                                                <div onclick="viewEngine(16)" class="one-line engine-item"><span>&gt;</span>&nbsp;Write Your Own Story</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="engine-preview" class="w-50 flex animate__animated animate__fadeInUp">
+                                        <div class="card-video flex" style="height:auto">
+                                            <div style="background:url(assets/images/bg/videoframeg.png);background-position:center;background-size:cover;aspect-ratio: 457 / 274;width:100%;position: relative;padding:1.2vh">
+                                                <div class="phone-inner flex" style="overflow:hidden;position: relative;">
+                                                    <div style="position: absolute;top:0;left:0" class="flex full">
+                                                        <img class="lazy" src="assets/images/icons/loading.gif" />
+                                                    </div>
+                                                    <iframe id="gold-hunt-frame" width="100%" style="opacity:0;aspect-ratio:560 / 315;max-width:100%;max-height:100%" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-video flex" style="height:auto">
+                                            <div style="background:url(assets/images/bg/videoframeg.png);background-position:center;background-size:cover;aspect-ratio: 457 / 274;width:100%;position: relative;padding:1.2vh">
+                                                <div class="phone-inner flex" style="overflow:hidden;position: relative;">
+                                                    <div style="position: absolute;top:0;left:0" class="flex full">
+                                                        <img class="lazy" src="assets/images/icons/loading.gif" />
+                                                    </div>
+                                                    <iframe id="gold-hunt-frame" width="100%" style="opacity:0;aspect-ratio:560 / 315;max-width:100%;max-height:100%" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <script>
+                                        viewEngine(0);
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="section3" class="section flex" style="background:url(assets/images/bg/2.jpeg);position: relative">
+                <div class="full flex" onscroll="showScroll(event)" style="overflow-y:auto">
+		<div class="w-80 flex">
+			<div style="height:70px" class="w-100"></div>
+                        <div class="card gray animate__animated animate__fadeInLeft">
+                            <div class="card-inner" style="background: url(assets/images/char/b.png);">
+                                <div class="card-title flex" style="padding:5%">
+                                    <div class="one-line">Toygar</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card gray animate__animated animate__fadeInLeft">
+                            <div class="card-inner" style="background: url(assets/images/char/a.png);">
+                                <div class="card-title flex" style="padding:5%">
+                                    <div class="one-line">Alkin</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card gray animate__animated animate__fadeInRight">
+                            <div class="card-inner" style="background: url(assets/images/char/r.png);">
+                                <div class="card-title flex" style="padding:5%">
+                                    <div class="one-line">Karayel</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card gray animate__animated animate__fadeInRight">
+                            <div class="card-inner" style="background: url(assets/images/char/tg.png?v=2);">
+                                <div class="card-title flex" style="padding:5%">
+                                    <div class="one-line">Tepegöz</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card gray animate__animated animate__fadeInLeft">
+                            <div class="card-inner"  style="background: url(assets/images/char/w.png);">
+                                <div class="card-title flex" style="padding:5%">
+                                    <div class="one-line">Dede Korkut</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card gray animate__animated animate__fadeInLeft">
+                            <div class="card-inner" style="background: url(assets/images/char/d.png?x=2);">
+                                <div class="card-title flex" style="padding:5%">
+                                    <div class="one-line">Vargas</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card gray animate__animated animate__fadeInRight">
+                            <div class="card-inner" style="background: url(assets/images/char/f.png);">
+                                <div class="card-title flex" style="padding:5%">
+                                    <div class="one-line">Temir Han</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card gray animate__animated animate__fadeInRight">
+                            <div class="card-inner" style="background: url(assets/images/char/t.png);">
+                                <div class="card-title flex" style="padding:5%">
+                                    <div class="one-line">Deli Dumrul</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card gray animate__animated animate__fadeInRight">
+                            <div class="card-inner" style="background: url(assets/images/char/erlik.png);">
+                                <div class="card-title flex" style="padding:5%">
+                                    <div class="one-line">Erlik Han</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card gray animate__animated animate__fadeInRight">
+                            <div class="card-inner" style="background: url(assets/images/char/al.png);">
+                                <div class="card-title flex" style="padding:5%">
+                                    <div class="one-line">Al Karısı</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card gray animate__animated animate__fadeInRight">
+                            <div class="card-inner" style="background: url(assets/images/char/gb.png);">
+                                <div class="card-title flex" style="padding:5%">
+                                    <div class="one-line">Gökbörü</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card gray animate__animated animate__fadeInRight">
+                            <div class="card-inner" style="background: url(assets/images/char/sm.png);">
+                                <div class="card-title flex" style="padding:5%">
+                                    <div class="one-line">Stable Master</div>
+                                </div>
+                            </div>
+                        </div>
+			<div style="height:20px" class="w-100"></div>
+			</div>
+		</div>
+			<div style="position:absolute;right:6.5%;bottom:8%;width:4%" id="scroll-icon" class="animate__animated animate__fadeIn flex"> 
+				<img src="assets/images/icons/scroll.gif?v=3" style="max-width:100%;opacity:.65"  />
+			</div>                    
+                </div>
+                <div id="section4" class="section" style="background:url(assets/images/bg/3.jpeg)">
+                    <div class="full flex" style="padding:5%">
+                        <div class="full flex" style="justify-content: center">
+                            <div class="card no-hover animate__animated animate__fadeIn" style="max-height:100%;margin-top:0;margin-bottom:0;height:auto;aspect-ratio: unset;">
+                                <div class="card-inner flex flex-ai-start">
+                                    <div class="w-50" style="overflow-y:auto">
+                                        <div class="card-header">
+                                            How Did We Start?
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="cp" style="text-align: justify">We are big fan of 2D Side Scroller RPG games.
+                                                We played a lot of them but because of low population and insufficient support, they closed one by one.
+                                                You already know that RPG category is filled with %99 similar games that has no interesting content. Thats why users delete right after first try.
+                                                So Mehmet and I started a long journey to build the mechanics of our dreams with a custom engine on July 2023 and it turned into a serious game. Hope you like it.
+                                            </div>
+                                            <div class="cp" style="text-align: justify">
+                                                In general we inspired from old games like Golden Axe, Moon Stone, Blaz Blue, Dungeon & Fighter.
+                                                About mechanics: Dragon Nest, Otherworld Legends, KOF All Star and HiT.
+                                                About the time and characters: Various mythologies and Mehmet CANPOLAT's noval named Norad.
+                                                We created a horror / medieval / caotic atmosphere with tension filled moments by blood & sound effects.
+                                            </div>
+                                            <div class="cp" style="text-align: justify">
+                                                And of course, after seeing success stories like this, we thought we had taken the right step.
+                                                <span style="color:var(--selection-color)"><a style="color:#F4BB44 !important" target="_blank" href="https://vgsales.fandom.com/wiki/Dungeon_Fighter_Online">You can see the revenue of Dungeon Fighter Online</a></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="w-50 flex flex-ai-start" style="padding-top:8vh">
+                                        <div class="card-video flex flex-ai-start" style="background: none;height:auto">
+                                            <iframe class="lazy" data-border="w" width="100%" style="aspect-ratio:560 / 315" src="https://www.youtube.com/embed/4-r7m8SYQEE?si=-b3ho_3iHjzTD0ou" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                            <div class="cp" style="margin-top:4vh;margin-bottom:8vh">
+                                                This is our first try on the week we start after digging some simple mechanics
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="section5" class="section" style="background:radial-gradient(#ffffff30, #000)">
+                    <div class="section-header flex flex-jc-start">
+                        <span>
+                           Latest Updates
+                        </span>
+                    </div>
+                    <div class="flex" style="padding:0;height:calc(90% - 70px);width:100%;overflow-y:auto">
+                          
+                        <div style="width:72vw;margin-bottom:40px;background:#00000080;border:1px solid #ffffff40;padding:.5vh 2.5vh 1.5vh 2.5vh" class="animate__animated animate__fadeIn">
+                            <div class="card-header flex" style="display:flex;justify-content:space-between;padding-bottom:8px">
+                                <span>Update 1.021</span>
+                                <span style="opacity: .35;font-size:small">14 Oct 2025</span>
+                            </div>
+                            <div class="w-100 flex flex-ai-start">
+                                <div class="flex flex-jc-start w-100" style="color:#ffffff99;text-indent: 3vh">
+                                    <ul style="width:100%;list-style-type: disc; list-style-position: inside">
+                                        <li class="one-line">New common skill added: Corpse Explosion</li>
+                                        <li class="one-line">Common skills and potion usage cooldown added</li>
+                                    </ul>
+                                    <div class="w-100 flex flex-jc-end" style="padding:.5vh 2vh 0 2vh">
+                                        <a style="color:var(--selection-color)" class="engine-item update-notes" href="downloads/?version=1.021">See Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="width:72vw;margin-bottom:40px;background:#00000080;border:1px solid #ffffff40;padding:.5vh 2.5vh 1.5vh 2.5vh" class="animate__animated animate__fadeIn">
+                            <div class="card-header flex" style="display:flex;justify-content:space-between;padding-bottom:8px">
+                                <span>Update 1.020</span>
+                                <span style="opacity: .35;font-size:small">15 Sept 2025</span>
+                            </div>
+                            <div class="w-100 flex flex-ai-start">
+                                <div class="flex flex-jc-start w-100" style="color:#ffffff99;text-indent: 3vh">
+                                    <ul style="width:100%;list-style-type: disc; list-style-position: inside">
+                                        <li>The application has been made adaptable to PC</li>
+                                        <li>Keyboard keys introduction screen added</li>
+                                    </ul>
+                                    <div class="w-100 flex flex-jc-end" style="padding:.5vh 2vh 0 2vh">
+                                        <a class="engine-item update-notes" href="downloads/?version=1.020">See Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                            <div style="width:72vw;margin-bottom:40px;background:#00000080;border:1px solid #ffffff40;padding:.5vh 2.5vh 1.5vh 2.5vh" class="animate__animated animate__fadeIn">
+                            <div class="card-header flex" style="display:flex;justify-content:space-between;padding-bottom:8px">
+                                <span>Update 1.019</span>
+                                <span style="opacity: .35;font-size:small">14 Aug 2025</span>
+                            </div>
+                            <div class="w-100 flex flex-ai-start">
+                                <div class="flex flex-jc-start w-100" style="color:#ffffff99;text-indent: 3vh">
+                                    <ul style="width:100%;list-style-type: disc; list-style-position: inside">
+                                        <li>Dungeon system added</li>
+                                        <li>Improved AI mechanics based on enemy difficulty levels</li>
+                                    </ul>
+                                    <div class="w-100 flex flex-jc-end" style="padding:.5vh 2vh 0 2vh">
+                                        <a class="engine-item update-notes" href="downloads/?version=1.019">See Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="section6" class="section" style="transition:--bg-light .3s ease">
+                    <div class="full flex" style="padding: 4% 10% 4% 14%;height:92%">
+                        <div class="full flex" style="overflow:hidden;position: relative;">
+                            <div style="background:linear-gradient(0deg, #000000cc, rgb(126 53 23))" onclick="slideHorizontal(0, 'red')" class="horizontal-slider-item selected flex flex-jc-start">
+                                <div class="horizontal-slider-item-left flex flex-ai-end flex-jc-start">
+                                    <div class="flex flex-jc-start">Control The Boss</div>
+                                </div>
+                                <div class="horizontal-slider-item-right" style="position: relative;overflow: hidden;">
+                                    <div style="position: absolute;width:calc(76vw - 150px);height:100%;top:0;left:0;background:url(https://cdn.photoroom.com/v2/image-cache?path=gs://background-7ef44.appspot.com/backgrounds_v3/red/33_-_red.jpg);background-size:cover;background-position:center center" class="flex">
+                                        <div class="card no-hover animate__animated animate__fadeIn" style="padding:0;margin:0;width:100%;height:100%">
+                                            <div class="card-inner flex"  style="background:url(assets/images/char/cyc.png);background-size:contain !important;background-repeat:no-repeat">
+                                                <div class="w-50 flex">
+                                                    <div class="full flex">
+                                                    </div>
+                                                </div>
+                                                <div class="w-50 flex flex-ai-end flex-jc-start" style="overflow-y:auto;padding:20px">
+                                                    <div style="background:#00000099;border:1px solid #ffffff40;box-shadow: 0 0 1vh #000; border-radius: 8px;padding:20px;margin:20px 0 20px 20px;width:calc(100% - 20px);max-height:calc(100% - 40px);overflow-y:auto">
+                                                        <div class="card-header">
+                                                            Control The Boss
+                                                        </div>
+                                                        <div class="card-content">
+                                                            <div class="cp">Boss characters are also controllable in game. Gather fragments and be able to summon & control them in some contents.
+                                                            </div>
+                                                            <iframe class="lazy" data-border="w" width="100%" style="margin-top:20px;aspect-ratio: 560 / 315;" src="https://www.youtube.com/embed/qjvLVG6pPhI?si=W3KKDFqoSi0MRBdQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- <div onclick="slideHorizontal(0, '#7E3517')" class="horizontal-slider-item selected flex" style="background:url(https://cdn.photoroom.com/v2/image-cache?path=gs://background-7ef44.appspot.com/backgrounds_v3/red/33_-_red.jpg);background-size:cover;background-position:center center">
+                                <div class="horizontal-slider-item-left flex flex-ai-end flex-jc-start">
+                                    <div class="flex flex-jc-start">Control The Boss</div>
+                                </div>
+                                <div class="horizontal-slider-item-right flex">
+                                    <div class="card no-hover animate__animated animate__fadeIn" style="padding:0;margin:0;width:100%;height:100%">
+                                        <div class="card-inner flex"  style="background:url(assets/images/char/c.png);background-size:contain !important;background-repeat:no-repeat;background-position: left !important;">
+                                            <div class="w-50 flex">
+                                                <div class="full flex">
+                                                </div>
+                                            </div>
+                                            <div class="w-50" style="overflow-y:auto;padding:20px">
+                                                <div class="card-header">
+                                                    Control The Boss
+                                                </div>
+                                                <div class="card-content">
+                                                    <div class="cp">Boss characters are also controllable in game. Some stories have that option and in <b>"Territory Wars"</b> content you will be able to choose
+                                                        and play with the boss or mob characters depends on your character collection.
+                                                    </div>
+                                                    <iframe width="100%" style="aspect-ratio: 560 / 315;" src="https://www.youtube.com/embed/qjvLVG6pPhI?si=W3KKDFqoSi0MRBdQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> -->
+                            <div style="background:linear-gradient(0deg, #000000cc, rgb(65 105 225))" onclick="slideHorizontal(1, 'blue')" class="horizontal-slider-item">
+                                <div class="horizontal-slider-item-left flex flex-ai-end flex-jc-start">
+                                    <div class="flex flex-jc-start">Brutal Fatalities</div>
+                                </div>
+                                <div class="horizontal-slider-item-right flex">
+                                    <div style="position: absolute;width:calc(76vw - 150px);height:100%;top:0;left:0;background:url(https://i.pinimg.com/736x/28/4a/a8/284aa87260ad17790d2ccf14305063e1.jpg);background-size:cover;background-position:center center" class="flex">
+                                        <div class="card no-hover animate__animated animate__fadeIn" style="padding:0;margin:0;width:100%;height:100%">
+                                            <div class="card-inner flex" style="background:url(assets/images/char/b.png);background-size:contain !important;background-repeat:no-repeat">
+                                                <div class="w-50 flex">
+                                                    <div class="full flex flex-ai-end">
+                                                    
+                                                    </div>
+                                                </div>
+                                                <div class="w-50 flex flex-jc-start" style="overflow-y:auto;padding:20px">
+                                                    <div style="background:#00000099;border:1px solid #ffffff40;box-shadow: 0 0 1vh #000; border-radius: 8px;padding:20px;margin:20px 0 20px 20px;width:calc(100% - 20px);overflow-y:auto;max-height:calc(100% - 40px)">
+                                                        <div class="card-header">
+                                                            Brutal Fatalities
+                                                        </div>
+                                                        <div class="card-content">
+                                                            <div class="cp">Several fatality options depends on your distance to mob, class of mob, health status and last animation status like if mob is in air or on ground.
+                                                            </div>
+                                                            <iframe class="lazy" data-border="w" width="100%" style="margin-top:20px;aspect-ratio: 560 / 315;" src="https://www.youtube.com/embed/F6RnBxgPNMI?si=v55z7ODwSenEOg3t" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="background:linear-gradient(0deg, #000000cc, rgb(127 0 255))" onclick="slideHorizontal(2, 'purple')" class="horizontal-slider-item">
+                                <div class="horizontal-slider-item-left flex flex-ai-end flex-jc-start">
+                                    <div class="flex flex-jc-start">Smart Enemies</div>
+                                </div>
+                                <div class="horizontal-slider-item-right flex">
+                                    <div style="position: absolute;width:calc(76vw - 150px);height:100%;top:0;left:0;background: url(https://wallpaper-mania.com/wp-content/uploads/2018/09/High_resolution_wallpaper_background_ID_77700338156.jpg);background-size:cover;background-position:center center" class="flex">
+                                        <div class="card no-hover animate__animated animate__fadeIn" style="padding:0;margin:0;width:100%;height:100%">
+                                            <div class="card-inner flex flex-jc-start">
+                                                <div class="w-50 flex flex-jc-start" style="height: auto;">
+                                                    <div style="background:#00000099;border:1px solid #ffffff40;box-shadow: 0 0 1vh #000; border-radius: 8px;padding:20px;margin:20px 0 20px 55px;width:calc(100% - 55px);height:calc(100% - 40px)">
+                                                        <div class="card-header">
+                                                            Smart Enemies
+                                                        </div>
+                                                        <div class="card-content">
+                                                            <div class="cp">
+                                                                There are 4 difficulties to increase enemy acting & decision speed, also enemies can calculate the range and use skill that can be applied from that range.
+                                                            </div>
+                                                            <iframe class="lazy" data-border="w" width="100%" style="margin-top:20px;aspect-ratio: 560 / 315;" src="https://www.youtube.com/embed/QHsM6dwkw24?si=f8lqf_9S53x0hm61" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> 
+                                                        </div>                                      
+                                                    </div>
+                                                </div>
+                                                <div class="w-50" style="overflow-y:auto;padding:20px;position: relative;">
+                                                    <img style="filter:drop-shadow(0 0 1vh #000);position: absolute;transform:scale(-1, 1);right: 10%;top:0%;height:85%;" src="assets/images/char/twin1.png" />
+                                                    <img style="filter:drop-shadow(0 0 1vh #000);position: absolute;transform:scale(-1, 1);right: 32%;top:35%;height:60%;" src="assets/images/char/twin2.png" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="background:linear-gradient(0deg, #000000cc, rgb(255 191 0))" onclick="slideHorizontal(3, 'yellow')" class="horizontal-slider-item">
+                                <div class="horizontal-slider-item-left flex flex-ai-end flex-jc-start">
+                                    <div class="flex flex-jc-start">PVP & Coop</div>
+                                </div>
+                                <div class="horizontal-slider-item-right flex">
+                                    <div style="position: absolute;width:calc(76vw - 150px);height:100%;top:0;left:0;background: url(https://img.freepik.com/free-vector/yellow-diagonal-geometric-striped-background-with-halftone-detailed_1409-1451.jpg);background-size:cover;background-position:center center" class="flex">
+                                        <div class="card no-hover animate__animated animate__fadeIn" style="padding:0;margin:0;width:100%;height:100%">
+                                            <div class="card-inner flex" style="background:url(assets/images/char/a.png);background-size:contain !important;background-repeat:no-repeat">
+                                                <div class="w-50 flex">
+                                                    <div class="full flex flex-ai-end">
+                                                    
+                                                    </div>
+                                                </div>
+                                                <div class="w-50 flex flex-ai-end flex-jc-start" style="overflow-y:auto;padding:20px">
+                                                    <div style="background:#00000099;border:1px solid #ffffff40;box-shadow: 0 0 1vh #000; border-radius: 8px;padding:20px">
+                                                        <div class="card-header">
+                                                            PVP & Coop
+                                                        </div>
+                                                        <div class="card-content">
+                                                            <div class="cp">
+                                                                Real-time & AI pvp is one of content in game. you can play with your friends as rival in Pvp Arena or as team member on each stories and dungeons.
+                                                            </div>
+                                                            <iframe class="lazy" data-border="w" width="100%" style="margin-top:20px; aspect-ratio: 560 / 315;" src="https://www.youtube.com/embed/-lcXI9wBnuw?si=IYct-5q1w3xV0rg0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="background:linear-gradient(0deg, #000000cc, rgb(138, 154, 91))" onclick="slideHorizontal(4, 'green')" class="horizontal-slider-item">
+                                <div class="horizontal-slider-item-left flex flex-ai-end flex-jc-start">
+                                    <div class="flex flex-jc-start">Never Heard Stories</div>
+                                </div>
+                                <div class="horizontal-slider-item-right flex">
+                                    <div style="position: absolute;width:calc(76vw - 150px);height:100%;top:0;left:0;background: url(https://files.123freevectors.com/wp-content/original/160366-dark-green-texture-background-image.jpg);background-size:cover;background-position:center center" class="flex">
+                                        <div class="card no-hover animate__animated animate__fadeIn" style="padding:0;margin:0;width:100%;height:100%">
+                                            <div class="card-inner flex" style="background:url(assets/images/char/w.png);background-size:contain !important;background-repeat:no-repeat">
+                                                <div class="w-50 flex">
+                                                    <div class="full flex flex-ai-end">
+                                                    
+                                                    </div>
+                                                </div>
+                                                <div class="w-50 flex flex-ai-end flex-jc-start" style="overflow-y:auto;padding:20px">
+                                                    <div style="background:#00000099;border:1px solid #ffffff40;box-shadow: 0 0 1vh #000; border-radius: 8px;padding:20px">
+                                                        <div class="card-header">
+                                                            Never Heard Stories
+                                                        </div>
+                                                        <div class="card-content">
+                                                            <div class="cp">
+                                                                We inspire our stories from Dede Korkut stories. The characters are personally inspired from the people, heroes or demons mentioned in these stories.  
+                                                            </div>
+                                                            <img style="border:1px solid #ffffff40 !important;aspect-ratio: 517 / 275;margin:6px 6px 10px 6px;width:calc(100% - 12px)"
+                                                                src="assets/images/char/ultimate.gif"/>
+                                                            <div class="flex w-100" style="color:var(--selection-color)">
+                                                                It Barak
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="section7" class="section" style="background:radial-gradient(#ffffff30, #000)">
+                    <div class="section-header flex flex-jc-start" style="margin-top:0">
+                        <span>
+                           About Us
+                        </span>
+                    </div>
+                    <div class="flex" style="padding:0;height:calc(90% - 70px);width:100%;overflow-y:auto">
+                        <div style="width:72vw;height:72vh;margin-bottom:40px;background:#00000080;border:1px solid #ffffff40;padding:10px 40px 20px 40px" class="animate__animated animate__fadeIn flex flex-ai-start">
+                            <div class="w-50 flex flex-ai-start" style="padding:20px; height:auto">
+                                <div class="card-header">
+                                    Our Team
+                                </div>
+                                <div class="team flex">
+                                    <div style="padding:4px" class="w-100 flex"><span><b>Özgün Değirmentepe</b> - Developer</span></div>
+                                    <div style="padding:4px" class="w-100 flex"><span><b>Mehmet Canpolat</b> - Art Director</span></div>
+                                    <div style="padding:4px" class="w-100 flex"><span><b>Buğra Güven Günbatı</b> - Marketing Manager</span></div>
+                                    <div style="padding:4px" class="w-100 flex"><span><b>Ricky Kasady</b> - Trailer & Cinematics Designer</span></div>
+                                    <div style="padding:4px" class="w-100 flex"><span><b>Theon James</b> - Parallax Map Designer</span></div>
+                                    <div style="padding:4px" class="w-100 flex"><span><b>Robert Pinero</b> - Character Designs</span></div>
+                                    <div style="padding:4px" class="w-100 flex"><span><b>Murat Ergün</b> - Tester</span></div>
+                                    <div style="padding:4px" class="w-100 flex"><span><b>Hasan Yanılmaz</b> - Tester</span></div>
+                                </div>
+                            </div>
+                            <div class="w-50 flex flex-ai-start" style="padding:20px;height:auto">
+                                <div class="w-100 card-header flex" style="text-align: center;">
+                                    Wishlist
+                                </div>
+                                <div class="w-100">
+                                    <div class="w-100 flex">
+                                        <input class="glow-yellow subs-email" style="border-color:#ffffff80;border-width:1px;width:calc(((100% - 96px) / 2) + 96px);max-width: unset !important" inputmode="email" type="text" placeholder="Enter your email" />
+                                    </div>
+                                    <div class="w-100 flex" style="padding:20px">
+                                        <div class="button" onclick="saveMyEmail(this)">Add to wishlist</div>
+                                    </div>
+                                </div>
+                                <div class="card-header w-100 flex" style="text-align: center;">
+                                    Support Us
+                                </div>
+                                <div id="footer-social" style="width:100%;padding:20px" class="flex">
+                                    <a title="instagram - warriors of tengri" target="_blank" href="https://www.instagram.com/warriors.of.tengri/"><img style="height:32px" src="./assets/images/icons/insta.png"></a>
+                                    <a title="youtube - warriors of tengri" target="_blank" href="https://www.youtube.com/@warriorsoftengri"><img style="height:32px" src="./assets/images/icons/yt.png"></a>
+                                    <a title="product hunt - warriors of tengri" target="_blank" href="https://www.producthunt.com/products/wot-warriors-of-tengri"><img style="height:32px" src="./assets/images/icons/p.svg"></a>
+                                </div>
+                                <div id="footer-social" style="width:100%;padding:20px" class="flex">
+                                    <a title="discord - warriors of tengri" target="_blank" href="https://discord.com/invite/N7yTkjjXte"><img style="height:32px" src="./assets/images/icons/discord.png"></a>
+                                    <a title="twitter - warriors of tengri" target="_blank" href="https://x.com/warrioroftengri"><img style="height:32px" src="./assets/images/icons/tw.png"></a>
+                                    <a title="gmail - warriors of tengri" target="_blank" href="mailto:warriorsoftengri@gmail.com"><img style="height:32px" src="./assets/images/icons/gm.png"></a>
+                                </div>
+                            </div>
+                            
+                        <div style="width: 100%;height: 8vh;" class="flex">
+                            <div class="hey socializer" data-features="32px,icon-light,bg-white,circle,pad" data-sites="facebook,twitter,linkedin,reddit,pinterest,whatsapp,wechat,telegram" data-text="no"></div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="section" style="background:url(assets/images/bg/7.jpeg)"></div> -->
+            </div>
+            <div class="section-navs">
+                <div class="full flex">
+                    <div onclick="slide(0,0)" class="section-nav flex selected"><img style="height: 60%;" src="assets/images/icons/_a.png"/></div>
+                    <div onclick="slide(1,1)" class="section-nav flex"><img style="height: 60%;" src="assets/images/icons/_b.png"/></div>
+                    <div onclick="slide(2,2)" class="section-nav flex"><img style="height: 60%;" src="assets/images/icons/_c.png"/></div>
+                    <div onclick="slide(3)" class="section-nav flex"><img style="height: 60%;" src="assets/images/icons/_d.png"/></div>
+                    <div onclick="slide(4,3)" class="section-nav flex"><img style="height: 60%;" src="assets/images/icons/_g.png"/></div>
+                    <div onclick="slide(5,4)" class="section-nav flex"><img style="height: 60%;" src="assets/images/icons/_i.png"/></div>
+                    <div onclick="slide(6,5)" class="section-nav flex"><img style="height: 60%;" src="assets/images/icons/_k.png"/></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/socializer.js?v=3"></script>
+    <script>
+        lazyLoadIFrames();
+        (function(){
+            socializer( '.hey', {meta: {
+                image: 'https://www.warriorsoftengri.com/assets/images/icons/sign.png?v=3',
+                title: 'Warriors Of Tengri', 
+                link: 'https://www.warriorsoftengri.com/'}} );
+        }());
+        const params = new URLSearchParams(window.location.search);
+        let focus = params.get("focus");
+        if(focus) {
+            focus = Number(focus);
+            if(!isNaN(focus)) {
+                document.querySelectorAll('.section-nav')[focus].onclick();
+            }
+        }
+    </script>
+</body>

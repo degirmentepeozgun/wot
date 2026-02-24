@@ -1,0 +1,198 @@
+@media only screen and (orientation: portrait) {
+    :root {
+        --engine-slide-height: calc((((275 * (100vw - 4vh)) / 457) + 4vh) * 2);
+        --engine-slide-height-old: calc((((275 * (100vw - 4vh)) / 457) + 4vh) * 2)
+    }
+    .wrapper .content {
+        height: auto;
+        min-height: 100vh;
+        overflow: unset;
+        overflow-x:hidden !important
+    }
+    .wrapper {
+        overflow-x: hidden !important
+    }
+    *:not(.socializer *) {
+        font-size: 2vh;
+    }
+    .mobile-only {
+        display: unset !important
+    }
+    .header::before {
+        background: none !important
+    }
+    .content .section {
+        box-shadow:inset 0 0 20vh #000,inset 0 0 15vh #000, inset 0 0 10vh #000 , inset 0 0 5vh #000 
+    }
+    .desktop-only {
+        display: none !important
+    }
+    .download-links {
+        width:100%;
+        left:0;
+        bottom:10%;
+        position: absolute;
+        max-height: 35vh;
+    }
+    .download-links img {
+        width:35vw !important
+    }
+    #section3 .card {
+        width:40%
+    }
+    #section3 .card-title {
+        font-size: 2.4vh;
+    }
+    #section6 {
+        background:none
+    }
+    #section6 .card {
+        box-shadow: none;
+    }
+    #section4 .card-header, #section6 .card-header, #section7 .card-header {
+        font-size: 2.4vh;
+    }
+    #section4 .card-content, #section6 .card-content, #section7 .card-content {
+        font-size: 2vh
+    }
+    .card-inner .cp {
+        padding:1vh 2vh;
+        text-indent: 3vh;
+    }
+    .section-header {
+        padding-top:0;
+        padding-left:0;
+        font-size:2.4vh
+    }
+    .section-header span {
+        font-size:2.4vh;
+        padding-left:3vh;
+        height:8vh
+    }
+    #section5 .card-header {
+        padding:2vh 1vh
+    }
+    #section4 .card {
+        aspect-ratio: unset;
+    }
+    input[type=text] {
+        font-size:2vh;
+        max-width: 100% !important;
+    }
+    .button {
+        padding:1vh 4vh;
+        border-radius: 4vh;
+        font-size:2vh;
+        line-height: 3vh;
+    }
+    .feature-card-wrapper {
+        padding:2vh 0 !important
+    }
+    .feature-card {
+        background:#00000099;
+        border-top:.4vh solid #ffffff20;
+        border-bottom:.4vh solid #ffffff20;
+        box-shadow: 0 0 1vh #000; 
+        border-radius: 1vh;
+        padding:2vh;
+        margin: 2vh 0;
+        width:100%
+    }
+    .feature-card .cp {
+        padding: 2vh 0;
+    }
+    .feature-card .card-content {
+        padding: 2vh
+    }
+    .feature-card .card-header {
+        text-align: center;
+    }
+    .card:has(.card-video) {
+        overflow-y:unset;
+    }
+    .mobile-only .engine-item {
+        padding:.5vh 0;
+        text-indent: 2vh;
+        position: relative;
+        border-top:0px solid #ffffffba;
+        border-bottom:0px solid #ffffffba;
+    }
+    .engine-preview-mobile {
+        height:0;
+        overflow: hidden;
+        box-shadow: inset 0 0  5vh #000;
+    }
+    .engine-item-icon {
+        height: 2vh;
+        margin:.5vh 1vh .5vh 0;
+        transition: all .3s ease;
+        filter:grayscale(100%);
+        transform:rotate(-90deg);
+    }
+    .engine-item.selected .engine-item-icon {
+        transform: unset;
+        margin:.5vh;
+        filter:unset;
+    }
+    .engine-preview-mobile .card-video {
+        height:calc((((275 * (100vw - 4vh)) / 457) + 4vh)) !important;
+        overflow-y:auto;
+        width: 92% !important;
+        max-width: 92% !important;
+    }
+    .engine-preview-mobile.expanded {
+        height:var(--engine-slide-height);
+        animation: expand .3s ease;
+        -webkit-animation: expand .3s ease;
+    }
+    .engine-preview-mobile.expanded .cp {
+        padding:2vh !important;
+        width: 100% !important;
+        border-left:0 !important;
+        border-right: 0 !important;
+        border-color:var(--selection-color40) !important
+    }
+    .engine-preview-mobile .card-video:has(.cp) {
+        max-width: 100% !important;
+        width:100% !important;
+        height: auto !important;
+        background: linear-gradient(90deg, #000, #00000080, #000), url(https://img.freepik.com/premium-photo/abstract-background-texture-rusty-metal-surface-with-cracks-scratches-nature-medieval-texture-background-medieval-background-textures-ai-generated_538213-8844.jpg) !important
+    }
+    .engine-preview-mobile .card-video:has(img[data-item]) * {
+        border:none !important
+    }
+    .engine-preview-mobile .card-video:has(.phone-inner) > div {
+        width: 99% !important;
+        padding: 1.2vh !important;
+    }
+    .engine-preview-mobile.collapsing {  
+        height:0;
+        animation: collapse .3s ease;
+        -webkit-animation: collapse .3s ease;
+    }
+    .engine-item.selected {
+        padding-bottom: 1.5vh
+    }
+    .socializer a {
+        font-size: 24px !important;
+        width: 12vw !important;
+        height: 12vw !important;
+        margin: 2vw !important
+    }
+    @keyframes expand {
+        from {
+            height: 0vh
+        }
+        to {
+            height: var(--engine-slide-height)
+        }
+    }
+    @keyframes collapse {
+        from {
+            height: var(--engine-slide-height-old)
+        }
+        to {
+            height: 0vh
+        }
+    }
+}
