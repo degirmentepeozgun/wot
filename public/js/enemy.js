@@ -668,96 +668,137 @@ function enemy(_e) {
 		this.enableSkills();
 	}
 	this.assignSlots = function() {
-		if(!this.dirtySlots || this.dirtySlots.length === 0)
-			return;
 
-		const _centerX = this.HURTLEFT + this._HURTBOX_half;
+    if(!this.dirtySlots || this.dirtySlots.length === 0)
+        return;
 
-		const _enemies = episode
-			.getAvailableEnemies(this)
-			?.filter(x => x.autoTarget === this && !x.slot);
+    const _centerX = this.HURTLEFT + this._HURTBOX_half;
 
-		if(!_enemies || _enemies.length === 0)
-			return;
+    const _enemies = episode
+        .getAvailableEnemies(this)
+        ?.filter(x => x.autoTarget === this && !x.slot);
 
-		const _stillDirty = [];
+    if(!_enemies || _enemies.length === 0)
+        return;
 
-		for(let _slot of this.dirtySlots) {
+    const _stillDirty = [];
 
-			const _isLeft = _slot.xGap < 0;
+    for(let _slot of this.dirtySlots) {
 
-			let _bestSameSide = null;
-			let _bestSameSideDist = Infinity;
+        const _isLeft = _slot.xGap < 0;
 
-			let _bestAnySide = null;
-			let _bestAnyDist = Infinity;
+        let _bestSameSide = null;
+        let _bestSameSideDist = Infinity;
 
-			for(let _enemy of _enemies) {
-				if(_enemy.slot)
-					continue;
-				const _enemyOriginX = _enemy.HURTLEFT + _enemy._HURTBOX_half;
-				const _isEnemyLeft = _enemyOriginX < _centerX;
-				const _distance = Math.abs(_enemyOriginX - _centerX);
+        let _bestAnySide = null;
+        let _bestAnyDist = Infinity;
 
-				if(_isLeft === _isEnemyLeft) {
-					if(_distance < _bestSameSideDist) {
-						_bestSameSideDist = _distance;
-						_bestSameSide = _enemy;
-					}
-				}
+        for(let _enemy of _enemies) {
 
-				if(_distance < _bestAnyDist) {
-					_bestAnyDist = _distance;
-					_bestAnySide = _enemy;
-				}
-			}
+            if(_enemy.slot)
+                continue;
 
-			let _chosen, _sameSide;
-			if(_bestSameSide) {
-				_chosen = _bestSameSide;
-				_sameSide = true;
-			} else {
-				_chosen = _bestAnySide;
-				_sameSide = false;
-			}	
+            const _enemyOriginX = _enemy.HURTLEFT + _enemy._HURTBOX_half;
+            const _isEnemyLeft = _enemyOriginX < _centerX;
+            const _distance = Math.abs(_enemyOriginX - _centerX);
 
-			if(_chosen) {
-				_slot.occupied = true;
-				_slot.target = _chosen;
-				_slot.mustCross = !_sameSide;
-				_slot.owner = this;
-				_chosen.slot = _slot;
-				//_chosen.solid = true;
-			}
-			else {
-				// assign edilemediyse dirty kalmaya devam
-				_stillDirty.push(_slot);
-			}
-		}
+            if(_isLeft === _isEnemyLeft) {
+                if(_distance < _bestSameSideDist) {
+                    _bestSameSideDist = _distance;
+                    _bestSameSide = _enemy;
+                }
+            }
 
-		this.dirtySlots = _stillDirty;
-	}
+            if(_distance < _bestAnyDist) {
+                _bestAnyDist = _distance;
+                _bestAnySide = _enemy;
+            }
+        }
+
+        let _chosen = null;
+        let _sameSide = false;
+
+        if(_bestSameSide) {
+            _chosen = _bestSameSide;
+            _sameSide = true;
+        } else {
+            _chosen = _bestAnySide;
+            _sameSide = false;
+        }
+
+        if(!_chosen) {
+            _stillDirty.push(_slot);
+            continue;
+        }
+
+        // ==== YAKIN / UZAK SLOT DOLULUK ANALİZİ ====
+
+        const sameSideSlots = this.slots.filter(s =>
+            (s.xGap < 0) === (_slot.xGap < 0)
+        );
+
+        const nearSlots = sameSideSlots.filter(s => s.yGap === 0);
+        const farSlots  = sameSideSlots.filter(s => s.yGap !== 0);
+
+        const nearOccupied = nearSlots.filter(s => s.occupied).length;
+        const farOccupied  = farSlots.filter(s => s.occupied).length;
+
+        const nearRatio = nearOccupied / nearSlots.length;
+        const farRatio  = farOccupied  / farSlots.length;
+
+        let _finalSlot = _slot;
+
+        // Eğer yakın doluluk oranı uzak doluluktan yüksekse
+        // ve bu slot yakın ise → uzaktan boş bir tane seç
+        if(_slot.yGap === 0 && nearRatio > farRatio) {
+
+            const emptyFar = farSlots.find(s => !s.occupied);
+            if(emptyFar)
+                _finalSlot = emptyFar;
+        }
+
+        _finalSlot.occupied = true;
+        _finalSlot.target = _chosen;
+        _finalSlot.mustCross = !_sameSide;
+        _finalSlot.owner = this;
+
+        _chosen.slot = _finalSlot;
+    }
+
+    this.dirtySlots = _stillDirty;
+}
 	this.createSlots = function() {
-		if(!this.solid)
-			this.solid = true;
-		this.slots = [
-			{
-				type:'front',
-				xGap: MathRound(this._HURTBOX_half * 1.5),
-				yGap: 0,
-				occupied: false,
-				target: null
-			},
-			{
-				type:'back',
-				xGap: MathRound(this._HURTBOX_half * -1.5),
-				yGap: 0,
-				occupied: false,
-				target: null
-			}
-		];
-		this.dirtySlots = [this.slots[0], this.slots[1]];
-	}
+
+    if(!this.solid)
+        this.solid = true;
+
+    const yOffset = MathRound(episode.cHeight * 0.05);
+
+    const makeSlot = (type, xGap, yGap) => ({
+        type,
+        xGap,
+        yGap,
+        occupied: false,
+        target: null
+    });
+
+    const frontX = MathRound(this._HURTBOX_half * 1.5);
+    const backX  = MathRound(this._HURTBOX_half * -1.5);
+
+    this.slots = [
+        // FRONT (sağ)
+        makeSlot('front', frontX, 0),
+        makeSlot('front', frontX, -yOffset),
+        makeSlot('front', frontX,  yOffset),
+
+        // BACK (sol)
+        makeSlot('back', backX, 0),
+        makeSlot('back', backX, -yOffset),
+        makeSlot('back', backX,  yOffset)
+    ];
+
+    this.dirtySlots = [...this.slots];
+}
 	this.getSlotCoords = function() {
 		if(!this.slot)
 			return undefined;
@@ -842,7 +883,6 @@ function enemy(_e) {
 							_owner.dirtySlots.push(_slot);
 							_slot.occupied = false;
 							_slot.target = null;
-							console.log('Slot lost by ' + this.key);
 							delete this.slot;
 						}
 					}
@@ -854,7 +894,8 @@ function enemy(_e) {
 						HEIGHT: this.autoTarget.HEIGHT,
 						_HURTBOX_half: .5,
 						yPosition: coords.y,
-						yGap: 1
+						yGap: 1,
+						oldYPosition: this.autoTarget.oldYPosition
 					};
 				}
 			}
@@ -877,8 +918,26 @@ function enemy(_e) {
 						this.moveDirection = 'down';
 					else
 						this.moveDirection = undefined;
-					if (MathAbs(_target.yPosition - this.yPosition) <= 2) {
+					if (MathAbs(_target.yPosition - this.yPosition) <= this.verticalStep) {
 						this.lookingAtTarget = true;
+					}
+					else {
+						// const _oldY = this.oldYPosition;
+						// if(_target.yPosition <= _oldY && this.yPosition <= _target.yPosition && _target.yPosition === _target.oldYPosition)
+						// 	{
+						// 		this.lookingAtTarget = true;
+						// 		console.log(3);
+						// 	}
+						// else if(_target.yPosition >= _oldY && this.yPosition >= _target.yPosition && _target.yPosition === _target.oldYPosition)
+						// 	{
+						// 		this.lookingAtTarget = true;
+						// 		console.log(4);
+						// 	}
+						// else if(_oldY === this.yPosition)
+						// 	{
+						// 		this.lookingAtTarget = true;
+						// 		console.log(5);
+						// 	}
 					}
 				}
 				else {
@@ -920,41 +979,22 @@ function enemy(_e) {
 
 					// Çok küçük fark varsa titreşmesin
 					if (Math.abs(diffY) > 2) {
+						const _oldY = this.yPosition;
 						this.yPosition += yStep;
+						if(_target.yPosition <= _oldY && this.yPosition <= _target.yPosition && _target.yPosition === _target.oldYPosition)
+							{
+								this.lookingAtTarget = true;
+							}
+						else if(_target.yPosition >= _oldY && this.yPosition >= _target.yPosition && _target.yPosition === _target.oldYPosition	)
+							{
+								this.lookingAtTarget = true;
+							}
 						this.limitYPosition();
-					}
-					else
-					{
-						this.lookingAtTarget = true;
 					}
 				}
 			}
 		}
 	}
-	this.adjustYPosition = function(target) {
-
-		const diffY = target.yPosition - this.yPosition;
-
-		if (Math.abs(diffY) <= 2)
-			return;
-
-		const diffX = Math.abs(
-			(target.HURTLEFT + target._HURTBOX_half) -
-			(this.HURTLEFT + this._HURTBOX_half)
-		);
-
-		const maxInfluenceDistance = 400;
-		const distanceFactor = Math.max(0, 1 - (diffX / maxInfluenceDistance));
-
-		const step = diffY * 0.04 * distanceFactor;
-
-		this.yPosition += step;
-
-		if (this.yPosition < 0)
-			this.yPosition = 0;
-		else if (this.yPosition > getGroundHeight())
-			this.yPosition = getGroundHeight();
-	};
 	this.autoCommand = function () {
 		if (this.keyboard || this.harmless || (episode.realTime && this.alp))
 			return;
@@ -6751,6 +6791,7 @@ function enemy(_e) {
 			if(_frame.hitZoom <= 1)
 				delete _frame.hitZoom;
 		}
+		this.oldYPosition = this.yPosition;
 	}
 	this.getCenterSolid = function() {
 		let _top = this.TOP;
