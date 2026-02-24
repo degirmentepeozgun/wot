@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Attribute\**" />
+    <EmbeddedResource Remove="Attribute\**" />
+    <None Remove="Attribute\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Entity\FilterBase.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
+    <ProjectReference Include="..\EntityTemplates\EntityTemplates.csproj" />
+    <ProjectReference Include="..\Log\Logging.csproj" />
+    <ProjectReference Include="..\RedisCache\RedisCache.csproj" />
+  </ItemGroup>
+
+</Project>
