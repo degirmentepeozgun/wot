@@ -783,18 +783,20 @@ function enemy(_e) {
     });
 
     const frontX = MathRound(this._HURTBOX_half * 1.5);
+    const frontX2 = MathRound(this._HURTBOX_half * 1.25);
     const backX  = MathRound(this._HURTBOX_half * -1.5);
+    const backX2  = MathRound(this._HURTBOX_half * -1.25);
 
     this.slots = [
         // FRONT (sağ)
         makeSlot('front', frontX, 0),
-        makeSlot('front', frontX, -yOffset),
-        makeSlot('front', frontX,  yOffset),
+        makeSlot('front', frontX2, -yOffset),
+        makeSlot('front', frontX2,  yOffset),
 
         // BACK (sol)
         makeSlot('back', backX, 0),
-        makeSlot('back', backX, -yOffset),
-        makeSlot('back', backX,  yOffset)
+        makeSlot('back', backX2, -yOffset),
+        makeSlot('back', backX2,  yOffset)
     ];
 
     this.dirtySlots = [...this.slots];
@@ -908,10 +910,12 @@ function enemy(_e) {
 			else {
 				if(this.lookingAtTarget)
 					this.lookingAtTarget = false;	
-				const _anima = this.getCurrentAnimation();
+				let _anima = this.getCurrentAnimation();
 				if(isObjectsVerticallyInSameOrder(this, _target)) {
 					if(this.animation !== 'walk')
 						this.animate('walk', 1);
+					_anima = this.getCurrentAnimation();
+					_anima.mobilityY = true;
 					if(this.yPosition < _target.yPosition && this.moveDirection !== 'up')
 						this.moveDirection = 'up';
 					else if(this.yPosition > _target.yPosition && this.moveDirection !== 'down')
@@ -921,24 +925,6 @@ function enemy(_e) {
 					if (MathAbs(_target.yPosition - this.yPosition) <= this.verticalStep) {
 						this.lookingAtTarget = true;
 					}
-					else {
-						// const _oldY = this.oldYPosition;
-						// if(_target.yPosition <= _oldY && this.yPosition <= _target.yPosition && _target.yPosition === _target.oldYPosition)
-						// 	{
-						// 		this.lookingAtTarget = true;
-						// 		console.log(3);
-						// 	}
-						// else if(_target.yPosition >= _oldY && this.yPosition >= _target.yPosition && _target.yPosition === _target.oldYPosition)
-						// 	{
-						// 		this.lookingAtTarget = true;
-						// 		console.log(4);
-						// 	}
-						// else if(_oldY === this.yPosition)
-						// 	{
-						// 		this.lookingAtTarget = true;
-						// 		console.log(5);
-						// 	}
-					}
 				}
 				else {
 					const _thisOrigin = this.HURTLEFT + this._HURTBOX_half;
@@ -947,14 +933,32 @@ function enemy(_e) {
 						this.direction = __right;
 					else if(_thisOrigin > _targetOrigin && this.direction !== __left)
 						this.direction = __left;
-					this.run(_anima, this.direction);
-
+					const maxInfluenceDistance = MathRound(episode.cWidth * 0.4); 
 					const diffX = Math.abs(_targetOrigin - _thisOrigin);
+					if(diffX > maxInfluenceDistance) {
+						if(diffX > episode.cWidth || getRandomValue2(1, 10) === 10) {
+							if(this.animation !== 'run')
+								this.animate('run', 1);
+							this.autoStepXRate = 1;
+							if(!this.extraStepXRate)
+								this.extraStepXRate = this.calculateMoveXStep();
+						}
+					}
+					else {
+						if(this.animation !== 'walk')
+							this.animate('walk', 1);
+						_anima = this.getCurrentAnimation();
+						_anima.mobilityY = false;
+						this.moveDirection = this.direction;
+						this.autoStepXRate = .5 + ((diffX / episode.cWidth) * 0.5);
+						if(!this.extraStepXRate)
+							this.extraStepXRate = this.calculateMoveXStep();
+					}
 					const diffY = _target.yPosition - this.yPosition;
 
 					// X mesafesine göre Y düzeltme gücü
 					// Yaklaştıkça daha hassas, uzakken daha serbest
-					const maxInfluenceDistance = 400; // sahneye göre ayarlayabilirsin
+					// sahneye göre ayarlayabilirsin
 					const distanceFactor = Math.max(0, 1 - (diffX / maxInfluenceDistance));
 
 					// Dalgalı hareket için zaman tabanlı sin
