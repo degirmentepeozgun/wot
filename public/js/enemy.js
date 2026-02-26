@@ -813,6 +813,17 @@ function enemy(_e) {
 		const _y = _owner.yPosition + _slot.yGap;
 		return { x: _x, y: _y };
 	}
+	this.getAttackMsByDifficulty = function() {
+		const _df = this.difficulty ?? __account.difficulty ?? 4;
+		switch(_df) {
+			case 0: return 0;
+			case 1: return 250;
+			case 2: return 500;
+			case 3: return 750;
+			case 4: return 1000;
+			default: return 1000;	
+		}
+	}
 	this.autoCommand2 = function () { 
 		if (this.keyboard || this.harmless || (episode.realTime && this.alp))
 			return;
@@ -829,12 +840,19 @@ function enemy(_e) {
 		if(!this.autoTarget.slots){
 			this.autoTarget.createSlots();
 		}
-		if(this.slot && (this.slot.owner?.isDead?.() || this.slot.owner !== this.autoTarget)){
+		if(this.slot && (this.slot.owner?.isDead?.() || this.slot.owner !== this.autoTarget || this.animation === 'release'  || this.animation.startsWith('knockback'))){
 			this.slot.owner.dirtySlots.push(this.slot);
 			this.slot.occupied = false;
 			this.slot.mustCross = false;
 			this.slot.target = null;
 			delete this.slot;
+		}
+		let _anima = this.getCurrentAnimation();
+		if ((_anima.hurt && !this.animationFinished && (!this.hasChain || this.noCounter)) || this.animation === 'release' || this.dying || this.dead || this.immobilize) {
+			this.autoAttacking = false;
+			if(this.slot)
+				this.slot.attacking = false;
+			return;
 		}
 		if(!this.ranged) {
 			//eğer bir slot varsa isObjectsInTouch için 2. parametremiz bu slotun koordinatı olmalı eğer yok ise this.autoTarget olmalı
@@ -904,13 +922,30 @@ function enemy(_e) {
 			_target = _target ?? this.autoTarget;
 			const _touch = isObjectsInTouch(this, _target);
 			if(_touch.touch && this.lookingAtTarget) {
-				if(this.animation !== 'idle')
+				if(this.animation !== 'idle'){
+					if(this.slot)
+						this.slot.attacking = false;
 					this.idle();
+					this.lastAttackTime = _gameTick;
+					console.log(Math.random());
+				}
+				if(!this.lastAttackTime)
+					this.lastAttackTime = _gameTick;
+				if(_gameTick - this.lastAttackTime >= this.getAttackMsByDifficulty()) {
+					this.pickRandomAttack();
+					if(this.upcomingAnimation && this.upcomingAnimation !== 'idle')
+					{
+						if(this.slot)
+							this.slot.attacking = true;
+						this.animate(this.upcomingAnimation, 1);
+						this.autoAttacking = true;	
+						this.upcomingAnimation = undefined;
+					}
+				}
 			}
 			else {
 				if(this.lookingAtTarget)
 					this.lookingAtTarget = false;	
-				let _anima = this.getCurrentAnimation();
 				if(isObjectsVerticallyInSameOrder(this, _target)) {
 					if(this.animation !== 'walk')
 						this.animate('walk', 1);
@@ -937,7 +972,7 @@ function enemy(_e) {
 					const diffX = Math.abs(_targetOrigin - _thisOrigin);
 					if(diffX > maxInfluenceDistance) {
 						if(diffX > episode.cWidth || getRandomValue2(1, 10) === 10) {
-							if(this.animation !== 'run')
+							if(this.slot && this.animation !== 'run')
 								this.animate('run', 1);
 							this.autoStepXRate = 1;
 							if(!this.extraStepXRate)
