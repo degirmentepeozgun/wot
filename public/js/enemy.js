@@ -858,7 +858,8 @@ function enemy(_e) {
 			//eğer bir slot varsa isObjectsInTouch için 2. parametremiz bu slotun koordinatı olmalı eğer yok ise this.autoTarget olmalı
 			let _target;
 			if (this.slot) {
-
+				if(!this.upcomingAnimation)
+					this.pickRandomAttack();
 				const _slot = this.slot;
 				const _owner = _slot.owner;
 
@@ -964,6 +965,14 @@ function enemy(_e) {
 				else {
 					const _thisOrigin = this.HURTLEFT + this._HURTBOX_half;
 					const _targetOrigin = _target.HURTLEFT + _target._HURTBOX_half;
+					if(this.autoTarget && this.upcomingAnimation) {
+						const _newAnima = this.animations[this.upcomingAnimation];
+						if(_newAnima && _newAnima.attack && _newAnima.chargeDistance) {
+							const _realTargetOrigin = this.autoTarget.HURTLEFT + this.autoTarget._HURTBOX_half;
+							const _realDiff = MathAbs(_realTargetOrigin - _thisOrigin);
+							_newAnima.useExtraStepXRate = (_realDiff < _newAnima.chargeDistance.value && _realDiff > (_newAnima.chargeDistance.value * .5));	
+						}
+					}
 					if(_thisOrigin < _targetOrigin && this.direction !== __right)
 						this.direction = __right;
 					else if(_thisOrigin > _targetOrigin && this.direction !== __left)
