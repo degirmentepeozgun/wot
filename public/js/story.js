@@ -7313,7 +7313,7 @@ const __stories = [
 						id: 621,
 						minX: 1580,
 						maxX: 4800,
-						count: 3,
+						count: 4,
 						sight: 1000,
 						spawn: 1,
 						hp:160,
