@@ -668,542 +668,552 @@ function enemy(_e) {
 		this.enableSkills();
 	}
 	this.assignSlots = function() {
+        //Yapılması gereken işlem
 
-		if(!this.dirtySlots || this.dirtySlots.length === 0)
-			return;
 
-		const _centerX = this.HURTLEFT + this._HURTBOX_half;
+        if(!this.dirtySlots || this.dirtySlots.length === 0)
+            return;
 
-		const _enemies = episode
-			.getAvailableEnemies(this)
-			?.filter(x => x.autoTarget === this && !x.slot);
+        const _centerX = this.HURTLEFT + this._HURTBOX_half;
 
-		if(!_enemies || _enemies.length === 0)
-			return;
+        const _enemies = episode
+            .getAvailableEnemies(this)
+            ?.filter(x => x.autoTarget === this && !x.slot);
 
-		const _stillDirty = [];
+        if(!_enemies || _enemies.length === 0)
+            return;
 
-		for(let _slot of this.dirtySlots) {
+        const _stillDirty = [];
 
-			const _isLeft = _slot.xGap < 0;
+        for(let _slot of this.dirtySlots) {
 
-			let _bestSameSide = null;
-			let _bestSameSideDist = Infinity;
+            const _isLeft = _slot.xGap < 0;
 
-			let _bestAnySide = null;
-			let _bestAnyDist = Infinity;
+            let _bestSameSide = null;
+            let _bestSameSideDist = Infinity;
 
-			for(let _enemy of _enemies) {
+            let _bestAnySide = null;
+            let _bestAnyDist = Infinity;
 
-				if(_enemy.slot)
-					continue;
+            for(let _enemy of _enemies) {
 
-				const _enemyOriginX = _enemy.HURTLEFT + _enemy._HURTBOX_half;
-				const _isEnemyLeft = _enemyOriginX < _centerX;
-				const _distance = Math.abs(_enemyOriginX - _centerX);
+                if(_enemy.slot)
+                    continue;
 
-				if(_isLeft === _isEnemyLeft) {
-					if(_distance < _bestSameSideDist) {
-						_bestSameSideDist = _distance;
-						_bestSameSide = _enemy;
-					}
-				}
+                const _enemyOriginX = _enemy.HURTLEFT + _enemy._HURTBOX_half;
+                const _isEnemyLeft = _enemyOriginX < _centerX;
+                const _distance = Math.abs(_enemyOriginX - _centerX);
 
-				if(_distance < _bestAnyDist) {
-					_bestAnyDist = _distance;
-					_bestAnySide = _enemy;
-				}
-			}
+                if(_isLeft === _isEnemyLeft) {
+                    if(_distance < _bestSameSideDist) {
+                        _bestSameSideDist = _distance;
+                        _bestSameSide = _enemy;
+                    }
+                }
 
-			let _chosen = null;
-			let _sameSide = false;
+                if(_distance < _bestAnyDist) {
+                    _bestAnyDist = _distance;
+                    _bestAnySide = _enemy;
+                }
+            }
 
-			if(_bestSameSide) {
-				_chosen = _bestSameSide;
-				_sameSide = true;
-			} else {
-				_chosen = _bestAnySide;
-				_sameSide = false;
-			}
+            let _chosen = null;
+            let _sameSide = false;
 
-			if(!_chosen) {
-				_stillDirty.push(_slot);
-				continue;
-			}
+            if(_bestSameSide) {
+                _chosen = _bestSameSide;
+                _sameSide = true;
+            } else {
+                _chosen = _bestAnySide;
+                _sameSide = false;
+            }
 
-			// ==== YAKIN / UZAK SLOT DOLULUK ANALİZİ ====
+            if(!_chosen) {
+                _stillDirty.push(_slot);
+                continue;
+            }
 
-			const sameSideSlots = this.slots.filter(s =>
-				(s.xGap < 0) === (_slot.xGap < 0)
-			);
+            // ==== YAKIN / UZAK SLOT DOLULUK ANALİZİ ====
 
-			const nearSlots = sameSideSlots.filter(s => s.yGap === 0);
-			const farSlots  = sameSideSlots.filter(s => s.yGap !== 0);
+            const sameSideSlots = this.slots.filter(s =>
+                (s.xGap < 0) === (_slot.xGap < 0)
+            );
 
-			const nearOccupied = nearSlots.filter(s => s.occupied).length;
-			const farOccupied  = farSlots.filter(s => s.occupied).length;
+            const nearSlots = sameSideSlots.filter(s => s.yGap === 0);
+            const farSlots  = sameSideSlots.filter(s => s.yGap !== 0);
 
-			const nearRatio = nearOccupied / nearSlots.length;
-			const farRatio  = farOccupied  / farSlots.length;
+            const nearOccupied = nearSlots.filter(s => s.occupied).length;
+            const farOccupied  = farSlots.filter(s => s.occupied).length;
 
-			let _finalSlot = _slot;
+            const nearRatio = nearOccupied / nearSlots.length;
+            const farRatio  = farOccupied  / farSlots.length;
 
-			// Eğer yakın doluluk oranı uzak doluluktan yüksekse
-			// ve bu slot yakın ise → uzaktan boş bir tane seç
-			if(_slot.yGap === 0 && nearRatio > farRatio) {
+            let _finalSlot = _slot;
 
-				const emptyFar = farSlots.find(s => !s.occupied);
-				if(emptyFar)
-					_finalSlot = emptyFar;
-			}
+            // Eğer yakın doluluk oranı uzak doluluktan yüksekse
+            // ve bu slot yakın ise → uzaktan boş bir tane seç
+            if(_slot.yGap === 0 && nearRatio > farRatio) {
 
-			_finalSlot.occupied = true;
-			if(_chosen.pendingSlot) {
-				_chosen.reorderPendingQueue();
-				_chosen.pendingSlot = undefined;
-			}
-			_finalSlot.occupant = _chosen;
-			_finalSlot.mustCross = !_sameSide;
-			_finalSlot.owner = this;
+                const emptyFar = farSlots.find(s => !s.occupied);
+                if(emptyFar)
+                    _finalSlot = emptyFar;
+            }
 
-			_chosen.slot = _finalSlot;
-			_chosen.pickRandomAttack();
-			_enemies.splice(_enemies.indexOf(_chosen), 1);
-		}
+            _finalSlot.occupied = true;
+            if(_chosen.pendingSlot) {
+                _chosen.reorderPendingQueue();
+                _chosen.pendingSlot = undefined;
+            }
+            _finalSlot.occupant = _chosen;
+            _finalSlot.mustCross = !_sameSide;
+            _finalSlot.owner = this;
 
-		this.dirtySlots = _stillDirty;
-	}
-	this.createSlots = function() {
+            _chosen.slot = _finalSlot;
+            _chosen.pickRandomAttack();
+            _enemies.splice(_enemies.indexOf(_chosen), 1);
+        }
 
-		if(!this.solid)
-			this.solid = true;
+        this.dirtySlots = _stillDirty;
+    }
+    this.createSlots = function() {
 
-		const yOffset = MathRound(episode.cHeight * 0.025);
+        if(!this.solid)
+            this.solid = true;
 
-		const makeSlot = (type, xGap, yGap) => ({
-			type,
-			xGap,
-			yGap,
-			occupied: false,
-			attackerQueue: [],
-			target: null,
-			owner: this
-		});
+        const yOffset = MathRound(episode.cHeight * 0.025);
 
-		const frontX = MathRound(this._HURTBOX_half * 1.5);
-		const frontX2 = MathRound(this._HURTBOX_half * 1.35);
-		const frontX3 = MathRound(this._HURTBOX_half * 1.2);
-		const backX  = MathRound(this._HURTBOX_half * -1.5);
-		const backX2  = MathRound(this._HURTBOX_half * -1.35);
-		const backX3  = MathRound(this._HURTBOX_half * -1.2);
+        const makeSlot = (type, xGap, yGap) => ({
+            type,
+            xGap,
+            yGap,
+            occupied: false,
+            attackerQueue: [],
+            target: null,
+            owner: this
+        });
 
-		this.slots = [
-			// FRONT (sağ)
-			makeSlot('front', frontX, 0),
-			// makeSlot('front', frontX2, -yOffset),
-			// makeSlot('front', frontX3, -yOffset * 2),
-			// makeSlot('front', frontX2,  yOffset),
-			// makeSlot('front', frontX3,  yOffset * 2),
-			// BACK (sol)
-			makeSlot('back', backX, 0),
-			// makeSlot('back', backX2, -yOffset),
-			// makeSlot('back', backX2,  yOffset),
-			// makeSlot('back', backX3, -yOffset * 2),
-			// makeSlot('back', backX3,  yOffset * 2)
-		];
+        const frontX = MathRound(this._HURTBOX_half * 1.5);
+        const frontX2 = MathRound(this._HURTBOX_half * 1.35);
+        const frontX3 = MathRound(this._HURTBOX_half * 1.2);
+        const backX  = MathRound(this._HURTBOX_half * -1.5);
+        const backX2  = MathRound(this._HURTBOX_half * -1.35);
+        const backX3  = MathRound(this._HURTBOX_half * -1.2);
 
-		this.dirtySlots = [...this.slots];
-	}
-	this.getSlotCoords = function() {
-		if(!this.slot && !this.pendingSlot)
-			return undefined;
-		const _slot = this.pendingSlot ?? this.slot;
-		const _owner = _slot.owner;
-		//burada owner bizim saldıracağımız karakter ve slotun xGap ve yGap değerlerini
-		//ownerın origin noktasına xGap ekleyerek ve yPosition değerine yGap ekleyerek koordinat bulunup geri döndürülür
-		const _ownerOriginX = _owner.HURTLEFT + _owner._HURTBOX_half;
-		const _x = _ownerOriginX + _slot.xGap;
-		const _y = _owner.yPosition + _slot.yGap;
-		return { x: _x, y: _y };
-	}
-	this.getAttackMsByDifficulty = function() {
-		const _df = this.difficulty ?? __account.difficulty ?? 4;
-		switch(_df) {
-			case 0: return 0;
-			case 1: return 250;
-			case 2: return 500;
-			case 3: return 750;
-			case 4: return 1000;
-			default: return 1000;	
-		}
-	}
-	this.animateSlotAttack = function() {
-		if(this.slot)
-			this.slot.attacking = true;
-		this.animate(this.upcomingAnimation, 1);
-		this.autoAttacking = true;	
-		this.upcomingAnimation = undefined;
-	}
-	this.pickSlotOrder = function() {
-		const _target = this.autoTarget;
-		const _targetCenterX = _target.HURTLEFT + _target._HURTBOX_half;
-		const _myCenterX     = this.HURTLEFT + this._HURTBOX_half;
-		const _amILeft = _myCenterX < _targetCenterX;
+        this.slots = [
+            // FRONT (sağ)
+            makeSlot('front', frontX, 0),
+            makeSlot('front', frontX2, -yOffset),
+            makeSlot('front', frontX3, -yOffset * 2),
+            makeSlot('front', frontX2,  yOffset),
+            makeSlot('front', frontX3,  yOffset * 2),
+            // BACK (sol)
+            makeSlot('back', backX, 0),
+            makeSlot('back', backX2, -yOffset),
+            makeSlot('back', backX2,  yOffset),
+            makeSlot('back', backX3, -yOffset * 2),
+            makeSlot('back', backX3,  yOffset * 2)
+        ];
 
-		// 1) İlgili taraf slotlarını al
-		const _sideSlots = [];
-		const _oppositeSlots = [];
-		let _sideSlotsZeroIndexCount = 0, _oppositeSlotsZeroIndexCount = 0;
-		let _minSideDepth = Infinity, _minOppositeDepth = Infinity;
-		for(let _slot of _target.slots) {
-			const _len = _slot.attackerQueue.length;
-			if((_amILeft && _slot.xGap < 0) ||
-			(!_amILeft && _slot.xGap > 0)) {
-				_sideSlots.push(_slot);
-				_sideSlotsZeroIndexCount += _len > 0 ? 1 : 0;
-				if(_minSideDepth > _len)
-					_minSideDepth = _len;
-			}
-			else {
-				_oppositeSlots.push(_slot);
-				_oppositeSlotsZeroIndexCount += _len > 0 ? 1 : 0;
-				if(_minOppositeDepth > _len)
-					_minOppositeDepth = _len;
-			}
-		}
+        this.dirtySlots = [...this.slots];
+    }
+    this.getSlotCoords = function() {
+        if(!this.slot && !this.pendingSlot)
+            return undefined;
+        const _slot = this.slot ?? this.pendingSlot;
+        const _owner = _slot.owner;
+        //burada owner bizim saldıracağımız karakter ve slotun xGap ve yGap değerlerini
+        //ownerın origin noktasına xGap ekleyerek ve yPosition değerine yGap ekleyerek koordinat bulunup geri döndürülür
+        const _ownerOriginX = _owner.HURTLEFT + _owner._HURTBOX_half;
+        const _x = _ownerOriginX + _slot.xGap;
+        const _y = _owner.yPosition + _slot.yGap;
+        return { x: _x, y: _y };
+    }
+    this.getAttackMsByDifficulty = function() {
+        const _df = this.difficulty ?? __account.difficulty ?? 4;
+        switch(_df) {
+            case 0: return 0;
+            case 1: return 250;
+            case 2: return 500;
+            case 3: return 750;
+            case 4: return 1000;
+            default: return 1000;   
+        }
+    }
+    this.animateSlotAttack = function() {
 		
-		const _isSideBusy = _sideSlotsZeroIndexCount > _oppositeSlotsZeroIndexCount; 
-		
-
-		if (!_isSideBusy && _sideSlots.length === 0) return null;
-		else if(_isSideBusy && _oppositeSlots.length === 0) return null;
-		const _arr = (!_isSideBusy ? _sideSlots : _oppositeSlots);
-		let _minDepth = !_isSideBusy ? _minSideDepth : _minOppositeDepth;
-		const _lowestDepthSlots = _arr.filter(s => {
-			const d = s.attackerQueue.length;
-			return d === _minDepth;
-		});
-
-		let _candidateSlots = [];
-		if (_lowestDepthSlots.length > 0 && _lowestDepthSlots.length !== _arr.length) {
-			_candidateSlots = _lowestDepthSlots;
-		} else {
-			const _sorted = [..._arr].sort((a, b) => {
-				const ax = _targetCenterX + a.xGap;
-				const bx = _targetCenterX + b.xGap;
-				const da = Math.abs(ax - _myCenterX);
-				const db = Math.abs(bx - _myCenterX);
-				return da - db;
-			});
-			_candidateSlots = _sorted.slice(0, 3);
+		if(this.autoTarget && this.autoTarget.slots){
+			if(this.autoTarget.slots.filter(x => x.attacking)?.length === 2)
+				return;
 		}
+        if(this.slot)
+            this.slot.attacking = true;
+        this.animate(this.upcomingAnimation, 1);
+        this.autoAttacking = true;  
+        this.upcomingAnimation = undefined;
+    }
+    this.pickSlotOrder = function() {
+        const _target = this.autoTarget;
+        const _targetCenterX = _target.HURTLEFT + _target._HURTBOX_half;
+        const _myCenterX     = this.HURTLEFT + this._HURTBOX_half;
+        const _amILeft = _myCenterX < _targetCenterX;
 
-		if (_candidateSlots.length === 0) return null;
+        // 1) İlgili taraf slotlarını al
+        const _sideSlots = [];
+        const _oppositeSlots = [];
+        let _sideSlotsZeroIndexCount = 0, _oppositeSlotsZeroIndexCount = 0;
+        let _minSideDepth = Infinity, _minOppositeDepth = Infinity;
+        for(let _slot of _target.slots) {
+            const _len = _slot.attackerQueue.length;
+            if((_amILeft && _slot.xGap < 0) ||
+            (!_amILeft && _slot.xGap > 0)) {
+                _sideSlots.push(_slot);
+                _sideSlotsZeroIndexCount += _len > 0 ? 1 : 0;
+                if(_minSideDepth > _len)
+                    _minSideDepth = _len;
+            }
+            else {
+                _oppositeSlots.push(_slot);
+                _oppositeSlotsZeroIndexCount += _len > 0 ? 1 : 0;
+                if(_minOppositeDepth > _len)
+                    _minOppositeDepth = _len;
+            }
+        }
+        
+        const _isSideBusy = _sideSlotsZeroIndexCount > _oppositeSlotsZeroIndexCount; 
+        
 
-		// 3) Random seçim
-		const _selectedSlot =
-			_candidateSlots[Math.floor(Math.random() * _candidateSlots.length)];
+        if (!_isSideBusy && _sideSlots.length === 0) return null;
+        else if(_isSideBusy && _oppositeSlots.length === 0) return null;
+        const _arr = (!_isSideBusy ? _sideSlots : _oppositeSlots);
+        let _minDepth = !_isSideBusy ? _minSideDepth : _minOppositeDepth;
+        const _lowestDepthSlots = _arr.filter(s => {
+            const d = s.attackerQueue.length;
+            return d === _minDepth;
+        });
 
-		// 4) Attacker queue kontrolü / ekleme
-		if (!_selectedSlot.attackerQueue) _selectedSlot.attackerQueue = [];
+        let _candidateSlots = [];
+        if (_lowestDepthSlots.length > 0 && _lowestDepthSlots.length !== _arr.length) {
+            _candidateSlots = _lowestDepthSlots;
+        } else {
+            const _sorted = [..._arr].sort((a, b) => {
+                const ax = _targetCenterX + a.xGap;
+                const bx = _targetCenterX + b.xGap;
+                const da = Math.abs(ax - _myCenterX);
+                const db = Math.abs(bx - _myCenterX);
+                return da - db;
+            });
+            _candidateSlots = _sorted.slice(0, 3);
+        }
 
-		if (_selectedSlot.occupied) {
-			// Slot doluysa kuyruğa ekle
-			//_selectedSlot.attackerQueue.push(this);
-			this.enqueueSlot(_selectedSlot, this, _isSideBusy);
+        if (_candidateSlots.length === 0) return null;
 
-			// this.pendingSlot = {
-			// 	mustCross: ,
-			// 	slot: _selectedSlot,
-			// 	xGap: _selectedSlot.xGap,
-			// 	yGap: _selectedSlot.yGap,
-			// 	index: _selectedSlot.attackerQueue.length - 1
-			// };
-			// this.pendingSlot.owner = this.pendingSlot.index > 0 ? 
-			// _selectedSlot.attackerQueue[this.pendingSlot.index - 1] : _selectedSlot.occupant;
-		} 
-		// else {
-		// 	// Slot boşsa direkt ata
-		// 	_selectedSlot.occupied = true;
-		// 	_selectedSlot.occupant = this;
-		// 	this.slot = _selectedSlot;
-		// 	this.pendingSlot = null;
-		// }
-		return _selectedSlot;
-	};
-	this.enqueueSlot = function(slot, enemy, _cross) {
-		if (!slot.attackerQueue.includes(enemy)) {
-			slot.attackerQueue.push(enemy);
-			enemy.pendingSlot = {
-				slot: slot,
-				mustCross: _cross,
-				xGap: slot.xGap,
-				yGap: slot.yGap,
-				index: slot.attackerQueue.length - 1,
-				owner: slot.attackerQueue.length > 1
-					? slot.attackerQueue[slot.attackerQueue.length - 2]
-					: slot.occupant
-			};
-		}
-	}
-	this.dequeueSlot = function(slot, enemy) {
+        // 3) Random seçim
+        const _selectedSlot =
+            _candidateSlots[Math.floor(Math.random() * _candidateSlots.length)];
 
-		const index = slot.attackerQueue.indexOf(enemy);
-		if (index === -1) return;
+        // 4) Attacker queue kontrolü / ekleme
+        if (!_selectedSlot.attackerQueue) _selectedSlot.attackerQueue = [];
 
-		slot.attackerQueue.splice(index, 1);
+        if (_selectedSlot.occupied) {
+            // Slot doluysa kuyruğa ekle
+            //_selectedSlot.attackerQueue.push(this);
+            this.enqueueSlot(_selectedSlot, this, _isSideBusy);
+        } 
+        return _selectedSlot;
+    };
+    this.enqueueSlot = function(slot, enemy, _cross) {
+        if (!slot.attackerQueue.includes(enemy)) {
+            slot.attackerQueue.push(enemy);
+            let _rand = MathRound((getRandomValue2(120, 150) / 100) * enemy._HURTBOX_half);
+            if(slot.type === 'back')
+                _rand *= -1;
+            const yOffset = MathRound(episode.cHeight * ((getRandomValue2(0,50) - 25) / 1000));
+            enemy.pendingSlot = {
+                slot: slot,
+                mustCross: _cross,
+                xGap: _rand,
+                yGap: yOffset,
+                index: slot.attackerQueue.length - 1,
+                owner: slot.attackerQueue.length > 1
+                    ? slot.attackerQueue[slot.attackerQueue.length - 2]
+                    : slot.occupant
+            };
+        }
+    }
+    this.dequeueSlot = function(slot, enemy) {
 
-		enemy.pendingSlot = null;
+        const index = slot.attackerQueue.indexOf(enemy);
+        if (index === -1) return;
 
-		// Zinciri düzelt
-		for (let i = 0; i < slot.attackerQueue.length; i++) {
-			const e = slot.attackerQueue[i];
+        slot.attackerQueue.splice(index, 1);
 
-			if (!e.pendingSlot) continue;
+        enemy.pendingSlot = null;
 
-			e.pendingSlot.index = i;
-			e.pendingSlot.owner =
-				i > 0
-					? slot.attackerQueue[i - 1]
-					: slot.occupant;
-		}
-	}
-	this.reorderPendingQueue = function() {
-		const slot = this.pendingSlot?.slot;
-		if (!slot) return;
-		const queue = slot.attackerQueue;
-		const index = queue.indexOf(this);
-		if (index === -1) return;	
-		while (slot.attackerQueue.length > 0) {
+        // Zinciri düzelt
+        for (let i = 0; i < slot.attackerQueue.length; i++) {
+            const e = slot.attackerQueue[i];
 
-			const next = slot.attackerQueue.shift();
+            if (!e.pendingSlot) continue;
 
-			if (!next || next.isDead?.()) {
-				continue; // ölü ise atla
-			}
+            e.pendingSlot.index = i;
+            e.pendingSlot.owner =
+                i > 0
+                    ? slot.attackerQueue[i - 1]
+                    : slot.occupant;
+        }
+    }
+    this.reorderPendingQueue = function() {
+        const slot = this.pendingSlot?.slot;
+        if (!slot) return;
+        const queue = slot.attackerQueue;
+        const index = queue.indexOf(this);
+        if (index === -1) return;   
+        while (slot.attackerQueue.length > 0) {
 
-			next.pendingSlot = null;
-			next.slot = slot;
+            const next = slot.attackerQueue.shift();
 
-			slot.occupant = next;
-			slot.occupied = true;
+            if (!next || next.isDead?.()) {
+                continue; // ölü ise atla
+            }
 
-			break;
-		}
-		// owner zincirini yeniden kur
-		for (let i = 0; i < slot.attackerQueue.length; i++) {
-			const e = slot.attackerQueue[i];
-			if (!e.pendingSlot) continue;
+            next.pendingSlot = null;
+            next.slot = slot;
 
-			e.pendingSlot.index = i;
-			e.pendingSlot.owner =
-				i > 0
-					? slot.attackerQueue[i - 1]
-					: slot.occupant;
-		}
-	}
-	this.promoteNext = function(slot) {
+            slot.occupant = next;
+            slot.occupied = true;
 
-		if (slot.occupied) return;
-		if (!slot.attackerQueue.length) return;
-		slot.occupied = false;
-		slot.occupant = null;
+            break;
+        }
+        // owner zincirini yeniden kur
+        for (let i = 0; i < slot.attackerQueue.length; i++) {
+            const e = slot.attackerQueue[i];
+            if (!e.pendingSlot) continue;
 
-		while (slot.attackerQueue.length > 0) {
+            e.pendingSlot.index = i;
+            e.pendingSlot.owner =
+                i > 0
+                    ? slot.attackerQueue[i - 1]
+                    : slot.occupant;
+        }
+    }
+    this.promoteNext = function(slot) {
 
-			const next = slot.attackerQueue.shift();
+        if (slot.occupied) return;
+        if (!slot.attackerQueue.length) return;
+        slot.occupied = false;
+        slot.occupant = null;
 
-			if (!next || next.isDead?.()) {
-				continue; // ölü ise atla
-			}
+        while (slot.attackerQueue.length > 0) {
 
-			next.pendingSlot = null;
-			next.slot = slot;
+            const next = slot.attackerQueue.shift();
 
-			slot.occupant = next;
-			slot.occupied = true;
+            if (!next || next.isDead?.()) {
+                continue; // ölü ise atla
+            }
 
-			break;
-		}
-		// owner zincirini yeniden kur
-		for (let i = 0; i < slot.attackerQueue.length; i++) {
-			const e = slot.attackerQueue[i];
-			if (!e.pendingSlot) continue;
+            next.pendingSlot = null;
+            next.slot = slot;
 
-			e.pendingSlot.index = i;
-			e.pendingSlot.owner =
-				i > 0
-					? slot.attackerQueue[i - 1]
-					: slot.occupant;
-		}
-	}
-	
-	this.releaseSlot = function() {
+            slot.occupant = next;
+            slot.occupied = true;
 
-		if (this.slot) {
+            break;
+        }
+        // owner zincirini yeniden kur
+        for (let i = 0; i < slot.attackerQueue.length; i++) {
+            const e = slot.attackerQueue[i];
+            if (!e.pendingSlot) continue;
 
-			const slot = this.slot;
+            e.pendingSlot.index = i;
+            e.pendingSlot.owner =
+                i > 0
+                    ? slot.attackerQueue[i - 1]
+                    : slot.occupant;
+        }
+    }
+    
+    this.releaseSlot = function() {
 
-			slot.owner.dirtySlots.push(this.slot);
-			slot.occupied = false;
-			slot.occupant = null;
+        if (this.slot) {
+			console.log('Releasing main slot for', this.key);
+            const slot = this.slot;
+			for(let attacker of slot.attackerQueue) {
+				attacker.pendingSlot = null;
+			}	
+			slot.attackerQueue.length = 0;
+            slot.owner.dirtySlots.push(this.slot);
+            slot.occupied = false;
+            slot.occupant = null;
+			slot.attacking = false;
+            this.slot = null;
+            //this.promoteNext(slot);
+        }
 
-			this.slot = null;
-			//this.promoteNext(slot);
-		}
+        else if (this.pendingSlot) {
+			console.log('Releasing pending slot for', this.key);
+            const slot = this.pendingSlot.slot;
 
-		else if (this.pendingSlot) {
+            this.dequeueSlot(slot, this);
+        }
+    }
+    this.updateSlot = function() {
+        const _slot = this.pendingSlot ?? this.slot;
+        if (!_slot || !_slot.owner) {
+            this.releaseSlot();
+            return undefined;
+        }
+        const _target = _slot.owner;
+        const coords = this.getSlotCoords();
+        if (coords) {
+            const slotLine = coords.x;
+            const myCenter = this.HURTLEFT + this._HURTBOX_half;
+            // === MUST CROSS RESET ===
+            if (_slot.mustCross) {
+                const passed =
+                    (_slot.xGap < 0 && myCenter < slotLine) ||
+                    (_slot.xGap > 0 && myCenter > slotLine);
+                if (passed) {
 
-			const slot = this.pendingSlot.slot;
+                    _slot.mustCross = false;
 
-			this.dequeueSlot(slot, this);
-		}
-	}
-	this.updateSlot = function() {
-		const _slot = this.pendingSlot ?? this.slot;
-		if (!_slot || !_slot.owner) {
-			this.releaseSlot();
-			return undefined;
-		}
-		const _target = _slot.owner;
-		const coords = this.getSlotCoords();
-		if (coords) {
-			const slotLine = coords.x;
-			const myCenter = this.HURTLEFT + this._HURTBOX_half;
-			// === MUST CROSS RESET ===
-			if (_slot.mustCross) {
-				const passed =
-					(_slot.xGap < 0 && myCenter < slotLine) ||
-					(_slot.xGap > 0 && myCenter > slotLine);
-				if (passed) {
+                    // --- YÖNÜ TARGET'A ÇEVİR ---
+                    const targetCenter =
+                        _target.HURTLEFT +
+                        _target._HURTBOX_half;
 
-					_slot.mustCross = false;
+                    this.direction =
+                        (myCenter < targetCenter)
+                            ? __right
+                            : __left;
+                }
+            }
 
-					// --- YÖNÜ TARGET'A ÇEVİR ---
-					const targetCenter =
-						_target.HURTLEFT +
-						_target._HURTBOX_half;
+            // === SLOT BOZULMA ===
+            else if(this.slot){
 
-					this.direction =
-						(myCenter < targetCenter)
-							? __right
-							: __left;
-				}
-			}
+                const wrongSide =
+                    (_slot.xGap < 0 && myCenter > slotLine) ||
+                    (_slot.xGap > 0 && myCenter < slotLine);
 
-			// === SLOT BOZULMA ===
-			else if(this.slot){
+                if (wrongSide && MathAbs(myCenter - slotLine) > (episode.cWidth * 0.1)) {
+                    this.releaseSlot();
+                    return undefined;
+                }
+            }
 
-				const wrongSide =
-					(_slot.xGap < 0 && myCenter > slotLine) ||
-					(_slot.xGap > 0 && myCenter < slotLine);
-
-				if (wrongSide) {
-					this.releaseSlot();
-					return undefined;
-				}
-			}
-
-			return {
-				HURTLEFT: coords.x + (_slot.mustCross ? (_slot.xGap < 0 ? -this.HURTWIDTH : this.HURTWIDTH) : 0),
-				HURTWIDTH: 1,
-				TOP: _target.TOP,
-				HEIGHT: _target.HEIGHT,
-				_HURTBOX_half: .5,
-				yPosition: coords.y,
-				yGap: 1,
-				oldYPosition: _target.oldYPosition
-			};
-		}
-		return undefined;
-	}
-	this.autoCommand2 = function () { 
-		if (this.keyboard || this.harmless || (episode.realTime && this.alp))
-			return;
-		if(!this.animationFinished && this.animations[this.animation]?.attack)
-			return;
-		if(!this.autoTarget || this.autoTarget.isDead())
-			this.pickNewTarget();
-		if(!this.autoTarget)
-		{
-			if(this.animation !== 'idle')
-				this.idle();
-			return;
-		}
-		if(!this.autoTarget.slots){
-			this.autoTarget.createSlots();
-		}
-		const _away = this.animation === 'release'  || this.animation.startsWith('knockback');
-		if(((this.slot && (this.slot.owner?.isDead?.() || this.slot.owner !== this.autoTarget)) ||
-		(this.pendingSlot && (this.pendingSlot.owner?.isDead?.()))) || _away){
-			this.releaseSlot();
-		}
-		let _anima = this.getCurrentAnimation();
-		if ((_anima.hurt && !this.animationFinished && (!this.hasChain || this.noCounter)) || this.animation === 'release' || this.dying || this.dead || this.immobilize) {
-			this.autoAttacking = false;
-			if(this.slot)
-				this.slot.attacking = false;
-			return;
-		}
-		if(!this.ranged) {
-			//eğer bir slot varsa isObjectsInTouch için 2. parametremiz bu slotun koordinatı olmalı eğer yok ise this.autoTarget olmalı
-			let _target;
-			if (this.slot) {
-				if(!this.upcomingAnimation)
-					this.pickRandomAttack();
-				_target = this.updateSlot();
-				if(!_target)
-					return;
-			}
-			else {
-				let hasEmptySlot = this.autoTarget.dirtySlots?.length > 0;
-				if(!hasEmptySlot && this.autoTarget.dirtySlots !== undefined && !this.pendingSlot)
-					this.pickSlotOrder();
-				if(this.pendingSlot){
-					_target = this.updateSlot();
-					if(!_target)
-						return;
-				}
-			}
-			_target = _target ?? this.autoTarget;
-			const _touch = isObjectsInTouch(this, _target);
-			if(_touch.touch && this.lookingAtTarget) {
-				if(this.animation !== 'idle'){
-					if(this.slot)
-						this.slot.attacking = false;
-					this.idle();
-					this.lastAttackTime = _gameTick;
-				}
-				if(!this.lastAttackTime)
-					this.lastAttackTime = _gameTick;
-				if(this.slot && _gameTick - this.lastAttackTime >= this.getAttackMsByDifficulty()) {
-					this.pickRandomAttack();
-					if(this.upcomingAnimation && this.upcomingAnimation !== 'idle')
-						this.animateSlotAttack();
-				}
-			}
-			else {
-				if(this.lookingAtTarget)
-					this.lookingAtTarget = false;	
-				if(isObjectsVerticallyInSameOrder(this, _target)) {
-					if(this.animation !== 'walk')
-						this.animate('walk', 1);
-					_anima = this.getCurrentAnimation();
-					_anima.mobilityY = true;
-					if(this.yPosition < _target.yPosition && this.moveDirection !== 'up')
-						this.moveDirection = 'up';
-					else if(this.yPosition > _target.yPosition && this.moveDirection !== 'down')
-						this.moveDirection = 'down';
-					else
-						this.moveDirection = undefined;
-					if (MathAbs(_target.yPosition - this.yPosition) <= this.verticalStep) {
-						this.lookingAtTarget = true;
+            return {
+                HURTLEFT: coords.x + (_slot.mustCross ? (_slot.xGap < 0 ? -this.HURTWIDTH : this.HURTWIDTH) : 0),
+                HURTWIDTH: 1,
+                TOP: _target.TOP,
+                HEIGHT: _target.HEIGHT,
+                _HURTBOX_half: .5,
+                yPosition: coords.y,
+                yGap: 1,
+                oldYPosition: _target.oldYPosition
+            };
+        }
+        return undefined;
+    }
+    this.autoCommand2 = function () { 
+        if (this.harmless || (episode.realTime && this.alp))
+            return;
+        if(!this.animationFinished && this.animations[this.animation]?.attack)
+            return;
+        if(this.isDead()) {
+            this.releaseSlot();
+            return;
+        }
+        if(!this.autoTarget || this.autoTarget.isDead())
+            this.pickNewTarget();
+        if(!this.autoTarget)
+        {
+            if(this.animation !== 'idle')
+                this.idle();
+            return;
+        }
+        if(!this.autoTarget.slots){
+            this.autoTarget.createSlots();
+        }
+        const _away = this.animation === 'release'  || this.animation.startsWith('knockback');
+        if(((this.slot && (this.slot.owner?.isDead?.() || this.slot.owner !== this.autoTarget)) ||
+        (this.pendingSlot && (this.pendingSlot.owner?.isDead?.()))) || _away){
+            this.releaseSlot();
+        }
+        let _anima = this.getCurrentAnimation();
+        if ((_anima.hurt && !this.animationFinished && (!this.hasChain || this.noCounter)) || this.animation === 'release' || this.dying || this.dead || this.immobilize) {
+            this.autoAttacking = false;
+            if(this.slot)
+                this.slot.attacking = false;
+            return;
+        }
+        if(!this.ranged) {
+            //eğer bir slot varsa isObjectsInTouch için 2. parametremiz bu slotun koordinatı olmalı eğer yok ise this.autoTarget olmalı
+            let _target;
+            if (this.slot) {
+                if(!this.upcomingAnimation)
+                    this.pickRandomAttack();
+                _target = this.updateSlot();
+                if(!_target)
+                    return;
+            }
+            else {
+                let hasEmptySlot = this.autoTarget.dirtySlots?.length > 0;
+                if(!hasEmptySlot && this.autoTarget.dirtySlots !== undefined && !this.pendingSlot)
+                    this.pickSlotOrder();
+                if(this.pendingSlot){
+                    _target = this.updateSlot();
+                    if(!_target)
+                        return;
+                }
+            }
+            _target = _target ?? this.autoTarget;
+            const _touch = isObjectsInTouch(this, _target);
+			const _canAttack = (_target.attackerCount ?? 0) < 2;
+            if(_touch.touch && this.lookingAtTarget) {
+                if(this.animation !== 'idle'){
+                    if(this.slot)
+                        this.slot.attacking = false;
+                    this.idle();
+					if(this.autoTarget) {
+						const _thisOrigin = this.HURTLEFT + this._HURTBOX_half;
+						const _targetOrigin = this.autoTarget.HURTLEFT + this.autoTarget._HURTBOX_half;
+						if(_targetOrigin < _thisOrigin && this.direction !== __left)
+							this.direction = __left;
+						else if(_targetOrigin > _thisOrigin && this.direction !== __right)
+							this.direction = __right;
 					}
-				}
+                    this.lastAttackTime = _gameTick;
+                }
+                if(!this.lastAttackTime)
+                    this.lastAttackTime = _gameTick;
+                if(this.slot && _canAttack && _gameTick - this.lastAttackTime >= this.getAttackMsByDifficulty()) {
+                    this.pickRandomAttack();
+                    if(this.upcomingAnimation && this.upcomingAnimation !== 'idle')
+                        this.animateSlotAttack();
+                }
+            }
+            else {
+                if(this.lookingAtTarget)
+                    this.lookingAtTarget = false;   
+                if(isObjectsVerticallyInSameOrder(this, _target)) {
+                    if(this.animation !== 'walk')
+                        this.animate('walk', 1);
+                    _anima = this.getCurrentAnimation();
+                    _anima.mobilityY = true;
+                    if(this.yPosition < _target.yPosition && this.moveDirection !== 'up')
+                        this.moveDirection = 'up';
+                    else if(this.yPosition > _target.yPosition && this.moveDirection !== 'down')
+                        this.moveDirection = 'down';
+                    else
+                        this.moveDirection = undefined;
+                    if (MathAbs(_target.yPosition - this.yPosition) <= this.verticalStep) {
+                        this.lookingAtTarget = true;
+                    }
+                }
 				else {
 					const _thisOrigin = this.HURTLEFT + this._HURTBOX_half;
 					const _targetOrigin = _target.HURTLEFT + _target._HURTBOX_half;
-					if(this.autoTarget && this.upcomingAnimation) {
+					if(this.autoTarget && _canAttack && this.upcomingAnimation) {
 						const _newAnima = this.animations[this.upcomingAnimation];
 						if(_newAnima && _newAnima.attack && _newAnima.chargeDistance) {
 							const _realTargetOrigin = this.autoTarget.HURTLEFT + this.autoTarget._HURTBOX_half;
@@ -1220,7 +1230,8 @@ function enemy(_e) {
 					else if(_thisOrigin > _targetOrigin && this.direction !== __left)
 						this.direction = __left;
 					const maxInfluenceDistance = MathRound(episode.cWidth * 0.4); 
-					const diffX = Math.abs(_targetOrigin - _thisOrigin);
+					const _autoTargetOrigin = this.autoTarget.HURTLEFT + this.autoTarget._HURTBOX_half;
+					const diffX = Math.abs(_autoTargetOrigin - _thisOrigin);
 					if(diffX > maxInfluenceDistance) {
 						if(diffX > episode.cWidth || getRandomValue2(1, 10) === 10) {
 							if((this.slot || this.pendingSlot) && this.animation !== 'run')
@@ -1230,6 +1241,8 @@ function enemy(_e) {
 								this.extraStepXRate = this.calculateMoveXStep();
 						}
 						else if(this.animation !== 'run') {
+							if(this.animation !== 'walk')
+                        		this.moveDirection = undefined;
 							if(this.extraStepXRate > 0)
 								this.extraStepXRate = 0;
 						}
@@ -1920,6 +1933,8 @@ function enemy(_e) {
 			if(_anima.rivalXMove)
 				delete _anima.rivalXMove;
 		}
+		if(this.slot)
+			this.slot.attacking = false;
 	}
 	this.checkActions = function () {
 		if(this.actions)
@@ -2322,10 +2337,11 @@ function enemy(_e) {
 			this.checkCommonSkills();
 			checkTimedQuest();
 			this.checkUseProgress();
-			this.assignSlots();
 		}
 		else
 			this.checkBoss();
+		if(this.slots)
+			this.assignSlots();
 		this.checkInCombat();
 		this.checkAutoFillHP();
 		this.checkCast();
