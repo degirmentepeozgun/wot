@@ -29461,10 +29461,10 @@ function isObjectsInTouch(obj1, obj2, yRange, _tolerance) {
 		obj1Direction = __left;
 		obj2Direction = __right;
 	}
-	if (true) {
-		showBorders(obj1Left, _gamePad.clientHeight - obj1.yPosition, obj1.HURTWIDTH ?? obj1.width, obj1.getTop ? obj1.getTop() : obj1.top, obj1.main ? 'green' : 'red');
-	 	showBorders(obj2Left, _gamePad.clientHeight - obj2.yPosition, obj2.HURTWIDTH ?? obj2.width, obj2.getTop ? obj2.getTop() : obj2.top, obj2.main ? 'green' : 'red');
-	}
+	// if (true) {
+	// 	showBorders(obj1Left, _gamePad.clientHeight - obj1.yPosition, obj1.HURTWIDTH ?? obj1.width, obj1.getTop ? obj1.getTop() : obj1.top, obj1.main ? 'green' : 'red');
+	//  	showBorders(obj2Left, _gamePad.clientHeight - obj2.yPosition, obj2.HURTWIDTH ?? obj2.width, obj2.getTop ? obj2.getTop() : obj2.top, obj2.main ? 'green' : 'red');
+	// }
 	if (isObjectInVisibleRectangle(obj1, obj2, null, _tolerance))
 		touch = true;
 	let _checkVertical = true;
@@ -29724,16 +29724,16 @@ function setCharacterFunctions(_char, _pvp) {
 	_newChar.maxExperience = _char.maxExperience;
 	return _newChar;
 }
-function showBorders(_l, _t, _w, _h, _id) {
-	let _a = document.getElementById(_id ?? 'main-frame');
+function showBorders(_l, _t, _w, _h, _id, _key) {
+	let _a = document.getElementById(_key ?? _id ?? 'main-frame');
 	if (!_a) {
 		_a = document.createElement('div');
-		_a.id = _id ?? 'main-frame';
+		_a.id = _key ?? _id ?? 'main-frame';
 		_gamePad.appendChild(_a);
 		_a.style.position = "absolute";
 		_a.style.zIndex = 9999;
-		_a.style.border = '5px solid ' + (_id ?? 'green');
 	}
+	_a.style.border = '2px solid ' + (_id ?? 'green');
 	_a.style.width = _w + 'px';
 	_a.style.left = _l + 'px';
 	_a.style.top = _t + 'px';
