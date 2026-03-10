@@ -2902,7 +2902,6 @@ function map(_m) {
 	}
 	else {
 		const base = _col ?? _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
-
 		_color = this._colorCache[base];
 		if (!_color) {
 			if (base.startsWith('#') && base.length >= 7) {
