@@ -8154,7 +8154,7 @@ function continueStoryAnyway() {
 }
 var __storyBonusItemCount = 0, __storyLastUsedSettings;
 function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
-	resetQuestLine();
+	resetQuestLine(3);
 	if(_client.quickPlay){
 		_client = new dataOperations(1);
 		_client.loadState();
@@ -8869,7 +8869,7 @@ function createStoryResultScreen(_failed) {
 		_game.suspended = true;
 }
 function killStory() {
-	resetQuestLine();
+	resetQuestLine(4);
 	quitFromStory();
 }
 function askQuitFromStory() {
@@ -8890,14 +8890,14 @@ function checkStoryFinish(_success, _retryId, _goldSelected, _expSelected, _item
 	const _after = function() {
 		if(!_retryId){
 			if(!_success) {
-				resetQuestLine();
+				resetQuestLine(1);
 				quitFromStory();
 			}
 			else
 				switchStoryScene();
 		}
 		else {
-			resetQuestLine();
+			resetQuestLine(2);
 			tryStartStoryMission(_retryId, _goldSelected, _expSelected, _itemSelected);
 		}
 	}

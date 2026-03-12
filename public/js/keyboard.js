@@ -820,7 +820,12 @@ const directionKeys = new Set(['w','a','s','d','arrowleft','arrowright','arrowup
 window.addEventListener('keydown', (e) => {
   const kRaw = e.key?.toLowerCase?.();
   if(kRaw === ' ' && episode?.hasSkippableScreen) {
-		skipQuickPlayTutorial();
+		const _skippableScreen = document.querySelector('.quick-play-desc-container');
+		if(_skippableScreen) {
+			const _click = _skippableScreen.querySelector('[onexactclick]');
+			if(_click)
+				_click.onexactclick();
+		}
 		return;
   }
   if(e.repeat) {

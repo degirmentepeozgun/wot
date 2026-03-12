@@ -419,7 +419,8 @@ function removeNPCQuestMarks() {
 				_n.relatedObjects = _n.relatedObjects.filter(x => x.id !== 'questprogress');
 		}
 }
-function resetQuestLine() {
+function resetQuestLine(_num) {
+	console.log(_num);
 	__account.questStatus = firstQuestData();
 	_client.saveState();
 }
@@ -443,6 +444,7 @@ function takeQuest(_storyQuestIndex, _nowarn, _title, _state, _force){
 	//	warn('<div class="flex heading toast-with-banner" style="position:relative;width:auto"><img style="height:10vh;z-index:-1" src="./images/icons/quest-accepted.png" /><div class="full flex" style="position:absolute;text-shadow:0px 0px 4px #000;color:#f7f7f7 !important">' + getLangData(_title ?? 'Quest Accepted') + '</div></div>', 'level-up');
 	if(!_state)
 		PlaySound({ key: 'questaccepted', volume: .8 });
+	console.log(_storyQuestIndex + ' take QUEST ' + _q);
 	removeNPCQuestMarks();
 	const _quest = _q ?? __story.quests.find(x => x.id === __account.questStatus.order);
 	if(!_quest)
