@@ -819,7 +819,7 @@ function enemy(_e) {
 			const rad = angle * Math.PI / 180;
 
 			const xGap = Math.round(Math.cos(rad) * distance) * 3.2;
-			const yGap = Math.round(Math.sin(rad) * distance) * .6;
+			const yGap = Math.round(Math.sin(rad) * distance) * .8;
 			const type = xGap >= 0 ? "front" : "back";
 			return {
 				ring: ring,
@@ -835,14 +835,14 @@ function enemy(_e) {
 			};
 		};
 
-		const base = this._HURTBOX_half;
+		const base = MathRound(this._HURTBOX_half * .75);
 
 		const rings = [
-			{ count: 6,  dist: base * 1 },
-			{ count: 12, dist: base * 2 },
-			{ count: 18, dist: base * 2.9 },
-			{ count: 24, dist: base * 3.7 },
-			{ count: 24, dist: base * 4.5 }
+			{ count: 6,  dist: base * .9 },
+			{ count: 12, dist: base * 2.1 },
+			{ count: 18, dist: base * 3.2 },
+			{ count: 24, dist: base * 4.2 },
+			{ count: 24, dist: base * 5.1 }
 		];
 		if(!this.slots)
 			this.slots = [];
@@ -914,7 +914,12 @@ function enemy(_e) {
         //ownerın origin noktasına xGap ekleyerek ve yPosition değerine yGap ekleyerek koordinat bulunup geri döndürülür
         const _ownerOriginX = _owner.HURTLEFT + _owner._HURTBOX_half;
         const _x = _ownerOriginX + _slot.xGap;
-        const _y = _owner.yPosition + _slot.yGap;
+        let _y = _owner.yPosition + _slot.yGap;
+		const my = this.getMaxYPosition()
+		if (_y > my)
+			_y = MathFloor(my);
+		else if (_y < minPositionY)
+			_y = minPositionY;
         return { x: _x, y: _y };
     }
     this.getAttackMsByDifficulty = function() {
@@ -1468,8 +1473,9 @@ function enemy(_e) {
 			//const _canAttack = (_target.attackerCount ?? 0) < 2 && !this.slot?.support;
 			const _canAttack =
 				(_target.attackerCount ?? 0) < 2 &&
-				!this.slot?.support &&
-				!this.slot?.mustCross;
+				this.slot &&
+				!this.slot.support &&
+				!this.slot.mustCross;
 			// if(this.lookingAtTarget && this.slot?.support && !this.slot?.parent?.support && this.animation === 'idle')
 			// {
             // 	const _supportTouch = isObjectsInTouch(_area, this.slot.owner.getTouchAreaBySlot());
@@ -1574,7 +1580,7 @@ function enemy(_e) {
 					const _thisOrigin = this.HURTLEFT + this._HURTBOX_half;
 					const _targetOrigin = _target.HURTLEFT + _target._HURTBOX_half;
 					const _yDiff = MathAbs(this.yPosition - _target.yPosition);
-					if(this.autoTarget && _canAttack && this.upcomingAnimation && _yDiff <= getGroundHeight() / 4) {
+					if(this.autoTarget && _canAttack && this.upcomingAnimation && _yDiff < getGroundHeight() / 3) {
 						const _newAnima = this.animations[this.upcomingAnimation];
 						if(_newAnima && _newAnima.attack && _newAnima.chargeDistance) {
 							const _realTargetOrigin = this.autoTarget.HURTLEFT + this.autoTarget._HURTBOX_half;
@@ -1582,6 +1588,7 @@ function enemy(_e) {
 							_newAnima.useExtraStepXRate = (_realDiff < _newAnima.chargeDistance.value && _realDiff > (_newAnima.chargeDistance.value * .5));
 							if(_newAnima.useExtraStepXRate) {
 								this.animateSlotAttack();
+								this.slot.lastAttackTime = _gameTick;
 								return;
 							}
 						}
@@ -2776,7 +2783,7 @@ function enemy(_e) {
 		
 		let _goOn;
 		if (this.autoMode && !this.keyboard && this.class !== __spell){
-			if(this.important)
+			if(this.important || this.ranged)
 				this.autoCommand();
 			else
 				this.autoCommand2();
@@ -4878,8 +4885,12 @@ function enemy(_e) {
 								_enemyLeft = this.chargeProperties.additionalRange;
 						}
 					}
-					_result.range = (this.direction === __left ? _left - _enemyRight
-						: _enemyLeft - _right) + 1;
+					_result.range = 
+					(MathAbs((this.HURTLEFT + this._HURTBOX_half) - 
+						(_result.enemy.HURTLEFT + _result.enemy._HURTBOX_half)) 
+						- (_result.enemy._HURTBOX_half + (this._HURTBOX_half * .5)));	
+					// (this.direction === __left ? _left - _enemyRight
+					// 	: _enemyLeft - _right) + 1;
 					if(_result.range <= 0) {
 						_result.range = 0;
 						if(this.chargeProperties)

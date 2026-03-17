@@ -7313,22 +7313,22 @@ const __stories = [
 						id: 619,
 						minX: 1100,
 						maxX: 4100,
-						count: 6,
+						count: 70,
 						sight: 1000,
 						spawn: 1,
 						hp:160,
 						experience: 250
 					},
-					{
-						id: 621,
-						minX: 1100,
-						maxX: 4100,
-						count: 6,
-						sight: 1000,
-						spawn: 1,
-						hp:160,
-						experience: 250
-					},
+					// {
+					// 	id: 621,
+					// 	minX: 1100,
+					// 	maxX: 4100,
+					// 	count: 6,
+					// 	sight: 1000,
+					// 	spawn: 1,
+					// 	hp:160,
+					// 	experience: 250
+					// },
 					// {
 					// 	id: 620,
 					// 	minX: 1580,
