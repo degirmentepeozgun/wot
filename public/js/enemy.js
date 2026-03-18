@@ -1699,8 +1699,25 @@ function enemy(_e) {
 	this.autoCommand = function () {
 		if (this.keyboard || this.harmless || (episode.realTime && this.alp))
 			return;
-		if(!this.animationFinished && this.animations[this.animation]?.attack)
+		if(!this.animationFinished && this.animations[this.animation]?.attack){
+			if(!this.chargimg && this.getCurrentFrame()?.directionChangeEnabled && this.start <= 1) {
+				console.log('change enabled');
+				const _thisOrigin = this.HURTLEFT + this._HURTBOX_half;
+				const _targetOrigin = this.autoTarget.HURTLEFT + this.autoTarget._HURTBOX_half;
+				const _diff = _targetOrigin - _thisOrigin;
+				const _tol = (4 * episode.cWidth) / 100;
+				let _dir = this.direction;
+				if (_diff > _tol){
+					_dir = __right;
+					this.setDirection(_dir, 1);
+				}
+				else if (_diff < -_tol){
+					_dir = __left;
+					this.setDirection(_dir, 1);
+				}
+			}
 			return;
+		}
 		if (this.animation === 'start' || (this.animation === 'before' && !this.animationFinished))
 			return;
 		const _anima = this.getCurrentAnimation();
@@ -1784,7 +1801,10 @@ function enemy(_e) {
 		if (this.autoAttacking) {
 			if(this.autoTarget) {
 				if(!this.chargimg && this.getCurrentFrame()?.directionChangeEnabled && this.start <= 1) {
-					const _diff = this.autoTarget.EXACTLEFT - this.EXACTLEFT;
+					console.log('change enabled');
+					const _thisOrigin = this.HURTLEFT + this._HURTBOX_half;
+					const _targetOrigin = this.autoTarget.HURTLEFT + this.autoTarget._HURTBOX_half;
+					const _diff = _targetOrigin - _thisOrigin;
 					const _tol = (4 * episode.cWidth) / 100;
 					if (_diff > _tol)
 						_dir = __right;

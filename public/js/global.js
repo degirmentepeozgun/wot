@@ -3076,6 +3076,8 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	goblinkingkickhurt: './images/sounds/goblin-king-kick-hurt.mp3',
+	goblinkingkick: './images/sounds/goblin-king-kick.mp3',
 	punchcartoon: './images/sounds/punch-cartoon.mp3',
 	slingmelee: './images/sounds/sling-melee.mp3',
 	rockhit: './images/sounds/rock-hit.mp3',
