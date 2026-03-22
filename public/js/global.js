@@ -3079,6 +3079,8 @@ const soundFiles = {
 	goblinkingkickhurt: './images/sounds/goblin-king-kick-hurt.mp3',
 	goblinkingkick: './images/sounds/goblin-king-kick.mp3',
 	punchcartoon: './images/sounds/punch-cartoon.mp3',
+	jesperroll: './images/sounds/jesper-roll6.mp3',
+	jesperboom: './images/sounds/jesper-boom.wav',
 	slingmelee: './images/sounds/sling-melee.mp3',
 	rockhit: './images/sounds/rock-hit.mp3',
 	rockhit2: './images/sounds/rock-hit2.mp3',
@@ -8500,6 +8502,211 @@ const spells = {
 							type: 'toxic'
 						}
 					}
+				]
+			}
+		}
+	},
+	suicide: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'run',
+		zoom: 2.5,
+		noRemove: true,
+		src: './images/sprites/ep623/eplosion.png',
+		invulnerable: true,
+		pierce: true,
+		class: __spell,
+		name: 'Suicide',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 137 * 4,
+						spriteTop: 600,
+						spriteWidth: 137,
+						spriteHeight: 200,
+						spriteOrigin: 69,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				priority: 1,
+				frames: [
+						{
+							spriteLeft: 137,
+							spriteTop: 0,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 1
+						},
+						{
+							spriteLeft: 137,
+							spriteTop: 0,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							knockback: true,
+							priority:1,
+							sound: { key: 'jesperboom', volume:1},
+							atk: {
+								yRange: 15,
+								rate: 5,
+								hitTaken: 1,
+								push: 5,
+								aoe: 200,
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									knockback: 3
+								},
+								type: 'common'
+							},
+							speed: 5
+						},
+						{
+							spriteLeft: 137 * 2,
+							spriteTop: 0,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						},
+						{
+							spriteLeft: 137 * 3,
+							spriteTop: 0,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						},
+						{
+							spriteLeft: 137 * 4,
+							spriteTop: 0,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						},
+						{
+							spriteLeft: 137 * 0,
+							spriteTop: 200,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						},
+						{
+							spriteLeft: 137 * 1,
+							spriteTop: 200,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						},
+						{
+							spriteLeft: 137 * 2,
+							spriteTop: 200,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						},
+						{
+							spriteLeft: 137 * 3,
+							spriteTop: 200,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						},
+						{
+							spriteLeft: 137 * 4,
+							spriteTop: 200,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						},
+						{
+							spriteLeft: 137 * 0,
+							spriteTop: 400,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						},
+						{
+							spriteLeft: 137 * 1,
+							spriteTop: 400,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						},
+						{
+							spriteLeft: 137 * 2,
+							spriteTop: 400,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						},
+						{
+							spriteLeft: 137 * 3,
+							spriteTop: 400,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						},
+						{
+							spriteLeft: 137 * 4,
+							spriteTop: 400,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						},
+						{
+							spriteLeft: 137 * 0,
+							spriteTop: 600,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						},
+						{
+							spriteLeft: 137 * 1,
+							spriteTop: 600,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						},
+						{
+							spriteLeft: 137 * 2,
+							spriteTop: 600,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						},
+						{
+							spriteLeft: 137 * 3,
+							spriteTop: 600,
+							spriteWidth: 137,
+							spriteHeight: 200,
+							spriteOrigin: 69,
+							speed: 6
+						}
 				]
 			}
 		}
@@ -32952,7 +33159,7 @@ function ligthenGradientColored2(x, y, radius, ctx, _color) {
     ctx.fill();
 }
 async function PlaySound(_s, _alternateKeys, _volumeRate) {
-	const _hidden = !__account.options.sound || episodeVisibilityHidden || __batterySaveMode;
+	const _hidden = !__account.options.sound || episode?.hasSkippableScreen || episodeVisibilityHidden || __batterySaveMode;
 	const _hasEnd = _s.end;
 	if((_hidden && !_hasEnd) || (_s?.force ? false : __switchingMap))
 			return undefined;

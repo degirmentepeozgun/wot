@@ -6963,7 +6963,7 @@ const __stories = [
 		heartCount : 3,
 		scenes: [
 			{
-				map: 201,
+				map: 36,
 				leaderBoards: {
 					calculate: function() {
 						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
@@ -7013,7 +7013,7 @@ const __stories = [
 				],
 				startsWith: 1,
 				save: true,
-				loadingCharacterIds: [37,38, 619, 620],
+				loadingCharacterIds: [37,38, 619, 620, 621, 622, 623],
 				start: function() {
 					clearAudioCache(loadedSounds);
 					removeCoopCharacter();
@@ -7310,13 +7310,12 @@ const __stories = [
 				],
 				mobs: [
 					{
-						id: 622,
+						id: 623,
 						minX: 1100,
 						maxX: 4100,
 						count: 1,
 						sight: 1000,
 						spawn: 1,
-						grade: 4,
 						hp:160,
 						experience: 250
 					},

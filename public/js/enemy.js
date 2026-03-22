@@ -11,6 +11,7 @@ function enemy(_e) {
 	this.npc = _e.npc;
 	this.class = _e.class;
 	this.noSmash = _e.noSmash;
+	this.noRemove = _e.noRemove;
 	this.villain = _e.villain;
 	this.divider = getRandomValue2(1000, 9999);
 	this.healthRate = 100;
@@ -23,6 +24,7 @@ function enemy(_e) {
 	this.skills = _e.skills;
 	this.still = _e.still;
 	this.gender = _e.gender;
+	this.noSpeedChange = _e.noSpeedChange;
 	this.finishableWith = _e.finishableWith;
 	this.finishAfter = _e.finishAfter;
 	this.animationKeysShuffledTime = _gameTick;
@@ -860,9 +862,10 @@ function enemy(_e) {
 				{
 					dist *= 0.75; // %25 daha yakın
 				}
-				this.slots.push(
-					makeSlot(r + 1, angle, dist)
-				);
+				const _slot = makeSlot(r + 1, angle, dist);
+				if((r + 1) > 2 && MathAbs(180 - angle) <= 30)
+					_slot.ranged = true;
+				this.slots.push(_slot);
 			}
 		}
 		if(_ringLevel)
@@ -936,18 +939,33 @@ function enemy(_e) {
         }
     }
     this.animateSlotAttack = function(_supportSlot) {
+		const _target = this.autoTarget;
+		if(!_target.attackers)
+			_target.attackers = {
+				melees : [],
+				rangeds : []
+			};
+		const _ranged = this.ranged;
+		if(_ranged && _target.attackers.rangeds.length > 0)
+			return;
+		else if(!_ranged && _target.attackers.melees.length > 1)
+			return;
+		if(_ranged)
+			_target.attackers.rangeds.push(this);
+		else
+			_target.attackers.melees.push(this);
 		const _slot = _supportSlot ?? this.slot;
-		if(this.autoTarget && this.autoTarget.slots){
-			if(this.autoTarget.slots.filter(x => x.attacking)?.length === 2)
-				return;
-		}
+		// if(this.autoTarget && this.autoTarget.slots){
+		// 	if(this.autoTarget.slots.filter(x => x.attacking)?.length === 2)
+		// 		return;
+		// }
         if(_slot)
             _slot.attacking = true;
         this.animate(this.upcomingAnimation, 1);
         this.autoAttacking = true;  
         this.upcomingAnimation = undefined;
 		const _thisOrigin = this.HURTLEFT + this._HURTBOX_half;
-		const _targetOrigin = this.autoTarget.HURTLEFT + this.autoTarget._HURTBOX_half;
+		const _targetOrigin = _target.HURTLEFT + _target._HURTBOX_half;
 		this.direction = _thisOrigin < _targetOrigin ? __right : __left;
 		this.lastAttackSlot = _slot;
     }
@@ -979,9 +997,12 @@ function enemy(_e) {
 		let bestSlot = null;
 		let bestScore = Infinity;
 		let bestRing = 0;
+		let _ranged = this.ranged;
 		for (const slot of target.slots) {
 			if(bestRing > 0 && slot.ring > bestRing)
 				break;
+			if(_ranged && !slot.ranged)
+				continue;
 			if (slot.occupied)
 				continue;
 
@@ -1428,6 +1449,10 @@ function enemy(_e) {
         if(!this.autoTarget.slots){
             this.autoTarget.createSlots(1);
         }
+		if(this.touchDead && this.autoTarget && isObjectsInTouch(this, this.autoTarget).touch) {
+			this.animate('dead', 1);
+			return;
+		}
         const _away = this.animation === 'release'  || this.animation.startsWith('knockback') || this.invisible;
         if(((this.slot && (this.slot.owner?.isDead?.() || 
 			(!this.slot.support && this.slot.owner !== this.autoTarget))) || _away)){
@@ -1440,11 +1465,17 @@ function enemy(_e) {
                 this.slot.attacking = false;
             return;
         }
-        if(!this.ranged) {
+        //if(!this.ranged) {
 			this.validateSlot();
 			const _pickedSlot = this.pickSlotOrder();
 			if(!_pickedSlot) {
-				this.autoTarget.createSlots(this.autoTarget.ringLevel + 1);
+				if(this.ranged) {
+					while(this.autoTarget.ringLevel < 3) {
+						this.autoTarget.createSlots(this.autoTarget.ringLevel + 1);
+					}
+				}
+				else
+					this.autoTarget.createSlots(this.autoTarget.ringLevel + 1);
 				this.pickSlotOrder();
 			}
             //eğer bir slot varsa isObjectsInTouch için 2. parametremiz bu slotun koordinatı olmalı eğer yok ise this.autoTarget olmalı
@@ -1471,11 +1502,22 @@ function enemy(_e) {
 			const _area = this.getTouchAreaBySlot();
             const _touch = isObjectsInTouch(_area, _target);
 			//const _canAttack = (_target.attackerCount ?? 0) < 2 && !this.slot?.support;
-			const _canAttack =
-				(_target.attackerCount ?? 0) < 2 &&
-				this.slot &&
-				!this.slot.support &&
-				!this.slot.mustCross;
+			let _canAttack = false;	
+			if(this.nextAttackTime)
+				_canAttack = _gameTick >= this.nextAttackTime;
+			else {
+				if(this.ranged)
+					_canAttack =
+						(_target.attackers?.rangeds?.length ?? 0) < 1 &&
+						this.slot &&
+						!this.slot.mustCross;
+				else
+					_canAttack =
+						(_target.attackers?.melees?.length ?? 0) < 2 &&
+						this.slot &&
+						!this.slot.support &&
+						!this.slot.mustCross;
+			}
 			// if(this.lookingAtTarget && this.slot?.support && !this.slot?.parent?.support && this.animation === 'idle')
 			// {
             // 	const _supportTouch = isObjectsInTouch(_area, this.slot.owner.getTouchAreaBySlot());
@@ -1538,7 +1580,7 @@ function enemy(_e) {
                 }
                 if(this.slot && !this.slot.lastAttackTime)
                     this.slot.lastAttackTime = _gameTick;
-                if(this.slot && _canAttack && (_gameTick - this.slot.lastAttackTime) >= (this.getAttackMsByDifficulty() + getRandomValue2(0, 120))) {
+                if(this.slot && _canAttack && (!this.nextAttackTime || _gameTick >= this.nextAttackTime)) {
                     this.pickRandomAttack();
                     if(this.upcomingAnimation && this.upcomingAnimation !== 'idle'){
                         this.animateSlotAttack();
@@ -1604,40 +1646,42 @@ function enemy(_e) {
 					const maxInfluenceDistance = MathRound(episode.cWidth * 0.4); 
 					const _autoTargetOrigin = this.autoTarget.HURTLEFT + this.autoTarget._HURTBOX_half;
 					const diffX = Math.abs(_autoTargetOrigin - _thisOrigin);
-					if(diffX > maxInfluenceDistance && !this.slot?.support) {
-						if(diffX > episode.cWidth || getRandomValue2(1, 10) === 10) {
-							if(this.slot && this.animation !== 'run') {
-								this.animate('run', 1);
-								this.autoStepXRate = 1;
-								if(!this.extraStepXRate)
-									this.extraStepXRate = this.calculateMoveXStep();
+					if(!this.noSpeedChange) {
+						if(diffX > maxInfluenceDistance && !this.slot?.support) {
+							if(diffX > episode.cWidth || getRandomValue2(1, 10) === 10) {
+								if(this.slot && this.animation !== 'run') {
+									this.animate('run', 1);
+									this.autoStepXRate = 1;
+									if(!this.extraStepXRate)
+										this.extraStepXRate = this.calculateMoveXStep();
+								}
+							}
+							else if(this.animation !== 'run') {
+								if(this.animation !== 'walk')
+									this.moveDirection = undefined;
+								if(this.extraStepXRate > 0)
+									this.extraStepXRate = 0;
 							}
 						}
-						else if(this.animation !== 'run') {
-							if(this.animation !== 'walk')
-                        		this.moveDirection = undefined;
-							if(this.extraStepXRate > 0)
-								this.extraStepXRate = 0;
+						else {
+							if(this.animation !== 'walk'){
+								this.animate('walk', 1);
+							}
+							_anima = this.getCurrentAnimation();
+							_anima.mobilityY = false;
+							this.moveDirection = this.direction;
+							if(this.slot?.support)
+								this.autoStepXRate = .5 + ((diffX / episode.cWidth) * 0.1);
+							else
+								this.autoStepXRate = .5 + ((diffX / episode.cWidth) * 0.5);
+							if(!this.extraStepXRate)
+								this.extraStepXRate = this.calculateMoveXStep();
 						}
-					}
-					else {
-						if(this.animation !== 'walk'){
-							this.animate('walk', 1);
-						}
-						_anima = this.getCurrentAnimation();
-						_anima.mobilityY = false;
-						this.moveDirection = this.direction;
-						if(this.slot?.support)
-							this.autoStepXRate = .5 + ((diffX / episode.cWidth) * 0.1);
-						else
-							this.autoStepXRate = .5 + ((diffX / episode.cWidth) * 0.5);
-						if(!this.extraStepXRate)
-							this.extraStepXRate = this.calculateMoveXStep();
 					}
 					this.organizeAutoYPosition(_target, diffX / maxInfluenceDistance);
 				}
 			}
-		}
+		//}
 	}
 	this.organizeAutoYPosition = function(_target, maxFactor) {
 		if(this.animation !== 'run' && this.animation !== 'walk'){
@@ -2278,6 +2322,20 @@ function enemy(_e) {
 				this.lastAttackSlot = undefined;
 			}
 		}
+		if(this.autoAttacking && this.slot) {
+			this.slot.attacking = false;
+			const _target = this.autoTarget;
+			if(_target && _target.attackers)
+			{
+				const _difficultyMS = this.getAttackMsByDifficulty();
+				this.nextAttackTime = _gameTick + (_difficultyMS === 0 ? 0 : _difficultyMS + getRandomValue2(0, 120));
+				const _ranged = this.ranged;
+				if(_ranged)		
+					_target.attackers.rangeds = _target.attackers.rangeds.filter(x => x !== this) ?? [];
+				else
+					_target.attackers.melees = _target.attackers.melees.filter(x => x !== this) ?? [];
+			}
+		}
 		this.autoAttacking = false;
 		if(this.pushDirection || this.pushback)
 			this.pushDirection = this.pushback = undefined;
@@ -2803,7 +2861,7 @@ function enemy(_e) {
 		
 		let _goOn;
 		if (this.autoMode && !this.keyboard && this.class !== __spell){
-			if(this.important || this.ranged)
+			if(this.important)
 				this.autoCommand();
 			else
 				this.autoCommand2();
@@ -2988,7 +3046,7 @@ function enemy(_e) {
 			this.stepSound.currentTime = 0;
 		}
 		var _sf = this.getCurrentFrame().sound;
-		if (_sf && this.soundPlaying != (this.frame + 1) && !this.animationFinished) {
+		if (_sf && this.soundPlaying != (this.frame + 1) && (!this.animationFinished || _sf.force)) {
 			if(!_sf.range || (!this.main && _sf.range))
 			{
 				this.soundPlaying = this.frame + 1;
@@ -5645,7 +5703,17 @@ function enemy(_e) {
 		}
 	}
 	this.installHurtFeet = function(_f) {
-		this.animations.hurtfeet = new animation(_f.atk?.hurt?.burn ? createHurtFeetAndBurn(this.zoom) : (_f.atk?.hurt?.knockback ? createHurtFeetWithKnockback(this.zoom, this.bloodColor, _f.atk.hurt.knockback) : createHurtFeet(this.zoom, this.bloodColor, null, _f.bottomGap, _f.atk?.type)));
+		this.animations.hurtfeet = new animation(
+			_f.atk?.hurt?.burn 
+			? 
+			createHurtFeetAndBurn(this.zoom) 
+			: (_f.atk?.hurt?.knockback 
+				? 
+				createHurtFeetWithKnockback(this.zoom, this.bloodColor, _f.atk.hurt.knockback) 
+				: 
+				createHurtFeet(this.zoom, this.bloodColor, null, _f.bottomGap, _f.atk?.type)
+			)
+		);
 	}
 	this.smash = function(_t, _f) {
 		_f = _f ?? this.getCurrentFrame();
@@ -6280,8 +6348,8 @@ function enemy(_e) {
 					_thisPriority--;
 				if(_enemyPriority > 1 && _enemy.chargeStarted && _enemyAnima.chargeStarted === _enemy.chargeStarted)
 					_enemyPriority--;
-				if (_enemyFrame?.atk) {
-					if (_enemyPriority === _thisPriority) {
+				if (_enemyPriority !== undefined) {
+					if (_enemyPriority === _thisPriority && _enemyFrame?.atk) {
 						if (this.class !== __spell && _enemy.class !== __spell && _enemy.direction !== this.direction && !this.friendly && !_enemy.friendly && getRandomValue(1, 10) === 1) {
 							const _eck = _enemy.animations.dash?.chargeKey;
 							if(_eck)
