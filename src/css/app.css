@@ -9502,6 +9502,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
    background:radial-gradient(circle at center,
 	rgba(0,0,0,0) 70%,
 	rgba(0,0,0,.5) 30%) !important;
+	border-radius: 100%;
 }
 .glow-jump {
 	opacity: 1 !important;
@@ -10987,4 +10988,31 @@ pointer-events: "auto";
     0%   { filter: brightness(1); }
     40%  { filter: brightness(1.8); }
     100% { filter: brightness(1); }
+}
+
+.tutorial-box {
+	width:70%;
+	position: absolute;
+	left:18%;
+	height:20%;
+	top:15%;
+	padding: 1vh;
+	border-radius: 1vh;
+	background:linear-gradient(-90deg,#814141,#5C4033,#5C4033,#814141);
+	box-shadow: 0 1vh 2vh #000000cc;
+}
+.tutorial-box-inner {
+	background:radial-gradient(	#36454F, #000) !important;
+	color:#f3f4f5ba !important;
+	line-height: 4vh !important;
+	padding: 1.5% 3% 1.5% 16%;
+	border-radius: 1vh;
+	font-size: 3vh !important;
+}
+.tutorial-avatar {
+	position: absolute;
+	left:-10%;
+	height:155%;
+	top:-45%;
+	filter:drop-shadow(0 0 2vh #000);
 }

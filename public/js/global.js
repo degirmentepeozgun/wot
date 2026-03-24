@@ -4524,6 +4524,52 @@ const mapSprites = [
 		],
 		ground: { width: 2048, height: 1152, zoom: 1.06, yRate: .9 }
 	},
+	{
+		id: 9998, still: true, minLevel : 1,
+		enterDirection: __left, //characterZoom: 1.4,
+		//ambiancePath: './images/music/story1-quest10.mp3',
+		//ambianceVolume: .67,
+		// coords: { 
+		// 	left: '48%', 
+		// 	top: '62%', 
+		// 	title: 'Gold Hunt',
+		// 	key: 'gold'
+		//  }, 
+		 theme: 'gold', 
+		distance: 1, width: MathFloor(2048 * .96),
+		mobs: [
+			// {
+			// 	id: 2000,
+			// 	minX: MathFloor(1050 * .96),
+			// 	maxX: MathFloor(1050 * .96),
+			// 	yPosition: function() {
+			// 		return MathRound(groundheight / 4);
+			// 	},
+			// 	sight: 1,
+			// 	count: 1,
+			// 	grade: 5,
+			// 	name: 'Gold Waggon',
+			// 	minLevel: 10,
+			// 	maxLevel: 10
+			// },
+			// {
+			// 	id: 1999,
+			// 	minX: MathFloor(1090 * .96),
+			// 	maxX: MathFloor(1090 * .96),
+			// 	yPosition: function() {
+			// 		return MathRound(groundheight / 4);
+			// 	},
+			// 	sight: 1,
+			// 	count: 1,
+			// 	minLevel: 1,
+			// 	maxLevel: 1
+			// }
+		],
+		tiles: [
+			{ name: 'bg', width: 2048, height: 1152, zoom: .96, rate: .85, bottom: -400, count:1 },
+		],
+		ground: { width: 2048, height: 1152, zoom: 1.06, yRate: .9 }
+	},
 	// {
 	// 	id: 800, disabled: true, battleGround: true, coords: { left: '4%', top: '22%', title: 'Battleground', icon: 'battleground' }, theme: 'cave', distance: 1, width: 6144,
 	// 	mobs: [
@@ -32048,8 +32094,10 @@ const cssAnimations = {
 							window.removeEventListener('keydown', _s.keyboardHandler);
 					}
 					if(_elem && __isPC) {
-						const _kbKey = _elem.getAttribute('data-key');
+						let _kbKey = _elem.getAttribute('data-key');
 						if(_kbKey) {
+							if(_kbKey === 'space')
+								_kbKey = ' ';
 							_self.keyboardHandler = function (event) {
 								try {
 									if (event?.key?.toLowerCase() === _kbKey) {

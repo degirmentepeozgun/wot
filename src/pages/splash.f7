@@ -30,7 +30,7 @@
 				</div>
 				<img src="./images/icons/enemy-left.png" class="enemy-left-arrow v-none" />
 				<img src="./images/icons/enemy-right.png" class="enemy-right-arrow v-none" />
-				<div id="top-nav" class="flex flex-jc-start">
+				<div id="top-nav" class="flex flex-jc-start top-ui-item">
 				</div>
 				<div id="mini-menu">
 					
@@ -99,10 +99,10 @@
 				<div class="skill-charge" id="skill7-cd-3">
 
 				</div>
-				<div id="add-player" style="cursor:pointer" class="flex" >
+				<div id="add-player" style="cursor:pointer" class="flex">
 					+
 				</div>
-				<div id="hit-count" class="flex v-none" style="font-weight:600;font-size:6vh">
+				<div id="hit-count" class="flex top-ui-item v-none" style="font-weight:600;font-size:6vh">
 					<div class="flex full scalable">
 						<span class="flex">
 							<div data-digit="x" class="hit-count-img hit-count-img-1"></div>
@@ -113,7 +113,7 @@
 						</span>
 					</div>
 				</div>
-				<div class="enemy-profile flex flex-jc-start">
+				<div class="enemy-profile flex flex-jc-start top-ui-item">
 					<div data-key="1" id='common-skill-1' class="flex common">
 
 					</div>
@@ -127,7 +127,7 @@
 
 					</div>
 				</div>
-				<div id="world-mini-map">
+				<div id="world-mini-map" class="top-ui-item">
 					<div id="world-mini-map-area" class="full">
 						<div class="world-mini-map-img"></div>
 						<img src="./images/ui/skill.png" />

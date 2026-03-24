@@ -4987,12 +4987,12 @@ function enemy(_e) {
 						if(!_speed)
 							for (var i = 0; i <= _anima.chargeDistance.untilFrame ?? 0; i++)
 								_speed += _anima.frames[i].speed;
-						const _addRange = _result.range * .2;
-						let _additionalRange;
-						if(this.direction === __left)
-							_additionalRange = _enemyRight - _addRange;
-						else
-							_additionalRange = _enemyLeft + _addRange;
+						// const _addRange = _result.range * .2;
+						let _additionalRange = 0;
+						// if(this.direction === __left)
+						// 	_additionalRange = _enemyRight - _addRange;
+						// else
+						// 	_additionalRange = _enemyLeft + _addRange;
 						this.chargeStarted = _gameTick;
 						_anima.chargeStarted = _gameTick;
 						//burada %10 tölerans da verelim eğer rakip kaçarsa geriye %10 daha ileri gidelim
@@ -5023,6 +5023,10 @@ function enemy(_e) {
 								this.yPosition += MathCeil((this.chargeProperties.enemy.yPosition - this.yPosition) / 2);
 							else
 								this.yPosition -= MathCeil((this.yPosition - this.chargeProperties.enemy.yPosition) / 2);
+						}
+						if(!_result.enemy?.getCurrentAnimation?.()?.def?.iframe && isObjectsInTouch(this, _result.enemy)?.touch){
+							this.chargeProperties.stop = 1;
+							this.chargeProperties.stepX = 0;
 						}
 					}
 				}

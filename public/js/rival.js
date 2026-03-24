@@ -36466,7 +36466,7 @@ const _allEnemies = {
 							spriteWidth: 473,
 							spriteHeight: 392,
 							spriteOrigin: 201,
-							speed: 12
+							speed: 16
 						},
 						{
 							spriteLeft: 849,
@@ -36474,7 +36474,7 @@ const _allEnemies = {
 							spriteWidth: 474,
 							spriteHeight: 400,
 							spriteOrigin: 201,
-							speed:12
+							speed:16
 						},
 						{
 							spriteLeft: 1549,
@@ -36482,7 +36482,7 @@ const _allEnemies = {
 							spriteWidth: 474,
 							spriteHeight: 391,
 							spriteOrigin: 201,
-							speed: 12
+							speed: 16
 						},
 						{
 							spriteLeft: 849,
@@ -36490,7 +36490,7 @@ const _allEnemies = {
 							spriteWidth: 474,
 							spriteHeight: 400,
 							spriteOrigin: 201,
-							speed: 12
+							speed: 16
 						}
 					]
 				},

@@ -6963,6 +6963,316 @@ const __stories = [
 		heartCount : 3,
 		scenes: [
 			{
+				// when: function() {
+				// 	return false;
+				// },
+				map: 9998,
+				loots: [
+				],
+				startsWith: 1,
+				save: true,
+				loadingCharacterIds: [622],
+				start: function() {
+					clearAudioCache(loadedSounds);
+					removeCoopCharacter();
+					mainCharacter.level = 0;
+					mainCharacter.experience = 0;
+					mainCharacter.maxExperience = 833;
+					setCharacterLevel(1, null, 1);
+					addClass(_gameUI, 'demo-playing');
+					episode.pauseBgMusic(1);
+					episode.createBgMusic(null, null, null, 'training');
+					episode.playBgMusic();
+					mainCharacter.direction = __right;
+					mainCharacter.left = mainCharacter.LEFT = MathRound(episode.cWidth / 3) + mainCharacter.WIDTH;
+					const _enemy = episode.enemies.find(x => x.enemy);
+					_enemy.left = _enemy.LEFT = MathRound((2 * episode.cWidth) / 3);
+					_enemy.direction = __left;
+					mainCharacter.immobilize = true;
+					mainCharacter.disableKeyboard = mainCharacter.still = true;
+					blurKeyboard();
+					_enemy.atk = mainCharacter.atk = 0;
+					for(let _key of _enemy.attackKeys)
+						_enemy.animations[_key].disabled = true;
+					_enemy.enableSkill('ground1');
+					_enemy.upcomingAnimation = 'ground1';
+					delete _enemy.animations.ground1.cooldown;
+					_enemy.animations.ground1.chargingDistance = structuredClone2(_enemy.animations.ground1.chargeDistance);
+					delete _enemy.animations.ground1.chargeDistance;
+					blurKeyboard();
+					episode.tutorialOrder = 0;
+					episode.boss = _enemy;
+					episode.boss.difficulty = 1;
+					document.querySelectorAll('.top-ui-item').forEach(x => 
+						addClass(x, 'd-none'));
+					setTimeout(() => {
+						const _div = document.createElement('div');
+						_div.className = 'flex show-ui tutorial-box fade-me';
+						_div.innerHTML = `<img class="tutorial-avatar flip" src="./images/main/blacksmith/concept.png" /><div class="tutorial-box-inner full">
+							${getLangData('Hold block before attack or press here after attack to make counterattack')}</div>`;
+						_gameUI.appendChild(_div);
+					}, 1000);
+				},
+				actions: [
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 0
+							&& !mainCharacter.attackedByObject 
+							&& episode.boss.animation !== 'ground1'
+							&& isObjectsInTouch(episode.boss, mainCharacter)?.touch;
+						},
+						do: function() {
+							episode.tutorialOrder = 1;
+							episode.boss.animate('ground1', 1);	
+						}
+					},
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 1
+							&& !mainCharacter.attackedByObject 
+							&& episode.boss.animation === 'ground1'
+							&& episode.boss.getCurrentFrame()?.atk
+						},
+						do: function() {
+							_game.suspended = 1;
+							const _inner = document.querySelector('.tutorial-box-inner');
+							_inner.innerText = 'You can dodge attacks by choosing a direction and roll, or by dashing backwards without direction';
+							focusMe('#skill7', function() {
+								removeFocus();
+								delete _game.suspended;
+								delete mainCharacter.disableKeyboard;
+								mainCharacter.still = mainCharacter.immobilize = false;
+								mainCharacter.enableSkills();
+								mainCharacter.animate('dash', 1);
+								const _inner = document.querySelector('.tutorial-box-inner');
+								_inner.innerHTML = `<div class="full toxic">
+										Well done!
+								</div>`;
+								disposeFocus();
+								episode.boss.animations.ground1.chargeDistance = episode.boss.animations.ground1.chargingDistance;
+								episode.boss.animations.ground1.useExtraStepXRate = true;
+								episode.tutorialOrder = 2;
+								episode.lastTutorialTime = _gameTick;
+								mainCharacter.disableKeyboard = true;
+								blurKeyboard();
+								setTimeout(() => {
+									episode.boss.animate('ground1', 1);
+								}, 1000);
+							}, 1, null, null, null, 1);
+						}
+					},
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 2
+							&& mainCharacter.chains 
+							&& !mainCharacter.attackedByObject 
+							&& !mainCharacter.counterLearned;
+						},
+						do: function() {
+							let _id = 'chain-skill-2';
+							const _cs = document.getElementById(_id);
+							if(hasClass(_cs, 'v-none'))
+								_id = 'chain-skill-4';
+							_game.suspended = 1;
+							focusMe('#' + _id, function() {
+								removeFocus();
+								delete _game.suspended;
+								delete mainCharacter.disableKeyboard;
+								mainCharacter.still = mainCharacter.immobilize = false;
+								mainCharacter.enableSkills();
+								mainCharacter.animate(mainCharacter.chains[1].key, 1);
+								mainCharacter.counterLearned = 1;
+								const _inner = document.querySelector('.tutorial-box-inner');
+								_inner.innerHTML = `<div class="full toxic">
+										Goold job!
+								</div>`;
+								disposeFocus();
+								episode.tutorialOrder = 3;
+								episode.lastTutorialTime = _gameTick;
+								mainCharacter.disableKeyboard = true;
+								blurKeyboard();
+							}, 1, null, null, null, 1);
+						}
+					},
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 3
+							&& (_gameTick - episode.lastTutorialTime) > 1000;
+						},
+						do: function() {
+							_game.suspended = 1;
+							const _inner = document.querySelector('.tutorial-box-inner');
+							_inner.innerText = 'Hold attack to combo your opponent until you knockback him';
+							delete mainCharacter.disableKeyboard;
+							focusMe('#skill1', function() {
+								removeFocus();
+								delete _game.suspended;
+								delete mainCharacter.disableKeyboard;
+								mainCharacter.still = mainCharacter.immobilize = false;
+								mainCharacter.enableSkills();
+								mainCharacter.animate('attack', 1);
+								episode.boss.animations.ground1.disabled = true;
+								episode.tutorialOrder = 4;
+								episode.lastTutorialTime = _gameTick;
+								disposeFocus();
+							}, 1);
+						}
+					},
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 4
+							&& episode.boss.animation.startsWith('knockback')
+						},
+						do: function() {
+							const _inner = document.querySelector('.tutorial-box-inner');
+								_inner.innerHTML = `<div class="full toxic">
+										Coool!
+								</div>`;
+							mainCharacter.immobilize = true;
+							mainCharacter.disableKeyboard = mainCharacter.still = true;
+							blurKeyboard();
+							episode.lastTutorialTime = _gameTick;
+							episode.tutorialOrder = 5;
+						}
+					},
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 5
+							&& (_gameTick - episode.lastTutorialTime) > 1000;
+						},
+						do: function() {
+							_game.suspended = 1;
+							const _inner = document.querySelector('.tutorial-box-inner');
+							_inner.innerText = 'Now use your attack again to charge and getting close to your opponent';
+							delete mainCharacter.disableKeyboard;
+							focusMe('#skill1', function() {
+								removeFocus();
+								delete _game.suspended;
+								delete mainCharacter.disableKeyboard;
+								mainCharacter.still = mainCharacter.immobilize = false;
+								mainCharacter.enableSkills();
+								mainCharacter.animations.attack.chargeDistance.value = 100;
+								mainCharacter.animate('attack', 1);
+								mainCharacter.disableKeyboard = true;
+								blurKeyboard();
+								episode.tutorialOrder = 6;
+								episode.lastTutorialTime = _gameTick;
+								disposeFocus();
+							}, 1);
+						}
+					},
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 6
+							&& (_gameTick - episode.lastTutorialTime) > 1000;
+						},
+						do: function() {
+							const _inner = document.querySelector('.tutorial-box-inner');
+							_inner.innerHTML = `<div class="full toxic">
+										Superb!
+								</div>`;
+							mainCharacter.immobilize = mainCharacter.still = true;
+							const _air2 = episode.boss.animations.air2;
+							delete _air2.disabled;
+							_air2.frames.forEach(x => x.def = undefined);
+							_air2.priority = 4;
+							episode.boss.rageCount = _air2.rage;
+							episode.boss.attackKeys = [ 'air2' ];
+							episode.boss.upcomingAnimation = 'air2';
+							episode.boss.animations.hurtair.next = 'dead';
+							episode.tutorialOrder = 7;
+							episode.lastTutorialTime = _gameTick;
+						}
+					},
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 7
+							&& episode.boss.animation === 'air2';
+						},
+						do: function() {
+							const _inner = document.querySelector('.tutorial-box-inner');
+							_inner.innerText = 'Last lesson: Time to break your opponent\'s powerful skill. Skill priority works for getting advantage when both sides attack';
+							
+							episode.tutorialOrder = 8;
+							episode.lastTutorialTime = _gameTick;
+						}
+					},
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 8
+							&& (_gameTick - episode.lastTutorialTime) > 700;
+						},
+						do: function() {
+							_game.suspended = 1;
+							setCharacterLevel(4, null, 1);
+							episode.tutorialOrder = 9;
+							episode.lastTutorialTime = _gameTick;
+							episode.boss.animations.air2.disabled = true;
+							delete mainCharacter.disableKeyboard;
+							focusMe('#skill4', function() {
+								removeFocus();
+								delete _game.suspended;
+								delete mainCharacter.disableKeyboard;
+								mainCharacter.still = mainCharacter.immobilize = false;
+								mainCharacter.enableSkills();
+								mainCharacter.animate('ground2', 1);
+								mainCharacter.disableKeyboard = true;
+								blurKeyboard();
+								episode.tutorialOrder = 9;
+								episode.lastTutorialTime = _gameTick;
+								disposeFocus();
+							}, 1);
+						}
+					},
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 9
+							&& episode.boss.animation === 'dead';
+						},
+						do: function() {
+							const _inner = document.querySelector('.tutorial-box-inner');
+								_inner.innerHTML = `<div class="full toxic">
+										Now you are ready!
+								</div>`;
+							mainCharacter.immobilize = true;
+							mainCharacter.disableKeyboard = mainCharacter.still = true;
+							blurKeyboard();
+							mainCharacter.ultimate = true;
+							mainCharacter.animate('idle',1);
+							episode.tutorialOrder = 10;
+						}
+					},
+				],
+				mobs: [
+					{
+						id: 622,
+						minX: 1100,
+						maxX: 1100,
+						count: 1,
+						sight: 1000,
+						grade: 4,
+						yPosition: function() {
+							return MathRound(groundheight * .5);
+						},
+						props: {
+							skipHealthBar: true
+						},
+						hp:160,
+						experience: 0
+					}
+				]
+			},
+			{
 				map: 36,
 				leaderBoards: {
 					calculate: function() {
@@ -7073,6 +7383,8 @@ const __stories = [
 					});
 					_gameUI.appendChild(_desc);
 					episode.hasSkippableScreen = 1;
+					document.querySelectorAll('.top-ui-item').forEach(x => 
+						removeClass(x, 'd-none'));
 				},
 				actions: [
 					{
@@ -8267,6 +8579,10 @@ function switchStoryScene(_func, _newOrder) {
 	if(_extraModals?.[0])
 		_extraModals.forEach(x => x.remove());
 	__storyScene = __story.scenes[__storySceneOrder - 1];
+	if(__storyScene?.when && !__storyScene.when()) {
+		__storySceneOrder++;
+		__storyScene = __story.scenes[__storySceneOrder - 1];
+	}
 	__storyPlaying = 1;
 	let _oldHeartCount = mainCharacter?.heartCount;
 	if(__storyScene?.save && __storyCheckPoint?.sceneOrder !== (__storySceneOrder - 1)) {
