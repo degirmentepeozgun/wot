@@ -7002,15 +7002,25 @@ const __stories = [
 					blurKeyboard();
 					episode.tutorialOrder = 0;
 					episode.boss = _enemy;
+					episode.noDamageFrame = true;
 					episode.boss.difficulty = 1;
+					episode.boss.releaseAfter = 999999999;
 					document.querySelectorAll('.top-ui-item').forEach(x => 
 						addClass(x, 'd-none'));
 					setTimeout(() => {
 						const _div = document.createElement('div');
 						_div.className = 'flex show-ui tutorial-box fade-me';
 						_div.innerHTML = `<img class="tutorial-avatar flip" src="./images/main/blacksmith/concept.png" /><div class="tutorial-box-inner full">
-							${getLangData('Hold block before attack or press here after attack to make counterattack')}</div>`;
+							<div class="full">You can dodge attacks by choosing a direction and roll, or by dashing backwards without direction</div>	
+						</div>`;
 						_gameUI.appendChild(_div);
+						const _skip = document.createElement('div');
+						_skip.className = 'flex show-ui tutorial-skip fade-me';
+						_skip.innerHTML = 'Skip Tutorial';
+						_skip.onexactclick = function() {
+							episode.tutorialEnded = true;
+						}
+						_gameUI.appendChild(_skip);
 					}, 1000);
 				},
 				actions: [
@@ -7019,12 +7029,14 @@ const __stories = [
 							return !_game.suspended 
 							&& episode.tutorialOrder === 0
 							&& !mainCharacter.attackedByObject 
-							&& episode.boss.animation !== 'ground1'
-							&& isObjectsInTouch(episode.boss, mainCharacter)?.touch;
+							&& ((episode.boss.animation !== 'ground1'
+							&& isObjectsInTouch(episode.boss, mainCharacter)?.touch) ||
+							episode.boss.animation === 'ground1');
 						},
 						do: function() {
 							episode.tutorialOrder = 1;
-							episode.boss.animate('ground1', 1);	
+							if(episode.boss.animation !== 'ground1')
+								episode.boss.animate('ground1', 1);	
 						}
 					},
 					{
@@ -7037,17 +7049,15 @@ const __stories = [
 						},
 						do: function() {
 							_game.suspended = 1;
-							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerText = 'You can dodge attacks by choosing a direction and roll, or by dashing backwards without direction';
 							focusMe('#skill7', function() {
 								removeFocus();
 								delete _game.suspended;
 								delete mainCharacter.disableKeyboard;
 								mainCharacter.still = mainCharacter.immobilize = false;
-								mainCharacter.enableSkills();
+								//mainCharacter.enableSkills();
 								mainCharacter.animate('dash', 1);
 								const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<div class="full toxic">
+								_inner.innerHTML = `<div class="full toxic fade-me">
 										Well done!
 								</div>`;
 								disposeFocus();
@@ -7077,16 +7087,19 @@ const __stories = [
 							if(hasClass(_cs, 'v-none'))
 								_id = 'chain-skill-4';
 							_game.suspended = 1;
+							const _inner = document.querySelector('.tutorial-box-inner');
+							_inner.innerHTML = '<div class="full fade-me">Hold block before attack or press here after attack to make counterattack</div>';
+							
 							focusMe('#' + _id, function() {
 								removeFocus();
 								delete _game.suspended;
 								delete mainCharacter.disableKeyboard;
 								mainCharacter.still = mainCharacter.immobilize = false;
-								mainCharacter.enableSkills();
+								//mainCharacter.enableSkills();
 								mainCharacter.animate(mainCharacter.chains[1].key, 1);
 								mainCharacter.counterLearned = 1;
 								const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<div class="full toxic">
+								_inner.innerHTML = `<div class="full toxic fade-me">
 										Goold job!
 								</div>`;
 								disposeFocus();
@@ -7106,14 +7119,14 @@ const __stories = [
 						do: function() {
 							_game.suspended = 1;
 							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerText = 'Hold attack to combo your opponent until you knockback him';
+							_inner.innerHTML = '<div class="full fade-me">Hold attack to combo your opponent until you knockback him</div>';
 							delete mainCharacter.disableKeyboard;
 							focusMe('#skill1', function() {
 								removeFocus();
 								delete _game.suspended;
 								delete mainCharacter.disableKeyboard;
 								mainCharacter.still = mainCharacter.immobilize = false;
-								mainCharacter.enableSkills();
+								//mainCharacter.enableSkills();
 								mainCharacter.animate('attack', 1);
 								episode.boss.animations.ground1.disabled = true;
 								episode.tutorialOrder = 4;
@@ -7130,7 +7143,7 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<div class="full toxic">
+								_inner.innerHTML = `<div class="full toxic fade-me">
 										Coool!
 								</div>`;
 							mainCharacter.immobilize = true;
@@ -7144,19 +7157,19 @@ const __stories = [
 						when: function() {
 							return !_game.suspended 
 							&& episode.tutorialOrder === 5
-							&& (_gameTick - episode.lastTutorialTime) > 1000;
+							&& (_gameTick - episode.lastTutorialTime) > 1250;
 						},
 						do: function() {
 							_game.suspended = 1;
 							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerText = 'Now use your attack again to charge and getting close to your opponent';
+							_inner.innerHTML = '<div class="full fade-me">Now use your attack again to charge and getting close to your opponent</div>';
 							delete mainCharacter.disableKeyboard;
 							focusMe('#skill1', function() {
 								removeFocus();
 								delete _game.suspended;
 								delete mainCharacter.disableKeyboard;
 								mainCharacter.still = mainCharacter.immobilize = false;
-								mainCharacter.enableSkills();
+								//mainCharacter.enableSkills();
 								mainCharacter.animations.attack.chargeDistance.value = 100;
 								mainCharacter.animate('attack', 1);
 								mainCharacter.disableKeyboard = true;
@@ -7171,11 +7184,11 @@ const __stories = [
 						when: function() {
 							return !_game.suspended 
 							&& episode.tutorialOrder === 6
-							&& (_gameTick - episode.lastTutorialTime) > 1000;
+							&& (_gameTick - episode.lastTutorialTime) > 500;
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerHTML = `<div class="full toxic">
+							_inner.innerHTML = `<div class="full toxic fade-me">
 										Superb!
 								</div>`;
 							mainCharacter.immobilize = mainCharacter.still = true;
@@ -7186,7 +7199,7 @@ const __stories = [
 							episode.boss.rageCount = _air2.rage;
 							episode.boss.attackKeys = [ 'air2' ];
 							episode.boss.upcomingAnimation = 'air2';
-							episode.boss.animations.hurtair.next = 'dead';
+							//episode.boss.animations.hurtair.next = 'dead';
 							episode.tutorialOrder = 7;
 							episode.lastTutorialTime = _gameTick;
 						}
@@ -7198,22 +7211,22 @@ const __stories = [
 							&& episode.boss.animation === 'air2';
 						},
 						do: function() {
-							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerText = 'Last lesson: Time to break your opponent\'s powerful skill. Skill priority works for getting advantage when both sides attack';
-							
 							episode.tutorialOrder = 8;
 							episode.lastTutorialTime = _gameTick;
 						}
 					},
 					{
-						when: function() {
+						when: function() {	
 							return !_game.suspended 
-							&& episode.tutorialOrder === 8
+							&& episode.tutorialOrder === 8 
 							&& (_gameTick - episode.lastTutorialTime) > 700;
 						},
 						do: function() {
+							const _inner = document.querySelector('.tutorial-box-inner');
+							_inner.innerHTML = '<div class="full fade-me">Last lesson: Time to break your opponent\'s powerful skill. Skill priority works for getting advantage when both sides attack</div>';
+							
 							_game.suspended = 1;
-							setCharacterLevel(4, null, 1);
+							setCharacterLevel(8, null, 1);
 							episode.tutorialOrder = 9;
 							episode.lastTutorialTime = _gameTick;
 							episode.boss.animations.air2.disabled = true;
@@ -7223,7 +7236,7 @@ const __stories = [
 								delete _game.suspended;
 								delete mainCharacter.disableKeyboard;
 								mainCharacter.still = mainCharacter.immobilize = false;
-								mainCharacter.enableSkills();
+								//mainCharacter.enableSkills();
 								mainCharacter.animate('ground2', 1);
 								mainCharacter.disableKeyboard = true;
 								blurKeyboard();
@@ -7237,21 +7250,209 @@ const __stories = [
 						when: function() {
 							return !_game.suspended 
 							&& episode.tutorialOrder === 9
+							&& mainCharacter.animation === 'idle';
+						},
+						do: function() {
+							const _inner = document.querySelector('.tutorial-box-inner');
+								_inner.innerHTML = `<div class="full fade-me">
+										Let's continue our combo and keep enemy on air
+								</div>`;
+							mainCharacter.immobilize = true;
+							mainCharacter.disableKeyboard = mainCharacter.still = true;
+							blurKeyboard();
+							episode.tutorialOrder = 10;
+							episode.lastTutorialTime = _gameTick;
+						}
+					},
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 10
+							&& (_gameTick - episode.lastTutorialTime) > 700;
+						},
+						do: function() {
+							_game.suspended = 1;
+							episode.tutorialOrder = 11;
+							episode.lastTutorialTime = _gameTick;
+							delete mainCharacter.disableKeyboard;
+							focusMe('#skill3', function() {
+								removeFocus();
+								delete _game.suspended;
+								delete mainCharacter.disableKeyboard;
+								mainCharacter.still = mainCharacter.immobilize = false;
+								mainCharacter.animate('ground1', 1);
+								episode.tutorialOrder = 11;
+								episode.lastTutorialTime = _gameTick;
+								disposeFocus();
+								requestAnimationFrame(() => {
+									mainCharacter.disableKeyboard = true;
+									blurKeyboard();
+								});
+							}, 1);
+						}
+					},
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 11
+							&& mainCharacter.animation === 'idle';
+						},
+						do: function() {
+							const _inner = document.querySelector('.tutorial-box-inner');
+								_inner.innerHTML = `<div class="full fade-me">
+										Let's continue our combo and keep enemy on air
+								</div>`;
+							mainCharacter.direction = __left;
+							mainCharacter.disableKeyboard = mainCharacter.still = true;
+							blurKeyboard();
+							episode.tutorialOrder = 12;
+							episode.lastTutorialTime = _gameTick;
+						}
+					},
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 12
+							&& mainCharacter.direction === __left;
+						},
+						do: function() {
+							const _inner = document.querySelector('.tutorial-box-inner');
+								_inner.innerHTML = `<div class="full fade-me">
+										That skill has an another phase to keep your combo up
+								</div>`;
+							episode.tutorialOrder = 13;
+							episode.lastTutorialTime = _gameTick;
+						}
+					},
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 13
+							&& (_gameTick - episode.lastTutorialTime) > 700;
+						},
+						do: function() {
+							_game.suspended = 1;
+							episode.tutorialOrder = 14;
+							episode.lastTutorialTime = _gameTick;
+							delete mainCharacter.disableKeyboard;
+							focusMe('#skill3', function() {
+								removeFocus();
+								delete _game.suspended;
+								delete mainCharacter.disableKeyboard;
+								mainCharacter.still = mainCharacter.immobilize = false;
+								mainCharacter.animate('ground3', 1);
+								const g3 = mainCharacter.animations.ground3;
+								let g3LastAttackFrame;
+								for(let _frame of g3.frames) {
+									if(_frame.atk)										
+										g3LastAttackFrame = _frame;
+								}
+								g3LastAttackFrame.knockback = true;
+								g3LastAttackFrame.atk.push = 5;
+								g3LastAttackFrame.atk.knockback = true;
+								mainCharacter.disableKeyboard = true;
+								blurKeyboard();
+								episode.tutorialOrder = 14;
+								episode.lastTutorialTime = _gameTick;
+								disposeFocus();
+							}, 1);
+						}
+					},
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 14
+							&& mainCharacter.animation === 'idle';
+						},
+						do: function() {
+							const _inner = document.querySelector('.tutorial-box-inner');
+								_inner.innerHTML = `<div class="full fade-me">
+										One last move but this time enemy is far away, 
+										use your ranged attack to take this rat down!
+								</div>`;
+							mainCharacter.direction = __right;
+							mainCharacter.disableKeyboard = mainCharacter.still = true;
+							blurKeyboard();
+							episode.tutorialOrder = 15;
+							episode.lastTutorialTime = _gameTick;
+						}
+					},
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 15
+							&& (_gameTick - episode.lastTutorialTime) > 700;
+						},
+						do: function() {
+							_game.suspended = 1;
+							episode.tutorialOrder = 16;
+							episode.lastTutorialTime = _gameTick;
+							delete mainCharacter.disableKeyboard;
+							focusMe('#skill5', function() {
+								removeFocus();
+								delete _game.suspended;
+								delete mainCharacter.disableKeyboard;
+								mainCharacter.still = mainCharacter.immobilize = false;
+								mainCharacter.animate('air1', 1);
+								mainCharacter.disableKeyboard = true;
+								blurKeyboard();
+								for(let anima in episode.boss.animations) {
+									if(anima.startsWith('hurt'))
+										episode.boss.animations[anima].next = 'dead';
+								}
+								episode.tutorialOrder = 16;
+								episode.lastTutorialTime = _gameTick;
+								disposeFocus();
+							}, 1);
+						}
+					},
+					{
+						when: function() {
+							return !_game.suspended 
+							&& episode.tutorialOrder === 16
 							&& episode.boss.animation === 'dead';
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<div class="full toxic">
-										Now you are ready!
+								_inner.innerHTML = `<div class="full toxic fade-me">
+										Spot on! Now you are ready!
 								</div>`;
 							mainCharacter.immobilize = true;
 							mainCharacter.disableKeyboard = mainCharacter.still = true;
 							blurKeyboard();
 							mainCharacter.ultimate = true;
 							mainCharacter.animate('idle',1);
-							episode.tutorialOrder = 10;
+							episode.tutorialOrder = 17;
 						}
 					},
+					{
+						when: function() {
+							return episode.tutorialOrder === 17
+							&& episode.boss.remove;
+						},
+						do: function() {
+							episode.tutorialEnded = true;
+							episode.tutorialOrder = 18;
+							episode.lastTutorialTime = _gameTick;
+						}
+					},
+					{
+						when: function() {
+							return episode.tutorialEnded
+							&& (_gameTick - episode.lastTutorialTime) > 500;
+						},
+						do: function() {
+							episode.tutorialOrder = 19;
+							episode.tutorialEnded = false;
+							switchStoryScene();
+							const _box = document.querySelector('.tutorial-box');
+							if(_box)
+								_box.remove();
+							const _skip = document.querySelector('.tutorial-skip');
+							if(_skip)
+								_skip.remove();
+						}
+					}
 				],
 				mobs: [
 					{
@@ -7267,7 +7468,7 @@ const __stories = [
 						props: {
 							skipHealthBar: true
 						},
-						hp:160,
+						hp:1000000,
 						experience: 0
 					}
 				]
@@ -7622,7 +7823,7 @@ const __stories = [
 				],
 				mobs: [
 					{
-						id: 623,
+						id: 622,
 						minX: 1100,
 						maxX: 4100,
 						count: 1,

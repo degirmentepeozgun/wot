@@ -36406,51 +36406,54 @@ const _allEnemies = {
 					priority: 5,
 					frames: [
 						{
-							spriteLeft: 117,
+							spriteLeft: 116,
 							spriteTop: 810,
-							spriteWidth: 473,
-							spriteHeight: 393,
-							spriteOrigin: 233,
+							spriteWidth: 476,
+							spriteHeight: 415,
+							spriteOrigin: 234,
+							bottomGap: 25,
 							speed:6
 						},
 						{
 							spriteLeft: 908,
 							spriteTop: 781,
-							spriteWidth: 322,
-							spriteHeight: 419,
+							spriteWidth: 323,
+							spriteHeight: 421,
+							bottomGap: 2,
 							spriteOrigin: 142,
 							speed:6
 						},
 						{
 							spriteLeft: 1522,
 							spriteTop: 769,
-							spriteWidth: 399,
-							spriteHeight: 1200 - 769,
+							spriteWidth: 400,
+							spriteHeight: 438,
+							bottomGap: 7,
 							spriteOrigin: 1750 - 1522,
 							speed:6
 						},
 						{
-							spriteLeft: 2198,
+							spriteLeft: 2197,
 							spriteTop: 772,
-							spriteWidth: 459,
+							spriteWidth: 460,
 							spriteHeight: 428,
-							spriteOrigin: 2450 - 2198,
+							spriteOrigin: 2450 - 2197,
 							speed:6
 						},
 						{
-							spriteLeft: 2936,
+							spriteLeft: 2935,
 							spriteTop: 785,
-							spriteWidth: 365,
-							spriteHeight: 417,
-							spriteOrigin: 214,
+							spriteWidth: 367,
+							spriteHeight: 415,
+							spriteOrigin: 215,
 							speed:6
 						},
 						{
-							spriteLeft: 3725,
+							spriteLeft: 3722,
 							spriteTop: 777,
-							spriteWidth: 341,
-							spriteHeight: 425,
-							spriteOrigin: 125,
+							spriteWidth: 347,
+							spriteHeight: 423,
+							spriteOrigin: 128,
 							speed:6
 						}
 					]
@@ -36461,35 +36464,39 @@ const _allEnemies = {
 					imediateBreak: true,
 					frames: [
 						{
-							spriteLeft: 149,
-							spriteTop: 210,
-							spriteWidth: 473,
-							spriteHeight: 392,
-							spriteOrigin: 201,
+							spriteLeft: 148,
+							spriteTop: 209,
+							spriteWidth: 475,
+							spriteHeight: 414,
+							bottomGap:23,
+							spriteOrigin: 202,
 							speed: 16
 						},
 						{
-							spriteLeft: 849,
+							spriteLeft: 847,
 							spriteTop: 201,
-							spriteWidth: 474,
-							spriteHeight: 400,
-							spriteOrigin: 201,
+							spriteWidth: 477,
+							spriteHeight: 423,
+							spriteOrigin: 203,
+							bottomGap:24,
 							speed:16
 						},
 						{
-							spriteLeft: 1549,
+							spriteLeft: 1548,
 							spriteTop: 209,
-							spriteWidth: 474,
-							spriteHeight: 391,
-							spriteOrigin: 201,
+							spriteWidth: 476,
+							spriteHeight: 415,
+							bottomGap:24,
+							spriteOrigin: 202,
 							speed: 16
 						},
 						{
-							spriteLeft: 849,
+							spriteLeft: 847,
 							spriteTop: 201,
-							spriteWidth: 474,
-							spriteHeight: 400,
-							spriteOrigin: 201,
+							spriteWidth: 477,
+							spriteHeight: 423,
+							spriteOrigin: 203,
+							bottomGap:24,
 							speed: 16
 						}
 					]
@@ -36511,11 +36518,11 @@ const _allEnemies = {
 							speed: 12
 						},
 						{
-							spriteLeft: 2824,
-							spriteTop: 1991,
+							spriteLeft: 2733,
+							spriteTop: 1992,
 							spriteWidth: 679,
-							spriteHeight: 409,
-							spriteOrigin: 326 - 63,
+							spriteHeight: 408,
+							spriteOrigin: 417 - 63,
 							sound: { key: 'woosh', volume:.5 },
 							speed: 12
 						},
@@ -36562,11 +36569,11 @@ const _allEnemies = {
 							}
 						},
 						{
-							spriteLeft: 833,
+							spriteLeft: 831,
 							spriteTop: 2009,
-							spriteWidth: 564,
-							spriteHeight: 392,
-							spriteOrigin: 217,
+							spriteWidth: 568,
+							spriteHeight: 391,
+							spriteOrigin: 219,
 							speed: 10,
 							def: {
 								rate: .8
@@ -36576,7 +36583,7 @@ const _allEnemies = {
 							spriteLeft: 1532,
 							spriteTop: 2009,
 							spriteWidth: 564,
-							spriteHeight: 392,
+							spriteHeight: 391,
 							spriteOrigin: 218,
 							sound: { key: 'woosh', volume:.5 },
 							atk: {
@@ -36642,9 +36649,9 @@ const _allEnemies = {
 						},
 						{
 							spriteLeft: 1527,
-							spriteTop: 3657,
+							spriteTop: 3636,
 							spriteWidth: 489,
-							spriteHeight: 544,
+							spriteHeight: 564,
 							spriteOrigin: 223,
 							speed: 8,
 							def: {
@@ -36653,9 +36660,9 @@ const _allEnemies = {
 						},
 						{
 							spriteLeft: 1527,
-							spriteTop: 3657,
+							spriteTop: 3636,
 							spriteWidth: 489,
-							spriteHeight: 544,
+							spriteHeight: 564,
 							spriteOrigin: 223,
 							speed: 4,
 							objects: [
@@ -36676,8 +36683,9 @@ const _allEnemies = {
 						{
 							spriteLeft: 2193,
 							spriteTop: 3883,
-							spriteWidth: 591,
+							spriteWidth: 592,
 							spriteHeight: 319,
+							bottomGap: 2,
 							spriteOrigin: 257,
 							speed: 8,
 							sound: {key:'slam',volume:.5},
@@ -36737,11 +36745,12 @@ const _allEnemies = {
 							}
 						},
 						{
-							spriteLeft: 2923,
+							spriteLeft: 2922,
 							spriteTop: 283,
-							spriteWidth: 500,
-							spriteHeight: 319,
-							spriteOrigin: 227,
+							spriteWidth: 501,
+							spriteHeight: 343,
+							spriteOrigin: 228,
+							bottomGap: 26,
 							speed: 8,
 							def: {
 								iframe: true
@@ -36894,11 +36903,11 @@ const _allEnemies = {
 							}
 						},
 						{
-							spriteLeft: 833,
+							spriteLeft: 831,
 							spriteTop: 2009,
-							spriteWidth: 564,
-							spriteHeight: 392,
-							spriteOrigin: 217,
+							spriteWidth: 568,
+							spriteHeight: 391,
+							spriteOrigin: 219,
 							speed: 10,
 							def: {
 								iframe: true
@@ -36908,11 +36917,11 @@ const _allEnemies = {
 							spriteLeft: 1532,
 							spriteTop: 2009,
 							spriteWidth: 564,
-							spriteHeight: 392,
+							spriteHeight: 391,
 							spriteOrigin: 218,
 							sound: { key: 'woosh', volume:.5 },
 							atk: {
-								yRange: 15,
+								yRange: 15,			
 								rate: 2,
 								hitTaken: .1,
 								type: 'common',
@@ -36928,11 +36937,11 @@ const _allEnemies = {
 							}
 						},
 						{
-							spriteLeft: 2824,
-							spriteTop: 1991,
+							spriteLeft: 2733,
+							spriteTop: 1992,
 							spriteWidth: 679,
-							spriteHeight: 409,
-							spriteOrigin: 326 - 63,
+							spriteHeight: 408,
+							spriteOrigin: 417 - 63,
 							sound: { key: 'woosh', volume:.5, reset: true },
 							speed: 10,
 							def: {
@@ -36962,11 +36971,11 @@ const _allEnemies = {
 							}
 						},
 						{
-							spriteLeft: 833,
+							spriteLeft: 831,
 							spriteTop: 2009,
-							spriteWidth: 564,
-							spriteHeight: 392,
-							spriteOrigin: 217,
+							spriteWidth: 568,
+							spriteHeight: 391,
+							spriteOrigin: 219,
 							speed: 8,
 							def: {
 								iframe: true
@@ -36976,7 +36985,7 @@ const _allEnemies = {
 							spriteLeft: 1532,
 							spriteTop: 2009,
 							spriteWidth: 564,
-							spriteHeight: 392,
+							spriteHeight: 391,
 							spriteOrigin: 218,
 							sound: { key: 'woosh', volume:.5, reset: true },
 							atk: {
@@ -36996,11 +37005,11 @@ const _allEnemies = {
 							}
 						},
 						{
-							spriteLeft: 2824,
-							spriteTop: 1991,
+							spriteLeft: 2733,
+							spriteTop: 1992,
 							spriteWidth: 679,
-							spriteHeight: 409,
-							spriteOrigin: 326 - 63,
+							spriteHeight: 408,
+							spriteOrigin: 417 - 63,
 							sound: { key: 'woosh', volume:.5, reset: true },
 							speed: 8,
 							def: {
@@ -37031,11 +37040,11 @@ const _allEnemies = {
 						},
 
 						{
-							spriteLeft: 833,
+							spriteLeft: 831,
 							spriteTop: 2009,
-							spriteWidth: 564,
-							spriteHeight: 392,
-							spriteOrigin: 217,
+							spriteWidth: 568,
+							spriteHeight: 391,
+							spriteOrigin: 219,
 							speed: 6,
 							def: {
 								iframe: true
@@ -37045,7 +37054,7 @@ const _allEnemies = {
 							spriteLeft: 1532,
 							spriteTop: 2009,
 							spriteWidth: 564,
-							spriteHeight: 392,
+							spriteHeight: 391,
 							spriteOrigin: 218,
 							sound: { key: 'woosh', volume:.5, reset: true },
 							atk: {
@@ -37065,11 +37074,11 @@ const _allEnemies = {
 							}
 						},
 						{
-							spriteLeft: 2824,
-							spriteTop: 1991,
+							spriteLeft: 2733,
+							spriteTop: 1992,
 							spriteWidth: 679,
-							spriteHeight: 409,
-							spriteOrigin: 326 - 63,
+							spriteHeight: 408,
+							spriteOrigin: 417 - 63,
 							sound: { key: 'woosh', volume:.5, reset: true },
 							speed: 6,
 							def: {
@@ -37136,9 +37145,9 @@ const _allEnemies = {
 						},
 						{
 							spriteLeft: 1527,
-							spriteTop: 3657,
+							spriteTop: 3636,
 							spriteWidth: 489,
-							spriteHeight: 544,
+							spriteHeight: 564,
 							spriteOrigin: 223,
 							speed: 8,
 							def: {
@@ -37147,9 +37156,9 @@ const _allEnemies = {
 						},
 						{
 							spriteLeft: 1527,
-							spriteTop: 3657,
+							spriteTop: 3636,
 							spriteWidth: 489,
-							spriteHeight: 544,
+							spriteHeight: 564,
 							spriteOrigin: 223,
 							speed: 4,
 							objects: [
@@ -37170,8 +37179,9 @@ const _allEnemies = {
 						{
 							spriteLeft: 2193,
 							spriteTop: 3883,
-							spriteWidth: 591,
+							spriteWidth: 592,
 							spriteHeight: 319,
+							bottomGap: 2,
 							spriteOrigin: 257,
 							speed: 8,
 							sound: {key:'slam',volume:.5},
@@ -37232,11 +37242,12 @@ const _allEnemies = {
 							}
 						},
 						{
-							spriteLeft: 2923,
+							spriteLeft: 2922,
 							spriteTop: 283,
-							spriteWidth: 500,
-							spriteHeight: 319,
-							spriteOrigin: 227,
+							spriteWidth: 501,
+							spriteHeight: 343,
+							spriteOrigin: 228,
+							bottomGap: 26,
 							speed: 8,
 							def: {
 								iframe: true
@@ -37343,14 +37354,112 @@ const _allEnemies = {
 						}
 					]
 				},
+				hurtblock: {
+					key: 'hurtblock',
+					hurt: true,
+					type: 'skill',
+					priority: 2,
+					frames: [
+						{
+							spriteLeft: 3048,
+							spriteTop: 4924,
+							spriteWidth: 317,
+							spriteHeight: 476,
+							spriteOrigin: 102,
+							speed: 1,
+							sound: {key:'shield', reset: true},
+							objects: [
+								{
+									key: 'shieldactive',
+									remove: true
+								}
+							]
+						},
+						{
+							spriteLeft: 3048,
+							spriteTop: 4924,
+							spriteWidth: 317,
+							spriteHeight: 476,
+							spriteOrigin: 102,
+							speed: 6,
+							objects: [
+								{
+									key: 'shieldhurt2',
+									position: 'middle-front',
+									scale:1.6,
+									yGap: 20,
+									xGap: 10
+								}
+							]
+						},
+						{
+							spriteLeft: 3048,
+							spriteTop: 4924,
+							spriteWidth: 317,
+							spriteHeight: 476,
+							spriteOrigin: 102,
+							speed: 53,
+							objects: [{	
+								key: 'shieldactive',
+								position: 'middle-front',
+								yGap: 20,
+								xGap: 20,
+								scale:1.6,
+								bind: 'hurtblock'
+							}]
+						}
+					]
+				},
+				block: {
+					key: 'block',
+					type: 'skill',
+					priority: 2,
+					frames: [
+						{
+							spriteLeft: 3048,
+							spriteTop: 4924,
+							spriteWidth: 317,
+							spriteHeight: 476,
+							spriteOrigin: 102,
+							speed: 1,
+							directionChangeEnabled: true
+						},
+						{
+							spriteLeft: 3048,
+							spriteTop: 4924,
+							spriteWidth: 317,
+							spriteHeight: 476,
+							spriteOrigin: 102,
+							speed: 1,
+							objects: [{
+								key: 'shieldactive',
+								position: 'middle-front',
+								yGap: 20,
+								scale:1.4,
+								xGap: 20
+							}],
+							directionChangeEnabled: true
+						},
+						{
+							spriteLeft: 3048,
+							spriteTop: 4924,
+							spriteWidth: 317,
+							spriteHeight: 476,
+							spriteOrigin: 102,
+							speed: 2,
+							directionChangeEnabled: true
+						}
+					]
+				},
 				// // hurtfeet: createHurtFeet(),
 				// // hurthip: createHurtHip(),
 				hurtground1: createHurtGround(
 					{
 						spriteLeft: 847,
 						spriteTop: 2573,
-						spriteWidth: 510,
-						spriteHeight: 428,
+						spriteWidth: 512,
+						spriteHeight: 441,
+						bottomGap: 14,
 						spriteOrigin: 203
 					},
 					{
@@ -37404,7 +37513,8 @@ const _allEnemies = {
 						spriteLeft: 2880,
 						spriteTop: 3380,
 						spriteWidth: 563,
-						spriteHeight: 221,
+						spriteHeight: 258,
+						bottomGap: 38,
 						spriteOrigin: 270
 					}, { key: 'goblinhurt1,goblinhurt2,goblinhurt3,goblinhurt4,goblinhurt5,goblinhurt6,goblinhurt7', volume: .5, reset: true }
 				),
@@ -37435,11 +37545,12 @@ const _allEnemies = {
 						spriteHeight: 380,
 						spriteOrigin: 241
 					}, {
-						spriteLeft: 2805,
+						spriteLeft: 2804,
 						spriteTop: 2795,
-						spriteWidth: 724,
-						spriteHeight: 207,
-						spriteOrigin: 345
+						spriteWidth: 726,
+						spriteHeight: 240,
+						bottomGap: 35,
+						spriteOrigin: 346
 					}
 				),
 				knockbackair: createKnockBackAir(
@@ -37453,7 +37564,8 @@ const _allEnemies = {
 						spriteLeft: 2880,
 						spriteTop: 3380,
 						spriteWidth: 563,
-						spriteHeight: 221,
+						spriteHeight: 258,
+						bottomGap: 38,
 						spriteOrigin: 270
 					}),
 				release: {
@@ -37595,83 +37707,93 @@ const _allEnemies = {
 							spriteLeft: 2112,
 							spriteTop: 2756,
 							spriteWidth: 677,
-							spriteHeight: 246,
+							spriteHeight: 260,
+							bottomGap: 16,
 							spriteOrigin: 338,
 							speed: 6,
 						},
 						{
-							spriteLeft: 2805,
+							spriteLeft: 2804,
 							spriteTop: 2795,
-							spriteWidth: 724,
-							spriteHeight: 207,
-							spriteOrigin: 345,
+							spriteWidth: 726,
+							spriteHeight: 240,
+							bottomGap: 35,
+							spriteOrigin: 346,
 							speed: 6,
 						},
 						{
-							spriteLeft: 2805,
+							spriteLeft: 2804,
 							spriteTop: 2795,
-							spriteWidth: 724,
-							spriteHeight: 207,
-							spriteOrigin: 345,
-							speed: 32,
+							spriteWidth: 726,
+							spriteHeight: 240,
+							bottomGap: 35,
+							spriteOrigin: 346,
+							speed: 64,
 						},
 						{
-							spriteLeft: 2805,
+							spriteLeft: 2804,
 							spriteTop: 2795,
-							spriteWidth: 724,
-							spriteHeight: 207,
-							spriteOrigin: 345,
+							spriteWidth: 726,
+							spriteHeight: 240,
+							bottomGap: 35,
+							spriteOrigin: 346,
 							alpha: true,
-							speed: 8
+							speed: 16
 						},
 						{
-							spriteLeft: 2805,
+							spriteLeft: 2804,
 							spriteTop: 2795,
-							spriteWidth: 724,
-							spriteHeight: 207,
-							spriteOrigin: 345,
-							speed: 8
+							spriteWidth: 726,
+							spriteHeight: 240,
+							bottomGap: 35,
+							spriteOrigin: 346,
+							speed: 16
 						},
 						{
-							spriteLeft: 2805,
+							spriteLeft: 2804,
 							spriteTop: 2795,
-							spriteWidth: 724,
-							spriteHeight: 207,
-							spriteOrigin: 345,
+							spriteWidth: 726,
+							spriteHeight: 240,
+							bottomGap: 35,
+							spriteOrigin: 346,
 							alpha: true,
-							speed: 8
+							speed: 16
 						},
 						{
-							spriteLeft: 2805,
+							spriteLeft: 2804,
 							spriteTop: 2795,
-							spriteWidth: 724,
-							spriteHeight: 207,
-							spriteOrigin: 345,
-							speed: 8
+							spriteWidth: 726,
+							spriteHeight: 240,
+							bottomGap: 35,
+							spriteOrigin: 346,
+							speed: 16
 						},
 						{
-							spriteLeft: 2805,
+							spriteLeft: 2804,
 							spriteTop: 2795,
-							spriteWidth: 724,
-							spriteHeight: 207,
-							spriteOrigin: 345,
+							spriteWidth: 726,
+							spriteHeight: 240,
+							bottomGap: 35,
+							spriteOrigin: 346,
 							alpha: true,
-							speed: 8
+							speed: 16
 						},
 						{
-							spriteLeft: 2805,
+							spriteLeft: 2804,
 							spriteTop: 2795,
-							spriteWidth: 724,
-							spriteHeight: 207,
-							spriteOrigin: 345,
-							speed: 7
+							spriteWidth: 726,
+							spriteHeight: 240,
+							bottomGap: 35,
+							spriteOrigin: 346,
+							speed: 15
 						},
 						{
-							spriteLeft: 2805,
+							spriteLeft: 2804,
 							spriteTop: 2795,
-							spriteWidth: 724,
-							spriteHeight: 207,
-							spriteOrigin: 345,
+							spriteWidth: 726,
+							spriteHeight: 240,
+							bottomGap: 35,
+							spriteOrigin: 346,
 							props: {
 								remove: true
 							},
@@ -79347,6 +79469,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteWidth: _sprite2.spriteWidth,
 				spriteHeight: _sprite2.spriteHeight,
 				spriteOrigin: _sprite2.spriteOrigin,
+				bottomGap: _sprite2.bottomGap ?? 0,
 				src: _sprite2.src,
 				speed: 6,
 				sound:{key:'landing', volume:.5},
@@ -79419,6 +79542,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite2.spriteHeight,
 				spriteOrigin: _sprite2.spriteOrigin,
 				src: _sprite2.src,
+				bottomGap: _sprite2.bottomGap ?? 0,
 				invisibleWhenLay: true,
 				speed: 1,
 				sound:{key:'landing', volume:.3, reset: true},
@@ -79436,6 +79560,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteWidth: _sprite2.spriteWidth,
 				spriteHeight: _sprite2.spriteHeight,
 				spriteOrigin: _sprite2.spriteOrigin,
+				bottomGap: _sprite2.bottomGap ?? 0,
 				invisibleWhenLay: true,
 				lay: true,
 				src: _sprite2.src,

@@ -92,6 +92,8 @@ const avatarTemplate = function (char, _name) {
 		return _html + '</div>';
 }
 function addDmgFrame(_item) {
+	if(episode?.noDamageFrame)
+		return;
 	if(dmgFrames?.[0]){
 		let _found;
 		for(let df of dmgFrames)

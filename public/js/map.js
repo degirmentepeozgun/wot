@@ -231,13 +231,13 @@ function map(_m) {
 						_cacheCAN.width = _f.spriteWidth;
 						let _additionalHeight = 0;
 						let _rel, _relZoom;
-						if(_e.hasShadow !== false){
-							_rel = structuredClone2(relatedObjects.find(x => x.id === 'shadow'));
-							_relZoom = _f.spriteWidth / _rel.width;
-							const _shadowHeight = _relZoom * (_e.yGap < 5 ? 8 : _e.yGap) * 3;
-							_additionalHeight = MathCeil(_shadowHeight / 2);
+						// if(_e.hasShadow !== false){
+						// 	_rel = structuredClone2(relatedObjects.find(x => x.id === 'shadow'));
+						// 	_relZoom = _f.spriteWidth / _rel.width;
+						// 	const _shadowHeight = _relZoom * (_e.yGap < 5 ? 8 : _e.yGap) * 3;
+						// 	_additionalHeight = MathCeil(_shadowHeight / 2);
 							
-						}
+						// }
 						_cacheCAN.height = _f.spriteHeight + _additionalHeight;
 						const _cacheCTX = _cacheCAN.getContext('2d');
 						_cacheCAN.imageSmoothingEnabled = false;
@@ -3910,16 +3910,16 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			}
 			if(!_hasDmg && (_item.char.hurting?.count > 0 || _item.skinColor))
 				_hasDmg = true;
-			// if (!_item.unseen && _item.char?.shadow && !_item.char.unseen) {
-			// 	const _rel = _item.char.shadow;
-			// 	const _relZoom = _item.char.WIDTH / (_rel.width);
-			// 	const _shadowHeight = _item.char.ZOOM * (_item.char.yGap < 5 ? 8 : _item.char.yGap) * 3;
-			// 	if(!__batterySaveMode)
-			// 		offCtx.drawImage(this.FootShadow, _rel.left ?? 0, _rel.top ?? 0, _rel.width, _rel.height,
-			// 			_item.char.LEFT,
-			// 			MathRound(this.cHeight - _item.char.yPosition - (_item.char.yGap < 5 ? _shadowHeight / 2 : ((_shadowHeight * 3) / 4))),
-			// 			MathFloor(_rel.width * _relZoom), MathFloor(_shadowHeight));
-			// }
+			if (!_item.unseen && _item.char?.shadow && !_item.char.unseen) {
+				const _rel = _item.char.shadow;
+				const _relZoom = _item.char.WIDTH / (_rel.width);
+				const _shadowHeight = _item.char.ZOOM * (_item.char.yGap < 5 ? 8 : _item.char.yGap) * 3;
+				if(!__batterySaveMode)
+					offCtx.drawImage(this.FootShadow, _rel.left ?? 0, _rel.top ?? 0, _rel.width, _rel.height,
+						_item.char.LEFT,
+						MathRound(this.cHeight - _item.char.yPosition - (_item.char.yGap < 5 ? _shadowHeight / 2 : ((_shadowHeight * 3) / 4))),
+						MathFloor(_rel.width * _relZoom), MathFloor(_shadowHeight));
+			}
 		}
 		let i = 0;
 		offCtx.reversed = c10.reversed = offGoreCtx.reversed = false;// = _cNPC.cleared = false;
