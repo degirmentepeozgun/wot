@@ -6352,6 +6352,7 @@ function enemy(_e) {
 					_thisPriority--;
 				if(_enemyPriority > 1 && _enemy.chargeStarted && _enemyAnima.chargeStarted === _enemy.chargeStarted)
 					_enemyPriority--;
+				let hurtedByPriority;
 				if (_enemyPriority !== undefined) {
 					if (_enemyPriority === _thisPriority && _enemyFrame?.atk) {
 						if (this.class !== __spell && _enemy.class !== __spell && _enemy.direction !== this.direction && !this.friendly && !_enemy.friendly && getRandomValue(1, 10) === 1) {
@@ -6385,6 +6386,7 @@ function enemy(_e) {
 						_enemyHurted = this.hurtEnemy(_anima, _frame, _enemy, _enemyFrame, _enemyAnima);
 						if (this.class === __spell && (!this.pierce) && this.animation !== 'dead')
 							this.animate('dead', null, null, 6);
+						hurtedByPriority = true;
 					}
 					else if (this.class === __spell && (!this.pierce) && this.animation !== 'dead')
 						this.animate('dead', null, null, 7);
@@ -6414,7 +6416,7 @@ function enemy(_e) {
 						}
 					}
 				}
-				else if (_enemy.animation.endsWith('block') && _thisPriority >= 1) {
+				if (!hurtedByPriority && _enemy.lastFatiqueDecreaseTime !== _gameTick && _enemy.animation.endsWith('block') && _thisPriority >= 1) {
 					_enemy.animate('hurtblock');
 					const _decreased = _enemy.decreaseFatique(this, _frame.atk?.rate);
 					if (!_decreased) {
@@ -9449,6 +9451,7 @@ function enemy(_e) {
 			return false;
 		}
 		this.fatique -= _dec;
+		this.lastFatiqueDecreaseTime = _gameTick;
 		_client.setFatique(this);
 		const _bar = document.querySelector('#char-' + this.key + ' .defbar-value');
 		if(_bar)
@@ -9461,6 +9464,10 @@ function enemy(_e) {
 			this.addObject({key:'sparkblockmedium', position: 'middle', xGap: -_gap});
 		else
 			this.addObject({key:'sparkblockbig', position: 'middle', xGap: -_gap});
+		if(this.animations.hurtblock && this.animation !== 'hurtblock'){
+			this.animate('hurtblock', 1);
+			alert(1);
+		}
 		return true;
 	}
 	this.increaseFatique = function (_val) {

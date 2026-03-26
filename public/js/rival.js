@@ -36520,7 +36520,7 @@ const _allEnemies = {
 						{
 							spriteLeft: 2733,
 							spriteTop: 1992,
-							spriteWidth: 679,
+							spriteWidth: 767,
 							spriteHeight: 408,
 							spriteOrigin: 417 - 63,
 							sound: { key: 'woosh', volume:.5 },
@@ -37471,7 +37471,7 @@ const _allEnemies = {
 						invisibleWhenLay: true
 					},
 					null,
-					{ key: 'goblinhurt1,goblinhurt2,goblinhurt3,goblinhurt4,goblinhurt5,goblinhurt6,goblinhurt7', volume:.5, reset: true }
+					{ key: 'goblinkinghurt1,goblinkinghurt2,goblinkinghurt3,goblinkinghurt4', volume:.7, reset: true }
 				),
 				hurtground2: function() { 
 					const _hurt = createHurtGround(
@@ -37497,8 +37497,8 @@ const _allEnemies = {
 						// 	spriteHeight: 274,
 						// 	spriteOrigin: 124
 						// },
-						{ key: 'goblinhurt1,goblinhurt2,goblinhurt3,goblinhurt4,goblinhurt5,goblinhurt6,goblinhurt7', volume:.5, reset: true }
-					);
+							{ key: 'goblinkinghurt1,goblinkinghurt2,goblinkinghurt3,goblinkinghurt4', volume:.7, reset: true }
+						);
 					_hurt.key = 'hurtground2';
 					return _hurt;
 				}(),
@@ -37516,7 +37516,7 @@ const _allEnemies = {
 						spriteHeight: 258,
 						bottomGap: 38,
 						spriteOrigin: 270
-					}, { key: 'goblinhurt1,goblinhurt2,goblinhurt3,goblinhurt4,goblinhurt5,goblinhurt6,goblinhurt7', volume: .5, reset: true }
+					}, { key: 'goblinkinghurt1,goblinkinghurt2,goblinkinghurt3,goblinkinghurt4', volume: .7, reset: true }
 				),
 				// hurtair2: function() {
 				// 	const _ha = createHurtAir(
@@ -37700,8 +37700,8 @@ const _allEnemies = {
 							spriteWidth: 551,
 							spriteHeight: 363,
 							spriteOrigin: 239,
-							sound: true,
-							speed: 5
+							sound: {key:'goblinkingdead', volume:.7},
+							speed: 11
 						},
 						{
 							spriteLeft: 2112,
@@ -37710,7 +37710,7 @@ const _allEnemies = {
 							spriteHeight: 260,
 							bottomGap: 16,
 							spriteOrigin: 338,
-							speed: 6,
+							speed: 12,
 						},
 						{
 							spriteLeft: 2804,
@@ -37719,7 +37719,7 @@ const _allEnemies = {
 							spriteHeight: 240,
 							bottomGap: 35,
 							spriteOrigin: 346,
-							speed: 6,
+							speed: 12,
 						},
 						{
 							spriteLeft: 2804,

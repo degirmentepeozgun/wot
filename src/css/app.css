@@ -833,7 +833,9 @@ canvas:not(.parallax canvas), .canvas, .parallax {
 	border: .2vh solid #ffffff99;
 	background-size: contain !important;
 }
-
+.pt3 {
+	padding-top:3%
+}
 .gray-concept {
 	filter: brightness(.5) grayscale(1) drop-shadow(0 0 .5vh #00000080)
 }
@@ -11003,14 +11005,17 @@ pointer-events: "auto";
 }
 .tutorial-box-inner {
 	background:radial-gradient(	#36454F, #000) !important;
-	padding: 1.5% 3% 1.5% 15.5%;
+	padding: 1.25% 3% 1.25% 15.5%;
 	color:#f3f4f5ba !important;
 	border-radius: 1vh;
 }
 .tutorial-box-inner, 
 .tutorial-box-inner * {
-	font-size: 3vh !important;
-	line-height: 4vh !important;
+	font-size: 2.8vh !important;
+	line-height: 3.8vh !important;
+}
+.tutorial-box .tutorial-title {
+	color:#F4BB44cc !important
 }
 .tutorial-avatar {
 	position: absolute;
@@ -11018,6 +11023,9 @@ pointer-events: "auto";
 	height:155%;
 	top:-45%;
 	filter:drop-shadow(0 0 2vh #000);
+}
+.tutorial-box .toxic {
+	margin-top:.25%
 }
 .tutorial-skip {
 	position: absolute;
@@ -11034,4 +11042,8 @@ pointer-events: "auto";
     aspect-ratio: 500 / 125 !important;
 	font-weight: 400;
 	box-shadow:0 .5vh 1vh #000
+}
+.tutorial-box .tutorial-description-text {
+	font-size: 2.7vh !important;
+	line-height: 3.4vh !important;
 }
