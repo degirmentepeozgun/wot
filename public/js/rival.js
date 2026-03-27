@@ -36314,6 +36314,7 @@ const _allEnemies = {
 			key: 'g0blmusc-' + Math.random().toString().replace(/[.]/g, ''),
 			yGap: 5,
 			id: 621,
+			slotPriority: 1,
 			healtbarGap: 0,
 			name: 'Goblin Gorilla',
 			class: 'goblin',

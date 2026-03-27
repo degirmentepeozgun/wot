@@ -6964,7 +6964,7 @@ const __stories = [
 		scenes: [
 			{
 				when: function() {
-					return true;
+					return false;
 				},
 				map: 9998,
 				loots: [
@@ -7660,6 +7660,40 @@ const __stories = [
 				actions: [
 					{
 						when: function() {
+							if(episode.mobPhase)
+								return false;
+							const _st = __account?.questStatus?.quest?.timer?.startTime;
+							if(_st) {
+								return (_gameTick - _st) > 5000; 
+							}
+							return false;
+						},
+						do: function() {
+							episode.mobPhase = 1;
+							let _x = MathRound((mainCharacter.HURTLEFT + platformX + (1200 * __zoom) + mainCharacter.HURTWIDTH) / __zoom);
+							const _mob1 = summonMobWithJson({
+								id: 623,
+								level: mainCharacter.level,
+								minX: _x,
+								maxX: _x,
+								experience: 1000
+							});
+							_mob1.acceptChanges();
+							_mob1.pickNewTarget();
+							_x = MathRound((mainCharacter.HURTLEFT + platformX - (1200 * __zoom) + mainCharacter.HURTWIDTH) / __zoom);
+							const _mob2 = summonMobWithJson({
+								id: 623,
+								level: mainCharacter.level,
+								minX: _x,
+								maxX: _x,
+								experience: 1000
+							});
+							_mob2.acceptChanges();
+							_mob2.pickNewTarget();
+						}
+					},
+					{
+						when: function() {
 							return episode.phase < 99 && (mainCharacter.level > 11 || episode.phase === 98);
 						},
 						do: function() {
@@ -7896,7 +7930,7 @@ const __stories = [
 						id: 619,
 						minX: 5000,
 						maxX: 5000,
-						count: 1,
+						count: 2,
 						sight: 1000,
 						spawn: 1,
 						hp:160,
