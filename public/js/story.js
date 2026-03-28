@@ -7675,6 +7675,10 @@ const __stories = [
 								id: 623,
 								level: mainCharacter.level,
 								minX: _x,
+								groupId: 10,
+								spawn: 1,
+								sight:1000,
+								count:1,
 								maxX: _x,
 								experience: 1000
 							});
@@ -7685,6 +7689,10 @@ const __stories = [
 								id: 623,
 								level: mainCharacter.level,
 								minX: _x,
+								count:1,
+								groupId: 20,
+								spawn: 1,
+								sight:1000,
 								maxX: _x,
 								experience: 1000
 							});

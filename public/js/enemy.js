@@ -32,6 +32,8 @@ function enemy(_e) {
 		this.finishWhen = function() {
 			return _e.finishWhen(this);
 		};
+	if(_e.slotPriority)
+		this.slotPriority = _e.slotPriority;
 	this.moveDirection = undefined;
 	this.experience = 0; // _e.experience ?? 500;
 	this.healtbarGap = _e.healtbarGap;
@@ -1337,7 +1339,7 @@ function enemy(_e) {
 
 		const target = this.autoTarget;
 		const myRing = this.slot.ring;
-		const myPriority = this.priority ?? 0;
+		const myPriority = this.slotPriority ?? 10;
 
 		const orders = target.releasedSlotOrders;
 		if(!orders)
@@ -1410,7 +1412,7 @@ function enemy(_e) {
 					if(!other || other === this)
 						continue;
 
-					const otherPriority = other.priority ?? 0;
+					const otherPriority = other.slotPriority ?? 10;
 
 					// ✅ CASE 1: normal priority steal
 					let canSteal = otherPriority < myPriority;
