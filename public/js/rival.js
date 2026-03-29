@@ -35674,6 +35674,7 @@ const _allEnemies = {
 							spriteWidth: 197,
 							spriteHeight: 251,
 							spriteOrigin: 98,
+							sound: { key: 'giantrun1,giantrun2', volume:.6, reset: true },
 							speed:6
 						}
 					]
@@ -35724,6 +35725,7 @@ const _allEnemies = {
 							spriteWidth: 199,
 							spriteHeight: 232,
 							spriteOrigin: 93,
+							sound: { key: 'giantrun1,giantrun2', volume:1, reset: true },
 							speed:6
 						},
 						{
@@ -36474,7 +36476,7 @@ const _allEnemies = {
 							spriteWidth: 329,
 							spriteHeight: 454,
 							spriteOrigin: 181,
-							sound: { key: 'giantrun1,giantrun2', volume:.5, reset: true },
+							sound: { key: 'giantrun1,giantrun2', volume:.75, reset: true },
 							speed:6
 						}
 					]
@@ -36528,7 +36530,7 @@ const _allEnemies = {
 							spriteWidth: 367,
 							spriteHeight: 415,
 							spriteOrigin: 215,
-							sound: { key: 'giantrun1,giantrun2', volume:.1, reset: true },
+							sound: { key: 'giantrun1,giantrun2', volume:1, reset: true },
 							speed:6
 						},
 						{
@@ -38013,7 +38015,7 @@ const _allEnemies = {
 							spriteWidth: 376,
 							spriteHeight: 310,
 							spriteOrigin: 134,
-							speed: 12
+							speed: 8
 						},
 						{
 							spriteLeft:1113,
@@ -38021,7 +38023,7 @@ const _allEnemies = {
 							spriteWidth: 300,
 							spriteHeight: 236,
 							spriteOrigin: 137,
-							speed: 12
+							speed: 8
 						}
 					]
 				},

@@ -7604,7 +7604,7 @@ const __stories = [
 					mainCharacter.level = 0;
 					mainCharacter.experience = 0;
 					mainCharacter.maxExperience = 833;
-					setCharacterLevel(8, null, 1);
+					setCharacterLevel(1, null, 1);
 					//setCharacterLevel(8, null, 1);
 					addClass(_gameUI, 'demo-playing');
 					episode.pauseBgMusic(1);
@@ -7662,7 +7662,7 @@ const __stories = [
 						when: function() {
 							const _st = episode.mobPhaseTick ?? __account?.questStatus?.quest?.timer?.startTime;
 							if(_st) {
-								return (_gameTick - _st) > 5000; 
+								return (_gameTick - _st) > 35000; 
 							}
 							return false;
 						},
@@ -7716,7 +7716,7 @@ const __stories = [
 							// setTimeout(function() {
 							// 	episode.loadCharacterSprites(function() {}, [37,38], null, 1);
 							// }, 20);
-							PlaySound({key:'goblinkingenter', volume: .5});
+							PlaySound({key:'bossalert', volume: .5});
 							warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
 							const _elm = document.getElementById('quest-status');
 							addClass(_elm, 'mission-done');
@@ -7761,7 +7761,7 @@ const __stories = [
 								}
 							mainCharacter.realLevel = mainCharacter.level;
 							setTimeout(() => {
-								PlaySound({key:'sistersenter', volume:1});
+							PlaySound({key:'goblinkingenter', volume: 1});
 								setTimeout(() => {
 									episode.phase = 100;
 									const installBoss = function(_b, _name) {
