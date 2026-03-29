@@ -3076,6 +3076,8 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	goblinkingrelease: './images/sounds/goblin-king-release.mp3',
+	goblinkingenter: './images/sounds/goblin-king-enter.mp3',
 	goblinkingdead: './images/sounds/goblin-king-dead.mp3',
 	goblinkinghurt1: './images/sounds/goblin-king-hurt1.mp3',
 	goblinkinghurt2: './images/sounds/goblin-king-hurt2.mp3',
@@ -3084,6 +3086,7 @@ const soundFiles = {
 	goblinkingkick: './images/sounds/goblin-king-kick.mp3',
 	punchcartoon: './images/sounds/punch-cartoon.mp3',
 	jesperroll: './images/sounds/jesper-roll6.mp3',
+	jesperhurt: './images/sounds/jesper-hurt.mp3',
 	jesperboom: './images/sounds/jesper-boom.wav',
 	slingmelee: './images/sounds/sling-melee.mp3',
 	rockhit: './images/sounds/rock-hit.mp3',
@@ -30198,214 +30201,393 @@ const canvasAnimations =  {
 // 		delete _params.top;
 // 	}
 // },
+	// debris: function (_char, _params, _canv) {
+
+	// 	const ctx = _canv ?? c10;
+
+	// 	const _l = _char.SCREENLEFT;
+	// 	const _t = _params.top ?? (_char.getTop() + _char.HEIGHT + MathRound(episode.cHeight * 0.01));
+	// 	if (_params.top === undefined) _params.top = _t;
+
+	// 	const _z = _char.getZoom();
+
+	// 	const x = _l + MathRound((_params.x ?? 0) * _z);
+	// 	const groundY = _t + MathRound((_params.y ?? 0) * _z);
+
+	// 	const dir = _params.dir ?? 'up';
+	// 	const strength = _params.strength ?? 1.5;
+
+	// 	if (!_char.dparticles)
+	// 		_char.dparticles = [];
+
+	// 	/* ================= COLORS ================= */
+
+	// 	function dustColor(alpha) {
+	// 		const b = 165 + Math.random() * 35;
+	// 		return `rgba(${b}, ${b - 15}, ${b - 35}, ${alpha})`;
+	// 	}
+
+	// 	/* ================= SHAPE ================= */
+
+	// 	function makeDustShape(size) {
+	// 		const points = [];
+	// 		const count = 6 + Math.random() * 4;
+
+	// 		for (let i = 0; i < count; i++) {
+	// 			const a = (Math.PI * 2 / count) * i;
+	// 			const r = size * (0.6 + Math.random() * 0.5);
+	// 			points.push({
+	// 				x: Math.cos(a) * r,
+	// 				y: Math.sin(a) * r
+	// 			});
+	// 		}
+	// 		return points;
+	// 	}
+
+	// 	/* ================= SPAWN ONCE ================= */
+
+	// 	if (!_params._spawned) {
+	// 		_params._spawned = true;
+
+	// 		const rockCount = Math.min(55, 12 + strength * 14);
+	// 		const baseSpeed = 2.2 + strength * 1.1;
+
+	// 		let centerAngle = 270;
+	// 		if (dir === __left) centerAngle = 210;
+	// 		if (dir === __right) centerAngle = 330;
+
+	// 		const spread = 140;
+
+	// 		/* ===== ROCKS ===== */
+
+	// 		for (let i = 0; i < rockCount; i++) {
+
+	// 			const a =
+	// 				centerAngle +
+	// 				(Math.random() * spread - spread / 2);
+
+	// 			const rad = a * Math.PI / 180;
+	// 			const spd = baseSpeed * (0.7 + Math.random());
+
+	// 			_char.dparticles.push({
+	// 				type: 'rock',
+	// 				x,
+	// 				y: groundY,
+	// 				vx: Math.cos(rad) * spd,
+	// 				vy: Math.sin(rad) * spd - (1.2 + Math.random()),
+	// 				p: platformX,
+	// 				radius: 1.4 + Math.random() * 2.5,
+	// 				life: 1,
+	// 				decay: 0.045,
+	// 				gravity: 0.55,
+	// 				frame: 0,
+	// 				color: 'rgb(95,75,55)'
+	// 			});
+	// 		}
+
+	// 		/* ===== DUST CLUSTER ===== */
+
+	// 		const clusterCount = 6 + Math.floor(strength * 3);
+
+	// 		for (let i = 0; i < clusterCount; i++) {
+	// 			const size = (2 + strength * 2) * (0.8 + Math.random() * 0.5);
+	// 			const shape = makeDustShape(size);
+
+	// 			const path = new Path2D();
+	// 			path.moveTo(shape[0].x, shape[0].y);
+	// 			for (let j = 1; j < shape.length; j++)
+	// 				path.lineTo(shape[j].x, shape[j].y);
+	// 			path.closePath();
+	// 			let ox = x;
+	// 			let oy = groundY;
+	// 			_char.dparticles.push({
+	// 				type: 'dust',
+	// 				x: x + ox,
+	// 				y: groundY + oy,
+	// 				vx: (Math.random() - 0.5) * 0.35,
+	// 				vy: -0.25 - Math.random() * 0.25,
+	// 				p: platformX,
+
+	// 				shape,       // debug için kalabilir
+	// 				path,        // <<< CACHE
+
+	// 				scale: 0.4,
+	// 				scaleGrow: 0.035 + Math.random() * 0.03,
+	// 				life: 1,
+	// 				decay: 0.025 + Math.random() * 0.01,
+	// 				frame: 0,
+	// 				gravity: 0.015,
+	// 				alpha: 0.28 + Math.random() * 0.12
+	// 			});
+
+	// 		}
+	// 	}
+
+	// 	/* ================= UPDATE & DRAW ================= */
+
+	// 	const oldAlpha = ctx.globalAlpha;
+	// 	if (ctx.reversed) ctx.restore();
+
+	// 	for (let i = _char.dparticles.length - 1; i >= 0; i--) {
+
+	// 		const p = _char.dparticles[i];
+
+	// 		p.x += p.vx;
+	// 		p.y += p.vy;
+
+	// 		if (p.type === 'rock') {
+	// 			p.vy += p.gravity;
+	// 			p.vx *= 0.97;
+	// 		}
+
+	// 		if (p.type === 'dust') {
+	// 			p.vy += p.gravity;
+	// 			p.scale += p.scaleGrow;
+	// 			p.scaleGrow *= 0.92;
+	// 		}
+
+	// 		p.life -= p.decay;
+	// 		p.frame++;
+
+	// 		ctx.globalAlpha = Math.max(0, p.life);
+
+	// 		if (p.type === 'rock') {
+	// 			ctx.fillStyle = p.color;
+	// 			ctx.beginPath();
+	// 			ctx.ellipse(
+	// 				p.x - (platformX - p.p),
+	// 				p.y,
+	// 				p.radius,
+	// 				p.radius * 0.7,
+	// 				0, 0, Math.PI * 2
+	// 			);
+	// 			ctx.fill();
+	// 		}
+
+	// 		if (p.type === 'dust') {
+	// 			// ctx.fillStyle = dustColor(p.alpha * p.life);
+	// 			// ctx.beginPath();
+	// 			// const s = p.shape;
+	// 			// ctx.moveTo(
+	// 			// 	(p.x - (platformX - p.p)) + s[0].x * p.scale,
+	// 			// 	p.y + s[0].y * p.scale
+	// 			// );
+	// 			// for (let j = 1; j < s.length; j++) {
+	// 			// 	ctx.lineTo(
+	// 			// 		(p.x - (platformX - p.p)) + s[j].x * p.scale,
+	// 			// 		p.y + s[j].y * p.scale
+	// 			// 	);
+	// 			// }
+	// 			// ctx.closePath();
+	// 			// ctx.fill();
+	// 			 ctx.fillStyle = dustColor(p.alpha * p.life);
+
+	// 			ctx.save();
+	// 			ctx.translate(
+	// 				p.x - (platformX - p.p),
+	// 				p.y
+	// 			);
+	// 			ctx.scale(p.scale, p.scale);
+	// 			ctx.fill(p.path);
+	// 			ctx.restore();
+	// 		}
+
+	// 		if (p.life <= 0)
+	// 			_char.dparticles.splice(i, 1);
+	// 	}
+
+	// 	ctx.globalAlpha = oldAlpha;
+
+	// 	if (ctx.reversed) {
+	// 		ctx.save();
+	// 		ctx.scale(-1, 1);
+	// 	}
+
+	// 	if (_char.dparticles.length === 0) {
+	// 		delete _char.dparticles;
+	// 		delete _params.top;
+	// 		delete _params._spawned;
+    //     	_char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'debris');
+	// 	}
+	// },
 	debris: function (_char, _params, _canv) {
 
-		const ctx = _canv ?? c10;
+	const ctx = _canv ?? c10;
 
-		const _l = _char.SCREENLEFT;
-		const _t = _params.top ?? (_char.getTop() + _char.HEIGHT + MathRound(episode.cHeight * 0.01));
-		if (_params.top === undefined) _params.top = _t;
+	const _l = _char.SCREENLEFT;
+	const _t = _params.top ?? (_char.getTop() + _char.HEIGHT + MathRound(episode.cHeight * 0.01));
+	if (_params.top === undefined) _params.top = _t;
 
-		const _z = _char.getZoom();
+	const _z = _char.getZoom();
 
-		const x = _l + MathRound((_params.x ?? 0) * _z);
-		const groundY = _t + MathRound((_params.y ?? 0) * _z);
+	const x = _l + MathRound((_params.x ?? 0) * _z);
+	const groundY = _t + MathRound((_params.y ?? 0) * _z);
 
-		const dir = _params.dir ?? 'up';
-		const strength = _params.strength ?? 1.5;
+	const dir = _params.dir ?? 'up';
+	const strength = _params.strength ?? 1.5;
 
-		if (!_char.dparticles)
-			_char.dparticles = [];
+	// 🔥 eksik olanlar
+	const ox = (Math.random() - 0.5) * 6;
+	const oy = (Math.random() - 0.5) * 3;
+	const sizeBase = (2 + strength * 2);
 
-		/* ================= COLORS ================= */
+	if (!_char.dparticles)
+		_char.dparticles = [];
 
-		function dustColor(alpha) {
-			const b = 165 + Math.random() * 35;
-			return `rgba(${b}, ${b - 15}, ${b - 35}, ${alpha})`;
+	function dustColor(alpha) {
+		const b = 165 + Math.random() * 35;
+		return `rgba(${b}, ${b - 15}, ${b - 35}, ${alpha})`;
+	}
+
+	function makeDustShape(size) {
+		const points = [];
+		const count = 6 + Math.floor(Math.random() * 4);
+
+		for (let i = 0; i < count; i++) {
+			const a = (Math.PI * 2 / count) * i;
+			const r = size * (0.6 + Math.random() * 0.5);
+			points.push({
+				x: Math.cos(a) * r,
+				y: Math.sin(a) * r
+			});
+		}
+		return points;
+	}
+
+	if (!_params._spawned) {
+		_params._spawned = true;
+
+		const rockCount = Math.min(55, 12 + strength * 14);
+		const baseSpeed = 2.2 + strength * 1.1;
+
+		let centerAngle = 270;
+		if (dir === __left) centerAngle = 210;
+		if (dir === __right) centerAngle = 330;
+
+		const spread = 140;
+
+		/* ===== ROCKS ===== */
+		for (let i = 0; i < rockCount; i++) {
+
+			const a = centerAngle + (Math.random() * spread - spread / 2);
+			const rad = a * Math.PI / 180;
+			const spd = baseSpeed * (0.7 + Math.random());
+
+			_char.dparticles.push({
+				type: 'rock',
+				x,
+				y: groundY,
+				vx: Math.cos(rad) * spd,
+				vy: Math.sin(rad) * spd - (1.2 + Math.random()),
+				p: platformX,
+				radius: 1.4 + Math.random() * 2.5,
+				life: 1,
+				decay: 0.045,
+				gravity: 0.55,
+				color: 'rgb(95,75,55)'
+			});
 		}
 
-		/* ================= SHAPE ================= */
+		/* ===== DUST ===== */
+		const clusterCount = 6 + Math.floor(strength * 3);
 
-		function makeDustShape(size) {
-			const points = [];
-			const count = 6 + Math.random() * 4;
+		for (let i = 0; i < clusterCount; i++) {
 
-			for (let i = 0; i < count; i++) {
-				const a = (Math.PI * 2 / count) * i;
-				const r = size * (0.6 + Math.random() * 0.5);
-				points.push({
-					x: Math.cos(a) * r,
-					y: Math.sin(a) * r
-				});
-			}
-			return points;
+			const size = sizeBase * (0.8 + Math.random() * 0.5);
+			const shape = makeDustShape(size);
+
+			const path = new Path2D();
+			path.moveTo(shape[0].x, shape[0].y);
+			for (let j = 1; j < shape.length; j++)
+				path.lineTo(shape[j].x, shape[j].y);
+			path.closePath();
+
+			_char.dparticles.push({
+				type: 'dust',
+				x: x + ox,
+				y: groundY + oy,
+				vx: (Math.random() - 0.5) * 0.35,
+				vy: -0.25 - Math.random() * 0.25,
+				p: platformX,
+
+				path,
+
+				scale: 0.4,
+				scaleGrow: 0.035 + Math.random() * 0.03,
+				life: 1,
+				decay: 0.025 + Math.random() * 0.01,
+				gravity: 0.015,
+				alpha: 0.28 + Math.random() * 0.12
+			});
+		}
+	}
+
+	const oldAlpha = ctx.globalAlpha;
+	if (ctx.reversed) ctx.restore();
+
+	for (let i = _char.dparticles.length - 1; i >= 0; i--) {
+
+		const p = _char.dparticles[i];
+
+		p.x += p.vx;
+		p.y += p.vy;
+
+		if (p.type === 'rock') {
+			p.vy += p.gravity;
+			p.vx *= 0.97;
 		}
 
-		/* ================= SPAWN ONCE ================= */
-
-		if (!_params._spawned) {
-			_params._spawned = true;
-
-			const rockCount = Math.min(55, 12 + strength * 14);
-			const baseSpeed = 2.2 + strength * 1.1;
-
-			let centerAngle = 270;
-			if (dir === __left) centerAngle = 210;
-			if (dir === __right) centerAngle = 330;
-
-			const spread = 140;
-
-			/* ===== ROCKS ===== */
-
-			for (let i = 0; i < rockCount; i++) {
-
-				const a =
-					centerAngle +
-					(Math.random() * spread - spread / 2);
-
-				const rad = a * Math.PI / 180;
-				const spd = baseSpeed * (0.7 + Math.random());
-
-				_char.dparticles.push({
-					type: 'rock',
-					x,
-					y: groundY,
-					vx: Math.cos(rad) * spd,
-					vy: Math.sin(rad) * spd - (1.2 + Math.random()),
-					p: platformX,
-					radius: 1.4 + Math.random() * 2.5,
-					life: 1,
-					decay: 0.045,
-					gravity: 0.55,
-					frame: 0,
-					color: 'rgb(95,75,55)'
-				});
-			}
-
-			/* ===== DUST CLUSTER ===== */
-
-			const clusterCount = 6 + Math.floor(strength * 3);
-
-			for (let i = 0; i < clusterCount; i++) {
-
-				const shape = makeDustShape(size);
-
-				const path = new Path2D();
-				path.moveTo(shape[0].x, shape[0].y);
-				for (let j = 1; j < shape.length; j++)
-					path.lineTo(shape[j].x, shape[j].y);
-				path.closePath();
-
-				_char.dparticles.push({
-					type: 'dust',
-					x: x + ox,
-					y: groundY + oy,
-					vx: (Math.random() - 0.5) * 0.35,
-					vy: -0.25 - Math.random() * 0.25,
-					p: platformX,
-
-					shape,       // debug için kalabilir
-					path,        // <<< CACHE
-
-					scale: 0.4,
-					scaleGrow: 0.035 + Math.random() * 0.03,
-					life: 1,
-					decay: 0.025 + Math.random() * 0.01,
-					frame: 0,
-					gravity: 0.015,
-					alpha: 0.28 + Math.random() * 0.12
-				});
-
-			}
+		if (p.type === 'dust') {
+			p.vy += p.gravity;
+			p.scale += p.scaleGrow;
+			p.scaleGrow *= 0.92;
 		}
 
-		/* ================= UPDATE & DRAW ================= */
+		p.life -= p.decay;
 
-		const oldAlpha = ctx.globalAlpha;
-		if (ctx.reversed) ctx.restore();
+		ctx.globalAlpha = Math.max(0, p.life);
 
-		for (let i = _char.dparticles.length - 1; i >= 0; i--) {
-
-			const p = _char.dparticles[i];
-
-			p.x += p.vx;
-			p.y += p.vy;
-
-			if (p.type === 'rock') {
-				p.vy += p.gravity;
-				p.vx *= 0.97;
-			}
-
-			if (p.type === 'dust') {
-				p.vy += p.gravity;
-				p.scale += p.scaleGrow;
-				p.scaleGrow *= 0.92;
-			}
-
-			p.life -= p.decay;
-			p.frame++;
-
-			ctx.globalAlpha = Math.max(0, p.life);
-
-			if (p.type === 'rock') {
-				ctx.fillStyle = p.color;
-				ctx.beginPath();
-				ctx.ellipse(
-					p.x - (platformX - p.p),
-					p.y,
-					p.radius,
-					p.radius * 0.7,
-					0, 0, Math.PI * 2
-				);
-				ctx.fill();
-			}
-
-			if (p.type === 'dust') {
-				// ctx.fillStyle = dustColor(p.alpha * p.life);
-				// ctx.beginPath();
-				// const s = p.shape;
-				// ctx.moveTo(
-				// 	(p.x - (platformX - p.p)) + s[0].x * p.scale,
-				// 	p.y + s[0].y * p.scale
-				// );
-				// for (let j = 1; j < s.length; j++) {
-				// 	ctx.lineTo(
-				// 		(p.x - (platformX - p.p)) + s[j].x * p.scale,
-				// 		p.y + s[j].y * p.scale
-				// 	);
-				// }
-				// ctx.closePath();
-				// ctx.fill();
-				 ctx.fillStyle = dustColor(p.alpha * p.life);
-
-				ctx.save();
-				ctx.translate(
-					p.x - (platformX - p.p),
-					p.y
-				);
-				ctx.scale(p.scale, p.scale);
-				ctx.fill(p.path);
-				ctx.restore();
-			}
-
-			if (p.life <= 0)
-				_char.dparticles.splice(i, 1);
+		if (p.type === 'rock') {
+			ctx.fillStyle = p.color;
+			ctx.beginPath();
+			ctx.ellipse(
+				p.x - (platformX - p.p),
+				p.y,
+				p.radius,
+				p.radius * 0.7,
+				0, 0, Math.PI * 2
+			);
+			ctx.fill();
 		}
 
-		ctx.globalAlpha = oldAlpha;
+		if (p.type === 'dust') {
+			ctx.fillStyle = dustColor(p.alpha * p.life);
 
-		if (ctx.reversed) {
 			ctx.save();
-			ctx.scale(-1, 1);
+			ctx.translate(p.x - (platformX - p.p), p.y);
+			ctx.scale(p.scale, p.scale);
+			ctx.fill(p.path);
+			ctx.restore();
 		}
 
-		if (_char.dparticles.length === 0) {
-			delete _char.dparticles;
-			delete _params.top;
-			delete _params._spawned;
-        	_char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'debris');
-		}
-	},
+		if (p.life <= 0)
+			_char.dparticles.splice(i, 1);
+	}
+
+	ctx.globalAlpha = oldAlpha;
+
+	if (ctx.reversed) {
+		ctx.save();
+		ctx.scale(-1, 1);
+	}
+
+	if (_char.dparticles.length === 0) {
+		delete _char.dparticles;
+		delete _params.top;
+		delete _params._spawned;
+		_char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'debris');
+	}
+},
 	flash: function(_char, _params, _canv) {
 		const ctx = _canv ?? c10;
 		if (_params.start === undefined) {

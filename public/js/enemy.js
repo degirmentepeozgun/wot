@@ -900,10 +900,9 @@ function enemy(_e) {
 					dist *= 0.75;
 
 				const _slot = makeSlot(r + 1, angle, dist);
-
-				if((r + 1) > 2 && MathAbs(180 - angle) <= 30)
+				if((r + 1) > 2 && (MathAbs(180 - angle) <= 30 || MathAbs(180 - angle) >= 150))
 					_slot.ranged = true;
-
+				console.log(angle, _slot.ranged);
 				this.slots.push(_slot);
 				this.slotsByRing[r + 1].push(_slot);
 			}
@@ -1068,7 +1067,7 @@ function enemy(_e) {
 		bestSlot.occupant = this;
 
 		this.slot = bestSlot;
-		
+		this.slot.bindTick = _gameTick;
 		this.reactionDelay =
 			getRandomValue2(300, 600) * (this.slot.ring + 1);
 		return bestSlot;
@@ -1340,7 +1339,7 @@ function enemy(_e) {
 		if (!this.slot)
 			return true;
 
-		if(this.slot.ring === 1)
+		if(this.slot.ring === 1 || (_gameTick - this.slot.bindTick) < 600)
 			return true;
 		if(this.slotJustReleasedTick === _gameTick)
 			return false;
@@ -1352,7 +1351,6 @@ function enemy(_e) {
 		const orders = target.releasedSlotOrders;
 		if(!orders)
 			return true;
-
 		let candidateRings = [];
 
 			// 🎯 PRIORITY 1 — RANGED optimize (5+ → 3/4)
@@ -1390,6 +1388,16 @@ function enemy(_e) {
 		const myCenterX = this.HURTLEFT + this._HURTBOX_half;
 		const isTargetLeft = myCenterX > targetCenterX;
 
+		// const slotSideWrong =
+		// 	(!isTargetLeft && this.slot.type === "front") ||
+		// 	(isTargetLeft && this.slot.type === "back");
+
+		// if(slotSideWrong && !this.slot.mustCross) {
+		// 	if(this.ranged)
+		// 		console.log('Geliom');
+		// 	this.releaseSlot(6); // direkt bırak → yeni slot seçilecek
+		// 	return true;
+		// }
 		for(const ring of candidateRings) {
 
 			const ringSlots = target.slotsByRing[ring];
@@ -1455,7 +1463,9 @@ function enemy(_e) {
 				bestSlot.occupied = true;
 				bestSlot.occupant = this;
 				this.slot = bestSlot;
-
+				this.slot.bindTick = _gameTick;
+				this.reactionDelay =
+					getRandomValue2(300, 600) * (this.slot.ring + 1);
 				// order tüket (sadece boş slot senaryosunda mantıklı ama yine azaltıyoruz)
 				if(target.releasedSlotOrders[ring] > 0)
 					target.releasedSlotOrders[ring]--;
@@ -2901,7 +2911,7 @@ function enemy(_e) {
 			else
 				this.autoCommand2();
 		}
-		// showBorders(this.HURTLEFT, _gamePad.clientHeight - this.yPosition, this.HURTWIDTH, 20, this.slot?.mustCross ? 'white' : this.slot && !this.slot.support ? 'orange' : (this.slot ? 'yellow' : (this.main ? 'blue' : 'green')), 'border-' + this.key);
+		//showBorders(this.HURTLEFT, _gamePad.clientHeight - this.yPosition, this.HURTWIDTH, 20, this.slot?.mustCross ? 'white' : this.slot && !this.slot.support ? 'orange' : (this.slot ? 'yellow' : (this.main ? 'blue' : 'green')), 'border-' + this.key);
 		// if(this.slots)
 		// 	for(let i = 0; i < this.slots.length; i++) {
 		// 		const _slot = this.slots[i];
@@ -2909,8 +2919,10 @@ function enemy(_e) {
 		// 		// 	continue;
 		// 		const _xGap = _slot.xGap ?? 0;
 		// 		const _origin = this.HURTLEFT + this._HURTBOX_half + _xGap;
+		// 		// showBorders(_origin - 10, _gamePad.clientHeight - this.yPosition + (_slot.yGap ?? 0), 
+		// 		// 	20, 20, _slot.occupied ? 'pink' : 'red', 'slot-' + i + '-' + this.key);
 		// 		showBorders(_origin - 10, _gamePad.clientHeight - this.yPosition + (_slot.yGap ?? 0), 
-		// 			20, 20, _slot.occupied ? 'pink' : 'red', 'slot-' + i + '-' + this.key);
+		// 			20, 20, _slot.occupied ? 'pink' : (_slot.ranged ? 'purple' : 'red'), 'slot-' + i + '-' + this.key);
 		// 	}
 		
 		// if (this.autoMode) {

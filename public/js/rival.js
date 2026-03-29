@@ -33792,7 +33792,47 @@ const _allEnemies = {
 							spriteWidth: 231,
 							spriteHeight: 162,
 							spriteOrigin: 111,
-							speed: 12
+							speed: 12,
+							go: {
+								rate: .9,
+								frame: 9
+							}
+						},
+						{
+							spriteLeft: 61,
+							spriteTop: 92,
+							spriteWidth: 205,
+							spriteHeight: 208,
+							spriteOrigin: 89,
+							speed: 12,
+							src: './images/sprites/ep619/idle2.png',
+						},
+						{
+							spriteLeft: 61,
+							spriteTop: 92,
+							spriteWidth: 205,
+							spriteHeight: 208,
+							spriteOrigin: 89,
+							speed: 12,
+							src: './images/sprites/ep619/idle2.png',
+						},
+						{
+							spriteLeft: 361,
+							spriteTop: 63,
+							spriteWidth: 203,
+							spriteHeight: 237,
+							spriteOrigin: 89,
+							speed: 12,
+							src: './images/sprites/ep619/idle2.png',
+						},
+						{
+							spriteLeft: 661,
+							spriteTop: 82,
+							spriteWidth: 201,
+							spriteHeight: 218,
+							spriteOrigin: 89,
+							speed: 12,
+							src: './images/sprites/ep619/idle2.png',
 						}
 					]
 				},
@@ -34656,6 +34696,46 @@ const _allEnemies = {
 							spriteWidth: 204,
 							spriteHeight: 200,
 							spriteOrigin: 93,
+							speed: 12,
+							go: {
+								rate: .9,
+								frame: 9
+							}
+						},
+						{
+							spriteLeft: 58,
+							spriteTop: 104,
+							spriteWidth: 221,
+							spriteHeight: 196,
+							spriteOrigin: 92,
+							src: './images/sprites/ep620/idle.png',
+							speed: 12
+						},
+						{
+							spriteLeft: 352,
+							spriteTop: 93,
+							spriteWidth: 204,
+							spriteHeight: 207,
+							spriteOrigin: 98,
+							src: './images/sprites/ep620/idle.png',
+							speed: 12
+						},
+						{
+							spriteLeft: 652,
+							spriteTop: 91,
+							spriteWidth: 197,
+							spriteHeight: 209,
+							spriteOrigin: 98,
+							src: './images/sprites/ep620/idle.png',
+							speed: 12
+						},
+						{
+							spriteLeft: 953,
+							spriteTop: 93,
+							spriteWidth: 203,
+							spriteHeight: 207,
+							spriteOrigin: 97,
+							src: './images/sprites/ep620/idle.png',
 							speed: 12
 						}
 					]
@@ -35526,7 +35606,7 @@ const _allEnemies = {
 			bleed: true,
 			stepX: 8,
 			weight: 1000,
-			stepXRate: .4,
+			stepXRate: .7,
 			bloodColor: 'green',
 			finishableWith: 'feet,hip',
 			finishAfter: 50,
@@ -36394,6 +36474,7 @@ const _allEnemies = {
 							spriteWidth: 329,
 							spriteHeight: 454,
 							spriteOrigin: 181,
+							sound: { key: 'giantrun1,giantrun2', volume:.5, reset: true },
 							speed:6
 						}
 					]
@@ -36447,6 +36528,7 @@ const _allEnemies = {
 							spriteWidth: 367,
 							spriteHeight: 415,
 							spriteOrigin: 215,
+							sound: { key: 'giantrun1,giantrun2', volume:.1, reset: true },
 							speed:6
 						},
 						{
@@ -37590,6 +37672,7 @@ const _allEnemies = {
 							spriteHeight: 496,
 							spriteOrigin: 236,
 							speed: 8,
+							sound: { key: 'goblinkingrelease', volume:.5 },
 							def: { iframe: true }
 						},
 						{
@@ -37817,9 +37900,9 @@ const _allEnemies = {
 			zoom: .65,
 			width: 400,
 			height: 333,
-			maxHP: 100,
-			atk: 20,
-			def: 100,
+			maxHP: 2000,
+			atk: 100,
+			def: 200,
 			bleed: true,
 			stepX: 8,
 			weight: 1000,
@@ -37877,6 +37960,67 @@ const _allEnemies = {
 							spriteHeight: 467,
 							spriteOrigin: 123,
 							extraStepXRate: .25,
+							speed: 12
+						}
+					]
+				},
+				hurtground1: {
+					key: 'hurtground1',
+					type: 'skill',
+					hurt: 'ground',
+					next: 'dead',
+					frames: [
+						{
+							spriteLeft:121,
+							spriteTop: 863,
+							spriteWidth: 307,
+							spriteHeight: 337,
+							spriteOrigin: 129,
+							zoom: .98,
+							speed: 1
+						},
+						{
+							spriteLeft:121,
+							spriteTop: 863,
+							spriteWidth: 307,
+							spriteHeight: 337,
+							spriteOrigin: 129,
+							zoom: .98,
+							sound: {key:'jesperhurt', volume:.5},
+							speed: 3
+						},
+						{
+							spriteLeft:121,
+							spriteTop: 863,
+							spriteWidth: 307,
+							spriteHeight: 337,
+							spriteOrigin: 129,
+							zoom: 1.01,
+							speed: 4
+						},
+						{
+							spriteLeft:121,
+							spriteTop: 863,
+							spriteWidth: 307,
+							spriteHeight: 337,
+							spriteOrigin: 129,
+							zoom: .99,
+							speed: 4
+						},
+						{
+							spriteLeft:616,
+							spriteTop: 890,
+							spriteWidth: 376,
+							spriteHeight: 310,
+							spriteOrigin: 134,
+							speed: 12
+						},
+						{
+							spriteLeft:1113,
+							spriteTop: 964,
+							spriteWidth: 300,
+							spriteHeight: 236,
+							spriteOrigin: 137,
 							speed: 12
 						}
 					]
@@ -38126,13 +38270,12 @@ const _allEnemies = {
 			width: 300,
 			height: 450,
 			maxHP: 100,
-			atk: 200,
+			atk: 100,
 			def: 100,
 			bleed: true,
 			stepX: 8,
 			noSpeedChange: true,
 			touchDead: true,
-			invulnerable: true,
 			weight: 1000,
 			stepXRate: .4,
 			bloodColor: 'green',

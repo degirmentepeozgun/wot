@@ -6901,7 +6901,7 @@ const __stories = [
 				minLevel: 1,
 				maps: [201],
 				timer: {
-					ms: 160000,
+					ms: 200000,
 					after: function() {
 						if(episode.phase > 98)
 							return;
@@ -7604,7 +7604,7 @@ const __stories = [
 					mainCharacter.level = 0;
 					mainCharacter.experience = 0;
 					mainCharacter.maxExperience = 833;
-					setCharacterLevel(1, null, 1);
+					setCharacterLevel(8, null, 1);
 					//setCharacterLevel(8, null, 1);
 					addClass(_gameUI, 'demo-playing');
 					episode.pauseBgMusic(1);
@@ -7660,17 +7660,15 @@ const __stories = [
 				actions: [
 					{
 						when: function() {
-							if(episode.mobPhase)
-								return false;
-							const _st = __account?.questStatus?.quest?.timer?.startTime;
+							const _st = episode.mobPhaseTick ?? __account?.questStatus?.quest?.timer?.startTime;
 							if(_st) {
 								return (_gameTick - _st) > 5000; 
 							}
 							return false;
 						},
 						do: function() {
-							episode.mobPhase = 1;
-							let _x = MathRound((mainCharacter.HURTLEFT + platformX + (1200 * __zoom) + mainCharacter.HURTWIDTH) / __zoom);
+							episode.mobPhaseTick = _gameTick;
+							let _x = MathRound((mainCharacter.HURTLEFT + platformX + episode.cWidth + mainCharacter.HURTWIDTH) / __zoom);
 							const _mob1 = summonMobWithJson({
 								id: 623,
 								level: mainCharacter.level,
@@ -7680,11 +7678,11 @@ const __stories = [
 								sight:1000,
 								count:1,
 								maxX: _x,
-								experience: 1000
-							});
+								experience: 0
+							}, 0, 1);
 							_mob1.acceptChanges();
 							_mob1.pickNewTarget();
-							_x = MathRound((mainCharacter.HURTLEFT + platformX - (1200 * __zoom) + mainCharacter.HURTWIDTH) / __zoom);
+							_x = MathRound((mainCharacter.HURTLEFT + platformX - episode.cWidth + mainCharacter.HURTWIDTH) / __zoom);
 							const _mob2 = summonMobWithJson({
 								id: 623,
 								level: mainCharacter.level,
@@ -7694,8 +7692,8 @@ const __stories = [
 								spawn: 1,
 								sight:1000,
 								maxX: _x,
-								experience: 1000
-							});
+								experience: 0
+							}, 0, 1);
 							_mob2.acceptChanges();
 							_mob2.pickNewTarget();
 						}
@@ -7718,7 +7716,7 @@ const __stories = [
 							// setTimeout(function() {
 							// 	episode.loadCharacterSprites(function() {}, [37,38], null, 1);
 							// }, 20);
-							PlaySound({key:'bossalert', volume: .5});
+							PlaySound({key:'goblinkingenter', volume: .5});
 							warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
 							const _elm = document.getElementById('quest-status');
 							addClass(_elm, 'mission-done');
@@ -7804,10 +7802,45 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase++;
+							const _mainPosition = mainCharacter.HURTLEFT + platformX;
+							const _minX = _mainPosition < (episode.width / 2) ? _mainPosition + episode.cWidth : _mainPosition - (2 * episode.cWidth);
+							const _maxX = _mainPosition < (episode.width / 2) ? _mainPosition + (2 * episode.cWidth) : _mainPosition - episode.cWidth;
 							for(let x of __storyScene.mobs){
 								let y = summonMobWithJson(structuredClone2(x),0,1);
-								y.experience = mainCharacter.level * 250;
-								y.maxHP = y.MAXHP = mainCharacter.level * 30;
+								y.count = 1;
+								y.minX = _minX;
+								y.maxX = _maxX;
+								y.experience = mainCharacter.level * 1000;
+								y.maxHP = y.MAXHP = mainCharacter.level * 60;
+								y.setHealth(y.maxHP);
+							}
+							if(mainCharacter.level === 2) {
+								__storyScene.mobs.push({
+									id: 620,
+									minX: _minX,
+									maxX: _maxX,
+									count: 2,
+									sight: 1000,
+									spawn: 5,
+									experience: mainCharacter.level * 1500
+								});
+								let y = summonMobWithJson(structuredClone2(__storyScene.mobs[__storyScene.mobs.length - 1]),0,1);
+								y.count = 1;
+								y.maxHP = y.MAXHP = mainCharacter.level * 80;
+								y.setHealth(y.maxHP);
+							}
+							if(mainCharacter.level === 4) {
+								__storyScene.mobs.push({
+									id: 621,
+									minX: _minX,
+									maxX: _maxX,
+									count: 1,
+									sight: 1000,
+									spawn: 10,
+									experience: mainCharacter.level * 3000
+								});
+								let y = summonMobWithJson(structuredClone2(__storyScene.mobs[__storyScene.mobs.length - 1]),0,1);
+								y.maxHP = y.MAXHP = mainCharacter.level * 120;
 								y.setHealth(y.maxHP);
 							}
 							// updateQuestArea(null, {
@@ -7939,32 +7972,32 @@ const __stories = [
 						id: 619,
 						minX: 4000,
 						maxX: 6000,
-						count: 50,
+						count: 2,
 						sight: 1000,
 						spawn: 1,
-						hp:160,
+						hp:60,
 						experience: 500
 					},
-					{
-						id: 621,
-						minX: 4000,
-						maxX: 6000,
-						count: 6,
-						sight: 1000,
-						spawn: 1,
-						hp:160,
-						experience: 500
-					},
-					{
-						id: 620,
-						minX: 4000,
-						maxX: 6000,
-						count: 4,
-						sight: 1000,
-						spawn: 1,
-						hp:160,
-						experience: 500
-					},
+					// {
+					// 	id: 621,
+					// 	minX: 4000,
+					// 	maxX: 6000,
+					// 	count: 6,
+					// 	sight: 1000,
+					// 	spawn: 1,
+					// 	hp:160,
+					// 	experience: 500
+					// },
+					// {
+					// 	id: 620,
+					// 	minX: 4000,
+					// 	maxX: 6000,
+					// 	count: 1,
+					// 	sight: 1000,
+					// 	spawn: 1,
+					// 	hp:160,
+					// 	experience: 500
+					// },
 					// {
 					// 	id: 621,
 					// 	minX: 1100,
@@ -8862,7 +8895,7 @@ function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 	mainCharacter.heartCount = __story.heartCount ?? 1;
 	if(_client.quickPlay) {
 		const _char = __account.characters.find(x => x.class === mainCharacter.class);
-		_char.tag = {id:2, grade:4};
+		_char.tag = {id:1, grade:4};
 		resetSkills(null, 1, mainCharacter);
 		delete mainCharacter.animations.tag.delay;
 		mainCharacter.animations.tag.modify = function(_e) {
@@ -8882,7 +8915,8 @@ function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 		const warmupAll = async function() {
 			await warmupSpriteSheet("./images/related/boom.png");
 			await warmupSpriteSheet("./images/related/boomgreen.png");
-			await warmupSpriteSheet("./images/sprites/ep29/sprite2.png");
+			await warmupSpriteSheet("./images/sprites/ep47/attack1.png");
+			await warmupSpriteSheet("./images/sprites/ep47/sprite.png");
 		}
 		warmupAll();
 		mainCharacter.direction = __left;
