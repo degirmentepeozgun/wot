@@ -7592,7 +7592,7 @@ const __stories = [
 				],
 				startsWith: 1,
 				save: true,
-				loadingCharacterIds: [37,38, 619, 620, 621, 622, 623],
+				loadingCharacterIds: [622, 619, 620, 621, 623],
 				start: function() {
 					clearAudioCache(loadedSounds);
 					removeCoopCharacter();
@@ -7729,30 +7729,30 @@ const __stories = [
 									tr: 'Parti Zamanı'
 								},
 								descriptions: {
-									en: 'Eliminate Sisters',
-									tr: 'Kardeşleri Yok Et'
+									en: 'Eliminate King',
+									tr: 'Kralı Yok Et'
 								},
 								owner: 'system',
 								minLevel: 1,
 								kills: [
 									{
-										enemy: [37],
+										enemy: [622],
 										limit: 1,
 										descriptions: {
-											en: 'Yecüc Cleared',
-											tr: 'Yecüc Temizlendi'
+											en: 'King Cleared',
+											tr: 'Kral Temizlendi'
 										}
 									},
-									{ 
-										enemy: [38], 
-										limit: 1, 
-										descriptions: {
-											en: 'Mecüc Cleared',
-											tr: 'Mecüc Temizlendi'
-										} 
-									}
+									// { 
+									// 	enemy: [38], 
+									// 	limit: 1, 
+									// 	descriptions: {
+									// 		en: 'Mecüc Cleared',
+									// 		tr: 'Mecüc Temizlendi'
+									// 	} 
+									// }
 								],
-								maps: [201]
+								maps: [episode.id]
 							};
 							if(_elm)
 								_elm.onanimationend = function(e) {
@@ -7782,10 +7782,11 @@ const __stories = [
 										_boss.pickNewTarget();
 										_boss.releaseAfter = 25;
 									}
-									installBoss(37, 'Yecüc');
-									requestAnimationFrame(() => {
-										installBoss(38, 'Mecüc');
-									});
+									// installBoss(37, 'Yecüc');
+									// requestAnimationFrame(() => {
+									// 	installBoss(38, 'Mecüc');
+									// });
+									installBoss(622, 'Goblin King');
 									mainCharacter.maxHP = mainCharacter.MAXHP =
 									mainCharacter.maxHP * 1;
 									mainCharacter.setHealth(mainCharacter.MAXHP);
@@ -7835,26 +7836,26 @@ const __stories = [
 							}
 						}
 					},
-					{
-						when: function() {
-							if(episode.phase !== 100 || episode.oneBossDown)
-								return false;
-							const _bosses = episode.enemies.filter(x => x.class === 'boss');
-							const _result = _bosses?.length === 1;
-							if(_result) {
-								episode.oneBossDown = 1;
-								const _counter = __storyScene.bossQuest.kills.find(x => x.enemy[0] !== _bosses[0].id);
-								if(_counter && _counter.count !== 1) {
-									_counter.count = 1;
-									updateQuestArea(null, __storyScene.bossQuest);
-								}
-							}
-							return _result;
-						},
-						do: function() {
+					// {
+					// 	when: function() {
+					// 		if(episode.phase !== 100 || episode.oneBossDown)
+					// 			return false;
+					// 		const _bosses = episode.enemies.filter(x => x.class === 'boss');
+					// 		const _result = _bosses?.length === 1;
+					// 		if(_result) {
+					// 			episode.oneBossDown = 1;
+					// 			const _counter = __storyScene.bossQuest.kills.find(x => x.enemy[0] !== _bosses[0].id);
+					// 			if(_counter && _counter.count !== 1) {
+					// 				_counter.count = 1;
+					// 				updateQuestArea(null, __storyScene.bossQuest);
+					// 			}
+					// 		}
+					// 		return _result;
+					// 	},
+					// 	do: function() {
 
-						}
-					},
+					// 	}
+					// },
 					{
 						when: function() {
 							return episode.phase === 100 && !episode.enemies.filter(x => x.class === 'boss')?.length;
@@ -7936,9 +7937,29 @@ const __stories = [
 				mobs: [
 					{
 						id: 619,
-						minX: 5000,
-						maxX: 5000,
-						count: 2,
+						minX: 4000,
+						maxX: 6000,
+						count: 50,
+						sight: 1000,
+						spawn: 1,
+						hp:160,
+						experience: 500
+					},
+					{
+						id: 621,
+						minX: 4000,
+						maxX: 6000,
+						count: 6,
+						sight: 1000,
+						spawn: 1,
+						hp:160,
+						experience: 500
+					},
+					{
+						id: 620,
+						minX: 4000,
+						maxX: 6000,
+						count: 4,
 						sight: 1000,
 						spawn: 1,
 						hp:160,

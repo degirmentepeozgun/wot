@@ -60,6 +60,7 @@ function enemy(_e) {
 	else
 		this.stepX = _e.stepX ?? 4;
 	this.startSound = _e.startSound;
+	this.bestRing = _e.bestRing;
 	this.stepY = 1;
 	this.color = _e.color;
 	if(_e.lightColor)
@@ -198,7 +199,7 @@ function enemy(_e) {
 		if(this.lastUsedAnimation !== this.animation) {
 			let _x = this.animations[this.animation];
 			if(!_x){
-				this.animation = 'idle';
+				this.animation = this.defaultAnimationKey;
 				_x = this.animations[this.animation];
 			}
 			this.CURRENT_ANIMA = _x;
@@ -990,10 +991,12 @@ function enemy(_e) {
 			return;
 		else if(!_ranged && _target.attackers.melees.length > 1)
 			return;
-		if(_ranged)
-			_target.attackers.rangeds.push(this);
-		else
-			_target.attackers.melees.push(this);
+		if(!this.bestRing){
+			if(_ranged)
+				_target.attackers.rangeds.push(this);
+			else
+				_target.attackers.melees.push(this);
+		}
 		const _slot = _supportSlot ?? this.slot;
 		// if(this.autoTarget && this.autoTarget.slots){
 		// 	if(this.autoTarget.slots.filter(x => x.attacking)?.length === 2)
@@ -1023,15 +1026,17 @@ function enemy(_e) {
     	const isTargetLeft = myCenterX > targetCenterX;
 		let bestSlot = null;
 		let bestScore = Infinity;
-		let bestRing = 0;
+		let bestRing = this.bestRing ?? 0;
 		let bestMustCross = false;
 		let _ranged = this.ranged;
 		for (const slot of target.slots) {
+			if(this.bestRing && slot.ring !== this.bestRing)
+				continue;
 			if(bestRing > 0 && slot.ring > bestRing)
 				break;
 			if(_ranged && !slot.ranged)
 				continue;
-			if (slot.occupied)
+			if (slot.occupied && !this.bestRing)
 				continue;
 
 			const slotX = targetCenterX + slot.xGap;
@@ -1089,7 +1094,7 @@ function enemy(_e) {
 
 		if (wrongSide && !slot.mustCross) {
 
-			this.releaseSlot();
+			this.releaseSlot(6);
 		}
 		// else if(!wrongSide && slot.placed) {
 		// 	const base = target._HURTBOX_half;
@@ -1140,9 +1145,12 @@ function enemy(_e) {
 	// 	this.slot = null;
 	// 	this.lookingAtTarget = false;
 	// };
-	this.releaseSlot = function () {
+	this.releaseSlot = function (_num) {
+		console.log(_num);
 		const root = this.slot;
 		if (!root) return;
+		if(this.bestRing)
+			return;
 
 		const owner = root.owner;
 		const releasedRing = root.ring;
@@ -1176,7 +1184,7 @@ function enemy(_e) {
 		if(owner?.releasedSlotOrders && owner.releasedSlotOrders[releasedRing] !== undefined) {
 			owner.releasedSlotOrders[releasedRing]++;
 		}
-		const _attackers = this.ranged ?owner.attackers?.rangeds : owner.attackers?.melees;
+		const _attackers = this.ranged ? owner.attackers?.rangeds : owner.attackers?.melees;
 		if(_attackers){
 			const _attackerIndex = _attackers.indexOf(this);
 			if(_attackerIndex !== -1)
@@ -1189,7 +1197,7 @@ function enemy(_e) {
     this.updateSlot = function() {
         const _slot = this.slot;
         if (!_slot || !_slot.owner) {
-            this.releaseSlot();
+            this.releaseSlot(1);
             return undefined;
         }
         const _target = _slot.owner;
@@ -1391,14 +1399,14 @@ function enemy(_e) {
 			let bestScore = Infinity;
 
 			for (const s of ringSlots) {
-
+				if(s === this.slot || s.attacking)
+					continue;
 				// side constraint
 				if (!isTargetLeft && s.type === "front") continue;
 				if (isTargetLeft && s.type === "back") continue;
 
 				// ranged / melee constraint
 				if(this.ranged && !s.ranged) continue;
-
 				let score = Infinity;
 
 				if (!s.occupied) {
@@ -1415,13 +1423,13 @@ function enemy(_e) {
 					const otherPriority = other.slotPriority ?? 10;
 
 					// ✅ CASE 1: normal priority steal
-					let canSteal = otherPriority < myPriority;
+					let canSteal = otherPriority > myPriority;
 
 					// ✅ CASE 2: ranged → melee steal (eşit priority ise)
 					if(!canSteal && this.ranged && !other.ranged && otherPriority === myPriority) {
 						canSteal = true;
 					}
-
+					
 					if(!canSteal)
 						continue;
 
@@ -1440,10 +1448,13 @@ function enemy(_e) {
 
 				// 🔥 STEAL varsa önce adamı düşür
 				if(bestSlot.occupied && bestSlot.occupant) {
-					bestSlot.occupant.releaseSlot();
+					bestSlot.occupant.releaseSlot(2);
 				}
 
-				this.releaseSlot();
+				this.releaseSlot(3);
+				bestSlot.occupied = true;
+				bestSlot.occupant = this;
+				this.slot = bestSlot;
 
 				// order tüket (sadece boş slot senaryosunda mantıklı ama yine azaltıyoruz)
 				if(target.releasedSlotOrders[ring] > 0)
@@ -1461,7 +1472,7 @@ function enemy(_e) {
         if(!this.animationFinished && this.animations[this.animation]?.attack)
             return;
         if(this.isDead()) {
-            this.releaseSlot();
+            this.releaseSlot(4);
             return;
         }
 		if(this.reactionStartTime && _gameTick < this.reactionStartTime)
@@ -1484,7 +1495,7 @@ function enemy(_e) {
         const _away = this.animation === 'release'  || this.animation.startsWith('knockback') || this.invisible;
         if(((this.slot && (this.slot.owner?.isDead?.() || 
 			(!this.slot.support && this.slot.owner !== this.autoTarget))) || _away)){
-            this.releaseSlot();
+            this.releaseSlot(7);
         }
         let _anima = this.getCurrentAnimation();
         if ((_anima.hurt && !this.animationFinished && (!this.hasChain || this.noCounter)) || this.animation === 'release' || this.dying || this.dead || this.immobilize) {
@@ -1552,6 +1563,8 @@ function enemy(_e) {
 							!this.slot.mustCross;
 				}
 			}
+			if(!_canAttack && this.bestRing)
+				_canAttack = true; // bestRing'li moblar slot kısıtlamasına takılmaz, her zaman saldırabilir
 			// if(this.lookingAtTarget && this.slot?.support && !this.slot?.parent?.support && this.animation === 'idle')
 			// {
             // 	const _supportTouch = isObjectsInTouch(_area, this.slot.owner.getTouchAreaBySlot());
@@ -1614,7 +1627,7 @@ function enemy(_e) {
                 }
                 if(this.slot && !this.slot.lastAttackTime)
                     this.slot.lastAttackTime = _gameTick;
-                if(this.slot && _canAttack && (!this.nextAttackTime || _gameTick >= this.nextAttackTime)) {
+                if(this.slot && _canAttack && (this.bestRing || (!this.nextAttackTime || _gameTick >= this.nextAttackTime))) {
                     this.pickRandomAttack();
                     if(this.upcomingAnimation && this.upcomingAnimation !== 'idle'){
                         this.animateSlotAttack();
@@ -2016,7 +2029,7 @@ function enemy(_e) {
 					if (!_isEnemyClose) {
 
 						if (this.animationFinished || this.animation === 'walk') {
-							if (this.animation === 'walk' && !this.animationFinished && !this.ranged
+							if (this.animation === 'walk' && this.animations.run && !this.animationFinished && !this.ranged
 								&& this.frame < this.animations.run.frames.length - 1) {
 								const _oldStart = this.start;
 								const _oldFrame = this.frame;
@@ -2344,7 +2357,7 @@ function enemy(_e) {
 				this.lastAttackSlot = undefined;
 			}
 		}
-		if(this.autoAttacking && this.slot) {
+		if(this.autoAttacking && this.slot && !this.bestRing) {
 			this.slot.attacking = false;
 			const _target = this.autoTarget;
 			if(_target && _target.attackers)
@@ -2888,17 +2901,17 @@ function enemy(_e) {
 			else
 				this.autoCommand2();
 		}
-		showBorders(this.HURTLEFT, _gamePad.clientHeight - this.yPosition, this.HURTWIDTH, 20, this.slot?.mustCross ? 'white' : this.slot && !this.slot.support ? 'orange' : (this.slot ? 'yellow' : (this.main ? 'blue' : 'green')), 'border-' + this.key);
-		if(this.slots)
-			for(let i = 0; i < this.slots.length; i++) {
-				const _slot = this.slots[i];
-				// if(_slot.support)
-				// 	continue;
-				const _xGap = _slot.xGap ?? 0;
-				const _origin = this.HURTLEFT + this._HURTBOX_half + _xGap;
-				showBorders(_origin - 10, _gamePad.clientHeight - this.yPosition + (_slot.yGap ?? 0), 
-					20, 20, _slot.occupied ? 'pink' : 'red', 'slot-' + i + '-' + this.key);
-			}
+		// showBorders(this.HURTLEFT, _gamePad.clientHeight - this.yPosition, this.HURTWIDTH, 20, this.slot?.mustCross ? 'white' : this.slot && !this.slot.support ? 'orange' : (this.slot ? 'yellow' : (this.main ? 'blue' : 'green')), 'border-' + this.key);
+		// if(this.slots)
+		// 	for(let i = 0; i < this.slots.length; i++) {
+		// 		const _slot = this.slots[i];
+		// 		// if(_slot.support)
+		// 		// 	continue;
+		// 		const _xGap = _slot.xGap ?? 0;
+		// 		const _origin = this.HURTLEFT + this._HURTBOX_half + _xGap;
+		// 		showBorders(_origin - 10, _gamePad.clientHeight - this.yPosition + (_slot.yGap ?? 0), 
+		// 			20, 20, _slot.occupied ? 'pink' : 'red', 'slot-' + i + '-' + this.key);
+		// 	}
 		
 		// if (this.autoMode) {
 		// 	if (!this.isDead()) {
