@@ -37674,7 +37674,7 @@ const _allEnemies = {
 							spriteHeight: 496,
 							spriteOrigin: 236,
 							speed: 8,
-							sound: { key: 'goblinkingrelease', volume:.5 },
+							sound: { key: 'goblinkingrelease', volume:1 },
 							def: { iframe: true }
 						},
 						{
@@ -37904,7 +37904,7 @@ const _allEnemies = {
 			height: 333,
 			maxHP: 2000,
 			atk: 100,
-			def: 200,
+			def: 150,
 			bleed: true,
 			stepX: 8,
 			weight: 1000,

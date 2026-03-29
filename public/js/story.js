@@ -7660,6 +7660,8 @@ const __stories = [
 				actions: [
 					{
 						when: function() {
+							if(episode.phase >= 99)
+								return false;
 							const _st = episode.mobPhaseTick ?? __account?.questStatus?.quest?.timer?.startTime;
 							if(_st) {
 								return (_gameTick - _st) > 35000; 
