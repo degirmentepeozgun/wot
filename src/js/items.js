@@ -27,6 +27,7 @@ const _equips = {
 				{ key: 'fire-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'ice-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'lightning-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
+				{ key: 'shadow-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'toxic-resist-rate', power: 4, min: 2, max: 3, upgrade: .25}
 			]
 		},
@@ -41,6 +42,7 @@ const _equips = {
 				{ key: 'ice-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'lightning-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'toxic-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
+				{ key: 'shadow-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'phsycal-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25}
 			]
 		}
@@ -72,6 +74,7 @@ const _equips = {
 				{ key: 'fire-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'ice-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'lightning-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
+				{ key: 'shadow-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'toxic-resist-rate', power: 4, min: 2, max: 3, upgrade: .25}
 			]
 		},
@@ -86,6 +89,7 @@ const _equips = {
 				{ key: 'ice-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'lightning-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'toxic-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
+				{ key: 'shadow-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'phsycal-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25}
 			]
 		}
@@ -117,6 +121,7 @@ const _equips = {
 				{ key: 'fire-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'ice-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'lightning-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
+				{ key: 'shadow-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'toxic-resist-rate', power: 4, min: 2, max: 3, upgrade: .25}
 			]
 		},
@@ -131,6 +136,7 @@ const _equips = {
 				{ key: 'ice-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'lightning-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'toxic-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
+				{ key: 'shadow-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'phsycal-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25}
 			]
 		}
@@ -162,6 +168,7 @@ const _equips = {
 				{ key: 'fire-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'ice-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'lightning-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
+				{ key: 'shadow-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'toxic-resist-rate', power: 4, min: 2, max: 3, upgrade: .25}
 			]
 		},
@@ -176,6 +183,7 @@ const _equips = {
 				{ key: 'ice-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'lightning-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'toxic-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
+				{ key: 'shadow-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'steal-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25}
 			]
 		}
@@ -207,6 +215,7 @@ const _equips = {
 				{ key: 'fire-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'ice-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'lightning-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
+				{ key: 'shadow-resist-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'toxic-resist-rate', power: 4, min: 2, max: 3, upgrade: .25}
 			]
 		},
@@ -221,6 +230,7 @@ const _equips = {
 				{ key: 'ice-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'lightning-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'toxic-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
+				{ key: 'shadow-resist-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'steal-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25}
 			]
 		}
@@ -249,10 +259,11 @@ const _equips = {
 				{ key: 'hp', power: .5, min: 200, max: 300, upgrade: 10},
 				{ key: 'crit-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'crit-dmg-rate', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'fire-dmg', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'ice-dmg', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'lightning-dmg', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'toxic-dmg', power: 4, min: 2, max: 3, upgrade: .25}
+				{ key: 'fire-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'ice-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'lightning-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'toxic-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'shadow-dmg', power: 2, min: 10, max: 20, upgrade: 1}
 			]
 		},
 		grade4: {
@@ -262,10 +273,11 @@ const _equips = {
 				{ key: 'hp', power: .5, min: 350, max: 450, upgrade: 10},
 				{ key: 'crit-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'crit-dmg-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'fire-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'ice-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'lightning-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'toxic-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
+				{ key: 'fire-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'ice-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'lightning-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'toxic-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'shadow-dmg', power: 2, min: 20, max: 30, upgrade: 1},
 				{ key: 'steal-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25}
 			]
 		}
@@ -294,10 +306,11 @@ const _equips = {
 				{ key: 'atk', power: 2, min: 20, max: 30, upgrade: 1},
 				{ key: 'crit-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'crit-dmg-rate', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'fire-dmg', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'ice-dmg', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'lightning-dmg', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'toxic-dmg', power: 4, min: 2, max: 3, upgrade: .25}
+				{ key: 'fire-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'ice-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'lightning-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'toxic-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'shadow-dmg', power: 2, min: 10, max: 20, upgrade: 1}
 			]
 		},
 		grade4: {
@@ -307,10 +320,11 @@ const _equips = {
 				{ key: 'hp', power: .5, min: 350, max: 450, upgrade: 10},
 				{ key: 'crit-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'crit-dmg-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'fire-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'ice-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'lightning-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'toxic-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
+				{ key: 'fire-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'ice-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'lightning-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'toxic-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'shadow-dmg', power: 2, min: 20, max: 30, upgrade: 1},
 				{ key: 'phsycal-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25}
 			]
 		}
@@ -339,10 +353,11 @@ const _equips = {
 				{ key: 'hp', power: .5, min: 200, max: 300, upgrade: 10},
 				{ key: 'crit-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'crit-dmg-rate', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'fire-dmg', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'ice-dmg', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'lightning-dmg', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'toxic-dmg', power: 4, min: 2, max: 3, upgrade: .25}
+				{ key: 'fire-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'ice-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'lightning-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'toxic-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'shadow-dmg', power: 2, min: 10, max: 20, upgrade: 1}
 			]
 		},
 		grade4: {
@@ -352,10 +367,11 @@ const _equips = {
 				{ key: 'hp', power: .5, min: 350, max: 450, upgrade: 10},
 				{ key: 'crit-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'crit-dmg-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'fire-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'ice-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'lightning-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'toxic-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
+				{ key: 'fire-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'ice-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'lightning-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'toxic-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'shadow-dmg', power: 2, min: 20, max: 30, upgrade: 1},
 				{ key: 'phsycal-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25}
 			]
 		}
@@ -384,10 +400,11 @@ const _equips = {
 				{ key: 'atk', power: 2, min: 20, max: 30, upgrade: 1},
 				{ key: 'crit-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'crit-dmg-rate', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'fire-dmg', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'ice-dmg', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'lightning-dmg', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'toxic-dmg', power: 4, min: 2, max: 3, upgrade: .25}
+				{ key: 'fire-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'ice-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'lightning-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'toxic-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'shadow-dmg', power: 2, min: 10, max: 20, upgrade: 1}
 			]
 		},
 		grade4: {
@@ -397,10 +414,11 @@ const _equips = {
 				{ key: 'atk', power: 2, min: 35, max: 45, upgrade: 1},
 				{ key: 'crit-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'crit-dmg-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'fire-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'ice-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'lightning-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'toxic-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
+				{ key: 'fire-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'ice-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'lightning-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'toxic-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'shadow-dmg', power: 2, min: 20, max: 30, upgrade: 1},
 				{ key: 'pierce-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25}
 			]
 		}
@@ -436,10 +454,11 @@ const _equips = {
 				{ key: 'atk', power: 2, min: 20, max: 30, upgrade: 1},
 				{ key: 'crit-rate', power: 4, min: 2, max: 3, upgrade: .25},
 				{ key: 'crit-dmg-rate', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'fire-dmg', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'ice-dmg', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'lightning-dmg', power: 4, min: 2, max: 3, upgrade: .25},
-				{ key: 'toxic-dmg', power: 4, min: 2, max: 3, upgrade: .25}
+				{ key: 'fire-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'ice-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'lightning-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'toxic-dmg', power: 2, min: 10, max: 20, upgrade: 1},
+				{ key: 'shadow-dmg', power: 2, min: 10, max: 20, upgrade: 1}
 			]
 		},
 		grade4: {
@@ -449,10 +468,11 @@ const _equips = {
 				{ key: 'atk', power: 2, min: 35, max: 45, upgrade: 1},
 				{ key: 'crit-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
 				{ key: 'crit-dmg-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'fire-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'ice-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'lightning-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
-				{ key: 'toxic-dmg', power: 4, min: 3.5, max: 4.5, upgrade: .25},
+				{ key: 'fire-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'ice-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'lightning-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'toxic-dmg', power: 2, min: 20, max: 30, upgrade: 1},
+				{ key: 'shadow-dmg', power: 2, min: 20, max: 30, upgrade: 1},
 				{ key: 'pierce-rate', power: 4, min: 3.5, max: 4.5, upgrade: .25}
 			]
 		}

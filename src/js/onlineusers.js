@@ -1,15 +1,15 @@
 ﻿'use strict';
-console.log('online users');
+console.log('onlineusers');
 function onlineusers() {
-	this.key = 'onlineusers';
+	this.key = 'onlineuser';
 	this.tutorial = {
 		tr: {
 			title: 'Çevrimiçi Oyuncular',
-			desc: 'Tüm dünyada şu anda oyunda olan diğer oyuncuları burada görebilir, düello teklif edebilirsiniz. Düello teklif ettiğinizde sistem sizden bir karakter seçmenizi ister. Aynı şekilde siz karakterinizi belirlediğinizde seçiminiz ve isteğiniz karşı tarafa iletilir. Kabul edildiği taktirde iki taraf da Arena haritasına ışınlanır ve her iki tarafın da güçleri eşit olacak adil bir şekilde müsabaka başlar.'
+			desc: 'Tüm dünyada şu anda oyunda olan diğer oyuncuları burada görebilir, düello teklif edebilirsiniz. Düello teklif ettiğinizde sistem sizden bir karakter seçmenizi ister. Aynı şekilde siz karakterinizi belirlediğinizde seçiminiz ve isteğiniz karşı tarafa iletilir. Müsait olunduğu ve kabul edildiği taktirde iki taraf da Arena haritasına ışınlanır ve her iki tarafın da güçleri eşit olacak adil bir şekilde müsabaka başlar.'
 		},
 		en: {
 			title: 'Online Players',
-			desc: 'Here, you can see other players currently playing around the world and challenge them to a duel. When you challenge a duel, the system prompts you to choose a character. Similarly, once you select your character, your choice and request are communicated to the other player. If accepted, both players are teleported to the Arena map, and a fair match begins, with both sides\' strengths being equal.'
+			desc: 'Here, you can see other players currently playing around the world and challenge them to a duel. When you challenge a duel, the system prompts you to choose a character. Similarly, once you select your character, your choice and request are communicated to the other player. If available and accepted, both players are teleported to the Arena map, and a fair match begins, with both sides\' strengths being equal.'
 		}
 	};
 	if(!tryShowMenuTutorial(this.key))
@@ -20,10 +20,10 @@ function onlineusers() {
 		let _content = showMenuTutorial(this.tutorial, this.key);
 		if(_content === '')
 			_content = `<div class="flex full">
-							<div class="flex game-btn2 animate-me" onexactclick="getRef('${this.key}')?.refresh()">${getLangData('REFRESH')}</div>
+							<div class="flex game-btn2 animate-me" onexactclick="getRef('onlineusers')?.refresh()">${getLangData('REFRESH')}</div>
 						</div>`
 		_container.innerHTML = 
-					'<div data-module="' + this.key + '" class="menu-ui-left fade-me">' +
+					'<div data-module="onlineusers" class="menu-ui-left fade-me">' +
 						'<div class="menu-modal-left menu-modal-left-content w-100">' +
 							'<div class="skills-content-left fragments-content-left menu-modal-left-container">' +
 								'<div id="online-users-list" style="padding:1% 5%;overflow-y:auto" class="full">' +
@@ -32,7 +32,7 @@ function onlineusers() {
 							'</div>' +
 						'</div>' +
 					'</div>' +
-					'<div data-module="' + this.key + '" class="menu-ui-right fade-me">' + 
+					'<div data-module="onlineusers" class="menu-ui-right fade-me">' + 
 						'<div class="menu-modal-right menu-modal-right-content w-100">' +
 							'<div class="skills-content-right fragments-content-right">' +
 								'<div class="skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">' +
@@ -120,7 +120,7 @@ function onlineusers() {
 		__selectedPvPClass = _selectableChars[0].class;
 		for(let _item of _selectableChars){
 			_choices += `<div data-class="${_item.class}" class="selection-item selection-char${_selected ? ' selected-character' : ''} flex" onexactclick="getRef(\'onlineusers\').selectCharacter(\'${_item.class}\')" style="width:21%;aspect-ratio:1/1;position:relative;cursor:pointer">
-				<img src="./images/icons/${_item.class}.png" style="padding:2%;height:80%" class="grade${_item.grade}-item" />
+				<img src="./images/main/avatars/${_item.class}.png" style="padding:2%;height:80%" class="grade${_item.grade}-item" />
 			</div>`;
 			if(_selected)
 				_selected = 0;
@@ -130,7 +130,7 @@ function onlineusers() {
 				<div style="padding:6vh 4vh 4vh 4vh" class="flex">
 					<span style="color:#f7f7f7dd !important;font-size:3vh !important">${getLangData('Select A Character')}</span>
 				</div>
-				<div class="flex" style="padding:2vh">`
+				<div class="flex" style="padding:2vh 4%">`
 				+ _choices +
 				`</div>
 				<div style="padding:4vh 2vh 6vh 2vh" class="flex">
@@ -150,7 +150,7 @@ function onlineusers() {
 		 	n: __account.name, 
 			s: __socketId,
 			cl: _class,
-			to: _id
+			t: _id
 		});
 		closeInventoryQuestionModal();
 		warn('<div class="flex important achievement" style="position:relative"><span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Duel request sent') + '!</span></div>', null, null, 1);

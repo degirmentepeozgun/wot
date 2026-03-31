@@ -1,13 +1,10 @@
 ﻿'use strict';
 function store(_repeatEpisodeKey) {
-	this.key = 'storm-of-blade-xyzxyz5558';
-	localStorage.removeItem(this.key);
-	localStorage.setItem(this.key, JSON.stringify(mainCharacter));
 	this.getMainCharacter = function (_ch, _friendlyChar) {
 		let _char = _ch ?? createMainCharacter(_friendlyChar);
 		_char = setCharacterFunctions(_char);
 		_char.direction = 'right';
-		_char.top = _canvas.height - _char.getHeight();
+		_char.top = _canvas.height - _char.HEIGHT;
 		_char.gearScore = _char.health = undefined;
 		_char.buffs = _char.deBuffs = [];
 		//_char.gearScore = this.calculateGearScore(null, _char);

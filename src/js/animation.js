@@ -16,17 +16,28 @@ function animation(_a) {
 	this.shadow = _a.shadow;
 	this.disabled = _a.disabled;
 	this.speed = _a.speed;
+	this.swapBeforeStart = _a.swapBeforeStart;
+	this.particleColor = _a.particleColor;
 	this.oldSpeed = this.speed;
 	this.frames = _a.frames;
+	if(this.frames?.[0])
+		this.frames.forEach(x => x.frameKey = 'l' + x.spriteLeft + 't' + x.spriteTop + 'w' + x.spriteWidth + 'h' + x.spriteHeight);
 	if(_a.alternateFrames)
 		this.alternateFrames = _a.alternateFrames;
 	if(_a.finishType)
 		this.finishType = _a.finishType;
 	if(this.speed)
 		this.frames.forEach(x => x.speed = MathCeil(x.speed / this.speed));
+	if(_a.useInCC)
+		this.useInCC = _a.useInCC;
 	this.passive = _a.passive;
+	if(_a.maxAttackedCount)
+		this.maxAttackedCount = _a.maxAttackedCount;
+	if(_a.shake)
+		this.shake = _a.shake;
 	this.ultimate = _a.ultimate;
 	this.rage = _a.rage;
+	this.hitStop = _a.hitStop;
 	this.rate = _a.rate;
 	this.level = _a.level;
 	this.maxLevel = _a.maxLevel;
@@ -78,6 +89,7 @@ function animation(_a) {
 	this.move = _a.move;
 	this.when = _a.when;
 	this.reset = _a.reset;
+	this.skipHealthBar = _a.skipHealthBar;
 	this.once = _a.once;
 	if (_a.src)
 		this.sprite = getImage(_a.src);

@@ -34698,8 +34698,17 @@ const _allEnemies = {
 							spriteOrigin: 93,
 							speed: 12,
 							go: {
-								rate: .9,
-								frame: 9
+								frame: 9,
+								when: function(_e) {
+									if(!_e.autoTarget)
+										return true;
+									if(getRandomValue2(1, 10) > 1)
+										return true;
+									const _target = _e.autoTarget;
+									if(_e.getRangeBetween(_target) < 20)
+										return true;
+									return false;
+								}
 							}
 						},
 						{
@@ -35666,6 +35675,10 @@ const _allEnemies = {
 							spriteWidth: 271,
 							spriteHeight: 251,
 							spriteOrigin: 139,
+							sound: { key: 'giantrun1,giantrun2', volume:.66, reset: true },
+							objects: [
+								{ key: 'groundbackdust', position:'behind-feet', scale: .4 }
+							],
 							speed:6
 						},
 						{
@@ -35674,7 +35687,6 @@ const _allEnemies = {
 							spriteWidth: 197,
 							spriteHeight: 251,
 							spriteOrigin: 98,
-							sound: { key: 'giantrun1,giantrun2', volume:.6, reset: true },
 							speed:6
 						}
 					]
@@ -35726,6 +35738,9 @@ const _allEnemies = {
 							spriteHeight: 232,
 							spriteOrigin: 93,
 							sound: { key: 'giantrun1,giantrun2', volume:1, reset: true },
+							objects: [
+								{ key: 'groundbackdust', position:'behind-feet', scale: .5 }
+							],
 							speed:6
 						},
 						{

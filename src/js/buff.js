@@ -1,6 +1,7 @@
 ﻿'use strict';
 const _allBuffs = {
 	nocc: {
+		id: 1,
 		objects: [
 			{ key: 'nocc', position: 'middle' }
 		],
@@ -19,6 +20,7 @@ const _allBuffs = {
 		}]
 	},
 	reflect: {
+		id: 2,
 		sound: { key: 'reflect', volume: 1 },
 		objects: [
 			{ key: 'reflect', position: 'middle' }
@@ -38,17 +40,32 @@ const _allBuffs = {
 		}]
 	},
 	hps: {
+		id: 3,
 		append: true,
 		gain: [
 			{
 				level: 1,
 				props: {
-					hpRegenRate: .3
+					hpRegenRate: 3
 				},
 				ms: 1000
 			},
 			{
 				level: 2,
+				props: {
+					hpRegenRate: 4
+				},
+				ms: 1000
+			},
+			{
+				level: 3,
+				props: {
+					hpRegenRate: 5
+				},
+				ms: 1000
+			},
+			{
+				level: 4,
 				props: {
 					hpRegenRate: .2
 				},
@@ -57,6 +74,7 @@ const _allBuffs = {
 		]
 	},
 	last: {
+		id: 4,
 		stack: true,
 		gain: [
 			{
@@ -76,6 +94,7 @@ const _allBuffs = {
 		]
 	},
 	atk: {
+		id: 5,
 		objects: [
 			{ key: 'atkbuff', position: 'over-head',  type: 'buff', still: false, repeat: true, bind: 'atk' }
 		],
@@ -97,6 +116,7 @@ const _allBuffs = {
 		]
 	},
 	stun: {
+		id: 6,
 		stack: 1,
 		loss: [
 			{
@@ -109,6 +129,7 @@ const _allBuffs = {
 		]
 	},
 	rage: {
+		id: 7,
 		gain: [
 			{
 				level: 3,
@@ -140,25 +161,71 @@ const _allBuffs = {
 			}
 		]
 	},
-	speedup: {
-		gain: [
+	weakness: {
+		id: 8,
+		stack: 3,
+		objects: [
+			{ key: 'weakness', position: 'middle', type: 'buff', still: false, scale: .8, singleton: true, bind: 'weakness', repeat: true }
+		],
+		loss: [
 			{
 				level: 1,
 				props: {
-					stepXRate: 25
+					atk: -5,
+					def: -5
 				},
 				ms: 3000
 			},
 			{
 				level: 2,
 				props: {
-					stepXRate: 50
+					atk: -10,
+					def: -10
 				},
-				ms: 4000
+				ms: 3000
+			}
+		]
+	},
+	speedup: {
+		id: 9,
+		gain: [
+			{
+				level: 1,
+				props: {
+					stepXRate: 5
+				},
+				ms: 5000
+			},
+			{
+				level: 2,
+				props: {
+					stepXRate: 10
+				},
+				ms: 5000
+			}
+		]
+	},
+	dance: {
+		id: 10,
+		gain: [
+			{
+				level: 1,
+				props: {
+					stepRate: 5
+				},
+				ms: 5000
+			},
+			{
+				level: 2,
+				props: {
+					stepRate: 10
+				},
+				ms: 5000
 			}
 		]
 	},
 	curse: {
+		id: 11,
 		waitToFinish: true,
 		objects: [
 			{
@@ -181,6 +248,7 @@ const _allBuffs = {
 		]
 	},
 	poison: {
+		id: 12,
 		objects: [
 			{ key: 'disease', position: 'middle', type: 'buff', still: false, scale: .8, singleton: true, bind: 'poison', repeat: true }
 		],
@@ -206,6 +274,7 @@ const _allBuffs = {
 		]
 	},
 	root: {
+		id: 13,
 		loss: [
 			{
 				level: 1,
@@ -218,8 +287,9 @@ const _allBuffs = {
 		]
 	},
 	fire: {
+		id: 14,
 		objects: [
-			{ key: 'burn', stillOnChar: true, position: 'middle', type: 'buff', still: false, singleton: true, bind: 'fire', repeat: true }
+			{ key: 'burn', position: 'middle', type: 'buff', still: false, singleton: true, bind: 'fire', repeat: true }
 		],
 		stack: 3,
 		append: true,
@@ -243,6 +313,7 @@ const _allBuffs = {
 		]
 	},
 	ice: {
+		id: 15,
 		// objects: [
 		// 	{ key: 'cold', position: 'middle-head', type: 'buff', still: false, singleton: true, bind: 'ice', repeat: true }
 		// ],
@@ -270,6 +341,7 @@ const _allBuffs = {
 		]
 	},
 	sleep: {
+		id: 16,
 		objects: [
 			{ key: 'sleep', position: 'middle-head' }
 		],
@@ -284,6 +356,7 @@ const _allBuffs = {
 		]
 	},
 	slow: {
+		id: 17,
 		loss: [
 			{
 				level: 1,
@@ -302,6 +375,7 @@ const _allBuffs = {
 		]
 	},
 	web: {
+		id: 18,
 		loss: [
 			{
 				level: 1,
@@ -320,6 +394,7 @@ const _allBuffs = {
 		]
 	},
 	invisibility: {
+		id: 19,
 		gain: [
 			{
 				level: 1,
@@ -348,6 +423,7 @@ const _allBuffs = {
 		]
 	},
 	timestop: {
+		id: 20,
 		waitToFinish: true,
 		loss: [
 			{
@@ -360,6 +436,7 @@ const _allBuffs = {
 		]
 	},
 	ticketgold: {
+		id: 21,
 		gain: [
 			{
 				level: 1,
@@ -371,6 +448,7 @@ const _allBuffs = {
 		]
 	},
 	ticketexp: {
+		id: 22,
 		gain: [
 			{
 				level: 1,
@@ -382,6 +460,7 @@ const _allBuffs = {
 		]
 	},
 	ticketitem: {
+		id: 23,
 		gain: [
 			{
 				level: 1,
@@ -393,6 +472,7 @@ const _allBuffs = {
 		]
 	},
 	release: {
+		id: 24,
 		gain: [
 			{
 				level: 1,
@@ -424,3 +504,12 @@ const _allBuffs = {
 		]
 	}
 };
+
+function getBuffKeyById(_id) {
+	for(let key in _allBuffs) {
+		const b = _allBuffs[key];
+		if(b.id === _id)
+			return key;
+	}
+	return null;
+}

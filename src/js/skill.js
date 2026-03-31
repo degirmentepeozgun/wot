@@ -700,7 +700,7 @@ function characterSkill() {
 		price: 5000
 	}, {
 		key: 'passive-roll',
-		name: 'lightning Reflexes',
+		name: 'Lightning Reflexes',
 		description: 'Decrease cooldown of dodge skill',
 		gain: ['%25 dodge cooldown descreased'],
 		unlockLevel: 10,
@@ -737,11 +737,24 @@ function characterSkill() {
 			this.getPassiveSkillUI(1);
 	}
 	this.getSkillUI = function (_class) {
+		let _tutorial = {
+			tr: {
+				title: 'Yetenekler',
+				desc: 'Seçilen karaktere göre değişen yetenekler karakterinizin seviyesine göre aktif olur. Yine karakterinizin seviyesine oranla geliştirilen yetenekler belli bir altın bedeli karşılığında güçlendirilir. Soldaki listeden seçtiğiniz yeteneğin açıklamasında etkisinin ne kadar güçlü olduğu ve hasar puanları ile sonraki seviyede oluşturacağı hasar puanını takip edebilir geliştirme stratejinizi bu bilgiler üstüne kurabilirsiniz.'
+			},
+			en: {
+				title: 'Skills',
+				desc: 'Abilities vary depending on the character you choose, and are activated based on your character\'s level. Abilities that are developed based on your character\'s level are also enhanced for a certain gold cost. You can track the strength of the ability you select from the list on the left, its damage rating, and the damage it will inflict at the next level. You can build your development strategy based on this information.'
+			}
+		};
+		if(!tryShowMenuTutorial('skill'))
+			_tutorial = undefined;
+		let _content = showMenuTutorial(_tutorial, 'skill');
 		updateMenuBottom(1);
 		const _container = selectMenuContainer();
 		_container.innerHTML = 
 					'<div class="menu-ui-left fade-me">' +
-						'<div class="menu-modal-left">' +
+						'<div class="menu-modal-left menu-modal-left-content">' +
 							'<div class="skills-content-left menu-modal-left-container">' +
 								'<div style="padding:1% 5%;overflow-y:auto" class="full">' +
 									this.getSkillsUI(_class, 1) +
@@ -750,12 +763,12 @@ function characterSkill() {
 						'</div>' +
 					'</div>' +
 					'<div class="menu-ui-right fade-me">' + 
-						'<div class="menu-modal-right">' +
+						'<div class="menu-modal-right menu-modal-right-content">' +
 							'<div class="skills-content-right">' +
 								'<div class="skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">' +
-									this.getSkillDetailUI(_class, 1) +
-								'<div id="shine"></div>' +
+									(_content !== '' ? _content : this.getSkillDetailUI(_class, 1, 1)) +
 							'</div>' +
+							'<div class="shine-area"></div>' +
 						'</div>' +
 					'</div>' +
 				'</div>';
@@ -763,12 +776,13 @@ function characterSkill() {
 	this.getSkillsUI = function (_class, _order) {
 		const _skills = this.allSkills.filter(x => x.class === _class && x.list !== false)?.sort((a, b) => a.order - b.order);
 		let html = '';
+		const _noSelect = tryShowMenuTutorial('skill');
 		if (_skills) {
 			let _i = 0;
 			for (var _skill of _skills) {
 				const _active = _skill.unlockLevel <= mainCharacter.level;
 				let _level = !_active ? 0 : _skill.level ?? 1;
-				html += '<div data-key="'+_skill.key+'" onclick="skill.selectSkill(\'' + _skill.key + '\', ' + _i + ')" class="skill-card animate-me flex' + ((_i + 1) === _order ? ' selected' : '') + '">' +
+				html += '<div data-key="'+_skill.key+'" onexactclick="skill.selectSkill(\'' + _skill.key + '\', ' + _i + ')" class="skill-card animate-me flex' + (((_i + 1) === _order && !_noSelect) ? ' selected' : '') + '">' +
 					'<div class="skill-icon-wrapper flex"><img src="./images/main/skill-icons/' + _class + '/' + _skill.key + '.png" /></div>' +
 					'<div style="flex:1;height:100%">' +
 					'<div class="flex flex-jc-start skill-card-title" style="height:50%;width:100%">' + _skill.names[getLang()] + '</div>' +
@@ -797,7 +811,9 @@ function characterSkill() {
 			_i++;
 		}
 	}
-	this.getSkillDetailUI = function (_class, _order) {
+	this.getSkillDetailUI = function (_class, _order, _noSound) {
+		if(!_noSound)
+			playClick();
 		const _skill = this.allSkills.find(x => x.class === _class && x.order === _order);
 		if (_skill) {
 			const _animation = mainCharacter.animations[_skill.key];
@@ -817,12 +833,14 @@ function characterSkill() {
 				(_skill.dmgType ?
 					'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Damage Type') + '</div>' +
 					'<div style="padding:1vh 0" class="w-50 flex flex-jc-end"><img style="height:3vh;margin-right:1vh" src="./images/elemental/' + _skill.dmgType.toLowerCase() + '.png" />' + getLangData(_skill.dmgType) + '</div></div>' : '') +
+				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Affected Target') + '</div>' +
+				'<div style="padding:1vh 0" class="w-50 flex flex-jc-end">' + (_animation.maxAttackedCount ?? __maxAttackedCount) + '</div></div>' +
 				'<div id="skill-current-props"><div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Current Level') + '</div>' +
 				'<div style="padding:1vh 0" class="w-50 flex flex-jc-end">+ %' + _currentProps.value + ' ' + getLangData(_currentProps.type) + '</div></div></div>' +
 				(_nextProps ? '<div id="skill-next-props"><div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Next Level') + '</div>' +
 					'<div style="padding:1vh 0" class="w-50 flex flex-jc-end">+ %' + _nextProps.value + ' ' + getLangData(_nextProps.type) + '</div></div></div>' : '') +
 				'</div>' +
-				'<div style="height:14%" class="flex"><div class="game-menu-button animate-me flex' + ((_nextProps && _skill.unlockLevel <= mainCharacter.level) ? '' : ' gray disabled') + '" onclick="skill.upgradeSkill(' + _order + ')" style="height:65%"><div class="flex">' + getLangData('UPGRADE') + '</div></div></div></div>';
+				'<div style="height:14%" class="flex action-button-container"><div class="game-menu-button animate-me flex' + ((_nextProps && _skill.unlockLevel <= mainCharacter.level) ? '' : ' gray disabled') + '" onexactclick="skill.upgradeSkill(' + _order + ')" style="height:65%"><div class="flex">' + getLangData('UPGRADE') + '</div></div></div></div>';
 			return html;
 		}
 		return '';
@@ -839,7 +857,7 @@ function characterSkill() {
 		let _i = 0;
 		for (var _skill of this.passiveSkills) {
 			const _active = _skill.unlockLevel <= mainCharacter.level;
-			html += '<div onclick="skill.selectPassiveSkill(' + _i + ')" class="skill-card flex' + ((_i + 1) === _order ? ' selected' : '') + '">' +
+			html += '<div onexactclick="skill.selectPassiveSkill(' + _i + ')" class="skill-card flex' + ((_i + 1) === _order ? ' selected' : '') + '">' +
 				'<div class="skill-icon-wrapper flex"><img src="./images/skills/' + _skill.key + '.png" /></div>' +
 				'<div style="flex:1;height:100%">' +
 				'<div class="flex flex-jc-start" style="height:50%;width:100%">' + _skill.names[getLang()] + '</div>' +
@@ -881,7 +899,7 @@ function characterSkill() {
 	this.getSkillCooldown = function (_cd) {
 		if (!_cd)
 			return getLangData('No Cooldown');
-		return (_cd / 1000).toFixed(1) + ' seconds';
+		return (_cd / 1000).toFixed(1) + ' ' + getLangData('seconds');
 	}
 	this.playSkillVideo = function (_skillKey) {
 		const _video = document.querySelector('#menu-ui video');
@@ -901,7 +919,7 @@ function characterSkill() {
 			'<div class="skill-content-title">Chance Rate</div>' +
 			'<div style="padding:1vh 5vh">%' + (_skill.chanceRate ?? 100) + '</div>' +
 			'</div>' +
-			'<div style="height:10%" class="flex"><div class="game-btn flex' + (_skill.unlockLevel <= mainCharacter.level ? '' : ' gray disabled') + '" onclick="skill.activatePassiveSkill(' + _index + ')"><div class="flex">ACTIVATE&nbsp;<img src="./images/icons/coin.png" style="height:2.6vh" />&nbsp;' + _skill.price + '</div></div></div>';
+			'<div style="height:10%" class="flex"><div class="game-btn flex' + (_skill.unlockLevel <= mainCharacter.level ? '' : ' gray disabled') + '" onexactclick="skill.activatePassiveSkill(' + _index + ')"><div class="flex">ACTIVATE&nbsp;<img src="./images/icons/coin.png" style="height:2.6vh" />&nbsp;' + _skill.price + '</div></div></div>';
 		return html;
 	}
 	this.upgradeSkill = function (_order) {
@@ -919,25 +937,25 @@ function characterSkill() {
 			warn('<span>' + getLangData('Not enough gold') + '</span>', 'warn');
 			return;
 		}
+		if(!shine(1000, document.querySelector('.skills-content-detail-wrapper')))
+			return;
 		updateGold(-1 * _price, mainCharacter);
 		if (!_skill.level)
 			_skill.level = 1;
 		_skill.level++;
 		const _currentProps = _skill.props.find(x => x.level === _skill.level);
 		document.getElementById('skill-current-props').innerHTML =
-			(_currentProps ? '<div class="skill-content-title">' + getLangData('Current Level') + '</div>' +
-				'<div style="padding:1vh 5vh">+ %' + _currentProps.value + ' ' + getLangData(_currentProps.type) + '</div>' : '');
+			(_currentProps ? '<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Current Level') + '</div>' +
+				'<div style="padding:1vh 0" class="w-50 flex flex-jc-end">+ %' + _currentProps.value + ' ' + getLangData(_currentProps.type) + '</div></div>' : '');
 		
 		const _nextProps = _skill.props.find(x => x.level === (_skill.level + 1));
 		document.getElementById('skill-next-props').innerHTML =
-			(_nextProps ? '<div class="skill-content-title">' + getLangData('Next Level') + '</div>' +
-				'<div style="padding:1vh 5vh">+ %' + _nextProps.value + ' ' + getLangData(_nextProps.type) + '</div>' : '');
+			(_nextProps ? '<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Next Level') + '</div>' +
+				'<div style="padding:1vh 0" class="w-50 flex flex-jc-end">+ %' + _nextProps.value + ' ' + getLangData(_nextProps.type) + '</div></div>' : '');
 		document.getElementById('skill-' + _skill.key + '-level').innerText = _skill.level;
 		document.getElementById('skill-cost').innerText = this.calculateSkillPrice(_skill.key);
-		PlaySound({ key: 'upgrade', volume: .5, reset: true });
-		shine(1000, document.querySelector('.skills-content-detail-wrapper'));
 		_client.upgradeSkill(mainCharacter, _skill);
-		checkUpdateAvailable();
+		checkUpdateAvailable2(2);
 	}
 	this.getSkills = function (_char) {
 		return this.allSkills.filter(x => x.class === (_char ?? mainCharacter).class);

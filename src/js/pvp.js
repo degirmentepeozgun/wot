@@ -1,12 +1,9 @@
 ﻿'use strict';
 function pvp() {
 	this.matchedUnit;
-	this.meContext;
-	this.rendered;
-	this.meFrame = 0;
-	this.meStart = 0;
 	this.timeLeft = 0;
 	this.unlockLevel = 10;
+	this.updateTimer;
 	this.match = function(_key) {
 		const _opponent = this.opponents.find(x => x.key === _key);
 		if(_opponent) {
@@ -14,12 +11,17 @@ function pvp() {
 			if(__account.pvp.duelCount > 0)
 			{
 				__account.pvp.duelCount--;
-				if(!__account.pvp.lastDuelTime)
-					__account.pvp.lastDuelTime = _gameTick;
+				//if(!__account.pvp.lastDuelTime)
+					__account.pvp.lastDuelTime = msNow;
 				this.timeLeft = '';
 				_client.saveState();
 				this.getPlayStatus();
 				createArena(_opponent);
+				const _noSelect = tryShowMenuTutorial('duel');
+				if(_noSelect) {
+					__account.menuTutorials.push('duel');
+					_client.saveState(1);
+				}
 			}
 			else {
 				warn('<span>' + getLangData('Duel limit reached') + '</span>', 'warn');
@@ -36,11 +38,18 @@ function pvp() {
 				removeClass(_o, 'selected');
 		askSomething('Start duel battle', "__pvp.match('" + _key + "')");
 	}
-	this.findOpponents = function() {
+	this.findOpponents = function () {
 		const _container = document.querySelector('.pvp-content-left-content');
+		if(mainCharacter.level < this.unlockLevel) {
+			_container.innerHTML = `<div class="skills-content-left menu-modal-left-container full"><div style="padding:1% 5%;overflow-y:auto" class="full">` +
+				renderLockedContent(getLangData('Lvl') + ' ' + this.unlockLevel + ' ' + getLangData('required')) + `</div></div>`;
+			return;
+		}
 		this.opponents = [];
-		for(var i = 1; i < 21; i++) {
-			const _e = setCharacterFunctions(_allEnemies['enemy0' + getRandomValue2(1, 3)]());
+		for(var i = 1; i < 11; i++) {
+			if((__account.pvp.order - i) <= 0)
+				break;
+			const _e = setCharacterFunctions(_allEnemies['enemy0' + getRandomValue2(1, 3)](), 1);
 			let _itemGrade = 1;
 			if(__account.pvp.order < 5000)
 				_itemGrade = 3;
@@ -55,15 +64,15 @@ function pvp() {
 		}
 		let _html = '<div class="skills-content-left menu-modal-left-container full"><div style="padding:1% 5%;overflow-y:auto" class="full">';
 		for(let _opponent of this.opponents)
-			_html += `<div onclick="__pvp.selectOpponent(this,'${_opponent.key}')" class="skill-card animate-me flex">
-						<div class="skill-icon-wrapper flex">
-							<img src="./images/icons/${_opponent.class}.png" />
+			_html += `<div onexactclick="__pvp.selectOpponent(this,'${_opponent.key}')" class="skill-card animate-me flex">
+						<div class="skill-icon-wrapper flex" style="padding-right:.5vh">
+							<img src="./images/main/avatars/${_opponent.class}.png" style="width:9vh" />
 						</div>
 						<div style="flex:1;height:100%" class="flex flex-jc-start">
 							<div class="flex flex-jc-start skill-card-title w-100" style="height:50%">${getLangData('Lvl')}&nbsp;${_opponent.level}&nbsp;${getLangData(_opponent.class)}</div>
 							<div class="flex skill-card-title w-100" style="height:50%">
 								<div class="flex flex-jc-start w-50 pvp-opponent-power" style="height:100%">
-									${getLangData('Power')}:&nbsp;${_opponent.totalPower.formatWithDots()}
+									<span style="opacity:.7">${getLangData('Power')}:</span>&nbsp;${_opponent.totalPower.formatWithDots()}
 								</div>
 								<div class="flex flex-jc-end w-50 pvp-opponent-order" style="height:100%">
 									${_opponent.pvpOrder.formatWithDots()}
@@ -74,106 +83,81 @@ function pvp() {
 		_container.innerHTML = _html + '</div></div>';
 	}
 	this.render = function() {
-		updateMenuBottom(4);
-		const _container = selectMenuContainer();
-		const _left = document.createElement('div');
-		_left.className = 'pvp-content-left menu-ui-left fade-me';
-		const _right = document.createElement('div');
-		_right.className = 'pvp-content-right menu-ui-right fade-me';
-		_container.innerHTML = '';
-		_container.appendChild(_left);
-		_container.appendChild(_right);
-		const _leftContent = document.createElement('div');
-		_leftContent.className = 'pvp-content-left-content menu-modal-left';
-		_left.appendChild(_leftContent);
-		const _rightContent2 = document.createElement('div');
-		_rightContent2.className = 'pvp-content-right-content menu-modal-right';
-		_right.appendChild(_rightContent2);
-
-		
-		const _rightContent1 = document.createElement('div');
-		_rightContent1.className = 'skills-content-right';
-		_rightContent2.appendChild(_rightContent1);
-
-		
-		const _rightContent = document.createElement('div');
-		_rightContent.className = 'honor-content-detail-wrapper menu-modal-right-container';
-		_rightContent1.appendChild(_rightContent);
-
-		const _meContainer = document.createElement('div');
-		_meContainer.className = 'me-container flex';
-		const _meFrame = document.createElement('div');
-		_meFrame.className = 'me-frame';
-		const _meCanvas = document.createElement('canvas');
-		_meCanvas.width = MathRound(_canvas.height * .45);
-		_meCanvas.height = _meCanvas.width;
-		const _meBanner = document.createElement('div');
-		_meBanner.className = 'pvp-banner flex';
+		let _tutorial = {
+			tr: {
+				title: 'PVP Duello',
+				desc: 'Seviye 10 ve sonrasında kullanabileceğiniz bu içerikte düşmanları yapay zeka yönlendirir. Belli bir sıralamanın olduğu bu serüvene başlarken alt ligde ve sıralarda başlarsınız ve kazandıkça galip geldiğiniz rakibiniz ile sıralamanız değiştirilir. Bulunduğunuz sıraya göre lig değişir. Lig kalitesi arttıkça o ligde karşılaşacağınız rakiplerin de gücü artar. Her galibiyet başına onur puanı kazanırsınız.'
+			},
+			en: {
+				title: 'PVP Duel',
+				desc: 'Available at level 10 and above, this content features AI-guided enemies. You\'ll begin this quest with a specific ranking, starting in a lower league and ranked position. As you win, your ranking is adjusted based on your victories. The league changes based on your current rank. As the league\'s quality increases, so too do the opponents you face within it. You earn honor points for each victory.'
+			}
+		};
+		if(!tryShowMenuTutorial('duel'))
+			_tutorial = undefined;
+		let _content = showMenuTutorial(_tutorial, 'duel');
+ 		updateMenuBottom(4);
 		let _league = 'Bronze';
-		if(__account.pvp.order < 1001)
-			_league = 'Platinum';
-		else if(__account.pvp.order < 5001)
-			_league = 'Gold';
-		else if(__account.pvp.order < 10001)
-			_league = 'Silver';
-		//_meBanner.innerText = getLangData(_league) + ' ' + getLangData('League');
-		//_meContainer.appendChild(_meBanner);
-		this.meContext = _meCanvas.getContext('2d');
-		_meCanvas.className = 'full';
-		_meFrame.appendChild(_meCanvas);
-		const _meFrameTop = document.createElement('img');
-		_meFrameTop.className = 'me-frame-top';
-		_meFrameTop.src= './images/ui/wolf-head.png';
-		_meFrame.appendChild(_meFrameTop);
+		if(__account.pvp.order === undefined)
+			__account.pvp.order= 0;
+		if (__account.pvp.order < 1001) _league = 'Platinum';
+		else if (__account.pvp.order < 5001) _league = 'Gold';
+		else if (__account.pvp.order < 10001) _league = 'Silver';
+    	const _container = selectMenuContainer();
+		_container.innerHTML =
+    	`<div class="pvp-content-left menu-ui-left fade-me"><div class="pvp-content-left-content menu-modal-left menu-modal-left-content"></div></div>
+			<div class="pvp-content-right menu-ui-right fade-me"><div class="pvp-content-right-content menu-modal-right menu-modal-right-content"><div class="skills-content-right">
+			<div class="honor-content-detail-wrapper menu-modal-right-container">`
+			+ (_content !== '' ? _content :
+			`<div style="justify-content:center" class="me-container flex">
+				<div style="height:100%;aspect-ratio:110/365;position:relative;z-index:10">
+					<img loading="lazy" src="./images/ui/border-left.png" style="max-width:120%;max-height:120%;position:relative;right:-20%;top:-10%;z-index:10" />
+				</div>
+				<div class="me-frame">
+					<div class="me-concept flex full">
+						<img loading="lazy" src="./images/main/${mainCharacter.class}/finish-concept-s.png" />
+					</div>
+				</div>
+				<div style="height:100%;aspect-ratio:110/365">
+					<img style="max-width:120%;max-height:120%;position:relative;left:-40%;top:-10%" loading="lazy" src="./images/ui/border-right.png" />
+				</div>
+			</div>
+			<div class="flex me-info">
+				<div class="flex pvp-info-0 w-100">
+				<div class="flex flex-jc-start w-50">${getLangData('League')}</div>
+				<div class="flex flex-jc-end w-50">${getLangData(_league)}</div>
+			</div>
+			<div class="flex pvp-info-1 w-100">
+				<div class="flex flex-jc-start w-50">${getLangData('PVP Order')}</div>
+				<div class="flex flex-jc-end w-50">${mainCharacter.level < this.unlockLevel ? '-' : __account.pvp.order.formatWithDots()}</div>
+			</div>
+			<div class="flex w-100 pvp-info-2"></div>
+			<div class="flex pvp-info-3 w-100">
+				<div class="w-50 flex flex-jc-start">${getLangData('Total Power')}</div>
+				<div class="flex w-50 flex-jc-end">${getTotalPower()?.total?.formatWithDots()}</div>
+			</div>
+			<div class="flex pvp-info-4 w-100"></div>`)
+			+
+			`</div>
+			</div>
+		</div></div></div>`;
 
-		const _bl = document.createElement('div');
-		_bl.innerHTML = `<div style="height:100%;aspect-ratio:110 / 365;position:relative;z-index:10"><img src="./images/ui/border-left.png" style="max-width:120%;max-height:120%;position:relative;right:-15%;top:-10%;z-index:10"></div>`;
-		_meContainer.appendChild(_bl.firstChild);
-		_meContainer.appendChild(_meFrame);
-		const _br = document.createElement('div');
-		_br.innerHTML = `<div style="height:100%;aspect-ratio:110 / 365"><img src="./images/ui/border-right.png" style="max-width: 120%;max-height: 120%;position: relative;left:-40%;top:-10%"></div>`;
-		_meContainer.appendChild(_br.firstChild);
-		_rightContent.appendChild(_meContainer);
-		_meContainer.style = 'justify-content:center';
-		const _meInfo = document.createElement('div');
-		_meInfo.className = 'flex me-info';
-		_rightContent.appendChild(_meInfo);
-		_meInfo.innerHTML = `<div class="flex pvp-info-0 w-100">
-		<div class="flex flex-jc-start w-50">
-			${getLangData('League')}</div>
-		<div class="flex flex-jc-end w-50">
-			${getLangData(_league)}
-		</div></div>
-		<div class="flex pvp-info-1 w-100">
-		<div class="flex flex-jc-start w-50">
-			${getLangData('PVP Order')}</div>
-		<div class="flex flex-jc-end w-50">
-			${mainCharacter.level < this.unlockLevel ? '-' : __account.pvp.order.formatWithDots()}
-		</div></div>
-		<div class="flex w-100 pvp-info-2"></div>
-		<div class="flex pvp-info-3 w-100"><div class="w-50 flex flex-jc-start">
-			${getLangData('Total Power')}
-		</div>
-		<div class="flex w-50 flex-jc-end">
-			${getTotalPower()?.total?.formatWithDots()}
-		</div></div>
-		<div class="flex pvp-info-4 w-100"></div>`;
-		this.rendered = 1;
-		this.meFrame = this.meStart = 0;
-		this.width = _meCanvas.width;
-		this.height = _meCanvas.height;
+		this.updateTimer = 1;
+		this.lastDuelTimeCheck = 0;
 		this.findOpponents();
 		this.getPlayStatus();
 	}
 	this.getPlayStatus = function() {
 		const _container = document.querySelector('.pvp-info-2');
 		const _container4 = document.querySelector('.pvp-info-4');
+		if(!_container4)
+			return;
 		if(mainCharacter.level < this.unlockLevel) {
 			_container.innerHTML = '<div class="w-50 flex flex-jc-start">' + getLangData('Active Duel') + '</div><div class="flex flex-jc-end w-50">-</div>';
 			return;
 		}
 		if(__account.pvp.duelCount < 10) {
-			const _hak = MathFloor((_gameTick - __account.pvp.lastDuelTime) / 600000);
+			const _hak = MathFloor((msNow - __account.pvp.lastDuelTime) / 600000);
 			if(_hak > 0) {
 				__account.pvp.duelCount += _hak;
 				if(__account.pvp.duelCount > 10)
@@ -187,49 +171,19 @@ function pvp() {
 		}
 		_container4.innerHTML = `<div class="flex w-50 flex-jc-start">${getLangData('Win Streak')}</div><div class="flex w-50 flex-jc-end">${__account.pvp.maxWinCount.formatWithDots()}</div>`;
 		_container.innerHTML = '<div class="flex w-50 flex-jc-start">' + getLangData('Active Duel') + '</div><div class="flex w-50 flex-jc-end">' + (__account.pvp.duelCount < 1 ? '0' : __account.pvp.duelCount.toString()) + ' / 10<span id="pvp-play-time-left"></span></div>';
+		this.updatePlayStatus();
 	}
 	this.updatePlayStatus = function() {
-		const _container = document.getElementById('pvp-play-time-left');
-		_container.innerHTML = this.timeLeft === 0 ? '' : ' (' + this.timeLeft + ')';
-	}
-	this.getSize = function(_frame) {
-		const _maxWidth = MathRound(this.width * .75);
-		const _maxHeight = MathRound(this.height * .75);
-		const _widthRate = _maxWidth / _frame.spriteWidth;
-		const _heightRate = _maxHeight / _frame.spriteHeight;
-		const _rate = _widthRate < _heightRate ? _widthRate : _heightRate;
-		const _w = MathRound(_frame.spriteWidth * _rate);
-		const _h = MathRound(_frame.spriteHeight * _rate);
-		const _t = MathRound((this.height - _h) / 2);
-		const _l = MathRound((this.width - _w) / 2);
-		return {
-			w: _w,
-			t: _t,
-			h: _h,
-			l: _l
-		};
-	}
-	this.draw = function() {
-		this.meStart++;
-		if(this.animation.frames[this.meFrame].speed < this.meStart) {
-			this.meStart = 0;
-			this.meFrame++;
-			this.meContext.clearRect(0,0,this.width, this.height);
-			if(this.animation.frames.length <= this.meFrame)
-				this.meFrame = 0;
-			let _frame = this.animation.frames[this.meFrame];
-			const _size = this.getSize(_frame);
-			this.meContext.drawImage(mainCharacter.sprite, _frame.spriteLeft, 
-				_frame.spriteTop, _frame.spriteWidth, _frame.spriteHeight,
-				_size.l, _size.t, _size.w, _size.h
-			);
-		}
+		if(!this.updateTimer)
+			return;
+		if(!((_gameTick - this.lastDuelTimeCheck) > 999))
+			return;
 		if(__account.pvp.duelCount < 10) {
-			const _between = 600000 - (_gameTick - __account.pvp.lastDuelTime);
+			const _between = 600000 - (msNow - __account.pvp.lastDuelTime);
 			const _minute = MathFloor(_between / 60000);
 			const _second = MathFloor((_between % 60000) / 1000);
-			const _result = ((_minute > 0 ? (_minute + getLangData('m')) : '') + ' ' +
-			(_second > 0 ? (_second + getLangData('s')) : '')).trim();
+			const _result = (((_minute > 9 ? _minute : '0' + _minute) + getLangData('m')) + ' ' +
+			((_second > 9 ? _second : '0' + _second) + getLangData('s'))).trim();
 			if(this.timeLeft !== _result) {
 				this.timeLeft = _result;
 				if(_minute <= 0 && _second <= 0)
@@ -241,25 +195,16 @@ function pvp() {
 				}
 				this.updatePlayStatus();
 			}
+			const _container = document.getElementById('pvp-play-time-left');
+			if(_container) {
+				const _txt = this.timeLeft === 0 ? '' : '&nbsp;<span class="red">(' + this.timeLeft + ')</span>';
+				if(_txt !== _container.innerHTML)
+					_container.innerHTML = _txt;
+			}
+			else
+				this.updateTimer = false;
+			this.lastDuelTimeCheck = _gameTick;
 		}
-	}
-	this.checkInPvpContent = function() {
-		if(!this.rendered)
-			return;
-		if(this.animation) {
-			this.draw();
-			return;
-		}
-		this.animation = mainCharacter.animations.idle;
-		this.draw();
-	}
-	this.dispose = function() {
-		this.me = this.animation = this.rendered = this.meFrame = this.meStart = 
-		this.width = this.height = this.timeLeft = this.meContext = undefined;
 	}
 }
 var __pvp = new pvp();
-
-function getArenaUI() {
-	
-}

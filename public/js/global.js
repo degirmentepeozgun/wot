@@ -2367,6 +2367,11 @@ const relatedObjects = [
 		id: 'chargeimpact', key: 'chargeimpact',
 		width: 1280/4, height: 1182/6, col:4, zoom: 1, frame:1, bind: true,
 		totalFrames: 23, speed: 3, singleton: true, stillOnChar: true
+	},
+	{
+		id: 'groundbackdust', key: 'groundbackdust',
+		width: 202, height: 411/3, col:3, zoom: 1,
+		totalFrames: 8, speed: 3, singleton: true, still: true
 	}
 ];
 function setRelatedObjectSpeed() {
@@ -2376,6 +2381,9 @@ function setRelatedObjectSpeed() {
 }
 setRelatedObjectSpeed();
 const relatedObjectImages = {
+	groundbackdust: function () {
+		return getImage('./images/related/ground-back-dust.png')
+	},
 	chargeimpact: function () {
 		return getImage('./images/related/charge-impact.png')
 	},

@@ -1,22 +1,35 @@
-﻿'use strict';
+﻿﻿﻿'use strict';
 const _borderRates = [
-	1.065, 1.065, 1.065, 
-	1.055, 1.055, 1.055, 1.055,
+	1.06, 1.06, 1.06, 
+	1.05, 1.05, 1.05, 1.05,
 	1.04, 1.04, 1.04, 1.04,
-	1.02, 1.02, 1.02, 1.02, 1.02,
-	1.02, 1.02, 1.02, 1.02, 1.02,
+	1.025, 1.025, 1.025, 1.025, 1.025,
+	1.025, 1.025, 1.025, 1.025, 1.025,
+	1.025, 1.025, 1.025, 1.025, 1.025,
+	1.025, 1.025, 1.025, 1.025, 1.025,
+	1.025, 1.025, 1.025, 1.025, 1.025,
+	1.025, 1.025, 1.025, 1.025, 1.025,
 	1.04, 1.04, 1.04, 1.04, 
-	1.055, 1.055, 1.055, 1.055,
-	1.065, 1.065, 1.065,
+	1.05, 1.05, 1.05, 1.05,
+	1.06, 1.06, 1.06,
 ];
 console.log('map');
 function map(_m) {
+	
+	if (!window._distortFX) {
+		const distc = document.createElement('canvas');
+		const dctx = distc.getContext('2d', { willReadFrequently: true });
+		window._distortFX = { distc, dctx };
+	}
 	this.season = _m.season;
 	const _mapSprite = mapSprites.find(x => x.id == this.season);
 	this.still = _mapSprite.still;
-	this.width = MathRound((_mapSprite.width ?? _m.width) * __zoom);
-	_canvasR.width = _canvasS.width = (this.width);
-	_canvasR.style.width = _canvasS.style.width = (this.width) + 'px';
+	// this.width = MathRound((_mapSprite.width ?? _m.width) * __zoom);
+	// if(this.width < _canvas.width)
+	// 	this.width = _canvas.width;
+	// _canvasR.width = _canvasS.width = (this.width);
+	//_canvasR.style.width = _canvasS.style.width = (this.width) + 'px';
+	//_canvasS.style.width = (this.width * __scale) + 'px';
 	this.missionRoadRate = 1;
 	cc = document.getElementById('constant-obj');
 	c3 = document.getElementById('droad');
@@ -25,23 +38,31 @@ function map(_m) {
 	c90 = document.getElementById('droad90');
 	c9 = document.getElementById('dobj-foreground');
 	this.FootShadow = getImage('./images/related/shadow3.png');
+	this.HBMob = getImage('./images/icons/hbmob.png');
+	this.HBBoss = getImage('./images/icons/hbboss.png');
 	const _cArr = [c3, c9, c50, c85, c90, cc];
 	for(let _c of _cArr) {
 		_c.innerHTML = '';
-		_c.style.width = this.width + 'px';
+		//_c.style.width = this.width + 'px';
 		_c.style.transform = 'translateX(0)';
 		_c.style.setProperty('-webkit-transform', 'translateX(0)');
 		_c.backgroundSet = undefined;
 	}
 	this.after = _mapSprite.after;
 	this.menu = _mapSprite.menu;
-	this.height = _m.height;
-	this.distance = (__globalDistance ? parseFloat(__globalDistance) / 100 : undefined) ?? (_mapSprite.distance ?? .5);
+	//this.height = _m.height;
+	this.hitCount = 0;
+	this.limitedEffects = [];
+	this.lastSortedTime = 0;
+	//this.distance = (__globalDistance ? parseFloat(__globalDistance) / 100 : undefined) ?? (_mapSprite.distance ?? .5);
 	this.sprites = _m.sprites;
 	this.status = _m.status ?? 'loading';
 	this.loadObjects = _m.loadObjects;
 	this.loadEnemies = _m.loadEnemies;
 	this.enemies = [];
+	this.seenEnemies = [];
+	this.activeSpells = [];
+	this.lastUnseenCheck = Date.now() - 200;
 	this.type = _m.type ?? 'mission';
 	this.enemyCounts = _m.enemyCounts;
 	this.pvp = _mapSprite.battleGround || _mapSprite.pvp;
@@ -63,26 +84,33 @@ function map(_m) {
 	this.backgroundSrc = this.assetPath;
 	this.totalObjectCount = _m.totalObjectCount;
 	this.ground = _mapSprite.ground;
+	//this.zoom = __zoom * (this.ground.zoom ?? 1);
 	this.id = _mapSprite.id;
-	if(this.id === 500)
-		this.war = 1;
 	this.mobs = _mapSprite.mobs;
+	this.mobs.forEach(x => {
+		x.listed = 1;
+		if(x.spawnMinX !== undefined)
+			delete x.spawnMinX;
+		if(x.spawnMaxX !== undefined)
+			delete x.spawnMaxX;
+	});
 	this.itemGrade = _mapSprite.itemGrade ?? 0;
 	this.equipmentDropRates = _mapSprite.equipmentDropRates;
 	this.artifacts = [];
-	this.cHeight = _canvas.clientHeight;
-	this.cWidth = _canvas.clientWidth;
-	this.dmgFrameHeight = this.cHeight / 20;
-	this.dmgFrameTopBoundary = MathRound(this.cHeight * .15);
-	this.defaultHealthBarHeight = MathRound(this.cHeight / 75);
-	this.RECT = { 
-		left: 0, 
-		right: this.cWidth,
-		top: 0, 
-		bottom: this.cHeight, 
-		width: this.cWidth, 
-		realWidth: this.cWidth 
-	};
+	// this.cHeight = _canvas.height;
+	// this.cUIHeight = _canvas.height * __scale;
+	// this.cWidth = _canvas.width;
+	// this.cUIWidth = _canvas.width * __scale;
+	// this.dmgFrameHeight = this.cHeight / 20;
+	// this.dmgFrameTopBoundary = MathRound(this.cHeight * .15);
+	// this.RECT = { 
+	// 	left: 0, 
+	// 	right: this.cWidth,
+	// 	top: 0, 
+	// 	bottom: this.cHeight, 
+	// 	width: this.cWidth, 
+	// 	realWidth: this.cWidth 
+	// };
 	// this.damages = [];
 	// for(let i = 0; i < 5; i++){
 	// 	const _textElem = document.createElement('div');
@@ -93,16 +121,16 @@ function map(_m) {
 	// setTimeout(function() {
 	// 	initDmgFrames();
 	// }, 100);
-	if(this.id < 100 && !this.lobby && !_mapSprite.menu)
+	if(this.id < 107 && this.id > 1 && !this.lobby && !_mapSprite.menu && !this.entertainment && !__storyScene?.noArtifact)
 	{
 		//artifact ekleyelim
 		const _minArtifactGrade = __artifacts.map(x => x.group).sort()[0];
 		const _maxArtifactGrade = __artifacts.map(x => x.group).sort().reverse()[0];
-		const _artifactGrade = getRandomValue(_minArtifactGrade, _maxArtifactGrade);
+		const _artifactGrade = getRandomValue2(_minArtifactGrade, _maxArtifactGrade);
 		let _artifact;
-		if(getRandomValue(1, _artifactGrade * 100) === 1)
+		if(getRandomValue2(1, _artifactGrade * 100) === 1)
 		{
-			const _artifactOrder = getRandomValue(1, __artifacts.filter(x => x.group === _artifactGrade).length);
+			const _artifactOrder = getRandomValue2(1, __artifacts.filter(x => x.group === _artifactGrade).length);
 			const _art = __artifacts.filter(x => x.group === _artifactGrade)[_artifactOrder - 1];
 			if(!__account.artifacts.find(x => x.id === _art.id))
 				_artifact = _art;
@@ -124,7 +152,7 @@ function map(_m) {
 				width: 128, 
 				height: 128,
 				zoom: 1, 
-				locate: { left: getRandomValue(256, _mapSprite.width - 256), bottom: -10 },
+				locate: { left: getRandomValue2(256, _mapSprite.width - 256), bottom: -10 },
 			});
 	}
 	this.croppedSprites = new Map();
@@ -132,55 +160,64 @@ function map(_m) {
 		const _key = _fKey ?? ('l' + _x + 't' + _y +'w' + _w  + 'h'+ _h);
 		if(_char.lastSpriteKey === _key)
 			return _char.lastSprite;
-		let _map = this.croppedSprites.get(_src);
-		if (_map) {
-			let sprite = _map[_key];
-			if(sprite?.width >= 0) {
-				_char.lastSprite = sprite;
-				_char.lastSpriteKey = _key;
-				return sprite;
-			}
-			else if (!(sprite < 3))
-				_map[_key] = 1;
-		}
-		else {
-			this.croppedSprites.set(_src, {});
-			_map = episode.croppedSprites.get(_src);
-			if (!_map[_key] && _map[_key] !== 2)
-				_map[_key] = 1;
+		// let _map = this.croppedSprites.get(_src);
+		// if (_map) {
+		// 	let sprite = _map[_key];
+		// 	_char.lastSprite = sprite;
+		// 	_char.lastSpriteKey = _key;
+		// 	return sprite;
+		// }
+		let srcMap = this.croppedSprites.get(_src);
+		if (srcMap) {
+			let sprite = srcMap.get(_key);
+			_char.lastSprite = sprite;
+			_char.lastSpriteKey = _key;
+			return sprite;
 		}
 		if(_char.lastSprite)
 			_char.lastSprite = _char.lastSpriteKey = undefined;
-		if(_map[_key] === 1) {
-			_map[_key] = 2;
-			setTimeout(function() {
-				episode.loadCharacterSprites(null, _char.realId ?? _char.id, _char.animation, _char.frame);
-			}, 0);
-		}
+		console.log(_key + ' sprite bulunamadı');
 		return undefined;
 	}
-	this.loadCharacterSprites = async function(_func, _id, _animation, _frame) {
-		if(!_id)
+	this.loadCharacterSprites = async function(_func, _extraIds, _kk, _excludeMain, _useCurrentEnemies) {
+		if(this.menu)
+		{
+			_func();
+			return;
+		}
+		if(!_kk)
 			this.disposing = 1;
-		const _ids = _id ? [_id] : this.mobs.map(x => x.id);
-		if(!_id)
+		const _ids = this.mobs.map(x => x.id);
+		if(mainCharacter && !_excludeMain)
 			_ids.push(mainCharacter.realId ?? mainCharacter.id);
+		if(_extraIds?.[0])
+			for(let _id of _extraIds)
+				if(_ids.indexOf(_id) === -1)
+					_ids.push(_id);
+		const _spls = [];
 		const _loadCharacterSprite = async function(_e) {
-			const _keys = _animation ? [_animation] : Object.keys(_e.animations);
+			const _keys = _kk ?? Object.keys(_e.animations);
 			for(let _key of _keys) {
 				const _anim = _e.animations[_key];
-				if(!_anim){
-					console.log(_e.id + ' - ' + _key);
+				// if(_key.startsWith('idle') || _key.startsWith('counter') || _key === 'release' || _key === 'before' || _key === 'start' ||
+				// 	_anim.type === 'move' || _anim.interactive || _anim.baseKey === 'finish' ||
+				// 	_anim.key.startsWith('dead') || _anim.key.startsWith('knockback'))
+				// 	continue;
+				if(!_anim) {
+					console.log('enemy' + _e?.id + ' ' + _key);
 					continue;
 				}
-				if(!_id) {
-					if(_key.startsWith('idle') || _key.startsWith('counter') || _key === 'release' || _key === 'before' || _key === 'start' ||
-						_anim.type === 'move' || _anim.interactive || _anim.baseKey === 'finish' ||
-						_anim.key.startsWith('dead') || _anim.key.startsWith('knockback'))
-						continue;
-				}
 				if(_anim.frames?.[0]){
-					for(let _f of (_frame ? [_anim.frames[_frame]] : _anim.frames)) {
+					for(let _f of _anim.frames) {
+						if(_f.spell?.key && _spls.indexOf(_f.spell.key) === -1) {
+							if(_f.spell.key.indexOf(',') !== -1) {
+								const _keys = _f.spell.key.split(',');
+								for(let _kk of _keys)
+									_spls.push(_kk);
+							}
+							else
+								_spls.push(_f.spell.key);
+						}
 						const _cKey = 'l' + _f.spriteLeft + 't' + _f.spriteTop + 'w' + _f.spriteWidth + 'h' + _f.spriteHeight;
 						let _src = _f.src ?? _anim.src ?? _e.src;
 						if(!_src)
@@ -192,26 +229,57 @@ function map(_m) {
 						const _img = await getImagePromise(_src, 1);
 						const _cacheCAN = document.createElement('canvas');
 						_cacheCAN.width = _f.spriteWidth;
-						_cacheCAN.height = _f.spriteHeight;
+						let _additionalHeight = 0;
+						let _rel, _relZoom;
+						// if(_e.hasShadow !== false){
+						// 	_rel = structuredClone2(relatedObjects.find(x => x.id === 'shadow'));
+						// 	_relZoom = _f.spriteWidth / _rel.width;
+						// 	const _shadowHeight = _relZoom * (_e.yGap < 5 ? 8 : _e.yGap) * 3;
+						// 	_additionalHeight = MathCeil(_shadowHeight / 2);
+							
+						// }
+						_cacheCAN.height = _f.spriteHeight + _additionalHeight;
 						const _cacheCTX = _cacheCAN.getContext('2d');
 						_cacheCAN.imageSmoothingEnabled = false;
+						if(_additionalHeight > 0) {
+							_cacheCTX.drawImage(
+								episode.FootShadow, 
+								_rel.left ?? 0, 
+								_rel.top ?? 0, 
+								_rel.width, 
+								_rel.height,
+								0,
+								_f.spriteHeight - _additionalHeight,
+								MathFloor(_rel.width * _relZoom), 
+								_additionalHeight * 2);
+						}
 						_cacheCTX.drawImage(_img, _f.spriteLeft, _f.spriteTop, 
 						_f.spriteWidth, _f.spriteHeight, 0, 0, _cacheCAN.width, _cacheCAN.height);
-						if (!episode.croppedSprites.has(_src))
-							episode.croppedSprites.set(_src, {});
-						const _map = episode.croppedSprites.get(_src);
-						if (!_map[_cKey] || _map[_cKey] === 2)
-							_map[_cKey] = _cacheCAN;
+						// if (!episode.croppedSprites.has(_src))
+						// 	episode.croppedSprites.set(_src, {});
+						// const _map = episode.croppedSprites.get(_src);
+						// if (!_map[_cKey])
+						// 	_map[_cKey] = _cacheCAN;
+						let srcMap = episode.croppedSprites.get(_src);
+						if (!srcMap) {
+							srcMap = new Map();
+							episode.croppedSprites.set(_src, srcMap);
+						}
+						if (!srcMap.has(_cKey)) {
+							srcMap.set(_cKey, _cacheCAN);
+}
 					}
 				}
 			}
 		}
 		for(const id of _ids)
-			await _loadCharacterSprite(_allEnemies['enemy' + id]());
-		if(_func)
-			_func();
-		if(!_id)
+			await _loadCharacterSprite(_useCurrentEnemies ? episode.enemies.find(x => x.id === id) : _allEnemies['enemy' + id]());
+		_spls.push('electricboltsmall');
+		for(const key of _spls)
+			await _loadCharacterSprite(new enemy(structuredClone2(spells[key])));
+		if(!_kk)
 			delete this.disposing;
+		_func();
 	}
 	this.setRepeat = function(_mSprite) {
 		if (_mSprite.do) {
@@ -224,7 +292,6 @@ function map(_m) {
 		}
 	}
 	this.setRepeat(_mapSprite);
-	const self = this;
 	let _canvasAreas = document.querySelectorAll('.canvas');
 	for (var _ca of _canvasAreas)
 		_ca.innerHTML = '';
@@ -238,31 +305,34 @@ function map(_m) {
 		pvpCounter.remove();
 	if (this.ground) {
 		this.ground.src = './images/texture/' + this.assetPath + '-ground.png';
-		if (this.ground.yRate)
-			groundheight = MathRound(idealground_height * this.ground.yRate);
-		else
-			groundheight = idealground_height;
-		minPositionY = this.ground.bottomGap ? MathRound(this.ground.bottomGap * __zoom) : 1;
-		minLeft = this.ground.leftGap ? MathRound(this.ground.leftGap * __zoom) : 0;
-		maxLeft = this.ground.rightGap ? MathRound(this.ground.rightGap * __zoom) : 0;
+		// if (this.ground.yRate)
+		// 	groundheight = MathRound(idealground_height * this.ground.yRate);
+		// else
+		// 	groundheight = idealground_height;
+		// minPositionY = this.ground.bottomGap ? MathRound(this.ground.bottomGap * __zoom) : 1;
+		// minLeft = this.ground.leftGap ? MathRound(this.ground.leftGap * __zoom) : 0;
+		// maxLeft = this.ground.rightGap ? MathRound(this.ground.rightGap * __zoom) : 0;
 	}
-	else
-		groundheight = idealground_height;
-	this.moveCamera = function(_endFunc) {
+	// else
+	// 	groundheight = idealground_height;
+	
+	// this.XStep = MathRound(getGroundHeight() / 4);
+	// this.YStep = MathRound(getGroundHeight() / 5);
+	this.moveCamera = function(_endFunc, speed, force) {
 		if(!mainCharacter)
 			return;
-		if(mainCharacter.left <= centerMinX) {
+		if(!force && mainCharacter.left <= centerMinX) {
 			if(_endFunc)
 				_endFunc();
 			return;
 		}
-		const _chars = this.enemies.filter(x => x.class !== 'object' && !x.isDead() && !x.remove && !x.immobilize);
+		const _chars = this.enemies.filter(x => x.class !== 'object' && !x.isDead() && !x.remove && (!x.immobilize || force));
 		if(_chars?.[0]) {
 			if(!this.cameraMoveStep) {
 				_chars.forEach(x => x.immobilize = x.disableKeyboard = true);
 				mainCharacter.fps = 1;
-				mainCharacter.keyboard.holdingKeys = [];
-				this.cameraMoveStep = MathCeil((mainCharacter.calculateMoveXStep() * this.cWidth) / 100);
+				blurKeyboard();
+				this.cameraMoveStep = (speed ?? 1) * MathCeil((mainCharacter.calculateMoveXStep() * this.cWidth) / 100);
 				this.cameraMoveEndFunc = _endFunc;
 			}
 		}
@@ -278,13 +348,16 @@ function map(_m) {
 			_store.setCharacterStats(_enemy);
 			_enemy.yPosition = (_mob.yPosition ? (typeof _mob.yPosition === 'function' ? _mob.yPosition(_enemy) : _mob.yPosition) : getRandomValue2(minPositionY, getGroundHeight()));
 			_enemy.direction = _mob.direction ?? getRandomValue2(0, 1) < 1 ? __left : __right;
-			_enemy.left = getRandomValue2(_mob.minX ? MathRound(_mob.minX * __zoom) : 0,
-				_mob.maxX ? MathRound(_mob.maxX * __zoom) : this.width - _enemy.WIDTH);
+			_enemy.left = getRandomValue2((_mob.spawnMinX ?? _mob.minX) ? MathRound((_mob.spawnMinX ?? _mob.minX) * __zoom) : 0,
+				(_mob.spawnMaxX ?? _mob.maxX) ? MathRound((_mob.spawnMaxX ?? _mob.maxX) * __zoom) : this.width - _enemy.WIDTH);
+			if(_respawn)
+				_enemy.respawned = _enemy.located = _enemy.started = 1;
 			_enemy.platformX = platformX;
+			_enemy.experience = _mob.experience ?? 0;
 			_enemy.grade = _mob.grade ?? 1;
 			if (_enemy.grade > 1) {
 				_enemy.gradeLeft = _enemy.grade - 1;
-				_enemy.zoom *= (1 + (.1 * _enemy.gradeLeft));
+				_enemy.zoom *= (1 + ((_enemy.gradeZoomRate ?? .1) * _enemy.gradeLeft));
 				_enemy.atk *= _enemy.grade;
 				_enemy.experience *= _enemy.grade;
 			}
@@ -293,7 +366,7 @@ function map(_m) {
 			if(_mob.spawnAsGroup)
 				_enemy.spawnAsGroup = _mob.spawnAsGroup;
 			if(_mob.spawnTime)
-				_enemy.spawnTime = _mob.spawnTime;
+				_enemy.spawnTime = _mob.spawnTimeStart = _mob.spawnTime;
 			if (_mob.groupId)
 				_enemy.groupId = _mob.groupId;
 			_enemy.displayName = _mob.name;
@@ -301,11 +374,11 @@ function map(_m) {
 			let _levelRate = 1;
 			if(_enemy.level > (_mob.minLevel ?? _enemy.level))
 				_levelRate = 1 + ((_enemy.level - _mob.minLevel) / 10);
-			_enemy.atk = MathRound(_enemy.atk *_levelRate);
+			_enemy.atk = _mob.atk ?? MathRound(_enemy.atk *_levelRate);
 			_enemy.maxHP = MathRound(_enemy.maxHP *_levelRate);
 			_enemy.def = MathRound(_enemy.def *_levelRate);
 			if (_mob.hp)
-				_enemy.maxHP = _enemy.MAXHP = _mob.hp;
+				_enemy.maxHP = _enemy.MAXHP = _enemy.health = _mob.hp;
 			_enemy.setHealth(_enemy.MAXHP);
 			_enemy.sight = _mob.sight;
 			if(_mob.zoom)
@@ -319,18 +392,19 @@ function map(_m) {
 				_enemy.inventory = _mob.inventory;
 				applyCharacterStats(null, _enemy);
 			}
-			_enemy.enemy = true;
-			_enemy.friendly = _enemy.main = false;
+			_enemy.enemy = _mob.enemy ?? true;
+			_enemy.friendly = _mob.friendly ?? false;
+			_enemy.main = false;
 			_enemy.setAutoMode(_mob.attackAfterHit ? 0 : 2);
 			this.enemies.push(_enemy);
 			if (_func)
 				_func(_enemy);
-			if((this.dungeon || this.pvp) && mainCharacter.leader) 
-			{
-				_enemy.socketId = (this.enemies.filter(x => x.socketId < 1000).map(x => x.socketId).sort().slice(-1)[0] ?? 0) + 1;
-				_enemy.station = mainCharacter.socketId;
-				//_enemy.getNewStatus(1, 1);
-			}
+			// if((this.dungeon || this.pvp) && mainCharacter.leader) 
+			// {
+			// 	_enemy.socketId = (this.enemies.filter(x => x.socketId < 1000).map(x => x.socketId).sort().slice(-1)[0] ?? 0) + 1;
+			// 	_enemy.station = mainCharacter.socketId;
+			// 	//_enemy.getNewStatus(1, 1);
+			// }
 			if(_mob.do)
 				_mob.do(_enemy);
 			if(_mob.targetKey) {
@@ -344,8 +418,13 @@ function map(_m) {
 				if(_m)
 					_enemy.setAutoTarget(_m);
 			}
-			if(_mob.ownerKey)
+			if(_mob.ownerKey){
 				_enemy.owner = this.enemies.find(x => x.key === _mob.ownerKey);
+				if(!_enemy.owner.enemy)
+					_enemy.enemy = false;
+			}
+			if(_mob.pick)
+				_enemy.pickNewTarget();
 			if (_return)
 				return _enemy;
 		}
@@ -355,6 +434,8 @@ function map(_m) {
 			return;
 		if (this.mobs?.[0] || _arr)
 			for (var _mob of _arr ?? this.mobs){
+				delete _mob.spawnMinX;
+				delete _mob.spawnMaxX;
 				if(_mob.spawnAsGroup)
 					_mob.spawnAsGroup = (_arr ?? this.mobs).filter(x => x.id === _mob.id && x.groupId === _mob.groupId)?.map(x => x.count)?.reduce((prev, next) => prev + next) ?? 1;
 				this.installMob(_mob, _func);
@@ -393,7 +474,6 @@ function map(_m) {
 				_lay.src = './images/texture/' + (_lay.theme ?? this.assetPath) + '-' + _lay.name + '.png?z=' + _lay.zoom;
 				
 	}
-	this.loadLayers();
 	this.floor = _mapSprite.floor;
 	this.bgAnimations = _mapSprite.bgAnimations;
 	if (this.bgAnimations)
@@ -479,16 +559,7 @@ function map(_m) {
 			return _object;
 		}
 	}
-	if (this.loadObjects) {
-		const _objects = _mapSprite.objects ?? [];
-		let _arr;
-		if(this.artifacts?.length > 0)
-			_arr = _objects.concat(this.artifacts);
-		else
-			_arr = _objects;
-		for (var _obj of _arr)
-			this.loadObject(_obj);
-	}
+	
 	this.checkTowerResult = function(_timeIsUp, _diff) {
 		let _end;
 		if(mainCharacter.isDead()) {
@@ -499,7 +570,7 @@ function map(_m) {
 		const _enemyCount = this.enemies?.filter(x => x.enemy && x.class !== __spell && x.class !== 'object' && !x.isDead())?.length ?? 0;
 		const _object = this.enemies?.find(x => x.enemy && x.class === 'object');
 		if(_enemyCount === 0 && !this.pauseTime)
-			this.pauseTime = _gameTick;
+			this.pauseTime = Date.now();
 		if(_timeIsUp && _enemyCount > 0)
 			this.resultStars[1].failed = _end = 1;
 		const _t = __account.missions.find(x => x.key === 'tower');
@@ -536,7 +607,7 @@ function map(_m) {
 		else
 			this.enemies.forEach(x => x.immobilize = true);
 		const _missionGain = !_diff ? 0 : _diff * 100;
-		let _table = '<div class="flex full pvp-result-table tower-result"><div class="flex" style="width:100%;height:16vh;position:relative"><img src="./images/icons/reward-star.png" style="height:100%;position:absolute"' + (_fail ? ' class="gray"': '') + ' /><span style="z-index:2;margin-top:4.7vh;font-size:3.15vh!important;font-weight:600;text-shadow:0px 0px 1vh #000;color:' + (_fail ? 'crimson' : '#F4BB44') + ' !important">' + getLangData('Mission' + (_fail ? ' Failed' : ' Cleared')) + '</span></div><div style="width:100%;overflow-y:auto;height:calc(100% - 24vh)"><div style="width:100%" class="flex"><span>';
+		let _table = '<div class="flex full pvp-result-table tower-result"><div class="flex" style="width:100%;height:15vh;position:relative"><img src="./images/icons/reward-star.png" style="height:100%;position:absolute"' + (_fail ? ' class="gray"': '') + ' /><span style="z-index:2;margin-top:4.7vh;font-size:3.15vh!important;font-weight:600;text-shadow:0px 0px 1vh #000;color:' + (_fail ? 'crimson' : '#F4BB44') + ' !important">' + getLangData('Mission' + (_fail ? ' Failed' : ' Cleared')) + '</span></div><div style="width:100%;overflow-y:auto;height:calc(100% - 15vh)"><div style="width:100%" class="flex"><span>';
 		for(let _star of this.resultStars)
 			_table += `<div class="flex" style="padding:2vh 2vh 0 2vh;width:100%;height:6vh">
 				<img src="./images/icons/star.png" style="height:4vh"${_star.failed ? ' class="gray"' : ' class="glow"'} />
@@ -574,13 +645,13 @@ function map(_m) {
 		}
 		_table += `</div><div class="flex" style="width:100%;height:8vh">
 			<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
-				<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important;line-height:3vh !important" onclick="hideMyModalPopUp(1);reviveAtLobby()">${getLangData('QUIT')}</div>
+				<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important;line-height:3vh !important" onexactclick="hideMyModalPopUp(1);reviveAtLobby()">${getLangData('QUIT')}</div>
 			</div>
 			<div class="${_fail ? 'd-none' : 'flex'}" style="width:calc(50% - 1vh);margin-left:1vh;overflow:hidden;position:relative;height:100%">
-				<div class="game-menu-button btn-info full flex animate-me${_needUpdateFirst ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important;line-height:3vh !important" onclick="trySwitchMap(${episode.id})">${getLangData('NEXT')}</div>
+				<div class="game-menu-button btn-info full flex animate-me${_needUpdateFirst ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important;line-height:3vh !important" onexactclick="trySwitchMap(${episode.id})">${getLangData('NEXT')}</div>
 			</div>
 			<div class="${_fail ? 'flex' : 'd-none'}" style="width:calc(50% - 1vh);margin-left:1vh;overflow:hidden;position:relative;height:100%">
-				<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important;line-height:3vh !important" onclick="trySwitchMap(${episode.id})">${getLangData('RETRY')}</div>
+				<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important;line-height:3vh !important" onexactclick="trySwitchMap(${episode.id})">${getLangData('RETRY')}</div>
 			</div>
 		</div>`;
 		pvpStatus.innerHTML = _table + '</div>';
@@ -595,7 +666,10 @@ function map(_m) {
 			pvpCounter = document.createElement('div');
 			pvpCounter.className = 'flex animate-me-600 map-name countdown';
 			pvpCounter.id = 'pvp-counter';
-			pvpCounter.innerText = getLangData(_mapSprite.coords.title.split(' ')[0]);
+			if(!__storyScene?.leaderBoards)
+				pvpCounter.innerText = __locations.find(x => x.mapId === _mapSprite.id)?.titles?.[getLang()] ?? getLangData( _mapSprite.coords.title);
+			else
+				pvpCounter.innerHTML = '<div class="flex" style="color:#F4BB44">' + getLangData('Stage') + ' ' + __storySceneOrder + '</div><div class="flex w-100">' + getLangData('Score') + ': ' + (__story.point ?? 0).formatWithDots() + '</div>'; 
 			_gameUI.appendChild(pvpCounter);
 		}
 		else if((_gameTick - this.nameWriten) > 2399) {
@@ -607,8 +681,11 @@ function map(_m) {
 		let _end;
 		let _fail = false;
 		const _enemyCount = this.enemies?.filter(x => x.enemy && x.class != 'object' && !x.isDead())?.length ?? 0;
-		if(_enemyCount === 0 && !this.pauseTime)
-			this.pauseTime = _gameTick;
+		if(_enemyCount === 0 && !this.pauseTime){
+			this.pauseTime = Date.now();
+			if(__story)
+				__story.endTime = _gameTick;
+		}
 		const _t = __account.missions.find(x => x.key === 'gold');
 		const _miss = _missions.find(x => x.key === 'gold');
 		const _mission = _miss.props.find(x => x.level === _t.level);
@@ -618,7 +695,7 @@ function map(_m) {
 			_fail = _end = 1;
 			const _hpAll = _en.MAXHP * _en.grade;
 			const _hpLeft = (_en.MAXHP * _en.gradeLeft) + _en.health;
-			_goldGain = MathRound(_goldGain * (_hpLeft / _hpAll));
+			_goldGain = MathRound(_goldGain * ((_hpAll - _hpLeft) / _hpAll));
 		}
 		if(!_en?.remove && !_end)
 			return;
@@ -626,47 +703,445 @@ function map(_m) {
 			_end = (_enemyCount === 0);
 		if(!_end)
 			return;
-		if (!pvpResult)
-			pvpResult = document.getElementById('pvp-result');
-		if (!pvpStatus)
-			pvpStatus = document.getElementById('pvp-status');
-		showMyModalPopUp('pvp-result');
+		this.pvpEnded = true;
+		const _missionGain = _fail ? 0 : (!_diff ? 0 : _diff * 100);
+		if(!_fail)
+			installStoryFinish();
+		else
+			installStoryFinish(1, {key:'gold', count:_missionGain + _goldGain});
+		return;
 		this.pauseAmbianceMusic();
 		if(!_fail)
 			this.playSound({ key: 'victory', volume: .2 });
 		else
 			mainCharacter.immobilize = true;
-		const _missionGain = _fail ? 0 : (!_diff ? 0 : _diff * 100);
-		let _table = '<div class="flex full pvp-result-table tower-result"><div class="flex" style="width:100%;height:16vh;position:relative"><img src="./images/icons/reward-star.png" style="height:100%;position:absolute"' + (_fail ? ' class="gray"': '') + ' /><span style="margin-top:4.7vh;z-index:2;font-size:3.15vh !important;font-weight:600;text-shadow:0px 0px 1vh #000;color:' + (_fail ? 'crimson' : '#F4BB44') + ' !important">' + getLangData('Mission' + (_fail ? ' Failed' : ' Cleared')) + '!</span></div><div style="width:100%;overflow-y:auto;height:calc(100% - 24vh)"><div style="width:100%" class="flex"><span>';
+		//const _missionGain = _fail ? 0 : (!_diff ? 0 : _diff * 100);
+		let _table = '<div class="flex full pvp-result-table tower-result"><div class="flex" style="width:100%;height:16vh;position:relative"><span style="margin-top:4.7vh;z-index:2;font-size:3.15vh !important;font-weight:600;text-shadow:0px 0px 1vh #000;color:' + (_fail ? 'crimson' : '#F4BB44') + ' !important">' + getLangData('Mission' + (_fail ? ' Failed' : ' Cleared')) + '!</span></div><div style="width:100%;overflow-y:auto;height:calc(100% - 24vh);z-index:2"><div style="width:100%" class="flex"><span>';
 		_table += `</span></div>`;
 		let _reachedMax = false;
-		_table += `<div class="flex" style="width:100%;padding:2vh 0 1vh 0;color:#F4BB44 !important; font-size:2.6vh !important; font-weight: 600">${getLangData('Finish Rewards')}</div>`;
-		_table += `<div class="flex" style="width:100%"><div class="flex flex-ai-end"><img style="width:5vh" src="./images/icons/gold.png" /><div style="font-size:2.4vh !important;color:#f7f7f7cc !important;padding-left:2vh">${_goldGain}x ${getLangData('Gold')}</div></div></div>`;
-		if(!_fail)
-			_table += `<div class="flex" style="width:100%;padding:2vh 0 1vh 0;color:#F4BB44 !important; font-size:2.6vh !important; font-weight: 600">${getLangData('Mission Rewards')}</div>
-				<div class="flex" style="width:100%"><div class="flex"><img style="width:5vh" src="./images/icons/coin.png" /><div style="font-size:2.4vh !important;color:#f7f7f7cc !important;padding-left:2vh">${_missionGain} ${getLangData('Gold')} (+Bonus)</div></div></div>`;
+		_table += `<div class="flex flex-jc-start" style="z-index:2;width:100%;padding:2vh 0 1vh 0;color:#F3F4F5 !important; font-size:2.6vh !important;padding-top: 4%;padding: 1%;border-bottom: 1px solid #9d987f60">${getLangData('Finish Rewards')}</div>`;
+		_table += `<div class="flex flex-jc-start" style="padding:4% 2%;z-index:2;width:100%"><div class="flex flex-ai-end"><img style="width:5vh" src="./images/icons/gold.png" /><div style="font-size:2.4vh !important;color:#f7f7f7cc !important;padding-left:2vh">&nbsp;x&nbsp;${_goldGain}</div></div></div>`;
+		if(!_fail && _missionGain > 0)
+			_table += `<div class="flex flex-jc-start" style="z-index:2;width:100%;padding:2vh 0 1vh 0;color:#F3F4F5 !important; font-size:2.6vh !important; ;padding-top: 4%;padding: 1%;border-bottom: 1px solid #9d987f60">${getLangData('Mission Rewards')}</div>
+				<div class="flex flex-jc-start" style="padding:4% 2%;z-index:2;width:100%"><div class="flex"><img style="width:5vh" src="./images/icons/coin.png" /><div style="font-size:2.4vh !important;color:#f7f7f7cc !important;padding-left:2vh">&nbsp;x&nbsp;${_missionGain} (+Bonus)</div></div></div>`;
 		//_t.current++;
-		if(_miss.limit <= _t.current)
-			_reachedMax = 1;
+		// if(_miss.limit <= _t.current)
+		// 	_reachedMax = 1;
 		updateGold(_missionGain + _goldGain);
-		_table += `</div><div class="flex" style="width:100%;height:8vh">
-			<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
-				<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onclick="hideMyModalPopUp(1);reviveAtLobby()">${getLangData('QUIT')}</div>
+		_table += `</div><div class="flex" style="width:100%;height:8vh;z-index:2">
+			<div class="flex" style="width:calc(50% - 1vh);margin-left:1vh;overflow:hidden;position:relative;height:100%">
+				<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="quitFromStory()">${getLangData('QUIT')}</div>
 			</div>
 			<div class="flex" style="width:calc(50% - 1vh);margin-left:1vh;overflow:hidden;position:relative;height:100%">
-				<div class="game-menu-button btn-info full flex animate-me${_reachedMax ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onclick="trySwitchMap(${episode.id})">${getLangData('RETRY')}</div>
+				<div class="game-menu-button btn-info full flex animate-me${_reachedMax ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="loadLastStoryCheckPoint()">${getLangData('RETRY')}</div>
 			</div>
 		</div>`;
-		pvpStatus.innerHTML = _table + '</div>';
+		//pvpStatus.innerHTML = _table + '</div>';
+		const _parent = document.createElement('div');
+		_parent.innerHTML = `<div class="flex my-pop-up-wrapper show" id="pvp-result">
+				<div id="game-over-pvp-content" class="flex" style="padding: 2%; width: 50%; height: 80%; border: 2px solid #b8860bcc; border-radius: 4vh; box-shadow: 0px 0px 2vh #000; background: linear-gradient(180deg, #000000cc, #00000099), url(./images/icons/battle.png); background-size:cover">
+					<div style="width:100%" class="flex full">
+						<div class="full" style="width:80%;color:#fff;text-align:center" id="pvp-status">`
+							+ _table + '</div>' +
+						`</div>
+					</div>
+				</div>
+			</div>`;
+		this.pvpResult = _parent.firstChild;
+		_gameUI.appendChild(this.pvpResult);
 		this.pvpEnded = true;
 		switchAutoMode(1);
 	}
 	this.checkPVPResult = function () {
-		if (this.pvpEnded || __switchingMap || this.disposing || (this.enemies?.length??0) < 2)
+		if (this.pvpEnded || this.pvpResult || _storySceneSwitching || __switchingMap || this.disposing)
 			return;
 		let _end, _diff;
 		if (!this.pvpStarted) {
-			this.pvpStarted = _gameTick;
+			this.pvpStarted = Date.now();
+			this.missionCountDown = 1;
+			pvpCounter = document.createElement('div');
+			pvpCounter.className = 'flex animate-me countdown pop2';
+			pvpCounter.id = 'pvp-counter';
+			pvpCounter.innerHTML = this.tower ? '<span style="font-weight:600;color:crimson!important">FLOOR ' +__account.missions.find(x => x.key === 'tower').current + '</span>' : 3;
+			if(!this.tower)
+				this.playSound({ key: 'beep', volume:.3 });
+			_gameUI.appendChild(pvpCounter);
+			if(mainCharacter?.keyboard) {
+				mainCharacter.disableKeyboard = true;
+				blurKeyboard();
+			}
+		}
+		else {
+			const _baseTime = ((this.tower && (__account.missions.find(x => x.key === 'tower').current % 10) > 0) || this.gold) ? 60 : 180;
+			_diff = (_baseTime + (this.tower ? 4 : 3)) - MathFloor(((this.pauseTime ?? Date.now()) - this.pvpStarted) / 1000);
+			if (_diff < 10)
+				addClass(pvpCounter, 'pvp-end-soon');
+			if (_diff < 0 || (_diff > _baseTime && this.challangeStarted)) {
+				_end = true;
+				delete this.challangeStarted;
+				pvpCounter.innerText = 0;
+			}
+			if (_diff > _baseTime) {
+				if (pvpCounter.innerText !== (_diff - _baseTime).toString()) {
+					if((_diff - _baseTime) <= 3) {
+						this.playSound({ key: 'beep', volume:.3 });
+						pvpCounter.innerHTML = '';
+						pvpCounter.innerText = _diff - _baseTime;
+						removeClass(pvpCounter, 'pop2');
+						removeClass(pvpCounter, 'pop');
+						void pvpCounter.offsetWidth;
+						addClass(pvpCounter, 'pop');
+					}
+				}
+			}
+			else if (_diff === _baseTime) {
+				if (pvpCounter.innerText !== 'START') {
+					this.playSound({ key: 'questaccepted', volume: .3 });
+					pvpCounter.innerText = 'START';
+					removeClass(pvpCounter, 'pop');
+					void pvpCounter.offsetWidth;
+					addClass(pvpCounter, 'pop');
+					delete this.missionCountDown;
+					if(mainCharacter?.keyboard)
+						mainCharacter.disableKeyboard = false;
+				}
+			}
+			else if (pvpCounter.innerText !== _diff.toString()) {
+				if (_diff === _baseTime || (_diff < _baseTime && hasClass(pvpCounter, 'countdown'))) {
+					removeClass(pvpCounter, 'countdown');
+					episode.enemies?.forEach(x => x.immobilize = false);
+					if(__story) {
+						__story.startTime = _gameTick;
+						this.challangeStarted = 1;
+						__story.endTime = undefined;
+					}
+				}
+				if (_diff >= 0 && pvpCounter.innerText !== _diff.toString())
+					pvpCounter.innerText = _diff;
+			}
+		}
+		if(this.tower) {
+			this.checkTowerResult(_end, _diff);
+			return;
+		}
+		else if(this.gold) {
+			this.checkGoldResult(_end, _diff);
+			return;
+		}
+		const _enemies = this.enemies?.filter(x => x.enemy && x.class !== __spell && x.class !== 'object' && !x.isDead() && !x.remove);
+		const _teamMates = this.enemies?.filter(x => (x.friendly || x.main || (x.groupId && x.groupId === (mainCharacter.realGroupId ?? mainCharacter.groupId))) && x.class !== __spell && x.class !== 'object' && !x.isDead() && !x.remove);
+		const _deads = this.enemies?.filter(x => x.class !== __spell && x.class !== 'object' && x.killedBy);
+		if(this.war){
+			if(mainCharacter.remove && !mainCharacter.ghosted) {
+				const _isMyTeamAlive = _teamMates?.[0];
+				if(_isMyTeamAlive) {
+					const _isOtherTeamAlive = _enemies?.[0];
+					if(_isOtherTeamAlive) {
+						episode.realClass = mainCharacter.class;
+						const _ghost = summonMob(500, MathRound(mainCharacter.SCREENLEFT / __zoom),
+						mainCharacter.yPosition);
+						_ghost.realGroupId = mainCharacter.groupId;
+						_ghost.noDirection = _ghost.still = _ghost.hasShadow = false;
+						_ghost.stepX = mainCharacter.stepX;
+						_ghost.stepXRate = mainCharacter.oldProps.stepXRate;
+						_ghost.animations.idle.frames.forEach(x => x.objects = undefined);
+						_ghost.animations.run = {
+							key: 'run',
+							type: 'move',
+							imediateBreak: true,
+							hold: true,
+							mobilityY: true,
+							frames: structuredClone2(_ghost.animations.idle.frames)
+						};
+						addClass(_gameUI, 'ghost');
+						mainCharacter.main = false;
+						mainCharacter.keyboard = undefined;
+						mainCharacter.setAutoMode(2);
+						const oldMain = mainCharacter;
+						mainCharacter = _ghost;
+						if (!episode.enemies.includes(oldMain)) {
+							const gidx = episode.enemies.indexOf(_ghost);
+							if (gidx === -1)
+								episode.enemies.push(oldMain);
+							else
+								episode.enemies.splice(gidx, 0, oldMain);
+						}
+						_ghost.main = true;
+						_ghost.enemy = false;
+						setKeyBoard(_ghost);
+						_ghost.dead = _ghost.remove = false;
+						_ghost.ghosted = 1;
+						_ghost.autoMode = undefined;
+						_ghost.unseen = false;
+						_ghost.located = true;
+						warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/ghost.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('You are in ghost mode') + '</span></div>', null, null, 1);
+					}
+				}
+			}
+			_deads?.forEach(x => {
+				if (!x.grayAvatar) {
+					x.grayAvatar = true;
+					const _killer = episode.enemies.find(y => y.key === x.killedBy);
+					_killer.killCount++;
+					let _msg = '';
+					if (_killer.killCount > 1) {
+						this.playSound({ key: _killer.gender + 'laugh', reset: true });
+						_msg = '<div class="flex" style="color:#FD1C03;font-weight:600;font-size:larger !important">' + _killer.killCount + ' x Killing Spree!</div>';
+					}
+					warn('<div class="pvp-kill">' + _msg + (_killer.main ? __account.name : _killer.displayName ?? _killer.name) + '&nbsp;<span style="color:' + (_killer.enemy ? 'red' : 'blue') + ' !important">' + getLangData('killed') + '</span>&nbsp;' + (x.main ? __account.name : x.displayName ?? x.name) + '</div>', 'level-up', null, null, 1);
+				}
+				else
+					return;
+				if (!x.enemy) {
+					const _avatar = document.getElementById('char-' + x.key);
+					if (_avatar)
+						addClass(_avatar, 'gray');
+				}
+			});
+		}
+		const _eCount = _enemies?.length ?? 0;
+		const _tCount = _teamMates?.length ?? 0;
+		if(!this.pauseTime && (!_enemies?.filter(x => !x.isDead())?.length || !_teamMates?.filter(x => !x.isDead())?.length))
+			this.pauseTime = Date.now();
+		if(_deads?.length) {
+			if((_deads.filter(x => x.remove)?.length ?? 0) < _deads.length)
+				return;
+		}
+		if ((_eCount === 0 || _tCount === 0 || _end)) {
+			this.pauseAmbianceMusic();
+			let _status = (_eCount > 0 && _tCount > 0) ? 1 : (_tCount > 0 ? 2 : 0);
+			let _table;
+			if(this.war) {
+				const _team1 = this.enemies.filter(x => x.groupId === 1);
+				const _team2 = this.enemies.filter(x => x.groupId === 2);
+				let _rewardsHtml = '';
+				if(_status > 1){
+					let _honorCount = (mainCharacter.killCount ?? 0) + (mainCharacter.killCount > 1 ? 1: 0) + (mainCharacter.killCount > 2 ? 1: 0);
+					__account.pvp.honor+=_honorCount;
+					_client.saveState();
+					_rewardsHtml = `<div class="flex w-100" style="padding:1vh 0;color:#F4BB44 !important; font-size:3.15vh !important; font-weight: 600">
+									${getLangData('Victory Rewards')}
+								</div>
+								<div class="flex w-100">
+									<div class="flex" style="height:4.5vh">
+										<img style="width:4vh" src="./images/icons/honor.png" />
+										<div style="font-size:3vh !important;color:#f7f7f7cc !important;padding-left:2vh">+1 ${getLangData('Win Bonus')}</div>
+									</div>
+								</div>`;
+					if(mainCharacter.killCount > 0)
+							_rewardsHtml += `<div class="flex w-100">
+									<div class="flex" style="height:4.5vh">
+										<img style="width:4vh" src="./images/icons/honor.png" />
+										<div style="font-size:3vh !important;color:#f7f7f7cc !important;padding-left:2vh">+${mainCharacter.killCount} ${getLangData('Kill Bonus')}</div>
+									</div>
+								</div>`;
+				}
+				_table = `<div class="flex full pvp-result-table arena-result">
+							<div class="flex" style="width:100%;height:11vh;position:relative">
+								<span style="margin-top:5vh;z-index:2;font-size:3.15vh !important;font-weight:600;text-shadow:0px 0px 1vh #000;color:${(!_status ? 'crimson' : '#F4BB44')} !important">${getLangData(!_status ? 'Defeat' : (_status > 1 ? 'Victory' : 'Draw'))}</span>
+							</div>
+							<div class="flex flex-ai-start" style="width:100%;overflow-y:auto;height:calc(100% - 17vh)">
+								<div class="war-final-screen flex w-100">
+									<div class="war-final-screen-row flex team-1-header">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											&nbsp;
+										</div>
+										<div class="war-final-screen-cell-25 flex">
+											<img src="./images/icons/kill.png">
+										</div>
+										<div class="war-final-screen-cell-25 flex">
+											<img src="./images/icons/dead.png">
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team1[0].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team1[0].main ? __account.name : _team1[0].displayName ?? _team1[0].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex">
+											${_team1[0].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex">
+											${_team1[0].isDead() ? 1 : 0}
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team1[1].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team1[1].main ? __account.name : _team1[1].displayName ?? _team1[1].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex">
+											${_team1[1].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex">
+											${_team1[1].isDead() ? 1 : 0}
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team1[2].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team1[2].main ? __account.name : _team1[2].displayName ?? _team1[2].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex">
+											${_team1[2].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex">
+											${_team1[2].isDead() ? 1 : 0}
+										</div>
+									</div>
+									<div class="war-final-screen-row flex team-2-header">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											&nbsp;
+										</div>
+										<div class="war-final-screen-cell-25 flex">
+											<img src="./images/icons/kill.png">
+										</div>
+										<div class="war-final-screen-cell-25 flex">
+											<img src="./images/icons/dead.png">
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team2[0].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team2[0].main ? __account.name : _team2[0].displayName ?? _team2[0].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex">
+											${_team2[0].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex">
+											${_team2[0].isDead() ? 1 : 0}
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team2[1].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team2[1].main ? __account.name : _team2[1].displayName ?? _team2[1].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex">
+											${_team2[1].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex">
+											${_team2[1].isDead() ? 1 : 0}
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team2[2].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team2[2].main ? __account.name : _team2[2].displayName ?? _team2[2].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex">
+											${_team2[2].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex">
+											${_team2[2].isDead() ? 1 : 0}
+										</div>
+									</div>
+								</div>
+								<div class="flex flex-ai-start w-100">`
+							+ _rewardsHtml +
+							`</div></div>
+							<div class="flex" style="width:100%;height:6vh">
+								<div class="flex w-100" style="overflow:hidden;position:relative;height:100%">
+									<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(null, __storySceneOrder)">${getLangData('QUIT')}</div>
+								</div>
+							</div>
+						</div>`;
+			}
+			else {
+				_table = '<div class="flex full pvp-result-table arena-result"><div class="flex" style="width:100%;height:15vh;position:relative"><span style="margin-top:4.7vh;z-index:2;font-size:3.15vh !important;font-weight:600;text-shadow:0px 0px 1vh #000;color:' + (!_status ? 'crimson' : '#F4BB44') + ' !important">' + getLangData(!_status ? 'Defeat' : (_status > 1 ? 'Victory' : 'Draw')) + '</span></div><div class="flex" style="flex-direction:column;justify-content:space-between;width:100%;overflow-y:auto;height:calc(100% - 15vh)"><div style="width:80%" class="flex">';
+				switch(_status) {
+					case 2: 
+						if(__account.pvp.lastDuelWin)
+							__account.pvp.winStreak++;
+						else
+							__account.pvp.winStreak = 1;
+						if(__account.pvp.maxWinCount < __account.pvp.winStreak)
+							__account.pvp.maxWinCount = __account.pvp.winStreak;
+						__account.pvp.winCount++;
+					    __account.pvp.lastDuelWin = true;
+						_table += `<div class="pvp-player-item pvp-winner flex"><div class="pvp-player-item-left flex">
+							${__account.name}</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>
+							<div class="pvp-player-item pvp-looser flex"><div class="pvp-player-item-left flex">
+							Player</div><div class="pvp-player-item-right flex"><img src="./images/icons/dead.png" /></div></div>`;
+						break;
+					case 1: 
+					    __account.pvp.lastDuelWin = false;
+						__account.pvp.winStreak = 0;
+						_table += `<div class="pvp-player-item pvp-draw flex"><div class="pvp-player-item-left flex">
+							${__account.name}</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>
+							<div class="pvp-player-item pvp-draw flex"><div class="pvp-player-item-left flex">
+							Player</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>`;
+						break;
+					case 0: 
+					    __account.pvp.lastDuelWin = false;
+						__account.pvp.winStreak = 0;
+						__account.pvp.looseCount++;
+						_table += `<div class="pvp-player-item pvp-winner flex"><div class="pvp-player-item-left flex">
+							Player</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>
+							<div class="pvp-player-item pvp-looser flex"><div class="pvp-player-item-left flex">
+							${__account.name}</div><div class="pvp-player-item-right flex"><img src="./images/icons/dead.png" /></div></div>`;
+					break;
+				}
+				_table + `</div>`;
+				if(_status > 1) {
+					__account.pvp.honor++;
+					updateGlobalQuest('pvp-win');
+					const _oldOrder = __account.pvp.order;
+					__account.pvp.order = this.pvpOrder;
+					const _newOrder = __account.pvp.order;
+					if((_oldOrder > 10000 && _newOrder < 10000) ||
+						(_oldOrder > 5000 && _newOrder < 5000) ||
+						(_oldOrder > 1000 && _newOrder < 1000)) {
+						if(_newOrder > 5000)
+							updateGlobalQuest('pvp-league-silver');
+						else if(_newOrder > 1000)
+							updateGlobalQuest('pvp-league-gold');
+						warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/pvp.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Pvp League Updated') + '</span></div>', null, null, 1);
+					}
+					_table += `<div class="flex" style="width:100%;padding:4vh 0 1vh 0;color:#F4BB44 !important; font-size:2.6vh !important; font-weight: 600">${getLangData('Duel Rewards')}</div>
+						<div class="flex" style="width:100%"><div class="flex"><img style="width:5vh" src="./images/icons/honor.png" /><div style="font-size:2.4vh !important;color:#f7f7f7cc !important;padding-left:2vh">+1 ${getLangData('Honor Point')}</div></div></div>`;
+				}
+				_client.saveState();
+				_table += `</div><div class="flex" style="width:100%;height:8vh">
+					<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
+						<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(null, __storySceneOrder)">${getLangData('QUIT')}</div>
+					</div>
+					<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
+						<div class="game-menu-button btn-info full flex animate-me${!__account.pvp.duelCount ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(function() { switchBookPage(` + (this.realTime ? '4,3' : '5,1') + `); }, __storySceneOrder)">${getLangData('BACK')}</div>
+					</div>
+				</div>`;
+			}
+			if(_status > 1)
+				this.playSound({ key: 'victory', volume: .3 });
+			else if(_status === 0)
+				this.playSound({ key: 'defeat', volume: .3 });
+			//pvpStatus.innerHTML =  _table;
+			const _parent = document.createElement('div');
+			_parent.innerHTML = `<div class="flex my-pop-up-wrapper show" id="pvp-result">
+					<div id="game-over-pvp-content" class="flex" style="padding: 2%; width: 50%; height: 80%; border: 2px solid #b8860bcc; border-radius: 4vh; box-shadow: 0px 0px 2vh #000; background: linear-gradient(180deg, #000000cc, #00000099), url(./images/icons/battle.png); background-size:cover">
+						<div style="width:100%" class="flex full">
+							<div class="full" style="width:80%;color:#fff;text-align:center" id="pvp-status">`
+								+ _table +
+							`</div>
+						</div>
+					</div>
+				</div>`;
+			this.pvpResult = _parent.firstChild;
+			_gameUI.appendChild(this.pvpResult);
+			_enemies?.forEach(x => {
+				x.immobilize = true;
+				x.animate('idle', 1);
+				x.upcomingAnimation = 'idle';
+			});
+			_teamMates?.forEach(x => {
+				x.immobilize = !x.main;
+				x.animate('idle', 1);
+				x.upcomingAnimation = 'idle';
+			});
+			this.pvpEnded = true;
+			switchAutoMode(1);
+		}
+	}
+	this.checkPVPResult2 = function () {
+		if (this.pvpEnded || this.pvpResult || _storySceneSwitching || __switchingMap || this.disposing)
+			return;
+		let _end, _diff;
+		if (!this.pvpStarted) {
+			this.pvpStarted = Date.now();
 			this.missionCountDown = 1;
 			pvpCounter = document.createElement('div');
 			pvpCounter.className = 'flex animate-me countdown pop2';
@@ -677,12 +1152,13 @@ function map(_m) {
 			_gameUI.appendChild(pvpCounter);
 		}
 		else {
-			const _baseTime = ((this.tower && (__account.missions.find(x => x.key === 'tower').current % 10) > 0) || this.gold) ? 60 : 120;
-			_diff = (_baseTime + (this.tower ? 4 : 3)) - MathFloor(((this.pauseTime ?? _gameTick) - this.pvpStarted) / 1000);
+			const _baseTime = ((this.tower && (__account.missions.find(x => x.key === 'tower').current % 10) > 0) || this.gold) ? 60 : 180;
+			_diff = (_baseTime + (this.tower ? 4 : 3)) - MathFloor(((this.pauseTime ?? Date.now()) - this.pvpStarted) / 1000);
 			if (_diff < 10)
 				addClass(pvpCounter, 'pvp-end-soon');
-			if (_diff < 0) {
+			if (_diff < 0 || (_diff > _baseTime && this.challangeStarted)) {
 				_end = true;
+				delete this.challangeStarted;
 				pvpCounter.innerText = 0;
 			}
 			if (_diff > _baseTime) {
@@ -712,13 +1188,16 @@ function map(_m) {
 				if (_diff === _baseTime || (_diff < _baseTime && hasClass(pvpCounter, 'countdown'))) {
 					removeClass(pvpCounter, 'countdown');
 					episode.enemies?.forEach(x => x.immobilize = false);
+					if(__story) {
+						__story.startTime = _gameTick;
+						this.challangeStarted = 1;
+						__story.endTime = undefined;
+					}
 				}
-				if (_diff >= 0)
+				if (_diff >= 0 && pvpCounter.innerText !== _diff.toString())
 					pvpCounter.innerText = _diff;
 			}
 		}
-		if (pvpResult && (hasClass(pvpResult, 'show') || hasClass(pvpResult, 'loaded')))
-			return;
 		if(this.tower) {
 			this.checkTowerResult(_end, _diff);
 			return;
@@ -727,12 +1206,57 @@ function map(_m) {
 			this.checkGoldResult(_end, _diff);
 			return;
 		}
-		if (mainCharacter.remove)
-			reviveAsGhost();
-		const _enemies = this.enemies?.filter(x => x.enemy && x.class !== __spell && x.class !== 'object' && !x.isDead() && !x.remove && !x.ghost);
-		const _teamMates = this.enemies?.filter(x => (x.friendly || x.main) && x.class !== __spell && x.class !== 'object' && !x.isDead() && !x.remove && !x.ghost);
+		const _enemies = this.enemies?.filter(x => x.enemy && x.class !== __spell && x.class !== 'object' && !x.isDead() && !x.remove);
+		const _teamMates = this.enemies?.filter(x => (x.friendly || x.main || (x.groupId && x.groupId === (mainCharacter.realGroupId ?? mainCharacter.groupId))) && x.class !== __spell && x.class !== 'object' && !x.isDead() && !x.remove);
 		const _deads = this.enemies?.filter(x => x.class !== __spell && x.class !== 'object' && x.killedBy);
-		if(!this.war)
+		if(this.war){
+			if(mainCharacter.remove && !mainCharacter.ghosted) {
+				const _isMyTeamAlive = _teamMates?.[0];
+				if(_isMyTeamAlive) {
+					const _isOtherTeamAlive = _enemies?.[0];
+					if(_isOtherTeamAlive) {
+						this.realClass = mainCharacter.class;
+						const _ghost = summonMob(500, MathRound(mainCharacter.SCREENLEFT / __zoom),
+						mainCharacter.yPosition);
+						_ghost.killCount = mainCharacter.killCount;
+						_ghost.realGroupId = mainCharacter.groupId;
+						_ghost.noDirection = _ghost.still = _ghost.hasShadow = false;
+						_ghost.stepX = mainCharacter.stepX;
+						_ghost.stepXRate = mainCharacter.oldProps.stepXRate;
+						_ghost.animations.idle.frames.forEach(x => x.objects = undefined);
+						_ghost.animations.run = {
+							key: 'run',
+							type: 'move',
+							imediateBreak: true,
+							hold: true,
+							mobilityY: true,
+							frames: structuredClone2(_ghost.animations.idle.frames)
+						};
+						addClass(_gameUI, 'ghost');
+						mainCharacter.main = false;
+						mainCharacter.keyboard = undefined;
+						mainCharacter.setAutoMode(2);
+						const oldMain = mainCharacter;
+						mainCharacter = _ghost;
+						if (!episode.enemies.includes(oldMain)) {
+							const gidx = episode.enemies.indexOf(_ghost);
+							if (gidx === -1)
+								episode.enemies.push(oldMain);
+							else
+								episode.enemies.splice(gidx, 0, oldMain);
+						}
+						_ghost.main = true;
+						_ghost.enemy = false;
+						setKeyBoard(_ghost);
+						_ghost.dead = _ghost.remove = false;
+						_ghost.ghosted = 1;
+						_ghost.autoMode = undefined;
+						_ghost.unseen = false;
+						_ghost.located = true;
+						warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/ghost.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('You are in ghost mode') + '</span></div>', null, null, 1);
+					}
+				}
+			}
 			_deads?.forEach(x => {
 				if (!x.grayAvatar) {
 					x.grayAvatar = true;
@@ -743,7 +1267,7 @@ function map(_m) {
 						this.playSound({ key: _killer.gender + 'laugh', reset: true });
 						_msg = '<div class="flex" style="color:#FD1C03;font-weight:600;font-size:larger !important">' + _killer.killCount + ' x Killing Spree!</div>';
 					}
-					warn('<div class="pvp-kill">' + _msg + (_killer.displayName ?? _killer.name) + '&nbsp;<span style="color:' + (_killer.enemy ? 'red' : 'blue') + ' !important">' + getLangData('killed') + '</span>&nbsp;' + (x.displayName ?? x.name) + '</div>', 'level-up', null, null, 1);
+					warn('<div class="pvp-kill">' + _msg + (_killer.main ? __account.name : _killer.displayName ?? _killer.name) + '&nbsp;<span style="color:' + (_killer.enemy ? 'red' : 'blue') + ' !important">' + getLangData('killed') + '</span>&nbsp;' + (x.main ? __account.name : x.displayName ?? x.name) + '</div>', 'level-up', null, null, 1);
 				}
 				else
 					return;
@@ -753,67 +1277,223 @@ function map(_m) {
 						addClass(_avatar, 'gray');
 				}
 			});
+		}
 		const _eCount = _enemies?.length ?? 0;
 		const _tCount = _teamMates?.length ?? 0;
-		if (_eCount === 0 || _tCount === 0 || _end) {
-			if (!pvpResult)
-				pvpResult = document.getElementById('pvp-result');
-			if (!pvpStatus)
-				pvpStatus = document.getElementById('pvp-status');
-			showMyModalPopUp('pvp-result');
-			this.pauseAmbianceMusic();
+		if(!this.pauseTime && (!_enemies?.filter(x => !x.isDead())?.length || !_teamMates?.filter(x => !x.isDead())?.length))
+			this.pauseTime = Date.now();
+		if(_deads?.length) {
+			if((_deads.filter(x => x.remove)?.length ?? 0) < _deads.length)
+				return;
+		}
+		if ((_eCount === 0 || _tCount === 0 || _end)) {
+			//this.pauseAmbianceMusic();
+			let _rewards = [];
 			let _status = (_eCount > 0 && _tCount > 0) ? 1 : (_tCount > 0 ? 2 : 0);
-			let _table = '<div class="flex full pvp-result-table arena-result"><div class="flex" style="width:100%;height:16vh;position:relative"><img src="./images/icons/reward-star.png" style="height:100%;position:absolute"' + (!_status ? ' class="gray"': '') + ' /><span style="margin-top:4.7vh;z-index:2;font-size:3.15vh !important;font-weight:600;text-shadow:0px 0px 1vh #000;color:' + (!_status ? 'crimson' : '#F4BB44') + ' !important">' + getLangData(!_status ? 'Defeat' : (_status > 1 ? 'Victory' : 'Draw')) + '</span></div><div class="flex" style="flex-direction:column;justify-content:space-between;width:100%;overflow-y:auto;height:calc(100% - 24vh)"><div style="width:80%" class="flex">';
-			switch(_status) {
-				case 2: 
-					_table += `<div class="pvp-player-item pvp-winner flex"><div class="pvp-player-item-left flex">
-						${__account.name}</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>
-						<div class="pvp-player-item pvp-looser flex"><div class="pvp-player-item-left flex">
-						Player</div><div class="pvp-player-item-right flex"><img src="./images/icons/dead.png" /></div></div>`;
-					break;
-				case 1: 
-					_table += `<div class="pvp-player-item pvp-draw flex"><div class="pvp-player-item-left flex">
-						${__account.name}</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>
-						<div class="pvp-player-item pvp-draw flex"><div class="pvp-player-item-left flex">
-						Player</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>`;
-					break;
-				case 0: 
-					_table += `<div class="pvp-player-item pvp-winner flex"><div class="pvp-player-item-left flex">
-						Player</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>
-						<div class="pvp-player-item pvp-looser flex"><div class="pvp-player-item-left flex">
-						${__account.name}</div><div class="pvp-player-item-right flex"><img src="./images/icons/dead.png" /></div></div>`;
-				break;
-			}
-			_table + `</div>`;
-			if(_status > 1) {
-				__account.pvp.honor++;
-				updateGlobalQuest('pvp-win');
-				const _oldOrder = __account.pvp.order;
-				__account.pvp.order = this.pvpOrder;
-				_client.saveState();
-				const _newOrder = __account.pvp.order;
-				if((_oldOrder > 10000 && _newOrder < 10000) ||
-					(_oldOrder > 5000 && _newOrder < 5000) ||
-					(_oldOrder > 1000 && _newOrder < 1000)) {
-					if(_newOrder > 5000)
-						updateGlobalQuest('pvp-league-silver');
-					else if(_newOrder > 1000)
-						updateGlobalQuest('pvp-league-gold');
-					warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/pvp.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Pvp League Updated') + '</span></div>', null, null, 1);
+			let _table;
+			if(this.war) {
+				const _team1 = this.enemies.filter(x => x.groupId === 1);
+				const _team2 = this.enemies.filter(x => x.groupId === 2);
+				let _rewardsHtml = '';
+				_rewards.push({key:'honor', title:getLangData('Blood Honor'), count:mainCharacter.killCount ?? 0});
+				if(_status > 1){
+					let _honorCount = (mainCharacter.killCount ?? 0) + (mainCharacter.killCount > 1 ? 1: 0) + (mainCharacter.killCount > 2 ? 1: 0);
+					//__account.pvp.honor+=_honorCount;
+					_client.saveState();
+					_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:1});
+					// _rewardsHtml = `<div class="flex w-100" style="padding:1vh 0;color:#F4BB44 !important; font-size:3.15vh !important; font-weight: 600">
+					// 				${getLangData('Victory Rewards')}
+					// 			</div>
+					// 			<div class="flex w-100">
+					// 				<div class="flex" style="height:4.5vh">
+					// 					<img style="width:4vh" src="./images/icons/honor.png" />
+					// 					<div style="font-size:3vh !important;color:#f7f7f7cc !important;padding-left:2vh">+1 ${getLangData('Win Bonus')}</div>
+					// 				</div>
+					// 			</div>`;
+					// if(mainCharacter.killCount > 0)
+					// 		_rewardsHtml += `<div class="flex w-100">
+					// 				<div class="flex" style="height:4.5vh">
+					// 					<img style="width:4vh" src="./images/icons/honor.png" />
+					// 					<div style="font-size:3vh !important;color:#f7f7f7cc !important;padding-left:2vh">+${mainCharacter.killCount} ${getLangData('Kill Bonus')}</div>
+					// 				</div>
+					// 			</div>`;
 				}
-				this.playSound({ key: 'victory', volume: .3 });
-				_table += `<div class="flex" style="width:100%;padding:2vh 0 1vh 0;color:#F4BB44 !important; font-size:2.6vh !important; font-weight: 600">${getLangData('Duel Rewards')}</div>
-					<div class="flex" style="width:100%"><div class="flex"><img style="width:5vh" src="./images/icons/honor.png" /><div style="font-size:2.4vh !important;color:#f7f7f7cc !important;padding-left:2vh">+1 ${getLangData('Honor Point')}</div></div></div>`;
+				else
+					_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:0});
+				_table = `<div class="flex full pvp-result-table arena-result" style="height:68%">
+							<div class="flex d-none" style="width:100%;height:11vh;position:relative">
+								<span style="margin-top:5vh;z-index:2;font-size:3.15vh !important;font-weight:600;text-shadow:0px 0px 1vh #000;color:${(!_status ? 'crimson' : '#F4BB44')} !important">${getLangData(!_status ? 'Defeat' : (_status > 1 ? 'Victory' : 'Draw'))}</span>
+							</div>
+							<div class="flex" style="width:100%;overflow-y:auto;height:100%">
+								<div class="war-final-screen flex w-100">
+									<div class="war-final-screen-row flex team-1-header">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											&nbsp;
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end">
+											<img src="./images/icons/kill.png">
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
+											<img src="./images/icons/dead.png">
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team1[0].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team1[0].main ? __account.name : _team1[0].displayName ?? _team1[0].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
+											${_team1[0].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
+											${_team1[0].isDead() ? 1 : 0}
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team1[1].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team1[1].main ? __account.name : _team1[1].displayName ?? _team1[1].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
+											${_team1[1].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
+											${_team1[1].isDead() ? 1 : 0}
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team1[2].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team1[2].main ? __account.name : _team1[2].displayName ?? _team1[2].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
+											${_team1[2].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
+											${_team1[2].isDead() ? 1 : 0}
+										</div>
+									</div>
+									<div class="war-final-screen-row flex team-2-header">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											&nbsp;
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end">
+											<img src="./images/icons/kill.png">
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
+											<img src="./images/icons/dead.png">
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team2[0].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team2[0].main ? __account.name : _team2[0].displayName ?? _team2[0].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
+											${_team2[0].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
+											${_team2[0].isDead() ? 1 : 0}
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team2[1].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team2[1].main ? __account.name : _team2[1].displayName ?? _team2[1].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
+											${_team2[1].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
+											${_team2[1].isDead() ? 1 : 0}
+										</div>
+									</div>
+									<div class="war-final-screen-row flex${_team2[2].main ? ' war-final-screen-row-me' : ''}">
+										<div class="war-final-screen-cell-50 flex flex-jc-start">
+											${_team2[2].main ? __account.name : _team2[2].displayName ?? _team2[2].name}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
+											${_team2[2].killCount ?? 0}
+										</div>
+										<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
+											${_team2[2].isDead() ? 1 : 0}
+										</div>
+									</div>
+								</div>
+								<div class="flex flex-ai-start w-100 d-none">`
+									+ _rewardsHtml +
+								`</div>
+							</div>
+							<div class="flex d-none" style="width:100%;height:6vh">
+								<div class="flex w-100" style="overflow:hidden;position:relative;height:100%">
+									<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(null, __storySceneOrder)">${getLangData('QUIT')}</div>
+								</div>
+							</div>
+						</div>`;
 			}
-			_table += `</div><div class="flex" style="width:100%;height:8vh">
-				<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
-					<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onclick="hideMyModalPopUp(1);reviveAtLobby()">${getLangData('QUIT')}</div>
-				</div>
-				<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
-					<div class="game-menu-button btn-info full flex animate-me${!__account.pvp.duelCount ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onclick="hideMyModalPopUp(1);reviveAtLobby(null, function() { showMyModalPopUp('game-menu');switchBookPage(10); })">${getLangData('BACK')}</div>
-				</div>
-			</div>`;
-			pvpStatus.innerHTML =  _table;
+			else {
+				_table = '<div class="flex full pvp-result-table arena-result"><div class="flex" style="flex-direction:column;justify-content:space-between;width:100%;overflow-y:auto;height:87.5%;padding:0 12.5%"><div class="flex" style="width:80%;margin-bottom:10%">';
+				switch(_status) {
+					case 2: 
+						_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:1});
+						if(__account.pvp.lastDuelWin)
+							__account.pvp.winStreak++;
+						else
+							__account.pvp.winStreak = 1;
+						if(__account.pvp.maxWinCount < __account.pvp.winStreak)
+							__account.pvp.maxWinCount = __account.pvp.winStreak;
+						__account.pvp.winCount++;
+					    __account.pvp.lastDuelWin = true;
+						_table += `<div class="pvp-player-item pvp-winner flex"><div class="pvp-player-item-left flex flex-jc-start">
+							${__account.name}</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>
+							<div class="pvp-player-item pvp-looser flex"><div class="pvp-player-item-left flex flex-jc-start">
+							Player</div><div class="pvp-player-item-right flex"><img src="./images/icons/dead.png" /></div></div>`;
+						break;
+					case 1: 
+						_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:0});
+					    __account.pvp.lastDuelWin = false;
+						__account.pvp.winStreak = 0;
+						_table += `<div class="pvp-player-item pvp-draw flex"><div class="pvp-player-item-left flex flex-jc-start">
+							${__account.name}</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>
+							<div class="pvp-player-item pvp-draw flex"><div class="pvp-player-item-left flex flex-jc-start">
+							Player</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>`;
+						break;
+					case 0: 
+						_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:0});
+					    __account.pvp.lastDuelWin = false;
+						__account.pvp.winStreak = 0;
+						__account.pvp.looseCount++;
+						_table += `<div class="pvp-player-item pvp-winner flex"><div class="pvp-player-item-left flex flex-jc-start">
+							Player</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>
+							<div class="pvp-player-item pvp-looser flex"><div class="pvp-player-item-left flex flex-jc-start">
+							${__account.name}</div><div class="pvp-player-item-right flex"><img src="./images/icons/dead.png" /></div></div>`;
+					break;
+				}
+				_table + `</div>`;
+				if(_status > 1) {
+					//__account.pvp.honor++;
+					updateGlobalQuest('pvp-win');
+					const _oldOrder = __account.pvp.order;
+					if(this.pvpOrder)
+						__account.pvp.order = this.pvpOrder;
+					const _newOrder = __account.pvp.order;
+					if((_oldOrder > 10000 && _newOrder < 10000) ||
+						(_oldOrder > 5000 && _newOrder < 5000) ||
+						(_oldOrder > 1000 && _newOrder < 1000)) {
+						if(_newOrder > 5000)
+							updateGlobalQuest('pvp-league-silver');
+						else if(_newOrder > 1000)
+							updateGlobalQuest('pvp-league-gold');
+						warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/pvp.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Pvp League Updated') + '</span></div>', null, null, 1);
+					}
+					// _table += `<div class="flex" style="width:100%;padding:4vh 0 1vh 0;color:#F4BB44 !important; font-size:2.6vh !important; font-weight: 600">${getLangData('Duel Rewards')}</div>
+					// 	<div class="flex" style="width:100%"><div class="flex"><img style="width:5vh" src="./images/icons/honor.png" /><div style="font-size:2.4vh !important;color:#f7f7f7cc !important;padding-left:2vh">+1 ${getLangData('Honor Point')}</div></div></div>`;
+				}
+				_client.saveState();
+				_table += `</div><div class="flex d-none w-100" style="height:8vh">
+					<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
+						<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(null, __storySceneOrder)">${getLangData('QUIT')}</div>
+					</div>
+					<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
+						<div class="game-menu-button btn-info full flex animate-me${!__account.pvp.duelCount ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(function() { switchBookPage(` + (this.realTime ? '4,3' : '5,1') + `); }, __storySceneOrder)">${getLangData('BACK')}</div>
+					</div>
+				</div>`;
+			}
 			_enemies?.forEach(x => {
 				x.immobilize = true;
 				x.animate('idle', 1);
@@ -826,7 +1506,23 @@ function map(_m) {
 			});
 			this.pvpEnded = true;
 			switchAutoMode(1);
+			if(this.realTime)
+				_rewards = [];
+			installStoryFinish(_status === 2 ? 0 : (_status === 1 ? 2 : 1), _rewards, _table);
 		}
+	}
+	this.focusOnPlayer = function(_key) {
+		if(!mainCharacter.ghosted)
+			return;
+		const char = episode.enemies.find(x => x.key === _key);
+		if(!char || char.main || char.remove)
+			return;
+		const _center = MathRound(this.cWidth / 2);
+		platformX = char.left - _center;
+		mainCharacter.left = _center;
+		mainCharacter.updateVariables();
+		prevPlatformX = undefined;
+		playClick();
 	}
 	this.checkRespawn = function() {
 		if(!this.respawners?.[0])
@@ -840,12 +1536,13 @@ function map(_m) {
 					this.mobs.find(x => x.id === _mob.id),
 					null, 1, 1
 				);
-				_respawner.zoom *= this.getPerspectiveRate(_respawner, 1);
+				//_respawner.zoom *= this.getPerspectiveRate(_respawner, 1);
 				this.respawners.splice(i, 1);
 				if(!_respawner.animations.respawn)
 					_respawner.animations.respawn = {
 						key: 'respawn',
 						type: 'skill',
+						next: _respawner.defaultAnimationKey,
 						frames: [
 							{
 								spriteLeft: 0,
@@ -860,7 +1557,7 @@ function map(_m) {
 									scale: (_respawner.zoom * _respawner.height) / 100
 								}
 								],
-								sound: _mob.spawnDirection ? undefined : { key: 'puff', volume: .3, range: 50 },
+								sound: _mob.spawnDirection ? undefined : { skipUnseen: true, key: 'puff', volume: .3, range: 50 },
 								speed: 20,
 								def: { iframe: true }
 							}
@@ -869,15 +1566,133 @@ function map(_m) {
 				//_respawner.addObject({ key: 'respawn', position: 'around' });
 				_respawner.animate('respawn', 1);
 				_respawner.immobilize = false;
+				_respawner.updateVariables();
 				return;
 			}
 		}
+	}
+	this.checkStoryTicketTimer = function() {
+		if(__account.storyTicket > 99){
+			if(__account.lastStoryTicketNeedTime)
+				delete __account.lastStoryTicketNeedTime;
+			return;
+		}
+		const _now = Date.now();
+		if(!__account.lastStoryTicketNeedTime)
+			__account.lastStoryTicketNeedTime = _now;
+		const _diff = _now - __account.lastStoryTicketNeedTime;
+		let _finish = 0;
+		if(_diff >= 600000) {
+			updateTicket(1);
+			if(__account.storyTicket > 99){
+				delete __account.lastStoryTicketNeedTime;
+				_finish = 2;
+			}
+			else {
+				__account.lastStoryTicketNeedTime = _now - (_diff - 600000);
+				_finish = 1;
+			}
+			_client.saveState();
+		}
+		if(this.menu) {
+			const _pt = document.getElementById('portal-timer');
+			if(!_pt)
+				return;
+			if(this.lastStoryTicketTimerCheck > (_gameTick - 1000))
+				return;
+			switch(_finish) {
+				case 2: 
+					if(_pt.innerText !== '')
+						_pt.innerText = '';
+					break;
+				case 1:
+					if(_pt.innerText !== '(09:59)')
+						_pt.innerText = '(09:59)';
+					break;
+				default:
+					const _txt = convertTimespanToTime(_diff);
+					if(_pt.innerText !== _txt)
+						_pt.innerText = _txt;
+					break;
+			}
+			this.lastStoryTicketTimerCheck = _gameTick;
+		}
+	}
+	this.tinyMoveCamera = function() {
+		if(__storyCutScenePlaying || this.end || _dialogAppeared || _game.suspended)
+			return false;
+		if(this.skipTinyCameraMove) {
+			this.skipTinyCameraMove--;
+			return false;
+		}
+		if(!mainCharacter || mainCharacter.hitStop || this?.still || this.ultimateTimeStop || __storyCutScenePlaying || mainCharacter.animation === 'run')
+			return false;
+		const _deadLeft = mainCharacter.direction === __left ? this.cWidth * .55 : this.cWidth * .35;
+		const _deadRight = mainCharacter.direction === __left ? this.cWidth * .65 : this.cWidth * .45;
+		if(mainCharacter.left > _deadLeft && mainCharacter.left < _deadRight)
+			return false;
+		if(!this.cameraEasing){
+			this.cameraEasing = 1;
+			this.cameraEasingStart = 0;
+		}
+		this.cameraEasingStart++;
+		if(this.cameraEasingStart !== this.cameraEasing)
+			return false;
+		else
+			this.cameraEasingStart = 0;
+		const _half = mainCharacter.direction === __left ? _deadRight : _deadLeft;
+		const _part = this.cWidth / 10;
+		let _step = episode.cWidth / 400;
+		if(mainCharacter.left < (_half - _step))
+		{
+			if(mainCharacter.getCurrentAnimation()?.attack || mainCharacter.animation === 'roll'
+		|| mainCharacter.animation === 'dash' || mainCharacter.animation === 'escape')
+				_step *= 2;
+			if(mainCharacter.chargeProperties)
+				_step *= 4;
+			if(_step > 1 && mainCharacter.left > (_half - _part))
+				_step *= .5;
+			else if(_step > 1 && mainCharacter.left > (_half - _part * 2))
+				_step *= .75;
+			if(mainCharacter.direction === __right)
+				_step *= .75;
+			_step = MathCeil(_step);
+			if((platformX - _step) >= 0){
+				platformX -= _step;
+				mainCharacter.left += _step;
+				return true;
+			}
+		}
+		else if(mainCharacter.left > (_half + _step)) {
+			if(mainCharacter.getCurrentAnimation()?.attack || mainCharacter.animation === 'roll'
+		|| mainCharacter.animation === 'dash' || mainCharacter.animation === 'escape')
+				_step *= 2;
+			if(mainCharacter.chargeProperties)
+				_step *= 4;
+			if(_step > 1 && mainCharacter.left < (_half + _part))
+				_step *= .5;
+			else if(_step > 1 && mainCharacter.left < (_half + _part * 2))
+				_step *= .75;
+			if(mainCharacter.direction === __left)
+				_step *= .75;
+			_step = MathCeil(_step);
+			const _maxW = this.width - this.cWidth;
+			if((platformX + _step) <= _maxW){
+				platformX += _step;
+				mainCharacter.left -= _step;
+				return true;
+			}
+		}
+		return false;
 	}
 	this.drawEnemies = function (_queue) {
 		//const rect = getVisibleRectangle();
 		if(this.disposing)
 			return;
+		__pvp.updatePlayStatus();
 		this.checkRespawn();
+		this.checkStoryTicketTimer();
+		checkCSSAnimations();
 		if(this.repeat){
 			if(!this.doTime)
 				this.doTime = _gameTick;
@@ -886,29 +1701,90 @@ function map(_m) {
 				this.do();
 			}
 		}
+		this.hasSolid = false;
 		//this.enemies?.filter(x => x.nextPoint)?.forEach(x => {delete x.nextPoint;});
 		//this.enemies?.filter(x => x.unseen && x.class !== 'boss' && x.healthBarDrawn)?.forEach(x => episode.hideHealthBar(x));
 		//if(this.enemies?.find(x => x.related?.dead || x.remove))
 		//	this.enemies = this.enemies.filter(x => !x.related?.dead && !x.remove);
-		let _len = this.enemies?.length;
+		let _len = this.enemies?.length, updateUnseen;
+		if((_gameTick - this.lastUnseenCheck) > 200) {
+			updateUnseen = 1;
+			this.lastUnseenCheck = _gameTick;
+			this.seenEnemies.length = 0;
+		}
+		this.limitedEffects.length = this.activeSpells.length = 0;
+		if(mainCharacter)
+			mainCharacter.hasLeftEnemy = mainCharacter.hasRightEnemy = undefined;
 		if (_len)
 			for (var i = 0; i < _len; i++) {
 				let sprite = this.enemies[i];
 				if(!sprite)
 					continue;
-				if(sprite.remove || sprite.related?.dead)
+				if(sprite.tagContainer && sprite.tagSkillUsed && ((_gameTick - sprite.tagSkillUsed) > 1500)) {
+					const _wrapper = sprite.tagContainer;
+					addClass(_wrapper, 'fade-out');
+					_wrapper.onanimationend = function(ev) {
+						if(ev.animationName === 'fade-out-me'){
+							if(_wrapper)
+								_wrapper.remove();
+							delete sprite.tagContainer;
+						}
+					}
+				}
+				if(sprite.remove || (sprite.related?.dead && !sprite.noRemove))
 				{
+					sprite.tagContainer?.remove?.();
 					const _bubble = episode.bubbles?.find(x => x.key === sprite.key)?.elem;
 					if (_bubble)
 						removeBubble(_bubble, sprite);
-					this.enemies.splice(i, 1);
-					i--;
-					_len--;
+					if(!this.war || sprite.owner || sprite.class === __spell) {
+						const spriteAnima = sprite.getCurrentAnimation();
+						if(spriteAnima?.sound?.stop){
+							spriteAnima.sound.stop();
+							delete spriteAnima.sound;
+						}
+						this.enemies.splice(i, 1);
+						i--;
+						_len--;
+					}
 				}
-				if(sprite.main)
+				else if(sprite.relatedObjects?.[0]) {
+					for(let _spr of sprite.relatedObjects)
+						if(_spr.removeId && !_spr.remove)
+							this.limitedEffects.push(_spr);
+				}
+				if(sprite.main){
+					if(updateUnseen)
+						this.seenEnemies.push(sprite);
+					if(sprite.hitStop > 0)
+						sprite.hitStop--;
 					continue;
-				sprite.unseen = (((sprite.EXACTLEFT) + sprite.WIDTH) < 0 ||
-					(sprite.EXACTLEFT) > this.cWidth);
+				}
+				if(!this.hasSolid && sprite.solid)
+					this.hasSolid = 1;
+				sprite.out = (((sprite.EXACTLEFT) + sprite.WIDTH) < 0 ||
+						(sprite.EXACTLEFT) > this.cWidth);
+				sprite.unseen = sprite.out && !sprite.npc && sprite.dropType !== 'quest-item';
+				if(sprite.unseen && !sprite.main) {
+					if(sprite.autoTarget && !sprite.invulnerable && !sprite.friendly && 
+						!sprite.puppetMode && sprite.enemy && sprite.class !== __spell && 
+						sprite.class !== 'object' && !sprite.isDead() && mainCharacter &&
+						sprite.autoTarget === mainCharacter)
+						{
+							if(mainCharacter.EXACTLEFT > sprite.EXACTLEFT)
+							{
+								if(!mainCharacter.hasLeftEnemy)
+									mainCharacter.hasLeftEnemy = 1;
+							}
+							else if(!mainCharacter.hasRightEnemy)
+								mainCharacter.hasRightEnemy = 1;
+						}
+				}
+				if(!sprite.unseen && updateUnseen && !sprite.remove){
+					this.seenEnemies.push(sprite);
+					if(sprite.class === __spell)
+						this.activeSpells.push(sprite);
+				}
 				if (sprite.autoMode > 0)
 					sprite.started = true;
 				else if (sprite.autoMode === 0 && sprite.dmgTaken)
@@ -916,9 +1792,32 @@ function map(_m) {
 				if (!sprite.located && sprite.animations.run)
 					sprite.located = true;
 				if (!episode.end || (episode.end && sprite.class !== __spell))
-					if (!sprite.unseen || sprite.started || sprite.station || (this.pvp || this.dungeon))
+					if (!sprite.unseen || sprite.started || sprite.socketId || (this.pvp || this.dungeon))
 						sprite.draw(_queue);
+				if(sprite.hitStop > 0)
+					sprite.hitStop--;
 			}
+		if(this.realTime && !this.pvpEnded && !__switchingMap)
+		{
+			let _dataItem;
+			if(!mainCharacter.firstTransferDone){
+				_dataItem = mainCharacter.getNewStatus2(1);
+				mainCharacter.firstTransferDone = 1;
+				mainCharacter.synced = true;
+			}
+			else {
+				_dataItem = mainCharacter.getNewStatus2(0, !mainCharacter.synced);
+				mainCharacter.synced = !mainCharacter.synced;
+			}
+			if(!_dataItem)
+				return;
+			const _last = JSON.stringify(_dataItem);
+			if(mainCharacter.lastRealTimePack === _last)
+				return;
+			mainCharacter.lastRealTimePack = _last;
+			_dataItem.s = __socketId;
+			setTransferMessage([_dataItem]);
+		}
 	}
 	this.drawBGAnimations = function () {
 		return;
@@ -1005,7 +1904,104 @@ function map(_m) {
 					_p.style.setProperty('-webkit-transform', _p.style.transform);
 				}
 		}
+		else if(letItSnow)
+			letItSnow.drawSnowFlakes();
 	}
+	this.drawLayers7 = async function () {
+
+	if (this.disposing || __batterySaveMode)
+		return;
+
+	const layers = this.layers;
+	const scale = __scale;
+	const zoom = __zoom;
+	const platX = platformX;
+
+	let firstDraw = !this.layersDrawn;
+
+	for (let i = 0, len = layers.length; i < len; i++) {
+
+		const _lay = layers[i];
+
+		// -------- TARGET CONTAINER --------
+
+		let _c;
+
+		if (_lay.foreground)
+			_c = c9;
+		else if (_lay.rate >= .9)
+			_c = c90;
+		else if (_lay.rate >= .75)
+			_c = c85;
+		else if (_lay.rate <= .5)
+			_c = c50;
+		else
+			_c = c3;
+
+		// -------- PARALLAX POSITION --------
+
+		const rate = _lay.rate || 1;
+		const p = MathRound(platX * rate * scale);
+
+		// -------- FIRST LOAD --------
+
+		if (firstDraw) {
+
+			let _img = _lay._cachedImg;
+
+			if (!_img) {
+
+				const srcImg = await getImagePromise(_lay.src);
+				if (!srcImg) return;
+
+				if (_lay.new) {
+
+					const copyc = document.createElement('canvas');
+					copyc.width = srcImg.width;
+					copyc.height = srcImg.height;
+
+					const copyctx = copyc.getContext("2d");
+					copyctx.imageSmoothingEnabled = false;
+					copyctx.drawImage(srcImg, 0, 0);
+
+					_img = copyc;
+
+				} else {
+
+					_img = srcImg;
+				}
+
+				// ---------- STATIC STYLE ONCE ----------
+
+				if (_lay.marginTop || _lay.marginLeft) {
+
+					_img.style.position = 'absolute';
+
+					if (_lay.marginTop)
+						_img.style.top =
+							MathFloor(_lay.marginTop * scale * zoom * _lay.zoom) + 'px';
+
+					if (_lay.marginLeft)
+						_img.style.left =
+							MathFloor(_lay.marginLeft * scale * zoom * _lay.zoom) + 'px';
+
+					_img.style.width = MathRound(_img.width * scale) + 'px';
+					_img.style.height = MathRound(_img.height * scale) + 'px';
+				}
+
+				_lay._cachedImg = _img;
+				_c.appendChild(_img);
+			}
+		}
+
+		// -------- FAST TRANSFORM --------
+
+		_c.style.transform = `translate3d(${-p}px,0,0)`;
+	}
+
+	this.layersDrawn = 1;
+};
+
 	// this.drawLayers5 = function () {
 	// 	for (let _lay of this.layers) {
 	// 		const p = MathRound(platformX * (_lay.rate ?? 1));
@@ -1035,55 +2031,58 @@ function map(_m) {
 	// 			});
 	// 	}
 	// }
-	this.drawLayers7 = async function () {
-		if(this.disposing || __batterySaveMode)
-			return;
-		let i = 0;
-		for (let _lay of this.layers) {
-			let _c;// = _lay.foreground ? c9 : (_lay.rate == .9 ? c90 : (_lay.rate == .85 ? c85 : (_lay.rate == .5 ? c50 : c3)));
-			if(_lay.foreground)
-				_c = c9;
-			else if(_lay.rate >= .75 && _lay.rate < .9)
-				_c = c85;
-			else if(_lay.rate >= .9 && _lay.rate < 1)
-				_c = c90;
-			else if(_lay.rate <= .5)
-				_c = c50;
-			else
-				_c = c3;
-			const p = MathRound(platformX * (_lay.rate ?? 1));
-			if(!this.layersDrawn)
-			{
-				const _i = await getImagePromise(_lay.src);
-				let _img;
-				if(_lay.new) {
-					const copyc = document.createElement('canvas');
-					copyc.width = _i.width;
-					copyc.height = _i.height;
-					const copyctx = copyc.getContext("2d");
-					copyc.imageSmoothingEnabled = false;
-					copyctx.drawImage(_i, 0, 0);
-					_img = copyc;
-				}
-				else 
-					_img = _i; //bitmapToCanvas(_i); // _i;
-				if(!_img)
-					return;
-				if(_lay.marginTop)
-					_img.style.top = MathFloor(_lay.marginTop * __zoom * _lay.zoom) + 'px';
-				if(_lay.marginLeft)
-					_img.style.left = MathFloor(_lay.marginLeft * __zoom * _lay.zoom) + 'px';
-				if(_lay.marginTop || _lay.marginLeft)
-					_img.style.position = 'absolute';
-				_c.appendChild(_img);
-			}	
-			_c.style.transform = 'translateX(-' + p + 'px)';
-			_c.style.setProperty('-webkit-transform', _c.style.transform);
-			i++;
-		}
-		if(!this.layersDrawn)
-			this.layersDrawn = 1;
-	}
+	// this.drawLayers7 = async function () {
+	// 	if(this.disposing || __batterySaveMode)
+	// 		return;
+	// 	let i = 0;
+	// 	for (let _lay of this.layers) {
+	// 		let _c;// = _lay.foreground ? c9 : (_lay.rate == .9 ? c90 : (_lay.rate == .85 ? c85 : (_lay.rate == .5 ? c50 : c3)));
+	// 		if(_lay.foreground)
+	// 			_c = c9;
+	// 		else if(_lay.rate >= .75 && _lay.rate < .9)
+	// 			_c = c85;
+	// 		else if(_lay.rate >= .9 && _lay.rate < 1)
+	// 			_c = c90;
+	// 		else if(_lay.rate <= .5)
+	// 			_c = c50;
+	// 		else
+	// 			_c = c3;
+	// 		const p = MathRound(platformX * (_lay.rate ?? 1) * __scale);
+	// 		if(!this.layersDrawn)
+	// 		{
+	// 			const _i = await getImagePromise(_lay.src);
+	// 			let _img;
+	// 			if(_lay.new) {
+	// 				const copyc = document.createElement('canvas');
+	// 				copyc.width = _i.width;
+	// 				copyc.height = _i.height;
+	// 				const copyctx = copyc.getContext("2d");
+	// 				copyc.imageSmoothingEnabled = false;
+	// 				copyctx.drawImage(_i, 0, 0);
+	// 				_img = copyc;
+	// 			}
+	// 			else 
+	// 				_img = _i; //bitmapToCanvas(_i); // _i;
+	// 			if(!_img)
+	// 				return;
+	// 			if(_lay.marginTop)
+	// 				_img.style.top = MathFloor(_lay.marginTop * __scale * __zoom * _lay.zoom) + 'px';
+	// 			if(_lay.marginLeft)
+	// 				_img.style.left = MathFloor(_lay.marginLeft * __scale * __zoom * _lay.zoom) + 'px';
+	// 			if(_lay.marginTop || _lay.marginLeft) {
+	// 				_img.style.position = 'absolute';
+	// 				_img.style.setProperty('width', MathRound(_img.width * __scale) + 'px', 'important');
+	// 				_img.style.setProperty('height', MathRound(_img.height * __scale) + 'px', 'important');
+	// 			}
+	// 			_c.appendChild(_img);
+	// 		}	
+	// 		_c.style.transform = 'translateX(-' + p + 'px)';
+	// 		_c.style.setProperty('-webkit-transform', _c.style.transform);
+	// 		i++;
+	// 	}
+	// 	if(!this.layersDrawn)
+	// 		this.layersDrawn = 1;
+	// }
 	
 	this.drawSpriteObjects2 = function (_forceId, _reset) {
 		if(this.disposing)
@@ -1093,9 +2092,15 @@ function map(_m) {
 			for (var _node of _nodes)
 				_node.remove();
 		}
-		let npcs = this.enemies?.filter(x => x.npc);
+		if(_forceId || !(this.lastNPCCheckTime > (_gameTick - 1000))){
+			this.NPCS = this.enemies?.filter(x => x.npc);
+			this.lastNPCCheckTime = _gameTick;
+		}
+		let npcs;
 		if (_forceId)
-			npcs = npcs.filter(x => x.class === _forceId);
+			npcs = this.NPCS.filter(x => x.class === _forceId);
+		else
+			npcs = this.NPCS;
 		if(npcs?.[0]) {
 			if (!this.spritesDrawnForeGround || _forceId || _reset) {
 				for (var sprite of npcs) {
@@ -1232,10 +2237,10 @@ function map(_m) {
 				return true;
 			}
 			else {
-				_canvasS.style.transform = 'translateX(-' + platformX + 'px)';
+				_canvasS.style.transform = 'translateX(-' + (platformX * __scale) + 'px)';
 				_canvasS.style.setProperty('-webkit-transform', _canvasS.style.transform);
 			}
-			cc.style.transform = 'translateX(-' + platformX + 'px)';
+			cc.style.transform = 'translateX(-' + (platformX * __scale)+ 'px)';
 			cc.style.setProperty('-webkit-transform', cc.style.transform);
 		}
 		return false;
@@ -1248,7 +2253,8 @@ function map(_m) {
 		if(!this.bgMusic)
 			this.bgMusic = (_path && _path.indexOf('.') === -1) ? getSound(null, _path) :
 		new Audio(_path ?? './images/music/' + (_key ?? getRandomValue(1, 13)) + '.mp3');
-		this.bgMusicVolume = _newVolume ?? .01;
+		this.minBgMusicVolume = _newVolume;
+		this.bgMusicVolume = _newVolume ?? .1;
 		if(_start)
 			this.bgMusic.oncanplay = function() {
 				_start();
@@ -1258,19 +2264,22 @@ function map(_m) {
 				_end();
 			}
 	}
-	this.setBgMusicVolume = function(_new) {
+	this.setBgMusicVolume = function(_new, _force, _noRate) {
 		if(this.bgMusic && !this.bgMusic.still) {
 			if(this.bgMusic.volumeDown)
 				delete this.bgMusic.volumeDown;
-			if(this.bgMusic.volume < .5 && _new > 0 && _new <= .5) {
-				if(this.bgMusic.volume !== _new){
-					this.bgMusic.volume = _new;
-				}
-			}
-			this.setBgMusicPlayBackRate();
+			if(!(this.bgMusic.lastVolumeChangeTime > (_gameTick - 300)))
+				if((this.bgMusic.volume <= .5 && _new > 0 && _new <= .5) || _force)
+					if(this.bgMusic.volume !== _new){
+						this.bgMusic.volume = _new;
+						this.bgMusic.lastVolumeChangeTime = _gameTick;
+						if(!_noRate)
+							this.setBgMusicPlayBackRate();
+					}
 		}
 	}
 	this.setBgMusicPlayBackRate = function() {
+		return;
 		if(this.bgMusic.volume < .25) {
 			if(this.bgMusic.playbackRate !== 1)
 				this.bgMusic.playbackRate = 1;
@@ -1285,20 +2294,18 @@ function map(_m) {
 		}
 	}
 	this.resetBgMusicVolume = function() {
-		if(this.bgMusic  && !this.bgMusic.still) {
-			if(this.bgMusic.volumeDown && this.bgMusic.volume > .1){
-				if(!(this.bgMusic.lastVolumeDownTime > (_gameTick - 250))){
-					this.bgMusic.volume -= .01;
-					this.bgMusic.lastVolumeDownTime = _gameTick;
+		if(this.bgMusic  && !this.bgMusic.still)
+			if(this.bgMusic.volumeDown && this.bgMusic.volume > (this.minBgMusicVolume ?? .1))
+				if ((_gameTick - 500) > this.bgMusic.lastVolumeChangeTime){
+					this.bgMusic.volume -= .02;
+					this.bgMusic.lastVolumeChangeTime = _gameTick;
 					this.setBgMusicPlayBackRate();
 				}
-			}
-		}
 	}
 	this.playBgMusic = function (_once, _still) {
 		// if(!_once)
 		// 	return;
-		if(!__account.options.ambiance || this.tower || !this.bgMusic)
+		if(!__account.options.ambiance || episodeVisibilityHidden || this.tower || !this.bgMusic)
 			return;
 		if(__batterySaveMode) {
 			this.pauseBgMusic();
@@ -1306,9 +2313,9 @@ function map(_m) {
 		}
 		if(this.bgMusic && !this.bgMusic.paused){
 			if((_gameTick - this.bgMusic.startTime) > 10000) {
-				this.bgMusic.playbackRate = parseFloat((this.bgMusic.playbackRate + .025).toFixed(2));
-				if(this.bgMusic.playbackRate > 1.25)
-					this.bgMusic.playbackRate = 1.25;
+				//this.bgMusic.playbackRate = parseFloat((this.bgMusic.playbackRate + .025).toFixed(2));
+				//if(this.bgMusic.playbackRate > 1.25)
+				//	this.bgMusic.playbackRate = 1.25;
 				this.bgMusic.startTime = _gameTick;
 			}
 			return;
@@ -1316,11 +2323,11 @@ function map(_m) {
 		if(this.bgMusic?.playRequestSent)
 			return;
 		try {
-			this.bgMusic.volume = .01;
+			this.bgMusic.volume = (this.minBgMusicVolume ?? .1);
 			this.bgMusic.crossOrigin = 'anonymous';
 			if(!_once)
 				this.bgMusic.loop = true;
-			this.bgMusic.playbackRate = 1;
+			//this.bgMusic.playbackRate = 1;
 			this.bgMusic.play();
 			this.bgMusic.still = _still;
 			this.bgMusic.playRequestSent = 1;
@@ -1330,8 +2337,8 @@ function map(_m) {
 				delete episode.bgMusicTimer;
 			}
 			this.bgMusicTimer = setInterval(function() {
-				if(!episode.bgMusic || episode.bgMusic.volume >= (episode.bgMusicVolume  ?? .1)) {
-					episode.bgMusic.volume = episode.bgMusicVolume ?? .1;
+				if(!episode.bgMusic || episode.bgMusic.volume >= (episode.bgMusicVolume ?? (episode.minBgMusicVolume ?? .1))) {
+					episode.bgMusic.volume = episode.bgMusicVolume ?? (episode.minBgMusicVolume ?? .1);
 					clearInterval(episode.bgMusicTimer);
 					delete episode.bgMusicTimer;
 					return;
@@ -1342,47 +2349,90 @@ function map(_m) {
 
 		}
 	}
+	// this.pauseBgMusic = function (_force) {
+	// 	if(!this.bgMusic || this.bgMusicTimer)
+	// 		return;
+	// 	if(this.bgMusic && this.bgMusic.paused && !_force)
+	// 		return;
+	// 	try {
+	// 		if(this.bgMusic && _force) {
+	// 			if(this.bgMusicTimer)
+	// 				clearInterval(this.bgMusicTimer);
+	// 			if(this.bgMusic){
+	// 				if(!this.bgMusic.paused)
+	// 					this.bgMusic.pause();
+	// 				this.bgMusic = null;
+	// 			}
+	// 			return;
+	// 		}
+	// 		this.bgMusic.volume = this.bgMusicVolume ?? (this.minBgMusicVolume ?? .1);
+	// 		if(this.bgMusicTimer) {
+	// 			clearInterval(episode.bgMusicTimer);
+	// 			delete episode.bgMusicTimer;
+	// 		}
+	// 		this.bgMusicTimer = setInterval(function() {
+	// 			if(!episode.bgMusic || episode.bgMusic.volume <= (episode.bgMusicVolume ?? .01)) {
+	// 				clearInterval(episode.bgMusicTimer);
+	// 				delete episode.bgMusicTimer;
+	// 				if(!episode.bgMusic)
+	// 					return;
+	// 				episode.bgMusic.pause();
+	// 				delete episode.bgMusic.playRequestSent;
+	// 				return;
+	// 			}
+	// 			episode.bgMusic.volume -= .01;
+	// 		}, 100);
+	// 	} catch (e) {
+
+	// 	}
+	// }
 	this.pauseBgMusic = function (_force) {
-		if(!this.bgMusic || this.bgMusicTimer)
+
+		if (!this.bgMusic) return;
+
+		if (_force) {
+			if(this.bgMusicTimer)
+				clearInterval(this.bgMusicTimer);
+			this.bgMusic.pause();
+			this.bgMusic = null;
 			return;
-		if(this.bgMusic && this.bgMusic.paused && !_force)
-			return;
-		try {
-			if(this.bgMusic && _force) {
+		}
+
+		if(this.bgMusicTimer) {
+			clearInterval(this.bgMusicTimer);
+			this.bgMusicTimer = null;
+		}
+		const fadeSpeed = 0.005; // daha yumuşak
+		const interval = 16; // ~60fps
+
+		this.bgMusicTimer = setInterval(() => {
+
+			if (!this.bgMusic) {
 				if(this.bgMusicTimer)
 					clearInterval(this.bgMusicTimer);
-				if(this.bgMusic){
-					if(!this.bgMusic.paused)
-						this.bgMusic.pause();
-					this.bgMusic = null;
-				}
+				this.bgMusicTimer = null;
 				return;
 			}
-			this.bgMusic.volume = this.bgMusicVolume ?? .1;
-			if(this.bgMusicTimer) {
-				clearInterval(episode.bgMusicTimer);
-				delete episode.bgMusicTimer;
-			}
-			this.bgMusicTimer = setInterval(function() {
-				if(!episode.bgMusic || episode.bgMusic.volume <= (episode.bgMusicVolume ?? .01)) {
-					clearInterval(episode.bgMusicTimer);
-					delete episode.bgMusicTimer;
-					episode.bgMusic.pause();
-					delete episode.bgMusic.playRequestSent;
-					return;
-				}
-				episode.bgMusic.volume -= .01;
-			}, 100);
-		} catch (e) {
 
-		}
+			if (this.bgMusic.volume <= 0.01) {
+				this.bgMusic.volume = 0;
+				this.bgMusic.pause();
+
+				clearInterval(this.bgMusicTimer);
+				this.bgMusicTimer = null;
+				return;
+			}
+
+			this.bgMusic.volume = Math.max(0, this.bgMusic.volume - fadeSpeed);
+
+		}, interval);
 	}
 	this.pauseAmbianceMusic = function() {
 		if(this.bgSound)
 			this.bgSound.pause();
 	}
 	this.resumeAmbianceMusic = function() {
-		if(!__account.options.ambiance)
+		if(!__account.options.ambiance || episodeVisibilityHidden)
 			return;
 		if(this.bgSound && this.bgSound.paused)
 			this.bgSound.play();
@@ -1395,6 +2445,8 @@ function map(_m) {
 			_name  =  _name.slice(0, this.theme.length - 6);
 		if(!_src)
 			_src = this.dungeon ? 'dungeon' : _name.replace(/\d+/, '');
+		if(episodeVisibilityHidden)
+			return;
 		if((!__account.options.ambiance || __batterySaveMode) && !_force)
 			return;
 		try {
@@ -1415,51 +2467,17 @@ function map(_m) {
 		}
 	}
 	this.playSound = function (_s, _alternateKeys, _volumeRate) {
-		if(!__account.options.sound || __batterySaveMode || (_s?.force ? false : __switchingMap))
-			return undefined;
-		let _soundKey = _s.key;
-		if (_alternateKeys && !soundFiles[_soundKey])
-			for (var _ak of _alternateKeys) {
-				if(!_ak)
-					continue;
-				if(_ak.indexOf && _ak.indexOf(',') !== -1) {
-					var _choices = _ak.split(',');
-					let _chosen = getRandomValue(0, _choices.length - 1);
-					if(soundFiles[_choices[_chosen]]) {
-						_soundKey = _choices[_chosen];
-						break;
-					}
-				}
-				else if (soundFiles[_ak]) {
-					_soundKey = _ak;
-					break;
-				}
-			}
-		if(_soundKey && _soundKey.indexOf(',') !== -1) {
-			var _keys = _soundKey.split(',');
-			_soundKey = _keys[getRandomValue(0, _keys.length - 1)];
-		}
-		try {
-			if (!soundFiles[_soundKey] && _alternateKeys?.[0]?.indexOf && _alternateKeys[0].indexOf(',') >= 0)
-			{
-				var _keys = _alternateKeys[0].split(',');
-				_soundKey = _keys[getRandomValue(0, _keys.length - 1)];
-			}
-		}
-		catch(cex) {
-			console.log(_alternateKeys);
-		}
-		// window.SoundManager.play(_soundKey, _s.path, _s.volume ?? .1, _s.loop, _s.reset);
-		// return undefined;
+		return PlaySound(_s, _alternateKeys, _volumeRate);
+		return undefined;
 		let _sound = getSound(null, _soundKey);
-		let _play;
+		let _play = _s?.reset;
 		if(!_sound && _s.path){
 			_sound = getSound(_s.path);
 			_play = true;
 		}
 		if(_sound && (_sound.lastUsed > (_gameTick - 100)))
 			return undefined;
-		if (_sound && (_sound.paused || _sound.currentTime > 0 || _play)) {
+		if (_sound && (_sound.paused || _sound.currentTime === 0 || _play)) {
 			const _vol = (_volumeRate ?? 1) * (_s.volume ?? .1);
 			if(_sound.volume !== _vol)
 				_sound.volume = _vol;
@@ -1561,11 +2579,16 @@ function map(_m) {
 		let _hand = document.getElementById('go-location');
 		if(_hand) 
 			_hand.remove();
-		if(episode.goSound) {
-			if(!episode.goSound.paused)
-				episode.goSound.pause();
-			episode.goSound = null;
-		}
+		// if(window.SoundManager.stop('go')) {
+		// 	if(!episode.goSound.paused)
+		// 		episode.goSound.pause();
+		// 	episode.goSound = null;
+		// }
+		this.stopGoSound();
+		this.hasGoSound = 0;
+	}
+	this.stopGoSound = function() {
+		window.SoundManager.stop('go');
 	}
 	this.showLocationHand = function(_dir) {
 		let _hand = document.getElementById('go-location');
@@ -1573,17 +2596,20 @@ function map(_m) {
 			_hand = document.createElement('div');
 			_hand.id = 'go-location';
 			_hand.className = 'go go-' + _dir;
-			episode.goSound = this.playSound({key:'go', force: true, loop:true, volume:.5});
+			this.playSound({key:'go', force: true, loop:true, volume:.5});
+			this.hasGoSound = 1;
 			_gameUI.appendChild(_hand);
 		}
 		else if(!hasClass(_hand, 'go-' + _dir)) {
 			removeClass(_hand, 'go-' + (_dir === __left ? __right : __left));
-			if(episode.goSound) {
-				if(!episode.goSound.paused)
-					episode.goSound.pause();
-				episode.goSound = null;
-			}
-			episode.goSound = this.playSound({key:'go', force: true, loop:true, volume:.5});
+			// if(episode.goSound) {
+			// 	if(!episode.goSound.paused)
+			// 		episode.goSound.pause();
+			// 	episode.goSound = null;
+			// }
+			this.stopGoSound();
+			this.playSound({key:'go', force: true, loop:true, volume:.5});
+			this.hasGoSound = 1;
 			addClass(_hand, 'go-' + _dir);
 		}
 	}
@@ -1640,7 +2666,7 @@ function map(_m) {
 		this.drawSpriteObjects2(null, 1);
 	}
 	this.resetMainQuest = function(_sprite, _unseen) {
-		if(!mainCharacter)
+		if(!mainCharacter || this.menu)
 			return;
 		const sprites =  _sprite ? [_sprite] : this.enemies?.filter(x => x.npc);
 		if (sprites?.[0]) {
@@ -1651,11 +2677,7 @@ function map(_m) {
 			}
 			let _quest = __story?.quests.find(x => x.id === __account.questStatus.order);
 			if (!_quest)
-			{
-				_quest = __story?.quests.find(x => x.id === __account.questStatus.quest?.id);
-				if(!_quest)
-					return;
-			}
+				return;
 			let _status; //1 başlamadı, 2 alındı, 3 devam ediyor, 4 bitti git ödülü al
 			switch (__account.questStatus.state) {
 				case 'begin':
@@ -1674,55 +2696,23 @@ function map(_m) {
 			for (var sprite of sprites) {
 				if (sprite.class !== _quest.owner)
 					continue;
-				const _id =sprite.class+ '-quest-mark';
-				let _imgQuest = document.getElementById(_id);
-				if(_imgQuest && _unseen)
-					addClass(_imgQuest, 'd-none');
-				if(!_unseen){
-					if(!_imgQuest) {
-						const _w = MathRound(sprite.WIDTH >= 0 ? sprite.WIDTH : sprite.width);
-						const _l = MathRound(sprite.LEFT >= 0 ? sprite.LEFT + platformX : sprite.left) ;
-						const _t = MathRound(sprite.TOP >= 0 ? sprite.TOP : sprite.top);
-						const _c = sprite.rate == .9 ? _canvasAnimated90 : cc;
-						_imgQuest = document.createElement('img');
-						_imgQuest.id = _id;
-						const _questMarkHeight = MathRound(this.cHeight / 16);
-						const _left = MathRound(_l + (((_w - (sprite.rightGap ?? 0)) - _questMarkHeight) / 2));
-						_imgQuest.left = _left;
-						_imgQuest.oldStatus = _status;
-						_imgQuest.src = "./images/icons/quest-" + (_status < 3 ? 'start' : 'progress') + ".png";
-						_imgQuest.style.left = _left + 'px';
-						_imgQuest.style.height = _imgQuest.style.width = _questMarkHeight + 'px';
-						_imgQuest.style.top = MathRound(_t - _questMarkHeight - (sprite.topGap ?? 0)) + 'px';
-						_imgQuest.style.position = 'absolute';
-						_imgQuest.className = 'quest-sign';
-						if ((_status % 2) === 0)
-							_imgQuest.className += ' glow-dark';
-						else
-							_imgQuest.className += ' gray';
-						_c.appendChild(_imgQuest);
-					}
-					else
-					{
-						if(_imgQuest.oldStatus !== _status) {
-							_imgQuest.src = "./images/icons/quest-" + (_status < 3 ? 'start' : 'progress') + ".png";
-							if ((_status % 2) === 0) {
-								removeClass(_imgQuest, 'gray');
-								addClass(_imgQuest, 'glow-dark');
-							}
-							else {
-								addClass(_imgQuest, 'gray');
-								removeClass(_imgQuest, 'glow-dark');
-							}
-						}
-						//_imgQuest.style.left = (_imgQuest.left - platformX) + 'px';
-						removeClass(_imgQuest, 'd-none');
-					}
-				}
+				if(!sprite.animations?.idle)
+					continue;
+				if(!sprite.animations.idle.frames[1].objects)
+					sprite.animations.idle.frames[1].objects = [];
+				if(!sprite.animations.idle.frames[1].objects.find(x => x.key === 'questprogress'))
+					sprite.animations.idle.frames[1].objects.push({
+						key:'questprogress',
+						position:'middle',
+						yGap: MathRound(sprite.animations.idle.frames[1].spriteHeight / 2) + 100
+					});
+				sprite.frame = 1;
+				sprite.start = 0;
 			}
 		}
 	}
 	this.resetSideQuests = function (_sprite, _unseen) {
+		return;
 		const sprites = _sprite ? [_sprite] : this.sprites?.filter(x => x.frames && x.npc);
 		if (sprites?.[0]) {
 			if(!_sprite) {
@@ -1813,202 +2803,198 @@ function map(_m) {
 					sprite.width, sprite.height);
 		}
 	}
-	this.isSameCoords = function (_item1, _item2) {
-		return _item1.sprite.src === _item2.sprite.src &&
-			_item1.spriteX === _item2.spriteX &&
-			_item1.spriteY === _item2.spriteY &&
-			_item1.spriteWidth === _item2.spriteWidth &&
-			_item1.spriteHeight === _item2.spriteHeight &&
-			_item1.reversed === _item2.reversed &&
-			_item1.left === _item2.left &&
-			_item1.top === _item2.top &&
-			_item1.width === _item2.width &&
-			_item1.height === _item2.height;
-	}
-	this.hurtSprites = {};
-	this.colorizeSprite = function(_item, _col, _animationKey) {
-		let _opc = 'ff';
-		switch(_item?.char?.hurting?.count) {
-			case 4:
-			case 3:
-			case 2:
-				_item.char.hurting.count = 2;
-				let _val = 60;
-				if(_item.char.attackerRange > 10)
-					_val = MathCeil(_val / MathCeil((_item.char.attackerRange / 10)));
-				_opc = _val.toString(16);
-				break;
-			case 1:
-				{
-					let _val = 100;
-					if(_item.char.attackerRange > 10)
-						_val = MathCeil(_val / MathCeil((_item.char.attackerRange / 10)));
-					_opc = _val.toString(16);
-				}
-				break;
-		}
-		let _color;
-		if(_item?.char?.hurting?.hit) {
-			delete _item.char.hurting.hit;
-			_color = '#FFFFFF';
-		}
-		else
-			_color = _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
-		if(_opc !== 'ff')
-			_color += _opc;
-		if(_col)
-			_color = _col;
-		const _key = _animationKey ?? (_item.char.animation + 'id' + _item.char.id + 'c' + _color +
-		'l' + _item.spriteX + 't' + _item.spriteY + 'w' + _item.spriteWidth + 'h' + _item.spriteHeight);
-		const _sprite = this.hurtSprites[_key];
-		if(_sprite)
-			return _sprite;
-		const _osc = document.createElement('canvas');
-		_osc.width = MathRound(_item.width * (_item.zoom ?? 1));
-		_osc.height = MathRound(_item.height * (_item.zoom ?? 1));
-		const _osContext = _osc.getContext('2d');
-		_osContext.drawImage(_item.sprite, 
-			_item.spriteX, 
-			_item.spriteY,
-			_item.spriteWidth, 
-			_item.spriteHeight,
-			0, 0, _osc.width, _osc.height);
-		_osContext.globalCompositeOperation = 'source-atop';
-		_osContext.fillStyle = _color;
-		if(_item.char?.hurting?.count <= 0 && _item.char.hurtColor)
-			delete _item.char.hurtColor;
-		_osContext.fillRect(0, 0, _osc.width, _osc.height);
-		this.hurtSprites[_key] = _osc;
-		return _osc;
-	}
-	this.colorizeSprite3 = function(_item, _col, _animationKey) {
-		let _opc = 'ff';
-		switch(_item?.char?.hurting?.count) {
-			case 4:
-			case 3:
-			case 2:
-				_item.char.hurting.count = 2;
-				let _val = 60;
-				if(_item.char.attackerRange > 10)
-					_val = MathCeil(_val / MathCeil((_item.char.attackerRange / 10)));
-				_opc = _val.toString(16);
-				break;
-			case 1:
-				{
-					let _val = 100;
-					if(_item.char.attackerRange > 10)
-						_val = MathCeil(_val / MathCeil((_item.char.attackerRange / 10)));
-					_opc = _val.toString(16);
-				}
-				break;
-		}
-		let _color;
-		if(_item?.char?.hurting?.hit) {
-			delete _item.char.hurting.hit;
-			_color = '#FFFFFF';
-		}
-		else
-			_color = _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
-		if(_opc !== 'ff')
-			_color += _opc;
-		if(_col)
-			_color = _col;
-		const _key = _animationKey ?? (_item.char.animation + 'id' + _item.char.id + 'c' + _color +
-		'l' + _item.spriteX + 't' + _item.spriteY + 'w' + _item.spriteWidth + 'h' + _item.spriteHeight);
-		const _sprite = this.hurtSprites[_key];
-		if(_sprite === 1)
-			return null;
-		else if(_sprite)
-			return _sprite;
-		this.hurtSprites[_key] = 1;
-		const _osc = document.createElement('canvas');
-		_osc.width = MathRound(_item.width * (_item.zoom ?? 1));
-		_osc.height = MathRound(_item.height * (_item.zoom ?? 1));
-		const _osContext = _osc.getContext('2d');
-		_osc.imageSmoothingEnabled = false;
-		_osContext.drawImage(_item.sprite, 
-			_item.spriteX, 
-			_item.spriteY,
-			_item.spriteWidth, 
-			_item.spriteHeight,
-			0, 0, _osc.width, _osc.height);
-		_osContext.globalCompositeOperation = 'source-atop';
-		_osContext.fillStyle = _color;
-		if(_item.char?.hurting?.count <= 0 && _item.char.hurtColor)
-			delete _item.char.hurtColor;
-		_osContext.fillRect(0, 0, _osc.width, _osc.height);
-		createImageBitmap(_osc).then((bitmap) => {
-			this.hurtSprites[_key] = bitmap;
-		});
-		if(_item.char?.hurting?.count <= 0 && _item.char.hurtColor)
-			delete _item.char.hurtColor;
-		return null;
-	}
-	const alphaLevels = [.25, .5, .75];
+	this.hurtSprites = {}; 
+	this.hurtRelSprites = {};
+	this.hurtFlashSprites = {};
+	// this.colorizeSprite4 = function (_item, _col, _force) {
+	// 	let _opc = .01;
+	// 	// switch (_item?.char?.hurting?.count) {
+	// 	// 	case 5: case 4: case 3:
+	// 	// 		_item.char.hurting.count = 2;
+	// 	// 		_opc = 90 / MathCeil((_item.char.attackerRange ?? 10) / 10);
+	// 	// 		break;
+	// 	// 	case 1: case 2:
+	// 	// 		_opc = 150 / MathCeil((_item.char.attackerRange ?? 10) / 10);
+	// 	// 		break;
+	// 	// }
+	// 	// _opc = Math.min(1, _opc / 100);
+	// 	let _color;
+	// 	if (_item?.char?.hurting?.hit) {
+	// 		// _color = `rgba(255,255,255,${_force ? _opc : _item.char.hurting.hit > 2 ? 1 : _item.char.hurting.hit * .3})`;
+	// 		// _item.char.hurting.hit--;
+	// 		let h = _item.char.hurting.hit;
+	// 		if (h >= 3) {
+	// 			// İlk şok
+	// 			_color = 'rgba(255,255,255,1)';
+	// 		}
+	// 		else if (h === 2) {
+	// 			// Heat flash
+	// 			_color = 'rgba(255,230,150,0.85)';
+	// 		}
+	// 		else if (h === 1) {
+	// 			// Burn fade
+	// 			_color = 'rgba(255,110,40,0.55)';
+	// 		}
+	// 		_item.char.hurting.hit--;
+	// 	} else {
+	// 		const base = _col ?? _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
+	// 		if (base.startsWith('#') && base.length >= 7) {
+	// 			let r = parseInt(base.slice(1, 3), 16);
+	// 			let g = parseInt(base.slice(3, 5), 16);
+	// 			let b = parseInt(base.slice(5, 7), 16);
+	// 			if(base.length === 9)
+	// 				_opc = parseInt(base.slice(7, 9), 16) / 255;
+	// 			_color = `rgba(${r},${g},${b},${_force ? MathRound(_opc * 10) / 10 : 1})`;
+	// 		} else
+	// 			_color = base;
+	// 	}
+	// 	const _key1 = 'i' + _item.char.id;
+	// 	const _key2 = 'a' + _item.animation;
+	// 	const _key3 = 
+	// 		'c' + _color + 'l' + _item.spriteX + 't' + _item.spriteY +
+	// 		'w' + _item.spriteWidth + 'h' + _item.spriteHeight;
+	// 	const _key = _key1 + _key2 + _key3;
+	// 	if(_key === _item.char.lastHurtSpriteKey)
+	// 		return _item.char.lastHurtSprite;
+	// 	let _hs = this.hurtSprites[_key1]?.[_key2]?.[_key3];
+	// 	if(!_hs) {
+	// 		this._colorizeCanvas = document.createElement('canvas');
+	// 		const _osc = this._colorizeCanvas;
+	// 		_osc.width = MathRound(_item.spriteWidth);
+	// 		_osc.height = MathRound(_item.spriteHeight);
+	// 		const ctx = _osc.getContext('2d');
+	// 		if(_osc.imageSmoothingEnabled != false)
+	// 			_osc.imageSmoothingEnabled = false;
+	// 		ctx.clearRect(0, 0, _osc.width, _osc.height);
+	// 		ctx.drawImage(_item.sprite,
+	// 			_item.spriteX,
+	// 			_item.spriteY,
+	// 			_item.spriteWidth,
+	// 			_item.spriteHeight,
+	// 			0, 0,
+	// 			_osc.width,
+	// 			_osc.height
+	// 		);
+	// 		ctx.globalCompositeOperation = 'source-atop';
+	// 		ctx.fillStyle = _color;
+	// 		ctx.fillRect(0, 0, _osc.width, _osc.height);
+	// 		ctx.globalCompositeOperation = 'source-over';
+	// 		if(!this.hurtSprites[_key1])
+	// 			this.hurtSprites[_key1] = {};
+	// 		if(!this.hurtSprites[_key1][_key2])
+	// 			this.hurtSprites[_key1][_key2] = {};
+	// 		this.hurtSprites[_key1][_key2][_key3] = _hs = _osc;
+	// 	}
+	// 	if (_hs) {
+	// 		_item.char.lastHurtSprite = _hs;
+	// 		_item.char.lastHurtSpriteKey = _key;
+	// 		return _hs;
+	// 	}
+	// 	else 	
+	// 		_item.char.lastHurtSprite = _item.char.lastHurtSpriteKey = undefined;
+	// 	if (_item.char?.hurting?.count <= 0)
+	// 		delete _item.char.hurtColor;
+	// 	return null;
+	// };
+	this.colorizeSprite4 = function (_item, _col, _force) {
 
-	this.snapAlpha = function(value) {
-		let closest = alphaLevels[0];
-		let minDiff = MathAbs(value - closest), minDiffFound;
-		for (let i = 1; i < alphaLevels.length; i++) {
-			const diff = MathAbs(value - alphaLevels[i]);
-			if (diff < minDiff) {
-				minDiff = diff;
-				closest = alphaLevels[i];
-				minDiffFound = 1;
-			}
-			else if(minDiffFound)
-				return closest;
-		}
-		return closest;
+	// =====================
+	// COLOR CACHE
+	// =====================
+	if (!this._colorCache)
+		this._colorCache = Object.create(null);
+
+	let _opc = 1;
+	let _color, _isHurtFlash;
+
+	// =====================
+	// HIT FLASH (AYNI)
+	// =====================
+	if (_item?.char?.hurting?.hit) {
+		const h = _item.char.hurting.hit;
+		if (h >= 3)
+			_color = 'rgba(255,255,255,1)';
+		else if (h === 2)
+			_color = 'rgba(255,230,150,0.85)';
+		else
+			_color = 'rgba(255,110,40,0.55)';
+
+		_item.char.hurting.hit--;
+		_isHurtFlash = 1;
 	}
-	this.colorizeSprite4 = function (_item, _col, _animationKey) {
-		let _opc = 1;
-		switch (_item?.char?.hurting?.count) {
-			case 5: case 4: case 3:
-				_item.char.hurting.count = 2;
-				_opc = 90 / MathCeil((_item.char.attackerRange ?? 10) / 10);
-				break;
-			case 1: case 2:
-				_opc = 150 / MathCeil((_item.char.attackerRange ?? 10) / 10);
-				break;
-		}
-		_opc = Math.min(1, _opc / 100);
-		let _color;
-		if (_item?.char?.hurting?.hit) {
-			delete _item.char.hurting.hit;
-			_color = `rgba(255,255,255,${this.snapAlpha(_opc)})`;
-		} else {
-			const base = _col ?? _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
+	else {
+		const base = _col ?? _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
+		_color = this._colorCache[base];
+		if (!_color) {
 			if (base.startsWith('#') && base.length >= 7) {
-				let r = parseInt(base.slice(1, 3), 16);
-				let g = parseInt(base.slice(3, 5), 16);
-				let b = parseInt(base.slice(5, 7), 16);
-				if(base.length === 9)
+				const r = parseInt(base.slice(1, 3), 16);
+				const g = parseInt(base.slice(3, 5), 16);
+				const b = parseInt(base.slice(5, 7), 16);
+				if (base.length === 9)
 					_opc = parseInt(base.slice(7, 9), 16) / 255;
-				_color = `rgba(${r},${g},${b},${this.snapAlpha(_opc)})`;
-			} else {
+
+				_color = `rgba(${r},${g},${b},${_force ? Math.round(_opc * 10) / 10 : 1})`;
+			}
+			else {
 				_color = base;
 			}
+			this._colorCache[base] = _color;
 		}
+	}
 
-		const _key = _animationKey ?? (
-			_item.char.animation + 'id' + _item.char.id +
-			'c' + _color + 'l' + _item.spriteX + 't' + _item.spriteY +
-			'w' + _item.spriteWidth + 'h' + _item.spriteHeight
-		);
-		if(_key === _item.char.lastHurtSpriteKey)
-			return _item.char.lastHurtSprite;
-		let _hs =this.hurtSprites[_key];
-		if(!_hs) {
+	// =====================
+	// KEY (AYNI MANTIK)
+	// =====================
+	const _key1 = 'i' + _item.char.id;
+	const _key2 = 'a' + _item.animation;
+	const _key3 =
+		'c' + _color +
+		'l' + _item.spriteX +
+		't' + _item.spriteY +
+		'w' + _item.spriteWidth +
+		'h' + _item.spriteHeight;
+
+	const _key = _key1 + _key2 + _key3;
+	if (_key === _item.char.lastHurtSpriteKey)
+		return _item.char.lastHurtSprite;
+	const _arr = _isHurtFlash ? this.hurtFlashSprites : this.hurtSprites;
+	let _hs = _arr[_key1]?.[_key2]?.[_key3];
+
+	if (!_hs) {
+
+		// =====================
+		// SHARED WORK CANVAS
+		// =====================
+
+		if (!this._colorizeCanvas) {
 			this._colorizeCanvas = document.createElement('canvas');
-			const _osc = this._colorizeCanvas;
-			_osc.width = MathRound(_item.spriteWidth);
-			_osc.height = MathRound(_item.spriteHeight);
-			const ctx = _osc.getContext('2d');
-			if(_osc.imageSmoothingEnabled != false)
-				_osc.imageSmoothingEnabled = false;
-			ctx.clearRect(0, 0, _osc.width, _osc.height);
-			ctx.drawImage(_item.sprite,
+			this._colorizeCtx = this._colorizeCanvas.getContext('2d');
+			this._colorizeCtx.imageSmoothingEnabled = false;
+		}
+		const _osc = this._colorizeCanvas;
+		const ctx = this._colorizeCtx;
+		_osc.width = _item.spriteWidth;
+		_osc.height = _item.spriteHeight;
+		ctx.clearRect(0, 0, _osc.width, _osc.height);
+		// if (!this._colorizeCanvas)
+		// 	this._colorizeCanvas = document.createElement('canvas');
+
+		// const _osc = this._colorizeCanvas;
+		//_osc.width = _item.spriteWidth;
+		//_osc.height = _item.spriteHeight;
+
+		//const ctx = _osc.getContext('2d');
+		//if (ctx.imageSmoothingEnabled)
+			//ctx.imageSmoothingEnabled = false;
+
+		//ctx.clearRect(0, 0, _osc.width, _osc.height);
+		const _cropped = this.getCroppedSprite(_item.spriteX, _item.spriteY, _item.spriteWidth, _item.spriteHeight, 
+								_item.char, _item.sprite.relativeSrc, _item.frameKey);
+		if(_cropped)
+			ctx.drawImage(_cropped, 0, 0, _osc.width, _osc.height);
+		else
+			ctx.drawImage(
+				_item.sprite,
 				_item.spriteX,
 				_item.spriteY,
 				_item.spriteWidth,
@@ -2017,30 +3003,94 @@ function map(_m) {
 				_osc.width,
 				_osc.height
 			);
-			ctx.globalCompositeOperation = 'source-atop';
-			ctx.fillStyle = _color;
-			ctx.fillRect(0, 0, _osc.width, _osc.height);
-			ctx.globalCompositeOperation = 'source-over';
-			this.hurtSprites[_key] = _hs = _osc;
-		}
 
-		if (_hs) {
-			_item.char.lastHurtSprite = _hs;
-			_item.char.lastHurtSpriteKey = _key;
-			return _hs;
-		}
-		else 	
-			_item.char.lastHurtSprite = _item.char.lastHurtSpriteKey = undefined;
+		ctx.globalCompositeOperation = 'source-atop';
+		ctx.fillStyle = _color;
+		ctx.fillRect(0, 0, _osc.width, _osc.height);
+		ctx.globalCompositeOperation = 'source-over';
 
-		// createImageBitmap(_osc).then(bitmap => {
-		// 	this.hurtSprites[_key] = bitmap;
-		// });
+		// =====================
+		// CLONE (CACHE SAFE)
+		// =====================
+		const out = document.createElement('canvas');
+		out.width = _osc.width;
+		out.height = _osc.height;
+		if(_osc.width > 0)
+			out.getContext('2d').drawImage(_osc, 0, 0);
 
-		if (_item.char?.hurting?.count <= 0)
-			delete _item.char.hurtColor;
+		if (!_arr[_key1]) 
+			_arr[_key1] = Object.create(null);
+		if (!_arr[_key1][_key2]) _arr[_key1][_key2] = Object.create(null);
+		//_hs = _osc;
+		_arr[_key1][_key2][_key3] = _hs = out;
+	}
 
-		return null;
-	};
+	_item.char.lastHurtSprite = _hs;
+	_item.char.lastHurtSpriteKey = _key;
+
+	if (_item.char?.hurting?.count <= 0)
+		delete _item.char.hurtColor;
+
+	return _hs;
+};
+
+	// this.colorizeRelSprite4 = function (_item, _col, _animationKey) {
+	// 	let _opc = .01;
+	// 	let _color;
+	// 	const base = _col;
+	// 	if (base.startsWith('#') && base.length >= 7) {
+	// 		let r = parseInt(base.slice(1, 3), 16);
+	// 		let g = parseInt(base.slice(3, 5), 16);
+	// 		let b = parseInt(base.slice(5, 7), 16);
+	// 		if(base.length === 9)
+	// 			_opc = parseInt(base.slice(7, 9), 16) / 255;
+	// 		_color = `rgba(${r},${g},${b},1)`;
+	// 	} 
+	// 	else
+	// 		_color = base;
+
+	// 	const _key = _animationKey ?? (
+	// 		_item.animation + 'id' + _item.char.id +
+	// 		'c' + _color + 'l' + _item.spriteX + 't' + _item.spriteY +
+	// 		'w' + _item.spriteWidth + 'h' + _item.spriteHeight
+	// 	);
+	// 	if(_key === _item.char.lastHurtRelSpriteKey)
+	// 		return _item.char.lastHurtRelSprite;
+	// 	let _hs =this.hurtRelSprites[_key];
+	// 	if(!_hs) {
+	// 		this._colorizeCanvas = document.createElement('canvas');
+	// 		const _osc = this._colorizeCanvas;
+	// 		_osc.width = MathRound(_item.spriteWidth);
+	// 		_osc.height = MathRound(_item.spriteHeight);
+	// 		const ctx = _osc.getContext('2d');
+	// 		if(_osc.imageSmoothingEnabled != false)
+	// 			_osc.imageSmoothingEnabled = false;
+	// 		ctx.clearRect(0, 0, _osc.width, _osc.height);
+	// 		ctx.drawImage(_item.sprite,
+	// 			_item.spriteX,
+	// 			_item.spriteY,
+	// 			_item.spriteWidth,
+	// 			_item.spriteHeight,
+	// 			0, 0,
+	// 			_osc.width,
+	// 			_osc.height
+	// 		);
+	// 		ctx.globalCompositeOperation = 'source-atop';
+	// 		ctx.fillStyle = _color;
+	// 		ctx.fillRect(0, 0, _osc.width, _osc.height);
+	// 		ctx.globalCompositeOperation = 'source-over';
+	// 		this.hurtRelSprites[_key] = _hs = _osc;
+	// 	}
+
+	// 	if (_hs) {
+	// 		_item.char.lastHurtRelSprite = _hs;
+	// 		_item.char.lastHurtRelSpriteKey = _key;
+	// 		return _hs;
+	// 	}
+	// 	else 	
+	// 		_item.char.lastHurtRelSprite = _item.char.lastHurtRelSpriteKey = undefined;
+	// 	return null;
+	// };
 	// this.spriteWorker = new Worker('./js/worker.js');
 	// this.spriteWorker.onmessage = (e) => {
 	// 	const { key, result } = e.data;
@@ -2103,11 +3153,108 @@ function map(_m) {
 	// 		delete _item.char.hurtColor;
 	// 	return null;
 	// }
-	const _maxSort = 200000000, _yTol = 7 * __zoom;
-	this.getPerspectiveRate = function(_char, _force) {
+	this.colorizeRelSprite4 = function (_item, _col, _animationKey) {
+
+	// =====================
+	// COLOR CACHE
+	// =====================
+	if (!this._colorCache)
+		this._colorCache = Object.create(null);
+
+	let _color = this._colorCache[_col];
+	let _opc = 1;
+
+	if (!_color) {
+		const base = _col;
+		if (base.startsWith('#') && base.length >= 7) {
+			const r = parseInt(base.slice(1, 3), 16);
+			const g = parseInt(base.slice(3, 5), 16);
+			const b = parseInt(base.slice(5, 7), 16);
+			if (base.length === 9)
+				_opc = parseInt(base.slice(7, 9), 16) / 255;
+
+			_color = `rgba(${r},${g},${b},1)`;
+		} else {
+			_color = base;
+		}
+		this._colorCache[_col] = _color;
+	}
+
+	// =====================
+	// KEY
+	// =====================
+	const _key = _animationKey ?? (
+		_item.animation + ':' +
+		_item.char.id + ':' +
+		_color + ':' +
+		_item.spriteX + ',' +
+		_item.spriteY + ',' +
+		_item.spriteWidth + ',' +
+		_item.spriteHeight
+	);
+
+	if (_key === _item.char.lastHurtRelSpriteKey)
+		return _item.char.lastHurtRelSprite;
+
+	let _hs = this.hurtRelSprites[_key];
+	if (!_hs) {
+
+		// =====================
+		// OFFSCREEN CANVAS (REUSE)
+		// =====================
+		if (!this._colorizeCanvas)
+			this._colorizeCanvas = document.createElement('canvas');
+
+		const _osc = this._colorizeCanvas;
+		_osc.width = _item.spriteWidth;
+		_osc.height = _item.spriteHeight;
+
+		const ctx = _osc.getContext('2d');
+
+		if (ctx.imageSmoothingEnabled)
+			ctx.imageSmoothingEnabled = false;
+
+		ctx.clearRect(0, 0, _osc.width, _osc.height);
+
+		ctx.drawImage(
+			_item.sprite,
+			_item.spriteX,
+			_item.spriteY,
+			_item.spriteWidth,
+			_item.spriteHeight,
+			0, 0,
+			_osc.width,
+			_osc.height
+		);
+
+		ctx.globalCompositeOperation = 'source-atop';
+		ctx.fillStyle = _color;
+		ctx.fillRect(0, 0, _osc.width, _osc.height);
+		ctx.globalCompositeOperation = 'source-over';
+
+		// ⚠️ CLONE CANVAS
+		// çünkü shared canvas reuse ediliyor
+		const out = document.createElement('canvas');
+		out.width = _osc.width;
+		out.height = _osc.height;
+		if(_osc.width > 0)
+			out.getContext('2d').drawImage(_osc, 0, 0);
+
+		this.hurtRelSprites[_key] = _hs = out;
+	}
+
+	_item.char.lastHurtRelSprite = _hs;
+	_item.char.lastHurtRelSpriteKey = _key;
+	return _hs;
+};
+
+	const _maxSort = 200000000;
+	let _yTol = 7 * __zoom;
+	this.getPerspectiveRate = function(_char, _force, _animation) {
 		if(_char.lastYPosition === _char.yPosition)
 			return _char.lastPerspectiveRate;
-		const _x = (_char.animation === 'walk' || _char.animation === 'run' || _force) ? 1 + ((((getGroundHeight() - _char.yPosition) * 10) / getGroundHeight()) / 100) : 1;
+		const _anim = _animation ?? _char.animation;
+		const _x = (_anim === 'walk' || _anim === 'run' || _force) ? 1 + ((((getGroundHeight() - _char.yPosition) * 10) / getGroundHeight()) / 100) : 1;
 		_char.lastYPosition = _char.yPosition;
 		if(_x !== _char.lastPerspectiveRate)
 			_char.lastPerspectiveRate = _x;
@@ -2117,6 +3264,9 @@ function map(_m) {
 	this.offCanvas.width = this.cWidth;
 	this.offCanvas.height = this.cHeight;
 	const offCtx = this.offCanvas.getContext('2d');
+	this.getOffContext = function() {
+		return offCtx;
+	}
 	this.offCanvas.imageSmoothingEnabled = false;
 	this.offGoreCanvas = document.createElement('canvas');
 	this.offGoreCanvas.width = this.cWidth;
@@ -2128,38 +3278,636 @@ function map(_m) {
 	this.offDmgCanvas.height = this.cHeight;
 	this.offDmgCtx = this.offDmgCanvas.getContext('2d');
 	this.offDmgCanvas.imageSmoothingEnabled = false;
+	this.drawChargeParticles = function (_item) {
+		  const list = _item.char.spawnDusts;
+    if (!list || list.length === 0) return;
+
+	const prevAlpha = offCtx.globalAlpha;
+	const prevFill = offCtx.fillStyle;
+    for (let d of list) {
+
+        // local wobble ve ilerleme etkilerini WORLD pozisyonuna uygula:
+        const pxWorld = d.worldX - ((_item.reversed ? -1 : 1) * (platformX - d.p))
+            + d.wobble * Math.sin(d.progress * 6) * 8
+            - (d.progress * 4);
+        // yukarı çıkış (y zaten dünya/ekran uyumlu olduğunu varsayıyoruz)
+        const py = d.y - d.rise * d.progress;
+
+        // asıl toz tanesinin boyutu
+        const s = d.size * (1 + d.progress * 1.4);
+
+        // üstteki parlak, alttaki flu
+        const alpha = 0.75 * (1 - d.progress);
+
+        // kamera offseti — ekranX = worldX - cameraX
+        const camX = pxWorld;
+
+        // ----------------------------
+        // 1) DALGA izi üretelim (izlerin de worldX olarak saklanması)
+        // ----------------------------
+        if (Math.random() < 0.6) {
+            d.trails.push({
+                worldX: pxWorld,   // world pozisyonu kaydet
+                y: py,
+                size: s * (1 + Math.random() * 0.6),
+                alpha: alpha * 0.6
+            });
+        }
+
+        // İzler çok olursa eskiyi sil
+        if (d.trails.length > 12) d.trails.shift();
+
+        // ----------------------------
+        // 2) İZLERİ ÇİZ (izleri world->cam çevir)
+        // ----------------------------
+
+		offCtx.fillStyle = "#c7b8a3";
+
+		for (let i = d.trails.length - 1; i >= 0; i--) {
+			const t = d.trails[i];
+
+			t.alpha *= 0.85;
+			t.size  *= 1.03;
+
+			if (t.alpha < 0.1)
+				break;
+
+			offCtx.globalAlpha = t.alpha;
+
+			offCtx.beginPath();
+			offCtx.ellipse(
+				t.worldX, t.y,
+				t.size * 1.3, t.size * 0.75,
+				0, 0, Math.PI * 2
+			);
+			offCtx.fill();
+		}
+
+
+
+        // ----------------------------
+        // 3) ASIL PARTİKÜLÜ ÇİZ
+        // ----------------------------
+        //offCtx.save();
+        offCtx.globalAlpha = alpha;
+        offCtx.fillStyle = "#d6c7b4";
+
+        offCtx.beginPath();
+        offCtx.ellipse(
+            camX, py,
+            s * 1.1, s * 0.7,
+            0, 0, Math.PI * 2
+        );
+        offCtx.fill();
+        //offCtx.restore();
+		
+        d.progress += 0.1;
+    }
+	offCtx.globalAlpha = prevAlpha;
+	offCtx.fillStyle   = prevFill;
+    // Ömür dolunca partikülleri sil
+    _item.char.spawnDusts = list.filter(d => d.progress < 1);
+	return;
+		if (_item.char.spawnDusts) {
+			for(let d of _item.char.spawnDusts) {
+				offCtx.save();
+				const w = d.width;
+				const h = d.height;
+				offCtx.globalAlpha = d.alpha;
+				offCtx.translate(d.x - ((_item.reversed ? -1 : 1) * (platformX - d.p)), d.y);
+
+				// Earth-like color (a bit brownish gray)
+				offCtx.fillStyle = "rgba(200, 180, 160, 0.9)";
+
+				// Soft horizontal oval
+				offCtx.beginPath();
+				offCtx.ellipse(0, 0, w, h * 0.45, 0, 0, Math.PI * 2);
+				offCtx.fill();
+
+				// Side small puffs (adds realism)
+				offCtx.beginPath();
+				offCtx.ellipse(-w * 0.5, -h * 0.1, h * 0.4, h * 0.35, 0, 0, Math.PI * 2);
+				offCtx.ellipse(w * 0.5, -h * 0.1, h * 0.4, h * 0.35, 0, 0, Math.PI * 2);
+				offCtx.fill();
+				offCtx.restore();
+				d.x += d.vx;
+				d.y += d.vy * 0.3;
+				d.vx *= 0.92;
+				d.alpha -= 0.06;
+			}
+			_item.char.spawnDusts = _item.char.spawnDusts.filter(g => g.alpha > 0);
+		}
+	}
+	// this.drawCharacterGhost = function (_item, _sprite, _x,_y,_w,_h) {
+	// 	if (_item.char.chargeProperties && _item.char.ghostData) {
+	// 		let _blur = _item.char.ghostData.length;
+	// 		const _ga = offCtx.globalAlpha;
+	// 		for (let g of _item.char.ghostData) {
+	// 			//offCtx.save();
+	// 			offCtx.globalAlpha = g.alpha;
+	// 			//offCtx.filter = 'blur(' + this.H(_blur) + 'px)';
+	// 			// offCtx.drawImage(
+	// 			// 	g.sprite,
+	// 			// 	g.left - ((_item.reversed ? -1 : 1) * (platformX - g.p)), g.top,
+	// 			// 	g.width, g.height
+	// 			// );
+	// 			 offCtx.drawImage(
+	// 			g.sprite,
+	// 			g.left - ((_item.reversed ? -1 : 1) * (platformX - g.p)),
+	// 			g.top,
+	// 			g.width * scale,
+	// 			g.height * scale
+	// 			);
+	// 			offCtx.filter = '';
+	// 			//offCtx.restore();
+	// 			g.alpha -= 0.12;
+	// 			_blur--;
+	// 		}
+	// 		offCtx.globalAlpha = _ga;
+	// 		_item.char.ghostData = _item.char.ghostData.filter(g => g.alpha > 0);
+	// 	}
+	// }
+	this.drawCharacterGhost = function (_item) {
+		const gd = _item.char.ghostData;
+		if (!_item.char.chargeProperties || !gd) return;
+
+		let blur = gd.length;
+
+		const baseAlpha = offCtx.globalAlpha;
+
+		for (let i = 0; i < gd.length; i++) {
+			const g = gd[i];
+
+			offCtx.globalAlpha = g.alpha;
+
+			const scale = 1 + blur * 0.02;
+
+			offCtx.drawImage(
+			g.sprite,
+			g.left - ((_item.reversed ? -1 : 1) * (platformX - g.p)),
+			g.top,
+			g.width * scale,
+			g.height * scale
+			);
+
+			g.alpha -= 0.12;
+			blur--;
+		}
+
+		offCtx.globalAlpha = baseAlpha;
+
+		_item.char.ghostData = gd.filter(g => g.alpha > 0);
+	};
+
+	this.H = function(v) {
+		return v * (episode.cHeight / 768);
+	}
+	this.drawSpriteWithFade = function(_can, img, imgx, imgy, imgw, imgh, x, y, w, h, op) {
+		const temp = document.createElement("canvas");
+		temp.width = w;
+		temp.height = h;
+		const tctx = temp.getContext("2d");
+
+		// 1 - Sprite'ı çiz
+		tctx.drawImage(img, imgx, imgy, imgw, imgh, 0, 0, w, h);
+
+		// 2 - Dikey fade: üst %50 → alt %0
+		const g = tctx.createLinearGradient(0, 0, 0, h);
+		g.addColorStop(0.0, `rgba(255,255,255,${op})`);
+		g.addColorStop(0.92, "rgba(255,255,255,0.0)"); // alt
+
+		tctx.globalCompositeOperation = "destination-in";
+		tctx.fillStyle = g;
+		tctx.fillRect(0, 0, w, h);
+		tctx.globalCompositeOperation = "source-over";
+
+		// 3 - Sonucu ana canvasa aktar
+		_can.drawImage(temp, x, y);
+	}
+// 	this.drawHitParticles = function(_char, x, y, direction, color, strength, reversed, _key) {
+// 	if (!_char.particles) _char.particles = [];
+
+// 	if (x) {
+
+// 		strength = Math.max(1, Math.min(3, strength - 1));
+// 		let _countRate = 1;
+// 		if(strength >= 2 && strength < 3)
+// 			_countRate = getRandomValue2(100, 300) / 100;
+// 		else if(strength >= 3)
+// 			_countRate = 4;
+// 		if(_char.particles.length > 0 && _countRate < 4)
+// 			return;
+// 		const count = (16 + _countRate) + strength * _countRate * ((_char.width * _char.ZOOM) / 30);
+// 		const spread = (20 + _countRate) + strength * 20;
+// 		const baseSpeed = (getRandomValue2(25, 45) / 10) + _countRate * ((_char.width * _char.ZOOM) / (60 + (_countRate * 15)));
+
+// 		// 2.5D için kontrollü aşağı eğim
+// 		let downwardBias = 18 + Math.random() * 6;
+// 		for (let i = 0; i < count; i++) {
+
+// 			const angle =
+// 				direction +
+// 				downwardBias +
+// 				(Math.random() * spread - spread / 2);
+			
+// 			const rad = angle * Math.PI / 180;
+
+// 			// HER PARTİKÜL FARKLI HAREKET PROFİLİ ALIR
+// 			let speedVariance = Math.random();
+// 			let speed =
+// 				baseSpeed *
+// 				(0.6 + speedVariance * speedVariance * 1.6);
+
+// 			let vx = Math.cos(rad) * speed;
+// 			let vy = Math.sin(rad) * speed;
+// 			if (_key === 'slam')
+// 				vy -= speed * 0.8;
+
+// 			// Mikro yön bozulması (robotik hissi öldürür)
+// 			vx += (Math.random() - 0.5) * 0.6;
+// 			vy += (Math.random() - 0.5) * 0.4;
+
+// 			_char.particles.push({
+// 				x,
+// 				y,
+// 				vx,
+// 				vy,
+// 				p: platformX,
+// 				radius: 1.5 + Math.random() * 3.2,
+// 				life: getRandomValue2(80, 110) / 100,
+// 				decay: 0.035 + Math.random() * 0.05,
+// 				frame: 0,
+// 				gravity: 0.28 + Math.random() * 0.5,
+// 				wobble: Math.random() * 2,
+// 				color: randomShade(color)
+// 			});
+// 		}
+// 	}
+
+// 	const oldAlpha = offCtx.globalAlpha;
+// 	const _reversed = (offCtx.reversed && !reversed) || (!offCtx.reversed && reversed);
+// 	for (let i = _char.particles.length - 1; i >= 0; i--) {
+// 		const p = _char.particles[i];
+
+// 		// Agresif başlangıç
+// 		let speedMultiplier = p.frame < 2 ? 2.5 : 1;
+// 		let sizeMultiplier  = p.frame < 2 ? 1.5 : 1;
+
+// 		// Organik jitter (çizgi hissini yok eder)
+// 		p.x += p.vx * speedMultiplier + Math.sin(p.frame + p.wobble) * 0.4;
+// 		p.y += p.vy * speedMultiplier;
+
+// 		p.vy += p.gravity;
+// 		p.vx *= 0.96; // hafif sürtünme
+
+// 		p.life -= p.decay;
+// 		p.frame++;
+
+// 		offCtx.globalAlpha = p.life;
+// 		offCtx.beginPath();
+// 		offCtx.fillStyle = p.color;
+// 		offCtx.ellipse(
+// 			p.x - ((_reversed ? -1 : 1) * (platformX - p.p)),
+// 			p.y,
+// 			p.radius * sizeMultiplier * (getRandomValue2(8, 24) / 10),
+// 			p.radius * sizeMultiplier * (getRandomValue2(8, 12) / 10),
+// 			0,
+// 			0,
+// 			Math.PI * 2
+// 		);
+// 		offCtx.fill();
+
+// 		if (p.life <= 0)
+// 			_char.particles.splice(i, 1);
+// 	}
+
+// 	offCtx.globalAlpha = oldAlpha;
+
+// 	if (_char.particles.length === 0)
+// 		delete _char.particles;
+
+// 	function randomShade(hex) {
+// 		let r = parseInt(hex.substr(1,2),16);
+// 		let g = parseInt(hex.substr(3,2),16);
+// 		let b = parseInt(hex.substr(5,2),16);
+
+// 		r += Math.random() * 35 - 15;
+// 		g += Math.random() * 25 - 10;
+// 		b += Math.random() * 20 - 5;
+
+// 		return `rgb(${r|0},${g|0},${b|0})`;
+// 	}
+// }
+
+// 	this.drawHitParticles = function(_char, x, y, direction, color, strength, reversed) {
+// 	if (!_char.particles) _char.particles = [];
+
+// 	if (x) {
+// 		if(_char.particles.length > 0)
+// 			return;
+
+// 		strength = Math.max(1, Math.min(3, strength - 1));
+// 		let _countRate = 1;
+// 		if(strength >= 2 && strength < 3)
+// 			_countRate = getRandomValue2(100, 300) / 100;
+// 		else if(strength >= 3)
+// 			_countRate = 4;
+// 		const count = 8 + strength * _countRate * ((_char.width * _char.ZOOM) / 30);
+// 		const spread = (18 + _countRate) + strength * 6;
+// 		const baseSpeed = (getRandomValue2(18, 28) / 10) + _countRate * ((_char.width * _char.ZOOM) / 120);
+
+// 		// 2.5D için kontrollü aşağı eğim
+// 		const downwardBias = strength >= 2 ? 12 : 6;
+
+// 		for (let i = 0; i < count; i++) {
+
+// 			const angle =
+// 				direction +
+// 				downwardBias +
+// 				(Math.random() * spread - spread / 2);
+
+// 			const rad = angle * Math.PI / 180;
+
+// 			// HER PARTİKÜL FARKLI HAREKET PROFİLİ ALIR
+// 			let speedVariance = Math.random();
+// 			let speed =
+// 				baseSpeed *
+// 				(0.6 + speedVariance * speedVariance * 1.6);
+
+// 			let vx = Math.cos(rad) * speed;
+// 			let vy = Math.sin(rad) * speed * 0.6;
+
+// 			// Mikro yön bozulması (robotik hissi öldürür)
+// 			vx += (Math.random() - 0.5) * 1.2;
+// 			vy += (Math.random() - 0.5) * 0.8;
+
+// 			_char.particles.push({
+// 				x,
+// 				y,
+// 				vx,
+// 				vy,
+// 				p: platformX,
+// 				radius: 1.5 + Math.random() * 3.2,
+// 				life: 1,
+// 				decay: 0.035 + Math.random() * 0.045,
+// 				frame: 0,
+// 				gravity: 0.32 + Math.random() * 0.18,
+// 				wobble: Math.random() * 2,
+// 				color: randomShade(color)
+// 			});
+// 		}
+// 	}
+
+// 	const oldAlpha = offCtx.globalAlpha;
+// 	const _reversed = (offCtx.reversed && !reversed) || (!offCtx.reversed && reversed);
+// 	for (let i = _char.particles.length - 1; i >= 0; i--) {
+// 		const p = _char.particles[i];
+
+// 		// Agresif başlangıç
+// 		let speedMultiplier = p.frame < 2 ? 3.4 : 1;
+// 		let sizeMultiplier  = p.frame < 2 ? 1.5 : 1;
+
+// 		// Organik jitter (çizgi hissini yok eder)
+// 		p.x += p.vx * speedMultiplier + Math.sin(p.frame + p.wobble) * 0.4;
+// 		p.y += p.vy * speedMultiplier;
+
+// 		p.vy += p.gravity;
+// 		p.vx *= 0.92; // hafif sürtünme
+
+// 		p.life -= p.decay;
+// 		p.frame++;
+
+// 		offCtx.globalAlpha = p.life;
+// 		offCtx.beginPath();
+// 		offCtx.fillStyle = p.color;
+// 		offCtx.ellipse(
+// 			p.x - ((_reversed ? -1 : 1) * (platformX - p.p)),
+// 			p.y,
+// 			p.radius * sizeMultiplier * (getRandomValue2(8, 20) / 10),
+// 			p.radius * sizeMultiplier * (getRandomValue2(8, 12) / 10),
+// 			0,
+// 			0,
+// 			Math.PI * 2
+// 		);
+// 		offCtx.fill();
+
+// 		if (p.life <= 0)
+// 			_char.particles.splice(i, 1);
+// 	}
+
+// 	offCtx.globalAlpha = oldAlpha;
+
+// 	if (_char.particles.length === 0)
+// 		delete _char.particles;
+
+// 	function randomShade(hex) {
+// 		let r = parseInt(hex.substr(1,2),16);
+// 		let g = parseInt(hex.substr(3,2),16);
+// 		let b = parseInt(hex.substr(5,2),16);
+
+// 		r += Math.random() * 35 - 15;
+// 		g += Math.random() * 25 - 10;
+// 		b += Math.random() * 20 - 5;
+
+// 		return `rgb(${r|0},${g|0},${b|0})`;
+// 	}
+// }
+const SIN_LUT = new Float32Array(360);
+for (let i = 0; i < 360; i++)
+ SIN_LUT[i] = Math.sin(i * Math.PI / 180);
+this.drawHitParticles = function(_char, x, y, direction, color, strength, reversed, _key) {
+	if (!_char.particles) 
+		_char.particles = [];
+ 	if (x) {
+  		strength = Math.max(1, Math.min(3, strength - 1));
+
+		let _countRate = 1;
+		if (strength >= 2 && strength < 3)
+			_countRate = getRandomValue2(100, 300) / 100;
+		else if (strength >= 3)
+			_countRate = 4;
+
+		// if (_char.particles.length > 0 && _countRate < 4)
+		// 	return;
+
+		const sizeFactor = (_char.width * _char.ZOOM) / 30;
+
+		const count =
+			(16 + _countRate) +
+			strength * _countRate * sizeFactor;
+
+		const spread =
+			(20 + _countRate) +
+			strength * 20;
+
+		const baseSpeed =
+			(getRandomValue2(25, 45) / 10) +
+			_countRate * (sizeFactor / (2 + _countRate));
+
+		const downwardBias = 18 + Math.random() * 6;
+		const radMul = Math.PI / 180;
+		_char.particleSpeed = 1.5;
+		for (let i = 0; i < count; i++) {
+			const angle =
+				direction +
+				downwardBias +
+				(Math.random() * spread - spread * 0.5);
+
+			const rad = angle * radMul;
+			const _isHeavyHit = (_key === 'heavy' || _key === 'slam');
+			const speedVariance = Math.random();
+			let speed =
+			baseSpeed *
+			(0.6 + speedVariance * speedVariance * 1.6);
+			if (!_isHeavyHit)
+				speed *= 1.1; // %10 boost
+			let vx = Math.cos(rad) * speed;
+			let vy = Math.sin(rad) * speed;
+
+			if (_key === 'slam')
+				vy -= speed * 0.8;
+
+			vx += (Math.random() - 0.5) * 0.6;
+			vy += (Math.random() - 0.5) * 0.4;
+
+			_char.particles.push({
+			x,
+			y,
+			vx,
+			vy,
+			p: platformX,
+
+			radius: 1.5 + Math.random() * 3.2,
+
+			rx: (getRandomValue2(8, 24) / 10),
+			ry: (getRandomValue2(8, 12) / 10),
+
+			life: getRandomValue2(80, 110) / 100,
+			decay: 0.035 + Math.random() * 0.05,
+
+			frame: 0,
+			gravity: 0.28 + Math.random() * 0.5,
+			wobble: Math.random() * 360 | 0,
+			airTime: _isHeavyHit ? 6 : 0,
+			color: randomShade(color)
+			});
+		}
+	}
+
+	const arr = _char.particles;
+
+	const oldAlpha = offCtx.globalAlpha;
+	const _reversed = (offCtx.reversed && !reversed) || (!offCtx.reversed && reversed);
+
+	let lastColor = null;
+	let lastAlpha = -1;
+	const hitSlow = _char.hitStop ? 0.9 : _char.particleSpeed;
+	if(_char.particleSpeed > 1)
+		_char.particleSpeed -= .1;
+	else if(_char.particleSpeed < 1)
+		_char.particleSpeed += .1;
+	for (let i = arr.length - 1; i >= 0; i--) {
+
+		const p = arr[i];
+		
+		const fast = p.frame < 2;
+		const speedMul = fast ? 2.5 : 1;
+		const sizeMul  = fast ? 1.5 : 1;
+
+		p.x += (p.vx * speedMul) * hitSlow
+		+ SIN_LUT[(p.frame + p.wobble) % 360] * 0.4 * hitSlow;
+
+		p.y += (p.vy * speedMul) * hitSlow;
+
+		if (p.airTime > 0)
+			p.airTime--;
+		else
+			p.vy += p.gravity;
+		p.vx *= 0.96;
+
+		p.life -= p.decay;
+		p.frame++;
+
+		const killY = (this.cHeight - _char.yPosition) + _char.yGap;
+
+		if (p.life <= 0 || p.y > killY) {
+			arr[i] = arr[arr.length - 1];
+			arr.pop();
+			continue;
+		}
+
+
+		if (p.life !== lastAlpha) {
+			offCtx.globalAlpha = p.life;
+			lastAlpha = p.life;
+		}
+
+		if (p.color !== lastColor) {
+			offCtx.fillStyle = p.color;
+			lastColor = p.color;
+		}
+
+		offCtx.beginPath();
+		offCtx.ellipse(
+			p.x - ((_reversed ? -1 : 1) * (platformX - p.p)),
+			p.y,
+			p.radius * sizeMul * p.rx,
+			p.radius * sizeMul * p.ry,
+			0, 0, Math.PI * 2
+		);
+		offCtx.fill();
+	}
+
+ 	offCtx.globalAlpha = oldAlpha;
+
+ 	if (arr.length === 0)
+  		delete _char.particles;
+
+
+ // ---------------- COLOR ----------------
+
+ 	function randomShade(hex) {
+		let r = parseInt(hex.substr(1,2),16);
+		let g = parseInt(hex.substr(3,2),16);
+		let b = parseInt(hex.substr(5,2),16);
+
+		r += Math.random() * 35 - 15;
+		g += Math.random() * 25 - 10;
+		b += Math.random() * 20 - 5;
+
+		return `rgb(${r|0},${g|0},${b|0})`;
+	}
+}
+
 	this.drawCharacterQueue = function (_queue) {
-		if (this.disposing || !_queue?.[0])
+		if (this.disposing || !_queue?.[0]){
+			this.checkSceneActions();
+			this.checkSceneActions(1);
 			return;
-		_queue = radixSortLSD(_queue, (a, b) => {
-			return _maxSort - parseInt((MathRound((a.drawPriority >= 10 ? 0 : a.char.yPosition) / _yTol)
-			* 100000) + 
-			(a.drawPriority * 10000) + 
-			((999 - (a.char.drawOrder ?? 0)))); 
-		});
+		}
+		this.checkSceneActions(1);
+		if((this.lastSortedTime + 100) < _gameTick) {
+			for(let a of _queue)
+				a.char.sortOrder = _maxSort - MathFloor((MathRound((a.drawPriority >= 10 ? 
+					0 : a.char.yPosition) / _yTol)
+				* 100000) + 
+				(a.drawPriority * 10000)
+				+ ((999 - (a.char.drawOrder ?? 0)))
+				);
+			this.lastSortedTime = _gameTick;
+		}
+		_queue = radixSortLSD(_queue, a => a.char.sortOrder);
 		c10.clearRect(0, 0, this.cWidth, this.cHeight);
 		offCtx.clearRect(0, 0, this.cWidth, this.cHeight);
 		if(__account.options.gore){
 			cGore.clearRect(0, 0, this.cWidth, this.cHeight);
 			offGoreCtx.clearRect(0, 0, this.cWidth, this.cHeight);
 		}
-		let _hasShadow, _hasDmg, _hasLeftEnemy, _hasRightEnemy;
+		let _hasDmg, _shadowItems;
 		for (var _item of _queue) {
-			if(_item.char.autoTarget && !_item.char.invulnerable && !_item.char.friendly && !_item.char.puppetMode && (_item.unseen || _item.char.unseen) && _item.char.enemy && _item.char.class !== __spell && _item.char.class !== 'object' && !_item.char.isDead() && 
-		_item.char.autoTarget === mainCharacter)
-			{
-				if(mainCharacter.EXACTLEFT > _item.char.EXACTLEFT)
-				{
-					if(!_hasLeftEnemy)
-						_hasLeftEnemy = 1;
-				}
-				else if(!_hasRightEnemy)
-					_hasRightEnemy = 1;
-			}
-			if(_item.unseen || _item.char.unseen)
+			if(_item.unseen || _item.char.out || _item.char.unseen){
 				continue;
-		 	if (!_hasShadow && _item.shadow)
-		 		_hasShadow = true;
+			}
 			if(!_hasDmg && (_item.char.hurting?.count > 0 || _item.skinColor))
 				_hasDmg = true;
 			if (!_item.unseen && _item.char?.shadow && !_item.char.unseen) {
@@ -2170,19 +3918,36 @@ function map(_m) {
 					offCtx.drawImage(this.FootShadow, _rel.left ?? 0, _rel.top ?? 0, _rel.width, _rel.height,
 						_item.char.LEFT,
 						MathRound(this.cHeight - _item.char.yPosition - (_item.char.yGap < 5 ? _shadowHeight / 2 : ((_shadowHeight * 3) / 4))),
-						parseInt(_rel.width * _relZoom), parseInt(_shadowHeight));
+						MathFloor(_rel.width * _relZoom), MathFloor(_shadowHeight));
 			}
 		}
 		let i = 0;
 		offCtx.reversed = c10.reversed = offGoreCtx.reversed = false;// = _cNPC.cleared = false;
-		let _zoomRate, _zoomedWidth, _zoomedHeight, _zoomedLeft, _zoomedTop, _hurt, _flash,
-		 _shadowItems, _hurted, _rotate, _wDiff, _hDiff, _colorized;
+		//let _zoomRate, _zoomedWidth, _zoomedHeight, _zoomedLeft, _zoomedTop, 
+		let _hurt, _hurted, _rotate, _wDiff, _hDiff, _hurtedCount = 0, _bounceCount = 0;
+		let _preDraws = [], _backgrounds = [], _relateds = [], _afterCanvasAnimations = [], _out;
 		for (var _item of _queue) {
 			if (_item.unseen || _item.char.remove || _item.char.unseen)
 				continue;
-			this.drawRelatedObjects(_item, function (x) { return x.background }, 1);
+			if(_item.char.bounce){
+				if(_bounceCount > 1)
+					continue;
+				_bounceCount++;
+			}
+			_backgrounds.length = _preDraws.length = _relateds.length = 0;
+			if(_item.objects)
+				for(let ob of _item.objects) {
+					if(ob.background)
+						_backgrounds.push(ob);
+					else if(ob.preDraw)
+						_preDraws.push(ob);
+					else
+						_relateds.push(ob);
+				}
+			this.drawRelatedObjects(_item, _backgrounds);
 			this.drawGoreObjects(_item);
-			if (!_item.unseen && !_item.alpha && !_item.char.unseen) {
+			_out = _item.char.out || _item.alpha;
+			if (!_out) {
 				if (_item.reversed) {
 					if (!offCtx.reversed) {
 						offCtx.reversed = true;
@@ -2202,11 +3967,12 @@ function map(_m) {
 			if (!_item.char.main && platformX)
 				_item.left -= platformX;
 			_hurt = _item.char.hurting?.count > 0;
-			if(_hurt && !_item.char.animations[_item.char.animation]?.hurt) {
+			const _anim = _item.char.animations?.[_item.animation];
+			if(_hurt && !_item.char.getCurrentAnimation()?.hurt) {
 				_hurt = false;
 				_item.char.hurting.count = 0;
 			}
-			_flash = _hurt; // && (!_item.char.lastHurtTime || ((_gameTick - _item.char.lastHurtTime) > 200));
+			// && (!_item.char.lastHurtTime || ((_gameTick - _item.char.lastHurtTime) > 200));
 			_shadowItems = [];
 			// if(_flash || _item.skinColor)
 			// {
@@ -2220,13 +3986,22 @@ function map(_m) {
 			// 		_shadowItems.push(_item.char.shadowData?.[shadowindex] ?? _item);
 			// 	}
 			// }
+			if (__account.options.effect && _item.char.shadowData?.length > 0 && 
+			!_item.char.unseen && !_hurt) {
+				for (var shadowindex = 0; shadowindex < (_item.char.shadowData?.length ?? 1); shadowindex++) {
+					if ((shadowindex % (_item.char.shadowIndex ?? 2)) > 0)
+						continue;
+					_shadowItems.push(_item.char.shadowData?.[shadowindex] ?? _item);
+				}
+			}
 			if (_hurt){
 				_item.char.hurting.count--;
 				if(_item.char.hurting.count <= 0)
 					_item.char.lastHurtTime = _gameTick;
 			}
-			if (!_item.unseen && !_item.alpha  && !_item.char.unseen) {
-				if(_item.char.release || _item.char.animation === 'release' || _item.char.buffs?.find(x => x.key === 'release')) {
+			if (!_out) {
+				if(_item.char.release || _item.animation === 'release' || 
+					_item.char.buffs?.find(x => x.key === 'release')) {
 					if(!_item.char.releaseCount)
 						_item.char.releaseCount = 0;
 					_item.char.releaseCount++;
@@ -2237,45 +4012,49 @@ function map(_m) {
 					_wDiff = (offCtx.reversed ? -1 : 1) * ((_item.width - (_item.width * (_item.zoom ?? 1))) / 2);
 					_hDiff = (_item.height - (_item.height * (_item.zoom ?? 1)));
 					if(!__batterySaveMode) {
-						_hurted = ((_hurt && _flash) || _item.skinColor);// && (_item.char.frame + _item.char.start) > 0;
-						// if(!_hurted && !_item.char.dead) {
-						// 	let _shadowItemOrder = 95;
-						// 	for(let _shadowItem of _shadowItems) {
-						// 		if(_shadowItemOrder > 255)
-						// 			break;
-						// 		const _shadowSprite = this.colorizeSprite4(_item, '#000000' + _shadowItemOrder.toString(16));
-						// 		if(_shadowSprite?.width > 0)
-						// 			offCtx.drawImage(_shadowSprite,
-						// 				MathRound(_shadowItem.reversed ? (-1 * _shadowItem.left) + (platformX - (_shadowItem.platformX ?? platformX))
-						// 					: _shadowItem.left - (platformX - (_shadowItem.platformX ?? platformX))), 
-						// 					MathRound(_shadowItem.top), 
-						// 					_shadowItem.width,
-						// 				_shadowItem.height);
-						// 		_shadowItemOrder += 40;
-						// 	}
-						// }
-						_rotate = _item.char.animations ?  _item.char.animations[_item.char?.animation]?.rotate : null;
+						_hurted = !(_item.char.readyForFatality && _item.animation === 'hurtground1') && 
+						(_hurt || _item.skinColor);// && (_item.char.frame + _item.char.start) > 0;
+						if(!_hurted && !_item.char.dead && _shadowItems?.[0]) {
+							let _shadowItemOrder = 55;
+							for(let _shadowItem of _shadowItems) {
+								if(_shadowItemOrder > 255)
+									break;
+								const _shadowSprite = this.colorizeSprite4(_item, _item.shadow + _shadowItemOrder.toString(16), 1);
+								if(_shadowSprite?.width > 0)
+									offCtx.drawImage(_shadowSprite,
+										MathRound(_shadowItem.reversed ? (-1 * _shadowItem.left) + (platformX - (_shadowItem.platformX ?? platformX))
+											: _shadowItem.left - (platformX - (_shadowItem.platformX ?? platformX))), 
+											MathRound(_shadowItem.top), 
+											_shadowItem.width,
+										_shadowItem.height);
+								_shadowItemOrder += 50;
+							}
+						}
+						_rotate = _item.char.animations ? _anim?.rotate : null;
 						if(_rotate) {
 							offCtx.translate(MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff - (_item.width / 2)) : (_item.left + _wDiff + (_item.width / 2))), 
 							MathRound(_item.top + _hDiff + (_item.height / 2)));  
 							offCtx.rotate(_rotate);  
 						}
-						_zoomRate = this.getPerspectiveRate(_item.char);
-						_zoomedWidth = MathRound(_item.width * _zoomRate);
-						_zoomedHeight = MathRound(_item.height * _zoomRate);
-						_zoomedLeft = MathRound((_zoomedWidth - _item.width) / 2);
-						_zoomedTop = MathRound(_zoomedHeight - _item.height);
+						// _zoomRate = this.getPerspectiveRate(_item.char, null, _item.animation);
+						// _zoomedWidth = MathRound(_item.width * _zoomRate);
+						// _zoomedHeight = MathRound(_item.height * _zoomRate);
+						// _zoomedLeft = MathRound((_zoomedWidth - _item.width) / 2);
+						// _zoomedTop = MathRound(_zoomedHeight - _item.height);
 						//_colorized = false;
-						if(_hurted) {
+						let _drawParticles = 1;
+						let _w, _x, _h, _y, _coordsSet;
+						if((_hurted && _anim.hurt && _item.char.frame < 2 && (_hurtedCount < 4 || _item.char.main)) || _item.skinColor) {
 							//if(!_item.char.colorized) {
 								//_item.char.colorized = _colorized = true;
-								const _hurtSprite = this.colorizeSprite4(_item);
+								const _hurtSprite = this.colorizeSprite4(_item, null, _item.skinColor ? 1 : null);
 								if(_hurtSprite?.width > 0)
 									offCtx.drawImage(_hurtSprite,
-										MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff + _zoomedLeft) : (_item.left + _wDiff - _zoomedLeft)), 
-										MathRound(_item.top + _hDiff - _zoomedTop), 
-										MathRound(_zoomedWidth * (_item.zoom ?? 1)),
-										MathRound(_zoomedHeight * (_item.zoom ?? 1)));
+										MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff)), 
+										MathRound(_item.top + _hDiff), 
+										MathRound(_item.width * (_item.zoom ?? 1) * 1.02),
+										MathRound(_item.height * (_item.zoom ?? 1) * 1.02));
+								_hurtedCount++;
 							// }
 							// else if(_item.char.colorized)
 							// 	_item.char.colorized = false;
@@ -2291,9 +4070,16 @@ function map(_m) {
 										_item.char.borderIndex =  0;
 								}
 								const _borderRate = _borderRates[_item.char.borderIndex];
-								const _zoomBRate = _zoomRate * _borderRate;
-								const _zoomedBWidth = MathRound(_item.width * _zoomBRate);
-								const _zoomedBHeight = MathRound(_item.height * _zoomBRate);
+								const _zoomBRate = 1 * _borderRate * (_item.char.borderRate ?? 1);
+								let _zoomedBWidth, _zoomedBHeight;
+								if(_item.width >= _item.height) {
+									_zoomedBWidth = MathCeil(_item.width * _zoomBRate);
+									_zoomedBHeight = (_zoomedBWidth - _item.width) + _item.height;
+								}
+								else {
+									_zoomedBHeight = MathCeil(_item.height * _zoomBRate);
+									_zoomedBWidth = (_zoomedBHeight - _item.height) + _item.width;
+								}
 								const _zoomedBLeft = MathRound((_zoomedBWidth - _item.width) / 2);
 								const _zoomedBTop = MathRound((_zoomedBHeight - _item.height) / 2);
 								const _borderSprite = this.colorizeSprite4(_item, _item.border);
@@ -2307,22 +4093,100 @@ function map(_m) {
 							}
 							else if(_item.char.borderIndex >= 0)
 								delete _item.char.borderIndex;
+							this.drawRelatedObjects(_item, _preDraws);
 							const _cropped = this.getCroppedSprite(_item.spriteX, _item.spriteY, _item.spriteWidth, _item.spriteHeight, 
 								_item.char, _item.sprite.relativeSrc, _item.frameKey);
 							if(!_cropped)
 								offCtx.drawImage(_item.sprite, _item.spriteX, _item.spriteY,
 									_item.spriteWidth, _item.spriteHeight,
-									MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff + _zoomedLeft) : (_item.left + _wDiff - _zoomedLeft)), 
-									MathRound(_item.top + _hDiff - _zoomedTop), 
-									MathRound(_zoomedWidth * (_item.zoom ?? 1)),
-									MathRound(_zoomedHeight * (_item.zoom ?? 1)));
-							else
-								offCtx.drawImage(_cropped,
-									MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff + _zoomedLeft) : (_item.left + _wDiff - _zoomedLeft)), 
-									MathRound(_item.top + _hDiff - _zoomedTop), 
-									MathRound(_zoomedWidth * (_item.zoom ?? 1)),
-									MathRound(_zoomedHeight * (_item.zoom ?? 1)));
+									MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff)), 
+									MathRound(_item.top + _hDiff), 
+									MathRound(_item.width * (_item.zoom ?? 1)),
+									MathRound(_item.height * (_item.zoom ?? 1)));
+							else if(_cropped.width > 0) {
+								_x = MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff));
+								_y = MathRound(_item.top + _hDiff);
+								_w = MathRound(_item.width * (_item.zoom ?? 1));
+								_h = MathRound(_item.height * (_item.zoom ?? 1));
+								_coordsSet = 1;
+								this.drawCharacterGhost(_item,_cropped,_x,_y,_w,_h);
+								offCtx.drawImage(_cropped,_x,_y,_w,_h);
+								if(_item.char.chargeProperties) {
+									if(!_item.char.ghostData)
+										_item.char.ghostData = [];
+									_item.char.ghostData.push({
+										left: _x,
+										top: _y,
+										width: _w,
+										height: _h,
+										sprite: _cropped,
+										p : platformX,
+										alpha: .6
+									});
+									if (_item.char.ghostData.length > 5)
+										_item.char.ghostData.shift();
+									// if(!_item.char.spawnDusts)
+									// 	_item.char.spawnDusts = [];
+									const _trails = (_item.char.relatedObjects.filter(x => x.key === 'trail2')?.length ?? 0);
+									const _scale = 1.5 - (_trails * 0.085);
+									// char init
+									if (_item.char.trailTick === undefined)
+										_item.char.trailTick = 0;
+
+									_item.char.trailTick++;
+
+									if ((_item.char.trailTick & 1) === 0)
+										_item.char.addObject({
+											key: 'trail2',
+											position: 'behind-feet',
+											xGap: 100 - (_trails * 10),
+											scale: _scale,
+											yGap: -5
+										});
+									// _item.char.spawnDusts.push({
+									// 	worldX: _x,
+									// 	y: _y + _h - 2,
+									// 	p: platformX,
+
+									// 	rise: (_h * 0.5),
+									// 	progress: 0,
+
+									// 	size: this.H(8) + Math.random() * this.H(4),
+									// 	wobble: (Math.random() - 0.5) * 0.5,
+
+									// 	trails: [] // ← işte dalga izi burada
+									// });
+								}
+								else {
+									if(_item.char.ghostData){
+										delete _item.char.ghostData;
+										_item.char.relatedObjects = _item.char.relatedObjects.filter(x => x.key !== 'trail2');
+									}
+								}
+							}
 						}
+						if(_item.char.hurtingStrength) {
+							if(!_coordsSet) {
+								_x = MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff));
+								_y = MathRound(_item.top + _hDiff);
+								_w = MathRound(_item.width * (_item.zoom ?? 1));
+								_h = MathRound(_item.height * (_item.zoom ?? 1));
+							}
+							const _knockback = _item.char.animation.startsWith('knockback');
+							let _hs = _item.char.hurtingStrength;
+							if(typeof _hs === 'string')
+								_hs = 4;
+							else 
+								_hs += (_knockback ? 2 : (_item.particleColor ? 3 : 0));
+							this.drawHitParticles(_item.char, _x + MathRound(_w / 2),
+							_y + MathRound(_h / 2), getRandomValue2(150, 190), 
+							_item.char.bloodColor === 'green' ? '#1f6f2e' : '#880808', 
+							_hs, _knockback, _item.char.hurtingStrength);
+							delete _item.char.hurtingStrength;
+							_drawParticles = 0;
+						}
+						if(_drawParticles && _item.char.particles)
+							this.drawHitParticles(_item.char);
 						if(_item.char.text)
 						{
 							let _restored;
@@ -2351,28 +4215,37 @@ function map(_m) {
 					}
 				}
 			}
-			if (!_item.char.friendly)
+			if (!_item.char.friendly && !_anim?.skipHealthBar)
 				this.drawHealthBar2(_item);
 			this.checkBubbleText(_item.char);
-			// if (_item.char.hasShadowBehind || (_item.char.chargeProperties && 
-			// 	(_item.char.main || _item.char.class === 'boss' || _item.char.alp))) {
-			// 	if (!_item.char.shadowData)
-			// 		_item.char.shadowData = [];
-			// 	else if (_item.char.shadowData.length > ((_item.char.chargeProperties || _item.char.hasShadowBehind) ? 5 : (_item.char.class === 'boss' ? 3 : 1)))
-			// 	_item.char.shadowData.splice(0, _item.char.shadowIndex ?? 2);
-			// 	_item.platformX = platformX;
-			// 	_item.char.shadowData.push(_item);
-			// }
-			// else if(_item.char.shadowData?.length > 0) {
-			// 	_item.char.shadowData.splice(0, _item.char.shadowIndex ?? 2);
-			// 	if(_item.char.shadowData?.length === 0)
-			// 		_item.char.shadowData = undefined;
-			// }
-			this.drawRelatedObjects(_item, function (x) { return !x.background });
+			if (_item.shadow 
+				// || (_item.char.chargeProperties && 
+				// (_item.char.main || _item.char.class === 'boss' || _item.char.alp))
+			) {
+				if (!_item.char.shadowData)
+					_item.char.shadowData = [];
+				else if (_item.char.shadowData.length > (_item.char.class === 'boss' ? 3 : 1))
+				_item.char.shadowData.splice(0, _item.char.shadowIndex ?? 2);
+				_item.platformX = platformX;
+				_item.char.shadowData.push(_item);
+			}
+			else if(_item.char.shadowData?.length > 0) {
+				_item.char.shadowData.splice(0, _item.char.shadowIndex ?? 2);
+				if(_item.char.shadowData?.length === 0)
+					_item.char.shadowData = undefined;
+			}
+			this.drawRelatedObjects(_item, _relateds);
 			if(_item.char.canvasObjects?.[0])
-				for(let _cobj of _item.char.canvasObjects)
-					canvasAnimations[_cobj.key](_item.char, _cobj.params);
+				for(let _cobj of _item.char.canvasObjects){
+					if(!_cobj.params.after)
+						canvasAnimations[_cobj.key](_item.char, _cobj.params, offCtx);
+					else
+						_afterCanvasAnimations.push({key:_cobj.key, char:_item.char,params:_cobj.params});
+				}
 		}
+		if(_afterCanvasAnimations?.[0])
+			for(let _cobj of _afterCanvasAnimations)
+				canvasAnimations[_cobj.key](_cobj.char, _cobj.params, offCtx);
 		if(offCtx.reversed) {
 			offCtx.restore();
 			offCtx.reversed = false;
@@ -2403,8 +4276,23 @@ function map(_m) {
 					}
 				}
 			}
+			else {
+				prevPlatformX = platformX;
+				platformX -= this.cameraMoveStep;
+				mainCharacter.left += this.cameraMoveStep;
+				mainCharacter.platformX = platformX;
+				if(mainCharacter.left >= centerMinX){
+					mainCharacter.direction = __left;
+					delete this.cameraMoveStep;
+					mainCharacter.disableKeyboard = mainCharacter.immobilize = false;
+					if(this.cameraMoveEndFunc) {
+						this.cameraMoveEndFunc();
+						delete this.cameraMoveEndFunc;
+					}
+				}
+			}
 		}
-		this.checkUnseenEnemyPointer(_hasLeftEnemy, _hasRightEnemy);
+		this.checkUnseenEnemyPointer();
 		this.checkSceneActions();
 	}
 	this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 3) {
@@ -2436,25 +4324,27 @@ function map(_m) {
 		ctx.drawImage(image, x, y);
 		ctx.restore();
 	}
-	this.checkUnseenEnemyPointer = function(_l, _r) {
+	this.checkUnseenEnemyPointer = function() {
 		if((_gameTick - 500) < this.enemyArrowsShown)
 			return;
+		const _l = mainCharacter?.hasLeftEnemy;
+		const _r = mainCharacter?.hasRightEnemy;
 		if(!this.enemyLeftArrow)
 			this.enemyLeftArrow = document.querySelector('.enemy-left-arrow');
 		else { 
 			if(_l)
-				removeClass(this.enemyLeftArrow, 'd-none');
+				removeClass(this.enemyLeftArrow, 'v-none');
 			else
-				addClass(this.enemyLeftArrow, 'd-none');
+				addClass(this.enemyLeftArrow, 'v-none');
 		}
 			
 		if(!this.enemyRightArrow)
 			this.enemyRightArrow = document.querySelector('.enemy-right-arrow');
 		else {
 			if(_r)
-				removeClass(this.enemyRightArrow, 'd-none');
+				removeClass(this.enemyRightArrow, 'v-none');
 			else
-				addClass(this.enemyRightArrow, 'd-none');
+				addClass(this.enemyRightArrow, 'v-none');
 		}
 		this.enemyArrowsShown  = _gameTick;
 		return;
@@ -2486,59 +4376,17 @@ function map(_m) {
 			c10.fill(path);
 		}
 	}
-	this.checkSceneActions = function() {
+	this.checkSceneActions = function(_before) {
 		if(!__storyScene?.actions)
 			return;
-		for(let _act of __storyScene.actions)
+		for(let _act of __storyScene.actions) {
+			if((_act.before && !_before) || (!_act.before && _before))
+				continue;
 			if(_act.when() && _act.do)
 				_act.do();
-	}
-	this.drawCharacter = function(_can, _item) {
-		const _wDiff = (_can.reversed ? -1 : 1) * ((_item.width - (_item.width * (_item.zoom ?? 1))) / 2);
-		const _hDiff = (_item.height - (_item.height * (_item.zoom ?? 1)));
-		const _left = MathRound(_can.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff));
-		const _top = MathRound(_item.top + _hDiff);
-		const _width = MathRound(_item.width * (_item.zoom ?? 1));
-		const _height =	MathRound(_item.height * (_item.zoom ?? 1));
-		if(!this.characterSprites)
-			this.characterSprites = [];
-		const _anim = _item.char.animation;
-		const _frame = _item.char.frame;
-		const _sprite = this.characterSprites.find(x => 
-			x.animation === _anim && 
-			x.frame === _frame && 
-			x.width === _width &&
-			x.height === _height
-		);
-		if(!_sprite?.img) {
-			_can.drawImage(_item.sprite, _item.spriteX, _item.spriteY,
-				_item.spriteWidth, _item.spriteHeight, _left, _top, _width, _height);
-			if(!this.characterCanvas)
-				this.characterCanvas = document.createElement('canvas');
-			this.characterCanvas.width = _width;
-			this.characterCanvas.height = _height;
-			const characterCanvasContext = this.characterCanvas.getContext('2d');
-			this.characterCanvas.imageSmoothingEnabled = false;
-			characterCanvasContext.clearRect(0, 0, _width, _height);
-			characterCanvasContext.drawImage(_item.sprite, _item.spriteX, _item.spriteY,
-				_item.spriteWidth, _item.spriteHeight, 0, 0, _width, _height);
-			this.characterCanvas.toBlob((blob) => {
-				let img = new Image();
-				img.onload = function() {
-					episode.characterSprites.push({
-						width: _width,
-						height: _height,
-						animation: _anim,
-						frame: _frame,
-						img: this
-					});
-				}
-				img.src = URL.createObjectURL(blob);
-			});
 		}
-		else
-			_can.drawImage(_sprite.img, _left, _top);
 	}
+	
 	this.checkBubbleText = function (_char) {
 		if (_char.remove || _char.dead || _char.dying) {
 			const _bubble = episode.bubbles?.find(x => x.key === _char.key)?.elem; //document.querySelectorAll('.talk-bubble-' + _char.key);
@@ -2552,10 +4400,11 @@ function map(_m) {
 				_char.buffContainer = document.querySelector('#char-' + _char.key + ' .buffs');
 			if (!_char.buffContainer)
 				return;
+			if(_char.buffKey === _char.lastBuffKey)
+				return;
 			while (_char.buffContainer.firstChild) {
 				_char.buffContainer.removeChild(_char.buffContainer.firstChild);
 			}
-			//_char.buffContainer.innerHTML = '';
 			const _arr = this.sortBuffs(_char.buffs);
 			for (var _buff of _arr) {
 				const _buffItem = document.createElement('img');
@@ -2563,10 +4412,12 @@ function map(_m) {
 				_buffItem.className = (_allBuffs[_buff.key].gain ? 'buff' : 'debuff') + (_buff.level > 3 ? 3 : _buff.level) + '-' + _size;
 				_char.buffContainer.appendChild(_buffItem);
 			}
+			_char.lastBuffKey = _char.buffKey;
 		}
 		else if (_char.buffContainer && _char.hadBuff) {
 			delete _char.hadBuff;
 			_char.buffContainer.innerHTML = '';
+			delete _char.lastBuffKey;
 		}
 	}
 	this.sortBuffs = function (_buffs) {
@@ -2592,242 +4443,6 @@ function map(_m) {
 			}
 		}
 	}
-	this.drawHealthBar = function (_item) {
-		if(__batterySaveMode)
-			return;
-		if (_item.char.main) {
-			this.drawBuffs(_item.char, 'big');
-			return;
-		}
-		if (!_item.char.key || !_item.char.hpDropped || _item.char.MAXHP <= 1 || _item.char.class === __spell || _item.char.animation === 'respawn')
-			return;
-		const _id = 'hb-' + _item.char.key;
-		let hb = _item.char.healthBarElem ?? document.getElementById(_id), hbInner;
-		const hbWidth = MathRound((this.cWidth / 100) * (_item.char.class === 'boss' ? 8 : 4));
-		if (_item.char.remove || _item.char.skipHealthBar || _item.char.isDead()) {
-			if (hb) {
-				hb.remove();
-				_item.char.healthBarElem = undefined;
-				_item.char.healthBarDrawn = false;
-			}
-			return;
-		}
-		else if(_item.unseen && hb) {
-			hb.unseen = 1;
-			addClass(hb, 'd-none');
-			return;
-		}
-		else if(hb?.unseen && !_item.unseen) {
-			delete hb.unseen;
-			removeClass(hb, 'd-none');
-		}
-		if(_item.char.lastHBUpdateTime && ((_gameTick - _item.char.lastHBUpdateTime) < 30))
-			return;
-		const _bigHPClass = 'boss';
-		_item.char.lastHBUpdateTime = _gameTick;
-		const isWarPlayer = _item.char.enemy && this.war;
-		const xGap = MathRound((_item.char.WIDTH - hbWidth) / 2);
-		const hpRate = _item.char.darkenHealthBar ? 100 : (_item.char.health / _item.char.MAXHP) * 100;
-		if (!hb) {
-			if(isWarPlayer) {
-				hb = document.createElement('span');
-				hb.id = _id;
-				//hb.src = "./images/icons/enemy.png";
-				let _name = _item.char.displayName ?? _item.char.name;
-				if(_name?.length > 8)
-					_name = _name.substring(0, 8);
-				hb.innerText = '<' + _name + '>';
-				hb.h = _item.char.HEIGHT;
-				hb.className = 'war-player-name';
-				_gamePad.appendChild(hb);
-				_item.char.healthBarDrawn = true;
-			}
-			else {
-				hb = document.createElement('div');
-				hb.id = _id;
-				hb.className = 'health-bar-tiny' + (_item.char.class === _bigHPClass ? ' boss' : '');
-				hbInner = document.createElement('div');
-				if (_item.char.displayName && (_item.char.grade > 1 || this.pvp || _item.char.receive) && (_item.char.class !== _bigHPClass))
-					hbInner.innerHTML = '<div class="flex one-line" style="color:#ffffffcc;position:absolute;top:-3vh">' + _item.char.displayName + '</div>';
-				hbInner.className = 'health-bar-tiny-inner flex flex-jc-start';
-				hb.appendChild(hbInner);
-				if (_item.char.animations.block && _item.char.enemy) {
-					const _enemyDefBar = document.createElement('div');
-					_enemyDefBar.style = 'height:35%;width:100%;background:#9D00FF';
-					_enemyDefBar.id = 'defbar-' + _id;
-					_enemyDefBar.className = 'enemy-def-bar';
-					hb.appendChild(_enemyDefBar);
-					_item.char.hasFatiqueBar = 1;
-				}
-				if (_item.char.animations.air2 && _item.char.enemy) {
-					const _enemyRageBar = document.createElement('div');
-					_enemyRageBar.style = 'height:20%;width:100%';
-					_enemyRageBar.className = 'enemy-rage-bar';
-					const _innerRageBar = document.createElement('div');
-					_innerRageBar.className = 'enemy-rage-bar-inner';
-					_innerRageBar.id = "ragebar-" + _id;
-					_enemyRageBar.appendChild(_innerRageBar);
-					hb.appendChild(_enemyRageBar);
-					_item.char.hasRageBar = 1;
-				}
-				(_item.char.class === _bigHPClass ? _gameUI : _gamePad).appendChild(hb);
-				_item.char.healthBarDrawn = true;
-				hb.h = _item.char.HEIGHT;
-				if (_item.char.grade > 1 && _item.char.gradeLeft > 0)
-					hb.style.background = getGradeBGColor(_item.char.grade);
-			}
-		}
-		if(!isWarPlayer) {
-			let _buffContainer = _item.char.buffWrapper ?? document.getElementById('buff-' + _id);
-			if (!_buffContainer) {
-				_buffContainer = document.createElement('div');
-				_buffContainer.className = 'flex flex-jc-start buff-container';
-				_buffContainer.id = 'buff-' + _id;
-				hb.appendChild(_buffContainer);
-				_item.char.buffWrapper = _buffContainer;
-			}
-			if (_item.char.buffs?.length > 0) {
-				let _buffCount = 0, _debuffCount = 0;
-				const _arr = this.sortBuffs(_item.char.buffs);
-				const _arrKey = _arr.map(x => x.key).join(',');
-				if(_buffContainer.buffKey !== _arrKey) {
-					_buffContainer.innerHTML = '';
-					for (var _b of _arr) {
-						const _buff = _allBuffs[_b.key];
-						const _type = _buff.gain ? 'buff' : 'debuff';
-						if (_buff.gain) {
-							if (_buffCount === 2)
-								continue;
-							_buffCount++;
-						}
-						else if (_buff.loss) {
-							if (_debuffCount === 2)
-								continue;
-							_debuffCount++;
-						}
-						const _buffIcon = document.createElement('img');
-						_buffIcon.src = './images/buff/icons/' + _b.key + '.png';
-						_buffIcon.className = _type + _b.level + '-small';
-						_buffContainer.appendChild(_buffIcon);
-					}
-					_buffContainer.buffKey =_arrKey;
-				}
-			}
-			else if(_buffContainer.buffKey) {
-				delete _buffContainer.buffKey;
-				_buffContainer.innerHTML = '';
-			}
-		}
-		let _extraTop = isWarPlayer ? MathRound(-40 * _item.char.ZOOM) : 0;
-		const _finishable = hpRate <= __finishingMoveHPPercent;
-		if (_item.char.animation === 'hurthug')
-			_extraTop = -1 * MathRound(_item.char.HEIGHT/ 2);
-		const _frame = _item.char.getCurrentFrame();
-		if (_frame.bottomGap)
-			_extraTop += MathRound(_frame.bottomGap * _item.char.ZOOM);
-		const _hbTop = MathRound((this.cHeight + _extraTop) - (MathRound((_item.char.healtbarGap ?? 0) * __zoom)) - _item.char.yPosition - hb.h - (_item.yGap ?? 0) - (_item.char.yGap ?? 0));
-		//if(hb.scrTop !== _hbTop)
-		//	hb.style.top = _hbTop + 'px';
-		const _hbLeft = MathRound(_item.char.EXACTLEFT + xGap);
-		if((hb.scrLeft !== _hbLeft || hb.scrTop !== _hbTop) && (_item.char.class !== _bigHPClass)){
-			hb.style.transform = 'translate(' + _hbLeft + 'px,-' + (this.cHeight - _hbTop) + 'px)';
-			hb.style.setProperty('-webkit-transform', hb.style.transform);
-		}
-		else if(_item.char.class === _bigHPClass && hbInner && 
-			hbInner.gradeLeft != _item.char.gradeLeft) {
-			hbInner.gradeLeft = _item.char.gradeLeft;
-			hb.innerHTML = hb.innerHTML + '<span style="position:absolute;height:100%;display:flex;align-items:center;left:1vw;top:0;color:#f7f7f7 !important;text-shadow:0 0 .5vh #000">Lvl ' + _item.char.level + ' - ' + _item.char.displayName + '</span><span id="boss-grade-count" style="color:#f7f7f7 !important;text-shadow:0 0 .5vh #000;position:absolute;top:0;height:100%;right:1vw;display:flex;align-items:center">' + (_item.char.gradeLeft > 0 ? 'x' + (_item.char.gradeLeft + 1) : '') + '</span>';
-		}
-		hb.scrLeft = _hbLeft;
-		hb.scrTop = _hbTop;
-		if (!hbInner)
-			hbInner = document.querySelector('#' + _id + ' .health-bar-tiny-inner');
-		if(hbInner && hpRate !== hbInner.hpRate) {
-			hbInner.style.width = hpRate + '%';
-			hbInner.hpRate = hpRate;
-		}
-		if(!isWarPlayer) {
-			if (_item.targeted && !_item.char.hasTargetIcon) {
-				let _icon = document.getElementById(_id + '-span');
-				if (_icon)
-					_icon.remove();
-				_icon = document.getElementById(_id + '-icon');
-				if (!_icon) {
-					_icon = document.createElement('div');
-					_icon.id = _id + '-icon';
-					_icon.className = 'finishable health-bar-tiny-icon';
-					_icon.innerHTML = '<img style="border-radius:100%" src="./images/main/skill-icons/finish.png" class="full finishable" />';
-					hb.appendChild(_icon);
-					_item.char.hasTargetIcon = 1;
-				}
-			}
-			else if(!_item.targeted) {
-				let _icon = document.getElementById(_id + '-icon');
-				if (_icon)
-					_icon.remove();
-				_icon = document.getElementById(_id + '-span');
-				if (!_icon) {
-					_icon = document.createElement('span');
-					_icon.id = _id + '-span';
-					_icon.className = (_item.char.class === 'minion' ? 'minion ' : '') + 'flex mob-level' + (_item.char.grade > 1 ? ' mob-level-grade' : '') + ' health-bar-tiny-icon';
-					_icon.innerText = _item.char.level;
-					hb.appendChild(_icon);
-				}
-				delete _item.char.hasTargetIcon;
-			}
-			if (_finishable)
-				addClass(hb, 'finishable');
-			else if (!_item.char.autoMode) {
-				addClass(hb, 'friendly-enemy');
-				removeClass(hb, 'hostile-enemy');
-			}
-			else if (_item.char.autoMode === 2) {
-				addClass(hb, 'hostile-enemy');
-				removeClass(hb, 'friendly-enemy');
-			}
-			else
-				removeClass(hb, 'finishable');
-			if (_item.char.darkenHealthBar) {
-				if(hbInner && hbInner.bg !== 0) {
-					hbInner.style.background = 'linear-gradient(180deg, rgba(0, 0, 0,.5),  black, black, #00000080)';
-					hbInner.bg = 0;
-				}
-			}
-			else if (_item.char.gradeLeft > 0) {
-				if(hbInner && hbInner.bg !== 1) {
-					if (__account.questStatus.quest && (__account.questStatus.quest.loots ?? __account.questStatus.quest.kills)?.find(x => x.enemy?.indexOf(_item.char.id) >= 0))
-						hbInner.style.border = '.4vh solid orange';
-					let _color = _item.char.grade < 2 ? '#008000' : getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
-					if(!_bigHPClass)
-						hbInner.style.background = 'linear-gradient(180deg, ' + _color + '80, ' + _color + ', ' + _color + ', ' + _color + '80)';
-					else
-						hbInner.style.background = _color;
-					hbInner.bg = 1;
-				}
-			}
-			else if (hpRate > 66) {
-				if(hbInner && hbInner.bg !== 4) {
-					if (__account.questStatus.quest && (__account.questStatus.quest.loots ?? __account.questStatus.quest.kills)?.find(x => x.enemy?.indexOf(_item.char.id) >= 0))
-						hbInner.style.border = '.4vh solid orange';
-					let _color = _item.char.grade < 2 ? '#008000' : getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
-					hbInner.style.background = 'linear-gradient(180deg, ' + _color + '80, ' + _color + ', ' + _color + ', ' + _color + '80)';
-					hbInner.bg = 4;
-				}
-			}
-			else if (hpRate > 33){
-				if(hbInner && hbInner.bg !== 2) {
-					hbInner.style.background = 'linear-gradient(180deg, rgba(255, 255, 0,.5),  yellow, yellow, #00000080)';
-					hbInner.bg = 2;
-				}
-			}
-			else {
-				if(hbInner && hbInner.bg !== 3) {
-					hbInner.style.background = 'linear-gradient(180deg, rgba(255, 0, 0,.5),  red, red, #00000080)';
-					hbInner.bg = 3;
-				}
-			}
-		}
-	}
 	this.fillRoundedRect = function(ctx, color, x, y, width, height) {
         ctx.fillStyle = color;
 		ctx.fillRect(x,y,width,height);
@@ -2837,271 +4452,772 @@ function map(_m) {
         ctx.lineWidth = lineWidth;
 		ctx.strokeRect(x,y,width,height);
     }
+	
+	// this.drawHealthBar2 = function (_item) {
+	// 	if(__batterySaveMode || _item.unseen || _item.char.skipHealthBar || _item.char.remove || _item.char.health <= 0 || _item.char.dead)
+	// 		return;
+	// 	if (_item.char.main) {
+	// 		this.drawBuffs(_item.char, 'big');
+	// 		return;
+	// 	}
+	// 	if (!_item.char.key || !_item.char.hpDropped || _item.char.MAXHP <= 1 || _item.char.class === __spell || _item.char.animation === 'respawn')
+	// 		return;
+	// 	if(_item.char.hpDropped < (_gameTick - 4000))
+	// 		return;
+	// 	const _hpRate = _item.char.healthRate;
+	// 	const isWarPlayer = _item.char.enemy && this.war;
+	// 	const _isBoss = _item.char.class === 'boss';
+	// 	let hbInner = {};
+	// 	let _hWidth = MathRound((this.cWidth / 100) * (_item.char.class === 'boss' ? 8 : 4));
+	// 	if(_item.char.healthBarWidthRate)
+	// 		_hWidth = MathRound(_item.char.healthBarWidthRate * _hWidth); 
+	// 	const _xGap = MathRound((_item.char.WIDTH - _hWidth) / 2);
+	// 	let _hLeft = MathRound(_item.char.EXACTLEFT + _xGap);
+	// 	let _extraTop = isWarPlayer ? MathRound(-40 * _item.char.ZOOM) : 0;
+	// 	let _hHeight = this.defaultHealthBarHeight;
+	// 	if(_item.char.healthBarHeightRate)
+	// 		_hHeight = MathRound(_item.char.healthBarHeightRate * _hHeight); 
+	// 	let _hTop = MathRound((this.cHeight + _extraTop) - _hHeight - (MathRound((_item.char.healtbarGap ?? 0) * __zoom)) - _item.char.yPosition -  _item.char.HEIGHT - (_item.yGap ?? 0) - (_item.char.yGap ?? 0));
+	// 	if(_isBoss) {
+	// 		const _id = 'hb-' + _item.char.key;
+	// 		let hb = _item.char.healthBarElem ?? document.getElementById(_id);
+	// 		if (!hb) {
+	// 			hb = document.createElement('div');
+	// 			hb.id = _id;
+	// 			hb.className = 'health-bar-tiny boss';
+	// 			hbInner = document.createElement('div');
+	// 			hbInner.className = 'health-bar-tiny-inner flex flex-jc-start';
+	// 			hb.appendChild(hbInner);
+	// 			if (_item.char.animations.block && _item.char.enemy) {
+	// 				const _enemyDefBar = document.createElement('div');
+	// 				_enemyDefBar.style = 'height:35%;width:100%;background:#9D00FF';
+	// 				_enemyDefBar.id = 'defbar-' + _id;
+	// 				_enemyDefBar.className = 'enemy-def-bar';
+	// 				hb.appendChild(_enemyDefBar);
+	// 				_item.char.hasFatiqueBar = 1;
+	// 			}
+	// 			if (_item.char.animations.air2 && _item.char.enemy) {
+	// 				const _enemyRageBar = document.createElement('div');
+	// 				_enemyRageBar.style = 'height:20%;width:100%';
+	// 				_enemyRageBar.className = 'enemy-rage-bar';
+	// 				const _innerRageBar = document.createElement('div');
+	// 				_innerRageBar.className = 'enemy-rage-bar-inner';
+	// 				_innerRageBar.id = "ragebar-" + _id;
+	// 				_enemyRageBar.appendChild(_innerRageBar);
+	// 				hb.appendChild(_enemyRageBar);
+	// 				_item.char.hasRageBar = 1;
+	// 			}
+	// 			_gameUI.appendChild(hb);
+	// 			_item.char.healthBarDrawn = true;
+	// 			hb.h = _item.char.HEIGHT;
+	// 			if (_item.char.grade > 1 && _item.char.gradeLeft > 0)
+	// 				hb.style.background = getGradeBGColor(_item.char.grade);
+	// 		}
+	// 		if(hbInner && 
+	// 			hbInner.gradeLeft != _item.char.gradeLeft) {
+	// 			hbInner.gradeLeft = _item.char.gradeLeft;
+	// 			hb.innerHTML = hb.innerHTML + '<span style="position:absolute;height:100%;display:flex;align-items:center;left:1vw;top:0;color:#f7f7f7 !important;text-shadow:0 0 .5vh #000">Lvl ' + _item.char.level + ' - ' + _item.char.displayName + '</span><span id="boss-grade-count" style="color:#f7f7f7 !important;text-shadow:0 0 .5vh #000;position:absolute;top:0;height:100%;right:1vw;display:flex;align-items:center">' + (_item.char.gradeLeft > 0 ? 'x' + (_item.char.gradeLeft + 1) : '') + '</span>';
+	// 		}
+	// 		hb.scrLeft = _hLeft;
+	// 		hb.scrTop = _hTop;
+	// 		if (!hbInner)
+	// 			hbInner = document.querySelector('#' + _id + ' .health-bar-tiny-inner');
+	// 		if(hbInner?.style && _hpRate !== hbInner.hpRate) {
+	// 			hbInner.style.width = _hpRate + '%';
+	// 			hbInner.hpRate =_hpRate;
+	// 		}
+	// 		if(!isWarPlayer) {
+	// 			if (!_item.char.autoMode) {
+	// 				addClass(hb, 'friendly-enemy');
+	// 				removeClass(hb, 'hostile-enemy');
+	// 			}
+	// 			else if (_item.char.autoMode === 2) {
+	// 				addClass(hb, 'hostile-enemy');
+	// 				removeClass(hb, 'friendly-enemy');
+	// 			}
+	// 		}
+	// 	}
+	// 	let _hpBG = !_item.char.gradeLeft ? '#B2BEB5' : getGradeBGColor(_item.char.gradeLeft + 1), _bg, _border;
+	// 	if (_item.char.gradeLeft > 0) {
+	// 		if(hbInner && hbInner.bg !== 1) {
+	// 			if (__account.questStatus.quest && (__account.questStatus.quest.loots ?? __account.questStatus.quest.kills)?.find(x => x.enemy?.indexOf(_item.char.id) >= 0))
+	// 				_border = '#B87333';
+	// 			let _color = _item.char.grade < 2 ? '#2E8B57' : getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
+	// 			if(!_isBoss)
+	// 				_bg = _color;
+	// 			else if(hbInner?.style)
+	// 				hbInner.style.background = _color;
+	// 			hbInner.bg = 1;
+	// 		}
+	// 	}
+	// 	else if (_hpRate > 50) {
+	// 		if(hbInner && hbInner.bg !== 4) {
+	// 			if (__account.questStatus.quest && (__account.questStatus.quest.loots ?? __account.questStatus.quest.kills)?.find(x => x.enemy?.indexOf(_item.char.id) >= 0))
+	// 				_border = '#B87333';
+	// 			_bg =  _item.char.grade < 2 ? '#2E8B57' : getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
+	// 			hbInner.bg = 4;
+	// 		}
+	// 	}
+	// 	else {//if (_hpRate > 0){
+	// 		if(hbInner && hbInner.bg !== 2) {
+	// 			_bg = 'yellow';
+	// 			hbInner.bg = 2;
+	// 		}
+	// 	}
+	// 	// else {
+	// 	// 	if(hbInner && hbInner.bg !== 3) {
+	// 	// 		_bg = 'red';
+	// 	// 		hbInner.bg = 3;
+	// 	// 	}
+	// 	// }
+	// 	if(_item.char.hurting?.count === 2)
+	// 		_border = '#f3f4f5';
+	// 	else if(!_border) {
+	// 		if (!_item.char.autoMode)
+	// 			_border = '#36454F';
+	// 		else if (_item.char.autoMode === 2)
+	// 			_border = '#C41E3A';
+	// 	}
+	// 	if (offCtx.reversed) 
+	// 		offCtx.restore();
+	// 	const _tinyHeight = MathRound(_hHeight / 5);
+	// 	const _H = (MathRound(_tinyHeight * 1.35) * 2) + _hHeight + 2;
+	// 	let _barHeight = MathRound(_tinyHeight * 1.5) + _hHeight;
+	// 	this.fillRoundedRect(offCtx, _hpBG, _hLeft, _hTop, _hWidth, _hHeight);
+	// 	this.fillRoundedRect(offCtx, _bg, _hLeft, _hTop, MathCeil(_hWidth * (_hpRate / 100)), _hHeight);
+    //     this.drawRoundedRect(offCtx, _border ?? '#E97451', 1, _hLeft, _hTop, _hWidth, _hHeight);
+	// 	//if(px === 1)
+    //     	//this.drawRoundedRect(offCtx, '#cccccc', 1, _hLeft, _hTop + 1, MathRound(MathCeil(_hWidth * (_hpRate / 100)) * .95), 1);
+	// 	// if (_item.char.animations.block && _item.char.enemy) {
+	// 	// 	const _fRate = (_item.char.fatique / _item.char.maxFatique);
+    //     // 	this.fillRoundedRect(offCtx, '#702963', _hLeft, _hTop + _hHeight, _hWidth, MathRound(_tinyHeight * 1.5));
+    //     // 	this.fillRoundedRect(offCtx, '#6082B6', _hLeft, _hTop + _hHeight, MathCeil(_hWidth * _fRate), MathRound(_tinyHeight * 1.5));
+	// 	// 	this.drawRoundedRect(offCtx, '#0437F2', 1, _hLeft, _hTop + _hHeight, _hWidth, MathRound(_tinyHeight * 1.35));
+	// 	// }
+	// 	// if(_item.char.animations.air2 && _item.char.enemy)
+	// 	// 	this.fillRoundedRect(offCtx, '#D2042D', _hLeft, _hTop + _hHeight + MathRound(_tinyHeight * 1.35), _hWidth, MathRound(_tinyHeight * 1.35));
+    //     if(_item.char.healthBarIcon) {
+	// 		_hTop -= (MathRound(((2 * _hHeight) - _barHeight) / 2) - 1);
+	// 		this.fillRoundedRect(offCtx, '#000000', _hLeft - _H - 2, _hTop - 2, _H + 4, _H + 4);
+	// 		getImage('./images/icons/' + _item.char.healthBarIcon + '.png', function(_img) {
+	// 			offCtx.drawImage(_img, _hLeft - _H, _hTop,_H,_H);
+	// 		});
+	// 	}
+	// 	if(offCtx.reversed) {
+	// 		offCtx.save();
+	// 		offCtx.scale(-1, 1);
+	// 	}
+	// }
+	this.healthBarCache = this.healthBarCache ?? new Map();
+	this.w100 = MathRound(this.cWidth / 100);
+	this.VH3 = MathRound(window.innerHeight / 33);
+	// this.drawMobHealthBar = function(cofftx, _item, x, y, w) {
+	// 	const _char = _item.char;
+	// 	const h = MathRound(w * (26 / 124));
+	//     // HP Ratio
+	//     let ratio = Math.max(0, Math.min(1, _char.health / _char.MAXHP));
+
+	//     // İlk tick ise previousHPRatio yok → oluştur
+	//     if (_char.previousHPRatio === undefined) {
+	//         _char.previousHPRatio = ratio;
+	//         _char.damageFlash = 0; 
+	//     }
+
+	//     // HP düştüyse flash tetikle
+	//     if (ratio < _char.previousHPRatio) {
+	//         _char.damageFlash = 1; 
+	//     }
+
+	//     // Flash zamanla sönsün
+	//     if (_char.damageFlash > 0) {
+	//         _char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
+	//     }
+
+	//     // Yeni HP değerini sakla
+	//     _char.previousHPRatio = ratio;
+	// 	const _rev = offCtx.reversed;
+	// 	if(offCtx.reversed)
+	// 		offCtx.restore();
+
+	//     // --- 1. ÇERÇEVEYİ ÇİZ ---
+	//     cofftx.drawImage(this.HBMob, x, y, w, h);
+
+
+	//     // --- 2. INNER BAR MARGIN ---
+	// 	let padX = w * .06;
+	// 	let padY = h * .225;
+	//     let innerX = x + padX;
+	//     let innerY = y + padY;
+	//     let innerW = w - padX * 2;
+	//     let innerH = h - padY * 2;
+
+	//     // --- 3. HEALTH COLOR (yeşil → kırmızı) ---
+	//     let r = Math.floor(255 * (1 - ratio));
+	//     let g = Math.floor(255 * ratio);
+	//     let color = `rgb(${r},${g},0)`;
+
+	//     // Bar genişliği
+	//     let barW = innerW * ratio;
+
+	//     // Health bar'ı çiz
+	//     cofftx.save();
+	//     cofftx.fillStyle = color;
+	//     cofftx.fillRect(innerX, innerY, barW, innerH);
+	//     //cofftx.restore();
+
+
+	//     // --- 4. DAMAGE FLASH (otomatik) ---
+	//     if (_char.damageFlash > 0) {
+	//         //cofftx.save();
+	//         cofftx.globalAlpha = _char.damageFlash;
+	//         cofftx.fillStyle = "white";
+	//         cofftx.fillRect(innerX, innerY, innerW, innerH);
+	//         //cofftx.restore();
+	//     }
+	// 	cofftx.restore();
+	// 	if(_rev) {
+	// 		offCtx.save();
+	// 		offCtx.scale(-1, 1);
+	// 	}
+	// }
+	this.drawMobHealthBar = function (ctx, _item, x, y, w) {
+		const _char = _item.char;
+		const h = MathRound(w * (26 / 124));
+
+		let ratio = _char.health / _char.MAXHP;
+		if (ratio < 0) ratio = 0;
+		else if (ratio > 1) ratio = 1;
+
+		if (_char.previousHPRatio === undefined) {
+			_char.previousHPRatio = ratio;
+			_char.damageFlash = 0;
+		}
+
+		if (ratio < _char.previousHPRatio)
+			_char.damageFlash = 1;
+
+		if (_char.damageFlash > 0)
+			_char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
+
+		_char.previousHPRatio = ratio;
+
+		// 🔑 WORLD-SPACE FIX
+		const drawX = ctx.reversed ? (-x - w) : x;
+
+		// --- FRAME ---
+		ctx.drawImage(this.HBMob, drawX, y, w, h);
+
+		const padX = w * 0.06;
+		const padY = h * 0.225;
+
+		const innerX = drawX + padX;
+		const innerY = y + padY;
+		const innerW = w - padX * 2;
+		const innerH = h - padY * 2;
+
+		const barW = innerW * ratio;
+
+		const r = (255 * (1 - ratio)) | 0;
+		const g = (255 * ratio) | 0;
+
+		ctx.save();
+		ctx.fillStyle = `rgb(${r},${g},0)`;
+
+		// 🔥 YÖN FIX (ASIL MESELE)
+		ctx.fillRect(
+			ctx.reversed ? (innerX + innerW) : innerX,
+			innerY,
+			ctx.reversed ? -barW : barW,
+			innerH
+		);
+
+		if (_char.damageFlash > 0) {
+			ctx.globalAlpha = _char.damageFlash;
+			ctx.fillStyle = "#fff";
+			ctx.fillRect(
+				ctx.reversed ? (innerX + innerW) : innerX,
+				innerY,
+				ctx.reversed ? -innerW : innerW,
+				innerH
+			);
+		}
+
+		ctx.restore();
+	};
+
+
+	this.drawBossName = function(cofftx, _char, x, y, w, padX) {
+
+		const name = _char.displayName ?? _char.name ?? "BOSS";
+
+		// Font ölçeklemesi (her çözünürlükte temiz)
+		let fontSize = MathRound(w * 0.12); // genişliğe göre ayarlanır
+
+		cofftx.save();
+
+		cofftx.font = `${fontSize}px 'Cinzel', serif`;
+		cofftx.textBaseline = "top";
+		cofftx.textAlign = "left";
+
+		// Stroke kalınlığı (dinamik)
+		cofftx.lineWidth = fontSize * 0.15;
+
+		// --- OUTLINE ---
+		cofftx.strokeStyle = "black";
+		cofftx.strokeText(name, x, y - fontSize);
+
+		// --- FILL ---
+		cofftx.fillStyle = "#F2F2F2"; // okunabilir kirli beyaz
+		cofftx.fillText(name, x, y - fontSize);
+		if(_char.gradeLeft > 0) {
+			const gradeText = "x" + (_char.gradeLeft + 1);
+			cofftx.strokeText(gradeText, x + w + padX, y);
+			cofftx.fillText(gradeText, x + w + padX, y);
+		}
+		cofftx.restore();
+	};
+	this.drawBossHealthBar = function(cofftx, _item, x, y, w) {
+
+		const _char = _item.char;
+		const h = MathRound(w * (26 / 252)); // boss bar aspect ratio
+
+		// HP Ratio
+		let ratio = Math.max(0, Math.min(1, _char.health / _char.MAXHP));
+
+		// Init
+		if (_char.previousHPRatio === undefined) {
+			_char.previousHPRatio = ratio;
+			_char.damageFlash = 0;
+		}
+
+		// Flash trigger
+		if (ratio < _char.previousHPRatio) {
+			_char.damageFlash = 1;
+		}
+
+		// Fade flash
+		if (_char.damageFlash > 0) {
+			_char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
+		}
+
+		_char.previousHPRatio = ratio;
+
+		// Reverse fix
+		const _rev = offCtx.reversed;
+		if (_rev) offCtx.restore();
+
+		// --- 1. ÇERÇEVE ---
+		cofftx.drawImage(this.HBBoss, x, y, w, h);
+
+		// --- 2. INNER BAR MARGIN ---
+		let padX = w * .03;
+		let padY = h * .225;
+		let innerX = x + padX;
+		let innerY = y + padY;
+		let innerW = w - padX * 2;
+		let innerH = h - padY * 2;
+
+		// --- 3. Renkler (daha parlak DF paleti) ---
+		const fantasy = [
+			"#C62828",
+			"#2ECC71",
+			"#2874A6",
+			"#E67E22",
+			"#8E44AD",
+			"#F1C40F",
+			'#1FA6A0',
+			'#7CB342',
+			'#C13A4A',
+			'#7470bbff',
+			'#C7CCD6',
+			'#3d354b'
+		];
+
+		let mainColor = fantasy[_char.gradeLeft + 1];
+		let underColor = fantasy[_char.gradeLeft];
+
+		// Bar width
+		let barW = innerW * ratio;
+
+		// --- 4. GradeLeft = 0 → Mob mantığı ---
+		if (_char.gradeLeft === 0) {
+
+			// arka plan yok (transparan)
+			// sadece ratio'lu ön bar var
+
+			if (ratio >= 0.5) {
+				// mob yeşil
+				mainColor = "#3CA64C";
+			} else {
+				// mob kırmızı
+				mainColor = "#B22222";
+			}
+
+			cofftx.save();
+			cofftx.fillStyle = mainColor;
+			cofftx.fillRect(innerX, innerY, barW, innerH);
+			cofftx.restore();
+
+		} else {
+
+			// --- 5. GradeLeft > 0 → Çift katmanlı boss bar ---
+
+			// Arka katman (gradeLeft)
+			cofftx.save();
+			cofftx.fillStyle = underColor;
+			cofftx.fillRect(innerX, innerY, innerW, innerH);
+			cofftx.restore();
+
+			// Üst katman (grade)
+			cofftx.save();
+			cofftx.fillStyle = mainColor;
+			cofftx.fillRect(innerX, innerY, barW, innerH);
+			cofftx.restore();
+		}
+
+		// --- 6. DAMAGE FLASH ---
+		if (_char.damageFlash > 0) {
+			cofftx.save();
+			cofftx.globalAlpha = _char.damageFlash;
+			cofftx.fillStyle = "white";
+			cofftx.fillRect(innerX, innerY, innerW, innerH);
+			cofftx.restore();
+		}
+		
+		this.drawBossName(cofftx, _item.char, x + padX, y, w, MathRound(padX * .5));
+		// Reverse geri al
+		if (_rev) {
+			offCtx.save();
+			offCtx.scale(-1, 1);
+		}
+	};
+
 	this.drawHealthBar2 = function (_item) {
-		if(__batterySaveMode || _item.unseen || _item.char.skipHealthBar || _item.char.remove || _item.char.health <= 0 || _item.char.dead)
+		const _isPvp = !this.gold && ((this.pvp || this.war) || _item.char.flagCapturer);
+		if(__batterySaveMode || _item.char.skipHealthBar || _item.char.health <= 0 || _item.char.dead)
 			return;
-		if (_item.char.main) {
+
+		// if(!(_item.char.grade > 1))
+		// 	return;
+
+		if (_item.char.main || (_isPvp && _item.char.alp)) {
 			this.drawBuffs(_item.char, 'big');
+			if(!_isPvp)
+				return;
+		}
+		if(!_isPvp) {
+			if(_item.char.hpDropped < (_gameTick - 4000))
+				return;
+			const _pass = (_item.char.class !== 'boss' && _item.char.phased == undefined);
+			if (!_item.char.key || (!_item.char.hpDropped && _pass) || _item.char.MAXHP <= 1 || _item.char.class === __spell || _item.animation === 'respawn')
+				return;
+			if (_pass && _item.char.hpDropped < mainCharacter.attackedUnitTime)
+				return;
+		}
+		else{
+			const _isBoss = _item.char.class === 'boss';
+
+			let _hWidth = MathRound((this.cWidth / 100) * (_isBoss ? 10 : 4));
+			if (_item.char.healthBarWidthRate)
+				_hWidth = MathRound(_item.char.healthBarWidthRate * _hWidth);
+
+			const _xGap = MathRound((_item.char.WIDTH - _hWidth) / 2);
+			const _hLeft = MathRound(_item.char.EXACTLEFT + _xGap);
+			const isWarPlayer = _item.char.enemy;
+			const _extraTop = isWarPlayer ? MathRound(-40 * __zoom * __scale) : MathRound(-10 * __zoom * __scale);
+			let _hHeight = this.cHeight / 75;
+			if (_item.char.healthBarHeightRate)
+				_hHeight *= _item.char.healthBarHeightRate;
+
+			const _hTop = MathRound(
+				(this.cHeight + _extraTop)
+				- _hHeight
+				- ((_item.hbGap ?? 0))
+				- _item.char.yPosition
+				- _item.char.HEIGHT
+				- (_item.yGap ?? 0)
+				- ((_item.char.yGap ?? 0))
+			);
+			const c = document.createElement('canvas');
+			const _ch = _hHeight * 2;
+			c.width = _hWidth;
+			c.height = _ch;
+			const ctx = c.getContext('2d');
+			ctx.imageSmoothingEnabled = false;
+
+			// Üçgenin noktaları
+			const x1 = MathRound(_hWidth * .25), y1 = 0;   // sol üst
+			const x2 = MathRound(_hWidth * .75), y2 = 0;  // sağ üst
+			const x3 = MathRound(_hWidth * .5), y3 = _ch; // alt orta (uç)
+
+			// Çizim
+			ctx.beginPath();
+			ctx.moveTo(x1, y1);
+			ctx.lineTo(x2, y2);
+			ctx.lineTo(x3, y3);
+			ctx.closePath();
+
+			// Dolgu rengi
+			ctx.fillStyle = _item.char.main ? "orange" : "red";
+			ctx.fill();
+
+			// Çerçeve (opsiyonel)
+			ctx.strokeStyle = "black";
+			ctx.lineWidth = MathCeil(episode.cHeight / 500);
+			ctx.stroke();
+			if(offCtx.reversed)
+				offCtx.restore();
+			offCtx.drawImage(c, _hLeft, _hTop);
+			if(offCtx.reversed) {
+				offCtx.save();
+				offCtx.scale(-1, 1);
+			}
 			return;
 		}
-		if (!_item.char.key || !_item.char.hpDropped || _item.char.MAXHP <= 1 || _item.char.class === __spell || _item.char.animation === 'respawn')
-			return;
-		if(_item.char.hpDropped < (_gameTick - 4000))
-			return;
-		const isWarPlayer = _item.char.enemy && this.war;
 		const _hpRate = _item.char.healthRate;
+
+		// === 4'lü gruba dönüştür ===
+		let hpGroupRate;
+		if (_hpRate >= 70) hpGroupRate = 100;
+		else if (_hpRate >= 50) hpGroupRate = 75;
+		else if (_hpRate >= 30) hpGroupRate = 50;
+		else hpGroupRate = 25;
+
 		const _isBoss = _item.char.class === 'boss';
-		let hbInner = {};
-		let _hWidth = MathRound((this.cWidth / 100) * (_item.char.class === 'boss' ? 8 : 4));
-		if(_item.char.healthBarWidthRate)
-			_hWidth = MathRound(_item.char.healthBarWidthRate * _hWidth); 
+
+		let _hWidth = MathRound((this.cWidth / 100) * (_isBoss ? 10 : 4));
+		if (_item.char.healthBarWidthRate)
+			_hWidth = MathRound(_item.char.healthBarWidthRate * _hWidth);
+
 		const _xGap = MathRound((_item.char.WIDTH - _hWidth) / 2);
-		let _hLeft = MathRound(_item.char.EXACTLEFT + _xGap);
-		let _extraTop = isWarPlayer ? MathRound(-40 * _item.char.ZOOM) : 0;
-		let _hHeight = this.defaultHealthBarHeight;
-		if(_item.char.healthBarHeightRate)
-			_hHeight = MathRound(_item.char.healthBarHeightRate * _hHeight); 
-		let _hTop = MathRound((this.cHeight + _extraTop) - _hHeight - (MathRound((_item.char.healtbarGap ?? 0) * __zoom)) - _item.char.yPosition -  _item.char.HEIGHT - (_item.yGap ?? 0) - (_item.char.yGap ?? 0));
-		if(_isBoss) {
-			const _id = 'hb-' + _item.char.key;
-			let hb = _item.char.healthBarElem ?? document.getElementById(_id);
-			if (!hb) {
-				hb = document.createElement('div');
-				hb.id = _id;
-				hb.className = 'health-bar-tiny boss';
-				hbInner = document.createElement('div');
-				hbInner.className = 'health-bar-tiny-inner flex flex-jc-start';
-				hb.appendChild(hbInner);
-				if (_item.char.animations.block && _item.char.enemy) {
-					const _enemyDefBar = document.createElement('div');
-					_enemyDefBar.style = 'height:35%;width:100%;background:#9D00FF';
-					_enemyDefBar.id = 'defbar-' + _id;
-					_enemyDefBar.className = 'enemy-def-bar';
-					hb.appendChild(_enemyDefBar);
-					_item.char.hasFatiqueBar = 1;
+		const _hLeft = MathRound(_item.char.EXACTLEFT + _xGap);
+		const isWarPlayer = _item.char.enemy && _isPvp;
+		const _extraTop = isWarPlayer ? MathRound(-40 * __zoom * __scale) : MathRound(-10 * __zoom * __scale);
+		let _hHeight = this.cHeight / 75;
+		if (_item.char.healthBarHeightRate)
+			_hHeight *= _item.char.healthBarHeightRate;
+		const _hTop = MathRound(
+			(this.cHeight + _extraTop)
+			- _hHeight
+			- ((_item.hbGap ?? 0))
+			- _item.char.yPosition
+			- _item.char.HEIGHT
+			- (_item.yGap ?? 0)
+			- ((_item.char.yGap ?? 0))
+		);
+		_hHeight = MathCeil(_hHeight);
+		if(!(_item.char.grade > 1))
+			this.drawMobHealthBar(offCtx, _item, _hLeft, _hTop, _hWidth);
+		else 
+			this.drawBossHealthBar(offCtx, _item, _hLeft, _hTop, _hWidth);
+		return;
+		const _hpBG = !_item.char.gradeLeft ? '#B2BEB5' : getGradeBGColor(_item.char.gradeLeft + 1);
+		let _bg = 'yellow';
+		if (hpGroupRate === 100 || hpGroupRate === 75)
+			_bg = _item.char.grade < 2 ? '#0BDA51' : getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
+		else if(_item.char.gradeLeft)
+			_bg = getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
+		// === Cache'e bak ===
+		const cacheKey = _isPvp ? `group-${_item.char.groupId}` : `group-${hpGroupRate}-${_hWidth}x${_hHeight}-${_bg}`;
+		let cached = this.healthBarCache.get(cacheKey);
+
+		if (!cached) {
+			
+			
+			// let _border = '#E97451';
+			// if(_item.char.hurting?.count === 2) _border = '#f3f4f5';
+			// else if (!_item.char.autoMode) _border = '#36454F';
+			// else if (_item.char.autoMode === 2) _border = '#C41E3A';
+
+			const c = document.createElement('canvas');
+			if(_isPvp) {
+				const _ch = _hHeight * 2;
+				c.width = _hWidth;
+				c.height = _ch;
+				const ctx = c.getContext('2d');
+				ctx.imageSmoothingEnabled = false;
+
+				// Üçgenin noktaları
+				const x1 = MathRound(_hWidth * .25), y1 = 0;   // sol üst
+				const x2 = MathRound(_hWidth * .75), y2 = 0;  // sağ üst
+				const x3 = MathRound(_hWidth * .5), y3 = _ch; // alt orta (uç)
+
+				// Çizim
+				ctx.beginPath();
+				ctx.moveTo(x1, y1);
+				ctx.lineTo(x2, y2);
+				ctx.lineTo(x3, y3);
+				ctx.closePath();
+
+				// Dolgu rengi
+				ctx.fillStyle = _item.char.main ? "orange" : "red";
+				ctx.fill();
+
+				// Çerçeve (opsiyonel)
+				ctx.strokeStyle = "black";
+				ctx.lineWidth = MathCeil(episode.cHeight / 500);
+				ctx.stroke();
+			}
+			else {
+				const _isGradedChar = _item.char.grade > 1 && _item.char.gradeLeft > 0;
+				const _maxTextHeight = _isGradedChar ? (_hHeight * 2) : _hHeight;
+				const _maxTextWidth = (_isGradedChar ? (_maxTextHeight * ((_item.char.gradeLeft + 1).toString().length + 1)) + (this.cWidth / 100) : 0);
+				c.width = MathRound(_hWidth + _maxTextWidth);
+				c.height = _maxTextHeight;
+				const ctxY = MathFloor((_maxTextHeight - _hHeight) / 2);
+				const ctx = c.getContext('2d');
+				ctx.imageSmoothingEnabled = false;
+				this.fillRoundedRect(ctx, _hpBG, 0, ctxY, _hWidth, _hHeight);
+				this.fillRoundedRect(ctx, _bg, 0, ctxY, MathCeil(_hWidth * (hpGroupRate / 100)), _hHeight);
+				//this.drawRoundedRect(ctx, '#C41E3A', 1, 0, ctxY, _hWidth, _height);
+				if(_isGradedChar){
+					ctx.fillStyle = '#262626';
+					ctx.font = 'bold ' + _maxTextHeight + 'px "Courier New", monospace';
+					const _txt = 'x' + (_item.char.gradeLeft + 1);
+					const metrics = ctx.measureText(_txt);
+					ctx.fillRect(_hWidth, 0, metrics.width + this.w100, _maxTextHeight);
+					ctx.fillStyle = '#f3f4f5';
+					ctx.textBaseline = 'middle';
+					ctx.fillText(_txt, 
+						_hWidth + MathRound(this.w100 / 2), _hHeight);
 				}
-				if (_item.char.animations.air2 && _item.char.enemy) {
-					const _enemyRageBar = document.createElement('div');
-					_enemyRageBar.style = 'height:20%;width:100%';
-					_enemyRageBar.className = 'enemy-rage-bar';
-					const _innerRageBar = document.createElement('div');
-					_innerRageBar.className = 'enemy-rage-bar-inner';
-					_innerRageBar.id = "ragebar-" + _id;
-					_enemyRageBar.appendChild(_innerRageBar);
-					hb.appendChild(_enemyRageBar);
-					_item.char.hasRageBar = 1;
-				}
-				_gameUI.appendChild(hb);
-				_item.char.healthBarDrawn = true;
-				hb.h = _item.char.HEIGHT;
-				if (_item.char.grade > 1 && _item.char.gradeLeft > 0)
-					hb.style.background = getGradeBGColor(_item.char.grade);
 			}
-			if(hbInner && 
-				hbInner.gradeLeft != _item.char.gradeLeft) {
-				hbInner.gradeLeft = _item.char.gradeLeft;
-				hb.innerHTML = hb.innerHTML + '<span style="position:absolute;height:100%;display:flex;align-items:center;left:1vw;top:0;color:#f7f7f7 !important;text-shadow:0 0 .5vh #000">Lvl ' + _item.char.level + ' - ' + _item.char.displayName + '</span><span id="boss-grade-count" style="color:#f7f7f7 !important;text-shadow:0 0 .5vh #000;position:absolute;top:0;height:100%;right:1vw;display:flex;align-items:center">' + (_item.char.gradeLeft > 0 ? 'x' + (_item.char.gradeLeft + 1) : '') + '</span>';
-			}
-			hb.scrLeft = _hLeft;
-			hb.scrTop = _hTop;
-			if (!hbInner)
-				hbInner = document.querySelector('#' + _id + ' .health-bar-tiny-inner');
-			if(hbInner?.style && _hpRate !== hbInner.hpRate) {
-				hbInner.style.width = _hpRate + '%';
-				hbInner.hpRate =_hpRate;
-			}
-			if(!isWarPlayer) {
-				if (!_item.char.autoMode) {
-					addClass(hb, 'friendly-enemy');
-					removeClass(hb, 'hostile-enemy');
-				}
-				else if (_item.char.autoMode === 2) {
-					addClass(hb, 'hostile-enemy');
-					removeClass(hb, 'friendly-enemy');
-				}
-			}
+			this.healthBarCache.set(cacheKey, c);
+			cached = c;
 		}
-		let _hpBG = !_item.char.gradeLeft ? '#B2BEB5' : getGradeBGColor(_item.char.gradeLeft + 1), _bg, _border;
-		if (_item.char.gradeLeft > 0) {
-			if(hbInner && hbInner.bg !== 1) {
-				if (__account.questStatus.quest && (__account.questStatus.quest.loots ?? __account.questStatus.quest.kills)?.find(x => x.enemy?.indexOf(_item.char.id) >= 0))
-					_border = '#B87333';
-				let _color = _item.char.grade < 2 ? '#2E8B57' : getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
-				if(!_isBoss)
-					_bg = _color;
-				else if(hbInner?.style)
-					hbInner.style.background = _color;
-				hbInner.bg = 1;
-			}
-		}
-		else if (_hpRate > 66) {
-			if(hbInner && hbInner.bg !== 4) {
-				if (__account.questStatus.quest && (__account.questStatus.quest.loots ?? __account.questStatus.quest.kills)?.find(x => x.enemy?.indexOf(_item.char.id) >= 0))
-					_border = '#B87333';
-				_bg =  _item.char.grade < 2 ? '#2E8B57' : getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
-				hbInner.bg = 4;
-			}
-		}
-		else if (_hpRate > 33){
-			if(hbInner && hbInner.bg !== 2) {
-				_bg = 'yellow';
-				hbInner.bg = 2;
-			}
-		}
-		else {
-			if(hbInner && hbInner.bg !== 3) {
-				_bg = 'red';
-				hbInner.bg = 3;
-			}
-		}
-		let px = 1;
-		if(_item.char.hurting?.count === 2){
-			_border = '#f3f4f5';
-			px=2;
-		}
-		else if(!_border) {
-			if (!_item.char.autoMode)
-				_border = '#36454F';
-			else if (_item.char.autoMode === 2)
-				_border = '#C41E3A';
-		}
-		if (offCtx.reversed) 
+		if(offCtx.reversed)
 			offCtx.restore();
-		const _tinyHeight = MathRound(_hHeight / 5);
-		const _H = (MathRound(_tinyHeight * 1.35) * 2) + _hHeight + 2;
-		let _barHeight = MathRound(_tinyHeight * 1.5) + _hHeight;
-		this.fillRoundedRect(offCtx, _hpBG, _hLeft, _hTop, _hWidth, _hHeight);
-		this.fillRoundedRect(offCtx, _bg, _hLeft, _hTop, MathCeil(_hWidth * (_hpRate / 100)), _hHeight);
-        this.drawRoundedRect(offCtx, _border ?? '#E97451', px, _hLeft, _hTop, _hWidth, _hHeight);
-		if(px === 1)
-        	this.drawRoundedRect(offCtx, '#ffffff40', 1, _hLeft, _hTop + 1, MathRound(MathCeil(_hWidth * (_hpRate / 100)) * .95), 1);
-		if (_item.char.animations.block && _item.char.enemy) {
-			const _fRate = (_item.char.fatique / _item.char.maxFatique);
-        	this.fillRoundedRect(offCtx, '#702963', _hLeft, _hTop + _hHeight, _hWidth, MathRound(_tinyHeight * 1.5));
-        	this.fillRoundedRect(offCtx, '#6082B6', _hLeft, _hTop + _hHeight, MathCeil(_hWidth * _fRate), MathRound(_tinyHeight * 1.5));
-			this.drawRoundedRect(offCtx, '#0437F2', 1, _hLeft, _hTop + _hHeight, _hWidth, MathRound(_tinyHeight * 1.35));
-		}
-		if(_item.char.animations.air2 && _item.char.enemy)
-			this.fillRoundedRect(offCtx, '#D2042D', _hLeft, _hTop + _hHeight + MathRound(_tinyHeight * 1.35), _hWidth, MathRound(_tinyHeight * 1.35));
-        if(_item.char.healthBarIcon) {
-			_hTop -= (MathRound(((2 * _hHeight) - _barHeight) / 2) - 1);
-			this.fillRoundedRect(offCtx, '#000000', _hLeft - _H - 2, _hTop - 2, _H + 4, _H + 4);
-			getImage('./images/icons/' + _item.char.healthBarIcon + '.png', function(_img) {
-				offCtx.drawImage(_img, _hLeft - _H, _hTop,_H,_H);
-			});
-		}
+		offCtx.drawImage(cached, _hLeft, _hTop);
 		if(offCtx.reversed) {
 			offCtx.save();
 			offCtx.scale(-1, 1);
 		}
-	}
-	this.drawRelatedObjects = function (_item, _func, _bg) {
-		if(!__account.options.effect || this.disposing || __batterySaveMode || _item.alpha)
+	};
+	this.drawRelatedObjects = function (_item, _arr) {
+		if(!_arr?.[0] || this.disposing || __batterySaveMode || _item.alpha)
 			return;
-		var _objects = _item.objects?.filter(x => !x.ground && (!_func || _func(x)));
-		if (!_objects?.[0])
-			return;
-		for (let _rel of _objects) {
-				var _can = _rel.background ? _cNPC : offCtx;
-				let _draw = !_item.char.unseen || _item.char.main;
-				if (_rel.bind === _item.char.animation)
+		let shouldRemove, _draw, removeIds = [];
+		for (let _rel of _arr) {
+			if(_rel.ground)
+				continue;
+			if(!_rel.background && !__account.options.effect)
+				continue;
+			var _can = _rel.background ? _cNPC : offCtx;
+			let _left = _item.left;
+			if(this.still && _rel.background){
+				delete _rel.background;
+				_left = _item.char.LEFT;
+			}
+			_draw = _item.char.main;
+			if (_rel.bind && _item.char.animation.startsWith(_rel.bind))
+				_draw = true;
+			else if (_rel.bind) {
+				_rel.remove = true;
+				if(_rel.type === 'buff' && _item.char.buffs?.find(x => x.key === _rel.bind)){
+					delete _rel.remove;
 					_draw = true;
-				else if (_rel.bind && _rel.bind !== _item.char.animation) {
-					_rel.remove = true;
-					if(_rel.type === 'buff' && _item.char.buffs?.find(x => x.key === _rel.bind)){
-						delete _rel.remove;
-						_draw = true;
-					}
-					else
-						_draw = false;
 				}
-				else if (_rel.remove)
-					continue;
-				if (_rel.delay) {
-					_rel.delay--;
-					continue;
+				else
+					_draw = false;
+			}
+			else if (_rel.remove){
+				if(!shouldRemove)
+					shouldRemove = 1;
+				if(_rel.removeId)
+					removeIds.push(_rel.removeId);
+				continue;
+			}
+			if (_rel.delay) {
+				_rel.delay--;
+				continue;
+			}
+			if (_rel.reset) {
+				_rel.reset = false;
+				_rel.start = _rel.frame = 0;
+				_rel.stillLeft = _rel.stillReversed = undefined;
+			}
+			if (_rel.totalFrames) {
+				if (_rel.start === undefined){
+					_rel.start = 0;
+					_item.char.calculateRelatedTop(_rel, _rel.position);
 				}
-				if (_rel.reset) {
-					_rel.reset = false;
-					_rel.start = _rel.frame = 0;
-					_rel.stillLeft = _rel.stillReversed = undefined;
-				}
-				if (_rel.totalFrames) {
-					if (_rel.start === undefined)
-						_rel.start = 0;
-					if (_rel.frame === undefined)
-						_rel.frame = 0;
-					if (_rel.start > 0 && ((_rel.start % (_rel.speed * (/*_item.char.fps ??*/ 1))) === 0)) {
+				if (_rel.frame === undefined)
+					_rel.frame = 0;
+				if (_rel.start > 0 && ((_rel.start % (_rel.speed * (/*_item.char.fps ??*/ 1))) === 0)) {
+					_rel.frame++;
+					if (_rel.skip && (_rel.frame % _rel.skip) === 0)
 						_rel.frame++;
-						if (_rel.skip && (_rel.frame % _rel.skip) === 0)
-							_rel.frame++;
-						_rel.start = 0;
-						_item.char.calculateRelatedTop(_rel, _rel.position);
-						if (_rel.frame >= _rel.totalFrames) {
-							if (!_rel.stay) {
-								if (_rel.repeat) {
-									if(typeof _rel.repeat === 'number')
-										_rel.repeat--;
-									if(!_rel.repeat)
-										_rel.remove = true;
-									else
-										_rel.frame = 0;
-								}
-								else
+					_rel.start = 0;
+					_item.char.calculateRelatedTop(_rel, _rel.position);
+					if (_rel.frame >= _rel.totalFrames) {
+						if (!_rel.stay) {
+							if (_rel.repeat) {
+								if(typeof _rel.repeat === 'number')
+									_rel.repeat--;
+								if(!_rel.repeat)
 									_rel.remove = true;
+								else
+									_rel.frame = 0;
 							}
-							else {
-								_rel.stay--;
-								_rel.frame--;
-							}
+							else
+								_rel.remove = true;
+						}
+						else {
+							_rel.stay--;
+							_rel.frame--;
 						}
 					}
 				}
-				if (!_rel.remove || _draw) {
-					if (_rel.sound && _rel.start === 0 && _rel.frame === 0)
-						this.playSound(_rel.sound);
-					let _reversed = (((_rel.reversed ? 1 : 0) + (_item.reversed ? 1 : 0)) % 2) > 0;
-					if (_rel.still && (_rel.stillLeft === undefined)) {
+			}
+			if (!_rel.remove || _draw) {
+				if (_rel.sound && _rel.start === 0 && _rel.frame === 0)
+					this.playSound(_rel.sound);
+				let _reversed = (((_rel.reversed ? 1 : 0) + (_item.reversed ? 1 : 0)) % 2) > 0;
+				if (_rel.still && (_rel.stillLeft === undefined || (_rel.stillReversed !== undefined && _rel.stillReversed !== _reversed))) {
+					_rel.stillPlatformX = platformX;
+					if(_rel.background && (_rel.stillLeft === undefined))
+						_rel.stillLeft = _item.left;
+					else if(!_rel.background)
+						_rel.stillLeft = _item.left;
+					_rel.stillTop = _rel.top;
+					// if(_rel.xGapMin && _rel.xGapMax)
+					// 	_rel.xGap = 0; //MathRound(getRandomValue2(_rel.xGapMin, _rel.xGapMax) / (__zoom *__scale));
+					// if(_rel.yGapMin && _rel.yGapMax)
+					// 	_rel.yGap = 0; // MathRound(getRandomValue2(_rel.yGapMin, _rel.yGapMax) / (__zoom *__scale));
+					_rel.stillXGap = (_rel.xGap + ((_rel.reversable === false && _item.reversed) ? _item.char.WIDTH : 0));
+					if (_rel.reversable != false)
+						_rel.stillReversed = _reversed;
+				} 
+				else if(_rel.type === 'buff') {
+					_rel.xGap = _item.char.getObjectXGap(_rel, {});
+					_rel.stillPlatformX = platformX;
+					_rel.stillReversed = _reversed;
+					_rel.stillLeft = _left;
+					_rel.stillXGap = _rel.xGap + ((_item.reversed ? 1 : -1) * (_rel.stillLeft === undefined ? 0 : _rel.stillLeft - _left));
+					_rel.stillTop = _rel.top;
+				}else if(_rel.stillOnChar) {
+					if(_rel.stillLeft !== _left || _rel.type === 'buff'){
+						if(!_rel.still && _rel.type !== 'buff')
+							_rel.still = true;
 						_rel.stillPlatformX = platformX;
-						if(_rel.background && (_rel.stillLeft === undefined))
-							_rel.stillLeft = _item.left;
-						else if(!_rel.background)
-							_rel.stillLeft = _item.left;
-						_rel.stillTop = _rel.top;
-						if(_rel.xGapMin && _rel.xGapMax)
-							_rel.xGap = getRandomValue(_rel.xGapMin, _rel.xGapMax);
-						if(_rel.yGapMin && _rel.yGapMax)
-							_rel.yGap = getRandomValue(_rel.yGapMin, _rel.yGapMax);
-						_rel.stillXGap = _rel.xGap;
-						if (_rel.reversable != false)
-							_rel.stillReversed = _reversed;
-					} else if(_rel.stillOnChar) {
-						if(_rel.stillLeft !== _item.left){
-							if(!_rel.still)
-								_rel.still = true;
-							_rel.stillPlatformX = platformX;
-							_rel.stillXGap = _rel.xGap + ((_item.reversed ? 1 : -1) * (_rel.stillLeft === undefined ? 0 : _rel.stillLeft - _item.left));
-							_rel.stillReversed = _reversed;
-							_rel.stillLeft = _item.left;
-						}
-						if(_rel.stillTop !== _rel.top)
+						_rel.stillLeft = _left;
+						_rel.stillXGap = _rel.xGap + ((_item.reversed ? 1 : -1) * (_rel.stillLeft === undefined ? 0 : _rel.stillLeft - _left));
+						_rel.stillReversed = _reversed;
+					}
+					if(_rel.stillTop !== _rel.top) {
+						if(!_rel.stillY || _rel.stillTop === undefined)
 							_rel.stillTop = _rel.top;
 					}
-					let _relLeft = (_rel.stillLeft !== undefined ? _rel.stillLeft + (_rel.stillPlatformX - platformX) :
-						_item.left);
-					let _restored;
-					if (_reversed) {
-						if (_rel.reversable != false) {
-							if (!_can.reversed && !_rel.background) {
-								_can.save();
-								_can.scale(-1, 1);
-								_can.reversed = true;
-							}
-						}
-						else if (_can.reversed && !_rel.background) {
-							_can.restore();
-							_can.reversed = false;
-							_restored = 1;
+				}
+				let _relLeft = (_rel.stillLeft !== undefined ? _rel.stillLeft + (_rel.stillPlatformX - platformX) :
+					_left);
+				let _restored;
+				if (_reversed) {
+					if (_rel.reversable != false) {
+						if (!_can.reversed && !_rel.background) {
+							_can.save();
+							_can.scale(-1, 1);
+							_can.reversed = true;
 						}
 					}
 					else if (_can.reversed && !_rel.background) {
@@ -3109,59 +5225,102 @@ function map(_m) {
 						_can.reversed = false;
 						_restored = 1;
 					}
-					if (!_can.reversed && _rel.stillReversed && !_rel.background) {
-						_can.save();
-						_can.scale(-1, 1);
-						_can.reversed = true;
+				}
+				else if (_can.reversed && !_rel.background) {
+					_can.restore();
+					_can.reversed = false;
+					_restored = 1;
+				}
+				if (!_can.reversed && _rel.stillReversed && !_rel.background) {
+					_can.save();
+					_can.scale(-1, 1);
+					_can.reversed = true;
+				}
+				else if (!_restored && _rel.stillReversed === false && _can.reversed && !_rel.background) {
+					_can.restore();
+					_can.reversed = false;
+				}
+				if(_rel.background && _rel.stillLeft !== undefined)
+					_relLeft = _rel.stillLeft;
+				let _xGap = _rel.locate ? ((_rel.stillXGap ?? _rel.xGap) ?? 0) : (MathAbs(_rel.stillXGap ?? _rel.xGap) ?? 0);
+				_relLeft += ((_can.reversed ? 1 : -1) * (_xGap));
+				if (_can.reversed)
+					_relLeft *= -1;
+				let _fl = _rel.frame, _ft = 0;
+				if (_rel.col) {
+					const frameIndex = _rel.frame;
+					_fl = frameIndex % _rel.col;
+					_ft = (frameIndex / _rel.col | 0) * _rel.height;
+				}
+				if(!__batterySaveMode || _rel.background) {
+					let _spr = _rel.sprite;
+					if(_rel.color)
+						_spr = this.colorizeRelSprite4({
+							sprite: _spr,
+							char: _item.char,
+							width: MathRound(_rel.width / _rel.zoom),
+							zoom: _rel.zoom ?? 1,
+							height: MathRound(_rel.height / _rel.zoom),
+							spriteX: ((_fl ?? 0) * _rel.width) + (_rel.baseLeft ?? 0),
+							spriteY:  _ft + (_rel.baseTop ?? 0),
+							spriteWidth: _rel.width - (_rel.baseRight ?? 0),
+							spriteHeight: _rel.height
+						}, _rel.color, _rel.key + '-frame' + (_rel.frame ?? 0));
+					if(_spr?.width > 0){
+						if(_rel.alpha < 1) {
+							this.drawSpriteWithFade(_can, _spr, 
+								((_fl ?? 0) * _rel.width) + (_rel.baseLeft ?? 0), 
+								_ft + (_rel.baseTop ?? 0), 
+								_rel.width - (_rel.baseRight ?? 0), 
+								_rel.height,
+							MathRound(_relLeft),
+							MathRound((_rel.stillTop ?? _rel.top) - (((_rel.stillTop ? 0 : (_item.yGap ?? 0)) + ((_rel.yGap ?? 0))) / __scale)),
+							MathFloor((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom), 
+							MathFloor(_rel.height * _rel.zoom), _rel.alpha);
+							if(_rel.fadeZoom)
+								_rel.zoom *= _rel.fadeZoom;
+						}
+						else 
+							_can.drawImage(_spr, ((_fl ?? 0) * _rel.width) + (_rel.baseLeft ?? 0), _ft + (_rel.baseTop ?? 0), _rel.width - (_rel.baseRight ?? 0), _rel.height,
+							MathRound(_relLeft),
+							MathRound((_rel.stillTop ?? _rel.top) - (((_rel.stillTop ? 0 : (_item.yGap ?? 0)) + ((_rel.yGap ?? 0))) / __scale)),
+							MathFloor((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom), MathFloor(_rel.height * _rel.zoom));
 					}
-					else if (!_restored && _rel.stillReversed === false && _can.reversed && !_rel.background) {
-						_can.restore();
-						_can.reversed = false;
-					}
-					if(_rel.background && _rel.stillLeft !== undefined)
-					  	_relLeft = _rel.stillLeft;
-					let _xGap = _rel.locate ? ((_rel.stillXGap ?? _rel.xGap) ?? 0) : (MathAbs(_rel.stillXGap ?? _rel.xGap) ?? 0);
-					_relLeft += ((_can.reversed ? 1 : -1) * _xGap);
-					if (_can.reversed)
-						_relLeft *= -1;
-					let _fl = _rel.frame, _ft = 0;
-					if (_rel.col) {
-						const frameIndex = _rel.frame;
-						_fl = frameIndex % _rel.col;
-						_ft = (frameIndex / _rel.col | 0) * _rel.height;
-					}
-					if(!__batterySaveMode || _rel.background) {
-						let _spr = _rel.sprite;
-						if(_rel.color)
-							_spr = this.colorizeSprite4({
-								sprite: _spr,
-								width: MathRound(_rel.width / _rel.zoom),
-								zoom: _rel.zoom ?? 1,
-								height: MathRound(_rel.height / _rel.zoom),
-								spriteX: (_fl ?? 0) * _rel.width,
-								spriteY:  _ft + (_rel.baseTop ?? 0),
-								spriteWidth: _rel.width - (_rel.baseRight ?? 0),
-								spriteHeight: _rel.height
-							}, _rel.color, _rel.key + '-frame' + (_rel.frame ?? 0));
-						_can.drawImage(_spr, (_fl ?? 0) * _rel.width, _ft + (_rel.baseTop ?? 0), _rel.width - (_rel.baseRight ?? 0), _rel.height,
-						MathRound(_relLeft),
-						MathRound((_rel.stillTop ?? _rel.top) - (_rel.still ? 0 : (_item.yGap ?? 0)) - ((_rel.yGap ?? 0))),
-						parseInt((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom), parseInt(_rel.height * _rel.zoom));
+					if(_rel.fade) {
+						if(!_rel.alpha)
+							_rel.alpha = 1;
+						_rel.alpha -= _rel.fade;
+						if(_rel.alpha <= 0)
+							_rel.remove = true;
 					}
 				}
-				if (_rel.start >= 0)
+			}
+			if(_rel.remove && !shouldRemove)
+				shouldRemove = 1;
+			if (_rel.start >= 0){
+				if(!_rel.delayedByHitStop && _item.char.hitStop)
+					_rel.delayedByHitStop = 1;
+				else
 					_rel.start++;
+			}
+		}
+		if(shouldRemove) {
+			if(removeIds?.[0])
+				for(let ri of removeIds)
+				{
+					const _index = this.limitedEffects.findIndex(x => x.removeId === ri);
+					if(_index !== -1)
+						this.limitedEffects.splice(_index, 1);
+				}
+			_item.char.relatedObjects = _item.char.relatedObjects.filter(x => !x.remove);
 		}
 	}
 
 	this.drawGoreObjects = function (_item) {
 		if(!__account.options.gore || this.disposing)
 			return;
-		var _objects = _item.objects?.filter(x => x.ground);
-		if (!_objects?.[0])
-			return;
-		for (var _rel of _objects) {
-			if (_rel.remove)
+		for (var _rel of _item.objects) {
+			if (!_rel.ground || _rel.remove)
 				continue;
 			if (_rel.delay) {
 				_rel.delay--;
@@ -3235,62 +5394,110 @@ function map(_m) {
 					offGoreCtx.drawImage(_rel.sprite, (_fl ?? 0) * _rel.width, _ft + (_rel.baseTop ?? 0), _rel.width - (_rel.baseRight ?? 0), _rel.height,
 						MathRound(_relLeft),
 						MathRound((_rel.stillTop ?? _rel.top) - ((_rel.yGap ?? 0) * _rel.zoom)),
-						parseInt((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom) - (_rel.baseRight ?? 0), parseInt(_rel.height * _rel.zoom));
+						MathFloor((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom) - (_rel.baseRight ?? 0), MathFloor(_rel.height * _rel.zoom));
 			}
 			if (_rel.start >= 0)
 				_rel.start++;
 		}
 	}
 
-	this.getFriendlyUnits = function () {
-		return this.enemies?.filter(x => !x.dead && !x.enemy && x.class !== __spell);
-	}
-
-	this.getAvailableEnemies = function (_char, _func) {
-		const _ff = _char.friendlyFire;
+	this.getAvailableEnemies = function (_char, _func, _force) {
+		if(!_force && (_char.lastAvailableEnemyPickDate > (_gameTick - 200)))
+			return  _char.lastAvailableEnemies;
+		_char.lastAvailableEnemyPickDate = _gameTick;
+		const _enemies = this.pvp ? this.enemies : this.seenEnemies;
 		if(_char.onlyTarget){
-			const _en = this.enemies.find(x => x.key === _char.onlyTarget);
-			if(_en)
-				return [_en];
+			const _en = _enemies.find(x => x.key === _char.onlyTarget);
+			if(_en){
+				_char.lastAvailableEnemies = [_en];
+				return _char.lastAvailableEnemies;
+			}
 		}
-		const onlyTarget = this.enemies?.find(x => x.attackingOnlyBy && x.attackingOnlyBy === _char.key && 
-			x != _char && !x.ghost && x.enemy != undefined && !x.dead && !(x.knockbacking && x.dying) && 
-			(_ff || x.enemy !== _char.enemy) && isObjectInVisibleRectangle(x));
-		if (onlyTarget)
-			return [onlyTarget];
+		// const onlyTarget = _enemies?.find(x => x.attackingOnlyBy && x.attackingOnlyBy === _char.key && 
+		// 	x != _char && x.enemy != undefined && !x.dead && !(x.knockbacking && x.dying) && 
+		// 	(_ff || x.enemy !== _char.enemy) && isObjectInVisibleRectangle(x));
+		// if (onlyTarget) 
+		// {
+		// 	_char.lastAvailableEnemies = [onlyTarget];
+		// 	return _char.lastAvailableEnemies;
+		// }
 		// if(_char.lastEnemyPick?.[0] && ((_gameTick - _char.lastEnemyPickDate) < 200))
 		// 	return _char.lastEnemyPick;
-		const activeEnemies = this.enemies?.filter(x =>
-			!x.dead && !x.remove && !x.ghost && x.class !== __spell);
+		// const activeEnemies = this.seenEnemies?.filter(x =>
+		// 	!x.dead && x.class !== __spell);
 		const _iv = !(_char.main && _char.autoMode === 2);
-		const _x = activeEnemies.filter(x => {
+		if(!_char._enemyBuffer)
+  			_char._enemyBuffer = [];
+		else
+			_char._enemyBuffer.length = 0;
+		const _x = _char._enemyBuffer;
+		const _ff = _char.friendlyFire && (_char.enemy !== mainCharacter.enemy);
+		for(let x of _enemies) {
+			if(_ff && x.enemy && _char.enemy)
+				continue;
+			if(x.attackingOnlyBy && x.attackingOnlyBy === _char.key && 
+			x != _char && x.enemy != undefined && !x.dead && !(x.knockbacking && x.dying) && 
+			(_ff || x.enemy !== _char.enemy) && isObjectInVisibleRectangle(x))
+			{
+				if(_x.length)
+					_x.length = 0;
+				_x.push(x);
+				break;
+			}
+			if(x.dead || x.class === __spell)
+				continue;
 			if (x === _char || x.enemy == undefined) 
-				return false;
-
-			const anim = x.getCurrentAnimation?.();
-			if (anim?.interactive && !episode?.fatality) 
-				return false;
+				continue;
 
 			if (!_ff && (
 				x.enemy === _char.enemy ||
-				x.owner === (_char.coopWith ?? _char) ||
-				_char.owner === (x.coopWith ?? x)
-			)) return false;
-
-			if (!episode.pvp && _iv && !isObjectInVisibleRectangle(x))
-				return false;
-
+				(x.owner === (_char.coopWith ?? _char)) ||
+				(_char.owner === (x.coopWith ?? x))
+			)) continue;
 			if (x.knockbacking && x.dying && (!_func || !_func(x))) 
-				return false;
+				continue;
 
 			if (x.attackingOnlyBy) 
-				return false;
+				continue;
 
-			return true;
-		});
-		// _char.lastEnemyPickDate = _gameTick;
-		// _char.lastEnemyPick = _x;
-		return _x;
+			const anim = x.getCurrentAnimation?.();
+			if (anim?.interactive && !this?.fatality) 
+				continue;
+
+			if (!this.pvp && _iv && !isObjectInVisibleRectangle(x))
+				continue;
+
+			_x.push(x);
+		}
+
+		// const _x = activeEnemies.filter(x => {
+		// 	if(x.dead || x.class === __spell)
+		// 		return false;
+		// 	if (x === _char || x.enemy == undefined) 
+		// 		return false;
+
+		// 	if (!_ff && (
+		// 		x.enemy === _char.enemy ||
+		// 		(x.owner === (_char.coopWith ?? _char)) ||
+		// 		(_char.owner === (x.coopWith ?? x))
+		// 	)) return false;
+		// 	if (x.knockbacking && x.dying && (!_func || !_func(x))) 
+		// 		return false;
+
+		// 	if (x.attackingOnlyBy) 
+		// 		return false;
+
+		// 	const anim = x.getCurrentAnimation?.();
+		// 	if (anim?.interactive && !episode?.fatality) 
+		// 		return false;
+
+		// 	if (!episode.pvp && _iv && !isObjectInVisibleRectangle(x))
+		// 		return false;
+
+		// 	return true;
+		// });
+		_char.lastAvailableEnemies = _x;
+		return _char.lastAvailableEnemies;
 		return this.enemies?.filter(x =>
 				x.class !== __spell &&
 				x != _char && (!x.getCurrentAnimation().interactive || episode?.fatality) &&
@@ -3298,7 +5505,7 @@ function map(_m) {
 				(_ff || ((x.enemy !== _char.enemy) && (x.owner !== (_char.coopWith ?? _char)) &&
 				(_char.owner !== (x.coopWith ?? x)))) &&
 				(isObjectInVisibleRectangle(x) || episode.pvp || (_char.main && _char.autoMode === 2)) &&
-				!x.dead && !x.ghost && !x.remove &&
+				!x.dead && !x.remove &&
 				(!(x.knockbacking && x.dying) || (_func && _func(x))) &&
 				!x.attackingOnlyBy
 			);
@@ -3306,15 +5513,68 @@ function map(_m) {
 	}
 
 	this.hasEnemyAlive = function (_c) {
-		return this.enemies?.find(x => x.enemy !== _c.enemy && x.class !== __spell && !x.isDead() && !x.ghost);
+		return this.enemies?.find(x => x.enemy !== _c.enemy && x.class !== __spell && !x.isDead());
 	}
+	this.removeBubbles = function() {
+		if(episode.bubbles?.[0]) {
+			for(let _b of episode.bubbles){
+				const _bubble = _b.elem;
+				if (_bubble?.remove)
+					_bubble.remove();
+			}
+			episode.bubbles = [];
+		}
+		if(episode.dialogs?.[0])
+			episode.dialogs = [];
+	}
+	this.initLightRadiusLayer = function() {
 
-	this.getEnemyByKey = function (_key) {
-		return this.enemies?.find(x => x.key === _key);
+		const container = document.getElementById('css-canvas-foreground');
+
+		const scale = 1;
+
+		const canvas = document.createElement('canvas');
+
+		canvas.width = container.clientWidth * scale;
+		canvas.height = container.clientHeight * scale;
+
+		const ctx = canvas.getContext('2d');
+		//ctx.scale(scale, scale);
+
+		container.appendChild(canvas);
+
+		this.lightradius2 = {
+			canvas: canvas,
+			ctx: ctx
+		};
+	}
+	this.disposeLightRadiusLayer = function() {
+
+		const lr = this.lightradius2;
+
+		if (!lr) return;
+
+		// DOM'dan kaldır
+		if (lr.canvas && lr.canvas.parentNode) {
+			lr.canvas.parentNode.removeChild(lr.canvas);
+		}
+
+		// GPU context referansını bırak
+		lr.ctx = null;
+		lr.canvas = null;
+
+		// Objeyi sil
+		this.lightradius2 = null;
 	}
 
 	this.dispose = function() {
-		this.pauseBgMusic();
+		if(this.challangeStarted)
+			delete this.challangeStarted;
+		if(this.pvpResult)
+			this.pvpResult.remove();
+		this.removeBubbles();
+		this.pauseBgMusic(1);
+		this.pauseAmbianceMusic();
 		if(this.after)
 			this.after();
 		this.disposing = 1;
@@ -3325,30 +5585,44 @@ function map(_m) {
 				this.goSound.pause();
 			this.goSound = null;
 		}
-		if(this.bgMusic){
-			if(!this.bgMusic.paused)
-				this.bgMusic.pause();
-			this.bgMusic = null;
-		}
+		const _bgAudios = [];
+		if(this.bgMusic)
+			_bgAudios.push(this.bgMusic);
+		if(this.bgSound)
+			_bgAudios.push(this.bgSound);
+		clearAudioCache(_bgAudios);
 		if(mainCharacter.heartbeat) {
 			mainCharacter.heartbeat.pause();
 			mainCharacter.heartbeat = undefined;
 		}
 		if(episode.enemies)
 			episode.enemies.forEach(e => {
-				if(e.stepSound) {
-					if(!e.stepSound.paused)
-						e.stepSound.pause();
-					e.stepSound = null;
-				}
+				e.stopStepSound();
 			});
+		if(episode.mobs?.find(x => !x.listed))
+			episode.mobs = episode.mobs.filter(x => x.listed);
+		if(episode.phase)
+			delete episode.phase;
+		if(episode.boss)
+			delete episode.boss;
 		this.removeLocationHand();
-		if (!this.dungeon)
-			disconnect();
 		for(let _elem of document.querySelectorAll('.dmg'))
 			_elem.remove();
-		if(this.offCanvas)
-			delete this.offCanvas;
+		if(this.offCanvas) {
+			this.offCanvas.width = 0;
+			this.offCanvas.height = 0;
+			this.offCanvas = null;
+		}
+		if(this.offDmgCanvas) {
+			this.offDmgCanvas.width = 0;
+			this.offDmgCanvas.height = 0;
+			this.offDmgCanvas = null;
+		}
+		if(this.offGoreCanvas) {
+			this.offGoreCanvas.width = 0;
+			this.offGoreCanvas.height = 0;
+			this.offGoreCanvas = null;
+		}
 		for(let _sp of this.sprites)
 			if(_sp.animation.sprites?.[0])
 				for(let _asp of _sp.animation.sprites)
@@ -3367,10 +5641,93 @@ function map(_m) {
 				delete _sp.sprite.image;
 				_sp = null;
 			}
-		addClass(this.enemyRightArrow, 'd-none');
-		addClass(this.enemyLeftArrow, 'd-none');
-		this.layersDrawn = false;
+		addClass(this.enemyRightArrow, 'v-none');
+		addClass(this.enemyLeftArrow, 'v-none');
+		this.layersDrawn = 0;
+		const _wrappers = document.querySelectorAll('.wrapper-3d');
+		_wrappers?.forEach(x => x.remove());
+		stopWeather();
+		this.seenEnemies.length = 0;
+		window.SoundManager.clearLoops();
+		this.disposeLightRadiusLayer();
 	}
-	if(!this.lobby && !this.pvp)
-		this.createBgMusic();
+	setBusyState(!(this.menu || this.lobby));
+	this.initLightRadiusLayer();
+	this.resize = function() {
+		const _ms = mapSprites.find(x => x.id == this.season);
+		this.width = MathRound((_ms.width) * __zoom);
+		if(this.width < _canvas.width)
+			this.width = _canvas.width;
+		_canvasR.width = _canvasS.width = (this.width);
+		_canvasS.style.width = (this.width * __scale) + 'px';
+		for(let _c of _cArr) {
+			_c.innerHTML = '';
+			_c.style.transform = 'translateX(0)';
+			_c.style.setProperty('-webkit-transform', 'translateX(0)');
+			_c.backgroundSet = undefined;
+		}
+		this.height = _canvas.height;
+		this.distance = (__globalDistance ? parseFloat(__globalDistance) / 100 : undefined) ?? (_ms.distance ?? .5);
+		this.zoom = __zoom * (this.ground.zoom ?? 1);
+		this.cHeight = _canvas.height;
+		this.cUIHeight = _canvas.height * __scale;
+		this.cWidth = _canvas.width;
+		this.cUIWidth = _canvas.width * __scale;
+		this.dmgFrameHeight = this.cHeight / 20;
+		this.dmgFrameTopBoundary = MathRound(this.cHeight * .15);
+		this.RECT = { 
+			left: 0, 
+			right: this.cWidth,
+			top: 0, 
+			bottom: this.cHeight, 
+			width: this.cWidth, 
+			realWidth: this.cWidth 
+		};
+		if (this.ground) {
+			if (this.ground.yRate)
+				groundheight = MathRound(idealground_height * this.ground.yRate);
+			else
+				groundheight = idealground_height;
+			minPositionY = this.ground.bottomGap ? MathRound(this.ground.bottomGap * __zoom) : 1;
+			minLeft = this.ground.leftGap ? MathRound(this.ground.leftGap * __zoom) : 0;
+			maxLeft = this.ground.rightGap ? MathRound(this.ground.rightGap * __zoom) : 0;
+		}
+		else
+			groundheight = idealground_height;
+		
+		this.loadLayers();
+		if (this.loadObjects) {
+			const _objects = _mapSprite.objects ?? [];
+			let _arr;
+			if(this.artifacts?.length > 0 && !this.artifactLocated) {
+				_arr = _objects.concat(this.artifacts);
+				this.artifactLocated = 1;
+			}
+			else
+				_arr = _objects;
+			for (var _obj of _arr) {
+				const _clone = this.sprites.find(x => x.id === _obj.id);
+				if(_clone)
+					this.sprites = this.sprites.filter(x => x !== _clone);
+				this.loadObject(_obj);
+			}
+		}
+		this.XStep = MathRound(getGroundHeight() / 4);
+		this.YStep = MathRound(getGroundHeight() / 5);
+		_yTol = 7 * __zoom;
+		this.offCanvas.width = this.cWidth;
+		this.offCanvas.height = this.cHeight;
+		this.offGoreCanvas.width = this.cWidth;
+		this.offGoreCanvas.height = this.cHeight;
+		this.offDmgCanvas.width = this.cWidth;
+		this.offDmgCanvas.height = this.cHeight;
+		this.w100 = MathRound(this.cWidth / 100);
+		this.VH3 = MathRound(window.innerHeight / 33);
+		this.spritesDrawnBackGround = this.spritesDrawnForeGround = false;
+		this.layersDrawn = 0;
+		prevPlatformX = -1;
+		this.drawSpriteObjects2();
+		this.drawLayers();
+	}
+	this.resize();
 }

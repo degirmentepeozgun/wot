@@ -10,9 +10,9 @@ function world() {
 			_mapName = 'act' + (__account.act ?? 1) + '-map';
 		let _html = 
 		`<div data-module='world' class="book-page-wrapper world-map-container shop-container${_noAnimation ? '' : ' fade-me'}">
-			<div class="flex book-page-bg">
+			<div class="flex book-page-bg has-world-map">
 				<div id="world-map" class="animate-me">
-					<img id="game-map-img" src="./images/icons/${_mapName}.jpg?x=2" />
+					<img loading="lazy" id="game-map-img" src="./images/icons/${_mapName}.jpg?x=2" />
 					<div id="map-coords" style="overflow:hidden;position:absolute;top:0;left:0" class="full remove-me">
 					</div>
 				</div>
@@ -24,25 +24,26 @@ function world() {
 		let mapArea = document.getElementById('map-coords');
 		this.closeMapInfoModal(1);
 		if(_mapName !== 'world-map')
-			mapArea.innerHTML = '<img src="./images/icons/compass.png" class="map-compass" />';
+			mapArea.innerHTML = '<img loading="lazy" src="./images/icons/compass.png" class="map-compass" />';
 		else
 			mapArea.innerHTML = `<div class="full flex act-map-whole">
-				<div class="flex active act-map-part">Act I</div>
-				<div class="flex act-map-part">Act II</div>
-				<div class="flex act-map-part">Act III</div>
-				<div class="flex act-map-part">Act IV</div>
-				<img src="./images/icons/world-title.png" />
+				<div class="flex active act-map-part">${getLangData('Act')}&nbsp;I</div>
+				<div class="flex act-map-part">${getLangData('Act')}&nbsp;II</div>
+				<div class="flex act-map-part">${getLangData('Act')}&nbsp;III</div>
+				<div class="flex act-map-part">${getLangData('Act')}&nbsp;IV</div>
+				<img loading="lazy" src="./images/icons/world-title.png" />
 			</div>
 			<div class="full world-map-frame"></div>
 			<div class="full flex act-map-whole-outer">
-				<div onclick="zoomInWorldMap(1)" class="flex act-map-part-outer"></div>
+				<div onexactclick="zoomInWorldMap(1)" class="flex act-map-part-outer"></div>
 				<div class="flex act-map-part-outer"></div>
 				<div class="flex act-map-part-outer"></div>
 				<div class="flex act-map-part-outer"></div>
-				<img src="./images/icons/world-title.png" />
+				<img loading="lazy" src="./images/icons/world-title.png" />
 			</div>`;
 		const _clouds = document.createElement('img');
 		_clouds.className = 'map-clouds';
+		_clouds.loading = "lazy";
 		_clouds.src = "./images/icons/clouds.png";
 		mapArea.appendChild(_clouds);
 		// if(!__storyPlaying)
@@ -52,7 +53,7 @@ function world() {
 		// 			continue;
 		// 		const _isLocked = mainCharacter.level < (_ms.minLevel ?? 1);
 		// 		let _label = '<div class="waypoint-title' + (_isLocked ? ' waypoint-locked' : '') + 
-		// 		(episode.id === _ms.id ? ' waypoint-current' : '') + '" onclick="getRef(\'world\')?.openMapDetailModal(' + _ms.id + 
+		// 		(episode.id === _ms.id ? ' waypoint-current' : '') + '" onexactclick="getRef(\'world\')?.openMapDetailModal(' + _ms.id + 
 		// 		')" style="left:' + _ms.coords.left + ';top:' + _ms.coords.top + ';cursor:pointer">' +
 		// 			getLangData(_ms.coords.title) + (_ms.coords.dir ? ' (' + getLangData(_ms.coords.dir) + ')': '');
 		// 		if (_ms.coords.icon)
@@ -70,18 +71,18 @@ function world() {
 				if(_quest) {
 					if(__account.questStatus.quest.navLocation === 'end')
 						_mark = [__locations.find(x => x.act === __account.act && x.lobby)?.mapId];
-					else if(__account.questStatus.quest.navLocation === 'start')
+					else if(__account.questStatus.quest.navLocation === 'start' && __account.questStatus.state !== 'end')
 						_mark = _quest.maps;
 				}
 			}
 			for (let sprite of __locations) {
 				const _isLocked = false;
 				const _canPort = (_mark?.indexOf(sprite.mapId) >= 0 && episode.id !== sprite.mapId);
-				let _label = '<div' + (sprite.mapId ? ' id="map-location-' + sprite.mapId + '"' : '') + ' class="waypoint-title' + (_isLocked ? ' waypoint-locked' : '') + 
+				let _label = '<div' + (sprite.mapId ? ' id="map-location-' + sprite.mapId + '"' : '') + ' class="flex waypoint-title' + (_isLocked ? ' waypoint-locked' : '') + 
 				(sprite.mapId ? '' : ' waypoint-title-small') +
 				(_canPort ? ' glow-yellow' : '') +
-				(episode?.id === sprite.mapId ? ' waypoint-current' : '') + '" onclick="getRef(\'world\')?.tryPort(' + sprite.mapId + ', ' + (_canPort ? 1 : 0) + ')" style="left:' + sprite.left + ';top:' + sprite.top + ';cursor:pointer">' +
-					sprite.titles[getLang()] ;
+				(episode?.id === sprite.mapId ? ' waypoint-current' : '') + '" onexactclick="getRef(\'world\')?.tryPort(' + sprite.mapId + ', ' + (_canPort ? 1 : 0) + ')" style="left:' + sprite.left + ';top:' + sprite.top + ';cursor:pointer">' +
+					sprite.titles[getLang()];
 				// if (_ms.coords.icon)
 				// 	_label += '<img src="./images/icons/' + _ms.coords.icon + '.png" class="map-lock map-icon" />';
 				// else if (_isLocked)
@@ -93,8 +94,10 @@ function world() {
 	this.tryPort = function(_id, _canPort) {
 		if(_canPort)
 			portTo(_id);
-		else
+		else if(!episode?.menu)
 			warn('<span>' + getLangData('Cannot port while a quest is in progress') + '</span>', 'warn');
+		else
+			this.openMapDetailModal(_id);
 	}
  	this.closeMapInfoModal = function(_nosound) {
 		if(!_nosound)
@@ -111,11 +114,26 @@ function world() {
 			}
 		}
 	}
-	this.openMapDetailModal = function(_id) {
+	this.startPort = function(_id) {
+		playClick();
 		const _map = mapSprites.find(x => x.id === _id);
 		let _mission;
 		if(_map.coords.key)
 			_mission = _missions.find(x => x.key === _map.coords.key);
+		if(_mission?.storyId) {
+			if(_mission.before)
+				if(!_mission.before())
+					return;
+			playStory(_mission.storyId);
+		}
+	}
+	this.openMapDetailModal = function(_id) {
+		const _map = mapSprites.find(x => x.id === _id);
+		let _mission;
+		if(_map?.coords?.key)
+			_mission = _missions.find(x => x.key === _map.coords.key);
+		if(!_mission)
+			return;
 		playClick();
 		let _container = document.getElementById('map-detail-modal');
 		if(_container)
@@ -125,23 +143,25 @@ function world() {
 		_container.className = 'flex animate-me fade-me';
 		_container.style = "background:url(./images/ui/square.png)";
 		_container.innerHTML = `<div class="full map-detail-modal-inner">
-			<div class="w-100 flex flex-jc-start map-detail-modal-title">${getLangData(_map.coords.title).toUpperCase()}</div>
-			<div class="full flex flex-ai-start map-detail-modal-content">
-				<div class="w-100 flex flex-jc-start map-detail-modal-desc">${_mission.description()}</div>
+			<div class="w-100 flex flex-jc-start map-detail-modal-title">${_mission?.titles?.[getLang()]?.toLocaleUpperCase(getLang())}</div>
+			<div class="full flex flex-ai-start flex-jc-start map-detail-modal-content">
+				<div class="w-100 flex flex-jc-start map-detail-modal-desc">${_mission?.descriptions?.[getLang()] ?? ''}`
+				+ (_mission.html?.() ?? '') +
+			`</div>
 			</div>
 			<div class="flex map-detail-modal-btn">
-				<div class="w-50 flex">
-					<div class="game-menu-button animate-me flex" onclick="" style="height:65%">
+				<div class="w-50 flex d-none">
+					<div class="game-menu-button animate-me flex" onexactclick="" style="height:65%">
 						<div class="flex">${getLangData('UPGRADE')}</div>
 					</div>
 				</div>
-				<div class="w-50 flex">
-					<div class="game-menu-button animate-me flex" onclick="" style="height:65%">
-						<div class="flex" style="color:#ff6c00 !important">${getLangData('PLAY')}</div>
+				<div class="w-100 flex" style="height:100%">
+					<div class="game-menu-button animate-me flex" onexactclick="getRef(\'world\')?.startPort(${_id})" style="height:65%">
+						<div class="flex" style="height:100%;color:#ff6c00 !important">${getLangData('START')}</div>
 					</div>
 				</div>
 			</div>
-			<div onclick="getRef(\'world\')?.closeMapInfoModal()" class="item-info-modal-close">&times;</div>
+			<div onexactclick="getRef(\'world\')?.closeMapInfoModal()" class="item-info-modal-close">&times;</div>
         	<div id="shine"></div>
 		</div>`;
 		document.querySelector('.world-map-container .book-page-bg').appendChild(_container);

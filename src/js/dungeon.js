@@ -37,31 +37,38 @@ function dungeon() {
 			</div>
 		</div>`;
 		if(_content === '')
-			this.selectDungeon(_id, 1);
+			this.selectDungeon(_id, 1, _noAnimation);
 	}
 	this.getDungeons = function(_id) {
 		const _noSelect = tryShowMenuTutorial('dungeon');
 		let _html = '';
-		const _arr = __stories.filter(x => x.mission);
+		const _arr = __stories.filter(x => x.mission && !(x.list === false));
+		const _resetTime = getTodayResetTimestamp();
 		for (var item of _arr){
 			const _mission = __account.missions?.find(x => x.key === item.mission);
+			if(item.daily && _mission?.current >= item.daily) {
+				if((_gameTick > _resetTime || ((_resetTime - _mission.lastActivity) > (24 * 60 * 60 * 1000))) 
+					&& _resetTime > _mission.lastActivity){
+					_mission.current = 0;
+				}
+			}
 			_html += `<div data-key="${item.id}" onexactclick="getRef('dungeon')?.selectDungeon(${item.id})" class="skill-card dungeon-card flex animate-me${(item.id === _id && !_noSelect) ? ' selected' : ''}">
 				<div class="skill-icon-wrapper flex">
-					<img src="./images/mission/icons/${item.mission}/icon.png" />
+					<img${item.bgColor ? ' style="background:radial-gradient(' + item.bgColor + ', #000)"' : ''} src="./images/mission/icons/${item.mission}/icon.png" />
 				</div>
 				<div class="flex" style="flex:1;height:100%;padding:1vh 0">
 					<div class="flex flex-jc-start skill-card-title w-100" style="height:40%">${item.title[getLang()]}</div>
-					<div class="story-level flex flex-jc-start w-100" style="height:30%">Level ${item.minLevel} required</div>
-					<div class="story-consume flex flex-jc-start w-50" style="height:30%">${_mission?.current ?? 0}&nbsp;/&nbsp;${item.daily}</div>
-					<div class="story-stars flex flex-jc-end w-50" style="height:30%">
-					</div>
-				</div>
-			</div>`;
+					<div class="story-level flex flex-jc-start w-100" style="height:30%">${getLangData('Lvl')}&nbsp;${item.minLevel}&nbsp;${getLangData('required')}</div>
+					<div class="story-consume flex flex-jc-start w-100" style="height:30%;color:#f3f4f5bf !important">${getLangData('Used')}:&nbsp;<span style="color:${item.daily === _mission?.current ? '#ff6c00' : '#AAFF00'}!important">${_mission?.current ?? 0}&nbsp;/&nbsp;${item.daily}</span></div>
+				</div>`
+			+ (item.daily ?
+				`<div class="story-bonus-mark dungeon-daily-mark">${getLangData('Daily').toLocaleUpperCase(getLang())}</div>` : '') +
+		`</div>`;
 		}
 		return _html;
 	}
-	this.selectDungeon = function(_id, _noSound) {
-		const _arr = __stories.filter(x => x.mission);
+	this.selectDungeon = function(_id, _noSound, _noAnimation) {
+		const _arr = __stories.filter(x => x.mission && !(x.list === false));
 		if(!_id)
 			_id = _arr?.length > 0 ? _arr[0].id : undefined;
 		else
@@ -74,10 +81,10 @@ function dungeon() {
 		if(_card) {
 			addClass(_card, 'selected');
 			addClass(_card, 'read');
-			this.openDungeonDetail(_id, _noSound);
+			this.openDungeonDetail(_id, _noSound, _noAnimation);
 		}
 	}
-	this.openDungeonDetail = function(_id, _noSound) {
+	this.openDungeonDetail = function(_id, _noSound, _noAnimation) {
 		if(!_noSound)
 			playClick();
 		const _s = __stories.find(x => x.id === _id);
@@ -88,12 +95,12 @@ function dungeon() {
 					<div class="flex story-goal-icon">
 						<img src="./images/ui/star-on.png" />
 					</div>
-					<div class="flex flex-jc-start story-goal-title" style="color:#F3F4F5 !important">
-						${_rs.title}
+					<div class="flex flex-jc-start story-goal-title">
+						${getLangData(_rs.title)}
 					</div>
 				</div>`;
 			}
-		let _html = `<div class="flex full show-ui story-detail"><div class="flex flex-jc-end story-detail-close"><div>${_s.title[getLang()]}</div></div>
+		let _html = `<div class="flex full show-ui story-detail${_noAnimation ? '' : ' fade-me'}"><div class="flex flex-jc-end story-detail-close"><div>${_s.title[getLang()]}</div></div>
 			<div class="story-detail-wrapper">`
 			+ _goals +
 			`<div class="flex flex-jc-start story-detail-heading" style="margin-top:2vh">${getLangData('Rewards')}</div>
@@ -158,7 +165,7 @@ function dungeon() {
 			</div>
 			<div class="w-100 flex action-button-container" style="height:14%">
 				<div onexactclick="getRef('dungeon')?.start(${_id})" class="flex game-menu-button">
-					<div class="flex">${getLangData('START')}</div>
+					<div class="flex" style="font-size:3vh!important">${getLangData('START')}</div>
 				</div>
 			</div>
 		</div>`;
@@ -168,8 +175,46 @@ function dungeon() {
 	}
 	this.start = function(_id) {
 		const _s = __stories.find(x => x.id === _id);
+		//level kontrolü yap
+		if(mainCharacter.level < _s.minLevel) {
+			warn('<span>' + getLangData('Your level is too low') + '</span>', 'warn');
+			return;
+		}
 		//daily kontrolü yap
-
+		if(_s.daily) {
+			let _am = __account.missions.find(x => x.key === _s.mission);
+			let _save;
+			if(!_am) {
+				__account.missions.push({current:0, key:_s.mission});
+				_am = __account.missions.find(x => x.key === _s.mission);
+				_save = true;
+			}
+			if(_am.current >= _s.daily) {
+				const _resetTime = getTodayResetTimestamp();
+				//Eğer son kullanım bugünün resetinden önce ise ve şuan bugünün resetinden sonra ise
+				if((_gameTick > _resetTime || ((_resetTime - _am.lastActivity) > (24 * 60 * 60 * 1000))) 
+					&& _resetTime > _am.lastActivity){
+					_am.current = 0;
+					_save = true;
+				}
+				else {
+					warn('<span>' + getLangData('Daily limit reached') + '</span>', 'warn');
+					return;
+				}
+			}
+			if(_save)
+				_client.saveState();
+		}
+   		playClick();
+		const _mission = _missions.find(x => x.key === _s.mission);
+		if(_mission?.before) {
+			_mission.before(_id);
+			return;
+		}
+		tryStartStoryMission(_id);
+	}
+	this.approve = function(_id) {
+		playClick();
 		tryStartStoryMission(_id);
 	}
 	return this;

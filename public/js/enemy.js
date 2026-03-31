@@ -3192,7 +3192,7 @@ function enemy(_e) {
 			}
 			else {
 				if(_frame.go)
-					this.calculateGoFrame(_frame.go);
+					this.calculateGoFrame(_frame);
 				else
 					this.frame++;
 				if(this.soundPlaying)
@@ -3278,7 +3278,15 @@ function enemy(_e) {
 		this.stepSound.pause();
 		this.stepSound.currentTime = 0;
 	}
-	this.calculateGoFrame = function(_go) {
+	this.calculateGoFrame = function(_frame) {
+		const _go = _frame.go;
+		if(_frame.when) {
+			if(_frame.when(this))
+				this.frame = _go.frame - 1;
+			else
+				this.frame++;
+			return;
+		}
 		if(_go.rate) {
 			if(getRandomValue2(1, 100) > (_go.rate * 100))
 				this.frame++;

@@ -2,13 +2,13 @@
 function getOptionsUI() {
 	let _html = 
 	`<div class="menu-ui-left fade-me">
-		<div class="menu-modal-left">
+		<div class="menu-modal-left menu-modal-left-content">
 			<div class="skills-content-left settings-content-left menu-modal-left-container">
 				<div style="padding:1% 5%;overflow-y:auto" class="full">
 		<div style="width:100%;height:10%;padding:4vh 2vh 5vh 2vh" class="flex flex-jc-start">${getLangData('Language Choice')}</div>
-		<div class="flex flex-jc-start" style="width:100%;padding:1vh;height:10vh">
+		<div onexactclick="langSelect('en')" class="flex flex-jc-start" style="width:100%;padding:1vh;height:10vh">
 			<div style="aspect-ratio:1/1;padding:1vh">
-				<div onclick="langSelect('en')" class="my-radio${(getLang()) === 'en' ? ' selected' : ''} flex">
+				<div class="my-radio${(getLang()) === 'en' ? ' selected' : ''} flex">
 					<div></div>
 				</div>
 			</div>
@@ -16,9 +16,9 @@ function getOptionsUI() {
 				${getLangData('English')}
 			</div>
 		</div>
-		<div class="flex flex-jc-start" style="width:100%;padding:1vh;height:10vh">
+		<div onexactclick="langSelect('tr')" class="flex flex-jc-start" style="width:100%;padding:1vh;height:10vh">
 			<div style="aspect-ratio:1/1;padding:1vh">
-				<div onclick="langSelect('tr')" class="my-radio${(getLang()) === 'tr' ? ' selected' : ''} flex">
+				<div class="my-radio${(getLang()) === 'tr' ? ' selected' : ''} flex">
 					<div></div>
 				</div>
 			</div>
@@ -27,13 +27,14 @@ function getOptionsUI() {
 			</div>
 		</div>
 		<div style="flex:1"></div>
-		<div onclick="askExitApp()" style="cursor:pointer;width:100%;height:10%;padding:4vh 2vh 7.5vh 2vh" class="flex flex-jc-start">${getLangData('Quit Game')}</div>
+		<div onexactclick="getKeyboardPromo(1)" style="cursor:pointer;width:100%;height:10%;padding:4vh 2vh 7.5vh 2vh" class="flex flex-jc-start${__isPC ? '' : ' d-none'}">${getLangData('Controls')}</div>
+		<div onexactclick="askExitApp()" style="cursor:pointer;width:100%;height:10%;padding:4vh 2vh 7.5vh 2vh" class="flex flex-jc-start">${getLangData('Quit Game')}</div>
 		</div>
 			</div>
 				</div>
 					</div>
 					<div class="menu-ui-right fade-me">
-							<div class="menu-modal-right">
+							<div class="menu-modal-right menu-modal-right-content">
 						<div class="skills-content-right settings-content-right">
 								<div class="skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">`;
 	
@@ -55,12 +56,14 @@ function getOptionsUI() {
 			'Arka Plan Müziği'
 		]
 	};
+	
 	let _i = 0;
 	for(let _key of Object.keys(__account.options)) {
 		const _opt = __account.options[_key];
-		_html += '<div class="flex flex-jc-start" style="width:100%;padding:0 2%;height:15%">' +
+		const _disabled = _optionActions.find(x => x.key === _key)?.disabled;
+		_html += '<div onexactclick="optionSelect(this.querySelector(\'.my-check\'), \'' + _key + '\')" class="flex flex-jc-start' + (_disabled ? ' disabled' : '') + '" style="width:100%;padding:0 2%;height:15%">' +
 					'<div style="aspect-ratio:1/1;padding:2%">' +
-						'<div onclick="optionSelect(this, \'' + _key + '\')" class="my-check' + (_opt ? ' selected' : '') + ' flex">' +
+						'<div class="my-check' + (_opt ? ' selected' : '') + ' flex">' +
 							'<div></div>' +
 						'</div>' +
 					'</div>' +
@@ -75,6 +78,7 @@ function getOptionsUI() {
 	_container.innerHTML = _html + '</div></div></div></div>';
 }
 function langSelect(_lang) {
+	playClick();
 	__account.lang = _lang;
 	_client.saveState();
 	getOptionsUI();
@@ -86,10 +90,33 @@ function langSelect(_lang) {
 			_name.innerText = getLangData(_mapSprite.coords.title.split(' ')[0]);
 	}
 }
+const _optionActions = [
+		{ key: 'gore', disabled: true },
+		{ key: 'ambiance', do: function(_status) {
+			if (!_status) {
+				if(episode && episode.bgMusic)
+					episode.pauseBgMusic();
+				if(episode && episode.bgSound)
+					episode.pauseAmbianceMusic();
+			} else {
+				
+				if(episode && episode.bgMusic) {
+					episode.createBgMusic();
+					episode.playBgMusic();
+				}
+				if(episode && episode.bgSound)
+					episode.resumeAmbianceMusic();
+			}
+		}}
+	];
 function optionSelect(_elem, _key) {
-	_client.upgradeOptions(_key);
+	playClick();
+	const _lastStatus = _client.upgradeOptions(_key);
 	if(__account.options[_key])
 		addClass(_elem, 'selected');
 	else
 		removeClass(_elem, 'selected');
+	const _option = _optionActions.find(x => x.key === _key);
+	if(_option?.do)
+		_option.do(_lastStatus);
 }

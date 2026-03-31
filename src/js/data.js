@@ -1,6 +1,8 @@
 ﻿'use strict';
-function dataOperations() {
-	this.storageKey = 'com-bi-frame-wrath-of-erlik'; //(__deviceId ?? 411191);// + '-' + (_dataId ?? '08');
+function dataOperations(_quickPlay) {
+	this.quickPlay = _quickPlay;
+	this.mails = [];
+	this.storageKey = 'com-bi-frame-wot-wrath-of-erlik'; //(__deviceId ?? 411191);// + '-' + (_dataId ?? '08');
 	this.localData = {
 		warrior: {
 			hp: undefined,
@@ -37,7 +39,9 @@ function dataOperations() {
 		this.localData[_char.class].fatique = _char.fatique;
 	}
 	this.saveState = function (_force) {
-		if (!_force && episode?.pvp)
+		if(this.quickPlay)
+			return;
+		if (!_force && (episode?.pvp || __storyPlaying))
 			return;
 		localStorage.setItem(this.storageKey, JSON.stringify(__account));
 	}
@@ -56,6 +60,12 @@ function dataOperations() {
 		const _id = this.createQuestID(10);
 		return {
 			act: 1,
+			version:55,//max 55
+			fragments: [],
+			gems: [
+			],
+			tutorials: [],
+			eventsDone: [],
 			storyTicket: 100,
 			monthlyLogins: [1,2,3],
 			storyResults: [
@@ -68,15 +78,18 @@ function dataOperations() {
 			// 		]
 			// 	}
 			],
-			name: 'Guest',
+			name: '',
 			friends: [],
 			difficulty: 3,
 			pvp: {
 				order: 15000,
-				honor: 1000,
+				honor: 0,
 				lastDuelTime: 0,
 				duelCount: 10,
 				winCount: 0,
+				looseCount: 0,
+				lastDuelWin: false,
+				winStreak: 0,
 				maxWinCount: 0
 			},
 			level: 10, // account level
@@ -102,30 +115,36 @@ function dataOperations() {
 					lastActivity: 0, 
 					level: 1, 
 					current: 0
+				},
+				{ 
+					key: 'ad', 
+					lastActivity: 0, 
+					level: 1, 
+					current: 0
 				}
 			],
-			lang: 'en',
+			lang: __account?.lang ? __account.lang : 'en',
 			options: {
-				gore: 1,
+				gore: 0,
 				effect: 1,
 				weather: 1,
 				request: 1,
 				sound: 1,
-				ambiance: 0
+				ambiance: 1
 			},
 			id: _id,
-			gold: 100000,
+			gold: 0,
 			commonInventory: [],
 			pots: [],
 			globalQuests: installGlobalQuests(),
 			questStatus: firstQuestData(),
-			visitedMaps: [103, 104, 105, 1, 0], //harita idlerini ekle ziyaret etmiş sayıl
+			visitedMaps: [103, 104, 105, 1, 0, 201, 11], //harita idlerini ekle ziyaret etmiş sayıl
 			slots: __startSlotAmount,
 			inventory: getRandomItems(1, 'warrior'), //getRandomItems(2, 'warrior'),
 			misc: [
-				{ type:'ticket-item-selection', count: 100 },
-				{ type:'ticket-random', count: 10 },
-				// { type:'ticket-gold', count: 12 },
+				//{ type:'ticket-item-selection', count: 100 },
+				//{ type:'ticket-random', count: 10 },
+				 //{ type:'ticket-gold', count: 12 },
 				// { type:'ticket-item', count: 13 },
 				// { type:'ticket-exp', count: 10 },
 				// { type:'ticket-pass', count: 50 },
@@ -145,10 +164,10 @@ function dataOperations() {
 						{ order: 12, level: 1 }
 					],
 					talents: [
-						{id:1, count:2},
-						{id:2, count:1},
-						{id:3, count:1},
-						{id:4, count:1}
+						// {id:1, count:2},
+						// {id:2, count:1},
+						// {id:3, count:1},
+						// {id:4, count:1}
 					]
 				},
 				{
@@ -185,6 +204,7 @@ function dataOperations() {
 	this.upgradeOptions = function (_key) {
 		__account.options[_key] = __account.options[_key] ? 0 : 1;
 		this.saveState();
+		return __account.options[_key];
 	}
 	this.upgradeAccountGrade = function (_grade) {
 		if(_grade > __account.grade)
@@ -205,26 +225,99 @@ function dataOperations() {
 			find(x => x.order === _skill.order).level = _skill.level;
 		this.saveState();
 	}
-	this.loadState = function () {
-		localStorage.removeItem(this.storageKey);
-		const _json = JSON.parse(localStorage.getItem(this.storageKey) ?? '{}');
-		if (_json?.name)
+	this.saveMailState = function () {
+		localStorage.setItem(this.storageKey + '-mails', JSON.stringify(this.getMails()));
+	}
+	this.getMails = function() {
+		return this.mails;
+	}
+	this.pushItemIntoMail = function(_item) {
+		let _max = 0;
+		for(let m of this.mails ?? [])
+			if(m.id > _max)
+				_max = m.id;
+		for(let m of __account.mailbox ?? [])
+			if(m.id > _max)
+				_max = m.id;	
+		_item.key = 'item';
+		this.mails.push({
+			id: _max + 1,
+			ts: Date.now(),
+			owner: {
+				en: 'Developer Team',
+				tr: 'Geliştirici Ekibi'
+			},
+			body: {
+				en: 'Since your inventory is full, the equipment has been sent to your email inbox.',
+				tr: 'Envanteriniz dolu olduğu için ekipman posta kutunuza gönderildi.'
+			},
+			attachment: [
+				structuredClone2(_item)
+			]
+		});
+		requestAnimationFrame(() => {
+			warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/mailbox.png" />&nbsp;<span style="flex:1">' + getLangData('Item Pushed Into Your Mailbox') + '</span></div>', null, null, 1);
+		});
+		this.saveMailState();
+	}
+	this.loadMails = function() {
+		let _json = JSON.parse(localStorage.getItem(this.storageKey + '-mails') ?? '[]');
+		if(_json.length === 0)
+		{
+			_json = [
+				{
+					id: 1000,
+					ts: Date.now() - 16545700,
+					owner: {
+						en: 'Just A Friend',
+						tr: 'Bir Dost'
+					},
+					body: {
+						en: 'Hail to you champion, welcome to the world\'s best game ever! Ahhh god, i know it will take too long but this is a mailbox system to check what is inside and you probably saying "Sh****t!" because this is an empty one but be patient with a hard work and being polite to other players, you will gain special rewards!!!',
+						tr: 'Selam sana şampiyon, dünyanın en iyi oyununa hoş geldin! Ahhh tanrım, çok uzun süreceğini biliyorum ama bu, içinde ne olduğunu kontrol etmek için bir posta kutusu sistemi ve muhtemelen boş olduğu için "S****t!" diyorsun ama sabırlı ol, sıkı çalış ve diğer oyunculara karşı nazik ol, özel ödüller kazanacaksın!!!'
+					}
+				},
+				{
+					id: 1001,
+					ts: Date.now() - 6545700,
+					owner: {
+						en: 'Developer Team',
+						tr: 'Geliştirici Ekibi'
+					},
+					body: {
+						en: 'We hope you enjoy using this little welcome gift that we think will accompany and guide you on your adventure.',
+						tr: 'Sana maceranda eşlik edecek ve yol göstereceğini düşündüğümüz bu küçük aramıza hoşgeldin hediyesini  güle güle kullanmanı dileriz'
+					},
+					attachment: [
+						{ key:'misc', type:'ticket-gold', count: 5 },
+						{ key:'misc', type:'ticket-exp', count: 5 },
+						{ key:'misc', type:'ticket-item', count: 5 },
+						{ key:'misc', type:'ticket-pass', count: 5 }
+					]
+				}
+			];
+		}
+		this.mails = _json;
+	}
+	this.loadState = function (_reset) {
+		let _r = this.quickPlay ?? _reset;
+		let _json = JSON.parse(localStorage.getItem(this.storageKey) ?? '{}');
+		if(_json?.version !== this.getDefaultData().version){
+			localStorage.removeItem(this.storageKey);
+			_json = {};
+			_r = 1;
+		}
+		const _kb = _json?.keyboard;
+		if (!_r)
 			__account = _json;
 		else {
 			__account = this.getDefaultData();
 			__account.inventory.forEach(x => x.weared = 'warrior');
 			this.saveState(1);
 		}
-	}
-	this.resetState = function () {
-		localStorage.removeItem(this.storageKey);
-		const _json = JSON.parse(localStorage.getItem(this.storageKey) ?? '{}');
-		if (_json?.name)
-			__account = _json;
-		else {
-			__account = this.getDefaultData();
-			this.saveState(1);
-		}
+		if(_kb && !__account.keyboard)
+			__account.keyboard = _kb;
+		this.loadMails();
 	}
 	this.loadItems = function(hasMainCharacter) {
 		applyCharacterStats(hasMainCharacter);
@@ -236,40 +329,42 @@ function dataOperations() {
 			_goldCount.innerText = __account.gold.formatWithDots();
 	}
 	this.loadPots = function () {
-		if (!_potCount)
-			_potCount = document.getElementById('main-pot-count');
+		const lp = document.getElementById('main-pot-count');
 		let _pot = __account.pots?.find(x => x.key === 'pot');
-		_potCount.innerText = _pot?.value ?? 0;
+		lp.innerText = _pot?.value ?? 0;
 	}
-	this.setCharacterValues = function (_char, _select) {
+	this.setCharacterValues = function (_char, _select, _tempLevel) {
+		let _c;
 		if (_char)
 			if (_select) {
 				__account.characters.forEach(x => delete x.selected);
 				try {
-					__account.characters.find(x => x.class === _char.class).selected = true;
+					_c = __account.characters.find(x => x.class === _char.class);
+					_c.selected = true;
 					this.saveState();
 				}
 				catch(selex) { }
 			}
-		const _c = __account.characters.find(x => x.class === (_char ?? mainCharacter).class);
+		const _ch = _char ?? mainCharacter;
+		//const _c = __account.characters.find(x => x.class === _ch.class);
+		if(!_c)
+			_c = _ch;
 		if(_c) {
-			(_char ?? mainCharacter).level = _c.level;
-			(_char ?? mainCharacter).experience = _c.experience;
-			const _maxExp = (Math.pow(1.2, _c.level - 1) * 1000);
-			(_char ?? mainCharacter).maxExperience = _maxExp;
+			_ch.level = _tempLevel ?? _c.level ?? 1;
+			_ch.experience = _c.experience;
+			let _maxExp = 1000;
+			for(var i = 1; i < _ch.level; i++)
+				_maxExp = MathRound(_maxExp * 1.2);
+			_ch.maxExperience = _maxExp;
 			const _skills = skill.getSkills(_c);
-			for (let _skill of _c.skills)
-				_skills.find(x => x.order === _skill.order).level = _skill.level;
-			if (_c.selected) {
-				if (!_mainExpBar)
-					_mainExpBar = document.getElementById('main-exp-bar');
-				_mainExpBar.style.width = MathRound((100 * _c.experience) / _maxExp) + '%';
-			}
-		}
-		else {
-			if (!_mainExpBar)
-				_mainExpBar = document.getElementById('main-exp-bar');
-			_mainExpBar.style.width = '0%';
+			if(!_c.skills?.length)
+				for (let _sk in _c.skills){
+					const _skill = _c.skills[_sk];
+					_skills.find(x => x.order === _skill.order).level = _skill.level ?? 1;
+				}
+			else
+				for (let _skill of _c.skills)
+					_skills.find(x => x.order === _skill.order).level = _skill.level;
 		}
 	}
 	this.checkResetTime = function() {
