@@ -3084,6 +3084,7 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	goblinkingtongue: './images/sounds/goblin-king-tongue.mp3',
 	goblinkingrelease: './images/sounds/goblin-king-release.mp3',
 	goblinkingenter: './images/sounds/goblin-king-enter.mp3',
 	goblinkingdead: './images/sounds/goblin-king-dead.mp3',

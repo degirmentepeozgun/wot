@@ -8282,6 +8282,10 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 .game-difficulty-wrapper img {
 	height: 2.8vh !important
 }
+.game-difficulty-wrapper img.disabled {
+	opacity: .6 !important;
+	background:none !important
+}
 #connect-btn, #qp-btn {
 	font-size: 2.8vh !important;
 }
@@ -11023,9 +11027,6 @@ pointer-events: "auto";
 	height:155%;
 	top:-45%;
 	filter:drop-shadow(0 0 2vh #000);
-}
-.tutorial-box .toxic {
-	margin-top:.25%
 }
 .tutorial-skip {
 	position: absolute;

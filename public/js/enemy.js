@@ -902,7 +902,6 @@ function enemy(_e) {
 				const _slot = makeSlot(r + 1, angle, dist);
 				if((r + 1) > 2 && (MathAbs(180 - angle) <= 30 || MathAbs(180 - angle) >= 150))
 					_slot.ranged = true;
-				console.log(angle, _slot.ranged);
 				this.slots.push(_slot);
 				this.slotsByRing[r + 1].push(_slot);
 			}
@@ -1145,7 +1144,6 @@ function enemy(_e) {
 	// 	this.lookingAtTarget = false;
 	// };
 	this.releaseSlot = function (_num) {
-		console.log(_num);
 		const root = this.slot;
 		if (!root) return;
 		if(this.bestRing)
@@ -1499,7 +1497,7 @@ function enemy(_e) {
             this.autoTarget.createSlots(1);
         }
 		if(this.touchDead && this.autoTarget && isObjectsInTouch(this, this.autoTarget).touch) {
-			this.animate('dead', 1);
+			this.animate(this.deadAnimationKey ?? 'dead', 1);
 			return;
 		}
         const _away = this.animation === 'release'  || this.animation.startsWith('knockback') || this.invisible;
@@ -1659,12 +1657,12 @@ function enemy(_e) {
 					}
                     _anima = this.getCurrentAnimation();
                     _anima.mobilityY = true;
-                    if(this.yPosition < _target.yPosition && this.moveDirection !== 'up')
+					if(this.lookingAtTarget)
+                        this.moveDirection = undefined;
+                    else if(this.yPosition < _target.yPosition && this.moveDirection !== 'up')
                         this.moveDirection = 'up';
                     else if(this.yPosition > _target.yPosition && this.moveDirection !== 'down')
                         this.moveDirection = 'down';
-                    else
-                        this.moveDirection = undefined;
                     if (MathAbs(_target.yPosition - this.yPosition) <= this.verticalStep) {
                         this.lookingAtTarget = true;
 						if(this.slot && _touch.touch)
@@ -1762,27 +1760,35 @@ function enemy(_e) {
 		const distanceFactor = Math.max(0, 1 - maxFactor);
 
 		// Dalgalı hareket için zaman tabanlı sin
-		const time = (_gameTick ?? Date.now()) * 0.005;
+		const time = (_gameTick ?? Date.now()) * .005;
 
 		let _mod = this.getRandom(200);
 		const wave =
-			Math.sin(time + _mod) * 0.6 +   // ana dalga
-			Math.sin(time * 0.5 + _mod) * 0.4; // yumuşatma
+			Math.sin(time + _mod) * .6 +   // ana dalga
+			Math.sin(time * .5 + _mod) * .4; // yumuşatma
 
 		// Random mikro jitter
-		const jitter = (Math.random() - 0.5) * 0.3;
+		const jitter = (Math.random() - .5) * .3;
 
 		// Toplam Y düzeltme gücü
-		const baseAdjust = 0.6 * distanceFactor; // yaklaştıkça azalır
+		const baseAdjust = .6 * distanceFactor; // yaklaştıkça azalır
 
-		const yStep =
-			MathRound((diffY * 0.04) +            // hedefe yaklaşma eğilimi
-			(wave * baseAdjust) +       // doğal dalga
-			jitter);                     // mikro kaos
+		// const yStep =
+		// 	MathRound((diffY * 0.04) +            // hedefe yaklaşma eğilimi
+		// 	(wave * baseAdjust) +       // doğal dalga
+		// 	jitter);                     // mikro kaos
+		let yStep = MathRound(
+			(diffY * .04) +
+			(diffY * wave * baseAdjust * .2) +
+			jitter * .2
+		);
 
+		// sadece aşırı spike'ı kes
+		if (MathAbs(yStep) > MathAbs(diffY))
+			yStep = diffY * .5;
 
 		// Çok küçük fark varsa titreşmesin
-		if (Math.abs(diffY) > 2) {
+		if (MathAbs(diffY) > 2) {
 			this.yPosition += yStep;
 			this.limitYPosition();
 		}
@@ -6409,7 +6415,7 @@ function enemy(_e) {
 				if(_enemyPriority > 1 && _enemy.chargeStarted && _enemyAnima.chargeStarted === _enemy.chargeStarted)
 					_enemyPriority--;
 				let hurtedByPriority;
-				if (_enemyPriority !== undefined) {
+				if (_enemyPriority !== undefined && !_enemy.newBlocked) {
 					if (_enemyPriority === _thisPriority && _enemyFrame?.atk) {
 						if (this.class !== __spell && _enemy.class !== __spell && _enemy.direction !== this.direction && !this.friendly && !_enemy.friendly && getRandomValue(1, 10) === 1) {
 							const _eck = _enemy.animations.dash?.chargeKey;
@@ -8859,9 +8865,10 @@ function enemy(_e) {
 				this.direction = _move;
 			}
 			const _oldBlockState = this.blocked || _blockSkill;
-			this.blocked = this.animation === 'block';
-			if (!_oldBlockState && this.blocked && !this.newBlocked)
+			this.blocked = this.animation.endsWith('block');
+			if (!_oldBlockState && this.blocked && !this.newBlocked){
 				this.newBlocked = 1;
+			}
 			else if (this.newBlocked)
 				this.newBlocked++;
 		}

@@ -6964,8 +6964,101 @@ const __stories = [
 		scenes: [
 			{
 				when: function() {
-					return false;
+					if(localStorage.getItem('qp-tutorial2'))
+						return false;
+					localStorage.setItem('qp-tutorial2', '1');
+					return true;
 				},
+				lang: [
+					{
+						title : {
+							en: 'Dodge',
+							tr: 'Kaçmak'
+						},
+						en: "You can avoid attacks by choosing a direction and roll, or by dashing backwards without direction",
+						tr: "Saldırılardan kaçmak için bir yön seçip yuvarlanabilir veya yön seçmeden geri doğru atılabilirsiniz"
+					},
+					{
+						en: "Well done",
+						tr: "Aferin"
+					},
+					{
+						title : {
+							en: 'Counter Attack',
+							tr: 'Karşı Saldırı'
+						},
+						en: "Hold block before attack or press here after attack to make counterattack",
+						tr: "Saldırıdan önce kalkan tutarak veya saldırıdan sonra buraya basarak karşı saldırı yapabilirsiniz"
+					},
+					{
+						en: "Good job",
+						tr: "Tebrikler"
+					},
+					{
+						title : {
+							en: 'Combo Move',
+							tr: 'Kombin Hamle'
+						},
+						en: "Hold attack to combo your opponent until you knockback him",
+						tr: "Saldırıya basılı tutarak rakibinizin geri savrulmasına kadar kombolayabilirsiniz"
+					},
+					{
+						en: "No no no",
+						tr: "Hayır hayır hayır"
+					},
+					{
+						en: "Coool",
+						tr: "Harika"
+					},
+					{
+						title : {
+							en: 'Charge Attack',
+							tr: 'Şarj Saldırısı'
+						},
+						en: "Now use your attack again to charge and getting close to your opponent",
+						tr: "Şimdi saldırınızı tekrar kullanarak şarj edin ve rakibinize yaklaşın"
+					},
+					{
+						en: "Superb",
+						tr: "Süper"
+					},
+					{
+						title : {
+							en: 'Ground Attack',
+							tr: 'Yer Saldırısı'
+						},
+						en: "Last lesson! Time to break your opponent\'s powerful skill. Skill priority works for getting advantage when both sides attack",
+						tr: "Son ders! Rakibinizin güçlü yeteneğini kırma zamanı. Her iki taraf saldırdığında yetenek önceliği avantaj sağlar"
+					},
+					{
+						title : {
+							en: 'Air Attack',
+							tr: 'Hava Saldırısı'
+						},
+						en: "Let's continue our combo and keep enemy on air",
+						tr: "Kombinimize devam edelim ve düşmanı havada tutalım"
+					},
+					{
+						title : {
+							en: 'Chain Attack',
+							tr: 'Zincir Saldırısı'
+						},
+						en: "That ability has an another phase to keep your combo up",
+						tr: "O yeteneğin kombinizi sürdürmek için başka bir aşaması var"
+					},
+					{
+						title : {
+							en: 'Ranged Attack',
+							tr: 'Menzilli Saldırı'
+						},
+						en: "One last move but this time enemy is far away, use your ranged attack to take this rat down!",
+						tr: "Son hamle ama bu sefer düşman uzakta, bu sıçanı indirmek için menzilli saldırınızı kullanın!"
+					},
+					{
+						en: "Spot on! Now you are ready",
+						tr: "İnanılmaz! Artık hazırsın"
+					}
+				],
 				map: 9998,
 				loots: [
 				],
@@ -7004,6 +7097,13 @@ const __stories = [
 					episode.boss = _enemy;
 					episode.noDamageFrame = true;
 					episode.boss.difficulty = 1;
+					const _idleFrames = episode.boss.animations.idle.frames;
+					const _idleFrameGoIndex = _idleFrames.findIndex(x => x.go);
+					if(_idleFrameGoIndex > -1){
+						episode.boss.animations.idle.frames =
+							_idleFrames.filter((x, i) => i <= _idleFrameGoIndex);
+						delete episode.boss.animations.idle.frames[_idleFrameGoIndex].go;
+					}
 					const _airFrames = episode.boss.animations.air2.frames;
 					let _ultimateEffects;
 					_airFrames.forEach(x => {
@@ -7038,9 +7138,9 @@ const __stories = [
 						_div.className = 'flex show-ui flex-ai-start tutorial-box fade-me';
 						_div.innerHTML = `<img class="tutorial-avatar flip" src="./images/main/blacksmith/concept.png" />
 						<div class="tutorial-box-inner full">
-							<b class="tutorial-title">Dodge:</b>
+						<b class="tutorial-title">${__storyScene.lang[0].title[getLang()]}:</b>
 							<div class="w-100 tutorial-description-text">
-								You can avoid attacks by choosing a direction and roll, or by dashing backwards without direction
+								${__storyScene.lang[0][getLang()]}
 							</div>	
 						</div>`;
 						_gameUI.appendChild(_div);
@@ -7093,7 +7193,7 @@ const __stories = [
 								const _inner = document.querySelector('.tutorial-box-inner');
 								const _div = document.createElement('div');
 								_div.className = "w-100 pt-3 toxic fade-me flex w-100 flex-jc-start";
-								_div.innerHTML = '<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;Well done!';
+								_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[1][getLang()]}!`;
 								_inner.appendChild(_div);
 								disposeFocus();
 								episode.boss.animations.ground1.chargeDistance = episode.boss.animations.ground1.chargingDistance;
@@ -7123,10 +7223,9 @@ const __stories = [
 								_id = 'chain-skill-4';
 							_game.suspended = 1;
 							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerHTML = `<b class="tutorial-title fade-me">Counter Attack:</b>
+							_inner.innerHTML = `<b class="tutorial-title fade-me">${__storyScene.lang[2].title[getLang()]}:</b>
 							<div class="w-100 fade-me tutorial-description-text"">
-								Hold block before attack or press here after attack to make counterattack</div>`;
-							
+								${__storyScene.lang[2][getLang()]}</div>`;
 							focusMe('#' + _id, function() {
 								removeFocus();
 								delete _game.suspended;
@@ -7139,7 +7238,7 @@ const __stories = [
 								
 								const _div = document.createElement('div');
 								_div.className = "w-100 pt-3 toxic fade-me flex w-100 flex-jc-start";
-								_div.innerHTML = '<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;Goold job!';
+								_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[3][getLang()]}!`;
 								_inner.appendChild(_div);
 								disposeFocus();
 								episode.tutorialOrder = 3;
@@ -7158,7 +7257,8 @@ const __stories = [
 						do: function() {
 							_game.suspended = 1;
 							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerHTML = '<b class="tutorial-title">Combo:</b><div class="w-100 fade-me">Hold attack to combo your opponent until you knockback him</div>';
+							_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[4].title[getLang()]}:</b>
+							<div class="w-100 fade-me">${__storyScene.lang[4][getLang()]}</div>`;
 							delete mainCharacter.disableKeyboard;
 							focusMe('#skill1', function() {
 								removeFocus();
@@ -7184,7 +7284,7 @@ const __stories = [
 							const _inner = document.querySelector('.tutorial-box-inner');
 							const _div = document.createElement('div');
 							_div.className = "w-100 pt-3 fire fade-me flex w-100 flex-jc-start";
-							_div.innerHTML = '<img src="./images/icons/cross.png" style="height:3.6vh" />&nbsp;No no no!';
+							_div.innerHTML = `<img src="./images/icons/cross.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[5][getLang()]}!`;
 							_inner.appendChild(_div);
 							mainCharacter.immobilize = true;
 							mainCharacter.disableKeyboard = mainCharacter.still = true;
@@ -7204,7 +7304,7 @@ const __stories = [
 							const _inner = document.querySelector('.tutorial-box-inner');
 							const _div = document.createElement('div');
 							_div.className = "w-100 pt-3 toxic fade-me flex w-100 flex-jc-start";
-							_div.innerHTML = '<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;Coool!';
+							_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[6][getLang()]}!`;
 							_inner.appendChild(_div);
 							mainCharacter.immobilize = true;
 							mainCharacter.disableKeyboard = mainCharacter.still = true;
@@ -7222,7 +7322,8 @@ const __stories = [
 						do: function() {
 							_game.suspended = 1;
 							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerHTML = '<b class="tutorial-title">Charge Attack:</b><div class="w-100 fade-me">Now use your attack again to charge and getting close to your opponent</div>';
+							_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[7].title[getLang()]}:</b>
+							<div class="w-100 fade-me">${__storyScene.lang[7][getLang()]}</div>`;
 							delete mainCharacter.disableKeyboard;
 							focusMe('#skill1', function() {
 								removeFocus();
@@ -7250,7 +7351,7 @@ const __stories = [
 							const _inner = document.querySelector('.tutorial-box-inner');
 							const _div = document.createElement('div');
 							_div.className = "w-100 pt-3 toxic fade-me flex w-100 flex-jc-start";
-							_div.innerHTML = '<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;Superb!';
+							_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[8][getLang()]}!`;
 							_inner.appendChild(_div);
 							mainCharacter.immobilize = mainCharacter.still = true;
 							const _air2 = episode.boss.animations.air2;
@@ -7284,9 +7385,9 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerHTML = `<b class="tutorial-title">Ground Attack:</b>
+							_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[9].title[getLang()]}:</b>
 							<div class="w-100 fade-me tutorial-description-text">
-								Last lesson! Time to break your opponent\'s powerful skill. Skill priority works for getting advantage when both sides attack
+								${__storyScene.lang[9][getLang()]}
 							</div>`;
 							_game.suspended = 1;
 							setCharacterLevel(8, null, 1);
@@ -7321,9 +7422,9 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<b class="tutorial-title">Air Attack:</b>
+								_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[10].title[getLang()]}:</b>
 									<div class="w-100 fade-me tutorial-description-text">
-										Let's continue our combo and keep enemy on air
+										${__storyScene.lang[10][getLang()]}
 								</div>`;
 							mainCharacter.immobilize = true;
 							mainCharacter.disableKeyboard = mainCharacter.still = true;
@@ -7381,9 +7482,9 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<b class="tutorial-title">Chain Attack:</b>
+								_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[11].title[getLang()]}:</b>
 								<div class="w-100 fade-me tutorial-description-text">
-										That ability has an another phase to keep your combo up
+									${__storyScene.lang[11][getLang()]}
 								</div>`;
 							episode.tutorialOrder = 13;
 							mainCharacter.still = mainCharacter.immobilize = true;
@@ -7434,9 +7535,8 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<b class="tutorial-title">Ranged Attack:</b><div class="w-100 fade-me tutorial-description-text">
-										One last move but this time enemy is far away, 
-										use your ranged attack to take this rat down!
+								_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[12].title[getLang()]}:</b><div class="w-100 fade-me tutorial-description-text">
+										${__storyScene.lang[12][getLang()]}
 								</div>`;
 							mainCharacter.direction = __right;
 							mainCharacter.disableKeyboard = mainCharacter.still = mainCharacter.immobilize = true;
@@ -7483,7 +7583,7 @@ const __stories = [
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
 								_inner.innerHTML = `<div class="w-100 pt-3 toxic fade-me flex w-100 flex-jc-start flex-ai-start">
-										<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;Spot on! Now you are ready
+										<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[13][getLang()]}!
 								</div>`;
 							mainCharacter.immobilize = true;
 							mainCharacter.disableKeyboard = mainCharacter.still = mainCharacter.immobilize = true;
@@ -7971,7 +8071,7 @@ const __stories = [
 				],
 				mobs: [
 					{
-						id: 621,
+						id: 619,
 						minX: 4000,
 						maxX: 6000,
 						count: 2,

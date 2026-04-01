@@ -35788,6 +35788,55 @@ const _allEnemies = {
 							spriteWidth: 251,
 							spriteHeight: 222,
 							spriteOrigin: 116,
+							speed: 12,
+							go: {
+								rate: .9,
+								frame: 10
+							}
+						},
+						{
+							spriteLeft: 497,
+							spriteTop: 49,
+							spriteWidth: 219,
+							spriteHeight: 251,
+							spriteOrigin: 103,
+							src: './images/sprites/ep621/idle.png',
+							speed: 12
+						},
+						{
+							spriteLeft: 897,
+							spriteTop: 49,
+							spriteWidth: 218,
+							spriteHeight: 251,
+							spriteOrigin: 103,
+							src: './images/sprites/ep621/idle.png',
+							speed: 24
+						},
+						{
+							spriteLeft: 97,
+							spriteTop: 49,
+							spriteWidth: 217,
+							spriteHeight: 251,
+							spriteOrigin: 103,
+							src: './images/sprites/ep621/idle.png',
+							speed: 24
+						},
+						{
+							spriteLeft: 897,
+							spriteTop: 49,
+							spriteWidth: 218,
+							spriteHeight: 251,
+							spriteOrigin: 103,
+							src: './images/sprites/ep621/idle.png',
+							speed: 24
+						},
+						{
+							spriteLeft: 497,
+							spriteTop: 49,
+							spriteWidth: 219,
+							spriteHeight: 251,
+							spriteOrigin: 103,
+							src: './images/sprites/ep621/idle.png',
 							speed: 12
 						}
 					]
@@ -36483,6 +36532,10 @@ const _allEnemies = {
 							spriteWidth: 496,
 							spriteHeight: 454,
 							spriteOrigin: 252,
+							sound: { key: 'giantrun1,giantrun2', volume:.75, reset: true },
+							objects: [
+								{ key: 'groundbackdust', position:'behind-feet', scale: .6 }
+							],
 							speed:6
 						},
 						{
@@ -36491,7 +36544,6 @@ const _allEnemies = {
 							spriteWidth: 329,
 							spriteHeight: 454,
 							spriteOrigin: 181,
-							sound: { key: 'giantrun1,giantrun2', volume:.75, reset: true },
 							speed:6
 						}
 					]
@@ -36546,6 +36598,9 @@ const _allEnemies = {
 							spriteHeight: 415,
 							spriteOrigin: 215,
 							sound: { key: 'giantrun1,giantrun2', volume:1, reset: true },
+							objects: [
+								{ key: 'groundbackdust', position:'behind-feet', scale: .8 }
+							],
 							speed:6
 						},
 						{
@@ -36597,7 +36652,62 @@ const _allEnemies = {
 							spriteHeight: 423,
 							spriteOrigin: 203,
 							bottomGap:24,
-							speed: 16
+							speed: 16,
+							go: {
+								rate: .9,
+								frame: 10
+							}
+						},
+						{
+							spriteLeft: 149,
+							spriteTop: 210,
+							spriteWidth: 474,
+							spriteHeight: 413,
+							spriteOrigin: 201,
+							bottomGap:23,
+							sound: {key:'goblinkingtongue', volume:.3},
+							speed: 12,
+							stc: './images/sprites/ep622/idle.png'
+						},
+						{
+							spriteLeft: 849,
+							spriteTop: 210,
+							spriteWidth: 474,
+							spriteHeight: 413,
+							spriteOrigin: 201,
+							bottomGap:23,
+							speed: 12,
+							stc: './images/sprites/ep622/idle.png'
+						},
+						{
+							spriteLeft: 1549,
+							spriteTop: 210,
+							spriteWidth: 474,
+							spriteHeight: 413,
+							spriteOrigin: 201,
+							bottomGap:23,
+							speed: 12,
+							stc: './images/sprites/ep622/idle.png'
+						},
+						{
+							spriteLeft: 2249,
+							spriteTop: 210,
+							spriteWidth: 474,
+							spriteHeight: 414,
+							spriteOrigin: 201,
+							bottomGap:24,
+							speed: 12,
+							stc: './images/sprites/ep622/idle.png'
+						},
+						{
+							spriteLeft: 2949,
+							spriteTop: 210,
+							spriteWidth: 475,
+							spriteHeight: 414,
+							spriteOrigin: 201,
+							bottomGap:24,
+							speed: 12,
+							stc: './images/sprites/ep622/idle.png'
 						}
 					]
 				},
