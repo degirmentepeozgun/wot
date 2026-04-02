@@ -6901,7 +6901,7 @@ const __stories = [
 				minLevel: 1,
 				maps: [201],
 				timer: {
-					ms: 200000,
+					ms: 5000, //200000,
 					after: function() {
 						if(episode.phase > 98)
 							return;
@@ -6924,7 +6924,7 @@ const __stories = [
 				minLevel: 1,
 				maps: [11],
 				timer: {
-					ms: 150000,
+					ms: 5000, //150000,
 					after: function() {
 						if(episode.phase > 99)
 							return;
@@ -6961,9 +6961,11 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
+		startScene: 3,
 		scenes: [
 			{
 				when: function() {
+						return false;
 					if(localStorage.getItem('qp-tutorial2'))
 						return false;
 					localStorage.setItem('qp-tutorial2', '1');
@@ -7704,7 +7706,7 @@ const __stories = [
 					mainCharacter.level = 0;
 					mainCharacter.experience = 0;
 					mainCharacter.maxExperience = 833;
-					setCharacterLevel(1, null, 1);
+					setCharacterLevel(9, null, 1);
 					//setCharacterLevel(8, null, 1);
 					addClass(_gameUI, 'demo-playing');
 					episode.pauseBgMusic(1);
@@ -7874,7 +7876,7 @@ const __stories = [
 											atk: mainCharacter.atk,
 											grade: 4
 										});
-										//_boss.health = _boss.maxHP = 1;
+										_boss.health = _boss.maxHP = 1;
 										_boss.class = 'boss';
 										_boss.experience = 0;
 										_boss.setDifficulty(__account.difficulty - 1);
@@ -8020,6 +8022,7 @@ const __stories = [
 								_x, 
 								MathRound(groundheight * .5), 1);
 							setTimeout(() => {
+								_portal.important = 1;
 								_portal.animations.after.frames.forEach(x => {
 									x.do = function(_e) {
 										x.zoom = 1.1;
@@ -8381,15 +8384,80 @@ const __stories = [
 								cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
 						}
 					},
+					// {
+					// 	when: function() {
+					// 		return episode.phase === 102 && !episode.enemies.filter(x => x.class === 'boss')?.length;
+					// 	},
+					// 	do: function() {
+					// 		episode.phase = 103;
+					// 		updateQuestArea();
+					// 		__storyPlaying = false;
+					// 		installStoryFinish();
+					// 	}
+					// },
 					{
+						// when: function() {
+						// 	return episode.phase === 100 && !episode.enemies.filter(x => x.class === 'boss')?.length;
+						// },
 						when: function() {
 							return episode.phase === 102 && !episode.enemies.filter(x => x.class === 'boss')?.length;
 						},
 						do: function() {
 							episode.phase = 103;
 							updateQuestArea();
-							__storyPlaying = false;
-							installStoryFinish();
+							episode.pauseBgMusic(1);
+							let _x = MathRound((mainCharacter.left + platformX + (mainCharacter.WIDTH * (mainCharacter.direction === __left ? -1 : 1))) / __zoom);
+							const _maxX = MathRound((episode.width - (episode.cWidth * .5)) / __zoom);
+							if(_x > _maxX)
+								_x = _maxX;
+							else {
+								const _minX = MathRound((episode.cWidth * .5) / __zoom);
+								if(_x < _minX)
+									_x = _minX;
+							}
+							const _portal = summonMob(113, 
+								_x, 
+								MathRound(groundheight * .5), 1);
+							setTimeout(() => {
+								_portal.important = 1;
+								_portal.animations.after.frames.forEach(x => {
+									x.do = function(_e) {
+										x.zoom = 1.1;
+										x.health = 0;
+										x.bottomGap += MathRound(x.spriteHeight / 20);
+										PlaySound({key:'portalclose', volume:.3 });
+										if(_e.toucher) {
+											_e.toucher.yPosition = _e.yPosition - 1;
+											_e.toucher.standBy();
+											_e.toucher.updateVariables();
+											const _oldLeft = _e.toucher.left;
+											_e.toucher.left = _e.left - MathRound((_e.toucher.WIDTH - _e.WIDTH) / 2) - platformX;
+											if(_e.toucher.left < _oldLeft && _e.toucher.direction === __right)
+												_e.toucher.direction = __left;
+											else if(_e.toucher.left > _oldLeft && _e.toucher.direction === __left)
+												_e.toucher.direction = __right;
+											_portal.animations.after.frames.forEach(y => delete y.do);
+											if(_e.toucher.relatedObjects)
+												_e.toucher.relatedObjects.length = 0;
+											// let _platX = _e.left - (episode.cWidth * .25);
+											// if(_platX < 0)
+											// 	_platX = 0;
+											// platformX = _platX;
+											_e.toucher.addObject(
+											{ 
+												key: 'zoom2x', 
+												position: 'css', 
+												p1: 1.3, 
+												p2: 10000
+											});
+											episode.moveCamera(function() {
+												__storyPlaying = false;
+												installStoryFinish();
+											}, 3, 1);
+										}
+									}
+								});
+							}, 100);
 						}
 					},
 					{
@@ -8421,10 +8489,10 @@ const __stories = [
 											id: _b,
 											level: 13,
 											atk: mainCharacter.atk * 4,
-											zoom: .66,
-											grade: 5
+											zoom: .7,
+											grade: 4
 										});
-										//_boss.health = _boss.maxHP = 1;
+										_boss.health = _boss.maxHP = 1;
 										_boss.class = 'boss';
 										_boss.experience = 0;
 										_boss.setDifficulty(__account.difficulty - 1);
@@ -8507,6 +8575,235 @@ const __stories = [
 						spawn: 10,
 						hp:300,
 						experience: 0
+					}
+				]
+			},
+			{
+				map: 1,
+				leaderBoards: {
+					calculate: function() {
+						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
+						//Kalan kalp (3 adet te) + 1000 * 3
+						//Yediği Damage ın toplam sağlığına oranı negatif bonusu (50 * 10) dmgTaken
+						
+						const _result = {
+							description: [
+								{
+									title: {
+										en: 'Time Bonus',
+										tr: 'Zaman Bonusu'
+									},
+									icon: 'time',
+									value: MathRound(((10 * 60000) - 
+									((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick))) / 10)
+								},
+								{
+									title: {
+										en: 'Quest Bonus',
+										tr: 'Görev Bonusu'
+									},
+									icon: 'strong',
+									value: episode.timerFailed ? 0 : 1000
+								},
+								{
+									title: {
+										en: 'Damage Taken',
+										tr: 'Hasar Alma'
+									},
+									icon: 'heart',
+									value: (-1 * MathRound(((mainCharacter.dmgTaken ?? 0) / mainCharacter.MAXHP) * 500)) -
+										((3 - (mainCharacter.heartCount ?? 0)) * 500)
+								}
+							]
+						};
+						_result.score = _result.description.reduce(
+							(sum, item) => sum + (item.value ?? 0),
+							0
+						);
+						return _result;
+					}
+				},
+				loots: [
+				],
+				startsWith: 1,
+				save: true,
+				loadingCharacterIds: [47, 1000, 2],
+				start: function() {
+					removeCoopCharacter();
+					setCharacterLevel(10, null, 1);
+					addClass(_gameUI, 'demo-playing');
+					mainCharacter.direction = __right;
+					const _tagChar = episode.enemies.find(x => x.tag);
+					if(_tagChar)
+						_tagChar.remove = true;
+					if(mainCharacter.tagContainer)
+					{
+						mainCharacter.tagContainer.remove();
+						delete mainCharacter.tagContainer;
+					}
+					delete mainCharacter.animations.tag.disabled;
+					mainCharacter.tagSkillSet = 1;
+					resetSkill('tag', mainCharacter);
+					episode.phase = 1;
+					episode.pvp = true;
+					mainCharacter.yPosition =MathRound(groundheight * .33);
+					removeClass(_gameUI, 'disable-ui');
+					// const _desc = document.createElement('div');
+					// _desc.className = 'flex show-ui full quick-play-desc-container fade-me';
+					// let _html = '';
+					// for(let i = 6; i < 12; i++) {
+					// 	const _tip = __quickTips[i];
+					// 	_html += `<div style="background-image:url(./images/ui/full-border-vert.png), url(./images/quicktips/${_tip.id}.png) !important;background-size: 100% auto !important;background-repeat: no-repeat !important" class="quick-play-desc-item quick-play-desc-item${_tip.id}">
+					// 				<div class="quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
+					// 			</div>`;
+					// }
+					// _desc.innerHTML = _html +
+					//    `<div onexactclick="takeQuest(1, 1, null, null, 1);skipQuickPlayTutorial()" class="quick-play-desc-skip flex glow">&lt;&nbsp;${getLangData('UNDERSTOOD')}&nbsp;&gt;</div>`;
+					// addClass(_gameUI, 'disable-ui');
+					// requestAnimationFrame(() => {
+					// 	_game.suspended = true;
+					// });
+					// _gameUI.appendChild(_desc);
+					// episode.hasSkippableScreen = 1;
+				},
+				actions: [
+					{
+						when: function() {
+							return episode.phase === 101 && episode.enemies.find(x => x.class === 'boss' && x.health <= 0);
+						},
+						do: function() {
+							episode.phase = 102;
+							episode.pauseBgMusic();
+							PlaySound({ key:'deepimpact', volume: 1 });
+							if(mainCharacter)
+								cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
+						}
+					},
+					{
+						when: function() {
+							return episode.phase === 102 && !episode.enemies.filter(x => x.class === 'boss')?.length;
+						},
+						do: function() {
+							episode.phase = 103;
+							updateQuestArea();
+							__storyPlaying = false;
+							installStoryFinish();
+						}
+					},
+					// {
+					// 	when: function() {
+					// 		return (episode.boss?.health <= 0 && episode.phase < 10) || episode.phase === 200;
+					// 	},
+					// 	do: function() {
+					// 		episode.phase = 100;
+					// 		delete episode.boss;
+					// 		if(__account?.questStatus?.quest?.timer)
+					// 			delete __account.questStatus.quest.timer;
+					// 		episode.enemies.filter(x => !x.main && !x.tag && !x.friendly).forEach(x => {
+					// 			x.stopSpawn();
+					// 			x.health = x.experience = 0;
+					// 			x.dead = x.dying = true;
+					// 			x.animate('dead', 1);
+					// 		});
+					// 		episode.mobs = episode.respawners = [];
+					// 		episode.playSound({key:'bossalert', volume: .5});
+					// 		warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
+						
+					// 		setTimeout(() => {
+					// 			//episode.playSound({key:'sistersenter', volume:1});
+					// 			setTimeout(() => {
+					// 				if(episode?.id !== 11)
+					// 					return;
+					// 				const installBoss = function(_b) {
+					// 					const _boss = summonMobWithJson({
+					// 						id: _b,
+					// 						level: 13,
+					// 						atk: mainCharacter.atk * 4,
+					// 						zoom: .7,
+					// 						grade: 4
+					// 					});
+					// 					_boss.health = _boss.maxHP = 1;
+					// 					_boss.class = 'boss';
+					// 					_boss.experience = 0;
+					// 					_boss.setDifficulty(__account.difficulty - 1);
+					// 					_boss.acceptChanges();
+					// 					_boss.pickNewTarget();
+					// 				}
+					// 				installBoss(47);
+					// 				PlaySound({key:'conquer', volume:.6});
+					// 				mainCharacter.maxHP = mainCharacter.MAXHP =
+					// 				mainCharacter.maxHP * 1;
+					// 				mainCharacter.setHealth(mainCharacter.MAXHP);
+					// 				requestAnimationFrame(() => {
+					// 					episode.phase = 101;
+					// 				});
+
+					// 				episode.pauseAmbianceMusic();
+					// 				episode.pauseBgMusic(1);
+					// 				episode.createBgMusic(null, null, null, 'boss-fight-1', .5);
+					// 				episode.playBgMusic();
+					// 			}, 1000);
+					// 			takeQuest(2, null, null, 'progress', 1);
+					// 		}, 4000);
+					// 		// __storyScene.bossQuest.kills[0].count = 1;
+					// 		// updateQuestArea(null, __storyScene.bossQuest);
+					// 		// __storyPlaying = false;
+					// 		// installStoryFinish();
+					// 	}
+					// }
+				],
+				mobs: [
+					{
+						id: 47,
+						minX: 5680,
+						maxX: 5680,
+						count: 1,
+						sight:1000,
+						minLevel: 10,
+						maxLevel: 10,
+						yPosition: function() {
+							return MathRound(groundheight * .66);
+						},
+						props: {
+							immobilize: true,
+							direction: 'left',
+							skipHealthBar: true
+						}
+					},
+					{
+						id: 1000,
+						minX: 5680,
+						maxX: 5680,
+						count: 1,
+						sight:1000,
+						minLevel: 10,
+						maxLevel: 10,
+						yPosition: function() {
+							return MathRound(groundheight * .33);
+						},
+						props: {
+							immobilize: true,
+							direction: 'left',
+							skipHealthBar: true
+						}
+					},
+					{
+						id: '02',
+						minX: 380,
+						maxX: 380,
+						count: 1,
+						sight:1000,
+						minLevel: 10,
+						maxLevel: 10,
+						yPosition: function() {
+							return MathRound(groundheight * .66);
+						},
+						props: {
+							immobilize: true,
+							direction: 'right',
+							skipHealthBar: true,
+							friendly: true
+						}
 					}
 				]
 			}
@@ -8997,7 +9294,7 @@ function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 	mainCharacter.heartCount = __story.heartCount ?? 1;
 	if(_client.quickPlay) {
 		const _char = __account.characters.find(x => x.class === mainCharacter.class);
-		_char.tag = {id:1, grade:4};
+		_char.tag = {id:1, grade:1};
 		resetSkills(null, 1, mainCharacter);
 		delete mainCharacter.animations.tag.delay;
 		mainCharacter.animations.tag.modify = function(_e) {

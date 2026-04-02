@@ -2162,6 +2162,130 @@ function createWar(_opponents) {
 		});
 	}
 }
+
+function createWarInMap(_opponents, _mapId) {
+	resetStoryVariables();
+	const _map = mapSprites.find(x => x.id === _mapId);
+	const _ms = mapSprites.filter(x => x.pvp);
+	const _assetMap = _ms[getRandomValue(0, _ms.length - 1)];
+	_map.assetPath = _assetMap.theme;
+	const _doFunc = _assetMap.do;
+	_map.do = function() { 
+		if(_doFunc) 
+			_doFunc(); 
+	};
+	const _afterFunc = _assetMap.after;
+	_map.after = function() { 
+		if(_afterFunc) 
+			_afterFunc();
+	};
+	_map.ambiancePath = './images/music/' + getRandomValue(1, 14) + '.mp3';
+	_map.tiles = JSON.parse(JSON.stringify(_assetMap.tiles ?? []));
+	_map.ground = JSON.parse(JSON.stringify(_assetMap.ground));
+	if(_assetMap.background)
+		_map.background = JSON.parse(JSON.stringify(_assetMap.background));
+	else
+		delete _map.background;
+	_map.objects = []; //JSON.parse(JSON.stringify(_assetMap.objects ?? []));
+	if(_map.pvp) {
+		let _place = _opponents.findIndex(x => x === mainCharacter) + 1, i = 0;
+		const _halfPlace = (_opponents.length / 2) + 1;
+		const _myTeam = _place < _halfPlace ? 1 : 2;
+		_map.mobs = [];
+		for(let _opponent of _opponents){
+			i++;
+			if(_opponent === mainCharacter)
+				continue;
+			const _team = i < _halfPlace ? 1 : 2;
+			_map.mobs.push({
+				id: _opponent.id,
+				minX: i < _halfPlace ? 250 : 5800,
+				maxX: i < _halfPlace ? 250 : 5800,
+				sight: 1000,
+				count: 1,
+				groupId: _team,
+				//inventory: JSON.parse(JSON.stringify(_opponent.inventory)),
+				minLevel: _opponent.level,
+				maxLevel: _opponent.level,
+				direction: i < _halfPlace ? __right : __left,
+				name: 'Player' + i,
+				difficulty: 0,
+				enemy: _team !== _myTeam,
+				props: {
+					alp: true
+				},
+			});
+		}
+		hideMyModalPopUp(1);
+		//switchMap(500, 1, function() {
+			episode.war = true;
+			mainCharacter.dead = false;
+			prevPlatformX = undefined;
+			if(_myTeam <= 1)
+				platformX = 0;
+			else
+				platformX = episode.width - episode.cWidth;
+			resetSkills(null);
+			//episode.pvpOrder = _opponent.pvpOrder;
+			hideMyMenu();
+			hideMenu();
+			removeClass(_gameUI, 'disable-ui');
+			_enemyProfile.innerHTML = '';
+			mainCharacter.groupId = _myTeam;
+			mainCharacter.maxHP = mainCharacter.MAXHP = mainCharacter.health = mainCharacter.maxHP * 5;
+			_navbar.innerHTML = pvpAvatarTemplate(mainCharacter);
+			episode.enemies.filter(x => !x.main).forEach(x => {
+				applyCharacterStats(1, x);
+				resetSkills(null, null, x);
+				x.alp = 1;
+				if(x.groupId === _myTeam)
+					x.skipHealthBar = true;
+				x.health = x.maxHP = x.MAXHP = x.maxHP * 5;
+				//x.setHealth(x.MAXHP);
+				if(x.groupId === _myTeam)
+					_navbar.innerHTML += pvpAvatarTemplate(x);
+				else
+					_enemyProfile.innerHTML += pvpAvatarTemplate(x);
+				//x.hbBars = undefined;
+			});
+			addClass(_enemyProfile, 'pvp');
+			for(let i = 1; i < (_opponents.length + 1); i++) {
+				const _opponent = episode.enemies.find(x => x.displayName === ('Player' + i));
+				const x = _opponent ?? mainCharacter;
+				let _y;
+				switch(i) {
+					case 1:
+					case 4:
+						_y = MathRound(getGroundHeight() * .25);
+						if(i === 1)
+							x.left = MathRound(episode.cWidth / 5);
+						else
+							x.left = (episode.cWidth - MathRound(episode.cWidth / 5) - x.getWidth()) + (x.main ? 0 : episode.width - episode.cWidth);
+						break;
+					case 2:
+					case 5:
+						_y = MathRound(getGroundHeight() * .5);
+						if(i === 2)
+							x.left = MathRound(episode.cWidth / 4);
+						else
+							x.left = (episode.cWidth - MathRound(episode.cWidth / 4) - x.getWidth()) + (x.main ? 0 : episode.width - episode.cWidth);
+						break;
+					case 3:
+					case 6:
+						if(i === 3)
+							x.left = MathRound(episode.cWidth / 5);
+						else
+							x.left = (episode.cWidth - MathRound(episode.cWidth / 5) - x.getWidth()) + (x.main ? 0 : episode.width - episode.cWidth);
+						_y = MathRound(getGroundHeight() * .75);
+						break;
+				}
+				x.yPosition = _y;
+				x.direction = i < _halfPlace ? __right : __left,
+				x.updateVariables();
+			}
+		//});
+	}
+}
 document.addEventListener("deviceready", onDeviceReady, false);
 function onDeviceReady() {
 	try{
