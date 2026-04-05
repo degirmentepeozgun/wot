@@ -123,7 +123,7 @@ function enemy(_e) {
 	this.lightningResistRate = _e.lightningResistRate ?? 0;
 	this.fireResistRate = _e.fireResistRate ?? 0;
 	this.toxicResistRate = _e.toxicResistRate ?? 0;
-	this.important = this.alp || this.main || this.class === 'boss' || this.class === 'minion' || this.grade > 1;
+	this.important = this.villain || this.alp || this.main || this.class === 'boss' || this.class === 'minion' || this.grade > 1;
 	this.baseProps = {
 		maxHP: _e.maxHP ?? 100,
 		critRate: _e.critRate ?? 5,
@@ -2931,100 +2931,100 @@ function enemy(_e) {
 		// 			20, 20, _slot.occupied ? 'pink' : (_slot.ranged ? 'purple' : 'red'), 'slot-' + i + '-' + this.key);
 		// 	}
 		
-		// if (this.autoMode) {
-		// 	if (!this.isDead()) {
-		// 		if(this.autoTarget && (_anima.type === 'move' || _anima.key === 'idle') && !this.keyboard && this.animationFinished && this.class !== __spell) {
-		// 			const _range = this.getRangeBetween(this.autoTarget);
-		// 			// const _arr = this.autoTarget.getClosestAttackers(__maxAttackedCount, _range, function(_e) {
-		// 			// 	const _a = _e.getCurrentAnimation();
-		// 			// 	return (_a.attack || _a.type === 'move') && _e !== this;
-		// 			// });
-		// 			//if(_arr?.length >= __maxAttackedCount) {
-		// 				// if(this.animation === 'walk' || this.animation === 'run')
-		// 				// {
+		if (this.autoMode && this.important) {
+			if (!this.isDead()) {
+				if(this.autoTarget && (_anima.type === 'move' || _anima.key === 'idle') && !this.keyboard && this.animationFinished && this.class !== __spell) {
+					const _range = this.getRangeBetween(this.autoTarget);
+					// const _arr = this.autoTarget.getClosestAttackers(__maxAttackedCount, _range, function(_e) {
+					// 	const _a = _e.getCurrentAnimation();
+					// 	return (_a.attack || _a.type === 'move') && _e !== this;
+					// });
+					//if(_arr?.length >= __maxAttackedCount) {
+						// if(this.animation === 'walk' || this.animation === 'run')
+						// {
 
-		// 				// }
-		// 				// else
-		// 				let _mod = this.getRandom(10);
-		// 				if(_mod === 1)
-		// 				{
-		// 					if(this.autoTarget.yPosition > this.yPosition)
-		// 						_mod = 5;
-		// 					else if(this.autoTarget.yPosition < this.yPosition)
-		// 						_mod = 2;
-		// 					else
-		// 						_mod = 9;
-		// 				}
-		// 				switch(_mod)
-		// 				{
-		// 					case 0:
-		// 						this.idle(79);
-		// 						break;
-		// 					case 1:
-		// 						this.lastDirection = this.direction;
-		// 						this.moveDirection = this.yPosition > this.autoTarget.yPosition ? 'down' : 'up';
-		// 						_anima = this.getCurrentAnimation();
-		// 						this.run(_anima, this.direction, true, 4);
-		// 						if (this.socketId)
-		// 							this.animationChanged = true;
-		// 						break;
-		// 					case 2:
-		// 					case 3:
-		// 					case 4:
-		// 						if(isObjectsInTouch(this, this.autoTarget)?.touch || this.still)
-		// 							this.idle(89);
-		// 						else {
-		// 							if(_range > 66)
-		// 								this.autoStepYRate = (getRandomValue(55,70) / 100);
-		// 							else if(_range > 33)
-		// 								this.autoStepYRate = (getRandomValue(70,85) / 100);
-		// 							else
-		// 								this.autoStepYRate = undefined;
-		// 							this.lastDirection = this.direction;
-		// 							this.moveDirection = 'down';
-		// 							_anima = this.getCurrentAnimation();
-		// 							this.animate('walk', 1);
-		// 							if (this.socketId)
-		// 								this.animationChanged = true;
-		// 						}
-		// 						break;
-		// 					case 5:
-		// 					case 6:
-		// 					case 7:
-		// 						if(isObjectsInTouch(this, this.autoTarget)?.touch || this.still)
-		// 							this.idle(99);
-		// 						else {
-		// 							if(_range > 66)
-		// 								this.autoStepYRate = (getRandomValue(55,70) / 100);
-		// 							else if(_range > 33)
-		// 								this.autoStepYRate = (getRandomValue(70,85) / 100);
-		// 							else
-		// 								this.autoStepYRate = undefined;
-		// 							this.lastDirection = this.direction;
-		// 							this.moveDirection = 'up';
-		// 							_anima = this.getCurrentAnimation();
-		// 							this.animate('walk', 1);
-		// 							if (this.socketId)
-		// 								this.animationChanged = true;
-		// 						}
-		// 						break;
-		// 					default:
-		// 						_goOn = 1;
-		// 						break;
-		// 				}
-		// 			//}
-		// 			// else
-		// 			// 	this.autoCommand();
-		// 		}
-		// 		else if(this.owner && !this.autoTarget)
-		// 			this.pickNewTarget();
-		// 		//else //if(this.animationFinished)
+						// }
+						// else
+						let _mod = this.getRandom(10);
+						if(_mod === 1)
+						{
+							if(this.autoTarget.yPosition > this.yPosition)
+								_mod = 5;
+							else if(this.autoTarget.yPosition < this.yPosition)
+								_mod = 2;
+							else
+								_mod = 9;
+						}
+						switch(_mod)
+						{
+							case 0:
+								this.idle(79);
+								break;
+							case 1:
+								this.lastDirection = this.direction;
+								this.moveDirection = this.yPosition > this.autoTarget.yPosition ? 'down' : 'up';
+								_anima = this.getCurrentAnimation();
+								this.run(_anima, this.direction, true, 4);
+								if (this.socketId)
+									this.animationChanged = true;
+								break;
+							case 2:
+							case 3:
+							case 4:
+								if(isObjectsInTouch(this, this.autoTarget)?.touch || this.still)
+									this.idle(89);
+								else {
+									if(_range > 66)
+										this.autoStepYRate = (getRandomValue(55,70) / 100);
+									else if(_range > 33)
+										this.autoStepYRate = (getRandomValue(70,85) / 100);
+									else
+										this.autoStepYRate = undefined;
+									this.lastDirection = this.direction;
+									this.moveDirection = 'down';
+									_anima = this.getCurrentAnimation();
+									this.animate('walk', 1);
+									if (this.socketId)
+										this.animationChanged = true;
+								}
+								break;
+							case 5:
+							case 6:
+							case 7:
+								if(isObjectsInTouch(this, this.autoTarget)?.touch || this.still)
+									this.idle(99);
+								else {
+									if(_range > 66)
+										this.autoStepYRate = (getRandomValue(55,70) / 100);
+									else if(_range > 33)
+										this.autoStepYRate = (getRandomValue(70,85) / 100);
+									else
+										this.autoStepYRate = undefined;
+									this.lastDirection = this.direction;
+									this.moveDirection = 'up';
+									_anima = this.getCurrentAnimation();
+									this.animate('walk', 1);
+									if (this.socketId)
+										this.animationChanged = true;
+								}
+								break;
+							default:
+								_goOn = 1;
+								break;
+						}
+					//}
+					// else
+					// 	this.autoCommand();
+				}
+				else if(this.owner && !this.autoTarget)
+					this.pickNewTarget();
+				//else //if(this.animationFinished)
 				
-		// 		this.autoCommand2();
-		// 		// _anima = this.getCurrentAnimation();
-		// 		// _frame = this.getCurrentFrame();
-		// 	}
-		// }
+				//this.autoCommand2();
+				// _anima = this.getCurrentAnimation();
+				// _frame = this.getCurrentFrame();
+			}
+		}
 		if ((!this.autoMode || !this.autoTarget || _goOn) && !this.keyboard && !this.realTime && !this.finishing && this.enemy && this.class !== __spell && this.animationFinished) {
 			if (!this.animations.run || this.immobilize)
 				this.idle(6);
@@ -3173,7 +3173,7 @@ function enemy(_e) {
 			this.direction = this.direction === __left ? __right : __left;
 		if (episode.check) {
 			if(episode.pvp)
-				episode.checkPVPResult2();
+				episode.checkPVPResult();
 			else
 				episode.checkMapName();
 			episode.check = false;

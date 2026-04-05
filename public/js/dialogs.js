@@ -420,7 +420,6 @@ function removeNPCQuestMarks() {
 		}
 }
 function resetQuestLine(_num) {
-	console.log(_num);
 	__account.questStatus = firstQuestData();
 	_client.saveState();
 }

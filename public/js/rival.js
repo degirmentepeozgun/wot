@@ -54552,6 +54552,7 @@ const _allEnemies = {
 			releaseAfter: 15,
 			bleed: true,
 			ranged: true,
+			villain: true,
 			maxRageCount: 5,
 			rageDecreasement: .25,
 			immunities: [ 'fire', 'shadow', 'earth' ],
@@ -55304,6 +55305,7 @@ const _allEnemies = {
 			stepXRate: .5,
 			bleed: true,
 			ranged: true,
+			villain: true,
 			src: './images/sprites/ep38/',
 			immunities: [ 'fire', 'shadow', 'earth' ],
 			buffs: []
@@ -77793,7 +77795,7 @@ const _allEnemies = {
 			yGap: 10,
 			id: 1000,
 			healtbarGap: 25,
-			class: 'boss',
+			class: 'al',
 			size: 'big',
 			level: 10,
 			direction: 'left',
@@ -77809,6 +77811,7 @@ const _allEnemies = {
 			weight: 1000,
 			stepXRate: .25,
 			bleed: true,
+			villain: true,
 			src: './images/sprites/ep1000/',
 			immunities: [ 'ice', 'shadow', 'toxic' ],
 			buffs: []

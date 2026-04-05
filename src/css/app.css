@@ -9025,7 +9025,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 #top-nav .war-player-profile-me .war-player-team-2,
 .enemy-profile .war-player-profile-me .war-player-team-1,
 #top-nav .war-player-profile-me .war-player-team-1 {
-	background:linear-gradient(0deg, #A0522D, #B87333) !important;
+	background:linear-gradient(0deg, #3A2418, #A0522D, #6A4433) !important;
 }
 .enemy-profile .war-player-team-2::after,
 #top-nav .war-player-team-2::after,
