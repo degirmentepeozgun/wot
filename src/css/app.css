@@ -2412,7 +2412,47 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 #pvp-result .pvp-result-table .mvp * {
 	color: #f8f8f8 !important
 }
-
+#score-board {
+	min-width: 24vh;
+	font-size: 4.5vh;
+	line-height: 6vh;
+	font-weight: 600;
+	height: 6vh;
+	z-index: -1;
+	color: #f7f7f7cc !important;
+	top: 3.6%;
+	left: 50%;
+	overflow: hidden;
+	position: absolute;
+	border-radius: .5vh;
+	border: 2px solid #000;
+	text-shadow: 0 0 .2vh #000;
+	transform:translateX(-50%) translateZ(0);
+	-webkit-transform:translateX(-50%) translateZ(0);
+	transform-origin: left;
+	-webkit-transform-origin: left;
+	will-change: transform
+}
+#score-board .team1-score {
+	color: #F3F4F5 !important;
+	width: 50%;
+	height:100%;
+	z-index: -2;
+	border-radius: .5vh;
+	position: relative;
+	background: linear-gradient(90deg, blue, black);
+	padding:0 1.2vh
+}
+#score-board .team2-score {
+	color: #F3F4F5 !important;
+	width: 50%;
+	height:100%;
+	z-index: -2;
+	border-radius: .5vh;
+	position: relative;
+	background: linear-gradient(-90deg, red, black);
+	padding:0 1.2vh
+}
 #pvp-counter {
 	width: auto !important;
 	min-width: 6vh;

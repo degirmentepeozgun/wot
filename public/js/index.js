@@ -2176,6 +2176,7 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 							x.left = (episode.cWidth - MathRound(episode.cWidth / 5) - x.getWidth()) + (x.main ? 0 : episode.width - episode.cWidth);
 						break;
 				}
+				x.startLeft = x.left;
 				x.yPosition = _y;
 				x.direction = i <= _halfPlace ? __right : __left;
 				x.updateVariables();

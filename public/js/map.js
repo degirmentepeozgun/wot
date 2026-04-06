@@ -40,6 +40,9 @@ function map(_m) {
 	this.FootShadow = getImage('./images/related/shadow3.png');
 	this.HBMob = getImage('./images/icons/hbmob.png');
 	this.HBBoss = getImage('./images/icons/hbboss.png');
+	let _sb = document.getElementById('score-board');
+	if(_sb)
+		_sb.remove();
 	const _cArr = [c3, c9, c50, c85, c90, cc];
 	for(let _c of _cArr) {
 		_c.innerHTML = '';
@@ -658,6 +661,13 @@ function map(_m) {
 		this.pvpEnded = true;
 		switchAutoMode(1);
 	}
+	this.addScoreBoard = function () {
+		_sb = document.createElement('div');
+		_sb.className = 'flex fade-me';
+		_sb.id = 'score-board';
+		_sb.innerHTML = `<div class="team1-score flex flex-jc-start">0</div><div class="team2-score flex flex-jc-end">0</div>`;
+		_gameUI.appendChild(_sb);
+	}
 	this.checkMapName = function () {
 		if (!_mapSprite.coords?.title || _mapSprite.gold || _mapSprite.tower || _mapSprite.pvp)
 			return;
@@ -796,6 +806,7 @@ function map(_m) {
 				if (pvpCounter.innerText !== 'START') {
 					this.playSound({ key: 'questaccepted', volume: .3 });
 					pvpCounter.innerText = 'START';
+					this.addScoreBoard();
 					if(this.beforePVPStart)
 						this.beforePVPStart();
 					removeClass(pvpCounter, 'pop');
@@ -882,6 +893,10 @@ function map(_m) {
 					x.grayAvatar = true;
 					const _killer = episode.enemies.find(y => y.key === x.killedBy);
 					_killer.killCount++;
+					const _gsb = document.querySelector('.team' + _killer.groupId + '-score');
+					if(_gsb) {
+						_gsb.innerText = parseInt(_gsb.innerText) + 1;
+					}
 					let _msg = '';
 					if (_killer.killCount > 1) {
 						this.playSound({ key: _killer.gender + 'laugh', reset: true });
@@ -900,7 +915,7 @@ function map(_m) {
 		}
 		const _eCount = _enemies?.length ?? 0;
 		const _tCount = _teamMates?.length ?? 0;
-		if(!this.pauseTime && (!_enemies?.filter(x => !x.isDead())?.length || !_teamMates?.filter(x => !x.isDead())?.length))
+		if(!this.pauseTime && this.canPause !== false && (!_enemies?.filter(x => !x.isDead())?.length || !_teamMates?.filter(x => !x.isDead())?.length))
 			this.pauseTime = Date.now();
 		if(_deads?.length) {
 			if((_deads.filter(x => x.remove)?.length ?? 0) < _deads.length)

@@ -4225,6 +4225,9 @@ function enemy(_e) {
 				this[_key] = _buff[_key + 'Diff'];
 		if (i >= 0) {
 			this.relatedObjects?.filter(x => x.buff === _buff.key)?.forEach(x => x.remove = true);
+			const _tb = this.buffs[i];
+			if(_tb.end)
+				_tb.end(this);
 			this.buffs.splice(i, 1);
 			if(i === 0 && this.buffs.length === 0)
 				this.hadBuff = 1;
@@ -4338,7 +4341,7 @@ function enemy(_e) {
 				break;
 			}
 		}
-		this.buffs.push({ type: _type, level: _b.level, key: _b.key, time: _date, ms: _b.ms ?? _attr.ms });
+		this.buffs.push({ type: _type, end: _b.end, level: _b.level, key: _b.key, time: _date, ms: _b.ms ?? _attr.ms });
 		return _buff;
 	}
 	this.applyBuffs = function () {

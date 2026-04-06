@@ -8629,6 +8629,7 @@ const __stories = [
 					},
 					{
 						when: function() {
+							return episode.phase < 2 && episode.pvpEnded;
 							//episode.enemies dizisinde groupId si olan enemylerin groupId lerini distinctleyerek al ve length i 1 ni diye bak
 							return episode.phase === 1 && 
 							episode.enemies.filter(x => x.groupId && x.health > 0).map(x => x.groupId).filter((value, index, self) => self.indexOf(value) === index)?.length === 1;
@@ -8665,9 +8666,52 @@ const __stories = [
 						opponents.push(_e);
 					}
 					createWar(opponents, 1, 1, 1, 600, function() {
+						mainCharacter.startPlatformX = platformX;
 						episode.skipPvPFinalScreen = 1;
 						episode.phase = 1;
+						episode.canPause = false;
+						episode.deathMatch = true;
 						episode.mainClass = mainCharacter.class;
+						episode.enemies.forEach(x => {
+							//x.animations içindeki key i dead ile başlayan animasyonları bul
+							Object.keys(x.animations).filter(y => y.startsWith('dead')).forEach(y => {
+								x.animations[y].frames.forEach(z => {
+									if(z.props?.remove) {
+										delete z.props;
+										z.do = function() {
+											x.left = x.startLeft;
+											if(x.startLeft < (episode.cWidth / 2))
+												x.direction = __right;
+											else												
+												x.direction = __left;
+											x.yPosition = getRandomValue2(0, getGroundHeight());
+											x.health = x.maxHP;
+											x.dead = x.dying = x.ultimateUsed = false;
+											delete x.killedBy;
+											const _animaKeys = Object.keys(x.animations);
+											_animaKeys.forEach(y => x.animations[y].next = x.animations[y].realNext);
+											x.animate('idle',1);
+											x.setHealth(x.maxHP);
+											x.addBuff({ key: 'release', level: 3, ms: 3000, end: function(_c) {
+												_c.still = _c.immobilize = _c.disableKeyboard = false;
+												delete x.grayAvatar;	
+												const _avatar = document.getElementById('char-' + x.key);
+												if (_avatar)
+													removeClass(_avatar, 'gray');
+											} });
+											x.immobilize = x.still = true;
+											if(x.keyboard)
+												x.disableKeyboard = true;
+											if(x.main)
+											{
+												platformX = 0;
+												prevPlatformX = -1;
+											}
+										}
+									}
+								});
+							});
+						});
 					});
 				}
 			}
