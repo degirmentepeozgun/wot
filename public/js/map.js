@@ -665,7 +665,7 @@ function map(_m) {
 		_sb = document.createElement('div');
 		_sb.className = 'flex fade-me';
 		_sb.id = 'score-board';
-		_sb.innerHTML = `<div class="team1-score flex flex-jc-start">0</div><div class="team2-score flex flex-jc-end">0</div>`;
+		_sb.innerHTML = `<div class="team1-score flex flex-jc-start"><span>0</span></div><div class="team2-score flex flex-jc-end"><span>0</span></div>`;
 		_gameUI.appendChild(_sb);
 	}
 	this.checkMapName = function () {
@@ -893,9 +893,15 @@ function map(_m) {
 					x.grayAvatar = true;
 					const _killer = episode.enemies.find(y => y.key === x.killedBy);
 					_killer.killCount++;
-					const _gsb = document.querySelector('.team' + _killer.groupId + '-score');
+					const _gsb = document.querySelector('.team' + _killer.groupId + '-score span');
 					if(_gsb) {
-						_gsb.innerText = parseInt(_gsb.innerText) + 1;
+						const _teamScore = parseInt(_gsb.innerText) + 1;
+						episode['team' + _killer.groupId + 'score'] = _teamScore;
+						_gsb.innerText = _teamScore;
+						//PlaySound({ key: 'scoreup', volume: .5 });
+						removeClass(_gsb, "score-bump");
+						void _gsb.offsetWidth; // reset animation
+						addClass(_gsb, "score-bump");
 					}
 					let _msg = '';
 					if (_killer.killCount > 1) {

@@ -441,6 +441,7 @@ const __langData = [
 	{ key: 'Cannot port while a quest is in progress', tr: 'Görev esnasında seyahat edemezsiniz' },
 	{ key: 'Make 50x combo', tr: '50 kombo yap' },
 	{ key: 'Stay above 1 heart', tr: '1 hakkın üstünde kal' },
+	{ key: 'Win the death match', tr: 'Ölüm maçını kazan' },
 	{ key: 'chance', tr: 'şans' },
 	{ key: 'Play Time', tr: 'Oynanış Süresi' },
 	{ key: 'Dummy Count', tr: 'Kukla Adeti' },

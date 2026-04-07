@@ -6876,8 +6876,9 @@ const __stories = [
 					//return !isMissionFailed(0) && !isMissionFailed(2) &&
 					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
 			}},
-			{ id: 3, key: 'heart', value: 1, title: 'Stay above 1 heart', when: function(_item) {
-				return (mainCharacter.heartCount > _item.value || (mainCharacter.groupId && mainCharacter.health > 0));
+			{ id: 3, key: 'war', title: 'Win the death match', when: function(_item) {
+				//return (mainCharacter.heartCount > _item.value || (mainCharacter.groupId && mainCharacter.health > 0));
+				return episode.team1score > episode.team2score;
 			}}
 		],
 		rewards: [
@@ -8243,7 +8244,7 @@ const __stories = [
 					{type:'common', key:'corpseexplode', chance:1},
 					{type:'common', key:'firespray', chance:1}
 				],
-				startsWith: 1,
+				startWith: 1,
 				save: true,
 				loadingCharacterIds: [47, 111, 33, 35, 2, 7],
 				start: function() {
@@ -8274,9 +8275,11 @@ const __stories = [
 						mainCharacter.tagContainer.remove();
 						delete mainCharacter.tagContainer;
 					}
-					delete mainCharacter.animations.tag.disabled;
-					mainCharacter.tagSkillSet = 1;
-					resetSkill('tag', mainCharacter);
+					if(mainCharacter.animations.tag){
+						delete mainCharacter.animations.tag.disabled;
+						mainCharacter.tagSkillSet = 1;
+						resetSkill('tag', mainCharacter);
+					}
 					//PlaySound({key:'conquer', volume:.6});
 					//episode.lastItemDropTime = _gameTick;
 					//takeQuest(1, 1, null, null, 1);
@@ -8613,6 +8616,7 @@ const __stories = [
 				]
 			},
 			{
+				map: 1,
 				actions: [	{
 						when: function() {
 							return episode.phase === 2 && 
@@ -8650,11 +8654,14 @@ const __stories = [
 					applyCharacterStats();
 					const _place = 0;
 					const opponents = [];
-					//const _mobs = [null, '02', 47, 1000];
-					const _mobs = [null, 47];
+					const _mobs = [null, '02', 47, 1000];
+					const _pvpNames = ['Berserker', 'Ranger', 'Cyclops', 'Al Karısı'];
+					// const _mobs = [null, 1000];
+					// const _pvpNames = ['Berserker','Al Karısı'];
 					for(var i = 0; i < _mobs.length; i++) {
 						if(i === _place){
 							mainCharacter.totalPower = getTotalPower().total;
+							mainCharacter.pvpName = _pvpNames[i];
 							opponents.push(mainCharacter);
 							continue;
 						}
@@ -8663,8 +8670,10 @@ const __stories = [
 						_e.inventory = [];
 						applyCharacterStats(null, _e);
 						_e.totalPower = getTotalPower(_e).total;
+						_e.pvpName = _pvpNames[i];
 						opponents.push(_e);
 					}
+					episode.loadCharacterSprites(function() {}, [10, 48, 624], null, 1);
 					createWar(opponents, 1, 1, 1, 600, function() {
 						mainCharacter.startPlatformX = platformX;
 						episode.skipPvPFinalScreen = 1;
@@ -8691,6 +8700,8 @@ const __stories = [
 											const _animaKeys = Object.keys(x.animations);
 											_animaKeys.forEach(y => x.animations[y].next = x.animations[y].realNext);
 											x.animate('idle',1);
+											x.removeBuffs();
+											x.attackerCount = 0;
 											x.setHealth(x.maxHP);
 											x.addBuff({ key: 'release', level: 3, ms: 3000, end: function(_c) {
 												_c.still = _c.immobilize = _c.disableKeyboard = false;
@@ -9256,7 +9267,12 @@ function switchStoryScene(_func, _newOrder) {
 	__storyScene = __story.scenes[__storySceneOrder - 1];
 	if(__storyScene?.do)
 	{
-		__storyScene.do();
+		if(episode)
+			__storyScene.do();
+		else 
+			switchMap(__storyScene.map, null, null, null, __storyScene, function() {
+				__storyScene.do();
+			});
 		return;
 	}
 	if(__storyScene?.when && !__storyScene.when()) {

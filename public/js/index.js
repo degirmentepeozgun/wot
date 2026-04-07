@@ -2091,8 +2091,8 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 				inventory: _opponent.inventory?.[0] ? JSON.parse(JSON.stringify(_opponent.inventory)) : [],
 				minLevel: _opponent.level,
 				maxLevel: _opponent.level,
-				direction: i <= _halfPlace ? 'right' : 'left',
-				name: 'Player' + i,
+				direction: i <= _halfPlace ? __right : __left,
+				name: _opponent.pvpName ?? ('Player' + i),
 				difficulty: _difficulty ?? 0,
 				enemy: _team !== _myTeam,
 				props: {
@@ -2135,7 +2135,8 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 			});
 			addClass(_enemyProfile, 'pvp');
 			for(let i = 1; i <= _opponents.length; i++) {
-				const _opponent = episode.enemies.find(x => x.displayName === ('Player' + i));
+				const _op = _opponents[i - 1];
+				const _opponent = episode.enemies.find(x => x.displayName === (_op.pvpName ?? ('Player' + i)));
 				const x = _opponent ?? mainCharacter;
 				let _y;
 				let _step = .25;

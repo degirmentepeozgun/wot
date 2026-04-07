@@ -77154,6 +77154,71 @@ const _allEnemies = {
 
 					]
 				},
+				// ground2: {
+				// 	key: 'ground2',
+				// 	order: 4,
+				// 	type: 'skill',
+				// 	move: true,
+				// 	src: './images/sprites/ep1000/attack.png',
+				// 	attack: true,
+				// 	cooldown: 10000,
+				// 	priority: 2,
+				// 	frames: [
+				// 		{
+				// 			spriteLeft: 0,
+				// 			spriteTop: 87,
+				// 			spriteWidth: 298,
+				// 			spriteHeight: 511 - 87,
+				// 			spriteOrigin: 119,
+				// 			sound: { key:'alground2'},
+				// 			speed: 10
+				// 		},
+				// 		{
+				// 			spriteLeft: 467,
+				// 			spriteTop: 87,
+				// 			spriteWidth: 340,
+				// 			spriteHeight: 511 - 87,
+				// 			spriteOrigin: 101,
+				// 			speed: 10
+				// 		},
+				// 		{
+				// 			spriteLeft: 932,
+				// 			spriteTop: 56,
+				// 			spriteWidth: 416,
+				// 			spriteHeight: 511 - 56,
+				// 			spriteOrigin: 101,
+				// 			directionChangeEnabled: true,
+				// 			speed: 10
+				// 		},
+				// 		{
+				// 			spriteLeft: 1866,
+				// 			spriteTop: 52,
+				// 			spriteWidth: 449,
+				// 			spriteHeight: 511 - 52,
+				// 			spriteOrigin: 101,
+				// 			speed: 10,
+				// 			spell: {
+				// 				key: 'bat'
+				// 			}
+				// 		},
+				// 			{
+				// 			spriteLeft: 932,
+				// 			spriteTop: 56,
+				// 			spriteWidth: 416,
+				// 			spriteHeight: 511 - 56,
+				// 			spriteOrigin: 101,
+				// 			speed: 10
+				// 		},
+				// 			{
+				// 			spriteLeft: 467,
+				// 			spriteTop: 87,
+				// 			spriteWidth: 340,
+				// 			spriteHeight: 511 - 87,
+				// 			spriteOrigin: 101,
+				// 			speed: 10
+				// 		},
+				// 	]
+				// },
 				roll: {
 					key: 'roll',
 					type: 'skill',

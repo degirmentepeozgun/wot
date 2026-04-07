@@ -601,6 +601,8 @@ function enemy(_e) {
 							_spellRange += (_spellFrame.speed * (_spellFrame.extraStepXRate ?? 0));
 						if (_spellRange > _anima.totalRange)
 							_anima.totalRange = _spellRange;
+						if(_spell.autoAim && _spell.autoAim > _anima.totalRange)
+							_anima.totalRange = _spell.autoAim;
 					}
 					break;
 				}
@@ -2633,6 +2635,7 @@ function enemy(_e) {
 			this.ultimateUsed = false;
 			forceResetSkills();
 			this.dying = this.dead = this.remove = false;
+			this.attackerCount = 0;
 			this.addBuff({ key: 'release', level: 3, ms: 3000 });
 			this.finishAnimation();
 			this.animate('idle', 1);

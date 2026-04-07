@@ -3084,6 +3084,7 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	scoreup: './images/sounds/score-up.mp3',
 	goblinkingtongue: './images/sounds/goblin-king-tongue.mp3',
 	goblinkingrelease: './images/sounds/goblin-king-release.mp3',
 	goblinkingenter: './images/sounds/goblin-king-enter.mp3',
@@ -3492,6 +3493,7 @@ const soundFiles = {
 	alstart: './images/sounds/al-start.mp3',
 	alscream: './images/sounds/al-scream.mp3?v=3',
 	alwin: './images/sounds/al-win.mp3',
+	alground2: './images/sounds/al-ground2.mp3',
 	allaugh: './images/sounds/witch-laugh.mp3?v=2',
 	batsattack: './images/sounds/bats-attack.mp3',
 	gearultimates: './images/sounds/gear-ultimate.wav',
@@ -26639,6 +26641,7 @@ const spells = {
 		zoom: 1.2 * 1.5,
 		invulnerable: true,
 		class: __spell,
+		autoAim: 30,
 		src: './images/sprites/ep14/sprite.png',
 		name: 'Bats',
 		animations: {
@@ -26700,6 +26703,191 @@ const spells = {
 						atk: {
 							yRange: 50,
 							rate: .1,
+							type: 'common',
+							hurt: {
+								sound: 'batsattack',
+								key: 'hurtground1',
+								type: 'ground'
+							}
+						}
+					}
+				]
+			},
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						bottomGap: -107,
+						speed: 1,
+						props: {
+							remove: true
+						}
+					}
+				]
+			}
+		}
+	},
+	bat: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'run',
+		zoom: 1,
+		invulnerable: true,
+		class: __spell,
+		autoAim: 42,
+		src: './images/sprites/ep624/sprite.png',
+		name: 'Bat',
+		animations: {
+			idle: {
+				key: "idle",
+				type: 'skill',
+				maxRepeat: 12,
+				move: true,
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						bottomGap: -100,
+						extraStepXRate: 1,
+						speed: 6,
+						sound: { key: 'batflap' , volume: 1 },
+						atk: {
+							yRange: 10,
+							rate: 1,
+							type: 'common',
+							hurt: {
+								sound: 'batsattack',
+								key: 'hurtground1',
+								type: 'ground'
+							}
+						}
+					},
+					{
+						spriteLeft: 200,
+						spriteTop: 0,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						bottomGap: -100,
+						extraStepXRate: 1,
+						speed: 6,
+						sound: { key: 'batflap' , volume: 1 },
+						atk: {
+							yRange: 10,
+							rate: 1,
+							type: 'common',
+							hurt: {
+								sound: 'batsattack',
+								key: 'hurtground1',
+								type: 'ground'
+							}
+						}
+					},
+					{
+						spriteLeft: 400,
+						spriteTop: 0,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						bottomGap: -100,
+						extraStepXRate: 1,
+						speed: 6,
+						sound: { key: 'batflap' , volume: 1 },
+						atk: {
+							yRange: 10,
+							rate: 1,
+							type: 'common',
+							hurt: {
+								sound: 'batsattack',
+								key: 'hurtground1',
+								type: 'ground'
+							}
+						}
+					},
+					{
+						spriteLeft: 600,
+						spriteTop: 0,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						bottomGap: -100,
+						extraStepXRate: 1,
+						speed: 6,
+						sound: { key: 'batflap' , volume: 1 },
+						atk: {
+							yRange: 10,
+							rate: 1,
+							type: 'common',
+							hurt: {
+								sound: 'batsattack',
+								key: 'hurtground1',
+								type: 'ground'
+							}
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 200,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						bottomGap: -100,
+						extraStepXRate: 1,
+						speed: 6,
+						sound: { key: 'batflap' , volume: 1 },
+						atk: {
+							yRange: 10,
+							rate: 1,
+							type: 'common',
+							hurt: {
+								sound: 'batsattack',
+								key: 'hurtground1',
+								type: 'ground'
+							}
+						}
+					},
+					{
+						spriteLeft: 200,
+						spriteTop: 200,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						bottomGap: -100,
+						extraStepXRate: 1,
+						speed: 6,
+						sound: { key: 'batflap' , volume: 1 },
+						atk: {
+							yRange: 10,
+							rate: 1,
+							type: 'common',
+							hurt: {
+								sound: 'batsattack',
+								key: 'hurtground1',
+								type: 'ground'
+							}
+						}
+					},
+					{
+						spriteLeft: 400,
+						spriteTop: 200,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						bottomGap: -100,
+						extraStepXRate: 1,
+						speed: 6,
+						sound: { key: 'batflap' , volume: 1 },
+						atk: {
+							yRange: 10,
+							rate: 1,
 							type: 'common',
 							hurt: {
 								sound: 'batsattack',
