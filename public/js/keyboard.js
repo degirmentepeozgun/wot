@@ -599,41 +599,51 @@ function keyboard(_character, _keys) {
 		this.action(_key);
 	}
 }
-// window.addEventListener('keydown', function (event) {
-// 	if(mainCharacter?.disableKeyboard){
-// 		mainCharacter.holdingKeys = [];
-// 		return;
-// 	}
-// 	if (event.repeat) return;
-// 	try {
-// 		if (event?.key) {
-// 			if (event.which === 9)
-// 				event.preventDefault();
-// 			// if(!mainCharacter.keyboard)
-// 			// 	switchAutoMode();
-// 			mainCharacter.keyboard.mouseDown(event.key.toLocaleLowerCase());
-// 		}
-// 	} catch (e) {
+window.addEventListener('keydown', function (event) {
+	if(mainCharacter?.disableKeyboard){
+		mainCharacter.holdingKeys = [];
+		return;
+	}
+	if (event.repeat) return;
+	try {
+	    const kRaw = event.key?.toLowerCase?.();
+  		if(kRaw === ' ' && episode?.hasSkippableScreen) {
+			const _skippableScreen = document.querySelector('.quick-play-desc-container');
+			if(_skippableScreen) {
+				const _click = _skippableScreen.querySelector('[onexactclick]');
+				if(_click)
+					_click.onexactclick();
+			}
+			return;
+		}
+		if (event?.key) {
+			if (event.which === 9)
+				event.preventDefault();
+			// if(!mainCharacter.keyboard)
+			// 	switchAutoMode();
+			mainCharacter.keyboard.mouseDown(event.key.toLocaleLowerCase());
+		}
+	} catch (e) {
 
-// 	}
-// });
-// window.addEventListener('keyup', function (event) {
-// 	if(mainCharacter?.disableKeyboard){
-// 		mainCharacter.holdingKeys = [];
-// 		return;
-// 	}
-// 	try {
-// 		if (event?.key) {
-// 			if (event.which === 9)
-// 				event.preventDefault();
-// 			// if(!mainCharacter.keyboard)
-// 			// 	switchAutoMode();
-// 			mainCharacter.keyboard.mouseUp(event.key.toLowerCase());
-// 		}
-// 	} catch (e) {
+	}
+});
+window.addEventListener('keyup', function (event) {
+	if(mainCharacter?.disableKeyboard){
+		mainCharacter.holdingKeys = [];
+		return;
+	}
+	try {
+		if (event?.key) {
+			if (event.which === 9)
+				event.preventDefault();
+			// if(!mainCharacter.keyboard)
+			// 	switchAutoMode();
+			mainCharacter.keyboard.mouseUp(event.key.toLowerCase());
+		}
+	} catch (e) {
 
-// 	}
-// });
+	}
+});
 // window.addEventListener("blur", () => {
 // 	if(mainCharacter?.keyboard)
 // 		mainCharacter.keyboard.holdingKeys = [];
@@ -817,51 +827,51 @@ function normalizeKey(key) {
 
 const directionKeys = new Set(['w','a','s','d','arrowleft','arrowright','arrowup','arrowdown']);
 
-window.addEventListener('keydown', (e) => {
-  const kRaw = e.key?.toLowerCase?.();
-  if(kRaw === ' ' && episode?.hasSkippableScreen) {
-		const _skippableScreen = document.querySelector('.quick-play-desc-container');
-		if(_skippableScreen) {
-			const _click = _skippableScreen.querySelector('[onexactclick]');
-			if(_click)
-				_click.onexactclick();
-		}
-		return;
-  }
-  if(e.repeat) {
-	if(!physicalKeys.has(kRaw))
-		return;
-  }
-  if (mainCharacter?.disableKeyboard || mainCharacter?.stop) {
-	blurKeyboard();
-	return;
-  }
+// window.addEventListener('keydown', (e) => {
+//   const kRaw = e.key?.toLowerCase?.();
+//   if(kRaw === ' ' && episode?.hasSkippableScreen) {
+// 		const _skippableScreen = document.querySelector('.quick-play-desc-container');
+// 		if(_skippableScreen) {
+// 			const _click = _skippableScreen.querySelector('[onexactclick]');
+// 			if(_click)
+// 				_click.onexactclick();
+// 		}
+// 		return;
+//   }
+//   if(e.repeat) {
+// 	if(!physicalKeys.has(kRaw))
+// 		return;
+//   }
+//   if (mainCharacter?.disableKeyboard || mainCharacter?.stop) {
+// 	blurKeyboard();
+// 	return;
+//   }
 
   
-  if (!kRaw) return;
+//   if (!kRaw) return;
 
-  const now = performance.now();
-  const lastUpTime = lastUp[kRaw] || 0;
+//   const now = performance.now();
+//   const lastUpTime = lastUp[kRaw] || 0;
 
-  const antiGhostMs = directionKeys.has(kRaw)
-    ? antiGhostMsDir
-    : antiGhostMsOther;
+//   const antiGhostMs = directionKeys.has(kRaw)
+//     ? antiGhostMsDir
+//     : antiGhostMsOther;
 
-  // Ghost engelleme (çok hızlı basılıp bırakılmış gibi olaylar)
-  if (now - lastUpTime < antiGhostMs)
-    return;
-  pressSkill(e);
-  lastDown[kRaw] = now;
-  physicalKeys.add(kRaw);
-});
+//   // Ghost engelleme (çok hızlı basılıp bırakılmış gibi olaylar)
+//   if (now - lastUpTime < antiGhostMs)
+//     return;
+//   pressSkill(e);
+//   lastDown[kRaw] = now;
+//   physicalKeys.add(kRaw);
+// });
 
-window.addEventListener('keyup', (e) => {
-  const kRaw = e.key?.toLowerCase?.();
-  if (!kRaw) return;
+// window.addEventListener('keyup', (e) => {
+//   const kRaw = e.key?.toLowerCase?.();
+//   if (!kRaw) return;
 
-  lastUp[kRaw] = performance.now();
-  physicalKeys.delete(kRaw);
-});
+//   lastUp[kRaw] = performance.now();
+//   physicalKeys.delete(kRaw);
+// });
 
 // Blur'da tüm tuşları temizleyelim
 function blurKeyboard() {
@@ -908,7 +918,7 @@ function syncKeysRobust() {
   requestAnimationFrame(syncKeysRobust);
 }
 
-syncKeysRobust();
+//syncKeysRobust();
 
 
 

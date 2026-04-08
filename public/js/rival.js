@@ -77134,21 +77134,51 @@ const _allEnemies = {
 										maxLevel: 2
 									}
 								];
-								episode.installMobs(_mobs, function (_e) {
-									_e.direction = _char.direction;
-									//_e.animations.before = _e.animations.start;
-									_e.animate('start', 1);
-									_e.autoTarget = _char.autoTarget;
-									_e.class = 'minion';
-									_e.skipHealthBar = _e.noLoot = _e.looted = _e.noCC = true;
-									_e.experience = 0;
-									_e.zoom /= 2;
-									if (_e.autoTarget && _e.autoTarget.isDead())
-										_e.remove = true;
-									_e.health = 1;
-									_e.friendly = _char.friendly;
-									_e.enemy = _char.enemy;
-								});
+								// episode.installMobs(_mobs, function (_e) {
+								// 	_e.direction = _char.direction;
+								// 	//_e.animations.before = _e.animations.start;
+								// 	_e.animate('start', 1);
+								// 	_e.autoTarget = _char.autoTarget;
+								// 	_e.class = 'minion';
+								// 	_e.skipHealthBar = _e.noLoot = _e.looted = _e.noCC = true;
+								// 	_e.experience = 0;
+								// 	_e.zoom /= 2;
+								// 	if (_e.autoTarget && _e.autoTarget.isDead())
+								// 		_e.remove = true;
+								// 	_e.health = 1;
+								// 	_e.friendly = _char.friendly;
+								// 	_e.enemy = _char.enemy;
+								// });
+								function spawnMobsGradually(mobs, perFrame = 3) {
+									let i = 0;
+
+									function step() {
+										for (let j = 0; j < perFrame && i < mobs.length; j++, i++) {
+											episode.installMobs([mobs[i]], function (_e) {
+												_e.direction = _char.direction;
+												//_e.animations.before = _e.animations.start;
+												_e.animate('start', 1);
+												_e.autoTarget = _char.autoTarget;
+												_e.class = 'minion';
+												_e.skipHealthBar = _e.noLoot = _e.looted = _e.noCC = true;
+												_e.experience = 0;
+												_e.zoom /= 2;
+												if (_e.autoTarget && _e.autoTarget.isDead())
+													_e.remove = true;
+												_e.health = 1;
+												_e.friendly = _char.friendly;
+												_e.enemy = _char.enemy;
+											});
+										}
+
+										if (i < mobs.length) {
+											requestAnimationFrame(step);
+										}
+									}
+
+									step();
+								}
+								spawnMobsGradually(_mobs, 3);
 							}
 						},
 

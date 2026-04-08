@@ -4117,18 +4117,56 @@ function enemy(_e) {
 			}
 		}
 	}
-	this.getBuffProps = function(_prop) {
-		let _val = 0;
-		for(let _buff of this.buffs ?? []) {
-			var _b = _allBuffs[_buff.key];
-			if(_b) {
-				var _p = _b.gain ?? _b.loss;
-				_p = _p.find(x => x.level === _buff.level);
-				if(_p.props[_prop])
-					_val += _p.props[_prop];
+	// this.getBuffProps = function(_prop) {
+	// 	const _current = this.finalBuffProps?.[_prop];
+	// 	if(_current && _current.lastCalculated > (_gameTick - 100))
+	// 		return _current.val;
+	// 	let _val = 0;
+	// 	for(let _buff of this.buffs ?? []) {
+	// 		var _b = _allBuffs[_buff.key];
+	// 		if(_b) {
+	// 			var _p = _b.gain ?? _b.loss;
+	// 			_p = _p.find(x => x.level === _buff.level);
+	// 			if(_p.props[_prop])
+	// 				_val += _p.props[_prop];
+	// 		}
+	// 	}
+	// 	if(!this.finalBuffProps)
+	// 		this.finalBuffProps = {};
+	// 	this.finalBuffProps[_prop] = { lastCalculated: _gameTick, val: _val };
+	// 	return _val;
+	// }
+	this.getBuffProps = function (_prop) {
+
+		const current = this.finalBuffProps?.[_prop];
+		if (current && (_gameTick - current.lastCalculated) < 100)
+			return current.val;
+
+		let val = 0;
+		const buffs = this.buffs;
+		if (buffs) {
+			for (let i = 0; i < buffs.length; i++) {
+
+				const bData = _allBuffs[buffs[i].key];
+				if (!bData) continue;
+
+				const list = bData.gain ?? bData.loss;
+				const p = list[buffs[i].level];
+
+				if (p?.props[_prop])
+					val += p.props[_prop];
 			}
 		}
-		return _val;
+
+		if (!this.finalBuffProps)
+			this.finalBuffProps = {};
+
+		this.finalBuffProps[_prop] = {
+			lastCalculated: _gameTick,
+			val: val
+		};
+
+		return val;
 	}
 	this.hasBuff = function(_prop) {
 		for(let _buff of this.buffs ?? []) {
@@ -5720,9 +5758,9 @@ function enemy(_e) {
 					continue;
 				const _eo = _enemy.HURTLEFT + _enemy._HURTBOX_half;
 				const _to = this.HURTLEFT + this._HURTBOX_half;
-				if (!_enemy.attackingOnlyBy === this.key && !_enemy.aoe && this.direction === __left && _eo > _to)
+				if (_enemy.attackingOnlyBy === this.key && !_enemy.aoe && this.direction === __left && _eo > _to)
 					continue;
-				if (!_enemy.attackingOnlyBy === this.key && !_enemy.aoe && this.direction === __right && _eo < _to)
+				if (_enemy.attackingOnlyBy === this.key && !_enemy.aoe && this.direction === __right && _eo < _to)
 					continue;
 				units.push(_en);
 			}

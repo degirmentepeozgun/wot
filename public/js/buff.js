@@ -234,7 +234,8 @@ const _allBuffs = {
 				p1: 3000,
 				p2: './images/related/witch.png',
 				main: true
-			}
+			},
+			{ key: 'sleep', position: 'middle-head' }
 		],
 		loss: [
 			{

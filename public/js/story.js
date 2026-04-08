@@ -8661,7 +8661,7 @@ const __stories = [
 					for(var i = 0; i < _mobs.length; i++) {
 						if(i === _place){
 							mainCharacter.totalPower = getTotalPower().total;
-							mainCharacter.pvpName = _pvpNames[i];
+							mainCharacter.pvpName = mainCharacter.displayName = _pvpNames[i];
 							opponents.push(mainCharacter);
 							continue;
 						}

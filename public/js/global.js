@@ -1668,7 +1668,7 @@ const relatedObjects = [
 	},
 	{
 		id: 'sleep', key: 'sleep', width: 158, height: 45, col: 5,
-		zoom: 2, totalFrames: 15, speed: 4, singleton: true, still: true, repeat: true
+		zoom: 2, totalFrames: 15, speed: 4, singleton: true, stillOnChar: true, repeat: true
 	},
 	{
 		id: 'heart', key: 'heart', width: 64, height: 64, col: 5,
@@ -1713,7 +1713,7 @@ const relatedObjects = [
 		totalFrames: 8, speed: 7, singleton: true
 	},
 	{
-		id: 'stun', key: 'stun', type: 'hurt', width: 102, height: 48, zoom: .75, repeat: true, bottom: 10,
+		id: 'stun', key: 'stun', type: 'hurt', width: 102, height: 48, zoom: 1, repeat: true, bottom: 10,
 		totalFrames: 20, skip: 2, speed: 4, stillOnChar: true, stillY: true, singleton: true, effect: 'stun', limit: 5, bind: 'hurtground'
 	},
 	{ id: 'glow', key: 'glow', width: 250, height: 250, totalFrames: 4, speed: 2, zoom: .8, still: true, singleton: true },

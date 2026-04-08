@@ -2078,8 +2078,10 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 		_map.mobs = [];
 		for(let _opponent of _opponents){
 			i++;
-			if(_opponent === mainCharacter)
+			if(_opponent === mainCharacter){
+				__account.name = mainCharacter.displayName = mainCharacter.pvpName = _opponent.pvpName;
 				continue;
+			}
 			const _team = i <= _halfPlace ? 1 : 2;
 			_map.mobs.push({
 				id: _opponent.id,

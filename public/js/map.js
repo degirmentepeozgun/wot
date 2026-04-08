@@ -665,7 +665,7 @@ function map(_m) {
 		_sb = document.createElement('div');
 		_sb.className = 'flex fade-me';
 		_sb.id = 'score-board';
-		_sb.innerHTML = `<div class="team1-score flex flex-jc-start"><span>0</span></div><div class="team2-score flex flex-jc-end"><span>0</span></div>`;
+		_sb.innerHTML = `<div class="team1-score flex flex-jc-start">0</div><div class="team2-score flex flex-jc-end">0</div>`;
 		_gameUI.appendChild(_sb);
 	}
 	this.checkMapName = function () {
@@ -765,6 +765,9 @@ function map(_m) {
 	this.checkPVPResult = function () {
 		if (this.pvpEnded || this.pvpResult || _storySceneSwitching || __switchingMap || this.disposing)
 			return;
+		// if(this.lastPvPTimeCheck > (_gameTick - 1000))
+		// 	return;
+		// this.lastPvPTimeCheck = _gameTick;
 		let _end, _diff;
 		if (!this.pvpStarted) {
 			this.pvpStarted = Date.now();
@@ -815,18 +818,40 @@ function map(_m) {
 					delete this.missionCountDown;
 				}
 			}
-			else if (pvpCounter.innerText !== _diff.toString()) {
-				if (_diff === _baseTime || (_diff < _baseTime && hasClass(pvpCounter, 'countdown'))) {
-					removeClass(pvpCounter, 'countdown');
-					episode.enemies?.forEach(x => x.immobilize = false);
-					if(__story) {
-						__story.startTime = _gameTick;
-						this.challangeStarted = 1;
-						__story.endTime = undefined;
+			// else if (pvpCounter.innerText !== _diff.toString()) {
+			// 	if (_diff === _baseTime || (_diff < _baseTime && hasClass(pvpCounter, 'countdown'))) {
+			// 		removeClass(pvpCounter, 'countdown');
+			// 		episode.enemies?.forEach(x => x.immobilize = false);
+			// 		if(__story) {
+			// 			__story.startTime = _gameTick;
+			// 			this.challangeStarted = 1;
+			// 			__story.endTime = undefined;
+			// 		}
+			// 	}
+			// 	if (_diff >= 0 && pvpCounter.innerText !== _diff.toString())
+			// 		pvpCounter.innerText = _diff;
+			// }
+			else {
+				const diffStr = _diff.toString();
+				const currentText = pvpCounter.textContent;
+
+				if (currentText !== diffStr) {
+
+					if (_diff === _baseTime || (_diff < _baseTime && hasClass(pvpCounter, 'countdown'))) {
+						removeClass(pvpCounter, 'countdown');
+						episode.enemies?.forEach(x => x.immobilize = false);
+
+						if (__story) {
+							__story.startTime = _gameTick;
+							this.challangeStarted = 1;
+							__story.endTime = undefined;
+						}
+					}
+
+					if (_diff >= 0) {
+						pvpCounter.textContent = diffStr;
 					}
 				}
-				if (_diff >= 0 && pvpCounter.innerText !== _diff.toString())
-					pvpCounter.innerText = _diff;
 			}
 		}
 		if(this.tower) {
@@ -893,15 +918,11 @@ function map(_m) {
 					x.grayAvatar = true;
 					const _killer = episode.enemies.find(y => y.key === x.killedBy);
 					_killer.killCount++;
-					const _gsb = document.querySelector('.team' + _killer.groupId + '-score span');
+					const _gsb = document.querySelector('.team' + _killer.groupId + '-score');
 					if(_gsb) {
 						const _teamScore = parseInt(_gsb.innerText) + 1;
 						episode['team' + _killer.groupId + 'score'] = _teamScore;
 						_gsb.innerText = _teamScore;
-						//PlaySound({ key: 'scoreup', volume: .5 });
-						removeClass(_gsb, "score-bump");
-						void _gsb.offsetWidth; // reset animation
-						addClass(_gsb, "score-bump");
 					}
 					let _msg = '';
 					if (_killer.killCount > 1) {
@@ -1381,7 +1402,7 @@ function map(_m) {
 					const _bubble = episode.bubbles?.find(x => x.key === sprite.key)?.elem;
 					if (_bubble)
 						removeBubble(_bubble, sprite);
-					if(!this.war || sprite.owner || sprite.class === __spell) {
+					if(!this.war || sprite.owner || sprite.class === __spell || sprite.class === 'minion') {
 						const spriteAnima = sprite.getCurrentAnimation();
 						if(spriteAnima?.sound?.stop){
 							spriteAnima.sound.stop();
