@@ -478,6 +478,14 @@ const __gems = [
 					{ key:'fire-dmg', value:10, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
 					{ key:'fire-resist-rate', value:10, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
 				]
+			},
+			{ 
+				grade: 3,
+				cost: 300,
+				props: [
+					{ key:'fire-dmg', value:15, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
+					{ key:'fire-resist-rate', value:15, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
+				]
 			}
 		] 
 	},
@@ -503,6 +511,14 @@ const __gems = [
 				props: [
 					{ key:'ice-dmg', value:10, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
 					{ key:'ice-resist-rate', value:10, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
+				]
+			},
+			{ 
+				grade: 3,
+				cost: 300,
+				props: [
+					{ key:'ice-dmg', value:15, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
+					{ key:'ice-resist-rate', value:15, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
 				]
 			}
 		] 
@@ -530,6 +546,14 @@ const __gems = [
 					{ key:'toxic-dmg', value:10, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
 					{ key:'toxic-resist-rate', value:10, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
 				]
+			},
+			{ 
+				grade: 3,
+				cost: 300,
+				props: [
+					{ key:'toxic-dmg', value:15, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
+					{ key:'toxic-resist-rate', value:15, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
+				]
 			}
 		] 
 	},
@@ -556,6 +580,14 @@ const __gems = [
 					{ key:'lightning-dmg', value:10, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
 					{ key:'lightning-resist-rate', value:10, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
 				]
+			},
+			{ 
+				grade: 3,
+				cost: 300,
+				props: [
+					{ key:'lightning-dmg', value:15, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
+					{ key:'lightning-resist-rate', value:15, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
+				]
 			}
 		] 
 	},
@@ -581,6 +613,14 @@ const __gems = [
 				props: [
 					{ key:'shadow-dmg', value:10, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
 					{ key:'shadow-resist-rate', value:10, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
+				]
+			},
+			{ 
+				grade: 3,
+				cost: 300,
+				props: [
+					{ key:'shadow-dmg', value:15, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
+					{ key:'shadow-resist-rate', value:15, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
 				]
 			}
 		] 

@@ -657,7 +657,7 @@ const __stories = [
 				map: 105,
 				startWith: 47,
 				noArtifact: 1,
-				loadingCharacterIds: [ 51,52,19 ],
+				loadingCharacterIds: [ 51,52,19,54 ],
 				actions: [
 					{
 						when: function() {
@@ -678,9 +678,10 @@ const __stories = [
 							_princess.invulnerable = true;
 							addClass(_gameUI, 'disable-ui');
 							episode.removeLocationHand();
-							mainCharacter.direction = 'right';
+							mainCharacter.direction = __right;
 							mainCharacter.standBy();
 							mainCharacter.left = MathRound(episode.cWidth * .2);
+							_princess.direction = _king.direction = __left;
 							mainCharacter.updateVariables();
 							mainCharacter.yPosition = MathRound(groundheight * .5);
 							if(mainCharacter.rageCount > 0 || mainCharacter.ultimate) {

@@ -865,7 +865,9 @@ function enemy(_e) {
 			};
 		};
 
-		const base = MathRound(this._HURTBOX_half * .75);
+		let base = MathRound(this._HURTBOX_half * .75);
+		if(base > (episode.cWidth / 28))
+			base = episode.cWidth / 28;
 
 		const rings = [
 			{ count: 6,  dist: base * .9 },
@@ -1154,29 +1156,44 @@ function enemy(_e) {
 		const owner = root.owner;
 		const releasedRing = root.ring;
 
+		const visitedOcc = new Set();
 		const clearBranch = (slot) => {
 
-			if (!slot) return;
+			if (!slot)
+				return;
 
 			const occ = slot.occupant;
 
-			if (occ)
+			let skipChildren = false;
+
+			if (occ) {
+				if (visitedOcc.has(occ)) {
+					skipChildren = true; // 🔥 sadece recursion'ı kes
+				} else {
+					visitedOcc.add(occ);
+				}
+
 				occ.slot = null;
 
-			if (occ && occ.slots) {
+				if (occ === this)
+					skipChildren = true;
+			}
+
+			// 🔥 sadece çocuklara gitmeyi kesiyoruz
+			if (!skipChildren && occ && occ.slots) {
 				for (const s of occ.slots)
 					clearBranch(s);
 
 				occ.slots = null;
 			}
 
+			// 🔥 BUNLAR HER ZAMAN ÇALIŞMALI
 			slot.occupied = false;
 			slot.occupant = null;
 			slot.mustCross = false;
 			slot.attacking = false;
 			slot.placed = false;
 		};
-
 		clearBranch(root);
 
 		// 🔥 ORDER ARTIR
@@ -2915,24 +2932,25 @@ function enemy(_e) {
 		
 		let _goOn;
 		if (this.autoMode && !this.keyboard && this.class !== __spell){
-			if(this.important)
+			if(this.important || this.puppetMode || this.immobilize || this.harmless 
+				|| this.still || this.action)
 				this.autoCommand();
 			else
 				this.autoCommand2();
 		}
-		//showBorders(this.HURTLEFT, _gamePad.clientHeight - this.yPosition, this.HURTWIDTH, 20, this.slot?.mustCross ? 'white' : this.slot && !this.slot.support ? 'orange' : (this.slot ? 'yellow' : (this.main ? 'blue' : 'green')), 'border-' + this.key);
-		// if(this.slots)
-		// 	for(let i = 0; i < this.slots.length; i++) {
-		// 		const _slot = this.slots[i];
-		// 		// if(_slot.support)
-		// 		// 	continue;
-		// 		const _xGap = _slot.xGap ?? 0;
-		// 		const _origin = this.HURTLEFT + this._HURTBOX_half + _xGap;
-		// 		// showBorders(_origin - 10, _gamePad.clientHeight - this.yPosition + (_slot.yGap ?? 0), 
-		// 		// 	20, 20, _slot.occupied ? 'pink' : 'red', 'slot-' + i + '-' + this.key);
-		// 		showBorders(_origin - 10, _gamePad.clientHeight - this.yPosition + (_slot.yGap ?? 0), 
-		// 			20, 20, _slot.occupied ? 'pink' : (_slot.ranged ? 'purple' : 'red'), 'slot-' + i + '-' + this.key);
-		// 	}
+		showBorders(this.HURTLEFT, _gamePad.clientHeight - this.yPosition, this.HURTWIDTH, 20, this.slot?.mustCross ? 'white' : this.slot && !this.slot.support ? 'orange' : (this.slot ? 'yellow' : (this.main ? 'blue' : 'green')), 'border-' + this.key);
+		if(this.slots)
+			for(let i = 0; i < this.slots.length; i++) {
+				const _slot = this.slots[i];
+				// if(_slot.support)
+				// 	continue;
+				const _xGap = _slot.xGap ?? 0;
+				const _origin = this.HURTLEFT + this._HURTBOX_half + _xGap;
+				// showBorders(_origin - 10, _gamePad.clientHeight - this.yPosition + (_slot.yGap ?? 0), 
+				// 	20, 20, _slot.occupied ? 'pink' : 'red', 'slot-' + i + '-' + this.key);
+				showBorders(_origin - 10, _gamePad.clientHeight - this.yPosition + (_slot.yGap ?? 0), 
+					20, 20, _slot.occupied ? 'pink' : (_slot.ranged ? 'purple' : 'red'), 'slot-' + i + '-' + this.key);
+			}
 		
 		if (this.autoMode && this.important) {
 			if (!this.isDead()) {
@@ -6459,7 +6477,7 @@ function enemy(_e) {
 				if(_enemyPriority > 1 && _enemy.chargeStarted && _enemyAnima.chargeStarted === _enemy.chargeStarted)
 					_enemyPriority--;
 				let hurtedByPriority;
-				if (_enemyPriority !== undefined && !_enemy.newBlocked) {
+				if (!_enemy.ironSkin && _enemyPriority !== undefined && !_enemy.newBlocked) {
 					if (_enemyPriority === _thisPriority && _enemyFrame?.atk) {
 						if (this.class !== __spell && _enemy.class !== __spell && _enemy.direction !== this.direction && !this.friendly && !_enemy.friendly && getRandomValue(1, 10) === 1) {
 							const _eck = _enemy.animations.dash?.chargeKey;

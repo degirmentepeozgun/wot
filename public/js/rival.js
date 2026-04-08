@@ -67703,6 +67703,7 @@ const _allEnemies = {
 			stepX: 8,
 			weight: 1000,
 			stepXRate: .35,
+			harmless: true,
 			invulnerable: true,
 			bleed: true,
 			ranged: true,
