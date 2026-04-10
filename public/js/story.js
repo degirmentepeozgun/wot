@@ -682,6 +682,7 @@ const __stories = [
 							mainCharacter.standBy();
 							mainCharacter.left = MathRound(episode.cWidth * .2);
 							_princess.direction = _king.direction = __left;
+							_king.important = _princess.important = true;
 							mainCharacter.updateVariables();
 							mainCharacter.yPosition = MathRound(groundheight * .5);
 							if(mainCharacter.rageCount > 0 || mainCharacter.ultimate) {

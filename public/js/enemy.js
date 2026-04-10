@@ -914,43 +914,6 @@ function enemy(_e) {
 		if(_ringLevel)
 			this.ringLevel = _ringLevel;
 	};
-    this.createSupportSlots = function(slot) {
-        const makeSlot = (type, xGap, yGap) => ({
-            type,
-            xGap,
-            yGap,
-			support: true,
-            occupied: false,
-            target: null,
-            owner: this,
-			parent: slot,
-			distance: getRandomValue2(MathFloor(this._HURTBOX_half / 2), this._HURTBOX_half)
-        });
-
-		const _randCoordsX = [];
-		const _randCoordsY = [];
-		const _randCoordsCount = getRandomValue2(1,3);
-		for(let i = 0; i < _randCoordsCount; i++) {
-        	const X = (slot.type === 'back' ? -1 : 1) * MathRound(this._HURTBOX_half * (getRandomValue2(80, 110) / 100));
-			_randCoordsX.push(X);
-		}
-		let j = 1;//getRandomValue2(1,4);
-		for(let i = 1; i <= _randCoordsCount; i++) {
-			//- veya 0 veya + offsetY seçicez ama random sırada olmalı randcoordsy dizisine atacaz
-			const yOffset = MathRound(episode.cHeight * (getRandomValue2(20, 40) / 1000));
-			if(j % i === 1)	
-				_randCoordsY.push(-yOffset);
-			else if(j % i === 2)		
-				_randCoordsY.push(0);
-			else					
-				_randCoordsY.push(yOffset);
-		}
-        this.slots = [];
-		for(let i = 0; i < _randCoordsCount; i++) {		
-			this.slots.push(makeSlot(slot.type, _randCoordsX[i], _randCoordsY[i]));
-		}
-        this.dirtySlots = [...this.slots];
-    }
     this.getSlotCoords = function() {
         if(!this.slot)
             return undefined;
@@ -1433,10 +1396,12 @@ function enemy(_e) {
 				// ranged / melee constraint
 				if(this.ranged && !s.ranged) continue;
 				let score = Infinity;
-
+				let slotLeft = (targetCenterX + s.xGap);
+				if(slotLeft < 0 || slotLeft > episode.cWidth)
+					continue;	
 				if (!s.occupied) {
 					// 🟢 boş slot
-					const dx = (targetCenterX + s.xGap) - myCenterX;
+					const dx = slotLeft - myCenterX;
 					score = Math.abs(dx);
 				}
 				else {
