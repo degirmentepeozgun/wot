@@ -231,6 +231,7 @@ const __stories = [
 		ticket: 2,
 		act:1,
 		list:true,
+		startScene: 2,
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
@@ -1491,6 +1492,7 @@ const __stories = [
 							delete mainCharacter.disableKeyboard;
 							takeQuest(0, 1, null, null, 1);
 							delete mainCharacter.animations.roll.cooldown;
+							mainCharacter.atk = 200;
 							delete mainCharacter.animations.roll.coolDownLeft;
 							episode.enemies.filter(x => x.enemy && x.class !== 'object')?.forEach(x => {
 								x.invulnerable = false;
@@ -6904,7 +6906,7 @@ const __stories = [
 				minLevel: 1,
 				maps: [201],
 				timer: {
-					ms: 5000, //200000,
+					ms: 200000,
 					after: function() {
 						if(episode.phase > 98)
 							return;
@@ -6927,7 +6929,7 @@ const __stories = [
 				minLevel: 1,
 				maps: [11],
 				timer: {
-					ms: 3000, // 150000,
+					ms: 3000, //200000,
 					after: function() {
 						if(episode.phase > 99)
 							return;
@@ -7717,7 +7719,7 @@ const __stories = [
 					mainCharacter.level = 0;
 					mainCharacter.experience = 0;
 					mainCharacter.maxExperience = 833;
-					setCharacterLevel(9, null, 1);
+					setCharacterLevel(1, null, 1);
 					//setCharacterLevel(8, null, 1);
 					addClass(_gameUI, 'demo-playing');
 					episode.pauseBgMusic(1);
@@ -8675,8 +8677,8 @@ const __stories = [
 						_e.pvpName = _pvpNames[i];
 						opponents.push(_e);
 					}
-					episode.loadCharacterSprites(function() {}, [10, 48, 624], null, 1);
-					createWar(opponents, 1, 1, 1, 600, function() {
+					episode.loadCharacterSprites(function() {}, [10, 48], null, 1);
+					createWar(opponents, 1, 1, 1, 300, function() {
 						mainCharacter.startPlatformX = platformX;
 						episode.skipPvPFinalScreen = 1;
 						episode.phase = 1;

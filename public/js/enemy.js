@@ -390,7 +390,7 @@ function enemy(_e) {
 
 		if (
 			this._cachedFrameIndex !== this.frame ||
-			this._cachedAnimation !== anima
+			this._cachedAnimation !== anima || (anima && !this.CURRENT_FRAME)
 		) {
 			this.PREV_FRAME = this.CURRENT_FRAME;
 			this.CURRENT_FRAME = anima.frames?.[this.frame];
@@ -618,7 +618,7 @@ function enemy(_e) {
 	}
 	this.pickNewTarget = function () {
 		let _dir = this.direction;
-		let _enemy = this.getClosestEnemy(10000, _dir, function (_e) {
+		let _enemy = this.getClosestEnemy(this.sight ?? 10000, _dir, function (_e) {
 			return !_e.invulnerable && !_e.isDead();
 		}, 100, 100);
 		if (_enemy?.enemy) {
@@ -626,7 +626,7 @@ function enemy(_e) {
 			return;
 		}
 		_dir = _dir === __left ? __right : __left;
-		_enemy = this.getClosestEnemy(10000, _dir, function (_e) {
+		_enemy = this.getClosestEnemy(this.sight ?? 10000, _dir, function (_e) {
 			return !_e.invulnerable && !_e.isDead();
 		}, 100, 100);
 		if (_enemy?.enemy) {
@@ -1005,8 +1005,11 @@ function enemy(_e) {
 				continue;
 
 			const slotX = targetCenterX + slot.xGap;
+			if(slotX < 0 || (slotX + platformX) > episode.width)
+				continue;
 			const slotY = targetCenterY + slot.yGap;
 
+			
 			const dx = slotX - myCenterX;
 			const dy = slotY - myCenterY;
 
@@ -1331,6 +1334,14 @@ function enemy(_e) {
 		const orders = target.releasedSlotOrders;
 		if(!orders)
 			return true;
+
+		const targetCenterX = target.HURTLEFT + target._HURTBOX_half;
+		let currentSlotLeft = (targetCenterX + this.slot.xGap);
+		if(currentSlotLeft < 0 || (currentSlotLeft + platformX) > episode.width){
+			this.releaseSlot();	
+			return true;
+		}
+
 		let candidateRings = [];
 
 			// 🎯 PRIORITY 1 — RANGED optimize (5+ → 3/4)
@@ -1364,7 +1375,6 @@ function enemy(_e) {
 		if(candidateRings.length === 0)
 			return true;
 
-		const targetCenterX = target.HURTLEFT + target._HURTBOX_half;
 		const myCenterX = this.HURTLEFT + this._HURTBOX_half;
 		const isTargetLeft = myCenterX > targetCenterX;
 
@@ -1397,7 +1407,7 @@ function enemy(_e) {
 				if(this.ranged && !s.ranged) continue;
 				let score = Infinity;
 				let slotLeft = (targetCenterX + s.xGap);
-				if(slotLeft < 0 || slotLeft > episode.cWidth)
+				if(slotLeft < 0 || (slotLeft + platformX) > episode.width)
 					continue;	
 				if (!s.occupied) {
 					// 🟢 boş slot
@@ -1686,14 +1696,24 @@ function enemy(_e) {
 					const _autoTargetOrigin = this.autoTarget.HURTLEFT + this.autoTarget._HURTBOX_half;
 					const diffX = Math.abs(_autoTargetOrigin - _thisOrigin);
 					if(!this.noSpeedChange) {
-						if(diffX > maxInfluenceDistance && !this.slot?.support) {
-							if(diffX > episode.cWidth || getRandomValue2(1, 10) === 10) {
+						let _runAway;
+						const _targetExactOrigin = this.autoTarget ?
+							this.autoTarget.HURTLEFT + this.autoTarget._HURTBOX_half 
+							: _targetOrigin;
+						if((_thisOrigin < _targetExactOrigin && this.direction === __left)
+							||
+							(_thisOrigin > _targetExactOrigin && this.direction === __right))
+							_runAway = 1;
+						if(_runAway || (diffX > maxInfluenceDistance && !this.slot?.support)) {
+							if(_runAway || (diffX > episode.cWidth || getRandomValue2(1, 10) === 10)) {
 								if(this.slot && this.animation !== 'run') {
 									this.animate('run', 1);
 									this.autoStepXRate = 1;
 									if(!this.extraStepXRate)
 										this.extraStepXRate = this.calculateMoveXStep();
 								}
+								else if(this.slot && _runAway)
+									this.autoStepXRate = 1;
 							}
 							else if(this.animation !== 'run') {
 								if(this.animation !== 'walk')
@@ -1781,7 +1801,7 @@ function enemy(_e) {
 		if (this.keyboard || this.harmless || (episode.realTime && this.alp))
 			return;
 		if(!this.animationFinished && this.animations[this.animation]?.attack){
-			if(!this.chargimg && this.getCurrentFrame()?.directionChangeEnabled && this.start <= 1) {
+			if(!this.chargimg && this.autoTarget && this.getCurrentFrame()?.directionChangeEnabled && this.start <= 1) {
 				const _thisOrigin = this.HURTLEFT + this._HURTBOX_half;
 				const _targetOrigin = this.autoTarget.HURTLEFT + this.autoTarget._HURTBOX_half;
 				const _diff = _targetOrigin - _thisOrigin;
@@ -2827,7 +2847,7 @@ function enemy(_e) {
 				delete this.hurting;
 				this.laying = true;
 				_anima.next = 'dead';
-				if(!this.heartCount){
+				if(!this.heartCount && !episode.pvp){
 					_anima.frames = _anima.frames?.filter(x => !x.invisibleWhenLay);
 					const _knockDead = this.knockDead;
 					const _isImportant = this.important;
@@ -2898,24 +2918,24 @@ function enemy(_e) {
 		let _goOn;
 		if (this.autoMode && !this.keyboard && this.class !== __spell){
 			if(this.important || this.puppetMode || this.immobilize || this.harmless 
-				|| this.still || this.action)
+				|| this.still || this.action || this.friendly || this.class === 'minion')
 				this.autoCommand();
 			else
 				this.autoCommand2();
 		}
-		showBorders(this.HURTLEFT, _gamePad.clientHeight - this.yPosition, this.HURTWIDTH, 20, this.slot?.mustCross ? 'white' : this.slot && !this.slot.support ? 'orange' : (this.slot ? 'yellow' : (this.main ? 'blue' : 'green')), 'border-' + this.key);
-		if(this.slots)
-			for(let i = 0; i < this.slots.length; i++) {
-				const _slot = this.slots[i];
-				// if(_slot.support)
-				// 	continue;
-				const _xGap = _slot.xGap ?? 0;
-				const _origin = this.HURTLEFT + this._HURTBOX_half + _xGap;
-				// showBorders(_origin - 10, _gamePad.clientHeight - this.yPosition + (_slot.yGap ?? 0), 
-				// 	20, 20, _slot.occupied ? 'pink' : 'red', 'slot-' + i + '-' + this.key);
-				showBorders(_origin - 10, _gamePad.clientHeight - this.yPosition + (_slot.yGap ?? 0), 
-					20, 20, _slot.occupied ? 'pink' : (_slot.ranged ? 'purple' : 'red'), 'slot-' + i + '-' + this.key);
-			}
+		// showBorders(this.HURTLEFT, _gamePad.clientHeight - this.yPosition, this.HURTWIDTH, 20, this.slot?.mustCross ? 'white' : this.slot && !this.slot.support ? 'orange' : (this.slot ? 'yellow' : (this.main ? 'blue' : 'green')), 'border-' + this.key);
+		// if(this.slots)
+		// 	for(let i = 0; i < this.slots.length; i++) {
+		// 		const _slot = this.slots[i];
+		// 		// if(_slot.support)
+		// 		// 	continue;
+		// 		const _xGap = _slot.xGap ?? 0;
+		// 		const _origin = this.HURTLEFT + this._HURTBOX_half + _xGap;
+		// 		// showBorders(_origin - 10, _gamePad.clientHeight - this.yPosition + (_slot.yGap ?? 0), 
+		// 		// 	20, 20, _slot.occupied ? 'pink' : 'red', 'slot-' + i + '-' + this.key);
+		// 		showBorders(_origin - 10, _gamePad.clientHeight - this.yPosition + (_slot.yGap ?? 0), 
+		// 			20, 20, _slot.occupied ? 'pink' : (_slot.ranged ? 'purple' : 'red'), 'slot-' + i + '-' + this.key);
+		// 	}
 		
 		if (this.autoMode && this.important) {
 			if (!this.isDead()) {
@@ -5817,22 +5837,32 @@ function enemy(_e) {
 	}
 	this.hurtEnemy = function(_anima, _f, _e, _ef, _ea, _tp, _ep) {
 		const _t = this;
-		if(_t.attackedUnitCount > (_anima.maxAttackedCount ?? __maxAttackedCount))
+		if(_t.attackedUnitCount > (_anima.maxAttackedCount ?? __maxAttackedCount)){
+					console.log('hurt6');
 			return false;
-		if((_gameTick - _e.comfortStarted) < 500)
+		}
+		if((_gameTick - _e.comfortStarted) < 500){
+					console.log('hurt7');
 			return false;
-		if (_ea.key.startsWith('dead') || _ea.key === 'release')
+		}
+		if (_ea.key.startsWith('dead') || _ea.key === 'release'){
+					console.log('hurt8');
 			return false;
+		}
 		if (_f.atk?.buffs)
 			_f.atk.buffs.forEach(x => _e.addBuff(x, _gameTick));
 		if (_f.atk.rate > 0)
 			(_t?.owner ?? _t?.related ?? _t).increaseHitCount();
-		else
+		else{
+					console.log('hurt9');
 			return false;
+		}
 		// if(!episode.pvp && episode.enemies?.filter(x => x.autoTarget === _e && x.attacked && x.animations[x.animation].attack)?.length > __maxAttackedCount)
 		// 	return false;
-		if(_t.parentKey === _e.key || _e === _t.related)
+		if(_t.parentKey === _e.key || _e === _t.related){
+					console.log('hurt10');
 			return false;
+		}
 		let _critHitTaken = false;
 		const _prevAutoMode = _e.autoMode;
 		if (_e.autoMode !== 2 && !_e.main && !_e.friendly && !_e.socketId) {
@@ -5853,6 +5883,7 @@ function enemy(_e) {
 					x: _e.LEFT,
 					y: episode.cHeight - _e.yPosition - _e.HEIGHT
 				});
+					console.log('hurt11');
 				return false;
 			}
 		if (_prevAutoMode === 2 && !_e.keyboard && _e.animations.block && _e.fatique >= fatiqueDecreasement) {
@@ -5872,6 +5903,7 @@ function enemy(_e) {
 						x: _t.LEFT,
 						y: episode.cHeight - _e.yPosition - _e.HEIGHT
 					});
+					console.log('hurt12');
 					return false;
 				}
 			}
@@ -5883,6 +5915,7 @@ function enemy(_e) {
 				_e.animate('roll', 1);
 				_e.setAutoTarget(_t, null, 6);
 				_e.autoAttacking = true;
+					console.log('hurt13');
 				return false;
 			}
 		}
@@ -5892,6 +5925,7 @@ function enemy(_e) {
 				_e.animate('dodge', 1);
 				_e.setAutoTarget(_t, null, 7);
 				_e.autoAttacking = true;
+					console.log('hurt14');
 				return false;
 			}
 		}
@@ -6426,13 +6460,21 @@ function enemy(_e) {
 		if (_enemies?.[0]) {
 			for (var _en of _enemies) {
 				const _enemy = _en.enemy;
-				if(_enemy.readyForFatality && !episode?.fatalityHappened)
+				if(_enemy.readyForFatality && !episode?.fatalityHappened){
+					console.log('hurt4');
 					continue;
-				if(_enemy.isDead())
+				}
+
+				if(_enemy.isDead()){
+					console.log('hurt3');
 					continue;
+				}
 				const _enemyFrame = _enemy.getCurrentFrame();
 				if (((_enemy.attackingOnlyBy && _enemy.attackingOnlyBy !== this.key && this.class !== __spell) || _enemyFrame.def?.iframe || _enemy.iframe || _enemy.reviveTime) && _enemy.health > 0)
+				{
+					console.log('hurt2');
 					continue;
+				}
 				_critHitTaken = false;
 				const _enemyAnima = _enemy.getCurrentAnimation();
 				let _enemyPriority = _enemyFrame.priority ?? _enemyAnima.priority;
@@ -6466,6 +6508,7 @@ function enemy(_e) {
 								position: 'middle'
 							});
 							PlaySound({ key: this.class + 'block', owner: this }, 'block');
+							console.log('hurt1');
 							return false;
 						}
 					}
@@ -6486,6 +6529,7 @@ function enemy(_e) {
 						position: 'middle'
 					});
 					PlaySound({ key: 'iron', owner: this, volume: .5 });
+					console.log('hurt5');
 					return false;
 				}
 				else if (_enemy.animations['counter'] && _enemy.newBlocked > 0 && _enemy.newBlocked <= counterAttackTolerance) {
@@ -9757,7 +9801,9 @@ function enemy(_e) {
 	else {
 		this.idle(1);
 		if(this.class !== __spell && (this.class !== 'object' || _e.randomStartFrame) && _e.randomStartFrame !== false && this.animations?.idle?.frames?.length > 0)
+		{
 			this.frame = getRandomValue2(0, this.animations.idle.frames.length - 1);
+		}
 	}
 	this.groundHurtKeys = [];
 	this.airHurtKeys = [];
