@@ -2035,6 +2035,7 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	background: #dcc5b2;
 	position: absolute;
 	border-color: #191213 !important;
+	transform: translateX(-50%);
 }
 .talk-bubble::before {
   content: "";
@@ -8062,11 +8063,12 @@ box-shadow:
 #focus-ui .overlay-black-text {
 	z-index: 99999 !important;
 	display:flex !important;
-	font-size: 3.6vh !important;
+	font-size: 3.4vh !important;
 	padding:2.5vh 5vh !important;
 	border:.3vh ridge #f3f4f550 !important;
 	background:#000000ab;
 	box-shadow: 0 0 2vh #000;
+	margin-bottom: 10.5%;
 }
 /* body:has(#splash:not(.d-none)) #game-ui .show-ui,
 body:has(#splash:not(.d-none)) #game-ui .push-me-finger,
@@ -11105,4 +11107,40 @@ pointer-events: "auto";
 .tutorial-box .tutorial-description-text {
 	font-size: 2.7vh !important;
 	line-height: 3.4vh !important;
+}
+.move-to-place {
+	top: 14%;
+	left: 45%;
+	width:10%;
+	height: auto !important;
+	aspect-ratio: 1/1 !important;
+	z-index: 999999 !important;
+	animation: glow-yellow 1.2s infinite alternate
+}
+body.pc-mission .move-to-place::after{
+	position: absolute !important;
+	content: '' !important;
+	top:0 !important;
+	left:0 !important;
+	background-image: url('./../images/ui/square6.png') !important;
+	background-repeat: no-repeat !important;
+	background-size: cover !important;
+	width:100% !important;
+	height:100% !important;
+}
+.slide-to-place {
+  transition:
+    top 2s ease,
+    left 2s ease,
+    width 2s ease,
+    height 2s ease,
+    transform 2s ease,
+    opacity 2s ease;
+
+  will-change: top, left, width, height, transform;
+}
+.focus-ui-done-btn-custom {
+	bottom:5% !important;
+	position: absolute;
+	z-index: 999999 !important
 }

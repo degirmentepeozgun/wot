@@ -231,7 +231,6 @@ const __stories = [
 		ticket: 2,
 		act:1,
 		list:true,
-		startScene: 2,
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
@@ -6929,7 +6928,7 @@ const __stories = [
 				minLevel: 1,
 				maps: [11],
 				timer: {
-					ms: 3000, //200000,
+					ms: 200000,
 					after: function() {
 						if(episode.phase > 99)
 							return;
@@ -8250,7 +8249,7 @@ const __stories = [
 				],
 				startWith: 1,
 				save: true,
-				loadingCharacterIds: [47, 111, 33, 35, 2, 7],
+				loadingCharacterIds: [47, 111, 33, 35, 2, 7, 37, 38],
 				start: function() {
 					episode.itemDropOrder = [ 
 						'belt', 'gloves', 'bracers', 'helmet', 'leggings',
@@ -8311,6 +8310,7 @@ const __stories = [
 					});
 					_gameUI.appendChild(_desc);
 					episode.hasSkippableScreen = 1;
+					mainCharacter.disableSkill('tag');
 				},
 				actions: [
 					{
@@ -8483,6 +8483,46 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 100;
+							const _e = episode.boss;
+							if(__account?.questStatus?.quest?.timer)
+								delete __account.questStatus.quest.timer;
+							episode.enemies.filter(x => !x.main && !x.tag && !x.friendly).forEach(x => {
+								x.stopSpawn();
+								x.health = x.experience = 0;
+								x.dead = x.dying = true;
+								x.animate('dead', 1);
+							});
+							episode.mobs = episode.respawners = [];
+							const _mob = episode.installMob({
+								id: 1002,
+								minX: MathRound((_e.LEFT + platformX) / __zoom),
+								maxX: MathRound((_e.LEFT + platformX) / __zoom),
+								sight: 1000,
+								count: 1,
+								spawnDirection: 'up',
+								yPosition : MathRound(getGroundHeight() / 2),
+								minLevel: 1,
+								maxLevel: 1
+							}, null, 1);
+							_mob.animate('start', 1);
+							_mob.enemy = undefined;
+							_mob.updateVariables();
+							const _mobCenterX = _mob.HURTLEFT + _mob._HURTBOX_half;
+							const _mainCenterX = mainCharacter.HURTLEFT + mainCharacter._HURTBOX_half;
+							if(_mobCenterX < _mainCenterX)
+								_mob.animations.start.frames.forEach(x => {
+									if(x.extraStepXRate)
+										x.extraStepXRate *= -1;
+								});
+							//delete episode.boss;
+						}
+					},
+					{
+						when: function() {
+							return (episode.boss?.health <= 0 && episode.phase < 10) || episode.phase === 200;
+						},
+						do: function() {
+							episode.phase = 100;
 							delete episode.boss;
 							if(__account?.questStatus?.quest?.timer)
 								delete __account.questStatus.quest.timer;
@@ -8493,6 +8533,7 @@ const __stories = [
 								x.animate('dead', 1);
 							});
 							episode.mobs = episode.respawners = [];
+							return;
 							episode.playSound({key:'bossalert', volume: .5});
 							warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
 						
@@ -8536,10 +8577,6 @@ const __stories = [
 								takeQuest(2, null, null, 'progress', 1);
 								__storyScene.bossQuest = __account.questStatus.quest;
 							}, 4000);
-							// __storyScene.bossQuest.kills[0].count = 1;
-							// updateQuestArea(null, __storyScene.bossQuest);
-							// __storyPlaying = false;
-							// installStoryFinish();
 						}
 					},
 					{
@@ -8562,6 +8599,213 @@ const __stories = [
 
 						}
 					},
+					{
+						when: function() {
+							return episode.supportFound;
+						},
+						do: function() {
+							delete episode.supportFound;
+							//warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/cyclops.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Supporter found') + '!</span></div>', null, null, 1);
+							mainCharacter.direction = __right;
+							mainCharacter.animate('idle', 1);
+							const original = document.getElementById('skill12');
+
+							// clone (true → içeriğiyle birlikte)
+							const clone = original.cloneNode(true);
+							clone.className = 'move-to-place';
+							clone.removeAttribute('id');
+							// absolute pozisyon ver
+							clone.style.position = 'absolute';
+							requestAnimationFrame(() => {
+								mainCharacter.still = mainCharacter.immobilize = mainCharacter.disableKeyboard = true;
+								blurKeyboard();
+								focusMe('#skill12', null, null, "<div class='full flex' style='flex-direction: column;'><div class='flex' style='padding-bottom:.5vh'>" + getLangData('You\'ve activated a support skill') + '</div><div class="flex">' + getLangData('It can be used even in danger') + "</div></div>", null, null, null, 1);
+								requestAnimationFrame(() => {
+									const _curt = document.getElementById('focus-ui');
+									_curt.appendChild(clone);
+								});
+								PlaySound({key:'skillmove3', volume:1});
+							});
+							setTimeout(() => {
+								function slideToPlace(el, { x, y, w, h }, onComplete) {
+									el.getBoundingClientRect(); // reflow
+
+									addClass(el, 'slide-to-place');
+									// hedef değerler
+									el.style.left = `${x}px`;
+									el.style.top = `${y}px`;
+									if (w) el.style.width = `${w}px`;
+									if (h) el.style.height = `${h}px`;
+
+									let called = false;
+
+									function done() {
+										if (called) return;
+										called = true;
+
+										el.removeEventListener('transitionend', onEnd);
+										onComplete?.(el);
+									}
+
+									function onEnd(e) {
+										if (e.target !== el) return;
+
+										// sadece bir property'e bak (ör: transform veya left)
+										if (e.propertyName !== 'left') return;
+
+										done();
+									}
+
+									el.addEventListener('transitionend', onEnd);
+
+									// 🔥 fallback (çok önemli)
+									setTimeout(done, 2100); // CSS duration + küçük buffer
+								}
+
+								requestAnimationFrame(() => {
+									requestAnimationFrame(() => {
+										// artık DOM kesin hazır
+
+										const _shield = document.querySelector('.focus-shield');
+
+										if (_shield) {
+											const wrapper = document.getElementById('wrapper');
+
+											const wrapperRect = wrapper.getBoundingClientRect();
+											const targetRect = _shield.getBoundingClientRect();
+
+											const x = targetRect.left - wrapperRect.left;
+											const y = targetRect.top - wrapperRect.top;
+											const w = targetRect.width;
+											const h = targetRect.height;
+											slideToPlace(clone, {
+												x: x,
+												y: y,
+												w: w,
+												h: h,
+											}, function () {
+												mainCharacter.enableSkill('tag');
+												clone.remove();
+												PlaySound({key:'skillmove2', volume:1});
+												const _btnWrapper = document.createElement('div');
+												_btnWrapper.className = 'flex black-screen-ok-btn w-100 focus-ui-done-btn-custom';
+												const _btn = document.createElement('div');
+												_btn.style = 'color:#f7f7f7cc !important;font-size:3vh !important';
+												_btn.className = "game-btn2 flex one-line fade-me";
+												_btn.innerText = getLangData('Done');
+												_btn.onexactclick = function() {					
+													playClick();
+													//mainCharacter.still = mainCharacter.immobilize = false;
+													//delete mainCharacter.disableKeyboard;
+													disposeFocus();
+													removeFocus();
+													createBubbleText({
+														id: 2,
+														location: { map: episode.id }, ms: 2000,
+														owner: mainCharacter.key,
+														text: 'There\'s something strange here',
+														onend: function() {
+															//episode.playSound({key:'bossalert', volume: .5});
+															//warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
+														
+															//setTimeout(() => {
+																//episode.playSound({key:'sistersenter', volume:1});
+																//setTimeout(() => {
+																	// if(episode?.id !== 11)
+																	// 	return;
+																	const installBoss = function(_b, _name) {
+																		const _boss = summonMobWithJson({
+																			id: _b,
+																			level: mainCharacter.level,
+																			name: _name,
+																			atk: mainCharacter.atk,
+																			grade: 4
+																		});
+																		_boss.health = _boss.maxHP = 1;
+																		_boss.class = 'boss';
+																		_boss.important = 1;
+																		_boss.experience = 0;
+																		_boss.setDifficulty(__account.difficulty - 1);
+																		_boss.acceptChanges();
+																		_boss.pickNewTarget();
+																		_boss.addObject({ 
+																			key:'respawn', 
+																			position: 'middle',
+																			scale: 1.5
+																		});
+																		return _boss;
+																	}
+																	const _yec = installBoss(37, 'Yecüc');
+																	const _mainCenterX = mainCharacter.HURTLEFT + mainCharacter._HURTBOX_half;
+																	_yec.left = (_mainCenterX - MathRound(200 * __zoom)) + platformX;
+																	_yec.yPosition = mainCharacter.yPosition - 1;
+																	_yec.updateVariables();
+																	_yec.direction = __right;
+																	_yec.animate('ground2', 1);
+																	requestAnimationFrame(() => {
+																		const _mec =installBoss(38, 'Mecüc');
+																		_mec.left = (_mainCenterX + MathRound(200 * __zoom)) + platformX;
+																		_mec.yPosition = mainCharacter.yPosition - 1;	
+																		_mec.updateVariables();
+																		_mec.direction = __left;
+																		_mec.animate('ground3', 1);
+																		PlaySound({ key: 'puff', volume: 1 });
+																		createBubbleText({
+																			id: 13,
+																			location: { map: episode.id }, ms: 1200,
+																			owner: _yec.key,
+																			text: 'Die!'
+																		});
+																		setTimeout(() => {
+																			_game.suspended = true;
+																			setTimeout(() => {
+																				focusMe('#skill12', function() {
+																					removeFocus();
+																					delete _game.suspended;
+																					delete mainCharacter.disableKeyboard;
+																					mainCharacter.still = mainCharacter.immobilize = false;
+																					const _keys = Object.keys(mainCharacter.animations);
+																					for(const _key of _keys) {
+																						const _anima = mainCharacter.animations[_key];
+																						delete _anima.alreadyDisabled;
+																					}
+																					mainCharacter.enableSkills();
+																					mainCharacter.animate('tag', 1);
+																					_yec.animate('hurtair', 1);
+																					_mec.animate('hurtair', 1);
+																					disposeFocus();
+																				}, null, getLangData('Use support skill to save yourself'));
+																			}, 150);
+																		}, 1300);
+																	});
+																	mainCharacter.maxHP = mainCharacter.MAXHP =
+																	mainCharacter.maxHP * 1;
+																	mainCharacter.setHealth(mainCharacter.MAXHP);
+																	requestAnimationFrame(() => {
+																		episode.phase = 101;
+																	});
+
+																	episode.pauseAmbianceMusic();
+																	episode.pauseBgMusic(1);
+																	episode.createBgMusic(null, null, null, 'boss-fight-1', .5);
+																	episode.playBgMusic();
+																//}, 1000);
+																takeQuest(2, null, null, 'progress', 1);
+																__storyScene.bossQuest = __account.questStatus.quest;
+															//}, 4000);
+														}
+													});
+												};
+												_btnWrapper.appendChild(_btn);
+												const _curt = document.getElementById('focus-ui');
+												_curt.appendChild(_btnWrapper);
+											});
+										}
+									});
+								});
+							}, 1200);
+						}
+					}
 				],
 				mobs: [
 					{
@@ -8570,53 +8814,53 @@ const __stories = [
 						maxX: 2580,
 						count: 1,
 						sight: 1000,
-						grade: 11,
-						hp: 2000,
+						//grade: 11,
+						hp: 1, //2000,
 						zoom: .34,
 						yPosition: function() {
 							return MathRound(groundheight * .5);
 						}
 					},
-					{
-						id: 35,
-						minX: 1580,
-						maxX: 4800,
-						count: 4,
-						sight: 1000,
-						spawn: 10,
-						hp:300,
-						experience: 0
-					},
-					{
-						id: 7,
-						minX: 2000,
-						maxX: 3200,
-						count: 2,
-						sight: 1000,
-						spawn: 10,
-						hp:300,
-						experience: 0
-					},
-					{
-						id: 2,
-						minX: 1580,
-						maxX: 4800,
-						count: 6,
-						sight: 1000,
-						spawn: 10,
-						hp:300,
-						experience: 0
-					},
-					{
-						id: 33,
-						minX: 1580,
-						maxX: 4800,
-						count: 1,
-						sight: 1000,
-						spawn: 10,
-						hp:300,
-						experience: 0
-					}
+					// {
+					// 	id: 35,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 4,
+					// 	sight: 1000,
+					// 	spawn: 10,
+					// 	hp:300,
+					// 	experience: 0
+					// },
+					// {
+					// 	id: 7,
+					// 	minX: 2000,
+					// 	maxX: 3200,
+					// 	count: 2,
+					// 	sight: 1000,
+					// 	spawn: 10,
+					// 	hp:300,
+					// 	experience: 0
+					// },
+					// {
+					// 	id: 2,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 6,
+					// 	sight: 1000,
+					// 	spawn: 10,
+					// 	hp:300,
+					// 	experience: 0
+					// },
+					// {
+					// 	id: 33,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 1,
+					// 	sight: 1000,
+					// 	spawn: 10,
+					// 	hp:300,
+					// 	experience: 0
+					// }
 				]
 			},
 			{
@@ -9700,8 +9944,8 @@ function storyBonus(_func, _instant) {
 // 	});
 // }, 2000);
 
-function focusMe(_selector, _func, _transparent, _text, _doneBtn, _fingerFade, _circle) {
-	new cssAnimations.focusui(_selector, _func, _transparent, _text, _doneBtn, null, _fingerFade, _circle);
+function focusMe(_selector, _func, _transparent, _text, _doneBtn, _fingerFade, _circle, _noFinger) {
+	new cssAnimations.focusui(_selector, _func, _transparent, _text, _doneBtn, null, _fingerFade, _circle, _noFinger);
 	if(!_transparent) {
 		mainCharacter.disableSkills(1);
 		mainCharacter.immobilize = mainCharacter.still = true;
@@ -9753,6 +9997,7 @@ function skipQuickPlayTutorial() {
 			_game.suspended = false;
 		});
 	}
+	removeFocus();
 }
 
 function createStoryResultScreen(_failed) {

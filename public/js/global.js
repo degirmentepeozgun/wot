@@ -3124,7 +3124,11 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	skillmove3: './images/sounds/skill-move3.mp3',
+	skillmove2: './images/sounds/skill-move2.mp3',
+	skillmove: './images/sounds/skill-move.mp3',
 	scoreup: './images/sounds/score-up.mp3',
+	eggfall: './images/sounds/egg-fall.mp3',
 	goblinkingtongue: './images/sounds/goblin-king-tongue.mp3',
 	goblinkingrelease: './images/sounds/goblin-king-release.mp3',
 	goblinkingenter: './images/sounds/goblin-king-enter.mp3',
@@ -32461,7 +32465,7 @@ const cssAnimations = {
 			cssAnimationProps.crack = { start: _gameTick };
 		}
 	},
-	focusui: function (_selector, _func, _transparent, _text, _doneBtn, _blackBG, _fingerFade, _circle) {
+	focusui: function (_selector, _func, _transparent, _text, _doneBtn, _blackBG, _fingerFade, _circle, _noFinger) {
 		_focusMode = 1;
 		let _curt = document.createElement('div');
 		_curt.id = 'focus-ui';
@@ -32552,33 +32556,86 @@ const cssAnimations = {
 			_finger.remove();
 		if(_doneBtn)
 			return;
-		_finger = document.createElement('img');
-		_finger.className = 'push-me-finger';
-		if(__isPC && (hasClass(_elem, 'skill') || hasClass(_elem, 'main-menu-btn')) && !_elem.id.startsWith('chain-skill'))
-			_finger.className += ' finger-top';
-		if(_fingerFade)
-			_finger.className += ' fade-me';
+		_finger = null;
+		if(!_noFinger) {
+			_finger = document.createElement('img');
+			_finger.className = 'push-me-finger';
+			if(__isPC && (hasClass(_elem, 'skill') || hasClass(_elem, 'main-menu-btn')) && !_elem.id.startsWith('chain-skill'))
+				_finger.className += ' finger-top';
+			if(_fingerFade)
+				_finger.className += ' fade-me';
+		}
 		const _rect = _elem.getBoundingClientRect();
-		const L = MathFloor(_rect.left - _extraX);
-		const T = MathFloor(_rect.top - _extraY);
-		const W = MathCeil(_rect.width);
-		const H = MathCeil(_rect.height);
+		const L = MathRound(_rect.left - _extraX);
+		const T = MathRound(_rect.top - _extraY);
+		const W = MathRound(_rect.width);
+		const H = MathRound(_rect.height);
+		const R = L + W;
+		const B = T + H;
+		//const _allW = _container.getBoundingClientRect().width;
 		// _curt.innerHTML += 
-		// `<div class='overlay-black show-ui animate-me' style="width:${parseInt((_rect.left - _extraX) + _rect.width)}px;left:0;top:0;height:${parseInt(_rect.top - _extraY)}px"></div>
-		// <div class='overlay-black show-ui animate-me' style="width:calc(100% - ${parseInt((_rect.left - _extraX) + _rect.width)}px);top:0;right:0;height:${parseInt((_rect.top - _extraY) + _rect.height)}px"></div>
-		// <div class='overlay-black show-ui animate-me' style="width:calc(100% - ${parseInt(_rect.left - _extraX)}px);bottom:0;right:0;height:calc(100% - ${parseInt((_rect.top - _extraY) + _rect.height)}px)"></div>
-		// <div class='overlay-black show-ui animate-me' style="width:${parseInt(_rect.left - _extraX)}px;left:0;bottom:0;height:calc(100% - ${parseInt(_rect.top - _extraY)}px)"></div>`;
-		
-		_curt.innerHTML += 
-		`<div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:${L}px;left:0;top:0;height:100%"></div>
-		<div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:${W}px;left:${L}px;top:0;height:${T}px"></div>
-		<div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:calc(100% - ${L + W}px);left:${L + W}px;top:0;height:100%"></div>
-		<div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:${W}px;left:${L}px;top:${T + H}px;height:calc(100% - ${T + H}px)"></div>
-		<div class='focus-shield${_circle ? ' circle' : ''} show-ui focus-shield-circle' style="background:#FFFFFF01;position:absolute;width:${W}px;left:${L}px;top:${T}px;height:${H}px"></div>`;
-		_finger.style.left = (_rect.left - _extraX) + 'px';
-		_finger.style.top = ((_rect.top - _extraY) + MathRound(.5 * _elem.offsetHeight)) + 'px';
-		_finger.src = './images/icons/push-me.gif';
-		_container.appendChild(_finger);
+		// `<div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:${L}px;left:0;top:0;height:100%"></div>
+		// <div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:${W}px;left:${L}px;top:0;height:${T}px"></div>
+		// <div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:${_allW - (L + W)}px;left:${L + W}px;top:0;right:1px;height:100%"></div>
+		// <div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:${W}px;left:${L}px;top:${T + H}px;height:calc(100% - ${T + H}px)"></div>
+		// <div class='focus-shield${_circle ? ' circle' : ''} show-ui focus-shield-circle' style="background:#FFFFFF01;position:absolute;width:${W}px;left:${L}px;top:${T}px;height:${H}px"></div>`;
+		_curt.innerHTML += `
+<!-- SOL -->
+<div class='overlay-black show-ui fade-me' style="
+  position:absolute;
+  left:0;
+  top:0;
+  width:${L}px;
+  height:100%;
+  background:#00000080;
+"></div>
+
+<!-- ÜST -->
+<div class='overlay-black show-ui fade-me' style="
+  position:absolute;
+  left:${L}px;
+  top:0;
+  width:${W}px;
+  height:${T}px;
+  background:#00000080;
+"></div>
+
+<!-- SAĞ -->
+<div class='overlay-black show-ui fade-me' style="
+  position:absolute;
+  left:${R}px;
+  right:0;
+  top:0;
+  bottom:0;
+  background:#00000080;
+"></div>
+
+<!-- ALT -->
+<div class='overlay-black show-ui fade-me' style="
+  position:absolute;
+  left:${L}px;
+  right:0;
+  top:${B}px;
+  bottom:0;
+  background:#00000080;
+"></div>
+
+<!-- FOCUS -->
+<div class='focus-shield${_circle ? ' circle' : ''} show-ui focus-shield-circle' style="
+  position:absolute;
+  left:${L}px;
+  top:${T}px;
+  width:${W}px;
+  height:${H}px;
+  background:#FFFFFF01;
+"></div>
+`;
+		if(!_noFinger) {
+			_finger.style.left = (_rect.left - _extraX) + 'px';
+			_finger.style.top = ((_rect.top - _extraY) + MathRound(.5 * _elem.offsetHeight)) + 'px';
+			_finger.src = './images/icons/push-me.gif';
+			_container.appendChild(_finger);
+		}
 		addClass(_gameUI, 'focus-ui-activated');
 	},
 	black: function (_c, _ms, _text, _func, _delay, _after) {

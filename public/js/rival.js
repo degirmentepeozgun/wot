@@ -3463,7 +3463,7 @@ function createCharacter(_settings) {
 								spriteWidth: 116,
 								spriteHeight: 249,
 								spriteOrigin: 55
-							}, { key:'toygarhurt4,toygarhurt6,toygarhurt7', volume:.2, reset: true }
+							}, { key:'toygarhurt4,toygarhurt6,toygarhurt7', volume:.4, reset: true }
 					),
 					hurtground2: function() {
 						const _hurt = createHurtGround(
@@ -58667,6 +58667,9 @@ const _allEnemies = {
 							spriteOrigin: 104,
 							extraStepXRate: .8,
 							sound: { key: 'cyclopsground1', reset: true, volume: .4 },
+							objects: [
+								{ key: 'groundbackdust', position:'behind-feet', reset: true }
+							],
 							def: {
 								iframe: true
 							},
@@ -58756,6 +58759,9 @@ const _allEnemies = {
 							spriteOrigin: 95,
 							extraStepXRate: 1.2,
 							sound: { key: 'cyclopsground1', reset: true, volume: .4 },
+							objects: [
+								{ key: 'groundbackdust', position:'behind-feet', reset: true }
+							],
 							def: {
 								iframe: true
 							},
@@ -58845,6 +58851,9 @@ const _allEnemies = {
 							spriteOrigin: 97,
 							extraStepXRate: .8,
 							sound: { key: 'cyclopsground1', reset: true, volume: .4 },
+							objects: [
+								{ key: 'groundbackdust', position:'behind-feet', reset: true }
+							],
 							def: {
 								iframe: true
 							},
@@ -58891,6 +58900,9 @@ const _allEnemies = {
 							spriteOrigin: 104,
 							extraStepXRate: 1,
 							sound: { key: 'cyclopsground1', reset: true, volume: .4 },
+							objects: [
+								{ key: 'groundbackdust', position:'behind-feet', reset: true }
+							],
 							def: {
 								iframe: true
 							},
@@ -58983,6 +58995,9 @@ const _allEnemies = {
 							spriteOrigin: 95,
 							extraStepXRate: 1,
 							sound: { key: 'cyclopsground1', reset: true, volume: .4 },
+							objects: [
+								{ key: 'groundbackdust', position:'behind-feet', reset: true }
+							],
 							def: {
 								iframe: true
 							},
@@ -59076,6 +59091,9 @@ const _allEnemies = {
 							spriteOrigin: 97,
 							extraStepXRate: 1,
 							sound: { key: 'cyclopsground1', reset: true, volume: .4 },
+							objects: [
+								{ key: 'groundbackdust', position:'behind-feet', reset: true }
+							],
 							def: {
 								iframe: true
 							},
@@ -78107,6 +78125,277 @@ const _allEnemies = {
 			invulnerable: true,
 			touchDead: true,
 			src: './images/main/warrior/weapon.png',
+			buffs: []
+		};
+	},
+	enemy1002: function () {
+		return {
+			animations: {
+				start: {
+					key: 'start',
+					type: 'skill',
+					interactive: true,
+					next: 'idle',
+					frames: [
+						{
+							spriteLeft: 46,
+							spriteTop: 25,
+							spriteWidth: 107,
+							spriteHeight: 148,
+							spriteOrigin: 54,
+							bottomGap:-200,
+							extraStepXRate: .5,
+							//objects: [{key:'respawn', position: 'middle'}],
+							speed: 4,
+							//sound:{key:'weaponswing', volume:.3},
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 46,
+							spriteTop: 25,
+							spriteWidth: 107,
+							spriteHeight: 148,
+							spriteOrigin: 54,
+							bottomGap:-233,
+							extraStepXRate: .45,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 46,
+							spriteTop: 25,
+							spriteWidth: 107,
+							spriteHeight: 148,
+							spriteOrigin: 54,
+							bottomGap:-266,
+							extraStepXRate: .4,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 46,
+							spriteTop: 25,
+							spriteWidth: 107,
+							spriteHeight: 148,
+							spriteOrigin: 54,
+							bottomGap:-233,
+							extraStepXRate: .35,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 46,
+							spriteTop: 25,
+							spriteWidth: 107,
+							spriteHeight: 148,
+							spriteOrigin: 54,
+							bottomGap:-200,
+							extraStepXRate: .3,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 46,
+							spriteTop: 25,
+							spriteWidth: 107,
+							spriteHeight: 148,
+							spriteOrigin: 54,
+							bottomGap:-166,
+							extraStepXRate: .25,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 46,
+							spriteTop: 25,
+							spriteWidth: 107,
+							spriteHeight: 148,
+							spriteOrigin: 54,
+							bottomGap:-133,
+							extraStepXRate: .2,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 46,
+							spriteTop: 25,
+							spriteWidth: 107,
+							spriteHeight: 148,
+							spriteOrigin: 54,
+							bottomGap:-100,
+							extraStepXRate: .15,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 46,
+							spriteTop: 25,
+							spriteWidth: 107,
+							spriteHeight: 148,
+							spriteOrigin: 54,
+							bottomGap:-66,
+							extraStepXRate: .1,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 46,
+							spriteTop: 25,
+							spriteWidth: 107,
+							spriteHeight: 148,
+							spriteOrigin: 54,
+							bottomGap:-33,
+							extraStepXRate: .05,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 46,
+							spriteTop: 25,
+							spriteWidth: 107,
+							spriteHeight: 148,
+							spriteOrigin: 54,
+							speed: 1,
+							sound: { key:'eggfall', volume: .5 },
+							do : function(_e) {
+								//warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/kill.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Weapon found') + '!</span></div>', null, null, 1);
+								//warn('<div class="flex heading" style="position:relative"><img style="position:absolute;z-index:-1;left:-40%;width:180%" src="./images/icons/banner.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Weapon found') + '!</span></div>', 'level-up');
+							},
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 46,
+							spriteTop: 25,
+							spriteWidth: 107,
+							spriteHeight: 148,
+							spriteOrigin: 54,
+							speed: 3,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 46,
+							spriteTop: 25,
+							spriteWidth: 107,
+							spriteHeight: 148,
+							spriteOrigin: 54,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						}
+					]
+				},
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					imediateBreak: true,
+					frames: [
+						{
+							spriteLeft: 46,
+							spriteTop: 25,
+							spriteWidth: 107,
+							spriteHeight: 148,
+							spriteOrigin: 54,
+							speed: 999
+						}
+					]
+				},
+				dead: {
+					key: 'dead',
+					type: 'skill',
+					interactive: true,
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 0,
+							spriteHeight: 0,
+							spriteOrigin: 0,
+							do: function(_e) {
+								PlaySound({ key: 'loot', volume: 1 });
+								episode.supportFound = 1;
+								// mainCharacter.still = mainCharacter.immobilize = mainCharacter.disableKeyboard = true;
+								// blurKeyboard();
+								// focusMe('#skill12', function() {
+								// 	playClick();
+								// 	mainCharacter.still = mainCharacter.immobilize = false;
+								// 	delete mainCharacter.disableKeyboard;
+								// 	disposeFocus();
+								// }, null, getLangData('You unlocked a support skill. You can use it for support anytime you need'), 1, null, null, 'bottom');
+							},
+							props: {
+								killingBy: undefined,
+								finishTarget: undefined,
+								dead: true
+							},
+							speed: 1
+						},
+						{
+							spriteLeft: 46,
+							spriteTop: 25,
+							spriteWidth: 107,
+							spriteHeight: 148,
+							spriteOrigin: 54,
+							props: {
+								remove: true
+							},
+							speed: 1
+						}
+					]
+				}
+			},
+			key: 'cyclopsegg-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 10,
+			id: 1002,
+			skipHealthBar: true,
+			name: 'Cyclops Egg',
+			class: 'object',
+			level: 1,
+			health: 1,
+			maxHP: 1,
+			health: 1,
+			direction: 'left',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: .75,
+			width: 107,
+			height: 148,
+			stepX: 1.5,
+			weight: 1000,
+			stepXRate: .15,
+			bleed: false,
+			noDirection: true,
+			noLoot: true,
+			harmless: true,
+			noCC: true,
+			experience: 0,
+			invulnerable: true,
+			touchDead: true,
+			src: './images/icons/egg.png',
 			buffs: []
 		};
 	},
