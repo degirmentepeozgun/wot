@@ -1042,28 +1042,22 @@ function setKeyBoard(_c) {
 function addEvent(_id, _char) {
 	const _skillbtn = document.getElementById(_id);
 	_skillbtn.addEventListener("mousedown", function() {
-		//mainCharacter.keyboard.mouseDown(_char);
-		physicalKeys.add(_char);
+		mainCharacter.keyboard.mouseDown(_char);
 	});
 	_skillbtn.addEventListener("mouseup", function() {
-		//mainCharacter.keyboard.mouseUp(_char);
-		physicalKeys.delete(_char);
+		mainCharacter.keyboard.mouseUp(_char);
 	});
 	_skillbtn.addEventListener("mouseout", function() {
-		//mainCharacter.keyboard.mouseUp(_char);
-		physicalKeys.delete(_char);
+		mainCharacter.keyboard.mouseUp(_char);
 	});
 	_skillbtn.addEventListener("touchcancel", function() {
-		//mainCharacter.keyboard.mouseUp(_char);
-		physicalKeys.delete(_char);
+		mainCharacter.keyboard.mouseUp(_char);
 	});
 	_skillbtn.addEventListener("touchend", function() {
-		//mainCharacter.keyboard.mouseUp(_char);
-		physicalKeys.delete(_char);
+		mainCharacter.keyboard.mouseUp(_char);
 	});
 	_skillbtn.addEventListener("touchstart", function() {
-		//mainCharacter.keyboard.mouseDown(_char);
-		physicalKeys.add(_char);
+		mainCharacter.keyboard.mouseDown(_char);
 	});
 }
 function setCharacterDefaults(_char, _swap) {

@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "AdazEJ+6i6wjUAzix4gdSchcOFTqIw+SHdm7CshdmvdtwmPCyd3T+ZVpUs0RAciesc7PJ0XEUJbROQU0SThspQ==",
+  "dgSpecHash": "3TVEWv/HnZE=",
   "success": true,
-  "projectFilePath": "C:\\Users\\ozgun\\Desktop\\WOT\\api\\Core\\MessageList\\MessageList.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\MessageList\\MessageList.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.36\\microsoft.netcore.app.ref.6.0.36.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.36\\microsoft.windowsdesktop.app.ref.6.0.36.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.36\\microsoft.aspnetcore.app.ref.6.0.36.nupkg.sha512"
+  ],
   "logs": []
 }

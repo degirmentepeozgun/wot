@@ -9541,7 +9541,7 @@ function enemy(_e) {
 			// if(this.main && this.health <= 0 && this.heartCount > 0)
 			// 	this.standUp();
 			if (_attacker && this.health <= 0)
-				this.killedBy = (_attacker.owner ?? _attacker)?.key;
+				this.killedBy = (_attacker.parent ?? _attacker.owner ?? _attacker.related ?? _attacker)?.key;
 			if (this.friendly && !episode.pvp) {
 				const _aidBtn = document.getElementById('aid-' + this.key);
 				if (_aidBtn) {

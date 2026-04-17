@@ -53088,7 +53088,7 @@ const _allEnemies = {
 							spriteWidth: 230,
 							spriteHeight: 278,
 							spriteOrigin: 102,
-							sound: { key: 'creatureground2', volume: .2 },
+							sound: { key: 'creatureground2', volume: .4 },
 							def: {
 								iframe: true
 							},
@@ -53518,7 +53518,7 @@ const _allEnemies = {
 							spriteWidth: 242,
 							spriteHeight: 278,
 							spriteOrigin: 131,
-							sound: { key: 'creatureground2', volume: .2 },
+							sound: { key: 'creatureground2', volume: .4 },
 							def: {
 								iframe: true
 							},
@@ -78276,7 +78276,7 @@ const _allEnemies = {
 							spriteHeight: 148,
 							spriteOrigin: 54,
 							speed: 1,
-							sound: { key:'eggfall', volume: .5 },
+							sound: { key:'eggfall', volume: .4 },
 							do : function(_e) {
 								//warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/kill.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Weapon found') + '!</span></div>', null, null, 1);
 								//warn('<div class="flex heading" style="position:relative"><img style="position:absolute;z-index:-1;left:-40%;width:180%" src="./images/icons/banner.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Weapon found') + '!</span></div>', 'level-up');
@@ -78285,28 +78285,28 @@ const _allEnemies = {
 								iframe: true
 							}
 						},
-						{
-							spriteLeft: 46,
-							spriteTop: 25,
-							spriteWidth: 107,
-							spriteHeight: 148,
-							spriteOrigin: 54,
-							speed: 3,
-							def: {
-								iframe: true
-							}
-						},
-						{
-							spriteLeft: 46,
-							spriteTop: 25,
-							spriteWidth: 107,
-							spriteHeight: 148,
-							spriteOrigin: 54,
-							speed: 4,
-							def: {
-								iframe: true
-							}
-						}
+						// {
+						// 	spriteLeft: 46,
+						// 	spriteTop: 25,
+						// 	spriteWidth: 107,
+						// 	spriteHeight: 148,
+						// 	spriteOrigin: 54,
+						// 	speed: 3,
+						// 	def: {
+						// 		iframe: true
+						// 	}
+						// },
+						// {
+						// 	spriteLeft: 46,
+						// 	spriteTop: 25,
+						// 	spriteWidth: 107,
+						// 	spriteHeight: 148,
+						// 	spriteOrigin: 54,
+						// 	speed: 4,
+						// 	def: {
+						// 		iframe: true
+						// 	}
+						// }
 					]
 				},
 				idle: {
@@ -78320,6 +78320,14 @@ const _allEnemies = {
 							spriteWidth: 107,
 							spriteHeight: 148,
 							spriteOrigin: 54,
+							objects: [
+								{
+									key: 'questshine',
+									position: 'middle',
+									yGap: 100,
+									bind: true
+								}
+							],
 							speed: 999
 						}
 					]

@@ -659,7 +659,7 @@ function createBubbleText(_dialog) {
 		// else {
 			_top = MathRound(_c.TOP - (_canvas.height / 7) - (__zoom * (_dialog.bottomGap ?? 0)));
 			if(__isPC && episode?.id > 1)
-				_top -= MathRound(_canvas.height / 10);
+				_top -= MathRound(_canvas.height / 25);
 			//_left = MathRound(_c.EXACTLEFT -
 			//	(((_gamePad.clientWidth * .15) - _c.WIDTH) / 2));
 			_left = _c.HURTLEFT + _c._HURTBOX_half; // MathRound((_c.SCREENLEFT - ((_c.width / 2) * _c.ZOOM)) + (__zoom * (_dialog.leftGap ?? 0)));  //MathRound((_c.SCREENLEFT - 

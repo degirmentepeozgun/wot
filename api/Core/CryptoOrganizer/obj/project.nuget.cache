@@ -1,20 +1,23 @@
 {
   "version": 2,
-  "dgSpecHash": "BZEP8oCwxwtad5wOWhIWt3eGpkDpFzyx3D42+AtQriHRiRV44DUKAcIE7xdWSM2IE+0Xmyyyrj34KAEO8Je6ZA==",
+  "dgSpecHash": "rj/W5iRh5d0=",
   "success": true,
-  "projectFilePath": "C:\\Users\\ozgun\\Desktop\\WOT\\api\\Core\\CryptoOrganizer\\CryptoOrganizer.csproj",
+  "projectFilePath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\CryptoOrganizer\\CryptoOrganizer.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\ozgun\\.nuget\\packages\\microsoft.extensions.configuration\\7.0.0-preview.4.22229.4\\microsoft.extensions.configuration.7.0.0-preview.4.22229.4.nupkg.sha512",
-    "C:\\Users\\ozgun\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\7.0.0-preview.4.22229.4\\microsoft.extensions.configuration.abstractions.7.0.0-preview.4.22229.4.nupkg.sha512",
-    "C:\\Users\\ozgun\\.nuget\\packages\\microsoft.extensions.configuration.fileextensions\\7.0.0-preview.4.22229.4\\microsoft.extensions.configuration.fileextensions.7.0.0-preview.4.22229.4.nupkg.sha512",
-    "C:\\Users\\ozgun\\.nuget\\packages\\microsoft.extensions.configuration.json\\7.0.0-preview.4.22229.4\\microsoft.extensions.configuration.json.7.0.0-preview.4.22229.4.nupkg.sha512",
-    "C:\\Users\\ozgun\\.nuget\\packages\\microsoft.extensions.fileproviders.abstractions\\7.0.0-preview.4.22229.4\\microsoft.extensions.fileproviders.abstractions.7.0.0-preview.4.22229.4.nupkg.sha512",
-    "C:\\Users\\ozgun\\.nuget\\packages\\microsoft.extensions.fileproviders.physical\\7.0.0-preview.4.22229.4\\microsoft.extensions.fileproviders.physical.7.0.0-preview.4.22229.4.nupkg.sha512",
-    "C:\\Users\\ozgun\\.nuget\\packages\\microsoft.extensions.filesystemglobbing\\7.0.0-preview.4.22229.4\\microsoft.extensions.filesystemglobbing.7.0.0-preview.4.22229.4.nupkg.sha512",
-    "C:\\Users\\ozgun\\.nuget\\packages\\microsoft.extensions.primitives\\7.0.0-preview.4.22229.4\\microsoft.extensions.primitives.7.0.0-preview.4.22229.4.nupkg.sha512",
-    "C:\\Users\\ozgun\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
-    "C:\\Users\\ozgun\\.nuget\\packages\\system.text.encodings.web\\7.0.0-preview.4.22229.4\\system.text.encodings.web.7.0.0-preview.4.22229.4.nupkg.sha512",
-    "C:\\Users\\ozgun\\.nuget\\packages\\system.text.json\\7.0.0-preview.4.22229.4\\system.text.json.7.0.0-preview.4.22229.4.nupkg.sha512"
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.extensions.configuration\\7.0.0-preview.4.22229.4\\microsoft.extensions.configuration.7.0.0-preview.4.22229.4.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\7.0.0-preview.4.22229.4\\microsoft.extensions.configuration.abstractions.7.0.0-preview.4.22229.4.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.extensions.configuration.fileextensions\\7.0.0-preview.4.22229.4\\microsoft.extensions.configuration.fileextensions.7.0.0-preview.4.22229.4.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.extensions.configuration.json\\7.0.0-preview.4.22229.4\\microsoft.extensions.configuration.json.7.0.0-preview.4.22229.4.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.extensions.fileproviders.abstractions\\7.0.0-preview.4.22229.4\\microsoft.extensions.fileproviders.abstractions.7.0.0-preview.4.22229.4.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.extensions.fileproviders.physical\\7.0.0-preview.4.22229.4\\microsoft.extensions.fileproviders.physical.7.0.0-preview.4.22229.4.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.extensions.filesystemglobbing\\7.0.0-preview.4.22229.4\\microsoft.extensions.filesystemglobbing.7.0.0-preview.4.22229.4.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.extensions.primitives\\7.0.0-preview.4.22229.4\\microsoft.extensions.primitives.7.0.0-preview.4.22229.4.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\system.text.encodings.web\\7.0.0-preview.4.22229.4\\system.text.encodings.web.7.0.0-preview.4.22229.4.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\system.text.json\\7.0.0-preview.4.22229.4\\system.text.json.7.0.0-preview.4.22229.4.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.36\\microsoft.netcore.app.ref.6.0.36.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.36\\microsoft.windowsdesktop.app.ref.6.0.36.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.36\\microsoft.aspnetcore.app.ref.6.0.36.nupkg.sha512"
   ],
   "logs": []
 }

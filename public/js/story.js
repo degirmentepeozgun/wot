@@ -8698,13 +8698,16 @@ const __stories = [
 													//mainCharacter.still = mainCharacter.immobilize = false;
 													//delete mainCharacter.disableKeyboard;
 													disposeFocus();
+													PlaySound({ key: 'trouble', volume:1 });
 													removeFocus();
 													createBubbleText({
 														id: 2,
-														location: { map: episode.id }, ms: 2000,
+														location: { map: episode.id }, ms: 4000,
 														owner: mainCharacter.key,
+														delay: 600,
 														text: 'There\'s something strange here',
 														onend: function() {
+															PlaySound({ key: 'puff5', volume:1 });
 															//episode.playSound({key:'bossalert', volume: .5});
 															//warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
 														
@@ -8742,6 +8745,7 @@ const __stories = [
 																	_yec.updateVariables();
 																	_yec.direction = __right;
 																	_yec.animate('ground2', 1);
+																	mainCharacter.hitTakenCount = 0;
 																	requestAnimationFrame(() => {
 																		const _mec =installBoss(38, 'Mecüc');
 																		_mec.left = (_mainCenterX + MathRound(200 * __zoom)) + platformX;
@@ -8749,11 +8753,13 @@ const __stories = [
 																		_mec.updateVariables();
 																		_mec.direction = __left;
 																		_mec.animate('ground3', 1);
-																		PlaySound({ key: 'puff', volume: 1 });
+																		cssAnimations.slowMotion(mainCharacter, 300);
 																		createBubbleText({
 																			id: 13,
-																			location: { map: episode.id }, ms: 1200,
+																			location: { map: episode.id }, ms: 1550,
 																			owner: _yec.key,
+																			asap: true,
+																			delay: 100,
 																			text: 'Die!'
 																		});
 																		setTimeout(() => {
@@ -8774,9 +8780,9 @@ const __stories = [
 																					_yec.animate('hurtair', 1);
 																					_mec.animate('hurtair', 1);
 																					disposeFocus();
-																				}, null, getLangData('Use support skill to save yourself'));
+																				}, null, getLangData('Use support skill to save yourself'),null,1);
 																			}, 150);
-																		}, 1300);
+																		}, 1650);
 																	});
 																	mainCharacter.maxHP = mainCharacter.MAXHP =
 																	mainCharacter.maxHP * 1;
@@ -8797,6 +8803,7 @@ const __stories = [
 													});
 												};
 												_btnWrapper.appendChild(_btn);
+												episode.hasFocusUIDoneBtn = 1;
 												const _curt = document.getElementById('focus-ui');
 												_curt.appendChild(_btnWrapper);
 											});
@@ -9964,6 +9971,8 @@ function removeFocus(_reUse) {
 	if(_focuses?.[0])
 		_focuses.forEach(x => removeClass(x, 'focus-me'));
 	_focusMode = undefined;
+	if(episode?.hasFocusUIDoneBtn)
+		delete episode.hasFocusUIDoneBtn;
 	removeClass(_gameUI, 'focus-ui-activated');
 }
 function disposeFocus() {
@@ -9995,6 +10004,7 @@ function skipQuickPlayTutorial() {
 		requestAnimationFrame(() => {
 			removeClass(_gameUI, 'disable-ui');
 			_game.suspended = false;
+			blurKeyboard();
 		});
 	}
 	removeFocus();

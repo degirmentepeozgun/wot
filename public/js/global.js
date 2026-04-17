@@ -3160,6 +3160,7 @@ const soundFiles = {
 	wooshfilm: './images/sounds/woosh-film.mp3',
 	kick: './images/sounds/kick.mp3',
 	slam: './images/sounds/slam.mp3',
+	horror: './images/sounds/horror.mp3',
 	singlekick: './images/sounds/single-kick.mp3',
 	woosh: './images/sounds/woosh.mp3',
 	waterfall: './images/sounds/waterfall2.mp3',
@@ -3501,7 +3502,12 @@ const soundFiles = {
 	dinohurt5: './images/sounds/dinohurt5.mp3',
 	dinohurt6: './images/sounds/dinohurt6.mp3',
 	goblindead: './images/sounds/goblin-dead.mp3',
+	trouble: './images/sounds/trouble.mp3',
 	puff: './images/sounds/puff.mp3',
+	puff2: './images/sounds/puff2.mp3',
+	puff3: './images/sounds/puff3.mp3',
+	puff4: './images/sounds/puff4.mp3',
+	puff5: './images/sounds/puff5.wav',
 	batrun: './images/sounds/bat-run.mp3',
 	bathurt: './images/sounds/bat-hurt.mp3',
 	bathurt2: './images/sounds/bat-hurt2.mp3',
@@ -32820,7 +32826,7 @@ const cssAnimations = {
 		}
 		else {
 			if (_url)
-				_css.innerHTML = '<div id="css-canvas-content" style="opacity:.35" class="full"><div class="full flex pop-outin" style="background:#000"><img src="' + _url + '" style="max-width:80%;max-height:80%" /></div>';
+				_css.innerHTML = '<div id="css-canvas-content" style="opacity:.35;background:#000" class="full"><div class="full flex pop-outin"><img src="' + _url + '" style="max-width:80%;max-height:80%" /></div>';
 			PlaySound({ key: 'curse', volume: .5 });
 			cssAnimationProps.curse = { start: _gameTick, p1: _c, p2: _ms, p3: _url};
 		}
@@ -32959,37 +32965,63 @@ const cssAnimations = {
 			cssAnimationProps.darkout = { start: _gameTick, p1: _ctx, p2: _opacity, p3: _cnvs};
 	},
 	dark: function (_char, _ms, _ctx, _opacity, _cnvs) {
-		if(cssAnimationProps.dark) {
-			if(_ms > 0 && ((_gameTick - cssAnimationProps.dark.start) > _ms)) {
-				//removeClass(_css, 'dark-blur-canvas');
+		if (cssAnimationProps.dark) {
+			var fc = document.getElementById('filter-canvas');
+			if(!fc)
+				return false;
+			if (_ms > 0 && ((_gameTick - cssAnimationProps.dark.start) > _ms)) {
 				delete cssAnimationProps.dark;
-				cssAnimations.darkout(_ctx, _opacity, _cnvs);
+				cssAnimations.darkout(null, _opacity, fc);
+				return false;
 			}
-			else if(_ctx?.clearRect && typeof _ctx.clearRect === 'function') {
-				_opacity+= 16;
-				if(_opacity <= 80) {
-					_ctx.clearRect(0, 0, episode.cUIWidth, episode.cUIHeight);
-					_ctx.fillStyle = 'rgba(0,0,0,' + (_opacity / 100) + ')';
-					cssAnimationProps.dark.p4 = _opacity;
-					_ctx.fillRect(0, 0, episode.cUIWidth, episode.cUIHeight);
-				}
+
+			_opacity += 16;
+
+			if (_opacity <= 80) {
+				cssAnimationProps.dark.p4 = _opacity;
+
+				fc.style.background = `rgba(0,0,0,${_opacity / 100})`;
 			}
+
 			return false;
 		}
 		else {
 			//addClass(_css, 'dark-blur-canvas');
+			// var fc = document.getElementById('filter-canvas');
+			// if(!fc) {
+			// 	fc = document.createElement("canvas");
+			// 	fc.width = _css.clientWidth;
+			// 	fc.height = _css.clientHeight;
+			// 	fc.id = 'filter-canvas';
+			// 	_css.appendChild(fc);
+			// }
+			// var ctx = fc.getContext('2d');
+			// ctx.fillStyle = '#00000000';
+			// ctx.fillRect(0, 0, fc.width, fc.height);
 			var fc = document.getElementById('filter-canvas');
-			if(!fc) {
-				fc = document.createElement("canvas");
-				fc.width = _css.clientWidth;
-				fc.height = _css.clientHeight;
+
+			if (!fc) {
+				fc = document.createElement("div");
 				fc.id = 'filter-canvas';
+
+				fc.style.position = 'absolute';
+				fc.style.left = '0';
+				fc.style.top = '0';
+				fc.style.width = '100%';
+				fc.style.height = '100%';
+				fc.style.background = 'rgba(0,0,0,0)';
+				fc.style.pointerEvents = 'none';
+
 				_css.appendChild(fc);
 			}
-			var ctx = fc.getContext('2d');
-			ctx.fillStyle = '#00000000';
-			ctx.fillRect(0, 0, fc.width, fc.height);
-			cssAnimationProps.dark = { start: _gameTick, p1:_char, p2: _ms ?? 1000, p3: ctx, p4: 0, p5: fc };
+			cssAnimationProps.dark = {
+				start: _gameTick,
+				p1: _char,
+				p2: _ms ?? 1000,
+				p3: null,
+				p4: 0,
+				p5: fc
+			};
 		}
 		return true;
 	},

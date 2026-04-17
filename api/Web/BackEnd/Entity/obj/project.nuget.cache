@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "ihtJTPMBfkOIs+FZ1s26dSd7uW4GVp6q0rR3ZoWqUOmVcW1RQESC4Bp2WKnttBTmEnfslCYPq56Hr7RZU4ojmA==",
+  "dgSpecHash": "AD0zthO7NWU=",
   "success": true,
-  "projectFilePath": "C:\\Users\\ozgun\\Desktop\\WOT\\api\\Web\\BackEnd\\Entity\\Entity.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Entity\\Entity.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.36\\microsoft.netcore.app.ref.6.0.36.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.36\\microsoft.windowsdesktop.app.ref.6.0.36.nupkg.sha512",
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.36\\microsoft.aspnetcore.app.ref.6.0.36.nupkg.sha512"
+  ],
   "logs": []
 }

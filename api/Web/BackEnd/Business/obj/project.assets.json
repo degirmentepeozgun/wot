@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "targets": {
     "net6.0": {
       "Microsoft.AspNetCore.Connections.Abstractions/7.0.2": {
@@ -2069,19 +2069,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ozgun\\.nuget\\packages\\": {}
+    "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ozgun\\Desktop\\WOT\\api\\Web\\BackEnd\\Business\\Business.csproj",
+      "projectUniqueName": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Business\\Business.csproj",
       "projectName": "Business",
-      "projectPath": "C:\\Users\\ozgun\\Desktop\\WOT\\api\\Web\\BackEnd\\Business\\Business.csproj",
-      "packagesPath": "C:\\Users\\ozgun\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ozgun\\Desktop\\WOT\\api\\Web\\BackEnd\\Business\\obj\\",
+      "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Business\\Business.csproj",
+      "packagesPath": "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Business\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\ozgun\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\ozgun.degirmentepe\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -2093,13 +2098,14 @@
       },
       "frameworks": {
         "net6.0": {
+          "framework": "net6.0",
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\ozgun\\Desktop\\WOT\\api\\Core\\Business\\BusinessTemplates.csproj": {
-              "projectPath": "C:\\Users\\ozgun\\Desktop\\WOT\\api\\Core\\Business\\BusinessTemplates.csproj"
+            "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\Business\\BusinessTemplates.csproj": {
+              "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\Business\\BusinessTemplates.csproj"
             },
-            "C:\\Users\\ozgun\\Desktop\\WOT\\api\\Web\\BackEnd\\Entity\\Entity.csproj": {
-              "projectPath": "C:\\Users\\ozgun\\Desktop\\WOT\\api\\Web\\BackEnd\\Entity\\Entity.csproj"
+            "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Entity\\Entity.csproj": {
+              "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Entity\\Entity.csproj"
             }
           }
         }
@@ -2108,10 +2114,17 @@
         "warnAsError": [
           "NU1605"
         ]
-      }
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "10.0.300"
     },
     "frameworks": {
       "net6.0": {
+        "framework": "net6.0",
         "targetAlias": "net6.0",
         "dependencies": {
           "Microsoft.AspNetCore.SignalR.Client": {
@@ -2130,12 +2143,26 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[6.0.36, 6.0.36]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[6.0.36, 6.0.36]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[6.0.36, 6.0.36]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.200\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300-preview.0.26177.108\\RuntimeIdentifierGraph.json"
       }
     }
   }
