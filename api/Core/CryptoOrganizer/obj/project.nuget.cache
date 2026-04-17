@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "rj/W5iRh5d0=",
+  "dgSpecHash": "9PjP56+77YI=",
   "success": true,
-  "projectFilePath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\CryptoOrganizer\\CryptoOrganizer.csproj",
+  "projectFilePath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Core\\CryptoOrganizer\\CryptoOrganizer.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.extensions.configuration\\7.0.0-preview.4.22229.4\\microsoft.extensions.configuration.7.0.0-preview.4.22229.4.nupkg.sha512",
     "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\7.0.0-preview.4.22229.4\\microsoft.extensions.configuration.abstractions.7.0.0-preview.4.22229.4.nupkg.sha512",

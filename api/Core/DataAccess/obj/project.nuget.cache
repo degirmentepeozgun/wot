@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "iS60fZG/bPE=",
+  "dgSpecHash": "mxdY43y+FLQ=",
   "success": true,
-  "projectFilePath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\DataAccess\\DataAccess.csproj",
+  "projectFilePath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Core\\DataAccess\\DataAccess.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.extensions.configuration\\6.0.0\\microsoft.extensions.configuration.6.0.0.nupkg.sha512",
     "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\6.0.0\\microsoft.extensions.configuration.abstractions.6.0.0.nupkg.sha512",
@@ -25,9 +25,9 @@
       "code": "NU1903",
       "level": "Warning",
       "message": "Package 'Npgsql' 6.0.4 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c",
-      "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\DataAccess\\DataAccess.csproj",
+      "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Core\\DataAccess\\DataAccess.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\DataAccess\\DataAccess.csproj",
+      "filePath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Core\\DataAccess\\DataAccess.csproj",
       "libraryId": "Npgsql",
       "targetGraphs": [
         "net6.0"

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "KaeEnIXvM28=",
+  "dgSpecHash": "Ty1tu0HXTTw=",
   "success": true,
-  "projectFilePath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\RedisCache\\RedisCache.csproj",
+  "projectFilePath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Core\\RedisCache\\RedisCache.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.netcore.platforms\\5.0.0\\microsoft.netcore.platforms.5.0.0.nupkg.sha512",
     "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.win32.registry\\5.0.0\\microsoft.win32.registry.5.0.0.nupkg.sha512",

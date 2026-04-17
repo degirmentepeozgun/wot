@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "wCyTuiaYwK0=",
+  "dgSpecHash": "sus1xKyJlTM=",
   "success": true,
-  "projectFilePath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Business\\Business.csproj",
+  "projectFilePath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Web\\BackEnd\\Business\\Business.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.aspnetcore.connections.abstractions\\7.0.2\\microsoft.aspnetcore.connections.abstractions.7.0.2.nupkg.sha512",
     "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\microsoft.aspnetcore.http.connections.client\\7.0.2\\microsoft.aspnetcore.http.connections.client.7.0.2.nupkg.sha512",

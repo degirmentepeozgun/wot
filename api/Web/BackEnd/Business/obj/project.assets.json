@@ -2075,11 +2075,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Business\\Business.csproj",
+      "projectUniqueName": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Web\\BackEnd\\Business\\Business.csproj",
       "projectName": "Business",
-      "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Business\\Business.csproj",
+      "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Web\\BackEnd\\Business\\Business.csproj",
       "packagesPath": "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Business\\obj\\",
+      "outputPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Web\\BackEnd\\Business\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -2101,11 +2101,11 @@
           "framework": "net6.0",
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\Business\\BusinessTemplates.csproj": {
-              "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\Business\\BusinessTemplates.csproj"
+            "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Core\\Business\\BusinessTemplates.csproj": {
+              "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Core\\Business\\BusinessTemplates.csproj"
             },
-            "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Entity\\Entity.csproj": {
-              "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Entity\\Entity.csproj"
+            "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Web\\BackEnd\\Entity\\Entity.csproj": {
+              "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Web\\BackEnd\\Entity\\Entity.csproj"
             }
           }
         }

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Entity\\Entity.csproj": {}
+    "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Web\\BackEnd\\Entity\\Entity.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\EntityTemplates\\EntityTemplates.csproj": {
+    "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Core\\EntityTemplates\\EntityTemplates.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\EntityTemplates\\EntityTemplates.csproj",
+        "projectUniqueName": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Core\\EntityTemplates\\EntityTemplates.csproj",
         "projectName": "EntityTemplates",
-        "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\EntityTemplates\\EntityTemplates.csproj",
+        "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Core\\EntityTemplates\\EntityTemplates.csproj",
         "packagesPath": "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\EntityTemplates\\obj\\",
+        "outputPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Core\\EntityTemplates\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -85,14 +85,14 @@
         }
       }
     },
-    "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Entity\\Entity.csproj": {
+    "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Web\\BackEnd\\Entity\\Entity.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Entity\\Entity.csproj",
+        "projectUniqueName": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Web\\BackEnd\\Entity\\Entity.csproj",
         "projectName": "Entity",
-        "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Entity\\Entity.csproj",
+        "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Web\\BackEnd\\Entity\\Entity.csproj",
         "packagesPath": "C:\\Users\\ozgun.degirmentepe\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Web\\BackEnd\\Entity\\obj\\",
+        "outputPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Web\\BackEnd\\Entity\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -114,8 +114,8 @@
             "framework": "net6.0",
             "targetAlias": "net6.0",
             "projectReferences": {
-              "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\EntityTemplates\\EntityTemplates.csproj": {
-                "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\WAT\\wot\\api\\Core\\EntityTemplates\\EntityTemplates.csproj"
+              "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Core\\EntityTemplates\\EntityTemplates.csproj": {
+                "projectPath": "C:\\Users\\ozgun.degirmentepe\\Desktop\\wot\\api\\Core\\EntityTemplates\\EntityTemplates.csproj"
               }
             }
           }
