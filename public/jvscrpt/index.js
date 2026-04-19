@@ -974,11 +974,11 @@ function openGame() {
 		idealground_height = getGroundHeight();
 		if(_openingSound)
 			_closeOpeningMusic = 1;
-		_canvas.width = _canvasDMG.height = _canvas1.width = _canvasB.width = _canvasGore.width = _canvasSPB.width = _canvasShadow.width = _canvasRage.width = _canvasHurt.width = _canvas3.width = _canvas4.width = _canvas5.width = _canvasF.width = _canvasS.width = _canvasR.width = _gamePad.offsetWidth;
+		_canvas.width = _canvasDMG.height = _canvasBRB.width = _canvas1.width = _canvasB.width = _canvasGore.width = _canvasSPB.width = _canvasShadow.width = _canvasRage.width = _canvasHurt.width = _canvas3.width = _canvas4.width = _canvas5.width = _canvasF.width = _canvasS.width = _canvasR.width = _gamePad.offsetWidth;
 		document.getElementById('game-pad-left').style.width =
 		document.getElementById('game-pad-right').style.width =
 		'calc((100vw - ' + _canvas.width + 'px) / 2)';
-		_canvas.height = _canvasDMG.height = _canvasB.height = _canvas4.height = _canvas3.height = _canvasGore.height = _canvasShadow.height = _canvasHurt.height = _canvasRage.height = _canvas5.height = _canvasS.height = _canvasSPB.height = _canvasF.height = _canvasR.height = _gamePad.offsetHeight;
+		_canvas.height = _canvasDMG.height = _canvasB.height = _canvas4.height = _canvas3.height = _canvasGore.height = _canvasShadow.height = _canvasHurt.height = _canvasRage.height = _canvas5.height = _canvasBRB.height = _canvasS.height = _canvasSPB.height = _canvasF.height = _canvasR.height = _gamePad.offsetHeight;
 		_canvas1.height = _canvas.height - getGroundHeight();
 		__r.style.setProperty('--ground-height', getGroundHeight() + 'px');
 		__r.style.setProperty('--use-progress-time', (2 * (165 / getGroundHeight())) + 's');

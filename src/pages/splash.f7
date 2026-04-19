@@ -6,6 +6,7 @@
 				<div class="canvas" id="sprite-obj-back"></div>
 				<div class="parallax" id="droad50"></div>
 				<div class="parallax" id="droad85"></div>
+				<canvas id="bg-road-bg"></canvas>
 				<div class="parallax" id="droad90"></div>
 				<canvas id="bg-sprite-obj"></canvas>
 				<div class="canvas" id="sprite-obj-90"></div>
@@ -221,12 +222,14 @@
 			_canvasDMG = document.getElementById('damage-frames');
 			cDMG = _canvasDMG.getContext('2d');
 			_canvasSPB = document.getElementById('sprite-obj-back');
+			_canvasBRB = document.getElementById('bg-road-bg');
+			cSPB = _canvasBRB.getContext('2d');
 			_canvasGore = document.getElementById('gore');
 			cGore = _canvasGore.getContext('2d');
 			_commons = document.querySelectorAll('.common');
 			c2.imageSmoothingEnabled = cDMG.imageSmoothingEnabled = c6.imageSmoothingEnabled =
 				c5.imageSmoothingEnabled = c9.imageSmoothingEnabled = c10.imageSmoothingEnabled
-				= cGore.imageSmoothingEnabled = false;
+				= cGore.imageSmoothingEnabled = cSPB.imageSmoothingEnabled = false;
 			_navbar = document.getElementById('top-nav');
 			_gamePad = document.getElementById('game-pad');
 			_gameUI = document.getElementById('game-ui');

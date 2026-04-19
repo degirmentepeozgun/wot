@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿'use strict';
+﻿﻿﻿﻿﻿'use strict';
 const __attackTolerance = 2;
 
 function enemy(_e) {
@@ -5572,6 +5572,8 @@ function enemy(_e) {
 		})?.filter(x => x.attacker == (this.related ?? this) || x.pushingBy == this || x == this.finishTarget);
 		if (_enemies?.[0]) {
 			const _anima = this.getCurrentAnimation();
+			const comboIndex = _anima.comboOrder ?? 1;
+			const comboScale = .9 + (comboIndex * .1);
 			for (var _e of _enemies) {
 				if (_e.health <= 0 || _e.dead || (_e.knockbacking && _e.dying) || _e.release || _e.noCC || _e.autoAttacking)
 					continue;
@@ -5591,7 +5593,9 @@ function enemy(_e) {
 					let _left = (((episode.cWidth * (MathAbs(_f.extraStepXRate) / 100))) + ((_f.leftGap ?? 0) * (this.related ?? this).ZOOM));
 					_e.pushingBy = this;
 					_e.direction = this.direction === __right ? __left : __right;
-					_e.pushRate = _e.calculateEasing(_ef, ((100 * (_left ?? 0)) / episode.cWidth) * (_e.defaultDirection !== __right ? 1 : -1));
+					_e.pushRate = _e.calculateEasing(_ef, 
+						((100 * (_left ?? 0)) / episode.cWidth) * (_e.defaultDirection !== __right ? 1 : -1)
+						* comboScale);
 					if (_f.push === 'reversed') {
 						const _t = isObjectsInTouch(this.related ?? this, _e, 100);
 						if (_t.touch){
@@ -5827,6 +5831,14 @@ function enemy(_e) {
 			)
 		);
 	}
+	this.installFall = function(_perc) {
+		this.animations.dead = new animation(
+			createFall(this)
+		);
+		this.animations.dead.key = 'dead';
+		this.animations.dead.zoom = _perc > 50 ? .95 : 1.05;
+		this.animations.dead.background = true;
+	}
 	this.smash = function(_t, _f) {
 		_f = _f ?? this.getCurrentFrame();
 		this.smasher = _t.owner ?? _t;
@@ -5838,15 +5850,12 @@ function enemy(_e) {
 	this.hurtEnemy = function(_anima, _f, _e, _ef, _ea, _tp, _ep) {
 		const _t = this;
 		if(_t.attackedUnitCount > (_anima.maxAttackedCount ?? __maxAttackedCount)){
-					console.log('hurt6');
 			return false;
 		}
 		if((_gameTick - _e.comfortStarted) < 500){
-					console.log('hurt7');
 			return false;
 		}
 		if (_ea.key.startsWith('dead') || _ea.key === 'release'){
-					console.log('hurt8');
 			return false;
 		}
 		if (_f.atk?.buffs)
@@ -5854,13 +5863,11 @@ function enemy(_e) {
 		if (_f.atk.rate > 0)
 			(_t?.owner ?? _t?.related ?? _t).increaseHitCount();
 		else{
-					console.log('hurt9');
 			return false;
 		}
 		// if(!episode.pvp && episode.enemies?.filter(x => x.autoTarget === _e && x.attacked && x.animations[x.animation].attack)?.length > __maxAttackedCount)
 		// 	return false;
 		if(_t.parentKey === _e.key || _e === _t.related){
-					console.log('hurt10');
 			return false;
 		}
 		let _critHitTaken = false;
@@ -5883,7 +5890,6 @@ function enemy(_e) {
 					x: _e.LEFT,
 					y: episode.cHeight - _e.yPosition - _e.HEIGHT
 				});
-					console.log('hurt11');
 				return false;
 			}
 		if (_prevAutoMode === 2 && !_e.keyboard && _e.animations.block && _e.fatique >= fatiqueDecreasement) {
@@ -5903,7 +5909,6 @@ function enemy(_e) {
 						x: _t.LEFT,
 						y: episode.cHeight - _e.yPosition - _e.HEIGHT
 					});
-					console.log('hurt12');
 					return false;
 				}
 			}
@@ -5915,7 +5920,6 @@ function enemy(_e) {
 				_e.animate('roll', 1);
 				_e.setAutoTarget(_t, null, 6);
 				_e.autoAttacking = true;
-					console.log('hurt13');
 				return false;
 			}
 		}
@@ -5925,7 +5929,6 @@ function enemy(_e) {
 				_e.animate('dodge', 1);
 				_e.setAutoTarget(_t, null, 7);
 				_e.autoAttacking = true;
-					console.log('hurt14');
 				return false;
 			}
 		}
@@ -6318,7 +6321,9 @@ function enemy(_e) {
 										_e.smash(_t, _f);
 										return {smashed: true, criticalHit: _critHitTaken};
 									}
-									if((_f.knockback || _charged || (_f.push && typeof _f.push === 'number'))) {
+									const _isHeavyHit = (_f.knockback || _charged || (_f.push && typeof _f.push === 'number'));
+									const _fall = _e.tryFall(_isHeavyHit);
+									if(_isHeavyHit && !_fall) {
 										_e.critDead = _t.criticalHit ? 3: 2;
 										let _knockbacked;
 										if(_hurtType === 'air' && _e.animations.knockbackair){
@@ -6439,7 +6444,43 @@ function enemy(_e) {
 			_t.attackedUnitTime = _gameTick;
 			_t.attackedUnitCount = 1;
 		}
+		if (_f.atk?.pushY)
+			_e.pushY = MathRound((episode.cHeight * _f.atk.pushY) / 100);
 		return {criticalHit: _critHitTaken};
+	}
+	this.tryFall = function(_heavy) {
+		if(!episode.cliffs || !this.animations.hurtair)
+			return false;
+		const _thisCenter = (this.HURTLEFT + this._HURTBOX_half + platformX) / __zoom;
+		let _y = this.yPosition;
+		const _maxY = getGroundHeight();
+		const _halfY = _maxY / 2;
+		if(_y <= _halfY)
+			_y -= this.yGap;
+		else
+			_y += this.yGap;
+		let _perc = (_y / _maxY) * 100;
+		if(_perc < 0)
+			_perc = 0;
+		else if(_perc > 100)
+			_perc = 100;
+		for(let _cliff of episode.cliffs) {
+			if(_thisCenter >= _cliff.minX && _thisCenter <= _cliff.maxX && 
+				_perc >= _cliff.minYRate && _perc <= _cliff.maxYRate
+			) {
+				this.installFall(_perc);
+				const _r = getRandomValue2(3, 6);
+				if(_heavy) {
+					this.animations.dead.frames.forEach(x => {
+						if(x.extraStepXRate) {
+							x.extraStepXRate *= _r;
+						}
+					});
+				}
+				return true;
+			}
+		}
+		return false;
 	}
 	this.attack = function (_anima, _frame) {
 		const trt = (this.related ?? this);
@@ -6461,18 +6502,15 @@ function enemy(_e) {
 			for (var _en of _enemies) {
 				const _enemy = _en.enemy;
 				if(_enemy.readyForFatality && !episode?.fatalityHappened){
-					console.log('hurt4');
 					continue;
 				}
 
 				if(_enemy.isDead()){
-					console.log('hurt3');
 					continue;
 				}
 				const _enemyFrame = _enemy.getCurrentFrame();
 				if (((_enemy.attackingOnlyBy && _enemy.attackingOnlyBy !== this.key && this.class !== __spell) || _enemyFrame.def?.iframe || _enemy.iframe || _enemy.reviveTime) && _enemy.health > 0)
 				{
-					console.log('hurt2');
 					continue;
 				}
 				_critHitTaken = false;
@@ -6508,7 +6546,6 @@ function enemy(_e) {
 								position: 'middle'
 							});
 							PlaySound({ key: this.class + 'block', owner: this }, 'block');
-							console.log('hurt1');
 							return false;
 						}
 					}
@@ -6529,7 +6566,6 @@ function enemy(_e) {
 						position: 'middle'
 					});
 					PlaySound({ key: 'iron', owner: this, volume: .5 });
-					console.log('hurt5');
 					return false;
 				}
 				else if (_enemy.animations['counter'] && _enemy.newBlocked > 0 && _enemy.newBlocked <= counterAttackTolerance) {
@@ -7589,8 +7625,22 @@ function enemy(_e) {
 		const _xDiff = ((_reversed ? -1 : 1) * (this.ZOOM * (_frame.leftGap ?? 0))) + ((_reversed ? 1 : -1) * (_frame.spriteOrigin * this.ZOOM));
 
 		let _left = this.left + _xDiff;
-		const _top = (episode.cHeight - (_frame.spriteHeight * this.ZOOM) +
+		const _top = (episode.cHeight - (_frame.spriteHeight * this.ZOOM) + (this.pushY ?? 0) +
 		MathRound((_frame.bottomGap ?? 0) * this.ZOOM)) - _stepY - this.yPosition;
+		if(this.pushY) {
+			if(!this.pushYStep)
+				this.pushYStep = MathRound((episode.cHeight * .3) / 100);
+			if(this.pushY > 0) {
+				this.pushY -= this.pushYStep;
+				if(this.pushY < 0)
+					this.pushY = 0;
+			}
+			else if(this.pushY < 0){
+				this.pushY += this.pushYStep;
+				if(this.pushY > 0)
+					this.pushY = 0;
+			}
+		}
 		if (this.turned)
 			this.turned = false;
 		let _invisible = (this.invisible && this.enemy) || this.unseen;

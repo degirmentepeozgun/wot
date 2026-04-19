@@ -6973,7 +6973,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		startScene: 2,
+		startScene: 1,
 		scenes: [
 			{
 				when: function() {
@@ -7656,7 +7656,7 @@ const __stories = [
 				]
 			},
 			{
-				map: 36,
+				map: 42,
 				leaderBoards: {
 					calculate: function() {
 						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)

@@ -2046,6 +2046,7 @@ function createCharacter(_settings) {
 								atk: {
 									yRange: 15,
 									rate: 2,
+									pushY: 1.5,
 									hurt: {
 										key: 'hurtground1',
 										type: 'ground',
@@ -2115,6 +2116,7 @@ function createCharacter(_settings) {
 						baseKey: 'attack',
 						next: 'attack3',
 						priority: 3,
+						comboOrder:2,
 						imediateBreak: true,
 						frames: [
 							{
@@ -2194,6 +2196,7 @@ function createCharacter(_settings) {
 						baseKey: 'attack',
 						next: 'attack4',
 						priority: 3,
+						comboOrder:3,
 						imediateBreak: true,
 						frames: [
 							{
@@ -2259,6 +2262,7 @@ function createCharacter(_settings) {
 						baseKey: 'attack',
 						next: 'attack5',
 						priority: 3,
+						comboOrder:4,
 						imediateBreak: true,
 						frames: [
 							{
@@ -2308,6 +2312,7 @@ function createCharacter(_settings) {
 								atk: {
 									yRange: 15,
 									rate: 2,
+									pushY: -1.5,
 									hurt: {
 										key: 'hurtground2',
 										type: 'ground',
@@ -38275,6 +38280,526 @@ const _allEnemies = {
 			stepXRate: .4,
 			bloodColor: 'green',
 			src: './images/sprites/ep623/',
+			buffs: []
+		};
+	},
+	enemy625: function () {
+		return {
+			animations: {
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87,
+							spriteTop: 0,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 2,
+							spriteTop: 0,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 3,
+							spriteTop: 0,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 4,
+							spriteTop: 0,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+
+						{
+							spriteLeft: 0,
+							spriteTop: 125,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87,
+							spriteTop: 125,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 2,
+							spriteTop: 125,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 3,
+							spriteTop: 125,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 4,
+							spriteTop: 125,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+
+						
+						{
+							spriteLeft: 0,
+							spriteTop: 125 * 2,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87,
+							spriteTop: 125 * 2,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 2,
+							spriteTop: 125 * 2,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 3,
+							spriteTop: 125 * 2,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 4,
+							spriteTop: 125 * 2,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						
+						{
+							spriteLeft: 0,
+							spriteTop: 125 * 3,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87,
+							spriteTop: 125 * 3,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 2,
+							spriteTop: 125 * 3,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 3,
+							spriteTop: 125 * 3,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 4,
+							spriteTop: 125 * 3,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						
+						{
+							spriteLeft: 0,
+							spriteTop: 125 * 4,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87,
+							spriteTop: 125 * 4,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 2,
+							spriteTop: 125 * 4,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 3,
+							spriteTop: 125 * 4,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 4,
+							spriteTop: 125 * 4,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						
+						{
+							spriteLeft: 0,
+							spriteTop: 125 * 5,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87,
+							spriteTop: 125 * 5,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 2,
+							spriteTop: 125 * 5,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 3,
+							spriteTop: 125 * 5,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 4,
+							spriteTop: 125 * 5,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						
+						{
+							spriteLeft: 0,
+							spriteTop: 125 * 6,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87,
+							spriteTop: 125 * 6,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 2,
+							spriteTop: 125 * 6,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 3,
+							spriteTop: 125 * 6,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 4,
+							spriteTop: 125 * 6,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 125 * 7,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						}
+					]
+				},
+			},
+			key: 'prpflm-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 5,
+			id: 625,
+			healtbarGap: 0,
+			name: 'Purple Flame',
+			class: 'object',
+			level: 1,
+			direction: 'left',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1,
+			width: 87,
+			height: 100,
+			maxHP: 100,
+			atk: 100,
+			def: 100,
+			invulnerable: true,
+			stepX: 0,
+			weight: 1000,
+			stepXRate: 0,
+			still: true,
+			immobilize: true,
+			noDirection: true,
+			hasShadow: false,
+			skipHealthBar: true,
+			src: './images/sprites/ep625/',
+			buffs: []
+		};
+	},
+	enemy626: function () {
+		return {
+			animations: {
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 223,
+							spriteHeight: 600,
+							spriteOrigin: 112,
+							speed: 999
+						}
+					]
+				},
+			},
+			key: 'bltmflg-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 5,
+			id: 626,
+			healtbarGap: 0,
+			name: 'Kazan Left',
+			class: 'object',
+			level: 1,
+			direction: 'left',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1,
+			width: 223,
+			height: 600,
+			maxHP: 100,
+			atk: 100,
+			def: 100,
+			invulnerable: true,
+			stepX: 0,
+			weight: 1000,
+			stepXRate: 0,
+			still: true,
+			immobilize: true,
+			noDirection: true,
+			skipHealthBar: true,
+			src: './images/sprites/ep626/',
+			buffs: []
+		};
+	},
+	enemy627: function () {
+		return {
+			animations: {
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 223,
+							spriteHeight: 600,
+							spriteOrigin: 112,
+							speed: 999
+						}
+					]
+				},
+			},
+			key: 'rdtmflg-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 5,
+			id: 627,
+			healtbarGap: 0,
+			name: 'Kazan Left',
+			class: 'object',
+			level: 1,
+			direction: 'left',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1,
+			width: 223,
+			height: 600,
+			maxHP: 100,
+			atk: 100,
+			def: 100,
+			invulnerable: true,
+			stepX: 0,
+			weight: 1000,
+			stepXRate: 0,
+			still: true,
+			immobilize: true,
+			noDirection: true,
+			skipHealthBar: true,
+			src: './images/sprites/ep627/',
+			buffs: []
+		};
+	},
+	enemy628: function () {
+		return {
+			animations: {
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 127,
+							spriteHeight: 139,
+							spriteOrigin: 64,
+							speed: 999
+						}
+					]
+				},
+			},
+			key: 'kznleft-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 5,
+			id: 628,
+			healtbarGap: 0,
+			name: 'Kazan Left',
+			class: 'object',
+			level: 1,
+			direction: 'left',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1,
+			width: 127,
+			height: 139,
+			maxHP: 100,
+			atk: 100,
+			def: 100,
+			invulnerable: true,
+			stepX: 0,
+			weight: 1000,
+			stepXRate: 0,
+			still: true,
+			immobilize: true,
+			noDirection: true,
+			hasShadow: false,
+			skipHealthBar: true,
+			src: './images/sprites/ep628/',
+			buffs: []
+		};
+	},
+	enemy629: function () {
+		return {
+			animations: {
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 127,
+							spriteHeight: 139,
+							spriteOrigin: 64,
+							speed: 999
+						}
+					]
+				},
+			},
+			key: 'kznright-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 5,
+			id: 629,
+			healtbarGap: 0,
+			name: 'Kazan Right',
+			class: 'object',
+			level: 1,
+			direction: 'left',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1,
+			width: 127,
+			height: 139,
+			maxHP: 100,
+			atk: 100,
+			def: 100,
+			invulnerable: true,
+			stepX: 0,
+			weight: 1000,
+			stepXRate: 0,
+			still: true,
+			immobilize: true,
+			noDirection: true,
+			hasShadow: false,
+			skipHealthBar: true,
+			src: './images/sprites/ep629/',
 			buffs: []
 		};
 	},
@@ -81976,6 +82501,200 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				invisibleWhenLay: true,
 				invisibleWhenDead: true
 			}
+		]
+	};
+}
+function createFall(_char) {
+	const _anima = _char.animations.hurtair;
+	const _sprite1 = _anima.frames[0];
+	const _src = _anima.src;
+	// if(_sound && !_sound.key)
+	// 	_sound = { key: _sound };
+	// if(!_sound.reset)
+	// 	_sound.reset = true;
+	return {
+		key: 'fall',
+		type: 'skill',
+		src: _src,
+		frames: [
+			{
+				spriteLeft: _sprite1.spriteLeft,
+				spriteTop: _sprite1.spriteTop,
+				spriteWidth: _sprite1.spriteWidth,
+				spriteHeight: _sprite1.spriteHeight,
+				spriteOrigin: _sprite1.spriteOrigin,
+				src: _sprite1.src,
+				extraStepYRate: 1,
+				extraStepXRate: -.2,
+				props: {
+					killingBy: undefined,
+					finishTarget: undefined,
+					dead: true
+				},
+				def: {
+					iframe: true
+				},
+				objects: [{
+					position: 'under-feet',
+					key: 'throw',
+					yGap:10
+				}],
+				speed: 1
+			},
+			{
+				spriteLeft: _sprite1.spriteLeft,
+				spriteTop: _sprite1.spriteTop,
+				spriteWidth: _sprite1.spriteWidth,
+				spriteHeight: _sprite1.spriteHeight,
+				spriteOrigin: _sprite1.spriteOrigin,
+				src: _sprite1.src,
+				extraStepYRate: 1,
+				extraStepXRate: -.2,
+				def: {
+					iframe: true
+				},
+				speed: 5
+			},
+			{
+				spriteLeft: _sprite1.spriteLeft,
+				spriteTop: _sprite1.spriteTop,
+				spriteWidth: _sprite1.spriteWidth,
+				spriteHeight: _sprite1.spriteHeight,
+				spriteOrigin: _sprite1.spriteOrigin,
+				src: _sprite1.src,
+				extraStepYRate: .8,
+				extraStepXRate: -.2,
+				//sound: _sound,
+				def: {
+					iframe: true
+				},
+				speed: 3
+			},
+			{
+				spriteLeft: _sprite1.spriteLeft,
+				spriteTop: _sprite1.spriteTop,
+				spriteWidth: _sprite1.spriteWidth,
+				spriteHeight: _sprite1.spriteHeight,
+				spriteOrigin: _sprite1.spriteOrigin,
+				src: _sprite1.src,
+				extraStepYRate: .5,
+				sound: { key: 'cliff', volume: 1 },
+				extraStepXRate: -.15,
+				def: {
+					iframe: true
+				},
+				speed: 3
+			},
+			{
+				spriteLeft: _sprite1.spriteLeft,
+				spriteTop: _sprite1.spriteTop,
+				spriteWidth: _sprite1.spriteWidth,
+				spriteHeight: _sprite1.spriteHeight,
+				spriteOrigin: _sprite1.spriteOrigin,
+				src: _sprite1.src,
+				extraStepYRate: -1,
+				extraStepXRate: -.15,
+				def: {
+					iframe: true
+				},
+				speed: 6
+			},
+			{
+				spriteLeft: _sprite1.spriteLeft,
+				spriteTop: _sprite1.spriteTop,
+				spriteWidth: _sprite1.spriteWidth,
+				spriteHeight: _sprite1.spriteHeight,
+				spriteOrigin: _sprite1.spriteOrigin,
+				src: _sprite1.src,
+				extraStepYRate: -1.2,
+				extraStepXRate: -.1,
+				def: {
+					iframe: true
+				},
+				speed: 6
+			},
+			{
+				spriteLeft: _sprite1.spriteLeft,
+				spriteTop: _sprite1.spriteTop,
+				spriteWidth: _sprite1.spriteWidth,
+				spriteHeight: _sprite1.spriteHeight,
+				spriteOrigin: _sprite1.spriteOrigin,
+				src: _sprite1.src,
+				extraStepYRate: -1.5,
+				extraStepXRate: -.05,
+				def: {
+					iframe: true
+				},
+				speed: 6
+			},
+			{
+				spriteLeft: _sprite1.spriteLeft,
+				spriteTop: _sprite1.spriteTop,
+				spriteWidth: _sprite1.spriteWidth,
+				spriteHeight: _sprite1.spriteHeight,
+				spriteOrigin: _sprite1.spriteOrigin,
+				src: _sprite1.src,
+				extraStepYRate: -1.9,
+				def: {
+					iframe: true
+				},
+				speed: 6
+			},
+			{
+				spriteLeft: _sprite1.spriteLeft,
+				spriteTop: _sprite1.spriteTop,
+				spriteWidth: _sprite1.spriteWidth,
+				spriteHeight: _sprite1.spriteHeight,
+				spriteOrigin: _sprite1.spriteOrigin,
+				src: _sprite1.src,
+				extraStepYRate: -2.4,
+				def: {
+					iframe: true
+				},
+				speed: 6
+			},
+			{
+				spriteLeft: _sprite1.spriteLeft,
+				spriteTop: _sprite1.spriteTop,
+				spriteWidth: _sprite1.spriteWidth,
+				spriteHeight: _sprite1.spriteHeight,
+				spriteOrigin: _sprite1.spriteOrigin,
+				src: _sprite1.src,
+				extraStepYRate: -3,
+				def: {
+					iframe: true
+				},
+				speed: 6
+			},
+			{
+				spriteLeft: _sprite1.spriteLeft,
+				spriteTop: _sprite1.spriteTop,
+				spriteWidth: _sprite1.spriteWidth,
+				spriteHeight: _sprite1.spriteHeight,
+				spriteOrigin: _sprite1.spriteOrigin,
+				src: _sprite1.src,
+				extraStepYRate: -3,
+				def: {
+					iframe: true
+				},
+				speed: 30
+			},
+			{
+				spriteLeft: _sprite1.spriteLeft,
+				spriteTop: _sprite1.spriteTop,
+				spriteWidth: _sprite1.spriteWidth,
+				spriteHeight: _sprite1.spriteHeight,
+				spriteOrigin: _sprite1.spriteOrigin,
+				src: _sprite1.src,
+				extraStepYRate: -3,
+				def: {
+					iframe: true
+				},
+				props: {
+					remove: true
+				},
+				speed: 1
+			},
 		]
 	};
 }

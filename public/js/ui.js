@@ -2220,7 +2220,7 @@ function setWindowVariables() {
 	const __r = document.querySelector(':root');
 		//const __rs = getComputedStyle(__r);
 	
-	_canvas.width = _canvas1.width = _canvasB.width = _canvasGore.width = _canvasSPB.width = _canvas3.width = _canvas5.width = 
+	_canvas.width = _canvas1.width = _canvasB.width = _canvasGore.width = _canvasBRB.width = _canvasSPB.width = _canvas3.width = _canvas5.width = 
 	_canvasF.width = _canvasS.width = _canvasDMG.width = _canvasR.width = MathRound(_gamePad.offsetWidth / __scale);
 	const root = document.querySelector(':root');
 	root.style.setProperty('--scale', __scale);
@@ -2230,7 +2230,7 @@ function setWindowVariables() {
 	document.getElementById('game-pad-right').style.width =
 	'calc((100vw - ' + (_canvas.width * __scale) + 'px) / 2)';
 	_canvas.height = _canvasDMG.height = _canvasB.height = _canvas3.height = _canvasGore.height = _canvas5.height = 
-	_canvasS.height = _canvasSPB.height = _canvasF.height = _canvasR.height = MathRound(_gamePad.offsetHeight / __scale);
+	_canvasS.height = _canvasSPB.height = _canvasBRB.height = _canvasF.height = _canvasR.height = MathRound(_gamePad.offsetHeight / __scale);
 	
 	__zoom = _canvas.width / 2048;
 	__dmgFrameDistance = MathRound(100 * __zoom);

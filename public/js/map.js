@@ -62,6 +62,7 @@ function map(_m) {
 	this.status = _m.status ?? 'loading';
 	this.loadObjects = _m.loadObjects;
 	this.loadEnemies = _m.loadEnemies;
+	this.cliffs = _mapSprite.cliffs;
 	this.enemies = [];
 	this.seenEnemies = [];
 	this.activeSpells = [];
@@ -3563,6 +3564,10 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 		}
 		_queue = radixSortLSD(_queue, a => a.char.sortOrder);
 		c10.clearRect(0, 0, this.cWidth, this.cHeight);
+		if(cSPB.drawHappened) {
+			 cSPB.clearRect(0, 0, this.cWidth, this.cHeight);
+			 cSPB.drawHappened = false;
+		}
 		offCtx.clearRect(0, 0, this.cWidth, this.cHeight);
 		if(__account.options.gore){
 			cGore.clearRect(0, 0, this.cWidth, this.cHeight);
@@ -3761,8 +3766,24 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 							this.drawRelatedObjects(_item, _preDraws);
 							const _cropped = this.getCroppedSprite(_item.spriteX, _item.spriteY, _item.spriteWidth, _item.spriteHeight, 
 								_item.char, _item.sprite.relativeSrc, _item.frameKey);
+							const _charCan = _anim.background ? cSPB : offCtx;
+							if(_anim.background) {
+								if(offCtx.reversed && !cSPB.reversed)
+								{
+									cSPB.reversed = true;
+									cSPB.save();
+									cSPB.scale(-1, 1);
+								}
+								else if(!offCtx.reversed && cSPB.reversed)
+								{
+									cSPB.reversed = false;
+									cSPB.restore();
+								}
+								if(!cSPB.drawHappened)
+									cSPB.drawHappened = true;
+							}
 							if(!_cropped)
-								offCtx.drawImage(_item.sprite, _item.spriteX, _item.spriteY,
+								_charCan.drawImage(_item.sprite, _item.spriteX, _item.spriteY,
 									_item.spriteWidth, _item.spriteHeight,
 									MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff)), 
 									MathRound(_item.top + _hDiff), 
@@ -3775,7 +3796,7 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 								_h = MathRound(_item.height * (_item.zoom ?? 1));
 								_coordsSet = 1;
 								this.drawCharacterGhost(_item,_cropped,_x,_y,_w,_h);
-								offCtx.drawImage(_cropped,_x,_y,_w,_h);
+								_charCan.drawImage(_cropped,_x,_y,_w,_h);
 								if(_item.char.chargeProperties) {
 									if(!_item.char.ghostData)
 										_item.char.ghostData = [];
@@ -3918,6 +3939,10 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 		if(c10.reversed) {
 			c10.restore();
 			c10.reversed = false;
+		}
+		if(cSPB.reversed) {
+			cSPB.restore();
+			cSPB.reversed = false;
 		}
 		c10.drawImage(this.offCanvas, 0, 0);
 		if (__account.options.gore){

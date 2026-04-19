@@ -3129,6 +3129,7 @@ const soundFiles = {
 	skillmove: './images/sounds/skill-move.mp3',
 	scoreup: './images/sounds/score-up.mp3',
 	eggfall: './images/sounds/egg-fall.mp3',
+	cliff: './images/sounds/cliff.mp3',
 	goblinkingtongue: './images/sounds/goblin-king-tongue.mp3',
 	goblinkingrelease: './images/sounds/goblin-king-release.mp3',
 	goblinkingenter: './images/sounds/goblin-king-enter.mp3',
@@ -4528,6 +4529,125 @@ const mapSprites = [
 			{ name: 'foreground', width: 5888, height: 1080, count:1, bottom: -610, foreground: true, zoom: 1.35, rate: 1 }
 		],
 		ground: { width: 5888, height: 1080, zoom: 1.065, yRate: 3.2, bottomGap: 120 }
+	},
+	{
+		id: 42, minLevel : 1,
+		coords: { 
+			title: 'Arena Ground',
+		 }, theme: 'arena', 
+		distance: 1, width: 6144,
+		cliffs: [
+			{ minYRate: 90, maxYRate: 100, minX: 1640, maxX: 2700 },
+			{ minYRate: 90, maxYRate: 100, minX: 3410, maxX: 4490 }
+		],
+		mobs: [
+			{
+				id: 626,
+				minX : 744,
+				maxX : 744,
+				zoom: .75,
+				yPosition: function() {
+					return groundheight;
+				},
+				do : function(_e) {
+					_e.drawPriority = .5;
+				}
+			},
+			{
+				id: 627,
+				minX : 5400,
+				maxX : 5400,
+				zoom: .75,
+				yPosition: function() {
+					return groundheight;
+				},
+				do : function(_e) {
+					_e.drawPriority = .5;
+				}
+			},
+			{
+				id: 628,
+				minX : 1840,
+				maxX : 1840,
+				yPosition: function() {
+					return 0;
+				},
+				do : function(_e) {
+					_e.drawPriority = .4;
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -445);
+				}
+			},
+			{
+				id: 629,
+				minX : 4700,
+				maxX : 4700,
+				yPosition: function() {
+					return 0;
+				},
+				do : function(_e) {
+					_e.drawPriority = .4;
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -445);
+				}
+			},
+			{
+				id: 625,
+				minX : 4697,
+				maxX : 4697,
+				zoom: 1.2,
+				yPosition: function() {
+					return 0;
+				},
+				do : function(_e) {
+					_e.drawPriority = .3;
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -468);
+				}
+			},
+			{
+				id: 625,
+				minX : 4849,
+				maxX : 4849,
+				zoom: .8,
+				yPosition: function() {
+					return groundheight;
+				},
+				do : function(_e) {
+					_e.drawPriority = .5;
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -252);
+				}
+			},
+			{
+				id: 625,
+				minX : 1842,
+				maxX : 1842,
+				zoom: 1.2,
+				yPosition: function() {
+					return 0;
+				},
+				do : function(_e) {
+					_e.drawPriority = .3;
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -468);
+				}
+			},
+			{
+				id: 625,
+				minX : 1704,
+				maxX : 1704,
+				zoom: .8,
+				yPosition: function() {
+					return groundheight;
+				},
+				do : function(_e) {
+					_e.drawPriority = .5;
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -244);
+				}
+			}
+		],
+		tiles: [
+			{ name: 'bg', width: 6144, height: 1080, count:1, bottom: -610, zoom: 1.065, rate: .85 },
+			{ name: 'ground', width: 6144, height: 1080, count:1, bottom: -610, zoom: 1.065, rate: 1 },
+			{ name: 'fg', width: 6144, height: 1080, count:1, bottom: -610, foreground: true, zoom: 1.065, rate: 1 }
+		],
+		ground: { width: 6144, height: 1080, zoom: 1.065, yRate:3.1, bottomGap: 220 }
 	},
 	{
 		id: 999, still: true, tower: true, minLevel : 1,
