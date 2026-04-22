@@ -63,6 +63,17 @@ function map(_m) {
 	this.loadObjects = _m.loadObjects;
 	this.loadEnemies = _m.loadEnemies;
 	this.cliffs = _mapSprite.cliffs;
+	this.blocks = _mapSprite.blocks;
+	this.playGrounds = _mapSprite.playGrounds;
+	if(this.playGrounds) {
+		this.playGrounds.forEach(x => {
+			x.minX = MathRound(x.minX * __zoom);
+			x.maxX = MathRound(x.maxX * __zoom);
+			x.bottomGap = MathRound(x.bottomGap * __zoom);
+		});
+	}
+	else
+		this.playGrounds = [];
 	this.enemies = [];
 	this.seenEnemies = [];
 	this.activeSpells = [];
@@ -3568,6 +3579,10 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			 cSPB.clearRect(0, 0, this.cWidth, this.cHeight);
 			 cSPB.drawHappened = false;
 		}
+		if(cFGA.drawHappened) {
+			 cFGA.clearRect(0, 0, this.cWidth, this.cHeight);
+			 cFGA.drawHappened = false;
+		}
 		offCtx.clearRect(0, 0, this.cWidth, this.cHeight);
 		if(__account.options.gore){
 			cGore.clearRect(0, 0, this.cWidth, this.cHeight);
@@ -3766,8 +3781,8 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 							this.drawRelatedObjects(_item, _preDraws);
 							const _cropped = this.getCroppedSprite(_item.spriteX, _item.spriteY, _item.spriteWidth, _item.spriteHeight, 
 								_item.char, _item.sprite.relativeSrc, _item.frameKey);
-							const _charCan = _anim.background ? cSPB : offCtx;
-							if(_anim.background) {
+							const _charCan = _item.background ? cSPB : (_item.foreground ? cFGA : offCtx);
+							if(_item.background) {
 								if(offCtx.reversed && !cSPB.reversed)
 								{
 									cSPB.reversed = true;
@@ -3781,6 +3796,21 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 								}
 								if(!cSPB.drawHappened)
 									cSPB.drawHappened = true;
+							}
+							else if(_item.foreground) {
+								if(offCtx.reversed && !cFGA.reversed)
+								{
+									cFGA.reversed = true;
+									cFGA.save();
+									cFGA.scale(-1, 1);
+								}
+								else if(!offCtx.reversed && cFGA.reversed)
+								{
+									cFGA.reversed = false;
+									cFGA.restore();
+								}
+								if(!cFGA.drawHappened)
+									cFGA.drawHappened = true;
 							}
 							if(!_cropped)
 								_charCan.drawImage(_item.sprite, _item.spriteX, _item.spriteY,
@@ -3943,6 +3973,10 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 		if(cSPB.reversed) {
 			cSPB.restore();
 			cSPB.reversed = false;
+		}
+		if(cFGA.reversed) {
+			cFGA.restore();
+			cFGA.reversed = false;
 		}
 		c10.drawImage(this.offCanvas, 0, 0);
 		if (__account.options.gore){
@@ -5344,6 +5378,42 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 	}
 	setBusyState(!(this.menu || this.lobby));
 	this.initLightRadiusLayer();
+	this.getMinPositionY = function(_e) {
+		if(!this.playGrounds)
+			return { y:minPositionY };
+		const _eCenter = _e.HURTLEFT + _e._HURTBOX_half + platformX;
+		const _oldCenter = _e.oldHURTLEFT + _e._HURTBOX_half;
+		for(let _pg of this.playGrounds) {
+			if(_eCenter >= _pg.minX && _eCenter <= _pg.maxX){
+				if(_pg.round) {
+					const _dist = MathAbs(_pg.minX - _pg.maxX);
+					const _rate = (_dist * _pg.round.rate);
+					if(_pg.round.dir === __right) {
+						const _esik = (_pg.maxX - _rate);
+						if(_eCenter > _esik)
+							return { 
+								//noXRate: _oldCenter < _eCenter, 
+								y:MathRound(((_eCenter - _esik) * minPositionY) / _rate)
+							};
+					}	
+					else {
+						const _esik = (_pg.minX + _rate);
+						if(_eCenter < _esik)
+							return { 
+								//noXRate: _oldCenter > _eCenter, 
+								y:MathRound(((_esik - _eCenter) * minPositionY) / _rate)
+							};
+					}	
+					return { y:_pg.bottomGap };
+				}
+				return { y:_pg.bottomGap};
+			}
+			else {
+				
+			}
+		}
+		return { y:minPositionY };
+	}
 	this.resize = function() {
 		const _ms = mapSprites.find(x => x.id == this.season);
 		this.width = MathRound((_ms.width) * __zoom);
@@ -5366,6 +5436,17 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 		this.cUIWidth = _canvas.width * __scale;
 		this.dmgFrameHeight = this.cHeight / 20;
 		this.dmgFrameTopBoundary = MathRound(this.cHeight * .15);
+		if(this.blocks) {
+			this.blocks.forEach(x => {
+				x.x = MathRound(x.l * __zoom);
+				x.y = MathRound(x.t * __zoom);
+				x.width = MathRound(x.w * __zoom);
+				x.height = MathRound(x.h * __zoom);
+			});
+			this.hasBlocks = true;
+		}
+		else
+			this.hasBlocks = false;
 		this.RECT = { 
 			left: 0, 
 			right: this.cWidth,

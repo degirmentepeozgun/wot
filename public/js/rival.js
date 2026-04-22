@@ -35720,7 +35720,7 @@ const _allEnemies = {
 					type: 'skill',
 					attack: true,
 					cooldown: 5000,
-					priority: 4,
+					priority: 3,
 					frames: [
 						{
 							spriteLeft: 1245,
@@ -35768,7 +35768,7 @@ const _allEnemies = {
 					hold:true,
 					cooldown: 5000,
 					chargeDistance: { value: 35, untilFrame: 1 },
-					priority: 3,
+					priority: 2,
 					frames: [
 						{
 							spriteLeft: 32,
@@ -38296,6 +38296,9 @@ const _allEnemies = {
 							spriteWidth: 87,
 							spriteHeight: 100,
 							spriteOrigin: 44,
+							objects: [
+								{ key: 'glow', position: 'canvas', p1: { x:0, y:80, r: 80, speed:8, from: '#D8BFD8ba', to: '#DA70D670' } },
+							],
 							speed: 4
 						},
 						{
@@ -38720,7 +38723,7 @@ const _allEnemies = {
 							spriteLeft: 0,
 							spriteTop: 0,
 							spriteWidth: 127,
-							spriteHeight: 139,
+							spriteHeight: 95,
 							spriteOrigin: 64,
 							speed: 999
 						}
@@ -38767,7 +38770,7 @@ const _allEnemies = {
 							spriteLeft: 0,
 							spriteTop: 0,
 							spriteWidth: 127,
-							spriteHeight: 139,
+							spriteHeight: 81,
 							spriteOrigin: 64,
 							speed: 999
 						}
@@ -38800,6 +38803,343 @@ const _allEnemies = {
 			hasShadow: false,
 			skipHealthBar: true,
 			src: './images/sprites/ep629/',
+			buffs: []
+		};
+	},
+	enemy630: function () {
+		return {
+			animations: {
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							objects: [
+								{ key: 'glow', position: 'canvas', p1: { x:0, y:80, r: 80, speed:8, from: '#D8BFD899', to: '#DA70D640' } },
+							],
+							speed: 4
+						},
+						{
+							spriteLeft: 87,
+							spriteTop: 0,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 2,
+							spriteTop: 0,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 3,
+							spriteTop: 0,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 4,
+							spriteTop: 0,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+
+						{
+							spriteLeft: 0,
+							spriteTop: 125,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87,
+							spriteTop: 125,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 2,
+							spriteTop: 125,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 3,
+							spriteTop: 125,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 4,
+							spriteTop: 125,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+
+						
+						{
+							spriteLeft: 0,
+							spriteTop: 125 * 2,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87,
+							spriteTop: 125 * 2,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 2,
+							spriteTop: 125 * 2,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 3,
+							spriteTop: 125 * 2,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 4,
+							spriteTop: 125 * 2,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						
+						{
+							spriteLeft: 0,
+							spriteTop: 125 * 3,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87,
+							spriteTop: 125 * 3,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 2,
+							spriteTop: 125 * 3,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 3,
+							spriteTop: 125 * 3,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 4,
+							spriteTop: 125 * 3,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						
+						{
+							spriteLeft: 0,
+							spriteTop: 125 * 4,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87,
+							spriteTop: 125 * 4,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 2,
+							spriteTop: 125 * 4,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 3,
+							spriteTop: 125 * 4,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 4,
+							spriteTop: 125 * 4,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						
+						{
+							spriteLeft: 0,
+							spriteTop: 125 * 5,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87,
+							spriteTop: 125 * 5,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 2,
+							spriteTop: 125 * 5,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 3,
+							spriteTop: 125 * 5,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 4,
+							spriteTop: 125 * 5,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						
+						{
+							spriteLeft: 0,
+							spriteTop: 125 * 6,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87,
+							spriteTop: 125 * 6,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 2,
+							spriteTop: 125 * 6,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 3,
+							spriteTop: 125 * 6,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 87 * 4,
+							spriteTop: 125 * 6,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 125 * 7,
+							spriteWidth: 87,
+							spriteHeight: 100,
+							spriteOrigin: 44,
+							speed: 4
+						}
+					]
+				},
+			},
+			key: 'prpflmdrk-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 5,
+			id: 630,
+			healtbarGap: 0,
+			name: 'Purple Flame',
+			class: 'object',
+			level: 1,
+			direction: 'left',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1,
+			width: 87,
+			height: 100,
+			maxHP: 100,
+			atk: 100,
+			def: 100,
+			invulnerable: true,
+			stepX: 0,
+			weight: 1000,
+			stepXRate: 0,
+			still: true,
+			immobilize: true,
+			noDirection: true,
+			hasShadow: false,
+			skipHealthBar: true,
+			src: './images/sprites/ep630/',
 			buffs: []
 		};
 	},

@@ -6928,7 +6928,7 @@ const __stories = [
 				minLevel: 1,
 				maps: [11],
 				timer: {
-					ms: 200000,
+					ms: 3000, //200000,
 					after: function() {
 						if(episode.phase > 99)
 							return;
@@ -8021,7 +8021,7 @@ const __stories = [
 							// __storyPlaying = false;
 							// installStoryFinish();
 							episode.pauseBgMusic(1);
-							let _x = MathRound((mainCharacter.left + platformX + (mainCharacter.WIDTH * (mainCharacter.direction === __left ? -1 : 1))) / __zoom);
+							let _x = MathRound((mainCharacter.left + platformX + (mainCharacter.WIDTH * 3 * (mainCharacter.direction === __left ? -1 : 1))) / __zoom);
 							const _maxX = MathRound((episode.width - (episode.cWidth * .5)) / __zoom);
 							if(_x > _maxX)
 								_x = _maxX;
@@ -8085,16 +8085,16 @@ const __stories = [
 					}
 				],
 				mobs: [
-					{
-						id: 619,
-						minX: 4000,
-						maxX: 6000,
-						count: 2,
-						sight: 1000,
-						spawn: 1,
-						hp:60,
-						experience: 500
-					},
+					// {
+					// 	id: 619,
+					// 	minX: 4000,
+					// 	maxX: 6000,
+					// 	count: 2,
+					// 	sight: 1000,
+					// 	spawn: 1,
+					// 	hp:60,
+					// 	experience: 500
+					// },
 					// {
 					// 	id: 621,
 					// 	minX: 4000,
@@ -8423,7 +8423,7 @@ const __stories = [
 							episode.phase = 103;
 							updateQuestArea();
 							episode.pauseBgMusic(1);
-							let _x = MathRound((mainCharacter.left + platformX + (mainCharacter.WIDTH * (mainCharacter.direction === __left ? -1 : 1))) / __zoom);
+							let _x = MathRound((mainCharacter.left + platformX + (mainCharacter.WIDTH * 3 * (mainCharacter.direction === __left ? -1 : 1))) / __zoom);
 							const _maxX = MathRound((episode.width - (episode.cWidth * .5)) / __zoom);
 							if(_x > _maxX)
 								_x = _maxX;
@@ -8871,7 +8871,7 @@ const __stories = [
 				]
 			},
 			{
-				map: 1,
+				map: 42,
 				actions: [	{
 						when: function() {
 							return episode.phase === 2 && 
@@ -8929,7 +8929,7 @@ const __stories = [
 						opponents.push(_e);
 					}
 					episode.loadCharacterSprites(function() {}, [10, 48], null, 1);
-					createWar(opponents, 1, 1, 1, 300, function() {
+					createWar(opponents, 42, 1, 1, 300, function() {
 						mainCharacter.startPlatformX = platformX;
 						episode.skipPvPFinalScreen = 1;
 						episode.phase = 1;

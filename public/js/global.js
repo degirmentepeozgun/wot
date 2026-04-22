@@ -4535,119 +4535,174 @@ const mapSprites = [
 		coords: { 
 			title: 'Arena Ground',
 		 }, theme: 'arena', 
-		distance: 1, width: 6144,
+		distance: 1, width: MathRound(6144 * 1.065),
+		playGrounds: [
+			{ minX: 0, maxX:1700, bottomGap: 20, round: { rate: .44, dir: __right} },
+			{ minX: MathRound(4544 * 1.065), round: { rate: .44, dir: __left}, maxX:MathRound(6144 * 1.065), bottomGap: 20 },
+		],
+		// blocks: [
+		// 	{
+		// 		l:1750, t:0, h:250, w:3010
+		// 	}
+		// ],
 		cliffs: [
-			{ minYRate: 90, maxYRate: 100, minX: 1640, maxX: 2700 },
-			{ minYRate: 90, maxYRate: 100, minX: 3410, maxX: 4490 }
+			{ minYRate: 90, maxYRate: 100, minX: 1900, maxX: 2700, background: true },
+			{ minYRate: 90, maxYRate: 100, minX: 3400, maxX: 4200, background: true },
+			{ minYRate: 0, maxYRate: 10, minX: 2000, maxX: 2850, foreground: true },
+			{ minYRate: 0, maxYRate: 10, minX: 3300, maxX: 4150, foreground: true }
 		],
 		mobs: [
 			{
 				id: 626,
-				minX : 744,
-				maxX : 744,
+				minX : 560,
+				maxX : 560,
 				zoom: .75,
 				yPosition: function() {
 					return groundheight;
 				},
 				do : function(_e) {
+					_e.positionable = true;
 					_e.drawPriority = .5;
 				}
 			},
 			{
 				id: 627,
-				minX : 5400,
-				maxX : 5400,
+				minX : 6000,
+				maxX : 6000,
 				zoom: .75,
 				yPosition: function() {
 					return groundheight;
 				},
 				do : function(_e) {
+					_e.positionable = true;
 					_e.drawPriority = .5;
 				}
 			},
 			{
 				id: 628,
-				minX : 1840,
-				maxX : 1840,
+				minX : 1741,
+				maxX : 1741,
+				zoom: 1.75,
 				yPosition: function() {
 					return 0;
 				},
 				do : function(_e) {
+					_e.positionable = true;
 					_e.drawPriority = .4;
-					_e.animations.idle.frames.forEach(x => x.bottomGap = -445);
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -235);
 				}
 			},
 			{
-				id: 629,
-				minX : 4700,
-				maxX : 4700,
+				id: 628,
+				minX : 4812,
+				maxX : 4812,
+				zoom: 1.75,
 				yPosition: function() {
 					return 0;
 				},
 				do : function(_e) {
+					_e.positionable = true;
 					_e.drawPriority = .4;
-					_e.animations.idle.frames.forEach(x => x.bottomGap = -445);
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -235);
 				}
 			},
 			{
 				id: 625,
-				minX : 4697,
-				maxX : 4697,
-				zoom: 1.2,
+				minX : 4810,
+				maxX : 4810,
+				zoom: 1.5,
 				yPosition: function() {
 					return 0;
 				},
 				do : function(_e) {
+					_e.positionable = true;
 					_e.drawPriority = .3;
-					_e.animations.idle.frames.forEach(x => x.bottomGap = -468);
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -362);
 				}
 			},
 			{
-				id: 625,
-				minX : 4849,
-				maxX : 4849,
+				id: 630,
+				minX : 4848,
+				maxX : 4848,
 				zoom: .8,
 				yPosition: function() {
 					return groundheight;
 				},
 				do : function(_e) {
+					_e.positionable = true;
 					_e.drawPriority = .5;
 					_e.animations.idle.frames.forEach(x => x.bottomGap = -252);
 				}
 			},
 			{
 				id: 625,
-				minX : 1842,
-				maxX : 1842,
-				zoom: 1.2,
+				minX : 1739,
+				maxX : 1739,
+				zoom: 1.5,
 				yPosition: function() {
 					return 0;
 				},
 				do : function(_e) {
+					_e.positionable = true;
 					_e.drawPriority = .3;
-					_e.animations.idle.frames.forEach(x => x.bottomGap = -468);
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -362);
 				}
 			},
 			{
-				id: 625,
-				minX : 1704,
-				maxX : 1704,
+				id: 630,
+				minX : 1703,
+				maxX : 1703,
 				zoom: .8,
 				yPosition: function() {
 					return groundheight;
 				},
 				do : function(_e) {
+					_e.positionable = true;
 					_e.drawPriority = .5;
 					_e.animations.idle.frames.forEach(x => x.bottomGap = -244);
 				}
-			}
+			},
+			// {
+			// 	id: 9999,
+			// 	minX : 1700,
+			// 	maxX : 1700,
+			// 	zoom: 1,
+			// 	yPosition: function() {
+			// 		return 0;
+			// 	},
+			// 	do : function(_e) {
+			// 		_e.animations.idle.frames.forEach(x => {
+			// 			x.spriteWidth = 2800;
+			// 			x.spriteHeight = 200;
+			// 			x.spriteOrigin = 1400;
+			// 			delete x.objects;
+			// 		});
+			// 		_e.yGap = MathRound(200 * __zoom);
+			// 		_e.relatedObjects = [];
+			// 		_e.solid = true;
+			// 		_e.width = 2800;
+			// 		_e.height = 200;
+			// 		_e.block = 1;
+			// 		_e._HURTBOX = {
+			// 			w: MathRound(_e.width * _e.getZoom()),
+			// 			h: MathRound(_e.height * _e.getZoom())
+			// 		};
+			// 		if(_e._HURTBOX.w % 2 > 0)
+			// 			_e._HURTBOX.w += 1;
+			// 		_e.HURTWIDTH = _e._HURTBOX.w;
+			// 		_e._HURTBOX_half = MathRound(_e._HURTBOX.w / 2);
+			// 		episode.hasSolid = true;
+			// 		// _e.drawPriority = .5;
+			// 		// _e.animations.idle.frames.forEach(x => x.bottomGap = -244);
+			// 	}
+			// }
 		],
 		tiles: [
 			{ name: 'bg', width: 6144, height: 1080, count:1, bottom: -610, zoom: 1.065, rate: .85 },
 			{ name: 'ground', width: 6144, height: 1080, count:1, bottom: -610, zoom: 1.065, rate: 1 },
 			{ name: 'fg', width: 6144, height: 1080, count:1, bottom: -610, foreground: true, zoom: 1.065, rate: 1 }
 		],
-		ground: { width: 6144, height: 1080, zoom: 1.065, yRate:3.1, bottomGap: 220 }
+		ground: { width: 6144, height: 1080, zoom: 1.065, yRate:3.1, bottomGap: 300 }
 	},
 	{
 		id: 999, still: true, tower: true, minLevel : 1,

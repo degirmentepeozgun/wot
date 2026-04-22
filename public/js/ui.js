@@ -480,6 +480,8 @@ function loadWindowEvents() {
 										_anm.coolDownStart2 += _diff;
 								}
 							});
+						if(episode.mobPhaseTick)
+							episode.mobPhaseTick += _diff;
 					}
 					organizeModules();
 					episodeVisibilityHidden = false;
@@ -545,6 +547,8 @@ function loadWindowEvents() {
 										_anm.coolDownStart2 += _diff;
 								}
 							});
+						if(episode.mobPhaseTick)
+							episode.mobPhaseTick += _diff;
 				}
 				episodeVisibilityHidden = false;
 				if(episode && episode.bgMusic)
@@ -2219,7 +2223,8 @@ function organizeScreenResize() {
 function setWindowVariables() {
 	const __r = document.querySelector(':root');
 		//const __rs = getComputedStyle(__r);
-	
+	// if(!_gamePad)
+	// 	_gamePad = document.getElementById('game-pad');
 	_canvas.width = _canvas1.width = _canvasB.width = _canvasGore.width = _canvasBRB.width = _canvasSPB.width = _canvas3.width = _canvas5.width = 
 	_canvasF.width = _canvasS.width = _canvasDMG.width = _canvasR.width = MathRound(_gamePad.offsetWidth / __scale);
 	const root = document.querySelector(':root');

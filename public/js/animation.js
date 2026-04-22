@@ -86,6 +86,7 @@ function animation(_a) {
 	this.uncounterable = _a.uncounterable;
 	this.before = _a.before;
 	this.background = _a.background;
+	this.foreground = _a.foreground;
 	this.next = _a.next;
 	this.realNext = this.next;
 	this.move = _a.move;

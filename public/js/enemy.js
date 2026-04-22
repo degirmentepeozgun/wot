@@ -927,8 +927,11 @@ function enemy(_e) {
 		const my = this.getMaxYPosition()
 		if (_y > my)
 			_y = MathFloor(my);
-		else if (_y < minPositionY)
-			_y = minPositionY;
+		else {
+			const _minY = episode.getMinPositionY(this);
+			if (_y < _minY.y)
+				_y = _minY.y;
+		}
         return { x: _x, y: _y };
     }
     this.getAttackMsByDifficulty = function() {
@@ -5831,13 +5834,22 @@ function enemy(_e) {
 			)
 		);
 	}
-	this.installFall = function(_perc) {
+	this.installFall = function(_cliff) {
 		this.animations.dead = new animation(
 			createFall(this)
 		);
 		this.animations.dead.key = 'dead';
-		this.animations.dead.zoom = _perc > 50 ? .95 : 1.05;
-		this.animations.dead.background = true;
+		this.animations.dead.zoom = _cliff.background ? .95 : 1.05;
+		if(_cliff.background)
+			this.animations.dead.frames.forEach(x => {
+				if(x.extraStepYRate < 0 || x.extraStepYRate === undefined)
+					x.background = true;
+			});
+		else
+			this.animations.dead.frames.forEach(x => {
+				if(x.extraStepYRate < 0 || x.extraStepYRate === undefined)
+					x.foreground = true;
+			});
 	}
 	this.smash = function(_t, _f) {
 		_f = _f ?? this.getCurrentFrame();
@@ -6454,12 +6466,16 @@ function enemy(_e) {
 		const _thisCenter = (this.HURTLEFT + this._HURTBOX_half + platformX) / __zoom;
 		let _y = this.yPosition;
 		const _maxY = getGroundHeight();
-		const _halfY = _maxY / 2;
+		const _minY = ((episode.ground?.bottomGap ?? 0) * __zoom);
+		if(_minY > 0)
+			_y -= _minY;
+		const _yArea = (_maxY - _minY);
+		const _halfY = _yArea / 2;
 		if(_y <= _halfY)
 			_y -= this.yGap;
 		else
 			_y += this.yGap;
-		let _perc = (_y / _maxY) * 100;
+		let _perc = (_y / _yArea) * 100;
 		if(_perc < 0)
 			_perc = 0;
 		else if(_perc > 100)
@@ -6468,12 +6484,11 @@ function enemy(_e) {
 			if(_thisCenter >= _cliff.minX && _thisCenter <= _cliff.maxX && 
 				_perc >= _cliff.minYRate && _perc <= _cliff.maxYRate
 			) {
-				this.installFall(_perc);
-				const _r = getRandomValue2(3, 6);
+				this.installFall(_cliff);
 				if(_heavy) {
 					this.animations.dead.frames.forEach(x => {
 						if(x.extraStepXRate) {
-							x.extraStepXRate *= _r;
+							x.extraStepXRate *= 2;
 						}
 					});
 				}
@@ -7514,7 +7529,7 @@ function enemy(_e) {
 		if(_solidity && _solidity.moveY === 0){
 			return;
 		}
-		if(_touch && this.yPosition === this.autoTarget.yPosition){
+		if(_touch && this.yPosition === this.autoTarget?.yPosition){
 			return;
 		}
 		if(!this.verticalStep || _touch)
@@ -7573,14 +7588,16 @@ function enemy(_e) {
 			_speedRate /= _fps;
 		this.extraStepYRate = this.stop ? 0 : (this.extraStepYRate ?? 0) + (_speedRate * (_frame.extraStepYRate ?? 0));
 		let _stepY = this.puppetMode ? 0 : MathRound(this.extraStepYRate * (episode.cHeight / 100));
-		const _solidity = this.isRunningAgainstSolidObject();
+		const _solidity = episode.hasBlocks ? this.isRunningAgainstBlockObject() : this.isRunningAgainstSolidObject();
 		if (!_anima) {
 			this.idle(8);
 			_anima = this.getCurrentAnimation();
 			_frame = this.getCurrentFrame();
 		}
-		if (_anima.mobilityY && !this.still)
-			this.limitYPosition();
+		//if (_anima.mobilityY && !this.still)
+		const _limitYResult = this.limitYPosition();
+		if(_limitYResult)
+			_noXRate = 1;
 		let _xRate = 0, _extraX = ((this.extraStepXRate ? this.extraStepXRate : (_solidity?.moveX ? this.calculateMoveXStep() : 0)) ?? 0) * _speedRate;
 		if (this.turned)
 			_extraX = 0;
@@ -7649,26 +7666,6 @@ function enemy(_e) {
 				//let _oldYPosition = this.yPosition;;
 				if ((_anima.mobilityY || _noXRate) && !this.still && !this.puppetMode)
 					this.calculateYStepAndMove(_solidity, _noXRate);
-				// _top -= this.yPosition;
-				// _top -= _stepY;
-				// const _coords = this.isRunningAgainstSolidObject2(this.left - _oldLeft, this.yPosition - _oldYPosition);
-				// if(_coords && _coords.l !== 0) {
-				// 	this.left = _oldLeft + (((_reversed || _anima.reversed) && !(_reversed && _anima.reversed)) ? - 1 * _coords.l : _coords.l);
-				// 	_left = this.left + _xDiff;
-				// }
-				// if(_coords && _coords.t !== 0) {
-				// 	_top += (this.yPosition - (_oldYPosition + _coords.t));
-				// 	this.yPosition = _oldYPosition + _coords.t;
-				// }
-				// if(_coords && _coords.t !== 0){
-				// 	console.log('1 - ' + _top + ', ' + _coords.t + ', ' + this.yPosition);
-				// 	_top = _coords.t;
-				// 	this.yPosition = MathRound(_canvas.height - _top - this.HEIGHT);
-				// 	_oldYPosition = this.yPosition;
-				// 	this.limitYPosition();
-				// 	_top += (_oldYPosition - this.yPosition);
-				// 	console.log('2 - ' + _top + ', ' + this.yPosition);
-				// }
 				if (_frame.objects)
 					for (var _o of _frame.objects)
 						if (!_o.hurt)
@@ -7778,6 +7775,8 @@ function enemy(_e) {
 							shadow: _frame.hasShadowBehind ? (_frame.shadow ?? '#000000') : undefined,
 							left: _left,
 							top: _top,
+							background: _frame.background ?? _anima.background,
+							foreground: _frame.foreground ?? _anima.foreground,
 							width: _frame.spriteWidth * this.ZOOM,
 							height: _frame.spriteHeight * this.ZOOM,
 							yGap: _stepY ?? 0,
@@ -7795,7 +7794,7 @@ function enemy(_e) {
 				console.log(xxxxxx.message);
 			}
 		}
-		if(this.solid)
+		if(this.solid || episode.hasSolid)
 			this.centerSolid = this.getCenterSolid();
 		if(_frame.hitZoom) {
 			_frame.hitZoom -= 0.025;
@@ -7803,6 +7802,7 @@ function enemy(_e) {
 				delete _frame.hitZoom;
 		}
 		this.oldYPosition = this.yPosition;
+		this.oldHURTLEFT = this.HURTLEFT + platformX;
 	}
 	this.getCenterSolid = function() {
 		let _top = this.TOP;
@@ -7829,78 +7829,13 @@ function enemy(_e) {
 		const my = this.getMaxYPosition()
 		if (this.yPosition > my)
 			this.yPosition = MathFloor(my);
-		else if (this.yPosition < minPositionY)
-			this.yPosition = minPositionY;
-	}
-	this.isRunningAgainstSolidObject2 = function(_sX, _sY) {
-		if(this.main)
-			return false;
-		if(!this.animations.run && !this.animations.walk)
-			return false;
-		if(this.animation !== 'run' && this.animation !== 'walk')
-			return false;
-		const _stepX = MathAbs(_sX), _stepY = MathAbs(_sY);
-		const _solids = episode.seenEnemies.filter(x => x.centerSolid && x.solid && !x.remove && !x.isDead() && x !== this);
-		if(_solids?.[0]) {
-			let _points = [];
-			const _targetCenter = this.autoTarget?.centerSolid;
-			_points.push({linc: -_stepX, l: this.centerSolid.l - _stepX, x:this.centerSolid.x - _stepX, t: this.centerSolid.t - _stepY, y: this.centerSolid.y - _stepY, tinc: -_stepY});
-			_points.push({linc: -_stepX, l: this.centerSolid.l - _stepX, x:this.centerSolid.x - _stepX, t: this.centerSolid.t, y: this.centerSolid.y, tinc: 0});
-			_points.push({linc: -_stepX, l: this.centerSolid.l - _stepX, x:this.centerSolid.x - _stepX, t: this.centerSolid.t + _stepY, y: this.centerSolid.y + _stepY, tinc: _stepY});
-			_points.push({linc: 0, l: this.centerSolid.l, x:this.centerSolid.x, t: this.centerSolid.t - _stepY, y: this.centerSolid.y - _stepY, tinc: -_stepY});
-			_points.push({linc: 0, l: this.centerSolid.l, x:this.centerSolid.x, t: this.centerSolid.t + _stepY, y: this.centerSolid.y + _stepY, tinc: _stepY});
-			_points.push({linc: _stepX, l: this.centerSolid.l + _stepX, x:this.centerSolid.x + _stepX, t: this.centerSolid.t - _stepY, y: this.centerSolid.y - _stepY, tinc: -_stepY});
-			_points.push({linc: _stepX, l: this.centerSolid.l + _stepX, x:this.centerSolid.x + _stepX, t: this.centerSolid.t, y: this.centerSolid.y, tinc: 0});
-			_points.push({linc: _stepX, l: this.centerSolid.l + _stepX, x:this.centerSolid.x + _stepX, t: this.centerSolid.t + _stepY, y: this.centerSolid.y + _stepY, tinc: _stepY});
-			//const _enemies = episode.enemies.filter(x => x.centerSolid && x !== this && x.solid && !x.isDead() && !x.remove);
-
-			for(const _solid of _solids)
-				if(this.centerSolid) {
-					let _len = _points.length;
-					for(let i = 0; i < _len;) {
-						let _point = _points[i];
-						if(this.isPointIntersectWithSolidObjects(_point, _solid, this.centerSolid.w, this.centerSolid.h)){
-							//point is safe
-							//_okPoints.push(_point);
-							_points.splice(i , 1);
-							_len--;
-						}
-						else
-							i++;
-					}
-					if(!_len)
-						break;
-				}
-			let _point;
-			if(!_points?.[0]) {
-				delete this.nextPoint;
-				return { l:-_sX, t: _sY };
-			}
-			else if(_points.length === 8) {
-				return { l:0, t:0 };
-			}
-			else if(_targetCenter){
-				_points = _points.sort((a, b) =>
-					(Math.sqrt(Math.pow(MathAbs(a.x - _targetCenter.x), 2) + Math.pow(MathAbs(a.y - _targetCenter.y), 2))) -
-					(Math.sqrt(Math.pow(MathAbs(b.x - _targetCenter.x), 2) + Math.pow(MathAbs(b.y - _targetCenter.y), 2)))
-				);
-				_point = _points[0];
-			}
-			else
-				_point = _points[getRandomValue(0, _points.length - 1)];
-			if(_point)
-				this.nextPoint = {
-					l: _point.linc,
-					t: _point.tinc,
-					h: this.centerSolid.h
-				};
+		else {
+			const _miny = episode.getMinPositionY(this);
+			if (!_miny.noXRate && this.yPosition < _miny.y)
+				this.yPosition = _miny.y;
+			//return _miny.noXRate;
 		}
-		// if(this.nextPoint)
-		// 	console.log((this.nextPoint.t + this.nextPoint.h) - this.getHeight(1));
-		return this.nextPoint ? {
-			l: this.nextPoint.l,
-			t: (this.nextPoint.t + this.nextPoint.h) - this.HEIGHT
-		} : { l:0, t:0 };
+		return undefined;
 	}
 	this.intersectRect = function(r1, r2) {
 		return !(r2.l > (r1.l + r1.w) ||
@@ -7908,6 +7843,7 @@ function enemy(_e) {
 		  r2.t > (r1.t + r1.h) ||
 		  (r2.t + r2.h) < r1.t);
 	}
+	
 	this.isPointIntersectWithSolidObjects = function(_point, _e, _pWidth, _pHeight) {
 		//for(let _e of _enemies) {
 			if(_e.nextPoint) {
@@ -8118,122 +8054,320 @@ function enemy(_e) {
 	// 		delete this.solidOne;
 	// 	return false;
 	// }
+	// this.isRunningAgainstBlockObject = function () {
+
+	// 	if (this.still || this.immobilize)
+	// 		return false;
+
+	// 	const inputX =
+	// 		this.moveDirection === __right || (this.oldHURTLEFT < (this.HURTLEFT + platformX)) ? 1 :
+	// 		this.moveDirection === __left || (this.oldHURTLEFT > (this.HURTLEFT + platformX)) ? -1 : 0;
+
+	// 	const inputYDir = this.getKeyboardYMove();
+	// 	const inputY =
+	// 		inputYDir === 'up' ? -1 :
+	// 		inputYDir === 'down' ? 1 : 0;
+
+	// 	const myLeft = this.HURTLEFT + platformX;
+	// 	const myRight = myLeft + this.HURTWIDTH;
+
+	// 	const myBottom = this.yPosition;
+	// 	const myTop = this.yPosition + this.yGap;
+
+	// 	let moveX = inputX;
+	// 	let moveY = inputY;
+
+	// 	// -------------------
+	// 	// X movement next
+	// 	// -------------------
+	// 	let nextLeft = myLeft + inputX;
+	// 	let nextRight = myRight + inputX;
+	// 	let nextBottom = myBottom - inputY;
+	// 	let nextTop = myTop - inputY;
+	// 	let overlap;
+	// 	for (let b of episode.blocks) {
+
+	// 		const bLeft = b.x;
+	// 		const bRight = b.x + b.width;
+	// 		const bBottom = b.y;
+	// 		const bTop = b.y + b.height;
+
+	// 		// next overlap (gerçek çarpışma durumu)
+	// 		const overlapX = nextRight > bLeft && nextLeft < bRight;
+	// 		const overlapY = nextTop > bBottom && nextBottom < bTop;
+	// 		if (overlapX && overlapY) {
+	// 			if(!overlap)
+	// 				overlap = true;
+	// 			// -------- X AXIS --------
+	// 			// -------- X AXIS --------
+	// 			if (inputX > 0 && myRight <= bRight) {
+	// 				moveX = 0;
+	// 			}
+
+	// 			if (inputX < 0 && myLeft >= bLeft) {
+	// 				moveX = 0;
+	// 			}
+
+	// 			// -------- Y AXIS --------
+	// 			if (inputY !== 0) {
+
+	// 				 if (inputY > 0) { // aşağı (y azalıyor)
+
+	// 					// sadece yukarıdan çarpıyorsan blokla
+	// 					if (myBottom >= bTop && nextBottom <= bTop) {
+	// 						moveY = 0;
+	// 					}
+
+	// 					// 🔥 kritik: zaten temas halindeysen ve aşağı gitmeye çalışıyorsan blokla
+	// 					else if (myBottom <= bTop) {
+	// 						moveY = 0;
+	// 					}
+	// 				}
+
+	// 				if (inputY < 0) { // yukarı (y artıyor)
+
+	// 					if (myTop <= bBottom && nextTop >= bBottom) {
+	// 						moveY = 0;
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// 	if(!overlap)
+	// 		return false;
+	// 	//if(this.main)
+	// 	//	console.log('moveX = ' + moveX + ', moveY = ' + moveY);
+	// 	//if (moveX !== inputX || moveY !== inputY) {
+	// 		if(moveX < 0)
+	// 			moveX = MathAbs(moveX);
+	// 		return { moveX, moveY };
+	// 	//}
+	// 	//return false;
+	// };
+	this.isRunningAgainstBlockObject = function () {
+
+	if (this.still || this.immobilize)
+		return false;
+
+	const inputXDir = this.getKeyboardXMove() ?? 
+		(this.moveDirection === __right ? __right : this.moveDirection === __left ? __left : undefined);
+	const inputX =
+		inputXDir === __right || (this.oldHURTLEFT < (this.HURTLEFT + platformX)) ? 1 :
+		inputXDir === __left || (this.oldHURTLEFT > (this.HURTLEFT + platformX)) ? -1 : 0;
+
+	const inputYDir = this.getKeyboardYMove();
+	const inputY =
+		inputYDir === 'up' ? -1 :
+		inputYDir === 'down' ? 1 : 0;
+
+	const myLeft = this.HURTLEFT + platformX;
+	const myRight = myLeft + this.HURTWIDTH;
+	const myOriginY = this.yPosition + (this.yGap * .5);
+	const myBottom = this.yPosition;
+	const myTop = this.yPosition + this.yGap;
+
+	let moveX = inputX;
+	let moveY = inputY;
+	if(moveY)
+		console.log('test');
+	const _oldMoveX = moveX;
+	const _oldMoveY = moveY;
+	let nextLeft = myLeft + inputX;
+	let nextRight = myRight + inputX;
+	let nextBottom = myBottom - inputY;
+	let nextTop = myTop - inputY;
+
+	let overlap;
+
+	for (let b of episode.blocks) {
+
+		const bLeft = b.x;
+		const bRight = b.x + b.width;
+		const bBottom = b.y;
+		const bTop = b.y + b.height;
+		const bOriginY = bBottom + (b.height * .5);
+		const overlapX = nextRight > bLeft && nextLeft < bRight;
+		const overlapY = nextTop > bBottom && nextBottom < bTop;
+
+		if (overlapX && overlapY) {
+
+			overlap = true;
+			let _skipY;
+			// ======================
+			// X AXIS (FIXED)
+			// ======================
+			if (inputX > 0) {//sağ
+				// SADECE bloğa doğru gidiyorsan blokla
+				if (myRight <= bLeft || myLeft < bLeft) {
+					moveX = 0;
+					if(inputYDir)
+						_skipY = true;
+				}
+			}
+			else if (inputX < 0) {
+				if (myLeft >= bRight || myRight > bRight) {
+					moveX = 0;
+					if(inputYDir)
+						_skipY = true;
+				}
+			}
+			else {
+				moveX = 0;
+				if(inputYDir){
+					if ((myLeft >= bRight || myRight > bRight) 
+						|| 
+						(myRight <= bLeft || myLeft < bLeft)) {
+						_skipY = true;
+					}
+				}
+			}
+
+			if(!_skipY) {
+				if (inputY > 0) { // aşağı
+					// SADECE bloğa doğru gidiyorsan blokla
+					if(myOriginY > bOriginY) {
+						if (myBottom <= bTop || myTop < bTop) {
+							moveY = 0;
+						}
+					}
+				}
+				else if (inputY < 0) {
+					if(myOriginY < bOriginY) {
+						if (myTop >= bBottom || myBottom > bBottom) {
+							moveY = 0;
+						}
+					}
+				}
+				else
+					moveY = 0;
+			}
+		}
+	}
+
+	if (!overlap)
+		return false;
+
+	if(moveX === _oldMoveX && moveY === _oldMoveY)
+		return false;
+	if (moveX < 0)
+		moveX = MathAbs(moveX);
+	return { moveX, moveY };
+};
 	this.isRunningAgainstSolidObject = function () {
 
-    if (!episode.hasSolid) return false;
+		if (!episode.hasSolid) return false;
 
-    if (this.action?.y) {
-        return {
-            moveX: 1,
-            moveY: this.moveDirection === 'up' ? -1 : (this.moveDirection === 'down' ? 1 : 0)
-        };
-    }
+		if (this.action?.y) {
+			return {
+				moveX: 1,
+				moveY: this.moveDirection === 'up' ? -1 : (this.moveDirection === 'down' ? 1 : 0)
+			};
+		}
 
-    if (this.puppetMode) {
-        return { moveX: 1, moveY: 0 };
-    }
+		if (this.puppetMode) {
+			return { moveX: 1, moveY: 0 };
+		}
 
-    if ((!this.animations.run && !this.animations.walk) ||
-        (this.animation !== 'run' && this.animation !== 'walk'))
-        return false;
+		if (this.still || this.immobilize)
+			return false;
 
-    const enemies = episode.seenEnemies;
-    const thisCenter = this.centerSolid;
-    const thisNext = this.getCenterSolid();
+		const enemies = episode.seenEnemies;
+		const thisCenter = this.centerSolid;
+		const thisNext = this.getCenterSolid();
 
-    if (!thisCenter || !thisNext) return false;
+		if (!thisCenter || !thisNext) return false;
 
-    for (let i = 0; i < enemies.length; i++) {
+		for (let i = 0; i < enemies.length; i++) {
 
-        const solid = enemies[i];
+			const solid = enemies[i];
+			// ===== CHEAP FILTER =====
+			if (!solid.solid ||
+				solid.remove ||
+				solid === this ||
+				solid.isDead())
+				continue;
 
-        // ===== CHEAP FILTER =====
-        if (!solid.solid ||
-            solid.remove ||
-            solid === this ||
-            solid.isDead())
-            continue;
+			if (!solid.centerSolid) continue;
 
-        if (!solid.centerSolid) continue;
+			// ===== HEAVY CHECK SONRA =====
+			if (!isObjectsPassingOver(this, solid))
+				continue;
 
-        // ===== HEAVY CHECK SONRA =====
-        if (!isObjectsPassingOver(this, solid))
-            continue;
+			const s = solid.centerSolid;
+			let moveX = 1;
+			let moveY = 0;
 
-        const s = solid.centerSolid;
-        let moveX = 1;
-        let moveY = 0;
+			switch (this.moveDirection) {
 
-        switch (this.moveDirection) {
+				case __right:
+					if ((thisNext.l + thisNext.w) >= s.l &&
+						(thisNext.l + thisNext.w) < (s.l + thisNext.l)) {
 
-            case __right:
-                if ((thisNext.l + thisNext.w) >= s.l &&
-                    (thisNext.l + thisNext.w) < (s.l + thisNext.l)) {
+						moveX = 0;
 
-                    moveX = 0;
+						const y = this.getKeyboardYMove();
 
-                    const y = this.getKeyboardYMove();
-                    moveY = y === 'up' ? -1 :
-                            y === 'down' ? 1 :
-                            (thisNext.y < s.y ? -1 : 1);
-                }
-                break;
+						moveY = y === 'up' ? -1 :
+								y === 'down' ? 1 :
+								(thisNext.y < s.y ? -1 : 1);
+					}
+					break;
 
-            case __left:
-                if (thisNext.l <= (s.l + s.w) &&
-                    thisNext.l > s.l) {
+				case __left:
+					if (thisNext.l <= (s.l + s.w) &&
+						thisNext.l > s.l) {
 
-                    moveX = 0;
+						moveX = 0;
 
-                    const y = this.getKeyboardYMove();
-                    moveY = y === 'up' ? -1 :
-                            y === 'down' ? 1 :
-                            (thisNext.y < s.y ? -1 : 1);
-                }
-                break;
+						const y = this.getKeyboardYMove();
+						moveY = y === 'up' ? -1 :
+								y === 'down' ? 1 :
+								(thisNext.y < s.y ? -1 : 1);
+					}
+					break;
 
-            case 'down':
-                if ((thisNext.t + thisNext.h) >= s.t &&
-                    thisNext.t < (s.t + s.h)) {
+				case 'down':
+					if ((thisNext.t + thisNext.h) >= s.t &&
+						thisNext.t < (s.t + s.h)) {
 
-                    moveY = 0;
-                    moveX = 1;
-                } else {
-                    moveY = 1;
-                }
-                break;
+						moveY = 0;
+						moveX = 1;
+					} else {
+						moveY = 1;
+					}
+					break;
 
-            case 'up':
-                if (thisNext.t <= (s.t + s.h) &&
-                    (thisNext.t + thisNext.h) > s.t) {
+				case 'up':
+					if (thisNext.t <= (s.t + s.h) &&
+						(thisNext.t + thisNext.h) > s.t) {
 
-                    moveY = 0;
-                    moveX = 1;
-                } else {
-                    moveY = -1;
-                }
-                break;
-        }
+						moveY = 0;
+						moveX = 1;
+					} else {
+						moveY = -1;
+					}
+					break;
+			}
 
-        if (moveY === 2) {
-            this.limitYPosition();
-            moveY = 0;
-        }
+			if (moveY === 2) {
+				//this.limitYPosition();
+				moveY = 0;
+			}
 
-        if (moveY && this.enemy && !this.solidOne)
-            this.solidOne = moveY;
+			if (moveY && this.enemy && !this.solidOne)
+				this.solidOne = moveY;
 
-        return {
-            moveX: moveX,
-            moveY: this.solidOne ?? moveY
-        };
-    }
+			return {
+				moveX: moveX,
+				moveY: this.solidOne ?? moveY
+			};
+		}
 
-    if (this.solidOne)
-        delete this.solidOne;
+		if (this.solidOne)
+			delete this.solidOne;
 
-    return false;
-};
+		return false;
+	};
 
 	this.setNewStatus = function (_diff) {
 		return;

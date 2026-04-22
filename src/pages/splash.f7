@@ -21,6 +21,7 @@
 				<canvas id="damage-frames"></canvas>
 				<canvas id="obj-foreground"></canvas>
 				<div class="parallax" id="dobj-foreground"></div>
+				<canvas id="sprite-foreground"></canvas>
 				<div class="full canvas-alike" id="css-canvas-foreground"></div>
 			</div>
 			<div id="game-pad-left"></div>
@@ -215,8 +216,9 @@
 			_canvasS = document.getElementById('sprite-obj');
 			_cNPC = _canvasS.getContext('2d');
 			_canvasAnimated90 = document.getElementById('sprite-obj-90');
-			_canvasF = document.getElementById('obj-foreground');
+			_canvasF = document.getElementById('sprite-foreground');
 			c9 = _canvasF.getContext('2d');
+			cFGA = _canvasF.getContext('2d');
 			_canvas5 = document.getElementById('enemies');
 			c10 = _canvas5.getContext('2d');
 			_canvasDMG = document.getElementById('damage-frames');
