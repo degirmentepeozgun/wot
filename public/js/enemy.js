@@ -1065,7 +1065,7 @@ function enemy(_e) {
 
 		if (wrongSide && !slot.mustCross) {
 
-			this.releaseSlot(6);
+			this.releaseSlot();
 		}
 		// else if(!wrongSide && slot.placed) {
 		// 	const base = target._HURTBOX_half;
@@ -1116,10 +1116,10 @@ function enemy(_e) {
 	// 	this.slot = null;
 	// 	this.lookingAtTarget = false;
 	// };
-	this.releaseSlot = function (_num) {
+	this.releaseSlot = function (_force) {
 		const root = this.slot;
 		if (!root) return;
-		if(this.bestRing)
+		if(!_force && this.bestRing)
 			return;
 
 		const owner = root.owner;
@@ -1182,7 +1182,7 @@ function enemy(_e) {
     this.updateSlot = function() {
         const _slot = this.slot;
         if (!_slot || !_slot.owner) {
-            this.releaseSlot(1);
+            this.releaseSlot();
             return undefined;
         }
         const _target = _slot.owner;
@@ -1451,10 +1451,10 @@ function enemy(_e) {
 
 				// 🔥 STEAL varsa önce adamı düşür
 				if(bestSlot.occupied && bestSlot.occupant) {
-					bestSlot.occupant.releaseSlot(2);
+					bestSlot.occupant.releaseSlot();
 				}
 
-				this.releaseSlot(3);
+				this.releaseSlot();
 				bestSlot.occupied = true;
 				bestSlot.occupant = this;
 				this.slot = bestSlot;
@@ -1477,7 +1477,7 @@ function enemy(_e) {
         if(!this.animationFinished && this.animations[this.animation]?.attack)
             return;
         if(this.isDead()) {
-            this.releaseSlot(4);
+            this.releaseSlot(true);
             return;
         }
 		if(this.reactionStartTime && _gameTick < this.reactionStartTime)
@@ -1494,13 +1494,14 @@ function enemy(_e) {
             this.autoTarget.createSlots(1);
         }
 		if(this.touchDead && this.autoTarget && isObjectsInTouch(this, this.autoTarget).touch) {
+			this.toucher = this.autoTarget;
 			this.animate(this.deadAnimationKey ?? 'dead', 1);
 			return;
 		}
         const _away = this.animation === 'release'  || this.animation.startsWith('knockback') || this.invisible;
         if(((this.slot && (this.slot.owner?.isDead?.() || 
 			(!this.slot.support && this.slot.owner !== this.autoTarget))) || _away)){
-            this.releaseSlot(7);
+            this.releaseSlot();
         }
         let _anima = this.getCurrentAnimation();
         if ((_anima.hurt && !this.animationFinished && (!this.hasChain || this.noCounter)) || this.animation === 'release' || this.dying || this.dead || this.immobilize) {
@@ -2555,7 +2556,7 @@ function enemy(_e) {
 		if (this.class !== 'boss')
 			return;
 		if (this.isDead() && !this.minionsRemoved) {
-			episode.enemies?.filter(x => x.class === 'minion')?.forEach(x => x.remove = true);
+			episode.enemies?.filter(x => x.class === 'minion' && x.owner === this)?.forEach(x => x.remove = true);
 			this.minionsRemoved = 1;
 		}
 	}
@@ -3137,37 +3138,7 @@ function enemy(_e) {
 		}
 		this.checkExperience();
 		this.checkLoot(_currentFrame);
-		if(this.remove && this.respawnAfterSeconds && !this.respawnRequested) {
-			let _skip;
-			if(this.groupId && this.spawnAsGroup) {
-				if(episode.enemies?.find(x => x !== this && x.groupId === this.groupId && !x.remove))
-					_skip = 1;
-			}
-			if(!_skip) {
-				this.respawnRequested = 1;
-				if(!episode.respawners)
-					episode.respawners = [];
-				const _mobs = episode.mobs.filter(x => x.id === this.id && x.groupId === this.groupId && (x.spawnAsGroup || x.spawn));
-				for(let _mob of _mobs) {
-					if(_mob.spawnTimeStart >= 0) {
-						if(_mob.spawnTimeStart > 0)
-							_mob.spawnTimeStart--;
-						else
-							continue;
-					}
-					for(let i = 0; i < (_mob.spawn ? 1 : (_mob.count ?? 1)); i++){
-						if(_mob.spawnDirection)
-							_mob.spawnMinX = _mob.spawnMaxX = MathRound((_mob.spawnDirection === __right ? platformX + episode.cWidth  + ((getRandomValue2(100, 200) / 100) * (episode.cWidth * .2)) :  platformX  - ((getRandomValue2(100, 200) / 100) * (episode.cWidth  * .2))) / __zoom);
-						episode.respawners.push({id: _mob.id, spawnSettings: function() {
-							_mob.attacker = _mob.autoTarget = _mob.owner = undefined;
-							const _json = structuredClone2(_mob);
-							_json.count = 1;
-							return _json;
-						}(), date: _gameTick, ms: _mob.spawn * 1000});
-					}
-				}
-			}
-		}
+		//this.checkSpawn();
 		this.checkKillQuest();
 		if (this.main && !episode.lobby)
 			this.checkHealth();
@@ -3234,8 +3205,9 @@ function enemy(_e) {
 				if (!_anima.repeat) {
 					this.finishAnimation();
 					let _hasNextSkill;
-					if (this.animation.startsWith('dead') && (this.enemy || this.class === __spell))
+					if (this.animation.startsWith('dead') && (this.enemy || this.class === __spell)){
 						this.remove = _removeEnemy = true;
+					}
 					if (this.animation.startsWith('dead') && this.main)
 						repeatFrame = true;
 					else if (_anima.next === 'dead')
@@ -3284,8 +3256,42 @@ function enemy(_e) {
 				}
 			}
 		}
-		if (_removeEnemy && !episode.pvp)
+		if (_removeEnemy && !episode.pvp) {
 			this.remove = true;
+		}
+	}
+	this.checkSpawn = function() {
+		if(this.respawnAfterSeconds && !this.respawnRequested) {
+			let _skip;
+			if(this.groupId && this.spawnAsGroup) {
+				if(episode.enemies?.find(x => x !== this && x.groupId === this.groupId && !x.remove))
+					_skip = 1;
+			}
+			if(!_skip) {
+				this.respawnRequested = 1;
+				if(!episode.respawners)
+					episode.respawners = [];
+				const _mobs = episode.mobs.filter(x => x.id === this.id && x.groupId === this.groupId && (x.spawnAsGroup || x.spawn));
+				for(let _mob of _mobs) {
+					if(_mob.spawnTimeStart >= 0) {
+						if(_mob.spawnTimeStart > 0)
+							_mob.spawnTimeStart--;
+						else
+							continue;
+					}
+					for(let i = 0; i < (_mob.spawn ? 1 : (_mob.count ?? 1)); i++){
+						if(_mob.spawnDirection)
+							_mob.spawnMinX = _mob.spawnMaxX = MathRound((_mob.spawnDirection === __right ? platformX + episode.cWidth  + ((getRandomValue2(100, 200) / 100) * (episode.cWidth * .2)) :  platformX  - ((getRandomValue2(100, 200) / 100) * (episode.cWidth  * .2))) / __zoom);
+						episode.respawners.push({id: _mob.id, spawnSettings: function() {
+							_mob.attacker = _mob.autoTarget = _mob.owner = undefined;
+							const _json = structuredClone2(_mob);
+							_json.count = 1;
+							return _json;
+						}(), date: _gameTick, ms: _mob.spawn * 1000});
+					}
+				}
+			}
+		}
 	}
 	this.stopStepSound = function() {
 		if(!this.stepSound)
@@ -5972,8 +5978,7 @@ function enemy(_e) {
 				if (!_dying && _e.dying)
 					_e.killingBy = _t.key;
 			}
-			const _isSmashable = _e.isSmashable();
-			if(_f.atk.hurt.smash && _isSmashable) {
+			if(_f.atk.hurt.smash && _e.isSmashable()) {
 				_e.smash(_t, _f);
 				return { smashed:true };
 			}
@@ -8168,8 +8173,6 @@ function enemy(_e) {
 
 	let moveX = inputX;
 	let moveY = inputY;
-	if(moveY)
-		console.log('test');
 	const _oldMoveX = moveX;
 	const _oldMoveY = moveY;
 	let nextLeft = myLeft + inputX;

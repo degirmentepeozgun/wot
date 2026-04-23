@@ -916,7 +916,7 @@ function createTagSkill(_char, _tag) {
 							_mob.warm = 1;
 						}
 						_mob.enemy = _mob.still = false;
-						_mob.friendly = _mob.invulnerable = _mob.puppetMode = _mob.alp = true;
+						_mob.friendly = _mob.invulnerable = _mob.puppetMode = _mob.alp = _mob.important = true;
 						_mob.puppetXMove = 0;
 						_mob.related = _mob.owner = _e;
 						_mob.experience = 0;

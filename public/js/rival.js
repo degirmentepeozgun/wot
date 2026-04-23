@@ -37900,7 +37900,7 @@ const _allEnemies = {
 			zoom: .65,
 			width: 400,
 			height: 333,
-			maxHP: 2000,
+			maxHP: 1000,
 			atk: 100,
 			def: 150,
 			bleed: true,
@@ -39140,6 +39140,274 @@ const _allEnemies = {
 			hasShadow: false,
 			skipHealthBar: true,
 			src: './images/sprites/ep630/',
+			buffs: []
+		};
+	},
+	enemy631: function () {
+		return {
+			animations: {
+				dead: {
+					key: 'dead',
+					type: 'skill',
+					interactive: true,
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 96,
+							spriteHeight: 0,
+							spriteOrigin: 48,
+							do: function(_e) {
+								_e.remove = true;
+								if(!_e.toucher)
+									return;
+								PlaySound({key:'packagegain', volume:.5});
+								_e.toucher.addCommonSkill({key:pickRandomCommonSkill(),priority:1});
+							},
+							props: {
+								killingBy: undefined,
+								finishTarget: undefined,
+								dead: true
+							},
+							speed: 1
+						}
+					]
+				},
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					src: './images/sprites/ep631/crate.png',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 96,
+							spriteHeight: 96,
+							spriteOrigin: 48,
+							do: function(_e) {
+								_e.touchDead = true;
+								_e.noLoot = true;
+								_e.important = true;
+								_e.enemy = undefined;
+								delete _e.harmless;
+							},
+							speed: 1
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 96,
+							spriteHeight: 96,
+							spriteOrigin: 48,
+							speed: 3600
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 96,
+							spriteHeight: 96,
+							spriteOrigin: 48,
+							alpha: true,
+							speed: 16
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 96,
+							spriteHeight: 96,
+							spriteOrigin: 48,
+							speed: 16
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 96,
+							spriteHeight: 96,
+							spriteOrigin: 48,
+							alpha: true,
+							speed: 16
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 96,
+							spriteHeight: 96,
+							spriteOrigin: 48,
+							next: 'dead',
+							speed: 16
+						}
+					]
+				},
+				start: {
+					key: 'start',
+					type: 'skill',
+					next: 'idle',
+					frames: [
+						{
+							spriteLeft: 803,
+							spriteTop: 23,
+							spriteWidth: 170,
+							spriteHeight: 263,
+							spriteOrigin: 50,
+							do: function(_e) {
+								warn('<div class="flex heading achievement-red" style="position:relative;width:auto"><img style="height:15vh;z-index:-1" src="./images/icons/txtbg.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Supply Incoming') + '</div></div>');
+								PlaySound({key:'airwhistle', volume:1});
+								const _start = _e.animations.start;
+								const _frames = _start.frames;
+								let _totalSpeed = 0;
+								const _zoom = _e.getZoom();
+								for(let _f in _frames)
+									_totalSpeed += _frames[_f].speed;
+								const _yDiff = episode.cHeight - _e.yPosition;
+								const _perc = (_yDiff * 100) / episode.cHeight;
+								delete _frames[0].do;
+								_frames.forEach(x => {
+									delete x.bottomGap;
+									x.spriteHeight += MathRound(_yDiff / _zoom);
+									x.extraStepYRate = -(_perc / _totalSpeed);
+								});
+							},
+							extraStepXRate:-.25,
+							bottomGap: -1200,
+							speed: 22
+						},
+						{
+							spriteLeft: 58,
+							spriteTop: 22,
+							spriteWidth: 151,
+							spriteHeight: 264,
+							spriteOrigin: 76,
+							extraStepXRate:-.1,
+							bottomGap: -1150,
+							speed: 16
+						},
+						{
+							spriteLeft: 331,
+							spriteTop: 22,
+							spriteWidth: 153,
+							spriteHeight: 262,
+							spriteOrigin: 100,
+							extraStepXRate:.5,
+							bottomGap: -950,
+							speed: 44
+						},
+						{
+							spriteLeft: 583,
+							spriteTop: 22,
+							spriteWidth: 151,
+							spriteHeight: 264,
+							spriteOrigin: 76,
+							extraStepXRate:.1,
+							bottomGap: -900,
+							speed: 16
+						},
+						{
+							spriteLeft: 803,
+							spriteTop: 23,
+							spriteWidth: 170,
+							spriteHeight: 263,
+							spriteOrigin: 50,
+							extraStepXRate:-.5,
+							bottomGap: -700,
+							speed: 44
+						},
+						{
+							spriteLeft: 58,
+							spriteTop: 22,
+							spriteWidth: 151,
+							spriteHeight: 264,
+							spriteOrigin: 76,
+							extraStepXRate:-.1,
+							bottomGap: -650,
+							speed: 16
+						},
+						{
+							spriteLeft: 331,
+							spriteTop: 22,
+							spriteWidth: 153,
+							spriteHeight: 262,
+							spriteOrigin: 100,
+							extraStepXRate:.5,
+							bottomGap: -450,
+							speed: 44
+						},
+						{
+							spriteLeft: 583,
+							spriteTop: 22,
+							spriteWidth: 151,
+							spriteHeight: 264,
+							spriteOrigin: 76,
+							extraStepXRate:.1,
+							bottomGap: -400,
+							speed: 16
+						},
+						{
+							spriteLeft: 803,
+							spriteTop: 23,
+							spriteWidth: 170,
+							spriteHeight: 263,
+							spriteOrigin: 50,
+							extraStepXRate:-.5,
+							bottomGap: -200,
+							speed: 44
+						},
+						{
+							spriteLeft: 58,
+							spriteTop: 22,
+							spriteWidth: 151,
+							spriteHeight: 264,
+							spriteOrigin: 76,
+							bottomGap: -150,
+							extraStepXRate:-.1,
+							speed: 16
+						},
+						{
+							spriteLeft: 331,
+							spriteTop: 22,
+							spriteWidth: 153,
+							spriteHeight: 262,
+							spriteOrigin: 100,
+							extraStepXRate:.25,
+							bottomGap: -50,
+							speed: 22
+						},
+						{
+							spriteLeft: 583,
+							spriteTop: 22,
+							spriteWidth: 151,
+							spriteHeight: 264,
+							spriteOrigin: 76,
+							bottomGap: 0,
+							sound:{key:'woodland', volume:1},
+							speed: 16
+						}
+					]
+				},
+			},
+			key: 'prsht-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 5,
+			id: 631,
+			healtbarGap: 0,
+			name: 'Parachute',
+			class: 'object',
+			level: 1,
+			direction: 'left',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1,
+			width: 262,
+			height: 285,
+			maxHP: 1,
+			atk: 100,
+			def: 100,
+			invulnerable: true,
+			harmless: true,
+			stepX: 0,
+			weight: 1000,
+			stepXRate: 0,
+			noDirection: true,
+			skipHealthBar: true,
+			src: './images/sprites/ep631/',
 			buffs: []
 		};
 	},
@@ -61482,6 +61750,7 @@ const _allEnemies = {
 						_mob.related = _mob.owner = _e;
 						_mob.experience = 0;
 						_mob.class = 'minion'
+						_mob.owner = _e;
 						_mob.direction = _e.direction;
 						PlaySound({ key: 'puff', volume: .3 });
 						_mob.addObject({
@@ -77912,6 +78181,7 @@ const _allEnemies = {
 												_e.animate('start', 1);
 												_e.autoTarget = _char.autoTarget;
 												_e.class = 'minion';
+												_e.owner = _char;
 												_e.skipHealthBar = _e.noLoot = _e.looted = _e.noCC = true;
 												_e.experience = 0;
 												_e.zoom /= 2;

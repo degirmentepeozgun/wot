@@ -60,6 +60,7 @@ const __langData = [
 	{ key: 'Total Score', tr: 'Toplam Puan' },
 	{ key: 'Leaderboard', tr: 'Lider Tablosu' },
 	{ key: 'New Record', tr: 'Yeni Rekor' },
+	{ key: 'Supply Incoming', tr: 'Tedarik Geliyor' },
 	{ key: 'No Internet', tr: 'İnternet Yok' },
 	{ key: 'You\'ve activated a support skill', tr: 'Destek yeteneğini aktifleştirdiniz' },
 	{ key: 'It can be used even in danger', tr: 'Tehlike anında bile kullanılabilir' },

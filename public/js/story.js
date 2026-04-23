@@ -6176,6 +6176,7 @@ const __stories = [
 									PlaySound({key: 'alhand', volume: .2});
 								_mob.experience = 0;
 								_mob.class = 'minion';
+								_mob.owner = _owner;
 								_mob.left = mainCharacter.left + platformX;
 								_mob.LEFT = mainCharacter.LEFT + platformX;
 								_mob.EXACTLEFT = mainCharacter.EXACTLEFT;
@@ -7708,6 +7709,18 @@ const __stories = [
 				save: true,
 				loadingCharacterIds: [622, 619, 620, 621, 623],
 				start: function() {
+					// setTimeout(() => {
+					// 	const _k = summonMobWithJson({
+					// 		id: 631,
+					// 		level: 1,
+					// 		minX: MathRound((mainCharacter.HURTLEFT + platformX) / __zoom),
+					// 		maxX: MathRound((mainCharacter.HURTLEFT + platformX) / __zoom),
+					// 		sight:1000,
+					// 		count:1,
+					// 		experience: 0
+					// 	}, 0, 1, 1);
+					// 	_k.animate('start', 1);
+					// }, 5000);
 					clearAudioCache(loadedSounds);
 					removeCoopCharacter();
 					mainCharacter.storyVariables = {
@@ -7770,6 +7783,8 @@ const __stories = [
 						removeClass(x, 'd-none'));
 					platformX = episode.cWidth;
 					mainCharacter.left = mainCharacter.LEFT = MathRound(episode.cWidth / 2);
+					episode.mobs.push(structuredClone2(__storyScene.mobs[0]));
+					episode.mobs[episode.mobs.length - 1].experience = 1000;
 				},
 				actions: [
 					{
@@ -7888,7 +7903,7 @@ const __stories = [
 											atk: mainCharacter.atk,
 											grade: 4
 										});
-										_boss.health = _boss.maxHP = 1;
+										//_boss.health = _boss.maxHP = 1;
 										_boss.class = 'boss';
 										_boss.experience = 0;
 										_boss.setDifficulty(__account.difficulty - 1);
@@ -7922,11 +7937,20 @@ const __stories = [
 							const _minX = _mainPosition < (episode.width / 2) ? _mainPosition + episode.cWidth : _mainPosition - (2 * episode.cWidth);
 							const _maxX = _mainPosition < (episode.width / 2) ? _mainPosition + (2 * episode.cWidth) : _mainPosition - episode.cWidth;
 							for(let x of __storyScene.mobs){
+								if(x.skipSummon)
+									continue;
+								x.minX = _minX;
+								x.maxX = _maxX;
 								let y = summonMobWithJson(structuredClone2(x),0,1);
-								y.count = 1;
-								y.minX = _minX;
-								y.maxX = _maxX;
-								y.experience = mainCharacter.level * 1000;
+								y.experience = mainCharacter.level * 350;
+								if(y.experience < 1000)
+									y.experience = 1000;
+								const _mob = episode.mobs.find(m => m.id === y.id);
+								if(_mob){
+									_mob.experience = y.experience;
+									_mob.minX = 0;
+									_mob.maxX = 6000;
+								}
 								y.maxHP = y.MAXHP = mainCharacter.level * 60;
 								y.setHealth(y.maxHP);
 							}
@@ -7937,26 +7961,29 @@ const __stories = [
 									maxX: _maxX,
 									count: 2,
 									sight: 1000,
-									spawn: 5,
+									spawn: 10,
+									skipSummon: true,
 									experience: mainCharacter.level * 1500
 								});
-								let y = summonMobWithJson(structuredClone2(__storyScene.mobs[__storyScene.mobs.length - 1]),0,1);
+								let y = summonMobWithJson(structuredClone2(__storyScene.mobs[__storyScene.mobs.length - 1]));
 								y.count = 1;
 								y.maxHP = y.MAXHP = mainCharacter.level * 80;
 								y.setHealth(y.maxHP);
 							}
-							if(mainCharacter.level === 4) {
-								__storyScene.mobs.push({
+							if(mainCharacter.level < 12 && episode.phase === mainCharacter.level && (mainCharacter.level % 4) === 0) {
+								episode.mobs.push({
 									id: 621,
 									minX: _minX,
 									maxX: _maxX,
 									count: 1,
 									sight: 1000,
-									spawn: 10,
-									experience: mainCharacter.level * 3000
+									grade:2,
+									difficulty: __account.difficulty - 1,
+									experience: mainCharacter.level * 4000
 								});
-								let y = summonMobWithJson(structuredClone2(__storyScene.mobs[__storyScene.mobs.length - 1]),0,1);
-								y.maxHP = y.MAXHP = mainCharacter.level * 120;
+								let y = summonMobWithJson(structuredClone2(episode.mobs[episode.mobs.length - 1]),0,1);
+								y.maxHP = y.MAXHP = mainCharacter.level * 60;
+								y.name = y.displayName = '';
 								y.setHealth(y.maxHP);
 							}
 							// updateQuestArea(null, {
@@ -7973,16 +8000,16 @@ const __stories = [
 							// 	minLevel: mainCharacter.level,
 							// 	maps: [201]
 							// });
-							if(mainCharacter.level > 8 && !mainCharacter.tagSkillSet) {
-								delete mainCharacter.animations.tag.disabled;
-								mainCharacter.tagSkillSet = 1;
-								resetSkill('tag', mainCharacter);
-								PlaySound({key:'conquer', volume:.6});
-								getImage('./images/main/avatars/cyclops.png', function(_img) {
-									const url = _img.toDataURL();
-									warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
-								});
-							}
+							// if(mainCharacter.level > 8 && !mainCharacter.tagSkillSet) {
+							// 	delete mainCharacter.animations.tag.disabled;
+							// 	mainCharacter.tagSkillSet = 1;
+							// 	resetSkill('tag', mainCharacter);
+							// 	PlaySound({key:'conquer', volume:.6});
+							// 	getImage('./images/main/avatars/cyclops.png', function(_img) {
+							// 		const url = _img.toDataURL();
+							// 		warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
+							// 	});
+							// }
 						}
 					},
 					// {
@@ -8085,16 +8112,16 @@ const __stories = [
 					}
 				],
 				mobs: [
-					// {
-					// 	id: 619,
-					// 	minX: 4000,
-					// 	maxX: 6000,
-					// 	count: 2,
-					// 	sight: 1000,
-					// 	spawn: 1,
-					// 	hp:60,
-					// 	experience: 500
-					// },
+					{
+						id: 619,
+						minX: 4000,
+						maxX: 6000,
+						count: 2,
+						sight: 1000,
+						spawn: 5,
+						hp:60,
+						experience: 500
+					},
 					// {
 					// 	id: 621,
 					// 	minX: 4000,
@@ -8249,7 +8276,7 @@ const __stories = [
 				],
 				startWith: 1,
 				save: true,
-				loadingCharacterIds: [47, 111, 33, 35, 2, 7, 37, 38],
+				loadingCharacterIds: [47, 1, 111, 33, 35, 2, 7, 37, 38],
 				start: function() {
 					episode.itemDropOrder = [ 
 						'belt', 'gloves', 'bracers', 'helmet', 'leggings',
@@ -8753,6 +8780,42 @@ const __stories = [
 																		_mec.updateVariables();
 																		_mec.direction = __left;
 																		_mec.animate('ground3', 1);
+																		PlaySound({key:'doggrunt', volume:1});
+																		summonMobWithJson({
+																			id: 1,
+																			minX: MathRound((_mec.left + 176) / __zoom),
+																			maxX: MathRound((_mec.left + 176) / __zoom),
+																			sight: 1000,
+																			count: 1,
+																			direction: __left,
+																			zoom: 1.1,
+																			yPosition: _yec.yPosition + MathRound(groundheight * .1),
+																			props : {
+																				immobilize: true,
+																				still: true,
+																				noDirection: true,
+																				reversed: true
+																			}
+																		});
+
+																		
+																		summonMobWithJson({
+																			id: 1,
+																			minX: MathRound((_mec.left + 202) / __zoom),
+																			maxX: MathRound((_mec.left + 202) / __zoom),
+																			sight: 1000,
+																			count: 1,
+																			direction: __left,
+																			zoom: 1.1,
+																			yPosition: _mec.yPosition - MathRound(groundheight * .1),
+																			props : {
+																				immobilize: true,
+																				still: true,
+																				noDirection: true,
+																				reversed: true
+																			}
+																		});
+
 																		cssAnimations.slowMotion(mainCharacter, 300);
 																		createBubbleText({
 																			id: 13,
@@ -9472,9 +9535,9 @@ function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 		resetSkills(null, 1, mainCharacter);
 		delete mainCharacter.animations.tag.delay;
 		mainCharacter.animations.tag.modify = function(_e) {
-			_e.animations.air2.priority = 1;
+			_e.animations.ground1.priority = 1;
 			delete _e.animations.idle.alternateFrames;
-			_e.animations.air2.frames.forEach(x => {
+			_e.animations.ground1.frames.forEach(x => {
 				if(x.atk){
 					x.atk.ignoreDef = true;
 					x.atk.rate = 2;

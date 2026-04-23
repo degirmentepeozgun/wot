@@ -1408,12 +1408,16 @@ function map(_m) {
 						}
 					}
 				}
+				if(sprite.slot && sprite.isDead())
+					sprite.releaseSlot(true);
 				if(sprite.remove || (sprite.related?.dead && !sprite.noRemove))
 				{
 					sprite.tagContainer?.remove?.();
 					const _bubble = episode.bubbles?.find(x => x.key === sprite.key)?.elem;
 					if (_bubble)
 						removeBubble(_bubble, sprite);
+					if(sprite.remove)
+						sprite.checkSpawn();
 					if(!this.war || sprite.owner || sprite.class === __spell || sprite.class === 'minion') {
 						const spriteAnima = sprite.getCurrentAnimation();
 						if(spriteAnima?.sound?.stop){
@@ -4470,9 +4474,11 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 	};
 
 
-	this.drawBossName = function(cofftx, _char, x, y, w, padX) {
+	this.drawBossName = function(cofftx, _char, x, y, w, padX, h) {
 
 		const name = _char.displayName ?? _char.name ?? "BOSS";
+		if(name === '')
+			return;
 
 		// Font ölçeklemesi (her çözünürlükte temiz)
 		let fontSize = MathRound(w * 0.12); // genişliğe göre ayarlanır
@@ -4495,16 +4501,21 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 		cofftx.fillText(name, x, y - fontSize);
 		if(_char.gradeLeft > 0) {
 			const gradeText = "x" + (_char.gradeLeft + 1);
-			cofftx.strokeText(gradeText, x + w + padX, y);
-			cofftx.fillText(gradeText, x + w + padX, y);
+    		cofftx.textBaseline = "middle";
+			cofftx.strokeText(gradeText, x + w + padX, y + h/2);
+			cofftx.fillText(gradeText, x + w + padX, y + h/2);
 		}
 		cofftx.restore();
 	};
 	this.drawBossHealthBar = function(cofftx, _item, x, y, w) {
 
 		const _char = _item.char;
-		const h = MathRound(w * (26 / 252)); // boss bar aspect ratio
-
+		let h = MathRound(w * (26 / 124)); // boss bar aspect ratio
+		w = MathRound(w * 252 / 105);
+		if(_char.class === 'boss') {
+			h = MathRound(h * .6);
+			w = MathRound(w * .6);
+		}
 		// HP Ratio
 		let ratio = Math.max(0, Math.min(1, _char.health / _char.MAXHP));
 
@@ -4608,7 +4619,7 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			cofftx.restore();
 		}
 		
-		this.drawBossName(cofftx, _item.char, x + padX, y, w, MathRound(padX * .5));
+		this.drawBossName(cofftx, _item.char, x + padX, y, w, MathRound(padX * .5), h);
 		// Reverse geri al
 		if (_rev) {
 			offCtx.save();

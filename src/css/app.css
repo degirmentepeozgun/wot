@@ -11111,9 +11111,9 @@ pointer-events: "auto";
 	line-height: 3.4vh !important;
 }
 .move-to-place {
-	top: 14%;
-	left: 45%;
-	width:10%;
+	top: 15%;
+	left: 45.5%;
+	width:9%;
 	height: auto !important;
 	aspect-ratio: 1/1 !important;
 	z-index: 999999 !important;

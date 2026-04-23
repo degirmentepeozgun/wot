@@ -1605,7 +1605,7 @@ const commonSkills = [
 	{ key: 'waterwave' },
 	{ key: 'poisonpuff' },
 	{ key: 'earthrock' },
-	{ key: 'corpseexplode', 
+	{ key: 'corpseexplode', pvp: false,
 		do: function(_char) {
 			const _corpses = episode.seenEnemies.filter(x => x !== _char && x.isDead()
 			&& x.class !== __spell && !x.finishingBy && !x.owner && !x.related && 
@@ -1640,6 +1640,16 @@ const commonSkills = [
 	// { key: 'speedup', type: 'buff' },
 	// { key: 'teberweapon', forEnemy: [2] }
 ];
+function pickRandomCommonSkill() {
+	const _isPvp = episode?.pvp;
+	const _indexes = [];
+	commonSkills.forEach((x, i) => {
+		if (_isPvp && x.pvp === false)
+			return;
+		_indexes.push(i);
+	});
+	return commonSkills[_indexes[getRandomValue2(0, _indexes.length - 1)]].key;
+}
 function drinkPot(_char, _gifter, _event) {
 	if (_event) {
 		_event.stopPropagation();
@@ -3124,6 +3134,10 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	packagegain: './images/sounds/package-gain.wav',
+	woodland: './images/sounds/wood-land2.mp3',
+	airwhistle: './images/sounds/air-whistle.mp3',
+	doggrunt: './images/sounds/dog-grunt.mp3',
 	skillmove3: './images/sounds/skill-move3.mp3',
 	skillmove2: './images/sounds/skill-move2.mp3',
 	skillmove: './images/sounds/skill-move.mp3',
