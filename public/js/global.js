@@ -1598,13 +1598,31 @@ const _quests = [
 ];
 const commonSkills = [
 	//{ key: 'timestop' },
-	{ key: 'firespray' },
+	{ key: 'firespray', title: {
+		tr: 'Ateş Spreyi',
+		en: 'Fire Spray'
+	} },
 	// { key: 'fireexplosion' },
-	{ key: 'icespike' },
-	{ key: 'electricbolt' },
-	{ key: 'waterwave' },
-	{ key: 'poisonpuff' },
-	{ key: 'earthrock' },
+	{ key: 'icespike', title: {
+		tr: 'Buz Mızrağı',
+		en: 'Ice Spike'
+	} },
+	{ key: 'electricbolt', title: {
+		tr: 'Elektrik Oku',
+		en: 'Electric Bolt'
+	} },
+	{ key: 'waterwave', title: {
+		tr: 'Su Dalgası',
+		en: 'Water Wave'
+	} },
+	{ key: 'poisonpuff', title: {
+		tr: 'Zehirli Puf',
+		en: 'Poison Puff'
+	} },
+	{ key: 'earthrock', title: {
+		tr: 'Toprak Kaya',
+		en: 'Earth Rock'
+	} },
 	{ key: 'corpseexplode', pvp: false,
 		do: function(_char) {
 			const _corpses = episode.seenEnemies.filter(x => x !== _char && x.isDead()
@@ -4551,19 +4569,14 @@ const mapSprites = [
 		 }, theme: 'arena', 
 		distance: 1, width: MathRound(6144 * 1.065),
 		playGrounds: [
-			{ minX: 0, maxX:1700, bottomGap: 20, round: { rate: .44, dir: __right} },
-			{ minX: MathRound(4544 * 1.065), round: { rate: .44, dir: __left}, maxX:MathRound(6144 * 1.065), bottomGap: 20 },
+			{ min_X: 0, max_X:1700, bottom_Gap: 20, round: { rate: .44, dir: __right} },
+			{ min_X: MathRound(4544 * 1.065), round: { rate: .44, dir: __left}, max_X:MathRound(6144 * 1.065), bottom_Gap: 20 },
 		],
-		// blocks: [
-		// 	{
-		// 		l:1750, t:0, h:250, w:3010
-		// 	}
-		// ],
 		cliffs: [
-			{ minYRate: 90, maxYRate: 100, minX: 1900, maxX: 2700, background: true },
-			{ minYRate: 90, maxYRate: 100, minX: 3400, maxX: 4200, background: true },
-			{ minYRate: 0, maxYRate: 10, minX: 2000, maxX: 2850, foreground: true },
-			{ minYRate: 0, maxYRate: 10, minX: 3300, maxX: 4150, foreground: true }
+			{ minYRate: 85, maxYRate: 100, min_X: MathRound(1900 * 1.065), max_X: MathRound(2700 * 1.065), background: true },
+			{ minYRate: 85, maxYRate: 100, min_X: MathRound(3400 * 1.065), max_X: MathRound(4200 * 1.065), background: true },
+			{ minYRate: 0, maxYRate: 15, min_X: MathRound(2000 * 1.065), max_X: MathRound(2850 * 1.065), foreground: true },
+			{ minYRate: 0, maxYRate: 15, min_X: MathRound(3300 * 1.065), max_X: MathRound(4150 * 1.065), foreground: true }
 		],
 		mobs: [
 			{
@@ -4604,6 +4617,7 @@ const mapSprites = [
 					_e.positionable = true;
 					_e.drawPriority = .4;
 					_e.animations.idle.frames.forEach(x => x.bottomGap = -235);
+					_e.animations.idle.foreground = true;
 				}
 			},
 			{
@@ -4618,6 +4632,7 @@ const mapSprites = [
 					_e.positionable = true;
 					_e.drawPriority = .4;
 					_e.animations.idle.frames.forEach(x => x.bottomGap = -235);
+					_e.animations.idle.foreground = true;
 				}
 			},
 			{
@@ -4632,6 +4647,25 @@ const mapSprites = [
 					_e.positionable = true;
 					_e.drawPriority = .3;
 					_e.animations.idle.frames.forEach(x => x.bottomGap = -362);
+					_e.animations.idle.foreground = true;
+					_e.animations.idle.frames.forEach(x => {
+						if(x.objects)
+							for(let o of x.objects)
+								o.foreground = true;
+					});
+				}
+			},
+			{
+				id: 629,
+				minX : 4848,
+				maxX : 4848,
+				yPosition: function() {
+					return groundheight;
+				},
+				do : function(_e) {
+					_e.positionable = true;
+					_e.drawPriority = .6;
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -155);
 				}
 			},
 			{
@@ -4660,6 +4694,25 @@ const mapSprites = [
 					_e.positionable = true;
 					_e.drawPriority = .3;
 					_e.animations.idle.frames.forEach(x => x.bottomGap = -362);
+					_e.animations.idle.foreground = true;
+					_e.animations.idle.frames.forEach(x => {
+						if(x.objects)
+							for(let o of x.objects)
+								o.foreground = true;
+					});
+				}
+			},
+			{
+				id: 629,
+				minX : 1703,
+				maxX : 1703,
+				yPosition: function() {
+					return groundheight;
+				},
+				do : function(_e) {
+					_e.positionable = true;
+					_e.drawPriority = .6;
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -155);
 				}
 			},
 			{
@@ -31113,11 +31166,18 @@ const canvasAnimations =  {
 		const _y = _t + MathRound((_params.y  ?? 0) * _z);
 		const _r = MathRound((_params.r  ?? 0) * _z);
 		const _rr = MathRound(3.25 * (_r / 10));
-		const _ca = _canv ?? c10;
+		let _ca;
+		if(_params.background)
+			_ca = cSPB;
+		else if(_params.foreground)
+			_ca = cFGA;
+		else 
+			_ca = _canv ?? c10;
 		const grad = _ca.createRadialGradient(_x,  _y,  MathRound(_r / 10), _x, _y - _rr, _r);
 		grad.addColorStop(0, _params.from);
 		grad.addColorStop(.35, _params.to);
 		grad.addColorStop(1, '#FAD5A500');
+		const oldStyle = _ca.fillStyle;
 		_ca.fillStyle = grad;
 		_ca.fillRect(_x - _r, _y - _r - _rr, _r * 2, _r * 2);		
 		switch(_params.start) {
@@ -31135,6 +31195,7 @@ const canvasAnimations =  {
 				_params.start = 0;
 				break;
 		}
+		_ca.fillStyle = oldStyle;
 	},
 
 	// halo: function (_char, _params, _canv) {
@@ -32541,6 +32602,19 @@ crit: function(_char, _params, _canv) {
 // }, 3000);
 
 let _focusMode;
+function cacheCanvas(ctx) {
+	return ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+}
+function restoreCanvas(ctx, imageData) {
+	ctx.putImageData(imageData, 0, 0);
+}
+function darkenLayer(ctx, alpha) {
+	ctx.save();
+	ctx.globalCompositeOperation = 'source-atop';
+	ctx.fillStyle = `rgba(0,0,0,${alpha})`;
+	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+	ctx.restore();
+}
 const cssAnimations = {
 	blur: function () {
 		return;
@@ -33140,12 +33214,16 @@ const cssAnimations = {
 				if(fc)
 					fc.remove();
 				delete cssAnimationProps.darkout;
+				c9.style.opacity = 1;
+				_canvasF.style.opacity = 1;
+				_canvasBRB.style.opacity = 1;
 				return;
 			}
+			const alpha = (_opacity / 100);
 			if(_ctx?.clearRect && typeof _ctx.clearRect === 'function'){
 				_ctx.clearRect(0, 0, episode.cUIWidth, episode.cUIHeight);
 				//_ctx.filter = 'blur(' + _opacity + 'px)';
-				_ctx.fillStyle = 'rgba(0,0,0,' + (_opacity / 100) + ')';
+				_ctx.fillStyle = 'rgba(0,0,0,' + alpha + ')';
 				_ctx.fillRect(0, 0, episode.cUIWidth, episode.cUIHeight);
 			}
 			cssAnimationProps.darkout.p2 = _opacity;
@@ -33168,25 +33246,15 @@ const cssAnimations = {
 
 			if (_opacity <= 80) {
 				cssAnimationProps.dark.p4 = _opacity;
-
-				fc.style.background = `rgba(0,0,0,${_opacity / 100})`;
+				const alpha = _opacity / 100;
+				fc.style.background = `rgba(0,0,0,${alpha})`;
+				c9.style.opacity = _canvasF.style.opacity = (1 - alpha) * 1.2;
+				_canvasBRB.style.opacity = (1 - alpha) * .85;
 			}
 
 			return false;
 		}
 		else {
-			//addClass(_css, 'dark-blur-canvas');
-			// var fc = document.getElementById('filter-canvas');
-			// if(!fc) {
-			// 	fc = document.createElement("canvas");
-			// 	fc.width = _css.clientWidth;
-			// 	fc.height = _css.clientHeight;
-			// 	fc.id = 'filter-canvas';
-			// 	_css.appendChild(fc);
-			// }
-			// var ctx = fc.getContext('2d');
-			// ctx.fillStyle = '#00000000';
-			// ctx.fillRect(0, 0, fc.width, fc.height);
 			var fc = document.getElementById('filter-canvas');
 
 			if (!fc) {
@@ -33200,7 +33268,6 @@ const cssAnimations = {
 				fc.style.height = '100%';
 				fc.style.background = 'rgba(0,0,0,0)';
 				fc.style.pointerEvents = 'none';
-
 				_css.appendChild(fc);
 			}
 			cssAnimationProps.dark = {
@@ -33234,6 +33301,8 @@ const cssAnimations = {
 		}
 	},
 	cast: function (_char) {
+		if(episode?.pvp)
+			return;
 		const _id = "cast-" + _char.key;
 		let _castContainer = _char.castContainer ?? document.getElementById(_id);
 		if (_castContainer) 
@@ -33825,11 +33894,9 @@ const cssAnimations = {
 		}
 		const _canv = episode.lightradius2.ctx.canvas;
 		episode.lightradius2.ctx.clearRect(0, 0, _canv.width, _canv.height);
-		console.log('sildim')
 		//ligthenGradient(_left, _top, _width, episode.lightradius2.ctx); 
 		for(let _spl of episode.activeSpells)
 			if(_spl.lightColor){
-				console.log('çizdim')
 				let _left = (_spl.SCREENLEFT + _spl.ORIGINDIST)  * __scale;
 				const _h = (_spl.height ? MathRound(_spl.height * _spl.ZOOM) : _spl.HEIGHT);
 				const _hwg = (_spl.height ? MathRound(_spl.height * _spl.ZOOM) : _spl.getHeightWithoutGap());

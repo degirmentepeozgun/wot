@@ -16914,6 +16914,52 @@ const _allEnemies = {
 						}
 					]
 				},
+				before: {
+					key: 'before',
+					type: 'skill',
+					frames: [
+						{
+							spriteLeft: 1078,
+							spriteTop: 268,
+							spriteWidth: 219,
+							spriteHeight: 82,
+							spriteOrigin: 98,
+							speed: 12
+						},
+						{
+							spriteLeft: 5,
+							spriteTop: 44,
+							spriteWidth: 236,
+							spriteHeight: 106,
+							spriteOrigin: 108,
+							speed: 12
+						},
+						{
+							spriteLeft: 245,
+							spriteTop: 46,
+							spriteWidth: 236,
+							spriteHeight: 104,
+							spriteOrigin: 108,
+							speed: 12
+						},
+						{
+							spriteLeft: 731,
+							spriteTop: 46,
+							spriteWidth: 236,
+							spriteHeight: 104,
+							spriteOrigin: 108,
+							speed: 12
+						},
+						{
+							spriteLeft: 5,
+							spriteTop: 44,
+							spriteWidth: 236,
+							spriteHeight: 106,
+							spriteOrigin: 108,
+							speed: 12
+						}
+					]
+				},
 				idle: {
 					key: 'idle',
 					type: 'skill',
@@ -38297,7 +38343,7 @@ const _allEnemies = {
 							spriteHeight: 100,
 							spriteOrigin: 44,
 							objects: [
-								{ key: 'glow', position: 'canvas', p1: { x:0, y:80, r: 80, speed:8, from: '#D8BFD8ba', to: '#DA70D670' } },
+								{ key: 'glow', position: 'canvas', p1: { x:0, foreground: true, y:80, r: 80, speed:8, from: '#D8BFD8ba', to: '#DA70D670' } },
 							],
 							speed: 4
 						},
@@ -38765,31 +38811,32 @@ const _allEnemies = {
 				idle: {
 					key: 'idle',
 					type: 'skill',
+					background: true,
 					frames: [
 						{
 							spriteLeft: 0,
 							spriteTop: 0,
-							spriteWidth: 127,
-							spriteHeight: 81,
-							spriteOrigin: 64,
+							spriteWidth: 79,
+							spriteHeight: 54,
+							spriteOrigin: 40,
 							speed: 999
 						}
 					]
 				},
 			},
-			key: 'kznright-' + Math.random().toString().replace(/[.]/g, ''),
+			key: 'kznbck-' + Math.random().toString().replace(/[.]/g, ''),
 			yGap: 5,
 			id: 629,
 			healtbarGap: 0,
-			name: 'Kazan Right',
+			name: 'Kazan Back',
 			class: 'object',
 			level: 1,
 			direction: 'left',
 			defaultDirection: 'right',
 			defaultAnimationKey: 'idle',
 			zoom: 1,
-			width: 127,
-			height: 139,
+			width: 79,
+			height: 86,
 			maxHP: 100,
 			atk: 100,
 			def: 100,
@@ -38812,6 +38859,7 @@ const _allEnemies = {
 				idle: {
 					key: 'idle',
 					type: 'skill',
+					background: true,
 					frames: [
 						{
 							spriteLeft: 0,
@@ -38820,7 +38868,7 @@ const _allEnemies = {
 							spriteHeight: 100,
 							spriteOrigin: 44,
 							objects: [
-								{ key: 'glow', position: 'canvas', p1: { x:0, y:80, r: 80, speed:8, from: '#D8BFD899', to: '#DA70D640' } },
+								{ key: 'glow', position: 'canvas', p1: { x:0, y:80, background: true, r: 80, speed:8, from: '#D8BFD899', to: '#DA70D640' } },
 							],
 							speed: 4
 						},
@@ -39162,7 +39210,10 @@ const _allEnemies = {
 								if(!_e.toucher)
 									return;
 								PlaySound({key:'packagegain', volume:.5});
-								_e.toucher.addCommonSkill({key:pickRandomCommonSkill(),priority:1});
+								_e.toucher.commonItem = {key:pickRandomCommonSkill(),priority:1};
+								if(_e.toucher.main)
+									_e.toucher.commonItemRendered = false;
+								//_e.toucher.addCommonSkill({key:pickRandomCommonSkill(),priority:1});
 							},
 							props: {
 								killingBy: undefined,
@@ -39189,7 +39240,15 @@ const _allEnemies = {
 								_e.noLoot = true;
 								_e.important = true;
 								_e.enemy = undefined;
+								_e.targetPriority = 1;
 								delete _e.harmless;
+								for(let x of episode.enemies) {
+									if(x.autoTarget && x.class !== 'object' && x.important && x.class !== 'minion')
+									{
+										x.autoTarget = undefined;
+										x.pickNewTarget();
+									}
+								}
 							},
 							speed: 1
 						},
@@ -78750,6 +78809,57 @@ const _allEnemies = {
 						}
 					]
 				},
+				knockbackground: 
+					createKnockBackGround(
+						{
+							spriteLeft: 387,
+							spriteTop: 651,
+							spriteWidth: 351,
+							spriteHeight: 315,
+							spriteOrigin: 176,
+							src: './images/sprites/ep1000/dead.png'
+						},
+						{
+							spriteLeft: 1954,
+							spriteTop: 880,
+							spriteWidth: 640,
+							spriteHeight: 86,
+							spriteOrigin: 185,
+							src: './images/sprites/ep1000/dead.png'
+						}
+					),
+				knockbackair: 
+				createKnockBackAir(
+				{
+					spriteLeft: 1656,
+					spriteTop: 1047,
+					spriteWidth: 330,
+					spriteHeight: 437,
+					spriteOrigin: 165
+				}, {
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 468,
+						spriteHeight: 255,
+						spriteOrigin: 234,
+						src: './images/sprites/ep1000/release.png'
+				}, null, './images/sprites/ep1000/dead.png'),
+				hurtair: createHurtAir(
+					{
+						spriteLeft: 1656,
+						spriteTop: 1048,
+						spriteWidth: 331,
+						spriteHeight: 438,
+						spriteOrigin: 118,
+					},
+					{
+						spriteLeft: 1656,
+						spriteTop: 1048,
+						spriteWidth: 331,
+						spriteHeight: 438,
+						spriteOrigin: 118,
+					},
+					{ key: 'alhurt1,alhurt2', reset: true }, './images/sprites/ep1000/dead.png'),
 				hurtground1: createHurtGround({
 							spriteLeft: 600,
 							spriteTop: 1102,
@@ -83123,7 +83233,7 @@ function createFall(_char) {
 	// if(!_sound.reset)
 	// 	_sound.reset = true;
 	return {
-		key: 'fall',
+		key: 'deadfall',
 		type: 'skill',
 		src: _src,
 		frames: [

@@ -397,7 +397,6 @@ function enemy(_e) {
 			this._cachedFrameIndex = this.frame;
 			this._cachedAnimation = anima;
 		}
-
 		return this.CURRENT_FRAME;
 	}
 	this.getNextFrame = function () {
@@ -2251,7 +2250,8 @@ function enemy(_e) {
 		}
 		let _newAnima = this.animations[this.upcomingAnimation];
 		const monsterAttack = this.class !== __spell && _newAnima.attack;
-		const shouldContinue = this.animations[this.animation].next === this.upcomingAnimation;
+		const _anima = this.getCurrentAnimation();
+		const shouldContinue = _anima.next === this.upcomingAnimation;
 		if(monsterAttack && !this.lastAttackTime && !this.important)
 			this.lastAttackTime = _gameTick;
 		else if(!_newAnima.attack)
@@ -2261,6 +2261,11 @@ function enemy(_e) {
 				return false;
 			else if(_c.main && monsterAttack && _overwhelmed)
 				return false;
+		}
+		if(this.commonItem && _newAnima.attack && !_anima.attack) {
+			this.useCommonSkill(1);
+			this.upcomingAnimation = 'idle';
+			return true;
 		}
 		this.animate(this.upcomingAnimation, null, null, 31);
 		this.autoAttacking = _newAnima.attack;
@@ -5522,8 +5527,17 @@ function enemy(_e) {
 				else if (_knocker.start <= 2 || _enemy) {
 					if(_skillName.startsWith('knockbackground') && _e.animation.startsWith('hurtair') && _e.animations.knockbackair)
 						_skillName = 'knockbackair';
-					if(!_e.animation.startsWith('knockback') && _skillName.startsWith('knockback'))
-						_e.animate(_skillName);
+					if(!_e.animation.startsWith('knockback') && _skillName.startsWith('knockback')){
+						const _fall = _e.tryFall();
+						if(_fall)
+						{
+							_e.setHealth(0);
+							_e.killedBy = _knocker.key;
+							_e.animate('dead');
+						}
+						else
+							_e.animate(_skillName);
+					}
 					(this.owner ?? this).talk();
 					_e.direction = _knocker.direction === __right ? __left : __right;
 					if (_e.dying)
@@ -5864,6 +5878,48 @@ function enemy(_e) {
 		this.installHurtFeet(_f);
 		this.animate('hurtfeet', 1);
 		this.smasher.talk();
+	}
+	this.addPVPRespawnFrame = function() {
+		const x = this;
+		Object.keys(x.animations).filter(y => y.startsWith('dead')).forEach(y => {
+			x.animations[y].frames.forEach(z => {
+				if(z.props?.remove) {
+					delete z.props;
+					z.do = function() {									
+						x.left = x.startLeft;
+						if(x.startLeft < (episode.cWidth / 2))
+							x.direction = __right;
+						else												
+							x.direction = __left;
+						x.yPosition = getRandomValue2(0, getGroundHeight());
+						x.health = x.maxHP;
+						x.dead = x.dying = x.ultimateUsed = false;
+						delete x.killedBy;
+						const _animaKeys = Object.keys(x.animations);
+						_animaKeys.forEach(y => x.animations[y].next = x.animations[y].realNext);
+						x.animate('idle',1);
+						x.removeBuffs();
+						x.attackerCount = 0;
+						x.setHealth(x.maxHP);
+						x.addBuff({ key: 'release', level: 3, ms: 3000, end: function(_c) {
+							_c.still = _c.immobilize = _c.disableKeyboard = false;
+							delete x.grayAvatar;	
+							const _avatar = document.getElementById('char-' + x.key);
+							if (_avatar)
+								removeClass(_avatar, 'gray');
+						} });
+						x.immobilize = x.still = true;
+						if(x.keyboard)
+							x.disableKeyboard = true;
+						if(x.main)
+						{
+							platformX = 0;
+							prevPlatformX = -1;
+						}
+					}
+				}
+			});
+		});
 	}
 	this.hurtEnemy = function(_anima, _f, _e, _ef, _ea, _tp, _ep) {
 		const _t = this;
@@ -6339,7 +6395,8 @@ function enemy(_e) {
 										return {smashed: true, criticalHit: _critHitTaken};
 									}
 									const _isHeavyHit = (_f.knockback || _charged || (_f.push && typeof _f.push === 'number'));
-									const _fall = _e.tryFall(_isHeavyHit);
+									const _fall = false;
+									//_e.tryFall(_isHeavyHit);
 									if(_isHeavyHit && !_fall) {
 										_e.critDead = _t.criticalHit ? 3: 2;
 										let _knockbacked;
@@ -6468,7 +6525,9 @@ function enemy(_e) {
 	this.tryFall = function(_heavy) {
 		if(!episode.cliffs || !this.animations.hurtair)
 			return false;
-		const _thisCenter = (this.HURTLEFT + this._HURTBOX_half + platformX) / __zoom;
+		// if(getRandomValue2(1, 10) > 1)
+		// 	return false;
+		const _thisCenter = (this.HURTLEFT + this._HURTBOX_half + platformX);
 		let _y = this.yPosition;
 		const _maxY = getGroundHeight();
 		const _minY = ((episode.ground?.bottomGap ?? 0) * __zoom);
@@ -7028,11 +7087,11 @@ function enemy(_e) {
 		return false;
 	}
 	this.useCommonSkill = function (_order) {
-		if(this.isDead() || this.deadTime || episode.pvp)
+		if(this.isDead() || this.deadTime || (episode.pvp && !this.commonItem))
 			return;
 		if((_gameTick - this.lastCommonSkillUsed) < 2000)
 			return;
-		const _item = __account.commonInventory[_order - 1];
+		const _item = this.commonItem ?? __account.commonInventory[_order - 1];
 		let _renew;
 		const _cs = commonSkills.find(x => x.key === _item.key);
 		if(_cs?.do) {
@@ -7046,10 +7105,20 @@ function enemy(_e) {
 				_renew = 1;
 		}
 		if(_renew) {
-			__account.commonInventory.splice(_order - 1, 1);
-			this.checkCommonInventory();
-			this.lastCommonSkillUsed = _gameTick;
-			_client.saveState();
+			if(this.commonItem) {
+				this.commonItem = undefined;
+				if(this.main) {
+					let _div = document.querySelector('.game-status-screen');
+					if(_div) 
+						_div.remove();
+				}
+			}
+			else if(this.main) {
+				__account.commonInventory.splice(_order - 1, 1);
+				this.checkCommonInventory();
+				this.lastCommonSkillUsed = _gameTick;
+				_client.saveState();
+			}
 		}
 	}
 	this.setAutoTarget = function (_e, _skipShare, _num) {
@@ -7593,7 +7662,7 @@ function enemy(_e) {
 			_speedRate /= _fps;
 		this.extraStepYRate = this.stop ? 0 : (this.extraStepYRate ?? 0) + (_speedRate * (_frame.extraStepYRate ?? 0));
 		let _stepY = this.puppetMode ? 0 : MathRound(this.extraStepYRate * (episode.cHeight / 100));
-		const _solidity = episode.hasBlocks ? this.isRunningAgainstBlockObject() : this.isRunningAgainstSolidObject();
+		const _solidity = this.isRunningAgainstSolidObject();
 		if (!_anima) {
 			this.idle(8);
 			_anima = this.getCurrentAnimation();
@@ -7884,378 +7953,7 @@ function enemy(_e) {
 		//}
 		return false;
 	}
-	// this.isRunningAgainstSolidObject = function() {
-	// 	if(!episode.hasSolid)
-	// 		return false;
-	// 	if(this.action?.y)
-	// 		return {
-	// 			moveX : 1,
-	// 			moveY : this.moveDirection === 'up' ? -1  : (this.moveDirection === 'down' ? 1 : 0)
-	// 		};
-	// 	else if(this.puppetMode)
-	// 		return {
-	// 			moveX : 1,
-	// 			moveY : 0
-	// 		};
-	// 	if(!this.animations.run && !this.animations.walk)
-	// 		return false;
-	// 	if(this.animation !== 'run' && this.animation !== 'walk')
-	// 		return false;
-	// 	const _solids = episode.seenEnemies.filter(x => (x.solid
-	// 		/*|| (x.enemy && this.enemy && x.autoMode !== 0 && this.autoMode !== 0 && this.class !== 'object' && x.class !== 'object')*/
-	// 	) && !x.remove && !x.isDead() && x !== this);
-	// 	if(_solids?.[0]) {
-	// 		const _thisDir = { to: this.getCenterSolid(), from: this.centerSolid};
-	// 		for(const _solid of _solids)
-	// 			if(isObjectsPassingOver(this, _solid) && this.centerSolid && _solid.centerSolid) {
-	// 				const _solidDir = _solid.centerSolid;
-	// 				let _moveX = 1, _moveY = 0;
-	// 				switch(this.moveDirection) {
-	// 					// Eğer soldan sağa giderken çarptıysam
-	// 					case __right:
-	// 						//TO.l+TO.w >= l && FROM.l + FROM.w < l MoveX = 0
-	// 						if((_thisDir.to.l + _thisDir.to.w) >= _solidDir.l
-	// 							&& (_thisDir.to.l + _thisDir.to.w) < (_solidDir.l + _thisDir.to.l)
-	// 							//&& (_thisDir.from.l + _thisDir.from.w) < _solidDir.l
-	// 						) {
-	// 							_moveX = 0;
-	// 							const _y = this.getKeyboardYMove();
-	// 							switch(_y) {
-	// 								case 'up':
-	// 									_moveY = -1;
-	// 									break;
-	// 								case 'down':
-	// 									_moveY = 1;
-	// 									break;
-	// 								default:
-	// 									if(_thisDir.to.y < _solidDir.y)
-	// 										_moveY = -1;
-	// 									else
-	// 										_moveY = 1;
-	// 									break;
-	// 							}
-
-	// 						}
-	// 						//If y yönde hareket varsa o yönde gitsin else
-	// 						//If TO.y < y ise MoveY = -1 else MoveY = 1
-
-	// 						break;
-	// 						// Eğer sağdan sola giderken çarptıysam
-	// 					case __left:
-	// 						//TO.l <= l+w && FROM.l > l+w MoveX = 0
-	// 						if(_thisDir.to.l <= (_solidDir.l + _solidDir.w)
-	// 							&& _thisDir.to.l > _solidDir.l
-	// 							//&& _thisDir.from.l > (_solidDir.l + _solidDir.w)
-	// 						) {
-	// 							_moveX = 0;
-	// 							const _y = this.getKeyboardYMove();
-	// 							switch(_y) {
-	// 								case 'up':
-	// 									_moveY = -1;
-	// 									break;
-	// 								case 'down':
-	// 									_moveY = 1;
-	// 									break;
-	// 								default:
-	// 									if(_thisDir.to.y < _solidDir.y)
-	// 										_moveY = -1;
-	// 									else
-	// 										_moveY = 1;
-	// 									break;
-	// 							}
-
-	// 						}
-	// 						//If y yönde hareket varsa o yönde gitsin else
-	// 						//If TO.y < y ise MoveY = -1 else MoveY = 1
-
-	// 						break;
-	// 					case 'down':
-	// 						_moveX = 0;
-	// 						if(this.yPosition < _solid.yPosition) {
-	// 							_moveX = 0;
-	// 							_moveY = 1;
-	// 						}
-	// 						//TO.t+TO.h >= t && FROM.t + FROM.h < t MoveY = 0
-	// 						//aşağı yönde giderken
-	// 						//bizim sonraki adımımızın bottom noktası >= objenin şuanki ayak TOP değeri
-	// 						//ve bizim sonraki adımımızın top değeri < (objenin bottom değeri)
-	// 						else if((_thisDir.to.t + _thisDir.to.h) >= _solidDir.t
-	// 						&& _thisDir.to.t < (_solidDir.t + _solidDir.h)) {
-	// 						//&& (_thisDir.from.t + _thisDir.from.h) < _solidDir.t) {
-	// 							_moveY = 0;
-	// 							_moveX = 1;
-	// 						}
-	// 						else
-	// 							_moveY = 1;
-	// 						//If y yönde hareket varsa o yönde gitsin else
-	// 						//If TO.y < y ise MoveY = -1 else MoveY = 1
-
-	// 						break;
-	// 					case 'up':
-	// 						_moveX = 0;
-	// 						if(this.yPosition > _solid.yPosition) {
-	// 							_moveX = 0;
-	// 							_moveY = -1;
-	// 						}
-	// 						//TO.t+TO.h >= t && FROM.t + FROM.h < t MoveY = 0
-	// 						else if(_thisDir.to.t <= (_solidDir.t + _solidDir.h) &&
-	// 						(_thisDir.to.t + _thisDir.to.h) > _solidDir.t) {
-	// 						//_thisDir.from.t > (_solidDir.t + _solidDir.h)) {
-	// 							_moveY = 0;
-	// 							_moveX = 1;
-	// 						}
-	// 						else
-	// 							_moveY = -1;
-	// 						//If y yönde hareket varsa o yönde gitsin else
-	// 						//If TO.y < y ise MoveY = -1 else MoveY = 1
-
-	// 						break;
-	// 					default:
-	// 						_moveX = 0;
-	// 						break;
-	// 				}
-	// 				// Eğer yukardan aşağı giderken çarptıysam
-	// 				//TO.t+TO.h >= t && FROM.t + FROM.h < t MoveY = 0
-	// 				//MoveX = 1
-
-	// 				// Eğer aşağıdan yukarı giderken çarptıysam
-	// 				//TO.t <= t+h && FROM.t > t+h MoveY = 0
-	// 				//MoveX = 1
-	// 				// if(this.moveDirection === __left || this.moveDirection === __right) {
-	// 				// 	if((this.direction === __right) && (_thisDir.to.l > (_solidDir.l + _solidDir.w)))
-	// 				// 		_moveX = 1;
-	// 				// 	else if((this.direction === __left) && (_thisDir.to.l + _thisDir.to.w) < _solidDir.l)
-	// 				// 		_moveX = 1;
-	// 				// 	else {
-	// 				// 		if(_thisDir.to.y > _solidDir.y)
-	// 				// 			_moveY = -1;
-	// 				// 		else
-	// 				// 			_moveY = 1;
-	// 				// 	}
-	// 				// }
-	// 				// else {
-	// 				// 	//yukardan aşağı direk iniyosa
-	// 				// 	if(this.moveDirection === 'down' && ((_thisDir.from.t + _thisDir.from.h) < _solidDir.t)
-	// 				// 		&& ((_thisDir.to.t + _thisDir.to.h) >= _solidDir.t))
-	// 				// 		_moveX = 1;
-	// 				// 		//aşağıdan yukarıya ise
-	// 				// 	else if(this.moveDirection === 'up' && (_thisDir.from.t > (_solidDir.t + _solidDir.h))
-	// 				// 		&& (_thisDir.to.t <= (_solidDir.t + _solidDir.h)))
-	// 				// 		_moveX = 1;
-	// 				// }
-	// 				if(_moveY === 2) {
-	// 					this.limitYPosition();
-	// 					_moveY = 0;
-	// 				}
-	// 				if(_moveY && this.enemy && !this.solidOne)
-	// 					this.solidOne = _moveY;
-	// 				return {
-	// 					moveX : _moveX,
-	// 					moveY : this.solidOne ?? _moveY
-	// 				}
-	// 			}
-	// 		}
-	// 	if(this.solidOne)
-	// 		delete this.solidOne;
-	// 	return false;
-	// }
-	// this.isRunningAgainstBlockObject = function () {
-
-	// 	if (this.still || this.immobilize)
-	// 		return false;
-
-	// 	const inputX =
-	// 		this.moveDirection === __right || (this.oldHURTLEFT < (this.HURTLEFT + platformX)) ? 1 :
-	// 		this.moveDirection === __left || (this.oldHURTLEFT > (this.HURTLEFT + platformX)) ? -1 : 0;
-
-	// 	const inputYDir = this.getKeyboardYMove();
-	// 	const inputY =
-	// 		inputYDir === 'up' ? -1 :
-	// 		inputYDir === 'down' ? 1 : 0;
-
-	// 	const myLeft = this.HURTLEFT + platformX;
-	// 	const myRight = myLeft + this.HURTWIDTH;
-
-	// 	const myBottom = this.yPosition;
-	// 	const myTop = this.yPosition + this.yGap;
-
-	// 	let moveX = inputX;
-	// 	let moveY = inputY;
-
-	// 	// -------------------
-	// 	// X movement next
-	// 	// -------------------
-	// 	let nextLeft = myLeft + inputX;
-	// 	let nextRight = myRight + inputX;
-	// 	let nextBottom = myBottom - inputY;
-	// 	let nextTop = myTop - inputY;
-	// 	let overlap;
-	// 	for (let b of episode.blocks) {
-
-	// 		const bLeft = b.x;
-	// 		const bRight = b.x + b.width;
-	// 		const bBottom = b.y;
-	// 		const bTop = b.y + b.height;
-
-	// 		// next overlap (gerçek çarpışma durumu)
-	// 		const overlapX = nextRight > bLeft && nextLeft < bRight;
-	// 		const overlapY = nextTop > bBottom && nextBottom < bTop;
-	// 		if (overlapX && overlapY) {
-	// 			if(!overlap)
-	// 				overlap = true;
-	// 			// -------- X AXIS --------
-	// 			// -------- X AXIS --------
-	// 			if (inputX > 0 && myRight <= bRight) {
-	// 				moveX = 0;
-	// 			}
-
-	// 			if (inputX < 0 && myLeft >= bLeft) {
-	// 				moveX = 0;
-	// 			}
-
-	// 			// -------- Y AXIS --------
-	// 			if (inputY !== 0) {
-
-	// 				 if (inputY > 0) { // aşağı (y azalıyor)
-
-	// 					// sadece yukarıdan çarpıyorsan blokla
-	// 					if (myBottom >= bTop && nextBottom <= bTop) {
-	// 						moveY = 0;
-	// 					}
-
-	// 					// 🔥 kritik: zaten temas halindeysen ve aşağı gitmeye çalışıyorsan blokla
-	// 					else if (myBottom <= bTop) {
-	// 						moveY = 0;
-	// 					}
-	// 				}
-
-	// 				if (inputY < 0) { // yukarı (y artıyor)
-
-	// 					if (myTop <= bBottom && nextTop >= bBottom) {
-	// 						moveY = 0;
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// 	if(!overlap)
-	// 		return false;
-	// 	//if(this.main)
-	// 	//	console.log('moveX = ' + moveX + ', moveY = ' + moveY);
-	// 	//if (moveX !== inputX || moveY !== inputY) {
-	// 		if(moveX < 0)
-	// 			moveX = MathAbs(moveX);
-	// 		return { moveX, moveY };
-	// 	//}
-	// 	//return false;
-	// };
-	this.isRunningAgainstBlockObject = function () {
-
-	if (this.still || this.immobilize)
-		return false;
-
-	const inputXDir = this.getKeyboardXMove() ?? 
-		(this.moveDirection === __right ? __right : this.moveDirection === __left ? __left : undefined);
-	const inputX =
-		inputXDir === __right || (this.oldHURTLEFT < (this.HURTLEFT + platformX)) ? 1 :
-		inputXDir === __left || (this.oldHURTLEFT > (this.HURTLEFT + platformX)) ? -1 : 0;
-
-	const inputYDir = this.getKeyboardYMove();
-	const inputY =
-		inputYDir === 'up' ? -1 :
-		inputYDir === 'down' ? 1 : 0;
-
-	const myLeft = this.HURTLEFT + platformX;
-	const myRight = myLeft + this.HURTWIDTH;
-	const myOriginY = this.yPosition + (this.yGap * .5);
-	const myBottom = this.yPosition;
-	const myTop = this.yPosition + this.yGap;
-
-	let moveX = inputX;
-	let moveY = inputY;
-	const _oldMoveX = moveX;
-	const _oldMoveY = moveY;
-	let nextLeft = myLeft + inputX;
-	let nextRight = myRight + inputX;
-	let nextBottom = myBottom - inputY;
-	let nextTop = myTop - inputY;
-
-	let overlap;
-
-	for (let b of episode.blocks) {
-
-		const bLeft = b.x;
-		const bRight = b.x + b.width;
-		const bBottom = b.y;
-		const bTop = b.y + b.height;
-		const bOriginY = bBottom + (b.height * .5);
-		const overlapX = nextRight > bLeft && nextLeft < bRight;
-		const overlapY = nextTop > bBottom && nextBottom < bTop;
-
-		if (overlapX && overlapY) {
-
-			overlap = true;
-			let _skipY;
-			// ======================
-			// X AXIS (FIXED)
-			// ======================
-			if (inputX > 0) {//sağ
-				// SADECE bloğa doğru gidiyorsan blokla
-				if (myRight <= bLeft || myLeft < bLeft) {
-					moveX = 0;
-					if(inputYDir)
-						_skipY = true;
-				}
-			}
-			else if (inputX < 0) {
-				if (myLeft >= bRight || myRight > bRight) {
-					moveX = 0;
-					if(inputYDir)
-						_skipY = true;
-				}
-			}
-			else {
-				moveX = 0;
-				if(inputYDir){
-					if ((myLeft >= bRight || myRight > bRight) 
-						|| 
-						(myRight <= bLeft || myLeft < bLeft)) {
-						_skipY = true;
-					}
-				}
-			}
-
-			if(!_skipY) {
-				if (inputY > 0) { // aşağı
-					// SADECE bloğa doğru gidiyorsan blokla
-					if(myOriginY > bOriginY) {
-						if (myBottom <= bTop || myTop < bTop) {
-							moveY = 0;
-						}
-					}
-				}
-				else if (inputY < 0) {
-					if(myOriginY < bOriginY) {
-						if (myTop >= bBottom || myBottom > bBottom) {
-							moveY = 0;
-						}
-					}
-				}
-				else
-					moveY = 0;
-			}
-		}
-	}
-
-	if (!overlap)
-		return false;
-
-	if(moveX === _oldMoveX && moveY === _oldMoveY)
-		return false;
-	if (moveX < 0)
-		moveX = MathAbs(moveX);
-	return { moveX, moveY };
-};
+	
 	this.isRunningAgainstSolidObject = function () {
 
 		if (!episode.hasSolid) return false;
@@ -8271,7 +7969,8 @@ function enemy(_e) {
 			return { moveX: 1, moveY: 0 };
 		}
 
-		if (this.still || this.immobilize)
+		if ((!this.animations.run && !this.animations.walk) ||
+			(this.animation !== 'run' && this.animation !== 'walk'))
 			return false;
 
 		const enemies = episode.seenEnemies;
@@ -8283,6 +7982,7 @@ function enemy(_e) {
 		for (let i = 0; i < enemies.length; i++) {
 
 			const solid = enemies[i];
+
 			// ===== CHEAP FILTER =====
 			if (!solid.solid ||
 				solid.remove ||
@@ -8309,7 +8009,6 @@ function enemy(_e) {
 						moveX = 0;
 
 						const y = this.getKeyboardYMove();
-
 						moveY = y === 'up' ? -1 :
 								y === 'down' ? 1 :
 								(thisNext.y < s.y ? -1 : 1);
@@ -8353,7 +8052,7 @@ function enemy(_e) {
 			}
 
 			if (moveY === 2) {
-				//this.limitYPosition();
+				this.limitYPosition();
 				moveY = 0;
 			}
 
@@ -8371,7 +8070,6 @@ function enemy(_e) {
 
 		return false;
 	};
-
 	this.setNewStatus = function (_diff) {
 		return;
 		for (var _k of Object.keys(_diff))
@@ -9093,11 +8791,21 @@ function enemy(_e) {
 			}
 			else if (_skill) {
 				if (_skill === 'common') {
-					const _order = this.keyboard.getCommonSkillOrder?.();
-					if (_order > 0) {
-						if (__account.commonInventory?.[_order - 1])
-							this.useCommonSkill(_order);
-						this.keyboard.removeCommonSkill?.();
+					const _pressedKey = this.keyboard.getCommonSkillOrder?.();
+					if (_pressedKey) {
+						let _order = getBaseKeyboardKey(_pressedKey);
+						if(_order) {
+							_order = parseInt(_order);
+							if(_order === 1 && this.commonItem) {
+								this.useCommonSkill(1);
+							}
+							else 
+							{
+								if (__account.commonInventory?.[_order - 1])
+									this.useCommonSkill(_order);
+							}
+							this.keyboard.removeCommonSkill?.();
+						}	
 					}
 					//this.idle(9);
 				}

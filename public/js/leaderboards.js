@@ -2,6 +2,17 @@
 function leaderboards() {
 	this.cacheKey = "wot-offline-scores";
 	const _self = this;
+	this.offlineData = [
+		{ name: 'Mehmet', point: 30000 },
+		{ name: 'Ozgun', point: 29100 },
+		{ name: 'EgeMan', point: 24300 },
+		{ name: 'Buğra', point: 17400 },
+		{ name: 'Mur@t', point: 16600 },
+		{ name: 'Yiiwiit', point: 10500 },
+		{ name: 'MG', point: 9100 },
+		{ name: 'Felon', point: 7200 },
+		{ name: 'Kan€', point: 7000 }
+	]
 	this.hmacSha256Hex = async function(secretBase64, message) {
 		const keyBytes = Uint8Array.from(
 			atob(secretBase64),
@@ -43,6 +54,10 @@ function leaderboards() {
 			deviceId: this.data.name,
 			missionKey: __story.mission
 		};
+		this.sessionGuid = '1';
+		this.secretKey = '2';
+		return;
+
 		webClient.post('missionsession/start', _payload, function(_resp) {
 			const _response = _resp.data;
 			_self.sessionGuid = _response.sessionGuid;
@@ -61,6 +76,20 @@ function leaderboards() {
 			_func([]);
 			return;
 		}
+		const _respData = [...this.offlineData];
+		if(_respData?.length > 10)
+			_respData.splice(9,1);
+		const _me = _respData.find(x => x.id === this.data.name);
+		if(_me){
+			_me.me = 1;
+			_me.point = __story.point;
+		}
+		else
+			_respData.push({id:this.data.name, point:__story.point, me:1});
+		_respData.sort((a, b) => b.point - a.point);
+		_func(_respData);
+		return;
+
 		webClient.get('leaderboards/get?deviceid=' + this.data.name + '&missionkey=' + __story.mission, function(_resp) {
 			if(_resp.data?.length > 10)
 				_resp.data.splice(9,1);
@@ -102,8 +131,17 @@ function leaderboards() {
 		const _score = __story.point;
 		if(_score <= 0)
 			return false;
-		const _deviceId = this.data.name;
+		
 		const _missionKey = __story.mission;
+		setTimeout(() => {
+			_self.updateScore(_missionKey, _score, 1, _func);
+		}, 1000);
+
+		return true;
+
+
+		const _deviceId = this.data.name;
+		//const _missionKey = __story.mission;
 		const _sessionGuid = this.sessionGuid;
 		const _secretKey = this.secretKey;
 		const payload = `${_sessionGuid}|${_deviceId}|${_missionKey}|${_score}`;

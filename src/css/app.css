@@ -499,6 +499,9 @@ body {
 		transform: translateX(.2vw)
 	}
 }
+#dobj-foreground.parallax {
+	width:99999% !important
+}
 canvas:not(.parallax canvas), .canvas, .parallax {
 	image-rendering: auto;
 	position: absolute;
@@ -8863,7 +8866,6 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 #game-ui[data-mapid="war"] #top-nav {
 	width:42% !important
 }
-
 .red {
 	color:#ff6c00 !important
 }
@@ -11048,7 +11050,7 @@ pointer-events: "auto";
 .bg-none {
 	background:none !important
 }
-.skill-pressed {
+.skill-pressed:not(.bgless) {
     animation: pressFlash 120ms ease-out
 }
 

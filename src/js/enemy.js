@@ -7985,120 +7985,120 @@ function enemy(_e) {
 	// }
 	this.isRunningAgainstSolidObject = function () {
 
-    if (!episode.hasSolid) return false;
+		if (!episode.hasSolid) return false;
 
-    if (this.action?.y) {
-        return {
-            moveX: 1,
-            moveY: this.moveDirection === 'up' ? -1 : (this.moveDirection === 'down' ? 1 : 0)
-        };
-    }
+		if (this.action?.y) {
+			return {
+				moveX: 1,
+				moveY: this.moveDirection === 'up' ? -1 : (this.moveDirection === 'down' ? 1 : 0)
+			};
+		}
 
-    if (this.puppetMode) {
-        return { moveX: 1, moveY: 0 };
-    }
+		if (this.puppetMode) {
+			return { moveX: 1, moveY: 0 };
+		}
 
-    if ((!this.animations.run && !this.animations.walk) ||
-        (this.animation !== 'run' && this.animation !== 'walk'))
-        return false;
+		if ((!this.animations.run && !this.animations.walk) ||
+			(this.animation !== 'run' && this.animation !== 'walk'))
+			return false;
 
-    const enemies = episode.seenEnemies;
-    const thisCenter = this.centerSolid;
-    const thisNext = this.getCenterSolid();
+		const enemies = episode.seenEnemies;
+		const thisCenter = this.centerSolid;
+		const thisNext = this.getCenterSolid();
 
-    if (!thisCenter || !thisNext) return false;
+		if (!thisCenter || !thisNext) return false;
 
-    for (let i = 0; i < enemies.length; i++) {
+		for (let i = 0; i < enemies.length; i++) {
 
-        const solid = enemies[i];
+			const solid = enemies[i];
 
-        // ===== CHEAP FILTER =====
-        if (!solid.solid ||
-            solid.remove ||
-            solid === this ||
-            solid.isDead())
-            continue;
+			// ===== CHEAP FILTER =====
+			if (!solid.solid ||
+				solid.remove ||
+				solid === this ||
+				solid.isDead())
+				continue;
 
-        if (!solid.centerSolid) continue;
+			if (!solid.centerSolid) continue;
 
-        // ===== HEAVY CHECK SONRA =====
-        if (!isObjectsPassingOver(this, solid))
-            continue;
+			// ===== HEAVY CHECK SONRA =====
+			if (!isObjectsPassingOver(this, solid))
+				continue;
 
-        const s = solid.centerSolid;
-        let moveX = 1;
-        let moveY = 0;
+			const s = solid.centerSolid;
+			let moveX = 1;
+			let moveY = 0;
 
-        switch (this.moveDirection) {
+			switch (this.moveDirection) {
 
-            case __right:
-                if ((thisNext.l + thisNext.w) >= s.l &&
-                    (thisNext.l + thisNext.w) < (s.l + thisNext.l)) {
+				case __right:
+					if ((thisNext.l + thisNext.w) >= s.l &&
+						(thisNext.l + thisNext.w) < (s.l + thisNext.l)) {
 
-                    moveX = 0;
+						moveX = 0;
 
-                    const y = this.getKeyboardYMove();
-                    moveY = y === 'up' ? -1 :
-                            y === 'down' ? 1 :
-                            (thisNext.y < s.y ? -1 : 1);
-                }
-                break;
+						const y = this.getKeyboardYMove();
+						moveY = y === 'up' ? -1 :
+								y === 'down' ? 1 :
+								(thisNext.y < s.y ? -1 : 1);
+					}
+					break;
 
-            case __left:
-                if (thisNext.l <= (s.l + s.w) &&
-                    thisNext.l > s.l) {
+				case __left:
+					if (thisNext.l <= (s.l + s.w) &&
+						thisNext.l > s.l) {
 
-                    moveX = 0;
+						moveX = 0;
 
-                    const y = this.getKeyboardYMove();
-                    moveY = y === 'up' ? -1 :
-                            y === 'down' ? 1 :
-                            (thisNext.y < s.y ? -1 : 1);
-                }
-                break;
+						const y = this.getKeyboardYMove();
+						moveY = y === 'up' ? -1 :
+								y === 'down' ? 1 :
+								(thisNext.y < s.y ? -1 : 1);
+					}
+					break;
 
-            case 'down':
-                if ((thisNext.t + thisNext.h) >= s.t &&
-                    thisNext.t < (s.t + s.h)) {
+				case 'down':
+					if ((thisNext.t + thisNext.h) >= s.t &&
+						thisNext.t < (s.t + s.h)) {
 
-                    moveY = 0;
-                    moveX = 1;
-                } else {
-                    moveY = 1;
-                }
-                break;
+						moveY = 0;
+						moveX = 1;
+					} else {
+						moveY = 1;
+					}
+					break;
 
-            case 'up':
-                if (thisNext.t <= (s.t + s.h) &&
-                    (thisNext.t + thisNext.h) > s.t) {
+				case 'up':
+					if (thisNext.t <= (s.t + s.h) &&
+						(thisNext.t + thisNext.h) > s.t) {
 
-                    moveY = 0;
-                    moveX = 1;
-                } else {
-                    moveY = -1;
-                }
-                break;
-        }
+						moveY = 0;
+						moveX = 1;
+					} else {
+						moveY = -1;
+					}
+					break;
+			}
 
-        if (moveY === 2) {
-            this.limitYPosition();
-            moveY = 0;
-        }
+			if (moveY === 2) {
+				this.limitYPosition();
+				moveY = 0;
+			}
 
-        if (moveY && this.enemy && !this.solidOne)
-            this.solidOne = moveY;
+			if (moveY && this.enemy && !this.solidOne)
+				this.solidOne = moveY;
 
-        return {
-            moveX: moveX,
-            moveY: this.solidOne ?? moveY
-        };
-    }
+			return {
+				moveX: moveX,
+				moveY: this.solidOne ?? moveY
+			};
+		}
 
-    if (this.solidOne)
-        delete this.solidOne;
+		if (this.solidOne)
+			delete this.solidOne;
 
-    return false;
-};
+		return false;
+	};
 
 	this.setNewStatus = function (_diff) {
 		return;

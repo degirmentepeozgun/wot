@@ -55,6 +55,7 @@ function animateStart(_failed) {
 	}
 	let _leaderboardsHTML = '';
 	let _hasNext = _failed ? false : __storySceneOrder < __story.scenes.length;
+	alert(_hasNext);
 	if(!_hasNext) {
 		__story.leaderBoards.set(function() {
 			const _stageResult = __story.leaderBoards.get(function(_leadersData) {

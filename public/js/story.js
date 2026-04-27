@@ -6929,7 +6929,7 @@ const __stories = [
 				minLevel: 1,
 				maps: [11],
 				timer: {
-					ms: 3000, //200000,
+					ms: 200000,
 					after: function() {
 						if(episode.phase > 99)
 							return;
@@ -6974,11 +6974,11 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		startScene: 1,
+		startScene: 2,
 		scenes: [
 			{
 				when: function() {
-						return false;
+						return true;
 					if(localStorage.getItem('qp-tutorial2'))
 						return false;
 					localStorage.setItem('qp-tutorial2', '1');
@@ -7120,6 +7120,7 @@ const __stories = [
 						delete episode.boss.animations.idle.frames[_idleFrameGoIndex].go;
 					}
 					const _airFrames = episode.boss.animations.air2.frames;
+					episode.boss.frame = 0;
 					let _ultimateEffects;
 					_airFrames.forEach(x => {
 						if(x.objects){
@@ -7657,7 +7658,7 @@ const __stories = [
 				]
 			},
 			{
-				map: 42,
+				map: 36,
 				leaderBoards: {
 					calculate: function() {
 						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
@@ -7731,7 +7732,7 @@ const __stories = [
 					mainCharacter.level = 0;
 					mainCharacter.experience = 0;
 					mainCharacter.maxExperience = 833;
-					setCharacterLevel(1, null, 1);
+					setCharacterLevel(10, null, 1);
 					//setCharacterLevel(8, null, 1);
 					addClass(_gameUI, 'demo-playing');
 					episode.pauseBgMusic(1);
@@ -8377,7 +8378,7 @@ const __stories = [
 									</div>
 									<div class="item-action-wrapper flex flex-jc-start w-100">
 										<div class="game-menu-button animate-me flex" onexactclick="wearStatusItem(${_item.id}, ${_powerDiff})">
-											<div class="flex">${getLangData('WEAR')}<span class="flex">(U)</span></div>
+											<div class="flex">${getLangData('WEAR')}<span class="flex">(${getNewKeyboardKey('U').baseKey})</span></div>
 										</div>
 									</div>
 								</div>
@@ -8577,7 +8578,7 @@ const __stories = [
 											atk: mainCharacter.atk,
 											grade: 4
 										});
-										_boss.health = _boss.maxHP = 1;
+										//_boss.health = _boss.maxHP = 1;
 										_boss.class = 'boss';
 										_boss.important = 1;
 										_boss.experience = 0;
@@ -8885,7 +8886,7 @@ const __stories = [
 						count: 1,
 						sight: 1000,
 						//grade: 11,
-						hp: 1, //2000,
+						hp: 1,//2000,
 						zoom: .34,
 						yPosition: function() {
 							return MathRound(groundheight * .5);
@@ -8935,7 +8936,80 @@ const __stories = [
 			},
 			{
 				map: 42,
-				actions: [	{
+				enableCommonSkills: true,
+				actions: [	
+					{
+						when: function() {
+							return mainCharacter?.commonItem && !mainCharacter.commonItemRendered;
+						},
+						do: function() {
+							let _div = document.querySelector('.game-status-screen');
+							if(_div) 
+								_div.remove();
+							_div = document.createElement('div');
+							_div.className = 'flex game-status-screen';
+							_gameUI.appendChild(_div);
+							mainCharacter.commonItemRendered = 1;
+							const _item = mainCharacter.commonItem;
+							const _ci = commonSkills.find(x => x.key === _item.key);
+							const _title = _ci.title[getLang()];
+							const _icon = `<span class="item-in-slot full grade3-item" 
+								style="display:inline-block;position:relative" 
+								onexactclick="mainCharacter.useCommonSkill(1)">
+								<img style="background:#010101" class="item-img" src="./images/common/icons/${_ci.key}.png"/></span>`;
+    
+							const frag = document.createDocumentFragment();
+							const _subDiv = document.createElement('div');
+							_subDiv.innerHTML = `<div data-status-item-id="${_item.id ?? _item.key}" class="flex status-item-container w-50 flex flex-ai-start">
+								<div class="status-item-icon-container">`
+									+ _icon +
+								`</div>
+								<div class="status-item-action-container flex">
+									<div class="item-title-wrapper flex w-50">
+										${_title}
+									</div>
+									<div class="item-title-wrapper flex w-50">
+										
+									</div>
+									<div class="item-action-wrapper flex flex-jc-start w-100">
+										<div class="game-menu-button animate-me flex" onexactclick="mainCharacter.useCommonSkill(1)">
+											<div class="flex">${getLangData('USE')}<span class="flex">(${getNewKeyboardKey('1').baseKey})</span></div>
+										</div>
+									</div>
+								</div>
+							</div>`;
+
+							frag.appendChild(_subDiv.firstElementChild);
+							_div.prepend(frag);
+						}
+					},
+					{
+						when: function() {
+							return episode.pvpCounterValue > 10 && episode.mobPhaseTick && (_gameTick - episode.mobPhaseTick) > 6000;
+						},
+						do: function() {
+							episode.mobPhaseTick = _gameTick;
+							const _maxW = MathRound(episode.width / __zoom);
+							const _minX = MathRound(_maxW * (1 / 6));
+							const _maxX = MathRound(_maxW * (5 / 6));
+							const _minY = MathRound(groundheight * (1 / 10));
+							const _maxY = MathRound(groundheight * (9 / 10));
+							const _parachute = summonMobWithJson({
+								id: 631,
+								level: 1,
+								minX: _minX,
+								maxX: _maxX,
+								yPosition: function() {
+									return getRandomValue2(_minY, _maxY);
+								},
+								sight:1000,
+								count:1,
+								experience: 0
+							}, 0, 1, 1);
+							_parachute.animate('start', 1);
+						}
+					},
+					{
 						when: function() {
 							return episode.phase === 2 && 
 							(episode.deads.filter(x => !x.remove)?.length ?? 0) === 0;
@@ -8999,48 +9073,15 @@ const __stories = [
 						episode.canPause = false;
 						episode.deathMatch = true;
 						episode.mainClass = mainCharacter.class;
-						episode.enemies.forEach(x => {
-							//x.animations içindeki key i dead ile başlayan animasyonları bul
-							Object.keys(x.animations).filter(y => y.startsWith('dead')).forEach(y => {
-								x.animations[y].frames.forEach(z => {
-									if(z.props?.remove) {
-										delete z.props;
-										z.do = function() {
-											x.left = x.startLeft;
-											if(x.startLeft < (episode.cWidth / 2))
-												x.direction = __right;
-											else												
-												x.direction = __left;
-											x.yPosition = getRandomValue2(0, getGroundHeight());
-											x.health = x.maxHP;
-											x.dead = x.dying = x.ultimateUsed = false;
-											delete x.killedBy;
-											const _animaKeys = Object.keys(x.animations);
-											_animaKeys.forEach(y => x.animations[y].next = x.animations[y].realNext);
-											x.animate('idle',1);
-											x.removeBuffs();
-											x.attackerCount = 0;
-											x.setHealth(x.maxHP);
-											x.addBuff({ key: 'release', level: 3, ms: 3000, end: function(_c) {
-												_c.still = _c.immobilize = _c.disableKeyboard = false;
-												delete x.grayAvatar;	
-												const _avatar = document.getElementById('char-' + x.key);
-												if (_avatar)
-													removeClass(_avatar, 'gray');
-											} });
-											x.immobilize = x.still = true;
-											if(x.keyboard)
-												x.disableKeyboard = true;
-											if(x.main)
-											{
-												platformX = 0;
-												prevPlatformX = -1;
-											}
-										}
-									}
-								});
+						mainCharacter.disableSkill('tag');
+						episode.beforePVPStart = function() {
+							episode.mobPhaseTick = _gameTick;
+							episode.enemies.forEach(x => {
+								x.pvpRespawn = true;
+								x.maxHP = x.MAXHP = x.health = mainCharacter.maxHP = 1000;
+								x.setHealth(x.health);
 							});
-						});
+						}
 					});
 				}
 			}
@@ -9637,7 +9678,7 @@ function switchStoryScene(_func, _newOrder) {
 				}
 				removeFocus();
 				__account.commonInventory = [];
-				if(mainCharacter)
+				if(mainCharacter && !__storyScene?.enableCommonSkills)
 					mainCharacter.disableCommonInventory();
 				removeClass(_gameUI, 'demo-playing');
 				if(__storyScene.start)

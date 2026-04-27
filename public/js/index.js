@@ -1060,6 +1060,23 @@ function addEvent(_id, _char) {
 		mainCharacter.keyboard.mouseDown(_char);
 	});
 }
+function enableCommonSkills(_char) {
+	const _html = `<div data-key="1" data-new-key="${document.getElementById('common-skill-1')?.getAttribute?.('data-new-key')}" id='common-skill-1' class="flex common"></div>
+			<div data-key="2" id='common-skill-2' data-new-key="${document.getElementById('common-skill-2')?.getAttribute?.('data-new-key')}" class="flex common"></div>
+			<div data-key="3" id='common-skill-3' data-new-key="${document.getElementById('common-skill-3')?.getAttribute?.('data-new-key')}" class="flex common"></div>
+			<div data-key="4" id='common-skill-4' data-new-key="${document.getElementById('common-skill-4')?.getAttribute?.('data-new-key')}" class="flex common"></div>`;
+	_enemyProfile.innerHTML = _html;
+	if(!episode?.pvp)
+		removeClass(_enemyProfile, 'pvp');
+	_commons = document.querySelectorAll('.common');
+	_char.checkCommonInventory();
+	setTimeout(() => {
+		addEvent('common-skill-1', document.getElementById('common-skill-1')?.getAttribute?.('data-new-key'));
+		addEvent('common-skill-2', document.getElementById('common-skill-2')?.getAttribute?.('data-new-key'));
+		addEvent('common-skill-3', document.getElementById('common-skill-3')?.getAttribute?.('data-new-key'));
+		addEvent('common-skill-4', document.getElementById('common-skill-4')?.getAttribute?.('data-new-key'));
+	}, 20);
+}
 function setCharacterDefaults(_char, _swap) {
 	if (_char.stepSound && !_char.stepSound.paused)
 		_char.stepSound.pause();
@@ -1076,20 +1093,8 @@ function setCharacterDefaults(_char, _swap) {
 		const _bar = document.querySelector('#char-' + _char.key + ' .defbar-value');
 		if (_bar)
 			_bar.style.width = ((_char.fatique / _char.maxFatique) * 100) + '%';
-		if(!episode.pvp) {
-			_enemyProfile.innerHTML = `<div data-key="1" data-new-key="${document.getElementById('common-skill-1')?.getAttribute?.('data-new-key')}" id='common-skill-1' class="flex common"></div>
-					<div data-key="2" id='common-skill-2' data-new-key="${document.getElementById('common-skill-2')?.getAttribute?.('data-new-key')}" class="flex common"></div>
-					<div data-key="3" id='common-skill-3' data-new-key="${document.getElementById('common-skill-3')?.getAttribute?.('data-new-key')}" class="flex common"></div>
-					<div data-key="4" id='common-skill-4' data-new-key="${document.getElementById('common-skill-4')?.getAttribute?.('data-new-key')}" class="flex common"></div>`;
-			removeClass(_enemyProfile, 'pvp');
-			_commons = document.querySelectorAll('.common');
-			_char.checkCommonInventory();
-			setTimeout(() => {
-				addEvent('common-skill-1', document.getElementById('common-skill-1')?.getAttribute?.('data-new-key'));
-				addEvent('common-skill-2', document.getElementById('common-skill-2')?.getAttribute?.('data-new-key'));
-				addEvent('common-skill-3', document.getElementById('common-skill-3')?.getAttribute?.('data-new-key'));
-				addEvent('common-skill-4', document.getElementById('common-skill-4')?.getAttribute?.('data-new-key'));
-			}, 20);
+		if(!episode.pvp || __storyScene?.enableCommonSkills) {
+			enableCommonSkills(_char);
 		}
 		else
 			_char.disableCommonInventory();
@@ -2193,7 +2198,7 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 						delete __storyCheckPoint.warn;
 					removeFocus();
 					__account.commonInventory = [];
-					if(mainCharacter)
+					if(mainCharacter && !__storyScene?.enableCommonSkills)
 						mainCharacter.disableCommonInventory();
 					removeClass(_gameUI, 'demo-playing');
 					_storySceneSwitching = _game.suspended = false;
@@ -2491,6 +2496,17 @@ function skipKeyboardPromo() {
 		addClass(_elem, 'selected');
 		_img.src = './images/ui/star-on.png';
 	}
+}
+function getNewKeyboardKey(_baseKey) {
+	const i = _keyCombinations.findIndex(x => x.baseKey === _baseKey);
+	return{ title: _keyCombinations[i].title, baseKey: __account.keyboard?.[i] ?? _keyCombinations[i].baseKey };
+}
+function getBaseKeyboardKey(_newKey) {
+	if(!__account.keyboard?.[0])
+		return _newKey;
+	const i = __account.keyboard.findIndex(x => x.toLowerCase() === _newKey.toLowerCase());
+	if(i !== -1)
+		return{ title: _keyCombinations[i].title, baseKey: _keyCombinations[i].baseKey };
 }
 function getKeyboardPromo(_force) {
 	const _seenBefore = localStorage.getItem('keyboard-promo-skip');

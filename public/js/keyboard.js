@@ -336,7 +336,7 @@ function keyboard(_character, _keys) {
 		return undefined;
 	}
 	this.getCommonSkillOrder = function () {
-		return parseInt(this.holdingKeys.find(x => x.name === 'common')?.key ?? 0);
+		return this.holdingKeys.find(x => x.name === 'common')?.key ?? 0;
 	}
 	this.getSkill = function () {
 		const _skill = this.holdingKeys.filter(x => x.type === 'skill');
@@ -601,14 +601,23 @@ function keyboard(_character, _keys) {
 }
 window.addEventListener('keydown', function (event) {
 	const kRaw = event.key?.toLowerCase?.();
-	if(kRaw === ' ' && episode?.hasFocusUIDoneBtn) {
-		const _skippableScreen = document.querySelector('.black-screen-ok-btn');
-		if(_skippableScreen) {
-			const _click = _skippableScreen.querySelector('.game-btn2');
-			if(_click)
-				_click.onexactclick();
+	if(kRaw === ' ') {
+		if(episode?.hasFocusUIDoneBtn) {
+			const _skippableScreen = document.querySelector('.black-screen-ok-btn');
+			if(_skippableScreen) {
+				const _click = _skippableScreen.querySelector('.game-btn2');
+				if(_click)
+					_click.onexactclick();
+			}
+			return;
 		}
-		return;
+		else if(!episode || episode.end) {
+			const _btn = document.querySelector('.quick-space-btn');
+			if(_btn && _btn.onexactclick) {
+				_btn.onexactclick();
+				return;
+			}
+		}
 	}
 	if(mainCharacter?.disableKeyboard){
 		mainCharacter.holdingKeys = [];

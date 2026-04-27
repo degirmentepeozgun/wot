@@ -2,6 +2,17 @@
 function leaderboards() {
 	this.cacheKey = "wot-offline-scores";
 	const _self = this;
+	this.offlineData = [
+		{ name: 'Mehmet', poing: 30000 },
+		{ name: 'Ozgun', poing: 29100 },
+		{ name: 'EgeMan', poing: 24300 },
+		{ name: 'Buğra', poing: 17400 },
+		{ name: 'Mur@t', poing: 16600 },
+		{ name: 'Yiiwiit', poing: 10500 },
+		{ name: 'MG', poing: 9100 },
+		{ name: 'Felon', poing: 7200 },
+		{ name: 'Kan€', poing: 7000 }
+	]
 	this.hmacSha256Hex = async function(secretBase64, message) {
 		const keyBytes = Uint8Array.from(
 			atob(secretBase64),
@@ -43,6 +54,8 @@ function leaderboards() {
 			deviceId: this.data.name,
 			missionKey: __story.mission
 		};
+		return;
+
 		webClient.post('missionsession/start', _payload, function(_resp) {
 			const _response = _resp.data;
 			_self.sessionGuid = _response.sessionGuid;
@@ -61,6 +74,15 @@ function leaderboards() {
 			_func([]);
 			return;
 		}
+		const _respData = this.offlineData;
+		if(_respData?.length > 10)
+			_respData.splice(9,1);
+		const _me = _respData.find(x => x.id === this.data.name);
+		if(_me)
+			_me.me = 1;
+		_func(_respData);
+		return;
+
 		webClient.get('leaderboards/get?deviceid=' + this.data.name + '&missionkey=' + __story.mission, function(_resp) {
 			if(_resp.data?.length > 10)
 				_resp.data.splice(9,1);
@@ -102,8 +124,15 @@ function leaderboards() {
 		const _score = __story.point;
 		if(_score <= 0)
 			return false;
-		const _deviceId = this.data.name;
+		
 		const _missionKey = __story.mission;
+		_self.updateScore(_missionKey, _score, 1, _func);
+
+		return true;
+
+
+		const _deviceId = this.data.name;
+		//const _missionKey = __story.mission;
 		const _sessionGuid = this.sessionGuid;
 		const _secretKey = this.secretKey;
 		const payload = `${_sessionGuid}|${_deviceId}|${_missionKey}|${_score}`;

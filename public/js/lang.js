@@ -238,6 +238,7 @@ const __langData = [
 	{ key: 'Lvl', tr: 'Svy'},
 	{ key: 'Match', tr: 'Eşleşme'},
 	{ key: 'START', tr: 'BAŞLAT'},
+	{ key: 'FIGHT', tr: 'BAŞLA'},
 	{ key: 'LEVEL UP!', tr: 'ÜST SEVİYE!'},
 	{ key: 'Victory', tr: 'Zafer'},
 	{ key: 'Draw', tr: 'Berabere'},

@@ -46,7 +46,6 @@ function map(_m) {
 	const _cArr = [c3, c9, c50, c85, c90, cc];
 	for(let _c of _cArr) {
 		_c.innerHTML = '';
-		//_c.style.width = this.width + 'px';
 		_c.style.transform = 'translateX(0)';
 		_c.style.setProperty('-webkit-transform', 'translateX(0)');
 		_c.backgroundSet = undefined;
@@ -62,18 +61,8 @@ function map(_m) {
 	this.status = _m.status ?? 'loading';
 	this.loadObjects = _m.loadObjects;
 	this.loadEnemies = _m.loadEnemies;
-	this.cliffs = _mapSprite.cliffs;
-	this.blocks = _mapSprite.blocks;
-	this.playGrounds = _mapSprite.playGrounds;
-	if(this.playGrounds) {
-		this.playGrounds.forEach(x => {
-			x.minX = MathRound(x.minX * __zoom);
-			x.maxX = MathRound(x.maxX * __zoom);
-			x.bottomGap = MathRound(x.bottomGap * __zoom);
-		});
-	}
-	else
-		this.playGrounds = [];
+	this.cliffs = structuredClone2(_mapSprite.cliffs);
+	this.playGrounds = structuredClone2(_mapSprite.playGrounds);
 	this.enemies = [];
 	this.seenEnemies = [];
 	this.activeSpells = [];
@@ -818,9 +807,10 @@ function map(_m) {
 				}
 			}
 			else if (_diff === _baseTime) {
-				if (pvpCounter.innerText !== 'START') {
+				const _start = getLangData('FIGHT');
+				if (pvpCounter.innerText !== _start) {
 					this.playSound({ key: 'questaccepted', volume: .3 });
-					pvpCounter.innerText = 'START';
+					pvpCounter.innerText = _start;
 					this.addScoreBoard();
 					if(this.beforePVPStart)
 						this.beforePVPStart();
@@ -862,6 +852,7 @@ function map(_m) {
 
 					if (_diff >= 0) {
 						pvpCounter.textContent = diffStr;
+						this.pvpCounterValue = _diff;
 					}
 				}
 			}
@@ -941,6 +932,8 @@ function map(_m) {
 						this.playSound({ key: _killer.gender + 'laugh', reset: true });
 						_msg = '<div class="flex" style="color:#FD1C03;font-weight:600;font-size:larger !important">' + _killer.killCount + ' x Killing Spree!</div>';
 					}
+					if(x.pvpRespawn)
+						x.addPVPRespawnFrame();
 					warn('<div class="pvp-kill">' + _msg + (_killer.main ? __account.name : _killer.displayName ?? _killer.name) + '&nbsp;<span style="color:' + (_killer.enemy ? 'red' : 'blue') + ' !important">' + getLangData('killed') + '</span>&nbsp;' + (x.main ? __account.name : x.displayName ?? x.name) + '</div>', 'level-up', null, null, 1);
 				}
 				else
@@ -5447,17 +5440,6 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 		this.cUIWidth = _canvas.width * __scale;
 		this.dmgFrameHeight = this.cHeight / 20;
 		this.dmgFrameTopBoundary = MathRound(this.cHeight * .15);
-		if(this.blocks) {
-			this.blocks.forEach(x => {
-				x.x = MathRound(x.l * __zoom);
-				x.y = MathRound(x.t * __zoom);
-				x.width = MathRound(x.w * __zoom);
-				x.height = MathRound(x.h * __zoom);
-			});
-			this.hasBlocks = true;
-		}
-		else
-			this.hasBlocks = false;
 		this.RECT = { 
 			left: 0, 
 			right: this.cWidth,
@@ -5509,6 +5491,21 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 		this.spritesDrawnBackGround = this.spritesDrawnForeGround = false;
 		this.layersDrawn = 0;
 		prevPlatformX = -1;
+		if(this.cliffs) {
+			this.cliffs.forEach(x => {
+				x.minX = MathRound(x.min_X * __zoom);
+				x.maxX = MathRound(x.max_X * __zoom);
+			});
+		}
+		if(this.playGrounds) {
+			this.playGrounds.forEach(x => {
+				x.minX = MathRound(x.min_X * __zoom);
+				x.maxX = MathRound(x.max_X * __zoom);
+				x.bottomGap = MathRound(x.bottom_Gap * __zoom);
+			});
+		}
+		else
+			this.playGrounds = [];
 		this.drawSpriteObjects2();
 		this.drawLayers();
 	}

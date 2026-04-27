@@ -1547,7 +1547,7 @@ function askSomething(_question, _okFuncString, _singletonAttr, _container) {
 				</div>
 				<div style="padding:4vh 2vh" class="flex">
 					<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
-					<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="${_okFuncString}">${getLangData('YES')}</div>
+					<div class="quick-space-btn game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="${_okFuncString}">${getLangData('YES')}</div>
 				</div>
 			</div>
 		</div>`;
