@@ -4573,10 +4573,10 @@ const mapSprites = [
 			{ min_X: MathRound(4544 * 1.065), round: { rate: .44, dir: __left}, max_X:MathRound(6144 * 1.065), bottom_Gap: 20 },
 		],
 		cliffs: [
-			{ minYRate: 85, maxYRate: 100, min_X: MathRound(1900 * 1.065), max_X: MathRound(2700 * 1.065), background: true },
-			{ minYRate: 85, maxYRate: 100, min_X: MathRound(3400 * 1.065), max_X: MathRound(4200 * 1.065), background: true },
-			{ minYRate: 0, maxYRate: 15, min_X: MathRound(2000 * 1.065), max_X: MathRound(2850 * 1.065), foreground: true },
-			{ minYRate: 0, maxYRate: 15, min_X: MathRound(3300 * 1.065), max_X: MathRound(4150 * 1.065), foreground: true }
+			{ minYRate: 85, maxYRate: 100, min_X: MathRound(1850 * 1.065), max_X: MathRound(2700 * 1.065), background: true },
+			{ minYRate: 85, maxYRate: 100, min_X: MathRound(3400 * 1.065), max_X: MathRound(4250 * 1.065), background: true },
+			{ minYRate: 0, maxYRate: 15, min_X: MathRound(1950 * 1.065), max_X: MathRound(2650 * 1.065), foreground: true },
+			{ minYRate: 0, maxYRate: 15, min_X: MathRound(3500 * 1.065), max_X: MathRound(4200 * 1.065), foreground: true }
 		],
 		mobs: [
 			{

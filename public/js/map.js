@@ -61,8 +61,8 @@ function map(_m) {
 	this.status = _m.status ?? 'loading';
 	this.loadObjects = _m.loadObjects;
 	this.loadEnemies = _m.loadEnemies;
-	this.cliffs = structuredClone2(_mapSprite.cliffs);
-	this.playGrounds = structuredClone2(_mapSprite.playGrounds);
+	this.cliffs = !_mapSprite.cliffs ? undefined : structuredClone2(_mapSprite.cliffs);
+	this.playGrounds = !_mapSprite.playGrounds ? undefined : structuredClone2(_mapSprite.playGrounds);
 	this.enemies = [];
 	this.seenEnemies = [];
 	this.activeSpells = [];

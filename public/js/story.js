@@ -8985,7 +8985,7 @@ const __stories = [
 					},
 					{
 						when: function() {
-							return episode.pvpCounterValue > 10 && episode.mobPhaseTick && (_gameTick - episode.mobPhaseTick) > 6000;
+							return episode.pvpCounterValue > 10 && episode.mobPhaseTick && (_gameTick - episode.mobPhaseTick) > 60000;
 						},
 						do: function() {
 							episode.mobPhaseTick = _gameTick;
@@ -9009,37 +9009,37 @@ const __stories = [
 							_parachute.animate('start', 1);
 						}
 					},
-					{
-						when: function() {
-							return episode.phase === 2 && 
-							(episode.deads.filter(x => !x.remove)?.length ?? 0) === 0;
-						},
-						do: function() {
-							__storyPlaying = false;
-							episode.pvp = episode.war = false;
-							mainCharacter.class = episode.mainClass;
-							delete episode.mainClass;
-							installStoryFinish();
-							episode.phase = 3;
-						}
-					},
-					{
-						when: function() {
-							return episode.phase < 2 && episode.pvpEnded;
-							//episode.enemies dizisinde groupId si olan enemylerin groupId lerini distinctleyerek al ve length i 1 ni diye bak
-							return episode.phase === 1 && 
-							episode.enemies.filter(x => x.groupId && x.health > 0).map(x => x.groupId).filter((value, index, self) => self.indexOf(value) === index)?.length === 1;
-						},
-						do: function() {
-							episode.phase = 2;
-							episode.deads = episode.enemies.filter(x => x.groupId && x.health <= 0);	
-							episode.pauseBgMusic();
-							PlaySound({ key:'deepimpact', volume: 1 });
-							if(mainCharacter)
-								cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
+					// {
+					// 	when: function() {
+					// 		return episode.phase === 2 && 
+					// 		(episode.deads.filter(x => !x.remove)?.length ?? 0) === 0;
+					// 	},
+					// 	do: function() {
+					// 		__storyPlaying = false;
+					// 		episode.pvp = episode.war = false;
+					// 		mainCharacter.class = episode.mainClass;
+					// 		delete episode.mainClass;
+					// 		installStoryFinish();
+					// 		episode.phase = 3;
+					// 	}
+					// },
+					// {
+					// 	when: function() {
+					// 		return episode.phase < 2 && episode.pvpEnded;
+					// 		//episode.enemies dizisinde groupId si olan enemylerin groupId lerini distinctleyerek al ve length i 1 ni diye bak
+					// 		return episode.phase === 1 && 
+					// 		episode.enemies.filter(x => x.groupId && x.health > 0).map(x => x.groupId).filter((value, index, self) => self.indexOf(value) === index)?.length === 1;
+					// 	},
+					// 	do: function() {
+					// 		episode.phase = 2;
+					// 		episode.deads = episode.enemies.filter(x => x.groupId && x.health <= 0);	
+					// 		episode.pauseBgMusic();
+					// 		PlaySound({ key:'deepimpact', volume: 1 });
+					// 		if(mainCharacter)
+					// 			cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
 
-						}
-					}
+					// 	}
+					// }
 				],
 				do: function() {
 					__account.inventory = [];
