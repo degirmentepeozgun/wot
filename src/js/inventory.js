@@ -925,7 +925,7 @@ function hasMaterial(_type) {
 function getCharacterStats(_char) {
     const _c = _char ?? mainCharacter;
     if(!_c)
-        return false;
+        return null;
     var _items = getItems(_char)?.filter(x => x.weared === _c.class) ?? [];
     if(!_items?.[0])
         return null;
@@ -1047,9 +1047,11 @@ function applyBonusStats(_char) {
     _c.bonusDef = (1 + (_bonuses.def / 100));
 }
 function applyCharacterStats(hasMainCharacter, _char) {
-    var _stats = getCharacterStats(_char);
-    if(!_stats)
-        return;
+    var _stats = getCharacterStats(_char) ?? { 
+        op: [],
+        dp: [],
+        mp: []
+    };
     if(!_char)
         applyBonusStats();
     const _c = _char ?? mainCharacter;
@@ -1098,9 +1100,9 @@ function applyCharacterStats(hasMainCharacter, _char) {
         _c.resilienceRate = _stats.dp.find(x => x.key === 'resilience-rate')?.value ?? 0;
     }
     if(!hasMainCharacter)
-        _c.setHealth(_c.MAXHP, 0, 0, 13);
+        _c.setHealth(_c.MAXHP, 0, 0);
     else
-        _c.setHealth(_c.health, 0, 0, 14);
+        _c.setHealth(_c.health, 0, 0);
 }
 function applyDefaultCharacterStats(_c) {
     _c.atk = 50;
@@ -1155,7 +1157,11 @@ function openCharacterInfoModal() {
     var _level = mainCharacter.level;
     var _class = mainCharacter.class;
     _class = getLangData(_class).toProperCase();
-    var _stats = getCharacterStats();
+    var _stats = getCharacterStats() ?? { 
+        op: [],
+        dp: [],
+        mp: []
+    };
     var _offensiveProps = _stats.op, _defensiveProps = _stats.dp, _miscProps = _stats.mp;
     let _props = '<div style="color:#f3f4f599 !important; position:relative" class="stats-group-title">' + getLangData('Offensive Stats') + '<img src="./images/icons/sword.png" style="opacity:.65;position:absolute;height:70%;top:15%;right:3vh" /></div>';
     //var _atk = _offensiveProps.find(x => x.key === 'atk')?.value ?? 1;

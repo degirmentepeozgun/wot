@@ -336,7 +336,7 @@ function keyboard(_character, _keys) {
 		return undefined;
 	}
 	this.getCommonSkillOrder = function () {
-		return parseInt(this.holdingKeys.find(x => x.name === 'common')?.key ?? 0);
+		return this.holdingKeys.find(x => x.name === 'common')?.key ?? 0;
 	}
 	this.getSkill = function () {
 		const _skill = this.holdingKeys.filter(x => x.type === 'skill');
@@ -599,41 +599,70 @@ function keyboard(_character, _keys) {
 		this.action(_key);
 	}
 }
-// window.addEventListener('keydown', function (event) {
-// 	if(mainCharacter?.disableKeyboard){
-// 		mainCharacter.holdingKeys = [];
-// 		return;
-// 	}
-// 	if (event.repeat) return;
-// 	try {
-// 		if (event?.key) {
-// 			if (event.which === 9)
-// 				event.preventDefault();
-// 			// if(!mainCharacter.keyboard)
-// 			// 	switchAutoMode();
-// 			mainCharacter.keyboard.mouseDown(event.key.toLocaleLowerCase());
-// 		}
-// 	} catch (e) {
+window.addEventListener('keydown', function (event) {
+	const kRaw = event.key?.toLowerCase?.();
+	if(kRaw === ' ') {
+		if(episode?.hasFocusUIDoneBtn) {
+			const _skippableScreen = document.querySelector('.black-screen-ok-btn');
+			if(_skippableScreen) {
+				const _click = _skippableScreen.querySelector('.game-btn2');
+				if(_click)
+					_click.onexactclick();
+			}
+			return;
+		}
+		else if(!episode || episode.end) {
+			const _btn = document.querySelector('.quick-space-btn');
+			if(_btn && _btn.onexactclick) {
+				_btn.onexactclick();
+				return;
+			}
+		}
+	}
+	if(mainCharacter?.disableKeyboard){
+		mainCharacter.holdingKeys = [];
+		return;
+	}
+	if (event.repeat) return;
+	try {
+  		if(kRaw === ' ' && episode?.hasSkippableScreen) {
+			const _skippableScreen = document.querySelector('.quick-play-desc-container');
+			if(_skippableScreen) {
+				const _click = _skippableScreen.querySelector('[onexactclick]');
+				if(_click)
+					_click.onexactclick();
+			}
+			return;
+		}
+		if (event?.key) {
+			if (event.which === 9)
+				event.preventDefault();
+			// if(!mainCharacter.keyboard)
+			// 	switchAutoMode();
+			pressSkill(event);
+			mainCharacter.keyboard.mouseDown(event.key.toLocaleLowerCase());
+		}
+	} catch (e) {
 
-// 	}
-// });
-// window.addEventListener('keyup', function (event) {
-// 	if(mainCharacter?.disableKeyboard){
-// 		mainCharacter.holdingKeys = [];
-// 		return;
-// 	}
-// 	try {
-// 		if (event?.key) {
-// 			if (event.which === 9)
-// 				event.preventDefault();
-// 			// if(!mainCharacter.keyboard)
-// 			// 	switchAutoMode();
-// 			mainCharacter.keyboard.mouseUp(event.key.toLowerCase());
-// 		}
-// 	} catch (e) {
+	}
+});
+window.addEventListener('keyup', function (event) {
+	if(mainCharacter?.disableKeyboard){
+		mainCharacter.holdingKeys = [];
+		return;
+	}
+	try {
+		if (event?.key) {
+			if (event.which === 9)
+				event.preventDefault();
+			// if(!mainCharacter.keyboard)
+			// 	switchAutoMode();
+			mainCharacter.keyboard.mouseUp(event.key.toLowerCase());
+		}
+	} catch (e) {
 
-// 	}
-// });
+	}
+});
 // window.addEventListener("blur", () => {
 // 	if(mainCharacter?.keyboard)
 // 		mainCharacter.keyboard.holdingKeys = [];
@@ -817,55 +846,55 @@ function normalizeKey(key) {
 
 const directionKeys = new Set(['w','a','s','d','arrowleft','arrowright','arrowup','arrowdown']);
 
-window.addEventListener('keydown', (e) => {
-  const kRaw = e.key?.toLowerCase?.();
-  if(kRaw === ' ' && episode?.hasSkippableScreen) {
-		const _skippableScreen = document.querySelector('.quick-play-desc-container');
-		if(_skippableScreen) {
-			const _click = _skippableScreen.querySelector('[onexactclick]');
-			if(_click)
-				_click.onexactclick();
-		}
-		return;
-  }
-  if(e.repeat) {
-	if(!physicalKeys.has(kRaw))
-		return;
-  }
-  if (mainCharacter?.disableKeyboard || mainCharacter?.stop) {
-	blurKeyboard();
-	return;
-  }
+// window.addEventListener('keydown', (e) => {
+//   const kRaw = e.key?.toLowerCase?.();
+//   if(kRaw === ' ' && episode?.hasSkippableScreen) {
+// 		const _skippableScreen = document.querySelector('.quick-play-desc-container');
+// 		if(_skippableScreen) {
+// 			const _click = _skippableScreen.querySelector('[onexactclick]');
+// 			if(_click)
+// 				_click.onexactclick();
+// 		}
+// 		return;
+//   }
+//   if(e.repeat) {
+// 	if(!physicalKeys.has(kRaw))
+// 		return;
+//   }
+//   if (mainCharacter?.disableKeyboard || mainCharacter?.stop) {
+// 	blurKeyboard();
+// 	return;
+//   }
 
   
-  if (!kRaw) return;
+//   if (!kRaw) return;
 
-  const now = performance.now();
-  const lastUpTime = lastUp[kRaw] || 0;
+//   const now = performance.now();
+//   const lastUpTime = lastUp[kRaw] || 0;
 
-  const antiGhostMs = directionKeys.has(kRaw)
-    ? antiGhostMsDir
-    : antiGhostMsOther;
+//   const antiGhostMs = directionKeys.has(kRaw)
+//     ? antiGhostMsDir
+//     : antiGhostMsOther;
 
-  // Ghost engelleme (çok hızlı basılıp bırakılmış gibi olaylar)
-  if (now - lastUpTime < antiGhostMs)
-    return;
-  pressSkill(e);
-  lastDown[kRaw] = now;
-  physicalKeys.add(kRaw);
-});
+//   // Ghost engelleme (çok hızlı basılıp bırakılmış gibi olaylar)
+//   if (now - lastUpTime < antiGhostMs)
+//     return;
+//   pressSkill(e);
+//   lastDown[kRaw] = now;
+//   physicalKeys.add(kRaw);
+// });
 
-window.addEventListener('keyup', (e) => {
-  const kRaw = e.key?.toLowerCase?.();
-  if (!kRaw) return;
+// window.addEventListener('keyup', (e) => {
+//   const kRaw = e.key?.toLowerCase?.();
+//   if (!kRaw) return;
 
-  lastUp[kRaw] = performance.now();
-  physicalKeys.delete(kRaw);
-});
+//   lastUp[kRaw] = performance.now();
+//   physicalKeys.delete(kRaw);
+// });
 
 // Blur'da tüm tuşları temizleyelim
 function blurKeyboard() {
-  physicalKeys.clear();
+  //physicalKeys.clear();
   for (const k in lastDown) delete lastDown[k];
   for (const k in lastUp) delete lastUp[k];
 
@@ -875,41 +904,6 @@ function blurKeyboard() {
 
 window.addEventListener('blur', blurKeyboard);
 let frameCounter = 0;
-
-function syncKeysRobust() {
-  if (!mainCharacter?.keyboard){
-	blurKeyboard();
-    return requestAnimationFrame(syncKeysRobust);
-  }
-
-  const doSync = !__isPC || (frameCounter++ % 3 === 0);
-
-  if (doSync) {
-
-    // normalize edilmiş logical key seti
-    const logicalKeys = new Set(Array.from(physicalKeys, normalizeKey));
-
-    // şu an oyunda kayıtlı holdingKeys
-    const currentHolding = new Set(
-      mainCharacter.keyboard.holdingKeys.map(x => x.key)
-    );
-
-    // ✔ Yeni basılanlar → mouseDown
-    for (const k of logicalKeys)
-      if (!currentHolding.has(k))
-        mainCharacter.keyboard.mouseDown(k);
-
-    // ✔ Bırakılanlar → mouseUp
-    for (const k of currentHolding)
-      if (!logicalKeys.has(k))
-        mainCharacter.keyboard.mouseUp(k);
-  }
-
-  requestAnimationFrame(syncKeysRobust);
-}
-
-syncKeysRobust();
-
 
 
 function resetTouchPad() {
@@ -925,14 +919,10 @@ function resetDPadKeyCommands() {
 		return;
 	// if(!mainCharacter.keyboard)
 	// 	switchAutoMode();
-	// mainCharacter.keyboard.mouseUp('w');
-	// mainCharacter.keyboard.mouseUp('a');
-	// mainCharacter.keyboard.mouseUp('s');
-	// mainCharacter.keyboard.mouseUp('d');
-	physicalKeys.delete('a');
-	physicalKeys.delete('w');
-	physicalKeys.delete('s');
-	physicalKeys.delete('d');
+	mainCharacter.keyboard.mouseUp('w');
+	mainCharacter.keyboard.mouseUp('a');
+	mainCharacter.keyboard.mouseUp('s');
+	mainCharacter.keyboard.mouseUp('d');
 }
 let lastAngle = null;
 let lastDirKeys = new Set();
@@ -948,7 +938,7 @@ function calculateSin(currentX, currentY) {
 
 	const angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
-	resetDPadKeyCommands();
+	//resetDPadKeyCommands();
 	const _directionChangeable = mainCharacter && (mainCharacter.animation === 'idle' ||
 		mainCharacter.animation === 'run' || mainCharacter.animation === 'walk'
 	);
@@ -960,80 +950,40 @@ function calculateSin(currentX, currentY) {
 	}
 	if (angle >= -30 && angle < 30) {
 		// sağ
-		physicalKeys.add('d');
+		mainCharacter.keyboard.mouseDown('d');
 	}
 	else if (angle >= 30 && angle < 65) {
 		// sağ-alt
-		physicalKeys.add('d');
-		physicalKeys.add('s');
+		mainCharacter.keyboard.mouseDown('d');
+		mainCharacter.keyboard.mouseDown('s');
 	}
 	else if (angle >= 65 && angle < 115) {
 		// alt
-		physicalKeys.add('s');
+		mainCharacter.keyboard.mouseDown('s');
 	}
 	else if (angle >= 115 && angle < 150) {
 		// sol-alt
-		physicalKeys.add('s');
-		physicalKeys.add('a');
+		mainCharacter.keyboard.mouseDown('s');
+		mainCharacter.keyboard.mouseDown('a');
 	}
 	else if (angle >= 150 || angle < -150) {
 		// sol
-		physicalKeys.add('a');
+		mainCharacter.keyboard.mouseDown('a');
 	}
 	else if (angle >= -150 && angle < -115) {
 		// sol-üst
-		physicalKeys.add('a');
-		physicalKeys.add('w');
+		mainCharacter.keyboard.mouseDown('a');
+		mainCharacter.keyboard.mouseDown('w');
 	}
 	else if (angle >= -115 && angle < -65) {
 		// üst
-		physicalKeys.add('w');
+		mainCharacter.keyboard.mouseDown('w');
 	}
 	else if (angle >= -65 && angle < -30) {
 		// sağ-üst
-		physicalKeys.add('w');
-		physicalKeys.add('d');
+		mainCharacter.keyboard.mouseDown('w');
+		mainCharacter.keyboard.mouseDown('d');
 	}
-	// if (angle >= -22.5 && angle < 22.5) {
-	// 	//mainCharacter.keyboard.mouseDown('d'); // sağ
-	// 	physicalKeys.add('d');
-	// }
-	// else if (angle >= 22.5 && angle < 67.5) {
-	// 	//mainCharacter.keyboard.mouseDown('d');
-	// 	physicalKeys.add('d');
-	// 	//mainCharacter.keyboard.mouseDown('s'); // sağ-alt
-	// 	physicalKeys.add('s');
-	// }
-	// else if (angle >= 67.5 && angle < 112.5) {
-	// 	//mainCharacter.keyboard.mouseDown('s'); // alt
-	// 	physicalKeys.add('s');
-	// }
-	// else if (angle >= 112.5 && angle < 157.5) {
-	// 	//mainCharacter.keyboard.mouseDown('s');
-	// 	physicalKeys.add('s');
-	// 	//mainCharacter.keyboard.mouseDown('a'); // sol-alt
-	// 	physicalKeys.add('a');
-	// }
-	// else if (angle >= 157.5 || angle < -157.5) {
-	// 	//mainCharacter.keyboard.mouseDown('a'); // sol
-	// 	physicalKeys.add('a');
-	// }
-	// else if (angle >= -157.5 && angle < -112.5) {
-	// 	//mainCharacter.keyboard.mouseDown('a');
-	// 	physicalKeys.add('a');
-	// 	//mainCharacter.keyboard.mouseDown('w'); // sol-üst
-	// 	physicalKeys.add('w');
-	// }
-	// else if (angle >= -112.5 && angle < -67.5) {
-	// 	//mainCharacter.keyboard.mouseDown('w'); // üst
-	// 	physicalKeys.add('w');
-	// }
-	// else if (angle >= -67.5 && angle < -22.5) {
-	// 	//mainCharacter.keyboard.mouseDown('w');
-	// 	physicalKeys.add('w');
-	// 	//mainCharacter.keyboard.mouseDown('d'); // sağ-üst
-	// 	physicalKeys.add('d');
-	// }
 }
 let deadZone, touch_startX, touch_startY;
 let lastValidTouch = null;

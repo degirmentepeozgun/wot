@@ -657,7 +657,7 @@ const __stories = [
 				map: 105,
 				startWith: 47,
 				noArtifact: 1,
-				loadingCharacterIds: [ 51,52,19 ],
+				loadingCharacterIds: [ 51,52,19,54 ],
 				actions: [
 					{
 						when: function() {
@@ -678,9 +678,11 @@ const __stories = [
 							_princess.invulnerable = true;
 							addClass(_gameUI, 'disable-ui');
 							episode.removeLocationHand();
-							mainCharacter.direction = 'right';
+							mainCharacter.direction = __right;
 							mainCharacter.standBy();
 							mainCharacter.left = MathRound(episode.cWidth * .2);
+							_princess.direction = _king.direction = __left;
+							_king.important = _princess.important = true;
 							mainCharacter.updateVariables();
 							mainCharacter.yPosition = MathRound(groundheight * .5);
 							if(mainCharacter.rageCount > 0 || mainCharacter.ultimate) {
@@ -1489,6 +1491,7 @@ const __stories = [
 							delete mainCharacter.disableKeyboard;
 							takeQuest(0, 1, null, null, 1);
 							delete mainCharacter.animations.roll.cooldown;
+							mainCharacter.atk = 200;
 							delete mainCharacter.animations.roll.coolDownLeft;
 							episode.enemies.filter(x => x.enemy && x.class !== 'object')?.forEach(x => {
 								x.invulnerable = false;
@@ -6173,6 +6176,7 @@ const __stories = [
 									PlaySound({key: 'alhand', volume: .2});
 								_mob.experience = 0;
 								_mob.class = 'minion';
+								_mob.owner = _owner;
 								_mob.left = mainCharacter.left + platformX;
 								_mob.LEFT = mainCharacter.LEFT + platformX;
 								_mob.EXACTLEFT = mainCharacter.EXACTLEFT;
@@ -6876,8 +6880,9 @@ const __stories = [
 					//return !isMissionFailed(0) && !isMissionFailed(2) &&
 					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
 			}},
-			{ id: 3, key: 'heart', value: 1, title: 'Stay above 1 heart', when: function(_item) {
-				return mainCharacter.heartCount > _item.value;
+			{ id: 3, key: 'war', title: 'Win the death match', when: function(_item) {
+				//return (mainCharacter.heartCount > _item.value || (mainCharacter.groupId && mainCharacter.health > 0));
+				return episode.team1score > episode.team2score;
 			}}
 		],
 		rewards: [
@@ -6924,7 +6929,7 @@ const __stories = [
 				minLevel: 1,
 				maps: [11],
 				timer: {
-					ms: 150000,
+					ms: 200000,
 					after: function() {
 						if(episode.phase > 99)
 							return;
@@ -6938,34 +6943,137 @@ const __stories = [
 			{
 				id: 1012,
 				names: {
-					en: 'Face the giant',
-					tr: 'Dev ile yüzleş'
+					en: 'Party Time',
+					tr: 'Parti Zamanı'
 				},
 				descriptions: {
-					en: 'Eliminate Cyclops',
-					tr: 'Tepegöz\'ü Yok Et'
+					en: 'Eliminate Sisters',
+					tr: 'Kardeşleri Yok Et'
 				},
 				owner: 'system',
 				minLevel: 1,
 				kills: [
 					{
-						enemy: [47],
+						enemy: [37],
 						limit: 1,
 						descriptions: {
-							en: 'Cyclops Cleared',
-							tr: 'Tepegöz Temizlendi'
+							en: 'Yecüc Cleared',
+							tr: 'Yecüc Temizlendi'
 						}
+					},
+					{ 
+						enemy: [38], 
+						limit: 1, 
+						descriptions: {
+							en: 'Mecüc Cleared',
+							tr: 'Mecüc Temizlendi'
+						} 
 					}
 				],
 				maps: [11]
 			}
 		],
 		heartCount : 3,
+		//startScene: 2,
 		scenes: [
 			{
 				when: function() {
-					return false;
+						return true;
+					if(localStorage.getItem('qp-tutorial2'))
+						return false;
+					localStorage.setItem('qp-tutorial2', '1');
+					return true;
 				},
+				lang: [
+					{
+						title : {
+							en: 'Dodge',
+							tr: 'Kaçmak'
+						},
+						en: "You can avoid attacks by choosing a direction and roll, or by dashing backwards without direction",
+						tr: "Saldırılardan kaçmak için bir yön seçip yuvarlanabilir veya yön seçmeden geri doğru atılabilirsiniz"
+					},
+					{
+						en: "Well done",
+						tr: "Aferin"
+					},
+					{
+						title : {
+							en: 'Counter Attack',
+							tr: 'Karşı Saldırı'
+						},
+						en: "Hold block before attack or press here after attack to make counterattack",
+						tr: "Saldırıdan önce kalkan tutarak veya saldırıdan sonra buraya basarak karşı saldırı yapabilirsiniz"
+					},
+					{
+						en: "Good job",
+						tr: "Tebrikler"
+					},
+					{
+						title : {
+							en: 'Combo Move',
+							tr: 'Kombin Hamle'
+						},
+						en: "Hold attack to combo your opponent until you knockback him",
+						tr: "Saldırıya basılı tutarak rakibinizin geri savrulmasına kadar kombolayabilirsiniz"
+					},
+					{
+						en: "No no no",
+						tr: "Hayır hayır hayır"
+					},
+					{
+						en: "Coool",
+						tr: "Harika"
+					},
+					{
+						title : {
+							en: 'Charge Attack',
+							tr: 'Şarj Saldırısı'
+						},
+						en: "Now use your attack again to charge and getting close to your opponent",
+						tr: "Şimdi saldırınızı tekrar kullanarak şarj edin ve rakibinize yaklaşın"
+					},
+					{
+						en: "Superb",
+						tr: "Süper"
+					},
+					{
+						title : {
+							en: 'Ground Attack',
+							tr: 'Yer Saldırısı'
+						},
+						en: "Last lesson! Time to break your opponent\'s powerful skill. Skill priority works for getting advantage when both sides attack",
+						tr: "Son ders! Rakibinizin güçlü yeteneğini kırma zamanı. Her iki taraf saldırdığında yetenek önceliği avantaj sağlar"
+					},
+					{
+						title : {
+							en: 'Air Attack',
+							tr: 'Hava Saldırısı'
+						},
+						en: "Let's continue our combo and keep enemy on air",
+						tr: "Kombinimize devam edelim ve düşmanı havada tutalım"
+					},
+					{
+						title : {
+							en: 'Chain Attack',
+							tr: 'Zincir Saldırısı'
+						},
+						en: "That ability has an another phase to keep your combo up",
+						tr: "O yeteneğin kombinizi sürdürmek için başka bir aşaması var"
+					},
+					{
+						title : {
+							en: 'Ranged Attack',
+							tr: 'Menzilli Saldırı'
+						},
+						en: "One last move but this time enemy is far away, use your ranged attack to take this rat down!",
+						tr: "Son hamle ama bu sefer düşman uzakta, bu sıçanı indirmek için menzilli saldırınızı kullanın!"
+					},
+					{
+						en: "Spot on! Now you are ready",
+						tr: "İnanılmaz! Artık hazırsın"
+					}
+				],
 				map: 9998,
 				loots: [
 				],
@@ -7004,7 +7112,15 @@ const __stories = [
 					episode.boss = _enemy;
 					episode.noDamageFrame = true;
 					episode.boss.difficulty = 1;
+					const _idleFrames = episode.boss.animations.idle.frames;
+					const _idleFrameGoIndex = _idleFrames.findIndex(x => x.go);
+					if(_idleFrameGoIndex > -1){
+						episode.boss.animations.idle.frames =
+							_idleFrames.filter((x, i) => i <= _idleFrameGoIndex);
+						delete episode.boss.animations.idle.frames[_idleFrameGoIndex].go;
+					}
 					const _airFrames = episode.boss.animations.air2.frames;
+					episode.boss.frame = 0;
 					let _ultimateEffects;
 					_airFrames.forEach(x => {
 						if(x.objects){
@@ -7038,9 +7154,9 @@ const __stories = [
 						_div.className = 'flex show-ui flex-ai-start tutorial-box fade-me';
 						_div.innerHTML = `<img class="tutorial-avatar flip" src="./images/main/blacksmith/concept.png" />
 						<div class="tutorial-box-inner full">
-							<b class="tutorial-title">Dodge:</b>
+						<b class="tutorial-title">${__storyScene.lang[0].title[getLang()]}:</b>
 							<div class="w-100 tutorial-description-text">
-								You can avoid attacks by choosing a direction and roll, or by dashing backwards without direction
+								${__storyScene.lang[0][getLang()]}
 							</div>	
 						</div>`;
 						_gameUI.appendChild(_div);
@@ -7093,7 +7209,7 @@ const __stories = [
 								const _inner = document.querySelector('.tutorial-box-inner');
 								const _div = document.createElement('div');
 								_div.className = "w-100 pt-3 toxic fade-me flex w-100 flex-jc-start";
-								_div.innerHTML = '<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;Well done!';
+								_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[1][getLang()]}!`;
 								_inner.appendChild(_div);
 								disposeFocus();
 								episode.boss.animations.ground1.chargeDistance = episode.boss.animations.ground1.chargingDistance;
@@ -7123,10 +7239,9 @@ const __stories = [
 								_id = 'chain-skill-4';
 							_game.suspended = 1;
 							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerHTML = `<b class="tutorial-title fade-me">Counter Attack:</b>
+							_inner.innerHTML = `<b class="tutorial-title fade-me">${__storyScene.lang[2].title[getLang()]}:</b>
 							<div class="w-100 fade-me tutorial-description-text"">
-								Hold block before attack or press here after attack to make counterattack</div>`;
-							
+								${__storyScene.lang[2][getLang()]}</div>`;
 							focusMe('#' + _id, function() {
 								removeFocus();
 								delete _game.suspended;
@@ -7139,7 +7254,7 @@ const __stories = [
 								
 								const _div = document.createElement('div');
 								_div.className = "w-100 pt-3 toxic fade-me flex w-100 flex-jc-start";
-								_div.innerHTML = '<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;Goold job!';
+								_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[3][getLang()]}!`;
 								_inner.appendChild(_div);
 								disposeFocus();
 								episode.tutorialOrder = 3;
@@ -7158,7 +7273,8 @@ const __stories = [
 						do: function() {
 							_game.suspended = 1;
 							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerHTML = '<b class="tutorial-title">Combo:</b><div class="w-100 fade-me">Hold attack to combo your opponent until you knockback him</div>';
+							_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[4].title[getLang()]}:</b>
+							<div class="w-100 fade-me">${__storyScene.lang[4][getLang()]}</div>`;
 							delete mainCharacter.disableKeyboard;
 							focusMe('#skill1', function() {
 								removeFocus();
@@ -7184,7 +7300,7 @@ const __stories = [
 							const _inner = document.querySelector('.tutorial-box-inner');
 							const _div = document.createElement('div');
 							_div.className = "w-100 pt-3 fire fade-me flex w-100 flex-jc-start";
-							_div.innerHTML = '<img src="./images/icons/cross.png" style="height:3.6vh" />&nbsp;No no no!';
+							_div.innerHTML = `<img src="./images/icons/cross.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[5][getLang()]}!`;
 							_inner.appendChild(_div);
 							mainCharacter.immobilize = true;
 							mainCharacter.disableKeyboard = mainCharacter.still = true;
@@ -7204,7 +7320,7 @@ const __stories = [
 							const _inner = document.querySelector('.tutorial-box-inner');
 							const _div = document.createElement('div');
 							_div.className = "w-100 pt-3 toxic fade-me flex w-100 flex-jc-start";
-							_div.innerHTML = '<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;Coool!';
+							_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[6][getLang()]}!`;
 							_inner.appendChild(_div);
 							mainCharacter.immobilize = true;
 							mainCharacter.disableKeyboard = mainCharacter.still = true;
@@ -7222,7 +7338,8 @@ const __stories = [
 						do: function() {
 							_game.suspended = 1;
 							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerHTML = '<b class="tutorial-title">Charge Attack:</b><div class="w-100 fade-me">Now use your attack again to charge and getting close to your opponent</div>';
+							_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[7].title[getLang()]}:</b>
+							<div class="w-100 fade-me">${__storyScene.lang[7][getLang()]}</div>`;
 							delete mainCharacter.disableKeyboard;
 							focusMe('#skill1', function() {
 								removeFocus();
@@ -7250,7 +7367,7 @@ const __stories = [
 							const _inner = document.querySelector('.tutorial-box-inner');
 							const _div = document.createElement('div');
 							_div.className = "w-100 pt-3 toxic fade-me flex w-100 flex-jc-start";
-							_div.innerHTML = '<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;Superb!';
+							_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[8][getLang()]}!`;
 							_inner.appendChild(_div);
 							mainCharacter.immobilize = mainCharacter.still = true;
 							const _air2 = episode.boss.animations.air2;
@@ -7284,9 +7401,9 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerHTML = `<b class="tutorial-title">Ground Attack:</b>
+							_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[9].title[getLang()]}:</b>
 							<div class="w-100 fade-me tutorial-description-text">
-								Last lesson! Time to break your opponent\'s powerful skill. Skill priority works for getting advantage when both sides attack
+								${__storyScene.lang[9][getLang()]}
 							</div>`;
 							_game.suspended = 1;
 							setCharacterLevel(8, null, 1);
@@ -7321,9 +7438,9 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<b class="tutorial-title">Air Attack:</b>
+								_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[10].title[getLang()]}:</b>
 									<div class="w-100 fade-me tutorial-description-text">
-										Let's continue our combo and keep enemy on air
+										${__storyScene.lang[10][getLang()]}
 								</div>`;
 							mainCharacter.immobilize = true;
 							mainCharacter.disableKeyboard = mainCharacter.still = true;
@@ -7381,9 +7498,9 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<b class="tutorial-title">Chain Attack:</b>
+								_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[11].title[getLang()]}:</b>
 								<div class="w-100 fade-me tutorial-description-text">
-										That ability has an another phase to keep your combo up
+									${__storyScene.lang[11][getLang()]}
 								</div>`;
 							episode.tutorialOrder = 13;
 							mainCharacter.still = mainCharacter.immobilize = true;
@@ -7434,9 +7551,8 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<b class="tutorial-title">Ranged Attack:</b><div class="w-100 fade-me tutorial-description-text">
-										One last move but this time enemy is far away, 
-										use your ranged attack to take this rat down!
+								_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[12].title[getLang()]}:</b><div class="w-100 fade-me tutorial-description-text">
+										${__storyScene.lang[12][getLang()]}
 								</div>`;
 							mainCharacter.direction = __right;
 							mainCharacter.disableKeyboard = mainCharacter.still = mainCharacter.immobilize = true;
@@ -7483,7 +7599,7 @@ const __stories = [
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
 								_inner.innerHTML = `<div class="w-100 pt-3 toxic fade-me flex w-100 flex-jc-start flex-ai-start">
-										<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;Spot on! Now you are ready
+										<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[13][getLang()]}!
 								</div>`;
 							mainCharacter.immobilize = true;
 							mainCharacter.disableKeyboard = mainCharacter.still = mainCharacter.immobilize = true;
@@ -7594,6 +7710,18 @@ const __stories = [
 				save: true,
 				loadingCharacterIds: [622, 619, 620, 621, 623],
 				start: function() {
+					// setTimeout(() => {
+					// 	const _k = summonMobWithJson({
+					// 		id: 631,
+					// 		level: 1,
+					// 		minX: MathRound((mainCharacter.HURTLEFT + platformX) / __zoom),
+					// 		maxX: MathRound((mainCharacter.HURTLEFT + platformX) / __zoom),
+					// 		sight:1000,
+					// 		count:1,
+					// 		experience: 0
+					// 	}, 0, 1, 1);
+					// 	_k.animate('start', 1);
+					// }, 5000);
 					clearAudioCache(loadedSounds);
 					removeCoopCharacter();
 					mainCharacter.storyVariables = {
@@ -7656,6 +7784,8 @@ const __stories = [
 						removeClass(x, 'd-none'));
 					platformX = episode.cWidth;
 					mainCharacter.left = mainCharacter.LEFT = MathRound(episode.cWidth / 2);
+					episode.mobs.push(structuredClone2(__storyScene.mobs[0]));
+					episode.mobs[episode.mobs.length - 1].experience = 1000;
 				},
 				actions: [
 					{
@@ -7808,11 +7938,20 @@ const __stories = [
 							const _minX = _mainPosition < (episode.width / 2) ? _mainPosition + episode.cWidth : _mainPosition - (2 * episode.cWidth);
 							const _maxX = _mainPosition < (episode.width / 2) ? _mainPosition + (2 * episode.cWidth) : _mainPosition - episode.cWidth;
 							for(let x of __storyScene.mobs){
+								if(x.skipSummon)
+									continue;
+								x.minX = _minX;
+								x.maxX = _maxX;
 								let y = summonMobWithJson(structuredClone2(x),0,1);
-								y.count = 1;
-								y.minX = _minX;
-								y.maxX = _maxX;
-								y.experience = mainCharacter.level * 1000;
+								y.experience = mainCharacter.level * 350;
+								if(y.experience < 1000)
+									y.experience = 1000;
+								const _mob = episode.mobs.find(m => m.id === y.id);
+								if(_mob){
+									_mob.experience = y.experience;
+									_mob.minX = 0;
+									_mob.maxX = 6000;
+								}
 								y.maxHP = y.MAXHP = mainCharacter.level * 60;
 								y.setHealth(y.maxHP);
 							}
@@ -7823,26 +7962,29 @@ const __stories = [
 									maxX: _maxX,
 									count: 2,
 									sight: 1000,
-									spawn: 5,
+									spawn: 10,
+									skipSummon: true,
 									experience: mainCharacter.level * 1500
 								});
-								let y = summonMobWithJson(structuredClone2(__storyScene.mobs[__storyScene.mobs.length - 1]),0,1);
+								let y = summonMobWithJson(structuredClone2(__storyScene.mobs[__storyScene.mobs.length - 1]));
 								y.count = 1;
 								y.maxHP = y.MAXHP = mainCharacter.level * 80;
 								y.setHealth(y.maxHP);
 							}
-							if(mainCharacter.level === 4) {
-								__storyScene.mobs.push({
+							if(mainCharacter.level < 12 && episode.phase === mainCharacter.level && (mainCharacter.level % 4) === 0) {
+								episode.mobs.push({
 									id: 621,
 									minX: _minX,
 									maxX: _maxX,
 									count: 1,
 									sight: 1000,
-									spawn: 10,
-									experience: mainCharacter.level * 3000
+									grade:2,
+									difficulty: __account.difficulty - 1,
+									experience: mainCharacter.level * 4000
 								});
-								let y = summonMobWithJson(structuredClone2(__storyScene.mobs[__storyScene.mobs.length - 1]),0,1);
-								y.maxHP = y.MAXHP = mainCharacter.level * 120;
+								let y = summonMobWithJson(structuredClone2(episode.mobs[episode.mobs.length - 1]),0,1);
+								y.maxHP = y.MAXHP = mainCharacter.level * 60;
+								y.name = y.displayName = '';
 								y.setHealth(y.maxHP);
 							}
 							// updateQuestArea(null, {
@@ -7859,16 +8001,16 @@ const __stories = [
 							// 	minLevel: mainCharacter.level,
 							// 	maps: [201]
 							// });
-							if(mainCharacter.level > 8 && !mainCharacter.tagSkillSet) {
-								delete mainCharacter.animations.tag.disabled;
-								mainCharacter.tagSkillSet = 1;
-								resetSkill('tag', mainCharacter);
-								PlaySound({key:'conquer', volume:.6});
-								getImage('./images/main/avatars/cyclops.png', function(_img) {
-									const url = _img.toDataURL();
-									warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
-								});
-							}
+							// if(mainCharacter.level > 8 && !mainCharacter.tagSkillSet) {
+							// 	delete mainCharacter.animations.tag.disabled;
+							// 	mainCharacter.tagSkillSet = 1;
+							// 	resetSkill('tag', mainCharacter);
+							// 	PlaySound({key:'conquer', volume:.6});
+							// 	getImage('./images/main/avatars/cyclops.png', function(_img) {
+							// 		const url = _img.toDataURL();
+							// 		warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
+							// 	});
+							// }
 						}
 					},
 					// {
@@ -7907,7 +8049,7 @@ const __stories = [
 							// __storyPlaying = false;
 							// installStoryFinish();
 							episode.pauseBgMusic(1);
-							let _x = MathRound((mainCharacter.left + platformX + (mainCharacter.WIDTH * (mainCharacter.direction === __left ? -1 : 1))) / __zoom);
+							let _x = MathRound((mainCharacter.left + platformX + (mainCharacter.WIDTH * 3 * (mainCharacter.direction === __left ? -1 : 1))) / __zoom);
 							const _maxX = MathRound((episode.width - (episode.cWidth * .5)) / __zoom);
 							if(_x > _maxX)
 								_x = _maxX;
@@ -7920,6 +8062,7 @@ const __stories = [
 								_x, 
 								MathRound(groundheight * .5), 1);
 							setTimeout(() => {
+								_portal.important = 1;
 								_portal.animations.after.frames.forEach(x => {
 									x.do = function(_e) {
 										x.zoom = 1.1;
@@ -7971,12 +8114,12 @@ const __stories = [
 				],
 				mobs: [
 					{
-						id: 621,
+						id: 619,
 						minX: 4000,
 						maxX: 6000,
 						count: 2,
 						sight: 1000,
-						spawn: 1,
+						spawn: 5,
 						hp:60,
 						experience: 500
 					},
@@ -8132,9 +8275,9 @@ const __stories = [
 					{type:'common', key:'corpseexplode', chance:1},
 					{type:'common', key:'firespray', chance:1}
 				],
-				startsWith: 1,
+				startWith: 1,
 				save: true,
-				loadingCharacterIds: [47, 111, 33, 35, 2, 7],
+				loadingCharacterIds: [47, 1, 111, 33, 35, 2, 7, 37, 38],
 				start: function() {
 					episode.itemDropOrder = [ 
 						'belt', 'gloves', 'bracers', 'helmet', 'leggings',
@@ -8163,9 +8306,11 @@ const __stories = [
 						mainCharacter.tagContainer.remove();
 						delete mainCharacter.tagContainer;
 					}
-					delete mainCharacter.animations.tag.disabled;
-					mainCharacter.tagSkillSet = 1;
-					resetSkill('tag', mainCharacter);
+					if(mainCharacter.animations.tag){
+						delete mainCharacter.animations.tag.disabled;
+						mainCharacter.tagSkillSet = 1;
+						resetSkill('tag', mainCharacter);
+					}
 					//PlaySound({key:'conquer', volume:.6});
 					//episode.lastItemDropTime = _gameTick;
 					//takeQuest(1, 1, null, null, 1);
@@ -8193,6 +8338,7 @@ const __stories = [
 					});
 					_gameUI.appendChild(_desc);
 					episode.hasSkippableScreen = 1;
+					mainCharacter.disableSkill('tag');
 				},
 				actions: [
 					{
@@ -8232,7 +8378,7 @@ const __stories = [
 									</div>
 									<div class="item-action-wrapper flex flex-jc-start w-100">
 										<div class="game-menu-button animate-me flex" onexactclick="wearStatusItem(${_item.id}, ${_powerDiff})">
-											<div class="flex">${getLangData('WEAR')}<span class="flex">(U)</span></div>
+											<div class="flex">${getLangData('WEAR')}<span class="flex">(${getNewKeyboardKey('U').baseKey})</span></div>
 										</div>
 									</div>
 								</div>
@@ -8271,7 +8417,9 @@ const __stories = [
 					},
 					{
 						when: function() {
-							return episode.phase === 101 && episode.enemies.find(x => x.class === 'boss' && x.health <= 0);
+							const _bosses = episode.enemies.filter(x => x.class === 'boss');
+							return episode.phase === 101 && _bosses?.[0] && 
+							_bosses.filter(x => x.health <= 0)?.length === _bosses.length;
 						},
 						do: function() {
 							episode.phase = 102;
@@ -8281,15 +8429,120 @@ const __stories = [
 								cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
 						}
 					},
+					// {
+					// 	when: function() {
+					// 		return episode.phase === 102 && !episode.enemies.filter(x => x.class === 'boss')?.length;
+					// 	},
+					// 	do: function() {
+					// 		episode.phase = 103;
+					// 		updateQuestArea();
+					// 		__storyPlaying = false;
+					// 		installStoryFinish();
+					// 	}
+					// },
 					{
+						// when: function() {
+						// 	return episode.phase === 100 && !episode.enemies.filter(x => x.class === 'boss')?.length;
+						// },
 						when: function() {
 							return episode.phase === 102 && !episode.enemies.filter(x => x.class === 'boss')?.length;
 						},
 						do: function() {
 							episode.phase = 103;
 							updateQuestArea();
-							__storyPlaying = false;
-							installStoryFinish();
+							episode.pauseBgMusic(1);
+							let _x = MathRound((mainCharacter.left + platformX + (mainCharacter.WIDTH * 3 * (mainCharacter.direction === __left ? -1 : 1))) / __zoom);
+							const _maxX = MathRound((episode.width - (episode.cWidth * .5)) / __zoom);
+							if(_x > _maxX)
+								_x = _maxX;
+							else {
+								const _minX = MathRound((episode.cWidth * .5) / __zoom);
+								if(_x < _minX)
+									_x = _minX;
+							}
+							const _portal = summonMob(113, 
+								_x, 
+								MathRound(groundheight * .5), 1);
+							setTimeout(() => {
+								_portal.important = 1;
+								_portal.animations.after.frames.forEach(x => {
+									x.do = function(_e) {
+										x.zoom = 1.1;
+										x.health = 0;
+										x.bottomGap += MathRound(x.spriteHeight / 20);
+										PlaySound({key:'portalclose', volume:.3 });
+										if(_e.toucher) {
+											_e.toucher.yPosition = _e.yPosition - 1;
+											_e.toucher.standBy();
+											_e.toucher.updateVariables();
+											const _oldLeft = _e.toucher.left;
+											_e.toucher.left = _e.left - MathRound((_e.toucher.WIDTH - _e.WIDTH) / 2) - platformX;
+											if(_e.toucher.left < _oldLeft && _e.toucher.direction === __right)
+												_e.toucher.direction = __left;
+											else if(_e.toucher.left > _oldLeft && _e.toucher.direction === __left)
+												_e.toucher.direction = __right;
+											_portal.animations.after.frames.forEach(y => delete y.do);
+											if(_e.toucher.relatedObjects)
+												_e.toucher.relatedObjects.length = 0;
+											// let _platX = _e.left - (episode.cWidth * .25);
+											// if(_platX < 0)
+											// 	_platX = 0;
+											// platformX = _platX;
+											_e.toucher.addObject(
+											{ 
+												key: 'zoom2x', 
+												position: 'css', 
+												p1: 1.3, 
+												p2: 10000
+											});
+											episode.moveCamera(function() {
+												__storyPlaying = false;
+												installStoryFinish();
+											}, 3, 1);
+										}
+									}
+								});
+							}, 100);
+						}
+					},
+					{
+						when: function() {
+							return (episode.boss?.health <= 0 && episode.phase < 10) || episode.phase === 200;
+						},
+						do: function() {
+							episode.phase = 100;
+							const _e = episode.boss;
+							if(__account?.questStatus?.quest?.timer)
+								delete __account.questStatus.quest.timer;
+							episode.enemies.filter(x => !x.main && !x.tag && !x.friendly).forEach(x => {
+								x.stopSpawn();
+								x.health = x.experience = 0;
+								x.dead = x.dying = true;
+								x.animate('dead', 1);
+							});
+							episode.mobs = episode.respawners = [];
+							const _mob = episode.installMob({
+								id: 1002,
+								minX: MathRound((_e.LEFT + platformX) / __zoom),
+								maxX: MathRound((_e.LEFT + platformX) / __zoom),
+								sight: 1000,
+								count: 1,
+								spawnDirection: 'up',
+								yPosition : MathRound(getGroundHeight() / 2),
+								minLevel: 1,
+								maxLevel: 1
+							}, null, 1);
+							_mob.animate('start', 1);
+							_mob.enemy = undefined;
+							_mob.updateVariables();
+							const _mobCenterX = _mob.HURTLEFT + _mob._HURTBOX_half;
+							const _mainCenterX = mainCharacter.HURTLEFT + mainCharacter._HURTBOX_half;
+							if(_mobCenterX < _mainCenterX)
+								_mob.animations.start.frames.forEach(x => {
+									if(x.extraStepXRate)
+										x.extraStepXRate *= -1;
+								});
+							//delete episode.boss;
 						}
 					},
 					{
@@ -8308,31 +8561,35 @@ const __stories = [
 								x.animate('dead', 1);
 							});
 							episode.mobs = episode.respawners = [];
+							return;
 							episode.playSound({key:'bossalert', volume: .5});
 							warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
 						
 							setTimeout(() => {
-								//episode.playSound({key:'sistersenter', volume:1});
+								episode.playSound({key:'sistersenter', volume:1});
 								setTimeout(() => {
 									if(episode?.id !== 11)
 										return;
-									const installBoss = function(_b) {
+									const installBoss = function(_b, _name) {
 										const _boss = summonMobWithJson({
 											id: _b,
-											level: 13,
-											atk: mainCharacter.atk * 4,
-											zoom: .66,
-											grade: 5
+											level: mainCharacter.level,
+											name: _name,
+											atk: mainCharacter.atk,
+											grade: 4
 										});
 										//_boss.health = _boss.maxHP = 1;
 										_boss.class = 'boss';
+										_boss.important = 1;
 										_boss.experience = 0;
 										_boss.setDifficulty(__account.difficulty - 1);
 										_boss.acceptChanges();
 										_boss.pickNewTarget();
 									}
-									installBoss(47);
-									PlaySound({key:'conquer', volume:.6});
+									installBoss(37, 'Yecüc');
+									requestAnimationFrame(() => {
+										installBoss(38, 'Mecüc');
+									});
 									mainCharacter.maxHP = mainCharacter.MAXHP =
 									mainCharacter.maxHP * 1;
 									mainCharacter.setHealth(mainCharacter.MAXHP);
@@ -8346,11 +8603,278 @@ const __stories = [
 									episode.playBgMusic();
 								}, 1000);
 								takeQuest(2, null, null, 'progress', 1);
+								__storyScene.bossQuest = __account.questStatus.quest;
 							}, 4000);
-							// __storyScene.bossQuest.kills[0].count = 1;
-							// updateQuestArea(null, __storyScene.bossQuest);
-							// __storyPlaying = false;
-							// installStoryFinish();
+						}
+					},
+					{
+						when: function() {
+							if((episode.phase ?? 0) < 101 || episode.oneBossDown)
+								return false;
+							const _bosses = episode.enemies.filter(x => x.class === 'boss');
+							const _result = _bosses?.length === 1;
+							if(_result) {
+								episode.oneBossDown = 1;
+								const _counter = __storyScene.bossQuest.kills.find(x => x.enemy[0] !== _bosses[0].id);
+								if(_counter && _counter.count !== 1) {
+									_counter.count = 1;
+									updateQuestArea(null, __storyScene.bossQuest);
+								}
+							}
+							return _result;
+						},
+						do: function() {
+
+						}
+					},
+					{
+						when: function() {
+							return episode.supportFound;
+						},
+						do: function() {
+							delete episode.supportFound;
+							//warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/cyclops.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Supporter found') + '!</span></div>', null, null, 1);
+							mainCharacter.direction = __right;
+							mainCharacter.animate('idle', 1);
+							const original = document.getElementById('skill12');
+
+							// clone (true → içeriğiyle birlikte)
+							const clone = original.cloneNode(true);
+							clone.className = 'move-to-place';
+							clone.removeAttribute('id');
+							// absolute pozisyon ver
+							clone.style.position = 'absolute';
+							requestAnimationFrame(() => {
+								mainCharacter.still = mainCharacter.immobilize = mainCharacter.disableKeyboard = true;
+								blurKeyboard();
+								focusMe('#skill12', null, null, "<div class='full flex' style='flex-direction: column;'><div class='flex' style='padding-bottom:.5vh'>" + getLangData('You\'ve activated a support skill') + '</div><div class="flex">' + getLangData('It can be used even in danger') + "</div></div>", null, null, null, 1);
+								requestAnimationFrame(() => {
+									const _curt = document.getElementById('focus-ui');
+									_curt.appendChild(clone);
+								});
+								PlaySound({key:'skillmove3', volume:1});
+							});
+							setTimeout(() => {
+								function slideToPlace(el, { x, y, w, h }, onComplete) {
+									el.getBoundingClientRect(); // reflow
+
+									addClass(el, 'slide-to-place');
+									// hedef değerler
+									el.style.left = `${x}px`;
+									el.style.top = `${y}px`;
+									if (w) el.style.width = `${w}px`;
+									if (h) el.style.height = `${h}px`;
+
+									let called = false;
+
+									function done() {
+										if (called) return;
+										called = true;
+
+										el.removeEventListener('transitionend', onEnd);
+										onComplete?.(el);
+									}
+
+									function onEnd(e) {
+										if (e.target !== el) return;
+
+										// sadece bir property'e bak (ör: transform veya left)
+										if (e.propertyName !== 'left') return;
+
+										done();
+									}
+
+									el.addEventListener('transitionend', onEnd);
+
+									// 🔥 fallback (çok önemli)
+									setTimeout(done, 2100); // CSS duration + küçük buffer
+								}
+
+								requestAnimationFrame(() => {
+									requestAnimationFrame(() => {
+										// artık DOM kesin hazır
+
+										const _shield = document.querySelector('.focus-shield');
+
+										if (_shield) {
+											const wrapper = document.getElementById('wrapper');
+
+											const wrapperRect = wrapper.getBoundingClientRect();
+											const targetRect = _shield.getBoundingClientRect();
+
+											const x = targetRect.left - wrapperRect.left;
+											const y = targetRect.top - wrapperRect.top;
+											const w = targetRect.width;
+											const h = targetRect.height;
+											slideToPlace(clone, {
+												x: x,
+												y: y,
+												w: w,
+												h: h,
+											}, function () {
+												mainCharacter.enableSkill('tag');
+												clone.remove();
+												PlaySound({key:'skillmove2', volume:1});
+												const _btnWrapper = document.createElement('div');
+												_btnWrapper.className = 'flex black-screen-ok-btn w-100 focus-ui-done-btn-custom';
+												const _btn = document.createElement('div');
+												_btn.style = 'color:#f7f7f7cc !important;font-size:3vh !important';
+												_btn.className = "game-btn2 flex one-line fade-me";
+												_btn.innerText = getLangData('Done');
+												_btn.onexactclick = function() {					
+													playClick();
+													//mainCharacter.still = mainCharacter.immobilize = false;
+													//delete mainCharacter.disableKeyboard;
+													disposeFocus();
+													PlaySound({ key: 'trouble', volume:1 });
+													removeFocus();
+													createBubbleText({
+														id: 2,
+														location: { map: episode.id }, ms: 4000,
+														owner: mainCharacter.key,
+														delay: 600,
+														text: 'There\'s something strange here',
+														onend: function() {
+															PlaySound({ key: 'puff5', volume:1 });
+															//episode.playSound({key:'bossalert', volume: .5});
+															//warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
+														
+															//setTimeout(() => {
+																//episode.playSound({key:'sistersenter', volume:1});
+																//setTimeout(() => {
+																	// if(episode?.id !== 11)
+																	// 	return;
+																	const installBoss = function(_b, _name) {
+																		const _boss = summonMobWithJson({
+																			id: _b,
+																			level: mainCharacter.level,
+																			name: _name,
+																			atk: mainCharacter.atk,
+																			grade: 4
+																		});
+																		//_boss.health = _boss.maxHP = 1;
+																		_boss.class = 'boss';
+																		_boss.important = 1;
+																		_boss.experience = 0;
+																		_boss.setDifficulty(__account.difficulty - 1);
+																		_boss.acceptChanges();
+																		_boss.pickNewTarget();
+																		_boss.addObject({ 
+																			key:'respawn', 
+																			position: 'middle',
+																			scale: 1.5
+																		});
+																		return _boss;
+																	}
+																	const _yec = installBoss(37, 'Yecüc');
+																	const _mainCenterX = mainCharacter.HURTLEFT + mainCharacter._HURTBOX_half;
+																	_yec.left = (_mainCenterX - MathRound(200 * __zoom)) + platformX;
+																	_yec.yPosition = mainCharacter.yPosition - 1;
+																	_yec.updateVariables();
+																	_yec.direction = __right;
+																	_yec.animate('ground2', 1);
+																	mainCharacter.hitTakenCount = 0;
+																	requestAnimationFrame(() => {
+																		const _mec =installBoss(38, 'Mecüc');
+																		_mec.left = (_mainCenterX + MathRound(200 * __zoom)) + platformX;
+																		_mec.yPosition = mainCharacter.yPosition - 1;	
+																		_mec.updateVariables();
+																		_mec.direction = __left;
+																		_mec.animate('ground3', 1);
+																		PlaySound({key:'doggrunt', volume:1});
+																		summonMobWithJson({
+																			id: 1,
+																			minX: MathRound((_mec.left + 176) / __zoom),
+																			maxX: MathRound((_mec.left + 176) / __zoom),
+																			sight: 1000,
+																			count: 1,
+																			direction: __left,
+																			zoom: 1.1,
+																			yPosition: _yec.yPosition + MathRound(groundheight * .1),
+																			props : {
+																				immobilize: true,
+																				still: true,
+																				noDirection: true,
+																				reversed: true
+																			}
+																		});
+
+																		
+																		summonMobWithJson({
+																			id: 1,
+																			minX: MathRound((_mec.left + 202) / __zoom),
+																			maxX: MathRound((_mec.left + 202) / __zoom),
+																			sight: 1000,
+																			count: 1,
+																			direction: __left,
+																			zoom: 1.1,
+																			yPosition: _mec.yPosition - MathRound(groundheight * .1),
+																			props : {
+																				immobilize: true,
+																				still: true,
+																				noDirection: true,
+																				reversed: true
+																			}
+																		});
+
+																		cssAnimations.slowMotion(mainCharacter, 300);
+																		createBubbleText({
+																			id: 13,
+																			location: { map: episode.id }, ms: 1550,
+																			owner: _yec.key,
+																			asap: true,
+																			delay: 100,
+																			text: 'Die!'
+																		});
+																		setTimeout(() => {
+																			_game.suspended = true;
+																			setTimeout(() => {
+																				focusMe('#skill12', function() {
+																					removeFocus();
+																					delete _game.suspended;
+																					delete mainCharacter.disableKeyboard;
+																					mainCharacter.still = mainCharacter.immobilize = false;
+																					const _keys = Object.keys(mainCharacter.animations);
+																					for(const _key of _keys) {
+																						const _anima = mainCharacter.animations[_key];
+																						delete _anima.alreadyDisabled;
+																					}
+																					mainCharacter.enableSkills();
+																					mainCharacter.animate('tag', 1);
+																					_yec.animate('hurtair', 1);
+																					_mec.animate('hurtair', 1);
+																					disposeFocus();
+																				}, null, getLangData('Use support skill to save yourself'),null,1);
+																			}, 150);
+																		}, 1650);
+																	});
+																	mainCharacter.maxHP = mainCharacter.MAXHP =
+																	mainCharacter.maxHP * 1;
+																	mainCharacter.setHealth(mainCharacter.MAXHP);
+																	requestAnimationFrame(() => {
+																		episode.phase = 101;
+																	});
+
+																	episode.pauseAmbianceMusic();
+																	episode.pauseBgMusic(1);
+																	episode.createBgMusic(null, null, null, 'boss-fight-1', .5);
+																	episode.playBgMusic();
+																//}, 1000);
+																takeQuest(2, null, null, 'progress', 1);
+																__storyScene.bossQuest = __account.questStatus.quest;
+															//}, 4000);
+														}
+													});
+												};
+												_btnWrapper.appendChild(_btn);
+												episode.hasFocusUIDoneBtn = 1;
+												const _curt = document.getElementById('focus-ui');
+												_curt.appendChild(_btnWrapper);
+											});
+										}
+									});
+								});
+							}, 1200);
 						}
 					}
 				],
@@ -8368,47 +8892,237 @@ const __stories = [
 							return MathRound(groundheight * .5);
 						}
 					},
-					{
-						id: 35,
-						minX: 1580,
-						maxX: 4800,
-						count: 4,
-						sight: 1000,
-						spawn: 10,
-						hp:300,
-						experience: 0
-					},
-					{
-						id: 7,
-						minX: 2000,
-						maxX: 3200,
-						count: 2,
-						sight: 1000,
-						spawn: 10,
-						hp:300,
-						experience: 0
-					},
-					{
-						id: 2,
-						minX: 1580,
-						maxX: 4800,
-						count: 6,
-						sight: 1000,
-						spawn: 10,
-						hp:300,
-						experience: 0
-					},
-					{
-						id: 33,
-						minX: 1580,
-						maxX: 4800,
-						count: 1,
-						sight: 1000,
-						spawn: 10,
-						hp:300,
-						experience: 0
-					}
+					// {
+					// 	id: 35,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 4,
+					// 	sight: 1000,
+					// 	spawn: 10,
+					// 	hp:300,
+					// 	experience: 0
+					// },
+					// {
+					// 	id: 7,
+					// 	minX: 2000,
+					// 	maxX: 3200,
+					// 	count: 2,
+					// 	sight: 1000,
+					// 	spawn: 10,
+					// 	hp:300,
+					// 	experience: 0
+					// },
+					// {
+					// 	id: 2,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 6,
+					// 	sight: 1000,
+					// 	spawn: 10,
+					// 	hp:300,
+					// 	experience: 0
+					// },
+					// {
+					// 	id: 33,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 1,
+					// 	sight: 1000,
+					// 	spawn: 10,
+					// 	hp:300,
+					// 	experience: 0
+					// }
 				]
+			},
+			{
+				map: 42,
+				leaderBoards: {
+					calculate: function() {
+						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
+						//Kalan kalp (3 adet te) + 1000 * 3
+						//Yediği Damage ın toplam sağlığına oranı negatif bonusu (50 * 10) dmgTaken
+						
+						const _result = {
+							description: [
+								{
+									title: {
+										en: 'Package Bonus',
+										tr: 'Paket Bonusu'
+									},
+									icon: 'pack',
+									value: (mainCharacter.packageCount ?? 0) * 1000
+								},
+								{
+									title: {
+										en: 'Kill Bonus',
+										tr: 'Öldürme Bonusu'
+									},
+									icon: 'strong',
+									value: (mainCharacter.killCount ?? 0) * 1500
+								},
+								{
+									title: {
+										en: 'Team Bonus',
+										tr: 'Takım Bonusu'
+									},
+									icon: 'war',
+									value: (episode['team' + mainCharacter.groupId + 'score'] ?? 0) * 500
+								}
+							]
+						};
+						_result.score = _result.description.reduce(
+							(sum, item) => sum + (item.value ?? 0),
+							0
+						);
+						return _result;
+					}
+				},
+				enableCommonSkills: true,
+				actions: [	
+					{
+						when: function() {
+							return mainCharacter?.commonItem && !mainCharacter.commonItemRendered;
+						},
+						do: function() {
+							let _div = document.querySelector('.game-status-screen');
+							if(_div) 
+								_div.remove();
+							_div = document.createElement('div');
+							_div.className = 'flex game-status-screen';
+							_gameUI.appendChild(_div);
+							mainCharacter.commonItemRendered = 1;
+							const _item = mainCharacter.commonItem;
+							const _ci = commonSkills.find(x => x.key === _item.key);
+							const _title = _ci.title[getLang()];
+							const _icon = `<span class="item-in-slot full grade3-item" 
+								style="display:inline-block;position:relative" 
+								onexactclick="mainCharacter.useCommonSkill(1)">
+								<img style="background:#010101" class="item-img" src="./images/common/icons/${_ci.key}.png"/></span>`;
+    
+							const frag = document.createDocumentFragment();
+							const _subDiv = document.createElement('div');
+							_subDiv.innerHTML = `<div data-status-item-id="${_item.id ?? _item.key}" class="flex status-item-container w-50 flex flex-ai-start">
+								<div class="status-item-icon-container">`
+									+ _icon +
+								`</div>
+								<div class="status-item-action-container flex">
+									<div class="item-title-wrapper flex w-50">
+										${_title}
+									</div>
+									<div class="item-title-wrapper flex w-50">
+										
+									</div>
+									<div class="item-action-wrapper flex flex-jc-start w-100">
+										<div class="game-menu-button animate-me flex" onexactclick="mainCharacter.useCommonSkill(1)">
+											<div class="flex">${getLangData('USE')}<span class="flex">(${getNewKeyboardKey('1').baseKey})</span></div>
+										</div>
+									</div>
+								</div>
+							</div>`;
+
+							frag.appendChild(_subDiv.firstElementChild);
+							_div.prepend(frag);
+						}
+					},
+					{
+						when: function() {
+							return episode.pvpCounterValue > 10 && episode.mobPhaseTick && (_gameTick - episode.mobPhaseTick) > 60000;
+						},
+						do: function() {
+							episode.mobPhaseTick = _gameTick;
+							const _maxW = MathRound(episode.width / __zoom);
+							const _minX = MathRound(_maxW * (1 / 6));
+							const _maxX = MathRound(_maxW * (5 / 6));
+							const _minY = MathRound(groundheight * (1 / 10));
+							const _maxY = MathRound(groundheight * (9 / 10));
+							const _parachute = summonMobWithJson({
+								id: 631,
+								level: 1,
+								minX: _minX,
+								maxX: _maxX,
+								yPosition: function() {
+									return getRandomValue2(_minY, _maxY);
+								},
+								sight:1000,
+								count:1,
+								experience: 0
+							}, 0, 1, 1);
+							_parachute.animate('start', 1);
+						}
+					},
+					// {
+					// 	when: function() {
+					// 		return episode.phase === 2 && 
+					// 		(episode.deads.filter(x => !x.remove)?.length ?? 0) === 0;
+					// 	},
+					// 	do: function() {
+					// 		__storyPlaying = false;
+					// 		episode.pvp = episode.war = false;
+					// 		mainCharacter.class = episode.mainClass;
+					// 		delete episode.mainClass;
+					// 		installStoryFinish();
+					// 		episode.phase = 3;
+					// 	}
+					// },
+					{
+						when: function() {
+							return episode.phase < 2 && episode.pvpEnded;
+						},
+						do: function() {
+							__storyPlaying = false;
+							episode.pvp = episode.war = false;
+							if(episode.mainClass) {
+								mainCharacter.class = episode.mainClass;
+								delete episode.mainClass;
+							}
+							installStoryFinish();
+							episode.phase = 2;
+						}
+					}
+				],
+				do: function() {
+					__account.inventory = [];
+					applyCharacterStats();
+					const _place = 0;
+					const opponents = [];
+					const _mobs = [null, '02', 47, 1000];
+					const _pvpNames = ['Berserker', 'Ranger', 'Cyclops', 'Al Karısı'];
+					// const _mobs = [null, 1000];
+					// const _pvpNames = ['Berserker','Al Karısı'];
+					for(var i = 0; i < _mobs.length; i++) {
+						if(i === _place){
+							mainCharacter.totalPower = getTotalPower().total;
+							mainCharacter.pvpName = mainCharacter.displayName = _pvpNames[i];
+							opponents.push(mainCharacter);
+							continue;
+						}
+						const _e = setCharacterFunctions(_allEnemies['enemy' + _mobs[i]](), 1);
+						_e.level = mainCharacter.level;
+						_e.inventory = [];
+						applyCharacterStats(null, _e);
+						_e.totalPower = getTotalPower(_e).total;
+						_e.pvpName = _pvpNames[i];
+						opponents.push(_e);
+					}
+					episode.loadCharacterSprites(function() {}, [10, 48], null, 1);
+					createWar(opponents, 42, 1, 1, 300, function() {
+						mainCharacter.startPlatformX = platformX;
+						episode.skipPvPFinalScreen = 1;
+						episode.phase = 1;
+						episode.canPause = false;
+						episode.deathMatch = true;
+						episode.mainClass = mainCharacter.class;
+						mainCharacter.disableSkill('tag');
+						episode.beforePVPStart = function() {
+							episode.mobPhaseTick = _gameTick;
+							episode.enemies.forEach(x => {
+								x.pvpRespawn = true;
+								x.maxHP = x.MAXHP = x.health = mainCharacter.maxHP = 1000;
+								x.setHealth(x.health);
+							});
+						}
+					});
+				}
 			}
 		]
 	},
@@ -8897,13 +9611,13 @@ function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 	mainCharacter.heartCount = __story.heartCount ?? 1;
 	if(_client.quickPlay) {
 		const _char = __account.characters.find(x => x.class === mainCharacter.class);
-		_char.tag = {id:1, grade:4};
+		_char.tag = {id:1, grade:1};
 		resetSkills(null, 1, mainCharacter);
 		delete mainCharacter.animations.tag.delay;
 		mainCharacter.animations.tag.modify = function(_e) {
-			_e.animations.air2.priority = 1;
+			_e.animations.ground1.priority = 1;
 			delete _e.animations.idle.alternateFrames;
-			_e.animations.air2.frames.forEach(x => {
+			_e.animations.ground1.frames.forEach(x => {
 				if(x.atk){
 					x.atk.ignoreDef = true;
 					x.atk.rate = 2;
@@ -8949,6 +9663,16 @@ function switchStoryScene(_func, _newOrder) {
 	if(_extraModals?.[0])
 		_extraModals.forEach(x => x.remove());
 	__storyScene = __story.scenes[__storySceneOrder - 1];
+	if(__storyScene?.do)
+	{
+		if(episode)
+			__storyScene.do();
+		else 
+			switchMap(__storyScene.map, null, null, null, __storyScene, function() {
+				__storyScene.do();
+			});
+		return;
+	}
 	if(__storyScene?.when && !__storyScene.when()) {
 		__storySceneOrder++;
 		__storyScene = __story.scenes[__storySceneOrder - 1];
@@ -8960,62 +9684,65 @@ function switchStoryScene(_func, _newOrder) {
 		// __storyCheckPoint.warn = 1;
 		// __storyCheckPoint.sceneOrder = __storySceneOrder - 1;
 	}
-	//if(__storySceneOrder === 1) {// || (__storyScene.map !== __story.scenes[__storySceneOrder - 2].map)) {
-		switchMap(__storyScene.map, null, null, null, __storyScene, function() {
-			if(__storyScene.tiles?.[0])
-				episode.loadLayers(__storyScene.tiles);
-			if(__storyScene.mobs?.[0])
-				episode.installMobs(__storyScene.mobs);
-			if(__storyScene.objects?.[0])
-				__storyScene.objects.forEach(x => episode.loadObject(x));
-			setTimeout(() => {
-				const _loc = __locations.find(x => x.mapId === episode.id);
-				if(_loc) {
-					document.querySelector('#world-mini-map .world-mini-map-img').style.background =
-					'url(./images/icons/act' + _loc.act + '-map.jpg)';
-					document.querySelector('#world-mini-map .world-mini-map-img').style.
-					setProperty('background-position', _loc.left + ' ' + _loc.top, 'important');
+
+	const _afterStart = function() {
+		if(__storyScene.tiles?.[0])
+			episode.loadLayers(__storyScene.tiles);
+		if(__storyScene.mobs?.[0])
+			episode.installMobs(__storyScene.mobs);
+		if(__storyScene.objects?.[0])
+			__storyScene.objects.forEach(x => episode.loadObject(x));
+		setTimeout(() => {
+			const _loc = __locations.find(x => x.mapId === episode.id);
+			if(_loc) {
+				document.querySelector('#world-mini-map .world-mini-map-img').style.background =
+				'url(./images/icons/act' + _loc.act + '-map.jpg)';
+				document.querySelector('#world-mini-map .world-mini-map-img').style.
+				setProperty('background-position', _loc.left + ' ' + _loc.top, 'important');
+			}
+			if(_oldHeartCount && __story.heartCount && !episode.war && !episode.pvp)
+			{
+				mainCharacter.heartCount = _oldHeartCount;
+				_navbar.innerHTML = avatarTemplate(mainCharacter);
+			}
+			//if(__storyScene.leaderBoards)
+			episode.loadCharacterSprites(function() {
+				addClass(_splash, 'd-none');
+				const _ts = document.getElementById('tip-screen');
+				if(_ts)
+					_ts.remove();
+				if(__storyCheckPoint?.warn) {
+					//warn('<div class="flex heading achievement achievement-system" style="position:relative"><img src="./images/icons/loader.gif" /><span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Checkpoint Marked') + '</span></div>', 'level-up',null, 1);
+					delete __storyCheckPoint.warn;
 				}
-				if(_oldHeartCount && __story.heartCount)
-				{
-					mainCharacter.heartCount = _oldHeartCount;
-					_navbar.innerHTML = avatarTemplate(mainCharacter);
-				}
-				//if(__storyScene.leaderBoards)
-				episode.loadCharacterSprites(function() {
-					addClass(_splash, 'd-none');
-					const _ts = document.getElementById('tip-screen');
-					if(_ts)
-						_ts.remove();
-					if(__storyCheckPoint?.warn) {
-						//warn('<div class="flex heading achievement achievement-system" style="position:relative"><img src="./images/icons/loader.gif" /><span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Checkpoint Marked') + '</span></div>', 'level-up',null, 1);
-						delete __storyCheckPoint.warn;
-					}
-					removeFocus();
-					__account.commonInventory = [];
-					if(mainCharacter)
-						mainCharacter.disableCommonInventory();
-					removeClass(_gameUI, 'demo-playing');
-					if(__storyScene.start)
-						__storyScene.start();
-					_storySceneSwitching = false;
-					_game.suspended = false;
-					const _ps = document.querySelectorAll('.placed-skill');
-					_ps?.forEach(x => addClass(x, 'v-none'));
-					blurKeyboard();
-				}, __storyScene.loadingCharacterIds);
-			}, 1000);
-			if(_func)
-				_func();
-		});
-	//}
+				removeFocus();
+				__account.commonInventory = [];
+				if(mainCharacter && !__storyScene?.enableCommonSkills)
+					mainCharacter.disableCommonInventory();
+				removeClass(_gameUI, 'demo-playing');
+				if(__storyScene.start)
+					__storyScene.start();
+				_storySceneSwitching = false;
+				_game.suspended = false;
+				const _ps = document.querySelectorAll('.placed-skill');
+				_ps?.forEach(x => addClass(x, 'v-none'));
+				blurKeyboard();
+			}, __storyScene.loadingCharacterIds);
+		}, 1000);
+		if(_func)
+			_func();
+	}
+
+	switchMap(__storyScene.map, null, null, null, __storyScene, function() {
+		_afterStart();
+	});
 }
 function checkPC () {
 	removeClass(document.body, 'pc-mission');
 	removeClass(document.body, 'pc-mission-without-skillui');
-	if(__isPC && episode?.id > 1)
+	if(__isPC && (episode?.id > 1 || episode?.war || episode?.pvp))
 		addClass(document.body, 'pc-mission');
-	else if(__isPC && episode?.id <= 1)
+	else if(__isPC && episode?.id <= 1 && !episode?.war && !episode?.pvp)
 		addClass(document.body, 'pc-mission-without-skillui');
 }
 function restartStory() {
@@ -9367,8 +10094,8 @@ function storyBonus(_func, _instant) {
 // 	});
 // }, 2000);
 
-function focusMe(_selector, _func, _transparent, _text, _doneBtn, _fingerFade, _circle) {
-	new cssAnimations.focusui(_selector, _func, _transparent, _text, _doneBtn, null, _fingerFade, _circle);
+function focusMe(_selector, _func, _transparent, _text, _doneBtn, _fingerFade, _circle, _noFinger) {
+	new cssAnimations.focusui(_selector, _func, _transparent, _text, _doneBtn, null, _fingerFade, _circle, _noFinger);
 	if(!_transparent) {
 		mainCharacter.disableSkills(1);
 		mainCharacter.immobilize = mainCharacter.still = true;
@@ -9387,6 +10114,8 @@ function removeFocus(_reUse) {
 	if(_focuses?.[0])
 		_focuses.forEach(x => removeClass(x, 'focus-me'));
 	_focusMode = undefined;
+	if(episode?.hasFocusUIDoneBtn)
+		delete episode.hasFocusUIDoneBtn;
 	removeClass(_gameUI, 'focus-ui-activated');
 }
 function disposeFocus() {
@@ -9418,8 +10147,10 @@ function skipQuickPlayTutorial() {
 		requestAnimationFrame(() => {
 			removeClass(_gameUI, 'disable-ui');
 			_game.suspended = false;
+			blurKeyboard();
 		});
 	}
+	removeFocus();
 }
 
 function createStoryResultScreen(_failed) {

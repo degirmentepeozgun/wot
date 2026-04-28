@@ -480,6 +480,8 @@ function loadWindowEvents() {
 										_anm.coolDownStart2 += _diff;
 								}
 							});
+						if(episode.mobPhaseTick)
+							episode.mobPhaseTick += _diff;
 					}
 					organizeModules();
 					episodeVisibilityHidden = false;
@@ -545,6 +547,8 @@ function loadWindowEvents() {
 										_anm.coolDownStart2 += _diff;
 								}
 							});
+						if(episode.mobPhaseTick)
+							episode.mobPhaseTick += _diff;
 				}
 				episodeVisibilityHidden = false;
 				if(episode && episode.bgMusic)
@@ -912,7 +916,7 @@ function createTagSkill(_char, _tag) {
 							_mob.warm = 1;
 						}
 						_mob.enemy = _mob.still = false;
-						_mob.friendly = _mob.invulnerable = _mob.puppetMode = _mob.alp = true;
+						_mob.friendly = _mob.invulnerable = _mob.puppetMode = _mob.alp = _mob.important = true;
 						_mob.puppetXMove = 0;
 						_mob.related = _mob.owner = _e;
 						_mob.experience = 0;
@@ -1543,7 +1547,7 @@ function askSomething(_question, _okFuncString, _singletonAttr, _container) {
 				</div>
 				<div style="padding:4vh 2vh" class="flex">
 					<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
-					<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="${_okFuncString}">${getLangData('YES')}</div>
+					<div class="quick-space-btn game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="${_okFuncString}">${getLangData('YES')}</div>
 				</div>
 			</div>
 		</div>`;
@@ -2219,8 +2223,9 @@ function organizeScreenResize() {
 function setWindowVariables() {
 	const __r = document.querySelector(':root');
 		//const __rs = getComputedStyle(__r);
-	
-	_canvas.width = _canvas1.width = _canvasB.width = _canvasGore.width = _canvasSPB.width = _canvas3.width = _canvas5.width = 
+	// if(!_gamePad)
+	// 	_gamePad = document.getElementById('game-pad');
+	_canvas.width = _canvas1.width = _canvasB.width = _canvasGore.width = _canvasBRB.width = _canvasSPB.width = _canvas3.width = _canvas5.width = 
 	_canvasF.width = _canvasS.width = _canvasDMG.width = _canvasR.width = MathRound(_gamePad.offsetWidth / __scale);
 	const root = document.querySelector(':root');
 	root.style.setProperty('--scale', __scale);
@@ -2230,7 +2235,7 @@ function setWindowVariables() {
 	document.getElementById('game-pad-right').style.width =
 	'calc((100vw - ' + (_canvas.width * __scale) + 'px) / 2)';
 	_canvas.height = _canvasDMG.height = _canvasB.height = _canvas3.height = _canvasGore.height = _canvas5.height = 
-	_canvasS.height = _canvasSPB.height = _canvasF.height = _canvasR.height = MathRound(_gamePad.offsetHeight / __scale);
+	_canvasS.height = _canvasSPB.height = _canvasBRB.height = _canvasF.height = _canvasR.height = MathRound(_gamePad.offsetHeight / __scale);
 	
 	__zoom = _canvas.width / 2048;
 	__dmgFrameDistance = MathRound(100 * __zoom);

@@ -478,6 +478,14 @@ const __gems = [
 					{ key:'fire-dmg', value:10, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
 					{ key:'fire-resist-rate', value:10, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
 				]
+			},
+			{ 
+				grade: 3,
+				cost: 300,
+				props: [
+					{ key:'fire-dmg', value:15, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
+					{ key:'fire-resist-rate', value:15, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
+				]
 			}
 		] 
 	},
@@ -503,6 +511,14 @@ const __gems = [
 				props: [
 					{ key:'ice-dmg', value:10, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
 					{ key:'ice-resist-rate', value:10, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
+				]
+			},
+			{ 
+				grade: 3,
+				cost: 300,
+				props: [
+					{ key:'ice-dmg', value:15, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
+					{ key:'ice-resist-rate', value:15, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
 				]
 			}
 		] 
@@ -530,6 +546,14 @@ const __gems = [
 					{ key:'toxic-dmg', value:10, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
 					{ key:'toxic-resist-rate', value:10, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
 				]
+			},
+			{ 
+				grade: 3,
+				cost: 300,
+				props: [
+					{ key:'toxic-dmg', value:15, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
+					{ key:'toxic-resist-rate', value:15, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
+				]
 			}
 		] 
 	},
@@ -556,6 +580,14 @@ const __gems = [
 					{ key:'lightning-dmg', value:10, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
 					{ key:'lightning-resist-rate', value:10, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
 				]
+			},
+			{ 
+				grade: 3,
+				cost: 300,
+				props: [
+					{ key:'lightning-dmg', value:15, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
+					{ key:'lightning-resist-rate', value:15, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
+				]
 			}
 		] 
 	},
@@ -581,6 +613,14 @@ const __gems = [
 				props: [
 					{ key:'shadow-dmg', value:10, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
 					{ key:'shadow-resist-rate', value:10, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
+				]
+			},
+			{ 
+				grade: 3,
+				cost: 300,
+				props: [
+					{ key:'shadow-dmg', value:15, for:['weapon', 'bracers', 'necklace', 'gloves', 'ring']},
+					{ key:'shadow-resist-rate', value:15, for:['helmet', 'chest', 'leggings', 'belt', 'boots']}
 				]
 			}
 		] 
@@ -1558,14 +1598,32 @@ const _quests = [
 ];
 const commonSkills = [
 	//{ key: 'timestop' },
-	{ key: 'firespray' },
+	{ key: 'firespray', title: {
+		tr: 'Ateş Spreyi',
+		en: 'Fire Spray'
+	} },
 	// { key: 'fireexplosion' },
-	{ key: 'icespike' },
-	{ key: 'electricbolt' },
-	{ key: 'waterwave' },
-	{ key: 'poisonpuff' },
-	{ key: 'earthrock' },
-	{ key: 'corpseexplode', 
+	{ key: 'icespike', title: {
+		tr: 'Buz Mızrağı',
+		en: 'Ice Spike'
+	} },
+	{ key: 'electricbolt', title: {
+		tr: 'Elektrik Oku',
+		en: 'Electric Bolt'
+	} },
+	{ key: 'waterwave', title: {
+		tr: 'Su Dalgası',
+		en: 'Water Wave'
+	} },
+	{ key: 'poisonpuff', title: {
+		tr: 'Zehirli Puf',
+		en: 'Poison Puff'
+	} },
+	{ key: 'earthrock', title: {
+		tr: 'Toprak Kaya',
+		en: 'Earth Rock'
+	} },
+	{ key: 'corpseexplode', pvp: false,
 		do: function(_char) {
 			const _corpses = episode.seenEnemies.filter(x => x !== _char && x.isDead()
 			&& x.class !== __spell && !x.finishingBy && !x.owner && !x.related && 
@@ -1600,6 +1658,16 @@ const commonSkills = [
 	// { key: 'speedup', type: 'buff' },
 	// { key: 'teberweapon', forEnemy: [2] }
 ];
+function pickRandomCommonSkill() {
+	const _isPvp = episode?.pvp;
+	const _indexes = [];
+	commonSkills.forEach((x, i) => {
+		if (_isPvp && x.pvp === false)
+			return;
+		_indexes.push(i);
+	});
+	return commonSkills[_indexes[getRandomValue2(0, _indexes.length - 1)]].key;
+}
 function drinkPot(_char, _gifter, _event) {
 	if (_event) {
 		_event.stopPropagation();
@@ -1668,7 +1736,7 @@ const relatedObjects = [
 	},
 	{
 		id: 'sleep', key: 'sleep', width: 158, height: 45, col: 5,
-		zoom: 2, totalFrames: 15, speed: 4, singleton: true, still: true, repeat: true
+		zoom: 2, totalFrames: 15, speed: 4, singleton: true, stillOnChar: true, repeat: true
 	},
 	{
 		id: 'heart', key: 'heart', width: 64, height: 64, col: 5,
@@ -1713,7 +1781,7 @@ const relatedObjects = [
 		totalFrames: 8, speed: 7, singleton: true
 	},
 	{
-		id: 'stun', key: 'stun', type: 'hurt', width: 102, height: 48, zoom: .75, repeat: true, bottom: 10,
+		id: 'stun', key: 'stun', type: 'hurt', width: 102, height: 48, zoom: 1, repeat: true, bottom: 10,
 		totalFrames: 20, skip: 2, speed: 4, stillOnChar: true, stillY: true, singleton: true, effect: 'stun', limit: 5, bind: 'hurtground'
 	},
 	{ id: 'glow', key: 'glow', width: 250, height: 250, totalFrames: 4, speed: 2, zoom: .8, still: true, singleton: true },
@@ -3084,6 +3152,17 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	packagegain: './images/sounds/package-gain.wav',
+	woodland: './images/sounds/wood-land2.mp3',
+	airwhistle: './images/sounds/air-whistle.mp3',
+	doggrunt: './images/sounds/dog-grunt.mp3',
+	skillmove3: './images/sounds/skill-move3.mp3',
+	skillmove2: './images/sounds/skill-move2.mp3',
+	skillmove: './images/sounds/skill-move.mp3',
+	scoreup: './images/sounds/score-up.mp3',
+	eggfall: './images/sounds/egg-fall.mp3',
+	cliff: './images/sounds/cliff.mp3',
+	goblinkingtongue: './images/sounds/goblin-king-tongue.mp3',
 	goblinkingrelease: './images/sounds/goblin-king-release.mp3',
 	goblinkingenter: './images/sounds/goblin-king-enter.mp3',
 	goblinkingdead: './images/sounds/goblin-king-dead.mp3',
@@ -3114,6 +3193,7 @@ const soundFiles = {
 	wooshfilm: './images/sounds/woosh-film.mp3',
 	kick: './images/sounds/kick.mp3',
 	slam: './images/sounds/slam.mp3',
+	horror: './images/sounds/horror.mp3',
 	singlekick: './images/sounds/single-kick.mp3',
 	woosh: './images/sounds/woosh.mp3',
 	waterfall: './images/sounds/waterfall2.mp3',
@@ -3455,7 +3535,12 @@ const soundFiles = {
 	dinohurt5: './images/sounds/dinohurt5.mp3',
 	dinohurt6: './images/sounds/dinohurt6.mp3',
 	goblindead: './images/sounds/goblin-dead.mp3',
+	trouble: './images/sounds/trouble.mp3',
 	puff: './images/sounds/puff.mp3',
+	puff2: './images/sounds/puff2.mp3',
+	puff3: './images/sounds/puff3.mp3',
+	puff4: './images/sounds/puff4.mp3',
+	puff5: './images/sounds/puff5.wav',
 	batrun: './images/sounds/bat-run.mp3',
 	bathurt: './images/sounds/bat-hurt.mp3',
 	bathurt2: './images/sounds/bat-hurt2.mp3',
@@ -3491,6 +3576,7 @@ const soundFiles = {
 	alstart: './images/sounds/al-start.mp3',
 	alscream: './images/sounds/al-scream.mp3?v=3',
 	alwin: './images/sounds/al-win.mp3',
+	alground2: './images/sounds/al-ground2.mp3',
 	allaugh: './images/sounds/witch-laugh.mp3?v=2',
 	batsattack: './images/sounds/bats-attack.mp3',
 	gearultimates: './images/sounds/gear-ultimate.wav',
@@ -4475,6 +4561,215 @@ const mapSprites = [
 			{ name: 'foreground', width: 5888, height: 1080, count:1, bottom: -610, foreground: true, zoom: 1.35, rate: 1 }
 		],
 		ground: { width: 5888, height: 1080, zoom: 1.065, yRate: 3.2, bottomGap: 120 }
+	},
+	{
+		id: 42, minLevel : 1,
+		coords: { 
+			title: 'Arena Ground',
+		 }, theme: 'arena', 
+		distance: 1, width: MathRound(6144 * 1.065),
+		playGrounds: [
+			{ min_X: 0, max_X:1700, bottom_Gap: 20, round: { rate: .44, dir: __right} },
+			{ min_X: MathRound(4544 * 1.065), round: { rate: .44, dir: __left}, max_X:MathRound(6144 * 1.065), bottom_Gap: 20 },
+		],
+		cliffs: [
+			{ minYRate: 85, maxYRate: 100, min_X: MathRound(1850 * 1.065), max_X: MathRound(2700 * 1.065), background: true },
+			{ minYRate: 85, maxYRate: 100, min_X: MathRound(3400 * 1.065), max_X: MathRound(4250 * 1.065), background: true },
+			{ minYRate: 0, maxYRate: 15, min_X: MathRound(1950 * 1.065), max_X: MathRound(2650 * 1.065), foreground: true },
+			{ minYRate: 0, maxYRate: 15, min_X: MathRound(3500 * 1.065), max_X: MathRound(4200 * 1.065), foreground: true }
+		],
+		mobs: [
+			{
+				id: 626,
+				minX : 560,
+				maxX : 560,
+				zoom: .75,
+				yPosition: function() {
+					return groundheight;
+				},
+				do : function(_e) {
+					_e.positionable = true;
+					_e.drawPriority = .5;
+				}
+			},
+			{
+				id: 627,
+				minX : 6000,
+				maxX : 6000,
+				zoom: .75,
+				yPosition: function() {
+					return groundheight;
+				},
+				do : function(_e) {
+					_e.positionable = true;
+					_e.drawPriority = .5;
+				}
+			},
+			{
+				id: 628,
+				minX : 1741,
+				maxX : 1741,
+				zoom: 1.75,
+				yPosition: function() {
+					return 0;
+				},
+				do : function(_e) {
+					_e.positionable = true;
+					_e.drawPriority = .4;
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -235);
+					_e.animations.idle.foreground = true;
+				}
+			},
+			{
+				id: 628,
+				minX : 4812,
+				maxX : 4812,
+				zoom: 1.75,
+				yPosition: function() {
+					return 0;
+				},
+				do : function(_e) {
+					_e.positionable = true;
+					_e.drawPriority = .4;
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -235);
+					_e.animations.idle.foreground = true;
+				}
+			},
+			{
+				id: 625,
+				minX : 4810,
+				maxX : 4810,
+				zoom: 1.5,
+				yPosition: function() {
+					return 0;
+				},
+				do : function(_e) {
+					_e.positionable = true;
+					_e.drawPriority = .3;
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -362);
+					_e.animations.idle.foreground = true;
+					_e.animations.idle.frames.forEach(x => {
+						if(x.objects)
+							for(let o of x.objects)
+								o.foreground = true;
+					});
+				}
+			},
+			{
+				id: 629,
+				minX : 4848,
+				maxX : 4848,
+				yPosition: function() {
+					return groundheight;
+				},
+				do : function(_e) {
+					_e.positionable = true;
+					_e.drawPriority = .6;
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -155);
+				}
+			},
+			{
+				id: 630,
+				minX : 4848,
+				maxX : 4848,
+				zoom: .8,
+				yPosition: function() {
+					return groundheight;
+				},
+				do : function(_e) {
+					_e.positionable = true;
+					_e.drawPriority = .5;
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -252);
+				}
+			},
+			{
+				id: 625,
+				minX : 1739,
+				maxX : 1739,
+				zoom: 1.5,
+				yPosition: function() {
+					return 0;
+				},
+				do : function(_e) {
+					_e.positionable = true;
+					_e.drawPriority = .3;
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -362);
+					_e.animations.idle.foreground = true;
+					_e.animations.idle.frames.forEach(x => {
+						if(x.objects)
+							for(let o of x.objects)
+								o.foreground = true;
+					});
+				}
+			},
+			{
+				id: 629,
+				minX : 1703,
+				maxX : 1703,
+				yPosition: function() {
+					return groundheight;
+				},
+				do : function(_e) {
+					_e.positionable = true;
+					_e.drawPriority = .6;
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -155);
+				}
+			},
+			{
+				id: 630,
+				minX : 1703,
+				maxX : 1703,
+				zoom: .8,
+				yPosition: function() {
+					return groundheight;
+				},
+				do : function(_e) {
+					_e.positionable = true;
+					_e.drawPriority = .5;
+					_e.animations.idle.frames.forEach(x => x.bottomGap = -244);
+				}
+			},
+			// {
+			// 	id: 9999,
+			// 	minX : 1700,
+			// 	maxX : 1700,
+			// 	zoom: 1,
+			// 	yPosition: function() {
+			// 		return 0;
+			// 	},
+			// 	do : function(_e) {
+			// 		_e.animations.idle.frames.forEach(x => {
+			// 			x.spriteWidth = 2800;
+			// 			x.spriteHeight = 200;
+			// 			x.spriteOrigin = 1400;
+			// 			delete x.objects;
+			// 		});
+			// 		_e.yGap = MathRound(200 * __zoom);
+			// 		_e.relatedObjects = [];
+			// 		_e.solid = true;
+			// 		_e.width = 2800;
+			// 		_e.height = 200;
+			// 		_e.block = 1;
+			// 		_e._HURTBOX = {
+			// 			w: MathRound(_e.width * _e.getZoom()),
+			// 			h: MathRound(_e.height * _e.getZoom())
+			// 		};
+			// 		if(_e._HURTBOX.w % 2 > 0)
+			// 			_e._HURTBOX.w += 1;
+			// 		_e.HURTWIDTH = _e._HURTBOX.w;
+			// 		_e._HURTBOX_half = MathRound(_e._HURTBOX.w / 2);
+			// 		episode.hasSolid = true;
+			// 		// _e.drawPriority = .5;
+			// 		// _e.animations.idle.frames.forEach(x => x.bottomGap = -244);
+			// 	}
+			// }
+		],
+		tiles: [
+			{ name: 'bg', width: 6144, height: 1080, count:1, bottom: -610, zoom: 1.065, rate: .85 },
+			{ name: 'ground', width: 6144, height: 1080, count:1, bottom: -610, zoom: 1.065, rate: 1 },
+			{ name: 'fg', width: 6144, height: 1080, count:1, bottom: -610, foreground: true, zoom: 1.065, rate: 1 }
+		],
+		ground: { width: 6144, height: 1080, zoom: 1.065, yRate:3.1, bottomGap: 300 }
 	},
 	{
 		id: 999, still: true, tower: true, minLevel : 1,
@@ -26638,6 +26933,7 @@ const spells = {
 		zoom: 1.2 * 1.5,
 		invulnerable: true,
 		class: __spell,
+		autoAim: 30,
 		src: './images/sprites/ep14/sprite.png',
 		name: 'Bats',
 		animations: {
@@ -26699,6 +26995,191 @@ const spells = {
 						atk: {
 							yRange: 50,
 							rate: .1,
+							type: 'common',
+							hurt: {
+								sound: 'batsattack',
+								key: 'hurtground1',
+								type: 'ground'
+							}
+						}
+					}
+				]
+			},
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						bottomGap: -107,
+						speed: 1,
+						props: {
+							remove: true
+						}
+					}
+				]
+			}
+		}
+	},
+	bat: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'run',
+		zoom: 1,
+		invulnerable: true,
+		class: __spell,
+		autoAim: 42,
+		src: './images/sprites/ep624/sprite.png',
+		name: 'Bat',
+		animations: {
+			idle: {
+				key: "idle",
+				type: 'skill',
+				maxRepeat: 12,
+				move: true,
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						bottomGap: -100,
+						extraStepXRate: 1,
+						speed: 6,
+						sound: { key: 'batflap' , volume: 1 },
+						atk: {
+							yRange: 10,
+							rate: 1,
+							type: 'common',
+							hurt: {
+								sound: 'batsattack',
+								key: 'hurtground1',
+								type: 'ground'
+							}
+						}
+					},
+					{
+						spriteLeft: 200,
+						spriteTop: 0,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						bottomGap: -100,
+						extraStepXRate: 1,
+						speed: 6,
+						sound: { key: 'batflap' , volume: 1 },
+						atk: {
+							yRange: 10,
+							rate: 1,
+							type: 'common',
+							hurt: {
+								sound: 'batsattack',
+								key: 'hurtground1',
+								type: 'ground'
+							}
+						}
+					},
+					{
+						spriteLeft: 400,
+						spriteTop: 0,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						bottomGap: -100,
+						extraStepXRate: 1,
+						speed: 6,
+						sound: { key: 'batflap' , volume: 1 },
+						atk: {
+							yRange: 10,
+							rate: 1,
+							type: 'common',
+							hurt: {
+								sound: 'batsattack',
+								key: 'hurtground1',
+								type: 'ground'
+							}
+						}
+					},
+					{
+						spriteLeft: 600,
+						spriteTop: 0,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						bottomGap: -100,
+						extraStepXRate: 1,
+						speed: 6,
+						sound: { key: 'batflap' , volume: 1 },
+						atk: {
+							yRange: 10,
+							rate: 1,
+							type: 'common',
+							hurt: {
+								sound: 'batsattack',
+								key: 'hurtground1',
+								type: 'ground'
+							}
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 200,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						bottomGap: -100,
+						extraStepXRate: 1,
+						speed: 6,
+						sound: { key: 'batflap' , volume: 1 },
+						atk: {
+							yRange: 10,
+							rate: 1,
+							type: 'common',
+							hurt: {
+								sound: 'batsattack',
+								key: 'hurtground1',
+								type: 'ground'
+							}
+						}
+					},
+					{
+						spriteLeft: 200,
+						spriteTop: 200,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						bottomGap: -100,
+						extraStepXRate: 1,
+						speed: 6,
+						sound: { key: 'batflap' , volume: 1 },
+						atk: {
+							yRange: 10,
+							rate: 1,
+							type: 'common',
+							hurt: {
+								sound: 'batsattack',
+								key: 'hurtground1',
+								type: 'ground'
+							}
+						}
+					},
+					{
+						spriteLeft: 400,
+						spriteTop: 200,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						bottomGap: -100,
+						extraStepXRate: 1,
+						speed: 6,
+						sound: { key: 'batflap' , volume: 1 },
+						atk: {
+							yRange: 10,
+							rate: 1,
 							type: 'common',
 							hurt: {
 								sound: 'batsattack',
@@ -30685,11 +31166,18 @@ const canvasAnimations =  {
 		const _y = _t + MathRound((_params.y  ?? 0) * _z);
 		const _r = MathRound((_params.r  ?? 0) * _z);
 		const _rr = MathRound(3.25 * (_r / 10));
-		const _ca = _canv ?? c10;
+		let _ca;
+		if(_params.background)
+			_ca = cSPB;
+		else if(_params.foreground)
+			_ca = cFGA;
+		else 
+			_ca = _canv ?? c10;
 		const grad = _ca.createRadialGradient(_x,  _y,  MathRound(_r / 10), _x, _y - _rr, _r);
 		grad.addColorStop(0, _params.from);
 		grad.addColorStop(.35, _params.to);
 		grad.addColorStop(1, '#FAD5A500');
+		const oldStyle = _ca.fillStyle;
 		_ca.fillStyle = grad;
 		_ca.fillRect(_x - _r, _y - _r - _rr, _r * 2, _r * 2);		
 		switch(_params.start) {
@@ -30707,6 +31195,7 @@ const canvasAnimations =  {
 				_params.start = 0;
 				break;
 		}
+		_ca.fillStyle = oldStyle;
 	},
 
 	// halo: function (_char, _params, _canv) {
@@ -32113,6 +32602,19 @@ crit: function(_char, _params, _canv) {
 // }, 3000);
 
 let _focusMode;
+function cacheCanvas(ctx) {
+	return ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+}
+function restoreCanvas(ctx, imageData) {
+	ctx.putImageData(imageData, 0, 0);
+}
+function darkenLayer(ctx, alpha) {
+	ctx.save();
+	ctx.globalCompositeOperation = 'source-atop';
+	ctx.fillStyle = `rgba(0,0,0,${alpha})`;
+	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+	ctx.restore();
+}
 const cssAnimations = {
 	blur: function () {
 		return;
@@ -32232,7 +32734,7 @@ const cssAnimations = {
 			cssAnimationProps.crack = { start: _gameTick };
 		}
 	},
-	focusui: function (_selector, _func, _transparent, _text, _doneBtn, _blackBG, _fingerFade, _circle) {
+	focusui: function (_selector, _func, _transparent, _text, _doneBtn, _blackBG, _fingerFade, _circle, _noFinger) {
 		_focusMode = 1;
 		let _curt = document.createElement('div');
 		_curt.id = 'focus-ui';
@@ -32323,33 +32825,86 @@ const cssAnimations = {
 			_finger.remove();
 		if(_doneBtn)
 			return;
-		_finger = document.createElement('img');
-		_finger.className = 'push-me-finger';
-		if(__isPC && (hasClass(_elem, 'skill') || hasClass(_elem, 'main-menu-btn')) && !_elem.id.startsWith('chain-skill'))
-			_finger.className += ' finger-top';
-		if(_fingerFade)
-			_finger.className += ' fade-me';
+		_finger = null;
+		if(!_noFinger) {
+			_finger = document.createElement('img');
+			_finger.className = 'push-me-finger';
+			if(__isPC && (hasClass(_elem, 'skill') || hasClass(_elem, 'main-menu-btn')) && !_elem.id.startsWith('chain-skill'))
+				_finger.className += ' finger-top';
+			if(_fingerFade)
+				_finger.className += ' fade-me';
+		}
 		const _rect = _elem.getBoundingClientRect();
-		const L = MathFloor(_rect.left - _extraX);
-		const T = MathFloor(_rect.top - _extraY);
-		const W = MathCeil(_rect.width);
-		const H = MathCeil(_rect.height);
+		const L = MathRound(_rect.left - _extraX);
+		const T = MathRound(_rect.top - _extraY);
+		const W = MathRound(_rect.width);
+		const H = MathRound(_rect.height);
+		const R = L + W;
+		const B = T + H;
+		//const _allW = _container.getBoundingClientRect().width;
 		// _curt.innerHTML += 
-		// `<div class='overlay-black show-ui animate-me' style="width:${parseInt((_rect.left - _extraX) + _rect.width)}px;left:0;top:0;height:${parseInt(_rect.top - _extraY)}px"></div>
-		// <div class='overlay-black show-ui animate-me' style="width:calc(100% - ${parseInt((_rect.left - _extraX) + _rect.width)}px);top:0;right:0;height:${parseInt((_rect.top - _extraY) + _rect.height)}px"></div>
-		// <div class='overlay-black show-ui animate-me' style="width:calc(100% - ${parseInt(_rect.left - _extraX)}px);bottom:0;right:0;height:calc(100% - ${parseInt((_rect.top - _extraY) + _rect.height)}px)"></div>
-		// <div class='overlay-black show-ui animate-me' style="width:${parseInt(_rect.left - _extraX)}px;left:0;bottom:0;height:calc(100% - ${parseInt(_rect.top - _extraY)}px)"></div>`;
-		
-		_curt.innerHTML += 
-		`<div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:${L}px;left:0;top:0;height:100%"></div>
-		<div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:${W}px;left:${L}px;top:0;height:${T}px"></div>
-		<div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:calc(100% - ${L + W}px);left:${L + W}px;top:0;height:100%"></div>
-		<div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:${W}px;left:${L}px;top:${T + H}px;height:calc(100% - ${T + H}px)"></div>
-		<div class='focus-shield${_circle ? ' circle' : ''} show-ui focus-shield-circle' style="background:#FFFFFF01;position:absolute;width:${W}px;left:${L}px;top:${T}px;height:${H}px"></div>`;
-		_finger.style.left = (_rect.left - _extraX) + 'px';
-		_finger.style.top = ((_rect.top - _extraY) + MathRound(.5 * _elem.offsetHeight)) + 'px';
-		_finger.src = './images/icons/push-me.gif';
-		_container.appendChild(_finger);
+		// `<div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:${L}px;left:0;top:0;height:100%"></div>
+		// <div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:${W}px;left:${L}px;top:0;height:${T}px"></div>
+		// <div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:${_allW - (L + W)}px;left:${L + W}px;top:0;right:1px;height:100%"></div>
+		// <div class='overlay-black show-ui fade-me' style="background:#00000080;position:absolute;width:${W}px;left:${L}px;top:${T + H}px;height:calc(100% - ${T + H}px)"></div>
+		// <div class='focus-shield${_circle ? ' circle' : ''} show-ui focus-shield-circle' style="background:#FFFFFF01;position:absolute;width:${W}px;left:${L}px;top:${T}px;height:${H}px"></div>`;
+		_curt.innerHTML += `
+<!-- SOL -->
+<div class='overlay-black show-ui fade-me' style="
+  position:absolute;
+  left:0;
+  top:0;
+  width:${L}px;
+  height:100%;
+  background:#00000080;
+"></div>
+
+<!-- ÜST -->
+<div class='overlay-black show-ui fade-me' style="
+  position:absolute;
+  left:${L}px;
+  top:0;
+  width:${W}px;
+  height:${T}px;
+  background:#00000080;
+"></div>
+
+<!-- SAĞ -->
+<div class='overlay-black show-ui fade-me' style="
+  position:absolute;
+  left:${R}px;
+  right:0;
+  top:0;
+  bottom:0;
+  background:#00000080;
+"></div>
+
+<!-- ALT -->
+<div class='overlay-black show-ui fade-me' style="
+  position:absolute;
+  left:${L}px;
+  right:0;
+  top:${B}px;
+  bottom:0;
+  background:#00000080;
+"></div>
+
+<!-- FOCUS -->
+<div class='focus-shield${_circle ? ' circle' : ''} show-ui focus-shield-circle' style="
+  position:absolute;
+  left:${L}px;
+  top:${T}px;
+  width:${W}px;
+  height:${H}px;
+  background:#FFFFFF01;
+"></div>
+`;
+		if(!_noFinger) {
+			_finger.style.left = (_rect.left - _extraX) + 'px';
+			_finger.style.top = ((_rect.top - _extraY) + MathRound(.5 * _elem.offsetHeight)) + 'px';
+			_finger.src = './images/icons/push-me.gif';
+			_container.appendChild(_finger);
+		}
 		addClass(_gameUI, 'focus-ui-activated');
 	},
 	black: function (_c, _ms, _text, _func, _delay, _after) {
@@ -32534,7 +33089,7 @@ const cssAnimations = {
 		}
 		else {
 			if (_url)
-				_css.innerHTML = '<div id="css-canvas-content" style="opacity:.35" class="full"><div class="full flex pop-outin" style="background:#000"><img src="' + _url + '" style="max-width:80%;max-height:80%" /></div>';
+				_css.innerHTML = '<div id="css-canvas-content" style="opacity:.35;background:#000" class="full"><div class="full flex pop-outin"><img src="' + _url + '" style="max-width:80%;max-height:80%" /></div>';
 			PlaySound({ key: 'curse', volume: .5 });
 			cssAnimationProps.curse = { start: _gameTick, p1: _c, p2: _ms, p3: _url};
 		}
@@ -32659,12 +33214,16 @@ const cssAnimations = {
 				if(fc)
 					fc.remove();
 				delete cssAnimationProps.darkout;
+				c9.style.opacity = 1;
+				_canvasF.style.opacity = 1;
+				_canvasBRB.style.opacity = 1;
 				return;
 			}
+			const alpha = (_opacity / 100);
 			if(_ctx?.clearRect && typeof _ctx.clearRect === 'function'){
 				_ctx.clearRect(0, 0, episode.cUIWidth, episode.cUIHeight);
 				//_ctx.filter = 'blur(' + _opacity + 'px)';
-				_ctx.fillStyle = 'rgba(0,0,0,' + (_opacity / 100) + ')';
+				_ctx.fillStyle = 'rgba(0,0,0,' + alpha + ')';
 				_ctx.fillRect(0, 0, episode.cUIWidth, episode.cUIHeight);
 			}
 			cssAnimationProps.darkout.p2 = _opacity;
@@ -32673,37 +33232,52 @@ const cssAnimations = {
 			cssAnimationProps.darkout = { start: _gameTick, p1: _ctx, p2: _opacity, p3: _cnvs};
 	},
 	dark: function (_char, _ms, _ctx, _opacity, _cnvs) {
-		if(cssAnimationProps.dark) {
-			if(_ms > 0 && ((_gameTick - cssAnimationProps.dark.start) > _ms)) {
-				//removeClass(_css, 'dark-blur-canvas');
+		if (cssAnimationProps.dark) {
+			var fc = document.getElementById('filter-canvas');
+			if(!fc)
+				return false;
+			if (_ms > 0 && ((_gameTick - cssAnimationProps.dark.start) > _ms)) {
 				delete cssAnimationProps.dark;
-				cssAnimations.darkout(_ctx, _opacity, _cnvs);
+				cssAnimations.darkout(null, _opacity, fc);
+				return false;
 			}
-			else if(_ctx?.clearRect && typeof _ctx.clearRect === 'function') {
-				_opacity+= 16;
-				if(_opacity <= 80) {
-					_ctx.clearRect(0, 0, episode.cUIWidth, episode.cUIHeight);
-					_ctx.fillStyle = 'rgba(0,0,0,' + (_opacity / 100) + ')';
-					cssAnimationProps.dark.p4 = _opacity;
-					_ctx.fillRect(0, 0, episode.cUIWidth, episode.cUIHeight);
-				}
+
+			_opacity += 16;
+
+			if (_opacity <= 80) {
+				cssAnimationProps.dark.p4 = _opacity;
+				const alpha = _opacity / 100;
+				fc.style.background = `rgba(0,0,0,${alpha})`;
+				c9.style.opacity = _canvasF.style.opacity = (1 - alpha) * 1.2;
+				_canvasBRB.style.opacity = (1 - alpha) * .85;
 			}
+
 			return false;
 		}
 		else {
-			//addClass(_css, 'dark-blur-canvas');
 			var fc = document.getElementById('filter-canvas');
-			if(!fc) {
-				fc = document.createElement("canvas");
-				fc.width = _css.clientWidth;
-				fc.height = _css.clientHeight;
+
+			if (!fc) {
+				fc = document.createElement("div");
 				fc.id = 'filter-canvas';
+
+				fc.style.position = 'absolute';
+				fc.style.left = '0';
+				fc.style.top = '0';
+				fc.style.width = '100%';
+				fc.style.height = '100%';
+				fc.style.background = 'rgba(0,0,0,0)';
+				fc.style.pointerEvents = 'none';
 				_css.appendChild(fc);
 			}
-			var ctx = fc.getContext('2d');
-			ctx.fillStyle = '#00000000';
-			ctx.fillRect(0, 0, fc.width, fc.height);
-			cssAnimationProps.dark = { start: _gameTick, p1:_char, p2: _ms ?? 1000, p3: ctx, p4: 0, p5: fc };
+			cssAnimationProps.dark = {
+				start: _gameTick,
+				p1: _char,
+				p2: _ms ?? 1000,
+				p3: null,
+				p4: 0,
+				p5: fc
+			};
 		}
 		return true;
 	},
@@ -32727,6 +33301,8 @@ const cssAnimations = {
 		}
 	},
 	cast: function (_char) {
+		if(episode?.pvp)
+			return;
 		const _id = "cast-" + _char.key;
 		let _castContainer = _char.castContainer ?? document.getElementById(_id);
 		if (_castContainer) 
@@ -33318,11 +33894,9 @@ const cssAnimations = {
 		}
 		const _canv = episode.lightradius2.ctx.canvas;
 		episode.lightradius2.ctx.clearRect(0, 0, _canv.width, _canv.height);
-		console.log('sildim')
 		//ligthenGradient(_left, _top, _width, episode.lightradius2.ctx); 
 		for(let _spl of episode.activeSpells)
 			if(_spl.lightColor){
-				console.log('çizdim')
 				let _left = (_spl.SCREENLEFT + _spl.ORIGINDIST)  * __scale;
 				const _h = (_spl.height ? MathRound(_spl.height * _spl.ZOOM) : _spl.HEIGHT);
 				const _hwg = (_spl.height ? MathRound(_spl.height * _spl.ZOOM) : _spl.getHeightWithoutGap());

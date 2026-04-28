@@ -55,7 +55,6 @@ function animateStart(_failed) {
 	}
 	let _leaderboardsHTML = '';
 	let _hasNext = _failed ? false : __storySceneOrder < __story.scenes.length;
-	alert(_hasNext);
 	if(!_hasNext) {
 		__story.leaderBoards.set(function() {
 			const _stageResult = __story.leaderBoards.get(function(_leadersData) {
@@ -67,7 +66,7 @@ function animateStart(_failed) {
 				for(let _player of _leadersData)
 					_leaderboardsHTML += `<div class="flex leaderboard-item${_player.me ? ' selected' : ''}">
 					<div class="flex flex-jc-start w-50 leaderboard-item-left">
-						${_player.name.substring(0,4).toUpperCase()}
+						${_player.me ? 'You' : _player.name}
 					</div>
 					<div class="flex flex-jc-end w-50 leaderboard-item-right">
 						${_player.point.formatWithDots()}
@@ -165,7 +164,7 @@ function animateStart(_failed) {
 					<div class="w-33 flex${_hasNext ? ' d-none' : ''}" style="padding: 1%;height: 100%">
 						<div onexactclick="playClick();hideMyModalPopUp(1);createPromoScreen();detachModule()" id="quit-stage-btn" style="height:74%!important" class="btn inactivated gray animate-me-500 flex">${getLangData('QUIT')}</div>
 					</div>
-					<div id="next-stage-btn" class="w-33 flex${!_hasNext ? ' d-none' : ''}" style="padding: 1%;height: 100%" onexactclick="playClick();hideMyModalPopUp(1);checkStoryFinish(1, ${__stories.find(x => !x.passive && x.order > __story.order)?.id}, null, null, null, 1)">
+					<div id="next-stage-btn" class="quick-space-btn w-33 flex${!_hasNext ? ' d-none' : ''}" style="padding: 1%;height: 100%" onexactclick="playClick();hideMyModalPopUp(1);checkStoryFinish(1, ${__stories.find(x => !x.passive && x.order > __story.order)?.id}, null, null, null, 1)">
 						<div style="height:74%!important" class="btn animate-me-500 flex">${getLangData('NEXT')}</div>
 					</div>
 				</div>

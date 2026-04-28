@@ -3316,7 +3316,41 @@ function createCharacter(_settings) {
 						key: 'idle',
 						type: 'skill',
 						imediateBreak: true,
-						alternateFrames: [
+						alternateFrames: [{ rate: 1, when: function(_e) {
+								return _e.sleep;
+							}, frames: [
+								{
+									spriteLeft: 2497,
+									spriteTop: 2027,
+									spriteWidth: 106,
+									spriteHeight: 145,
+									spriteOrigin: 53,
+									speed: 14
+								},
+								{
+									spriteLeft: 2497,
+									spriteTop: 2027,
+									spriteWidth: 106,
+									spriteHeight: 145,
+									spriteOrigin: 53,
+									speed: 14
+								},{
+									spriteLeft: 2497,
+									spriteTop: 2027,
+									spriteWidth: 106,
+									spriteHeight: 145,
+									spriteOrigin: 53,
+									speed: 14
+								},{
+									spriteLeft: 2497,
+									spriteTop: 2027,
+									spriteWidth: 106,
+									spriteHeight: 145,
+									spriteOrigin: 53,
+									speed: 14
+								}
+							]
+						},
 							{ rate: 1, when: function(_e) {
 								return _e.ultimate;
 							}, frames: [
@@ -39213,7 +39247,9 @@ const _allEnemies = {
 								_e.toucher.commonItem = {key:pickRandomCommonSkill(),priority:1};
 								if(_e.toucher.main)
 									_e.toucher.commonItemRendered = false;
-								//_e.toucher.addCommonSkill({key:pickRandomCommonSkill(),priority:1});
+								if(!_e.toucher.lootedPackageCount)
+									_e.toucher.lootedPackageCount = 0;
+								_e.toucher.lootedPackageCount++;
 							},
 							props: {
 								killingBy: undefined,

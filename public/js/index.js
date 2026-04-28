@@ -2221,24 +2221,55 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 		//	_setMapVariables();
 	}
 }
-
 document.addEventListener("deviceready", onDeviceReady, false);
-function onDeviceReady() {
-	try{
-		if(StatusBar)
-			StatusBar.hide();
-		if (window.plugins && window.plugins.insomnia)
-			window.plugins.insomnia.keepAwake();
-		 if (window.NavigationBar)
-        		window.NavigationBar.backgroundColorByHexString("#000000");
-		__deviceId = device.uuid;
-	}catch(ex) {
+function getDeviceId() {
+    // mobile
+    if (window.device?.uuid) {
+        return device.uuid;
+    }
 
-	}
-	_client = new dataOperations();
-	_client.loadState();
+    // electron / fallback
+    let id = localStorage.getItem("device_id");
+
+    if (!id) {
+        id = crypto.randomUUID(); // modern ve güvenli
+        localStorage.setItem("device_id", id);
+    }
+
+    return id;
 }
+function onDeviceReady() {
+    try {
 
+        const isElectron = navigator.userAgent.includes("Electron");
+
+        if (!isElectron && window.StatusBar) {
+            StatusBar.hide();
+        }
+
+        if (!isElectron && window.plugins?.insomnia) {
+            window.plugins.insomnia.keepAwake();
+        }
+
+        if (!isElectron && window.NavigationBar) {
+            window.NavigationBar.backgroundColorByHexString("#000000");
+        }
+
+        __deviceId = getDeviceId();
+
+        _client = new dataOperations();
+        _client.loadState();
+
+    } catch (ex) {
+        console.error(ex);
+
+        // fallback (kritik)
+        __deviceId = getDeviceId();
+
+        _client = new dataOperations();
+        _client.loadState();
+    }
+}
 function floatDusts() {
 	return;
 	var speed = 400;

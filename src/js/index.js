@@ -733,7 +733,9 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 					_onEnd();
 				else {
 					addClass(_splash, 'd-none');
-					document.getElementById('tip-screen').remove();
+					const _ts = document.getElementById('tip-screen');
+					if(_ts)
+						_ts.remove();
 				}
 				const _loading = document.getElementById('game-start-loading');
 				episode.drawSpriteObjects2();
@@ -1040,29 +1042,40 @@ function setKeyBoard(_c) {
 function addEvent(_id, _char) {
 	const _skillbtn = document.getElementById(_id);
 	_skillbtn.addEventListener("mousedown", function() {
-		//mainCharacter.keyboard.mouseDown(_char);
-		physicalKeys.add(_char);
+		mainCharacter.keyboard.mouseDown(_char);
 	});
 	_skillbtn.addEventListener("mouseup", function() {
-		//mainCharacter.keyboard.mouseUp(_char);
-		physicalKeys.delete(_char);
+		mainCharacter.keyboard.mouseUp(_char);
 	});
 	_skillbtn.addEventListener("mouseout", function() {
-		//mainCharacter.keyboard.mouseUp(_char);
-		physicalKeys.delete(_char);
+		mainCharacter.keyboard.mouseUp(_char);
 	});
 	_skillbtn.addEventListener("touchcancel", function() {
-		//mainCharacter.keyboard.mouseUp(_char);
-		physicalKeys.delete(_char);
+		mainCharacter.keyboard.mouseUp(_char);
 	});
 	_skillbtn.addEventListener("touchend", function() {
-		//mainCharacter.keyboard.mouseUp(_char);
-		physicalKeys.delete(_char);
+		mainCharacter.keyboard.mouseUp(_char);
 	});
 	_skillbtn.addEventListener("touchstart", function() {
-		//mainCharacter.keyboard.mouseDown(_char);
-		physicalKeys.add(_char);
+		mainCharacter.keyboard.mouseDown(_char);
 	});
+}
+function enableCommonSkills(_char) {
+	const _html = `<div data-key="1" data-new-key="${document.getElementById('common-skill-1')?.getAttribute?.('data-new-key')}" id='common-skill-1' class="flex common"></div>
+			<div data-key="2" id='common-skill-2' data-new-key="${document.getElementById('common-skill-2')?.getAttribute?.('data-new-key')}" class="flex common"></div>
+			<div data-key="3" id='common-skill-3' data-new-key="${document.getElementById('common-skill-3')?.getAttribute?.('data-new-key')}" class="flex common"></div>
+			<div data-key="4" id='common-skill-4' data-new-key="${document.getElementById('common-skill-4')?.getAttribute?.('data-new-key')}" class="flex common"></div>`;
+	_enemyProfile.innerHTML = _html;
+	if(!episode?.pvp)
+		removeClass(_enemyProfile, 'pvp');
+	_commons = document.querySelectorAll('.common');
+	_char.checkCommonInventory();
+	setTimeout(() => {
+		addEvent('common-skill-1', document.getElementById('common-skill-1')?.getAttribute?.('data-new-key'));
+		addEvent('common-skill-2', document.getElementById('common-skill-2')?.getAttribute?.('data-new-key'));
+		addEvent('common-skill-3', document.getElementById('common-skill-3')?.getAttribute?.('data-new-key'));
+		addEvent('common-skill-4', document.getElementById('common-skill-4')?.getAttribute?.('data-new-key'));
+	}, 20);
 }
 function setCharacterDefaults(_char, _swap) {
 	if (_char.stepSound && !_char.stepSound.paused)
@@ -1080,20 +1093,8 @@ function setCharacterDefaults(_char, _swap) {
 		const _bar = document.querySelector('#char-' + _char.key + ' .defbar-value');
 		if (_bar)
 			_bar.style.width = ((_char.fatique / _char.maxFatique) * 100) + '%';
-		if(!episode.pvp) {
-			_enemyProfile.innerHTML = `<div data-key="1" data-new-key="${document.getElementById('common-skill-1')?.getAttribute?.('data-new-key')}" id='common-skill-1' class="flex common"></div>
-					<div data-key="2" id='common-skill-2' data-new-key="${document.getElementById('common-skill-2')?.getAttribute?.('data-new-key')}" class="flex common"></div>
-					<div data-key="3" id='common-skill-3' data-new-key="${document.getElementById('common-skill-3')?.getAttribute?.('data-new-key')}" class="flex common"></div>
-					<div data-key="4" id='common-skill-4' data-new-key="${document.getElementById('common-skill-4')?.getAttribute?.('data-new-key')}" class="flex common"></div>`;
-			removeClass(_enemyProfile, 'pvp');
-			_commons = document.querySelectorAll('.common');
-			_char.checkCommonInventory();
-			setTimeout(() => {
-				addEvent('common-skill-1', document.getElementById('common-skill-1')?.getAttribute?.('data-new-key'));
-				addEvent('common-skill-2', document.getElementById('common-skill-2')?.getAttribute?.('data-new-key'));
-				addEvent('common-skill-3', document.getElementById('common-skill-3')?.getAttribute?.('data-new-key'));
-				addEvent('common-skill-4', document.getElementById('common-skill-4')?.getAttribute?.('data-new-key'));
-			}, 20);
+		if(!episode.pvp || __storyScene?.enableCommonSkills) {
+			enableCommonSkills(_char);
 		}
 		else
 			_char.disableCommonInventory();
@@ -2040,10 +2041,12 @@ function createArena(_opponent, _realTime) {
 		});
 	}
 }
-function createWar(_opponents) {
-	resetStoryVariables();
-	const _map = mapSprites.find(x => x.id === 500);
-	const _ms = mapSprites.filter(x => x.pvp);
+function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _after) {
+	if(!_continueStory)
+		resetStoryVariables();
+	const _mapId = _id ?? 500;
+	const _map = mapSprites.find(x => x.id === _mapId);
+	const _ms = _id ? [_map] : mapSprites.filter(x => x.pvp);
 	const _assetMap = _ms[getRandomValue(0, _ms.length - 1)];
 	_map.assetPath = _assetMap.theme;
 	const _doFunc = _assetMap.do;
@@ -2064,28 +2067,34 @@ function createWar(_opponents) {
 	else
 		delete _map.background;
 	_map.objects = []; //JSON.parse(JSON.stringify(_assetMap.objects ?? []));
+	const _oldPvPValue = _map.pvp;
+	if(!_oldPvPValue)
+		_map.pvp = true;
 	if(_map.pvp) {
 		let _place = _opponents.findIndex(x => x === mainCharacter) + 1, i = 0;
-		const _myTeam = _place < 4 ? 1 : 2;
+		let _halfPlace = MathFloor(_opponents.length / 2);
+		const _myTeam = _place <= _halfPlace ? 1 : 2;
 		_map.mobs = [];
 		for(let _opponent of _opponents){
 			i++;
-			if(_opponent === mainCharacter)
+			if(_opponent === mainCharacter){
+				__account.name = mainCharacter.displayName = mainCharacter.pvpName = _opponent.pvpName;
 				continue;
-			const _team = i < 4 ? 1 : 2;
+			}
+			const _team = i <= _halfPlace ? 1 : 2;
 			_map.mobs.push({
 				id: _opponent.id,
-				minX: i < 4 ? 250 : 5800,
-				maxX: i < 4 ? 250 : 5800,
+				minX: i <= _halfPlace ? 250 : 5800,
+				maxX: i <= _halfPlace ? 250 : 5800,
 				sight: 1000,
 				count: 1,
 				groupId: _team,
-				inventory: JSON.parse(JSON.stringify(_opponent.inventory)),
+				inventory: _opponent.inventory?.[0] ? JSON.parse(JSON.stringify(_opponent.inventory)) : [],
 				minLevel: _opponent.level,
 				maxLevel: _opponent.level,
-				direction: i < 4 ? 'right' : 'left',
-				name: 'Player' + i,
-				difficulty: 0,
+				direction: i <= _halfPlace ? __right : __left,
+				name: _opponent.pvpName ?? ('Player' + i),
+				difficulty: _difficulty ?? 0,
 				enemy: _team !== _myTeam,
 				props: {
 					alp: true
@@ -2093,7 +2102,7 @@ function createWar(_opponents) {
 			});
 		}
 		hideMyModalPopUp(1);
-		switchMap(500, 1, function() {
+		const _setMapVariables = function() {
 			episode.war = true;
 			mainCharacter.dead = false;
 			prevPlatformX = undefined;
@@ -2102,6 +2111,8 @@ function createWar(_opponents) {
 			else
 				platformX = episode.width - episode.cWidth;
 			resetSkills(null);
+			if(_baseTime)
+				episode.baseTime = _baseTime;
 			//episode.pvpOrder = _opponent.pvpOrder;
 			hideMyMenu();
 			hideMenu();
@@ -2114,54 +2125,103 @@ function createWar(_opponents) {
 				applyCharacterStats(1, x);
 				resetSkills(null, null, x);
 				x.alp = 1;
+				x.important = true;
 				if(x.groupId === _myTeam)
 					x.skipHealthBar = true;
 				x.health = x.maxHP = x.MAXHP = x.maxHP * 5;
-				//x.setHealth(x.MAXHP);
 				if(x.groupId === _myTeam)
 					_navbar.innerHTML += pvpAvatarTemplate(x);
 				else
 					_enemyProfile.innerHTML += pvpAvatarTemplate(x);
-				//x.hbBars = undefined;
 			});
 			addClass(_enemyProfile, 'pvp');
-			for(let i = 1; i < 7; i++) {
-				const _opponent = episode.enemies.find(x => x.displayName === ('Player' + i));
+			for(let i = 1; i <= _opponents.length; i++) {
+				const _op = _opponents[i - 1];
+				const _opponent = episode.enemies.find(x => x.displayName === (_op.pvpName ?? ('Player' + i)));
 				const x = _opponent ?? mainCharacter;
 				let _y;
+				let _step = .25;
+				switch(_halfPlace) {
+					case 1:
+						_step = .5;
+						break;
+					case 2:
+						_step = .33;
+						break;
+					case 3:
+						_step = .25;
+						break;
+				}
 				switch(i) {
 					case 1:
-					case 4:
-						_y = MathRound(getGroundHeight() * .25);
+					case (_halfPlace + 1):
+						_y = MathRound(getGroundHeight() * _step);
 						if(i === 1)
 							x.left = MathRound(episode.cWidth / 5);
 						else
 							x.left = (episode.cWidth - MathRound(episode.cWidth / 5) - x.getWidth()) + (x.main ? 0 : episode.width - episode.cWidth);
 						break;
 					case 2:
-					case 5:
-						_y = MathRound(getGroundHeight() * .5);
+					case (_halfPlace + 2):
+						_y = MathRound(getGroundHeight() * (_step * 2));
 						if(i === 2)
 							x.left = MathRound(episode.cWidth / 4);
 						else
 							x.left = (episode.cWidth - MathRound(episode.cWidth / 4) - x.getWidth()) + (x.main ? 0 : episode.width - episode.cWidth);
 						break;
 					case 3:
-					case 6:
+					case (_halfPlace + 3):
+						_y = MathRound(getGroundHeight() * (_step * 3));
 						if(i === 3)
 							x.left = MathRound(episode.cWidth / 5);
 						else
 							x.left = (episode.cWidth - MathRound(episode.cWidth / 5) - x.getWidth()) + (x.main ? 0 : episode.width - episode.cWidth);
-						_y = MathRound(getGroundHeight() * .75);
 						break;
 				}
+				x.startLeft = x.left;
 				x.yPosition = _y;
-				x.direction = i < 4 ? 'right' : 'left';
+				x.direction = i <= _halfPlace ? __right : __left;
 				x.updateVariables();
 			}
-		});
+			_map.pvp = _oldPvPValue;
+		}
+		//if(episode?.id !== _mapId)
+			switchMap(_mapId, 1, function() {
+				episode.loadCharacterSprites(function() {
+					_setMapVariables();
+					// const _splash = document.getElementById('splash');
+					// addClass(_splash, 'd-none');
+					// const _ts = document.getElementById('tip-screen');
+					// if(_ts)
+					// 	_ts.remove();
+					if(__storyCheckPoint?.warn)
+						delete __storyCheckPoint.warn;
+					removeFocus();
+					__account.commonInventory = [];
+					if(mainCharacter && !__storyScene?.enableCommonSkills)
+						mainCharacter.disableCommonInventory();
+					removeClass(_gameUI, 'demo-playing');
+					_storySceneSwitching = _game.suspended = false;
+					const _ps = document.querySelectorAll('.placed-skill');
+					_ps?.forEach(x => addClass(x, 'v-none'));
+					blurKeyboard();
+					removeClass(_gameUI, 'disable-ui');
+					episode.beforePVPStart = function() {
+						episode.enemies.forEach(x => {
+							x.health = x.maxHP = x.MAXHP = 1000;
+							x.setHealth(x.health);
+							x.atk = x.def = 10;
+						});
+					}
+					if(_after)
+						_after();
+				}, _opponents.map(x => x.id));
+			});
+		//else
+		//	_setMapVariables();
 	}
 }
+
 document.addEventListener("deviceready", onDeviceReady, false);
 function onDeviceReady() {
 	try{
@@ -2436,6 +2496,17 @@ function skipKeyboardPromo() {
 		addClass(_elem, 'selected');
 		_img.src = './images/ui/star-on.png';
 	}
+}
+function getNewKeyboardKey(_baseKey) {
+	const i = _keyCombinations.findIndex(x => x.baseKey === _baseKey);
+	return{ title: _keyCombinations[i].title, baseKey: __account.keyboard?.[i] ?? _keyCombinations[i].baseKey };
+}
+function getBaseKeyboardKey(_newKey) {
+	if(!__account.keyboard?.[0])
+		return _newKey;
+	const i = __account.keyboard.findIndex(x => x.toLowerCase() === _newKey.toLowerCase());
+	if(i !== -1)
+		return{ title: _keyCombinations[i].title, baseKey: _keyCombinations[i].baseKey };
 }
 function getKeyboardPromo(_force) {
 	const _seenBefore = localStorage.getItem('keyboard-promo-skip');

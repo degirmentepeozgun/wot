@@ -62,6 +62,7 @@ function animation(_a) {
 	this.imediateBreak = _a.imediateBreak;
 	this.maxCharge = _a.maxCharge;
 	this.keyCombination = _a.keyCombination;
+	this.comboOrder = _a.comboOrder;
 	this.chargeKey = _a.chargeKey;
 	this.realWidth = _a.realWidth;
 	this.atkType = _a.atkType;
@@ -84,6 +85,8 @@ function animation(_a) {
 	this.channeling = _a.channeling;
 	this.uncounterable = _a.uncounterable;
 	this.before = _a.before;
+	this.background = _a.background;
+	this.foreground = _a.foreground;
 	this.next = _a.next;
 	this.realNext = this.next;
 	this.move = _a.move;

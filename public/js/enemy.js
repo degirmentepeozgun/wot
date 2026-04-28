@@ -5533,7 +5533,7 @@ function enemy(_e) {
 						{
 							_e.setHealth(0);
 							_e.killedBy = _knocker.key;
-							_e.animate('dead');
+							_e.animate('deadfall', 1);
 						}
 						else
 							_e.animate(_skillName);
@@ -5855,18 +5855,18 @@ function enemy(_e) {
 		);
 	}
 	this.installFall = function(_cliff) {
-		this.animations.dead = new animation(
+		this.animations.deadfall = new animation(
 			createFall(this)
 		);
-		this.animations.dead.key = 'dead';
-		this.animations.dead.zoom = _cliff.background ? .95 : 1.05;
+		this.animations.deadfall.key = 'deadfall';
+		this.animations.deadfall.zoom = _cliff.background ? .95 : 1.05;
 		if(_cliff.background)
-			this.animations.dead.frames.forEach(x => {
+			this.animations.deadfall.frames.forEach(x => {
 				if(x.extraStepYRate < 0 || x.extraStepYRate === undefined)
 					x.background = true;
 			});
 		else
-			this.animations.dead.frames.forEach(x => {
+			this.animations.deadfall.frames.forEach(x => {
 				if(x.extraStepYRate < 0 || x.extraStepYRate === undefined)
 					x.foreground = true;
 			});
@@ -5899,8 +5899,15 @@ function enemy(_e) {
 						_animaKeys.forEach(y => x.animations[y].next = x.animations[y].realNext);
 						x.animate('idle',1);
 						x.removeBuffs();
-						x.attackerCount = 0;
+						x.attackerCount = x.hitTakenCount = 0;
 						x.setHealth(x.maxHP);
+						x.commonItem = undefined;
+						resetSkills(null, null,x);
+						if(x.main) {
+							let _div = document.querySelector('.game-status-screen');
+							if(_div) 
+								_div.remove();
+						}
 						x.addBuff({ key: 'release', level: 3, ms: 3000, end: function(_c) {
 							_c.still = _c.immobilize = _c.disableKeyboard = false;
 							delete x.grayAvatar;	
@@ -6525,8 +6532,8 @@ function enemy(_e) {
 	this.tryFall = function(_heavy) {
 		if(!episode.cliffs || !this.animations.hurtair)
 			return false;
-		// if(getRandomValue2(1, 10) > 1)
-		// 	return false;
+		if(getRandomValue2(1, 10) > 1)
+			return false;
 		const _thisCenter = (this.HURTLEFT + this._HURTBOX_half + platformX);
 		let _y = this.yPosition;
 		const _maxY = getGroundHeight();
@@ -6549,8 +6556,8 @@ function enemy(_e) {
 				_perc >= _cliff.minYRate && _perc <= _cliff.maxYRate
 			) {
 				this.installFall(_cliff);
-				if(_heavy) {
-					this.animations.dead.frames.forEach(x => {
+				if(_heavy && this.animations.deadfall) {
+					this.animations.deadfall.frames.forEach(x => {
 						if(x.extraStepXRate) {
 							x.extraStepXRate *= 2;
 						}

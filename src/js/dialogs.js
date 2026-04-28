@@ -420,7 +420,6 @@ function removeNPCQuestMarks() {
 		}
 }
 function resetQuestLine(_num) {
-	console.log(_num);
 	__account.questStatus = firstQuestData();
 	_client.saveState();
 }
@@ -660,15 +659,15 @@ function createBubbleText(_dialog) {
 		// else {
 			_top = MathRound(_c.TOP - (_canvas.height / 7) - (__zoom * (_dialog.bottomGap ?? 0)));
 			if(__isPC && episode?.id > 1)
-				_top -= MathRound(_canvas.height / 10);
+				_top -= MathRound(_canvas.height / 25);
 			//_left = MathRound(_c.EXACTLEFT -
 			//	(((_gamePad.clientWidth * .15) - _c.WIDTH) / 2));
-			_left = MathRound((_c.SCREENLEFT - ((_c.width / 2) * _c.ZOOM)) + (__zoom * (_dialog.leftGap ?? 0)));  //MathRound((_c.SCREENLEFT - 
+			_left = _c.HURTLEFT + _c._HURTBOX_half; // MathRound((_c.SCREENLEFT - ((_c.width / 2) * _c.ZOOM)) + (__zoom * (_dialog.leftGap ?? 0)));  //MathRound((_c.SCREENLEFT - 
 			//(_d.clientWidth / 2)) + (_c.direction === 'left' ? 0 : _c.WIDTH));
 		//}
 		// _d.style.top = _top + 'px';
 		// _d.style.left = _left + 'px';
-		_d.style.transform = 'translate(' + (_left * __scale) + 'px,' + (_top * __scale) + 'px)'; // BURAYI DEĞİŞTİR
+		_d.style.transform = 'translate(' + (_left * __scale) + 'px,' + (_top * __scale) + 'px) translate(-50%, -100%)'; // BURAYI DEĞİŞTİR
 		_d.style.setProperty('-webkit-transform', _d.style.transform);
 	}
 	//if(!episode.dialogs?.find(x => x.id === _dialog.id))

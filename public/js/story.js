@@ -6974,7 +6974,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		startScene: 2,
+		//startScene: 2,
 		scenes: [
 			{
 				when: function() {
@@ -7732,7 +7732,7 @@ const __stories = [
 					mainCharacter.level = 0;
 					mainCharacter.experience = 0;
 					mainCharacter.maxExperience = 833;
-					setCharacterLevel(10, null, 1);
+					setCharacterLevel(1, null, 1);
 					//setCharacterLevel(8, null, 1);
 					addClass(_gameUI, 'demo-playing');
 					episode.pauseBgMusic(1);
@@ -8752,7 +8752,7 @@ const __stories = [
 																			atk: mainCharacter.atk,
 																			grade: 4
 																		});
-																		_boss.health = _boss.maxHP = 1;
+																		//_boss.health = _boss.maxHP = 1;
 																		_boss.class = 'boss';
 																		_boss.important = 1;
 																		_boss.experience = 0;
@@ -8885,8 +8885,8 @@ const __stories = [
 						maxX: 2580,
 						count: 1,
 						sight: 1000,
-						//grade: 11,
-						hp: 1,//2000,
+						grade: 11,
+						hp: 2000,
 						zoom: .34,
 						yPosition: function() {
 							return MathRound(groundheight * .5);
@@ -8936,6 +8936,47 @@ const __stories = [
 			},
 			{
 				map: 42,
+				leaderBoards: {
+					calculate: function() {
+						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
+						//Kalan kalp (3 adet te) + 1000 * 3
+						//Yediği Damage ın toplam sağlığına oranı negatif bonusu (50 * 10) dmgTaken
+						
+						const _result = {
+							description: [
+								{
+									title: {
+										en: 'Package Bonus',
+										tr: 'Paket Bonusu'
+									},
+									icon: 'pack',
+									value: (mainCharacter.packageCount ?? 0) * 1000
+								},
+								{
+									title: {
+										en: 'Kill Bonus',
+										tr: 'Öldürme Bonusu'
+									},
+									icon: 'strong',
+									value: (mainCharacter.killCount ?? 0) * 1500
+								},
+								{
+									title: {
+										en: 'Team Bonus',
+										tr: 'Takım Bonusu'
+									},
+									icon: 'war',
+									value: (episode['team' + mainCharacter.groupId + 'score'] ?? 0) * 500
+								}
+							]
+						};
+						_result.score = _result.description.reduce(
+							(sum, item) => sum + (item.value ?? 0),
+							0
+						);
+						return _result;
+					}
+				},
 				enableCommonSkills: true,
 				actions: [	
 					{
@@ -9023,23 +9064,21 @@ const __stories = [
 					// 		episode.phase = 3;
 					// 	}
 					// },
-					// {
-					// 	when: function() {
-					// 		return episode.phase < 2 && episode.pvpEnded;
-					// 		//episode.enemies dizisinde groupId si olan enemylerin groupId lerini distinctleyerek al ve length i 1 ni diye bak
-					// 		return episode.phase === 1 && 
-					// 		episode.enemies.filter(x => x.groupId && x.health > 0).map(x => x.groupId).filter((value, index, self) => self.indexOf(value) === index)?.length === 1;
-					// 	},
-					// 	do: function() {
-					// 		episode.phase = 2;
-					// 		episode.deads = episode.enemies.filter(x => x.groupId && x.health <= 0);	
-					// 		episode.pauseBgMusic();
-					// 		PlaySound({ key:'deepimpact', volume: 1 });
-					// 		if(mainCharacter)
-					// 			cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
-
-					// 	}
-					// }
+					{
+						when: function() {
+							return episode.phase < 2 && episode.pvpEnded;
+						},
+						do: function() {
+							__storyPlaying = false;
+							episode.pvp = episode.war = false;
+							if(episode.mainClass) {
+								mainCharacter.class = episode.mainClass;
+								delete episode.mainClass;
+							}
+							installStoryFinish();
+							episode.phase = 2;
+						}
+					}
 				],
 				do: function() {
 					__account.inventory = [];
