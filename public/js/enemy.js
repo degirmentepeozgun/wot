@@ -5776,8 +5776,10 @@ function enemy(_e) {
 		this.noLoot = 1;
 	}
 	this.getAtackableUnits = function (_anima, _frame, _force) {
-		const _enemies = this.getEnemyKillingBy() ?? 
-		this.getEnemiesInTouch(_anima, _frame, 10, null, _force, this.charging);
+		const _onlyKilling = this.getEnemyKillingBy();
+		if(_onlyKilling)
+			return _onlyKilling;
+		const _enemies = _onlyKilling ?? this.getEnemiesInTouch(_anima, _frame, 10, null, _force, this.charging);
 		const units = [];
 		if (_enemies?.[0])
 			for (var _en of _enemies) {
@@ -8978,6 +8980,8 @@ function enemy(_e) {
 	this.animate = function (_skill, _force, _dontResetFrame, num) {
 		if(this.puppetMode && _skill === 'walk')
 			_skill = 'run';
+		if(_skill === 'hurtfeet')
+			console.log('hurtfeet');
 		_skill = this.modifySkill(_skill);
 		this.organizeRelatedObjects(_skill);
 		let oldAnima = this.animations[this.animation];

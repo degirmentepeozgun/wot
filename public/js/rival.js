@@ -6676,6 +6676,7 @@ function createCharacter(_settings) {
 								atk: {
 									rate: .1,
 									hurt: {
+										smash: true,
 										catch: 'front',
 										props: {
 											skipHealthBar: true,
@@ -6759,6 +6760,7 @@ function createCharacter(_settings) {
 								atk: {
 									rate: .1,
 									hurt: {
+										smash: true,
 										catch: 'front',
 										props: {
 											skipHealthBar: true,
