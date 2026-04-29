@@ -40,7 +40,7 @@
     "cross-env": "^7.0.3",
     "html-minifier-cli": "^0.1.0",
     "html-minifier-terser": "^7.2.0",
-    "javascript-obfuscator": "^4.1.1",
+    "javascript-obfuscator": "^4.2.2",
     "postcss-preset-env": "^9.3.0",
     "rollup": "^4.9.0",
     "rollup-plugin-framework7": "^1.2.1",

@@ -1,0 +1,8 @@
+cd wot
+npx vite build
+xcopy www cordova\www /E /I /Y
+cd cordova
+cordova prepare electron
+npx javascript-obfuscator platforms/electron/www/js --output platforms/electron/www/js --compact true --string-array true --string-array-encoding base64 --string-array-threshold 1 --identifier-names-generator hexadecimal --rename-globals true --control-flow-flattening true --control-flow-flattening-threshold 1
+-- platorm_www altına kendi main.js ni koy
+cordova build electron

@@ -1750,6 +1750,8 @@ function enemy(_e) {
 			this.lookingAtTarget = false;
 			return;
 		}
+		if(this.stop)
+			return;
 		const _rand = getRandomValue2(1, 4);
 		if(maxFactor > 1.2 && _rand > 1){
 			this.lookingAtTarget = false;
@@ -2143,7 +2145,7 @@ function enemy(_e) {
 								this.autoStepXRate = this.autoStepYRate = undefined;
 							this.animations[this.animation].moveInYCoords = (_isEnemyClose || getRandomValue(-_range, 100) > _range);
 						}
-						if (!(this.getFps() > 1) && this.getRandom(20) > 5 && (this.animations[this.animation].moveInYCoords || this.alp)) {
+						if (!this.stop && !(this.getFps() > 1) && this.getRandom(20) > 5 && (this.animations[this.animation].moveInYCoords || this.alp)) {
 							var _up = this.yPosition >= _enm.yPosition, _verticalStep;
 							// const _isTargetRunning = this.autoTarget?.animation === 'run' ||
 							// 	this.autoTarget?.animation === 'walk';
@@ -2299,13 +2301,15 @@ function enemy(_e) {
 				this.moveDirection = this.direction = __left;
 			else
 				this.moveDirection = this.direction = __right;
-			if (MathAbs(this.yPosition - _char.yPosition) < MathCeil(getGroundHeight() / 6)) {
+			if(!this.stop) {
+				if (MathAbs(this.yPosition - _char.yPosition) < MathCeil(getGroundHeight() / 6)) {
 
+				}
+				else if (this.yPosition > _char.yPosition)
+					this.yPosition--;
+				else if (this.yPosition < _char.yPosition)
+					this.yPosition++;
 			}
-			else if (this.yPosition > _char.yPosition)
-				this.yPosition--;
-			else if (this.yPosition < _char.yPosition)
-				this.yPosition++;
 			this.run(this.getCurrentAnimation(), this.direction);
 			return true;
 		}
@@ -4312,6 +4316,8 @@ function enemy(_e) {
 				if (_o)
 					_o.buff = _buff.key;
 			}
+		if(_b.after)
+			_b.after(this);
 	}
 	this.checkGlobalBuffs = function () {
 		if(!this.main)
@@ -5041,7 +5047,7 @@ function enemy(_e) {
 
 
 	this.charge2 = function (_anima, _frame) {
-		if (this.immobilize || this.slot?.support)
+		if (this.immobilize || this.slot?.support || this.stop)
 			return;
 
 		if(this.realTime && !this.main && this.alp)
@@ -7609,7 +7615,7 @@ function enemy(_e) {
 		return this.lastYStep;
 	}
 	this.calculateYStepAndMove = function (_solidity, _touch) {
-		if(_solidity && _solidity.moveY === 0){
+		if(this.stop || (_solidity && _solidity.moveY === 0)){
 			return;
 		}
 		if(_touch && this.yPosition === this.autoTarget?.yPosition){
@@ -8694,7 +8700,7 @@ function enemy(_e) {
 	this.applyCommand = function () {
 		if(this.sleep && this.animation !== 'idle') {
 			blurKeyboard();
-			this.animate('idle', 1, null, 8);
+			this.animate('idle', 1);
 			return;
 		}
 		let _anima = this.getCurrentAnimation();
@@ -8980,8 +8986,6 @@ function enemy(_e) {
 	this.animate = function (_skill, _force, _dontResetFrame, num) {
 		if(this.puppetMode && _skill === 'walk')
 			_skill = 'run';
-		if(_skill === 'hurtfeet')
-			console.log('hurtfeet');
 		_skill = this.modifySkill(_skill);
 		this.organizeRelatedObjects(_skill);
 		let oldAnima = this.animations[this.animation];
@@ -9883,6 +9887,7 @@ function enemy(_e) {
 		_attacker.fatalityOnlyTarget = _attacker.onlyTarget = this.key;
 	}
 	this.equalizeHeights = function(_a){
+		return;
 		if(_a.frames)
 		{
 			const _max = _a.frames.map(x => x.spriteHeight).sort().reverse()[0];

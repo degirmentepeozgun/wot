@@ -3325,6 +3325,7 @@ function createCharacter(_settings) {
 									spriteWidth: 106,
 									spriteHeight: 145,
 									spriteOrigin: 53,
+									zoom: 1.005,
 									speed: 14
 								},
 								{
@@ -3333,6 +3334,7 @@ function createCharacter(_settings) {
 									spriteWidth: 106,
 									spriteHeight: 145,
 									spriteOrigin: 53,
+									zoom: 1.005,
 									speed: 14
 								},{
 									spriteLeft: 2497,
@@ -3340,7 +3342,7 @@ function createCharacter(_settings) {
 									spriteWidth: 106,
 									spriteHeight: 145,
 									spriteOrigin: 53,
-									speed: 14
+									speed: 28
 								},{
 									spriteLeft: 2497,
 									spriteTop: 2027,
@@ -11505,6 +11507,47 @@ function createCharacter(_settings) {
 						type: 'skill',
 						imediateBreak: true,
 						alternateFrames: [
+								{ rate: 1, when: function(_e) {
+									return _e.sleep;
+								}, frames: [
+									{
+										spriteLeft: 27,
+										spriteTop: 0,
+										spriteWidth: 97,
+										spriteHeight: 199,
+										spriteOrigin: 56,
+										zoom: 1.005,
+										speed: 14,
+										src: './images/main/archer/hurt1.png'
+									},
+									{
+										spriteLeft: 27,
+										spriteTop: 0,
+										spriteWidth: 97,
+										spriteHeight: 199,
+										spriteOrigin: 56,
+										zoom: 1.005,
+										speed: 14,
+										src: './images/main/archer/hurt1.png'
+									},{
+										spriteLeft: 27,
+										spriteTop: 0,
+										spriteWidth: 97,
+										spriteHeight: 199,
+										spriteOrigin: 56,
+										speed: 28,
+										src: './images/main/archer/hurt1.png'
+									},{
+										spriteLeft: 27,
+										spriteTop: 0,
+										spriteWidth: 97,
+										spriteHeight: 199,
+										spriteOrigin: 56,
+										speed: 14,
+										src: './images/main/archer/hurt1.png'
+									}
+								]
+							},
 							{ rate: 1, when: function(_e) {
 								return _e.disabled && _e.unarmed;
 							}, frames: [
@@ -33714,8 +33757,8 @@ const _allEnemies = {
 				idle: {
 					key: 'idle',
 					type: 'skill',
-					src: './images/sprites/ep619/idle.png',
 					imediateBreak: true,
+					src: './images/sprites/ep619/idle.png',
 					frames: [
 						{
 							spriteLeft: 39,
@@ -33753,6 +33796,42 @@ const _allEnemies = {
 								frame: 9
 							}
 						},
+						// {
+						// 	spriteLeft: 30,
+						// 	spriteTop: 434,
+						// 	spriteWidth: 234,
+						// 	spriteHeight: 166,
+						// 	spriteOrigin: 117,
+						// 	speed: 12,
+						// },
+						// {
+						// 	spriteLeft: 330,
+						// 	spriteTop: 436,
+						// 	spriteWidth: 234,
+						// 	spriteHeight: 164,
+						// 	spriteOrigin: 117,
+						// 	speed: 12,
+						// },
+						// {
+						// 	spriteLeft: 630,
+						// 	spriteTop: 435,
+						// 	spriteWidth: 234,
+						// 	spriteHeight: 165,
+						// 	spriteOrigin: 117,
+						// 	speed: 12,
+						// },
+						// {
+						// 	spriteLeft: 939,
+						// 	spriteTop: 98,
+						// 	spriteWidth: 231,
+						// 	spriteHeight: 162,
+						// 	spriteOrigin: 111,
+						// 	speed: 12,
+						// 	go: {
+						// 		rate: .9,
+						// 		frame: 9
+						// 	}
+						// },
 						{
 							spriteLeft: 61,
 							spriteTop: 92,

@@ -342,6 +342,13 @@ const _allBuffs = {
 		]
 	},
 	sleep: {
+		after: function(_e) {
+			if(!_e.animations.idle)
+				return;
+			if(_e.animation !== 'idle')
+				_e.animate('idle', 1);
+			_e.swapAnimation('idle');
+		},
 		id: 16,
 		objects: [
 			{ key: 'sleep', position: 'middle-head' }
