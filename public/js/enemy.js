@@ -222,6 +222,7 @@ function enemy(_e) {
 	if(this._HURTBOX.w % 2 > 0)
 		this._HURTBOX.w += 1;
 	this.HURTWIDTH = this._HURTBOX.w;
+	this.HURTHEIGHT = this._HURTBOX.h;
 	this._HURTBOX_half = MathRound(this._HURTBOX.w / 2);
 	this.setAutoMode = function (_mode, _force) {
 		if(episode.realTime && this.alp)
@@ -1328,7 +1329,9 @@ function enemy(_e) {
 			return true;
 		if(this.slotJustReleasedTick === _gameTick)
 			return false;
-
+		if(this.ranged && this.rangedSlotOccupiedTime && 
+			(_gameTick - this.rangedSlotOccupiedTime) < this.rangedSlotOccupyDelay)
+			return true;
 		const target = this.autoTarget;
 		const myRing = this.slot.ring;
 		const myPriority = this.slotPriority ?? 10;
@@ -1456,6 +1459,11 @@ function enemy(_e) {
 				this.releaseSlot();
 				bestSlot.occupied = true;
 				bestSlot.occupant = this;
+				if(this.ranged)
+				{
+					this.rangedSlotOccupiedTime = _gameTick;
+					this.rangedSlotOccupyDelay = getRandomValue2(800, 1200);
+				}
 				this.slot = bestSlot;
 				this.slot.bindTick = _gameTick;
 				this.reactionDelay =
@@ -1479,7 +1487,7 @@ function enemy(_e) {
             this.releaseSlot(true);
             return;
         }
-		if(this.reactionStartTime && _gameTick < this.reactionStartTime)
+		if(this.animation === 'idle' && this.reactionStartTime && _gameTick < this.reactionStartTime)
             return;
         if(!this.autoTarget || this.autoTarget.isDead())
             this.pickNewTarget();
@@ -1548,7 +1556,7 @@ function enemy(_e) {
 			const _area = this.getTouchAreaBySlot();
             const _touch = isObjectsInTouch(_area, _target);
 			//const _canAttack = (_target.attackerCount ?? 0) < 2 && !this.slot?.support;
-			let _canAttack = false;	
+			let _canAttack = false, _isPlacing = false;	
 			if(this.autoTarget?.lastHitTime && (_gameTick - this.autoTarget.lastHitTime) < 
 				(this.getAttackMsByDifficulty() * (this.ranged ? .66 : 1))) {
 				_canAttack = false;
@@ -1639,6 +1647,7 @@ function enemy(_e) {
 						this.slot.lastAttackTime = _gameTick;
 					}
                 }
+				_isPlacing = true;
             }
             else {
                 if(this.lookingAtTarget){
@@ -1663,7 +1672,7 @@ function enemy(_e) {
                     if (MathAbs(_target.yPosition - this.yPosition) <= this.verticalStep) {
                         this.lookingAtTarget = true;
 						if(this.slot && _touch.touch)
-							this.slot.placed = true;
+							this.slot.placed = _isPlacing = true;
 						this.autoStepXRate = 0;
 						// if(!this.slot?.support && this.slots) {
 						// 	this.slots.forEach(s => s.occupant?.releaseSlot?.());
@@ -1743,6 +1752,8 @@ function enemy(_e) {
 					this.organizeAutoYPosition(_target, diffX / maxInfluenceDistance);
 				}
 			}
+			if(this.slot?.placed && !_isPlacing)
+				this.slot.placed = undefined;
 		//}
 	}
 	this.organizeAutoYPosition = function(_target, maxFactor) {
@@ -1803,7 +1814,7 @@ function enemy(_e) {
 		}
 	}
 	this.autoCommand = function () {
-		if (this.keyboard || this.harmless || (episode.realTime && this.alp))
+		if (this.keyboard || this.sleep || this.harmless || (episode.realTime && this.alp))
 			return;
 		if(!this.animationFinished && this.animations[this.animation]?.attack){
 			if(!this.chargimg && this.autoTarget && this.getCurrentFrame()?.directionChangeEnabled && this.start <= 1) {
@@ -1963,9 +1974,11 @@ function enemy(_e) {
 					this.setAutoTarget(_enemy.enemy, null, 3);
 				_newAnima.useExtraStepXRate = _charge;
 				if(_isEnemyClose && this.touchDead && !this.isDead()) {
-					this.toucher = _enemy.enemy;
-					this.animate(this.deadAnimationKey ?? 'dead', 1);
-					return;
+					if(_enemy.enemy.class !== 'minion') {
+						this.toucher = _enemy.enemy;
+						this.animate(this.deadAnimationKey ?? 'dead', 1);
+						return;
+					}
 				}
 				if (this.animation !== 'before' && (!_anima.hurt || (_anima.hurt && _newAnima.chain))) {
 					if(this.animation === 'walk' && !this.animationFinished && this.upcomingAnimation === 'idle')
@@ -2803,6 +2816,21 @@ function enemy(_e) {
 			this.potsActive = true;
 		}
 	}
+	this.TESTSLOTS = function (){
+		showBorders(this.HURTLEFT, _gamePad.clientHeight - this.yPosition, this.HURTWIDTH, 20, this.slot?.mustCross ? 'white' : this.slot && !this.slot.support ? 'orange' : (this.slot ? 'yellow' : (this.main ? 'blue' : 'green')), 'border-' + this.key);
+		if(this.slots)
+			for(let i = 0; i < this.slots.length; i++) {
+				const _slot = this.slots[i];
+				// if(_slot.support)
+				// 	continue;
+				const _xGap = _slot.xGap ?? 0;
+				const _origin = this.HURTLEFT + this._HURTBOX_half + _xGap;
+				// showBorders(_origin - 10, _gamePad.clientHeight - this.yPosition + (_slot.yGap ?? 0), 
+				// 	20, 20, _slot.occupied ? 'pink' : 'red', 'slot-' + i + '-' + this.key);
+				showBorders(_origin - 10, _gamePad.clientHeight - this.yPosition + (_slot.yGap ?? 0), 
+					20, 20, _slot.occupied ? 'pink' : (_slot.ranged ? 'purple' : 'red'), 'slot-' + i + '-' + this.key);
+			}
+	}
 	this.draw = function (_queue) {
 		if(this.remove || (_game.suspended && !this.warm))
 			return;
@@ -2936,19 +2964,8 @@ function enemy(_e) {
 			else
 				this.autoCommand2();
 		}
-		// showBorders(this.HURTLEFT, _gamePad.clientHeight - this.yPosition, this.HURTWIDTH, 20, this.slot?.mustCross ? 'white' : this.slot && !this.slot.support ? 'orange' : (this.slot ? 'yellow' : (this.main ? 'blue' : 'green')), 'border-' + this.key);
-		// if(this.slots)
-		// 	for(let i = 0; i < this.slots.length; i++) {
-		// 		const _slot = this.slots[i];
-		// 		// if(_slot.support)
-		// 		// 	continue;
-		// 		const _xGap = _slot.xGap ?? 0;
-		// 		const _origin = this.HURTLEFT + this._HURTBOX_half + _xGap;
-		// 		// showBorders(_origin - 10, _gamePad.clientHeight - this.yPosition + (_slot.yGap ?? 0), 
-		// 		// 	20, 20, _slot.occupied ? 'pink' : 'red', 'slot-' + i + '-' + this.key);
-		// 		showBorders(_origin - 10, _gamePad.clientHeight - this.yPosition + (_slot.yGap ?? 0), 
-		// 			20, 20, _slot.occupied ? 'pink' : (_slot.ranged ? 'purple' : 'red'), 'slot-' + i + '-' + this.key);
-		// 	}
+		
+		//this.TESTSLOTS();
 		
 		if (this.autoMode && this.important) {
 			if (!this.isDead()) {
@@ -4502,11 +4519,10 @@ function enemy(_e) {
 		const zoom = this.getZoom();
 		if(zoom !== this.ZOOM)
 			this.ZOOM = zoom;
-		const spriteOrigin = _frame.spriteOrigin ?? 0;
+		let spriteOrigin = _frame.spriteOrigin ?? 0;
 		const bottomGap = _frame.bottomGap ?? 0;
 		const rightGap = _frame.rightGap ?? 0;
 		const leftGap = _frame.leftGap ?? 0;
-
 		const _h = MathRound((_frame.spriteHeight + MathAbs(bottomGap)) * zoom);
 		if(_h !== this.HEIGHT)
 			this.HEIGHT = _h;
@@ -5905,8 +5921,9 @@ function enemy(_e) {
 						delete x.killedBy;
 						const _animaKeys = Object.keys(x.animations);
 						_animaKeys.forEach(y => x.animations[y].next = x.animations[y].realNext);
-						x.animate('idle',1);
 						x.removeBuffs();
+						x.animate('idle',1);
+						x.swapAnimation('idle');
 						x.attackerCount = x.hitTakenCount = 0;
 						x.setHealth(x.maxHP);
 						x.commonItem = undefined;
@@ -6024,7 +6041,7 @@ function enemy(_e) {
 		if (_f.atk.hurt) {
 			let _decreaseHP;
 			_e.removeBuffByKey('invisibility');
-			if(_e.sleep) {
+			if(_e.sleep && !_e.curse) {
 				_e.removeBuffByKey('sleep');
 				delete _e.sleep;
 			}
@@ -6605,6 +6622,10 @@ function enemy(_e) {
 				const _enemyFrame = _enemy.getCurrentFrame();
 				if (((_enemy.attackingOnlyBy && _enemy.attackingOnlyBy !== this.key && this.class !== __spell) || _enemyFrame.def?.iframe || _enemy.iframe || _enemy.reviveTime) && _enemy.health > 0)
 				{
+					if(_enemyFrame.def?.iframe){
+						_enemy.hasIframe = true;
+						this.iFrameJitter = MathRound(episode.cWidth / getRandomValue2(100, 200));
+					}
 					continue;
 				}
 				_critHitTaken = false;
@@ -7728,14 +7749,29 @@ function enemy(_e) {
 			else if ((this.enemy || this.dropType === 'quest-item') && (this.left > (episode.width - (yy * maxLeft))))
 				this.left = (episode.width - MathCeil(yy * maxLeft));
 		}
-		const _xDiff = ((_reversed ? -1 : 1) * (this.ZOOM * (_frame.leftGap ?? 0))) + ((_reversed ? 1 : -1) * (_frame.spriteOrigin * this.ZOOM));
-
+		let _xDiff = ((_reversed ? -1 : 1) * (this.ZOOM * (_frame.leftGap ?? 0))) + ((_reversed ? 1 : -1) * (_frame.spriteOrigin * this.ZOOM));
+		let _sw = _frame.spriteWidth * this.ZOOM;
+		if(this.iFrameJitter)
+		{
+			_xDiff -= (_reversed ? -1 : 1) * this.iFrameJitter;
+			_sw += this.iFrameJitter;
+			if(!this.iframeJitterTime) {
+				this.iframeJitterTime = _gameTick;
+			}
+			else if(this.iframeJitterTime < (_gameTick - 60)){
+				delete this.iFrameJitter;
+				delete this.iframeJitterTime;
+			}
+		}
 		let _left = this.left + _xDiff;
-		const _top = (episode.cHeight - (_frame.spriteHeight * this.ZOOM) + (this.pushY ?? 0) +
-		MathRound((_frame.bottomGap ?? 0) * this.ZOOM)) - _stepY - this.yPosition;
+		let _py = this.pushY;
+		if(_py && this.animation.startsWith('hurt'))
+			_py = 0;
+		const _top = (episode.cHeight - (_frame.spriteHeight * this.ZOOM) + (_py ?? 0) +
+		MathRound((this.pushY ? 0 :_frame.bottomGap ?? 0) * this.ZOOM)) - _stepY - this.yPosition;
 		if(this.pushY) {
 			if(!this.pushYStep)
-				this.pushYStep = MathRound((episode.cHeight * .3) / 100);
+				this.pushYStep = MathRound((episode.cHeight * .5) / 100);
 			if(this.pushY > 0) {
 				this.pushY -= this.pushYStep;
 				if(this.pushY < 0)
@@ -7788,68 +7824,68 @@ function enemy(_e) {
 					}
 					else
 						_zoom = (_frame.zoom ?? _anima.zoom);
-					if (this.drawHalf || _cut) { // && (_cutX || _cutY)) {
-						_queue.push({
-							skinColor: this.freeze ? '#a2d2df70' : _frame.color,
-							particleColor: _particleColor,
-							drawPriority: this.drawPriority,
-							sprite: _frame.sprite ?? (_anima.sprite ?? this.sprite),
-							spriteX: _frame.spriteLeft,
-							spriteY: _frame.spriteTop,
-							alpha: _frame.alpha,
-							zoom: _zoom,
-							spriteWidth: _frame.spriteWidth,
-							spriteHeight: _frame.spriteHeight,
-							shadow: _frame.hasShadowBehind ? (_frame.shadow ?? '#000000') : undefined,
-							left: _left,
-							top: _top,
-							width: _frame.spriteWidth * this.ZOOM,
-							height: _frame.spriteHeight * this.ZOOM,
-							yGap: _stepY ?? 0,
-							reversed: _reversed,
-							border: _frame.border,
-							frameKey: _frame.frameKey,
-							objects: this.stop ? this.relatedObjects?.filter(x => x.totalFrames === 1) ?? [] : this.relatedObjects,
-							char: this,
-							animation: this.animation,
-							hbGap: this.healtbarGap + (_frame.healtbarGap ?? 0)
-						});
-						let _cutSpriteWidth = _cutX > 0 ? _cutX : _frame.spriteWidth;
-						let _cutSpriteHeight = _cutY > 0 ? _cutY : _frame.spriteHeight;
-						let _cutSpriteTop = _frame.spriteTop;
-						let _cutTop = _top;
-						if(_cut.exclude) {
-							if(_cutY > 0) {
-								_cutSpriteTop += _cutSpriteHeight;
-								_cutTop += (_cutSpriteHeight * this.ZOOM);
-								_cutSpriteHeight = _frame.spriteHeight - _cutSpriteHeight;
-							}
-						}
-						_queue.push({
-							skinColor: this.freeze ? '#a2d2df70' : _frame.color,
-							particleColor: _particleColor,
-							drawPriority: .5,
-							sprite: _frame.sprite ?? (_anima.sprite ?? this.sprite),
-							spriteX: _frame.spriteLeft,
-							spriteY: _cutSpriteTop,
-							alpha: _frame.alpha,
-							zoom: _zoom,
-							spriteWidth: _cutSpriteWidth,
-							spriteHeight: _cutSpriteHeight,
-							shadow: _frame.hasShadowBehind ? (_frame.shadow ?? '#000000') : undefined,
-							left: _left,
-							top: _cutTop,
-							width: MathRound(_cutSpriteWidth * this.ZOOM),
-							height: MathRound(_cutSpriteHeight * this.ZOOM),
-							yGap: _stepY ?? 0,
-							reversed: _reversed,
-							frameKey: _frame.frameKey,
-							char: this,
-							animation: this.animation,
-							hbGap: this.healtbarGap + (_frame.healtbarGap ?? 0)
-						});
-					}
-					else
+					// if (this.drawHalf || _cut) { // && (_cutX || _cutY)) {
+					// 	_queue.push({
+					// 		skinColor: this.freeze ? '#a2d2df70' : _frame.color,
+					// 		particleColor: _particleColor,
+					// 		drawPriority: this.drawPriority,
+					// 		sprite: _frame.sprite ?? (_anima.sprite ?? this.sprite),
+					// 		spriteX: _frame.spriteLeft,
+					// 		spriteY: _frame.spriteTop,
+					// 		alpha: _frame.alpha,
+					// 		zoom: _zoom,
+					// 		spriteWidth: _frame.spriteWidth,
+					// 		spriteHeight: _frame.spriteHeight,
+					// 		shadow: _frame.hasShadowBehind ? (_frame.shadow ?? '#000000') : undefined,
+					// 		left: _left,
+					// 		top: _top,
+					// 		width: _frame.spriteWidth * this.ZOOM,
+					// 		height: _frame.spriteHeight * this.ZOOM,
+					// 		yGap: _stepY ?? 0,
+					// 		reversed: _reversed,
+					// 		border: _frame.border,
+					// 		frameKey: _frame.frameKey,
+					// 		objects: this.stop ? this.relatedObjects?.filter(x => x.totalFrames === 1) ?? [] : this.relatedObjects,
+					// 		char: this,
+					// 		animation: this.animation,
+					// 		hbGap: this.healtbarGap + (_frame.healtbarGap ?? 0)
+					// 	});
+					// 	let _cutSpriteWidth = _cutX > 0 ? _cutX : _frame.spriteWidth;
+					// 	let _cutSpriteHeight = _cutY > 0 ? _cutY : _frame.spriteHeight;
+					// 	let _cutSpriteTop = _frame.spriteTop;
+					// 	let _cutTop = _top;
+					// 	if(_cut.exclude) {
+					// 		if(_cutY > 0) {
+					// 			_cutSpriteTop += _cutSpriteHeight;
+					// 			_cutTop += (_cutSpriteHeight * this.ZOOM);
+					// 			_cutSpriteHeight = _frame.spriteHeight - _cutSpriteHeight;
+					// 		}
+					// 	}
+					// 	_queue.push({
+					// 		skinColor: this.freeze ? '#a2d2df70' : _frame.color,
+					// 		particleColor: _particleColor,
+					// 		drawPriority: .5,
+					// 		sprite: _frame.sprite ?? (_anima.sprite ?? this.sprite),
+					// 		spriteX: _frame.spriteLeft,
+					// 		spriteY: _cutSpriteTop,
+					// 		alpha: _frame.alpha,
+					// 		zoom: _zoom,
+					// 		spriteWidth: _cutSpriteWidth,
+					// 		spriteHeight: _cutSpriteHeight,
+					// 		shadow: _frame.hasShadowBehind ? (_frame.shadow ?? '#000000') : undefined,
+					// 		left: _left,
+					// 		top: _cutTop,
+					// 		width: MathRound(_cutSpriteWidth * this.ZOOM),
+					// 		height: MathRound(_cutSpriteHeight * this.ZOOM),
+					// 		yGap: _stepY ?? 0,
+					// 		reversed: _reversed,
+					// 		frameKey: _frame.frameKey,
+					// 		char: this,
+					// 		animation: this.animation,
+					// 		hbGap: this.healtbarGap + (_frame.healtbarGap ?? 0)
+					// 	});
+					// }
+					// else
 						_queue.push({
 							skinColor: this.freeze ? '#a2d2df70' : _frame.color,
 							particleColor: _particleColor,
@@ -7866,7 +7902,7 @@ function enemy(_e) {
 							top: _top,
 							background: _frame.background ?? _anima.background,
 							foreground: _frame.foreground ?? _anima.foreground,
-							width: _frame.spriteWidth * this.ZOOM,
+							width: _sw,
 							height: _frame.spriteHeight * this.ZOOM,
 							yGap: _stepY ?? 0,
 							reversed: _reversed,

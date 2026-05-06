@@ -1,4 +1,5 @@
 ﻿'use strict';
+(function(){
 console.log('stage-finish');
 function animateStart(_failed) {
 	_game.suspended = true;
@@ -160,14 +161,17 @@ function animateStart(_failed) {
 					'</div>'
 					+ //_firstFinishRewardsHtml +
 				`</div>
-				<div class="flex w-100 ms2000 op-none" style="height: 10%">
-					<div class="w-33 flex${_hasNext ? ' d-none' : ''}" style="padding: 1%;height: 100%">
-						<div onexactclick="playClick();hideMyModalPopUp(1);createPromoScreen();detachModule()" id="quit-stage-btn" style="height:74%!important" class="btn inactivated gray animate-me-500 flex">${getLangData('QUIT')}</div>
-					</div>
-					<div id="next-stage-btn" class="quick-space-btn w-33 flex${!_hasNext ? ' d-none' : ''}" style="padding: 1%;height: 100%" onexactclick="playClick();hideMyModalPopUp(1);checkStoryFinish(1, ${__stories.find(x => !x.passive && x.order > __story.order)?.id}, null, null, null, 1)">
+				<div class="flex w-100 ms2000 op-none" style="height: 10%">`
+					+ (_hasNext ? '' :
+					`<div class="w-33 flex" style="padding: 1%;height: 100%">
+						<div onexactclick="createPromoScreen()" id="quit-stage-btn" style="height:74%!important" class="btn quick-space-btn inactivated gray animate-me-500 flex">${getLangData('QUIT')}</div>
+					</div>`)
+					+ (_hasNext ?
+					`<div id="next-stage-btn" class="quick-space-btn w-33 flex" style="padding: 1%;height: 100%" onexactclick="playClick();hideMyModalPopUp(1);checkStoryFinish(1, ${__stories.find(x => !x.passive && x.order > __story.order)?.id}, null, null, null, 1)">
 						<div style="height:74%!important" class="btn animate-me-500 flex">${getLangData('NEXT')}</div>
-					</div>
-				</div>
+					</div>` : '')
+					+
+				`</div>
 			</div>
 		</div>
 	</div>`;
@@ -293,3 +297,8 @@ function animateScore(containerId, currentScore, targetScore, duration) {
         stop: stopAll
     };
 }
+
+// 🔥 EXPORT
+window.stagefinish = window.stagefinish || {};
+window.stagefinish.animateStart = animateStart;
+})();

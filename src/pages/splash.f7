@@ -32,6 +32,8 @@
 				</div>
 				<img src="./images/icons/enemy-left.png" class="enemy-left-arrow v-none" />
 				<img src="./images/icons/enemy-right.png" class="enemy-right-arrow v-none" />
+				<img src="./images/icons/package-left.png" class="package-left-arrow v-none" />
+				<img src="./images/icons/package-right.png" class="package-right-arrow v-none" />
 				<div id="top-nav" class="flex flex-jc-start top-ui-item">
 				</div>
 				<div id="mini-menu">

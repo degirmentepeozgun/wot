@@ -2614,7 +2614,7 @@ function installOpeningScreen(_instant, _lateOpening) {
 				<img src="./images/icons/lang.png" /><span>${getLang().toUpperCase()}</span>
 			</div>
 			<div style="height:20%;width:100%;padding-bottom:30vh;z-index:2" class="flex">
-				<div class="game-difficulty-wrapper flex w-100">
+				<div class="game-difficulty-wrapper flex w-100 d-none">
 					<div class="game-difficulty-content flex">
 						<div class="flex">
 							<div class="game-difficulty-title">${getLangData('Difficulty')}:</div>
@@ -2626,7 +2626,7 @@ function installOpeningScreen(_instant, _lateOpening) {
 				</div>
 				<div class="flex">
 					<div id="qp-btn" class="framed-btn flex" onexactclick="activateGameStart(1)">${getLangData('QUICK PLAY')}</div>
-					<div id="connect-btn" class="framed-btn flex" onexactclick="activateGameStart()">${getLangData('DEMO PLAY')}</div>
+					<div id="connect-btn" class="d-none framed-btn flex" onexactclick="activateGameStart()">${getLangData('DEMO PLAY')}</div>
 				</div>
 				<div style="padding-top:1vh;width:100%;color:#f8f8f880 !important;font-size:2.8vh!important" class="flex" id="assets-progress"></div>
 			</div>`;
@@ -3047,7 +3047,8 @@ function installQuickPlayStageFinish(_failed) {
 	episode.pauseBgMusic(1);
 	injectModule('stagefinish', function(_arr, _name) {
 		__latestUIModule[_name] = { data: _arr };
-		animateStart(_failed);
+		//animateStart(_failed);
+		window.stagefinish.animateStart(_failed);
 	});
 }
 function installTalents() {

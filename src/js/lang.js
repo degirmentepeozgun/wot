@@ -243,6 +243,7 @@ const __langData = [
 	{ key: 'Victory', tr: 'Zafer'},
 	{ key: 'Draw', tr: 'Berabere'},
 	{ key: 'Defeat', tr: 'Yenilgi'},
+	{ key: 'Comeback', tr: 'Öne Geçti'},
 	{ key: 'Conversation', tr: 'Konuşma'},
 	{ key: 'Not started yet', tr: 'Henüz Başlanmadı'},
 	{ key: 'Min Level Requirement', tr: 'Seviye Gereksinimi'},

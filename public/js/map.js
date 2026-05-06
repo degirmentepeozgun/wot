@@ -90,7 +90,9 @@ function map(_m) {
 	this.ground = _mapSprite.ground;
 	//this.zoom = __zoom * (this.ground.zoom ?? 1);
 	this.id = _mapSprite.id;
-	this.mobs = _mapSprite.mobs;
+	this.mobs = [..._mapSprite.mobs];
+	if(_mapSprite.objectMobs)
+		this.objectMobs = [..._mapSprite.objectMobs];
 	this.mobs.forEach(x => {
 		x.listed = 1;
 		if(x.spawnMinX !== undefined)
@@ -925,6 +927,18 @@ function map(_m) {
 					if(_gsb) {
 						const _teamScore = parseInt(_gsb.innerText) + 1;
 						episode['team' + _killer.groupId + 'score'] = _teamScore;
+						if(_teamScore > 9) {
+							this.pvpStarted = 1;
+						}
+						if(_teamScore > episode['team' + x.groupId + 'score']){
+							if(episode.winningTeam && episode.winningTeam !== _killer.groupId) {
+								//comeback
+								const isMain = mainCharacter.groupId === _killer.groupId;
+								//warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/flag' + _killer.groupId + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Comeback') + '!</span></div>', null, null, 1);
+								PlaySound({ key: isMain ? 'comebackwin' : 'comebackloose', volume: 1 });
+							}
+							episode.winningTeam = _killer.groupId;
+						}
 						_gsb.innerText = _teamScore;
 					}
 					let _msg = '';
@@ -1181,6 +1195,7 @@ function map(_m) {
 				installStoryFinish(_status === 2 ? 0 : (_status === 1 ? 2 : 1), _rewards, _table);
 		}
 	}
+	
 	this.focusOnPlayer = function(_key) {
 		if(!mainCharacter.ghosted)
 			return;
@@ -1384,7 +1399,8 @@ function map(_m) {
 		}
 		this.limitedEffects.length = this.activeSpells.length = 0;
 		if(mainCharacter)
-			mainCharacter.hasLeftEnemy = mainCharacter.hasRightEnemy = undefined;
+			mainCharacter.hasLeftEnemy = mainCharacter.hasRightEnemy =
+		mainCharacter.hasLeftPackage = mainCharacter.hasRightPackage = undefined;
 		if (_len)
 			for (var i = 0; i < _len; i++) {
 				let sprite = this.enemies[i];
@@ -1453,6 +1469,15 @@ function map(_m) {
 							else if(!mainCharacter.hasRightEnemy)
 								mainCharacter.hasRightEnemy = 1;
 						}
+					else if(sprite.package) {
+						if(mainCharacter.EXACTLEFT > sprite.EXACTLEFT)
+						{
+							if(!mainCharacter.hasLeftPackage)
+								mainCharacter.hasLeftPackage = 1;
+						}
+						else if(!mainCharacter.hasRightPackage)
+							mainCharacter.hasRightPackage = 1;
+					}
 				}
 				if(!sprite.unseen && updateUnseen && !sprite.remove){
 					this.seenEnemies.push(sprite);
@@ -3552,7 +3577,152 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 		return `rgb(${r|0},${g|0},${b|0})`;
 	}
 }
+this.animateIFrameRipple = function (_item, _wDiff) {
 
+	const _char = _item.char;
+
+	if (!_char.ripples)
+		_char.ripples = [];
+
+	// ---------------- SPAWN (rate limitli) ----------------
+	if (_char.hasIframe) {
+
+		if (!_char._lastRipple || (_gameTick - _char._lastRipple) > 6) {
+
+			_char._lastRipple = _gameTick;
+			
+			_char.ripples.push({
+				y: _char.TOP + MathRound(_char.HEIGHT * 0.5),
+				p: platformX,
+				t: 0,
+				life: 1,
+				decay: 0.07 + Math.random() * 0.03,
+
+				startR: (_char._HURTBOX_half) * 0.5,
+				maxR: (_char._HURTBOX_half) * (_char.HURTHEIGHT * .0075),
+
+				wobble: (Math.random() * 360) | 0
+			});
+			PlaySound({key:'iframe', volume: .05});
+		}
+	}
+
+	const arr = _char.ripples;
+	if (!arr.length) return;
+
+	const oldAlpha = offCtx.globalAlpha;
+	const oldComp = offCtx.globalCompositeOperation;
+	const oldShadow = offCtx.shadowBlur;
+
+	const _reversed =
+		(offCtx.reversed && !_item.reversed) ||
+		(!offCtx.reversed && _item.reversed);
+
+	offCtx.globalCompositeOperation = 'lighter';
+	offCtx.shadowBlur = 12;
+	offCtx.shadowColor = "rgba(80,180,255,0.8)";
+
+	for (let i = arr.length - 1; i >= 0; i--) {
+
+		const r = arr[i];
+
+		// ---------- PROGRESS ----------
+		r.t += 0.1 + Math.random() * 0.04;
+		r.life -= r.decay;
+
+		if (r.life <= 0) {
+			arr[i] = arr[arr.length - 1];
+			arr.pop();
+			continue;
+		}
+
+		// ---------- EASE OUT ----------
+		const ease = 1 - Math.pow(1 - r.t, 3);
+
+		const radius =
+			r.startR +
+			(r.maxR - r.startR) * ease;
+
+		const alpha = r.life;
+
+		const wobble =
+			SIN_LUT[(r.t * 120 + r.wobble) % 360] * 2;
+
+		// ---------- WORLD → SCREEN ----------
+		const _centerX = _char.HURTLEFT + _char._HURTBOX_half;
+		let drawX =  (offCtx.reversed ? -1 * _centerX : _centerX);
+		// if (reversed)
+		// 	drawX = this.cWidth - drawX;
+		// (platformX - r.p) ile dünya-kamera farkını uygula  ve uygularken reverse durumunu da hesaba kat
+		const drawY = r.y;
+		if (r.t < 0.3) {
+
+			const coreSize = Math.max(4, radius * 0.5);
+			const intensity = 1 - (r.t / 0.3);
+
+			const grad = offCtx.createRadialGradient(
+				drawX, drawY, 0,
+				drawX, drawY, coreSize
+			);
+
+			grad.addColorStop(0, `rgba(255,255,255,${intensity})`);
+			grad.addColorStop(0.3, `rgba(80,180,255,0)`);
+			grad.addColorStop(0.5, `rgba(255,255,255,${intensity * .8})`);
+			grad.addColorStop(1, `rgba(80,180,255,0)`);
+
+			const oldComp = offCtx.globalCompositeOperation;
+			const oldAlpha = offCtx.globalAlpha;
+
+			offCtx.globalCompositeOperation = 'screen';
+			offCtx.globalAlpha = 1;
+
+			offCtx.beginPath();
+			offCtx.arc(drawX, drawY, coreSize, 0, Math.PI * 2);
+			offCtx.fillStyle = grad;
+			offCtx.fill();
+
+			offCtx.globalCompositeOperation = oldComp;
+			offCtx.globalAlpha = oldAlpha;
+		}
+		// =========================
+		// 🔵 CORE FLASH (dolgu)
+		// =========================
+		offCtx.beginPath();
+		offCtx.arc(drawX, drawY, radius * 0.35, 0, Math.PI * 2);
+		offCtx.globalAlpha = alpha * 0.35;
+		offCtx.fillStyle = "rgba(120,200,255,0.8)";
+		offCtx.fill();
+
+		// =========================
+		// 🔵 GLOW RING (kalın)
+		// =========================
+		const _lw = MathRound(this.cWidth / 800);
+		offCtx.beginPath();
+		offCtx.arc(drawX, drawY, radius + wobble, 0, Math.PI * 2);
+		offCtx.lineWidth = _lw * 3;
+		offCtx.globalAlpha = alpha * 0.25;
+		offCtx.strokeStyle = "rgba(80,180,255,0.6)";
+		offCtx.stroke();
+
+		// =========================
+		// ⚪ SHARP OUTER RING
+		// =========================
+		offCtx.beginPath();
+		offCtx.arc(drawX, drawY, radius + wobble, 0, Math.PI * 2);
+		offCtx.lineWidth = _lw;
+		offCtx.globalAlpha = alpha * 0.9;
+		offCtx.strokeStyle = "#ffffff";
+		offCtx.stroke();
+	}
+
+	// ---------- RESTORE ----------
+	offCtx.globalAlpha = oldAlpha;
+	offCtx.globalCompositeOperation = oldComp;
+	offCtx.shadowBlur = oldShadow;
+
+	if (arr.length === 0)
+		delete _char.ripples;
+};
 	this.drawCharacterQueue = function (_queue) {
 		if (this.disposing || !_queue?.[0]){
 			this.checkSceneActions();
@@ -3898,8 +4068,13 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 							delete _item.char.hurtingStrength;
 							_drawParticles = 0;
 						}
+						else if(_item.char.hasIframe || _item.char.ripples?.[0]){
+							this.animateIFrameRipple(_item, _wDiff);
+							if(_item.char.hasIframe)
+								_item.char.hasIframe = false;
+						}
 						if(_drawParticles && _item.char.particles)
-							this.drawHitParticles(_item.char);
+							this.drawHitParticles(_item);
 						if(_item.char.text)
 						{
 							let _restored;
@@ -4050,6 +4225,8 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			return;
 		const _l = mainCharacter?.hasLeftEnemy;
 		const _r = mainCharacter?.hasRightEnemy;
+		const _lp = mainCharacter?.hasLeftPackage;
+		const _rp = mainCharacter?.hasRightPackage;
 		if(!this.enemyLeftArrow)
 			this.enemyLeftArrow = document.querySelector('.enemy-left-arrow');
 		else { 
@@ -4067,6 +4244,18 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			else
 				addClass(this.enemyRightArrow, 'v-none');
 		}
+		if(!this.packageLeftArrow)
+			this.packageLeftArrow = document.querySelector('.package-left-arrow');
+		if(_lp)
+			removeClass(this.packageLeftArrow, 'v-none');
+		else
+			addClass(this.packageLeftArrow, 'v-none');
+		if(!this.packageRightArrow)
+			this.packageRightArrow = document.querySelector('.package-right-arrow');
+		if(_rp)
+			removeClass(this.packageRightArrow, 'v-none');
+		else
+			addClass(this.packageRightArrow, 'v-none');
 		this.enemyArrowsShown  = _gameTick;
 		return;
 		if(!_l && !_r)
@@ -5160,6 +5349,7 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 		else
 			_char._enemyBuffer.length = 0;
 		const _x = _char._enemyBuffer;
+		const _isMinion = _char.class === 'minion';
 		const _ff = _char.friendlyFire && (_char.enemy !== mainCharacter.enemy);
 		for(let x of _enemies) {
 			if(_ff && x.enemy && _char.enemy)
@@ -5195,7 +5385,8 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 
 			if (!this.pvp && _iv && !isObjectInVisibleRectangle(x))
 				continue;
-
+			if(_isMinion && x.class === 'object')
+				continue;
 			_x.push(x);
 		}
 
@@ -5328,8 +5519,12 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			episode.enemies.forEach(e => {
 				e.stopStepSound();
 			});
-		if(episode.mobs?.find(x => !x.listed))
-			episode.mobs = episode.mobs.filter(x => x.listed);
+		// if(episode.mobs?.find(x => !x.listed))
+		// 	episode.mobs = episode.mobs.filter(x => x.listed);
+		this.mobs = [];
+		this.respawners = [];
+		this.cliffs = undefined;
+		this.playGrounds = undefined;
 		if(episode.phase)
 			delete episode.phase;
 		if(episode.boss)

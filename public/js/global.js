@@ -3154,6 +3154,8 @@ const storySoundFiles = {
 const soundFiles = {
 	packagegain: './images/sounds/package-gain.wav',
 	woodland: './images/sounds/wood-land2.mp3',
+	comebackwin: './images/sounds/comeback-win.mp3',
+	comebackloose: './images/sounds/comeback-loose.mp3',
 	airwhistle: './images/sounds/air-whistle.mp3',
 	doggrunt: './images/sounds/dog-grunt.mp3',
 	skillmove3: './images/sounds/skill-move3.mp3',
@@ -3161,6 +3163,7 @@ const soundFiles = {
 	skillmove: './images/sounds/skill-move.mp3',
 	scoreup: './images/sounds/score-up.mp3',
 	eggfall: './images/sounds/egg-fall.mp3',
+	iframe: './images/sounds/iframe.mp3',
 	cliff: './images/sounds/cliff.mp3',
 	goblinkingtongue: './images/sounds/goblin-king-tongue.mp3',
 	goblinkingrelease: './images/sounds/goblin-king-release.mp3',
@@ -4578,7 +4581,7 @@ const mapSprites = [
 			{ minYRate: 0, maxYRate: 15, min_X: MathRound(1950 * 1.065), max_X: MathRound(2650 * 1.065), foreground: true },
 			{ minYRate: 0, maxYRate: 15, min_X: MathRound(3500 * 1.065), max_X: MathRound(4200 * 1.065), foreground: true }
 		],
-		mobs: [
+		objectMobs: [
 			{
 				id: 626,
 				minX : 560,
@@ -7092,6 +7095,9 @@ const spells = {
 						spriteHeight: 46,
 						spriteOrigin: 0,
 						bottomGap: -120,
+						props: {
+							hurtingStrength: 5
+						},
 						extraStepXRate: -.3,
 						speed: 12
 					},
@@ -7102,6 +7108,9 @@ const spells = {
 						spriteHeight: 46,
 						spriteOrigin: 0,
 						bottomGap: -100,
+						props: {
+							hurtingStrength: 5
+						},
 						extraStepXRate: -.25,
 						speed: 12
 					},
@@ -7112,6 +7121,9 @@ const spells = {
 						spriteHeight: 46,
 						spriteOrigin: 0,
 						bottomGap: -80,
+						props: {
+							hurtingStrength: 4
+						},
 						extraStepXRate: -.2,
 						speed: 10
 					},
@@ -7122,6 +7134,9 @@ const spells = {
 						spriteHeight: 46,
 						spriteOrigin: 0,
 						bottomGap: -60,
+						props: {
+							hurtingStrength: 4
+						},
 						extraStepXRate: -.2,
 						speed: 10
 					},
@@ -7132,6 +7147,9 @@ const spells = {
 						spriteHeight: 46,
 						spriteOrigin: 0,
 						bottomGap: -40,
+						props: {
+							hurtingStrength: 3
+						},
 						extraStepXRate: -.15,
 						speed: 8
 					},
@@ -7142,6 +7160,9 @@ const spells = {
 						spriteHeight: 46,
 						spriteOrigin: 0,
 						bottomGap: -20,
+						props: {
+							hurtingStrength: 3
+						},
 						extraStepXRate: -.15,
 						speed: 8
 					},

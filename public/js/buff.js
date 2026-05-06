@@ -225,6 +225,13 @@ const _allBuffs = {
 		]
 	},
 	curse: {
+		after: function(_e) {
+			if(!_e.animations.idle)
+				return;
+			if(_e.animation !== 'idle')
+				_e.animate('idle', 1);
+			_e.swapAnimation('idle');
+		},
 		id: 11,
 		waitToFinish: true,
 		objects: [
@@ -241,8 +248,8 @@ const _allBuffs = {
 			{
 				level: 3,
 				props: {
-					hpRegenRate: -2,
-					immobilize: true
+					sleep: true,
+					curse: true
 				},
 				ms: 5000
 			}

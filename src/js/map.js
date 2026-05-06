@@ -90,7 +90,9 @@ function map(_m) {
 	this.ground = _mapSprite.ground;
 	//this.zoom = __zoom * (this.ground.zoom ?? 1);
 	this.id = _mapSprite.id;
-	this.mobs = _mapSprite.mobs;
+	this.mobs = [..._mapSprite.mobs];
+	if(_mapSprite.objectMobs)
+		this.objectMobs = [..._mapSprite.objectMobs];
 	this.mobs.forEach(x => {
 		x.listed = 1;
 		if(x.spawnMinX !== undefined)
@@ -925,6 +927,15 @@ function map(_m) {
 					if(_gsb) {
 						const _teamScore = parseInt(_gsb.innerText) + 1;
 						episode['team' + _killer.groupId + 'score'] = _teamScore;
+						if(_teamScore > episode['team' + x.groupId + 'score']){
+							if(episode.winningTeam && episode.winningTeam !== _killer.groupId) {
+								//comeback
+								const isMain = mainCharacter.groupId === _killer.groupId;
+								//warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/flag' + _killer.groupId + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Comeback') + '!</span></div>', null, null, 1);
+								PlaySound({ key: isMain ? 'comebackwin' : 'comebackloose', volume: 1 });
+							}
+							episode.winningTeam = _killer.groupId;
+						}
 						_gsb.innerText = _teamScore;
 					}
 					let _msg = '';
@@ -1384,7 +1395,8 @@ function map(_m) {
 		}
 		this.limitedEffects.length = this.activeSpells.length = 0;
 		if(mainCharacter)
-			mainCharacter.hasLeftEnemy = mainCharacter.hasRightEnemy = undefined;
+			mainCharacter.hasLeftEnemy = mainCharacter.hasRightEnemy =
+		mainCharacter.hasLeftPackage = mainCharacter.hasRightPackage = undefined;
 		if (_len)
 			for (var i = 0; i < _len; i++) {
 				let sprite = this.enemies[i];
@@ -1453,6 +1465,15 @@ function map(_m) {
 							else if(!mainCharacter.hasRightEnemy)
 								mainCharacter.hasRightEnemy = 1;
 						}
+					else if(sprite.package) {
+						if(mainCharacter.EXACTLEFT > sprite.EXACTLEFT)
+						{
+							if(!mainCharacter.hasLeftPackage)
+								mainCharacter.hasLeftPackage = 1;
+						}
+						else if(!mainCharacter.hasRightPackage)
+							mainCharacter.hasRightPackage = 1;
+					}
 				}
 				if(!sprite.unseen && updateUnseen && !sprite.remove){
 					this.seenEnemies.push(sprite);
@@ -4050,6 +4071,8 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			return;
 		const _l = mainCharacter?.hasLeftEnemy;
 		const _r = mainCharacter?.hasRightEnemy;
+		const _lp = mainCharacter?.hasLeftPackage;
+		const _rp = mainCharacter?.hasRightPackage;
 		if(!this.enemyLeftArrow)
 			this.enemyLeftArrow = document.querySelector('.enemy-left-arrow');
 		else { 
@@ -4067,6 +4090,18 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			else
 				addClass(this.enemyRightArrow, 'v-none');
 		}
+		if(!this.packageLeftArrow)
+			this.packageLeftArrow = document.querySelector('.package-left-arrow');
+		if(_lp)
+			removeClass(this.packageLeftArrow, 'v-none');
+		else
+			addClass(this.packageLeftArrow, 'v-none');
+		if(!this.packageRightArrow)
+			this.packageRightArrow = document.querySelector('.package-right-arrow');
+		if(_rp)
+			removeClass(this.packageRightArrow, 'v-none');
+		else
+			addClass(this.packageRightArrow, 'v-none');
 		this.enemyArrowsShown  = _gameTick;
 		return;
 		if(!_l && !_r)
@@ -5328,8 +5363,12 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			episode.enemies.forEach(e => {
 				e.stopStepSound();
 			});
-		if(episode.mobs?.find(x => !x.listed))
-			episode.mobs = episode.mobs.filter(x => x.listed);
+		// if(episode.mobs?.find(x => !x.listed))
+		// 	episode.mobs = episode.mobs.filter(x => x.listed);
+		this.mobs = [];
+		this.respawners = [];
+		this.cliffs = undefined;
+		this.playGrounds = undefined;
 		if(episode.phase)
 			delete episode.phase;
 		if(episode.boss)

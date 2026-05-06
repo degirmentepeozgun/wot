@@ -853,7 +853,9 @@ canvas:not(.parallax canvas), .canvas, .parallax {
 	right: 44vh;
 	bottom: 8vh;
 	border: .2vh solid #ffffff99;
-	box-shadow: 0 0 1vh red, 0 0 2vh #000, 0 0 3vh red
+	box-shadow: 0 0 1vh red, 0 0 2vh #000, 0 0 3vh red;
+	background: url(./../images/main/skill-icons/finish.png);
+	background-size: contain
 }
 
 svg#use-progress {
@@ -2485,15 +2487,13 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	color: #f7f7f7cc !important;
 	top: 3.8%;
 	left: 50%;
+	transform: translate(-50%, 0) scale(1);
+	transform-origin: center;
 	border-radius: .5vh;
 	border: .5vh solid #f7f7f799;
 	background: #00000090;
 	position: absolute;
 	text-shadow: 0 0 .2vh #000;
-	transform:translateX(-50%) translateZ(0);
-	-webkit-transform:translateX(-50%) translateZ(0);
-	transform-origin: left;
-	-webkit-transform-origin: left;
 	will-change: transform
 }
 #pvp-counter.map-name {
@@ -2512,13 +2512,29 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 		border:none !important;
 		height: 12%;
 		color: #f8f8f8cc !important;
-		background: none
+		background: none;
+		font-weight: 700;
+		letter-spacing: 0.2vh;
+
+		/* OUTLINE (retro arcade hissi) */
+		text-shadow:
+			0 0 0.2vh #000,
+			0 0 0.4vh #000,
+			0 0 0.8vh #000,
+
+			/* GOLD GLOW */
+			0 0 0.5vh #FFD700,
+			0 0 1.5vh #FFD700,
+			0 0 3vh #ffae00;
+
+		/* daha keskin görünüm */
+		filter: contrast(1.1) brightness(1.1);
 	}
 	#pvp-counter.map-name.countdown {
 		font-size: 6vh !important;
 	}
 		#pvp-counter.countdown.pop {
-		color: #FFD700  !important;
+			color: #FFD700 !important;
 			animation: 1s anim-popoutin2 ease;
 			-webkit-animation: 1s anim-popoutin2 ease;
 			animation-delay: 0s, 1s, 2s, 3s;
@@ -2532,16 +2548,30 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 			-webkit-animation-delay: 0s, 1s, 2s, 3s
 		}
 		#pvp-counter.countdown.pop *{
-		color: #FFD700  !important;
+			color: #FFD700  !important;
 		}
 		#pvp-counter.countdown.pop2 *{
-		color: #FFD700  !important;
+			color: #FFD700  !important;
 		}
 	#pvp-counter.pvp-end-soon {
 		border-color: red !important;
 		color: red !important
 	}
+#pvp-counter.countdown::before {
+	content: "";
+	position: absolute;
+	inset: 0;
 
+	background: repeating-linear-gradient(
+		to bottom,
+		rgba(0,0,0,0.15) 0px,
+		rgba(0,0,0,0.15) 1px,
+		transparent 2px,
+		transparent 4px
+	);
+
+	pointer-events: none;
+}
 #touch-d-pad {
     position: absolute;
     bottom: 4vw;
@@ -2811,25 +2841,23 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 
 @keyframes anim-popoutin2 {
 	0% {
-		transform: scale(0) translateX(-50%);
-		opacity: 0
+		transform: translateX(-50%) scale(0);
+		opacity: 0;
 	}
 
 	25% {
-		transform: scale(1.5) translateX(-50%);
-		opacity: 1
+		transform: translateX(-50%) scale(1.5);
+		opacity: 1;
 	}
 
 	50% {
-		transform: scale(1.2) translateX(-50%);
-		opacity: 1
+		transform: translateX(-50%) scale(1.2);
+		opacity: 1;
 	}
 
 	100% {
-		top: var(--ground-height);
-		/* animate nothing to add pause at the end of animation */
-		transform: scale(1.2) translateX(-50%);
-		opacity: 1
+		transform: translateX(-50%) scale(1.2);
+		opacity: 1;
 	}
 }
 
@@ -8112,10 +8140,15 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	height: 6%;
 	top:47%;
 }
-.enemy-left-arrow {
+.package-left-arrow, .package-right-arrow {
+	position: absolute;
+	height: 6%;
+	top:45%;
+}
+.enemy-left-arrow,.package-left-arrow {
 	left:0
 }
-.enemy-right-arrow {
+.enemy-right-arrow,.package-right-arrow {
 	right:0
 }
 .item-in-slot img {
@@ -11150,7 +11183,7 @@ body.pc-mission .move-to-place::after{
 }
 /* Version yazısı */
 .opening-cover::after {
-    content: "Version 1.01";
+    content: "Version 1.0002";
     position: absolute;
     bottom: 2vh;
     left: 3vh;

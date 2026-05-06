@@ -3047,7 +3047,8 @@ function installQuickPlayStageFinish(_failed) {
 	episode.pauseBgMusic(1);
 	injectModule('stagefinish', function(_arr, _name) {
 		__latestUIModule[_name] = { data: _arr };
-		animateStart(_failed);
+		//animateStart(_failed);
+		window.stagefinish.animateStart(_failed);
 	});
 }
 function installTalents() {

@@ -6785,152 +6785,51 @@ function createCharacter(_settings) {
 					},
 					finishhead: {
 						key: 'finishhead',
+						finishType: 'finishhead',
 						type: 'skill',
 						attack: true,
-						finishingMove: true,
 						interactive: true,
-						push: true,
-						order: 9,
+						finishingMove: true,
+						baseKey: 'finish',
+						minRange: 7,
+						maxRange: 12,
+						when: function(_e) {
+							return _e.animations['hurthead'] //&& isObjectsInTouch(mainCharacter, _e, 10, 5)?.touch
+							&& !_e.animation.startsWith('hurtair');
+						},
 						priority: 1,
-						minRange: 2,
-						maxRange: 9,
-						src: './images/main/warrior/finish.png',
 						frames: [
 							{
-								spriteLeft: 40,
-								spriteTop: 233,
-								spriteWidth: 178,
-								spriteHeight: 178,
-								spriteOrigin: 60,
-								speed: 4,
-								def: {
-									iframe: true
-								}
-							},
-							{
-								spriteLeft: 453,
-								spriteTop: 233,
-								spriteWidth: 193,
-								spriteHeight: 178,
-								spriteOrigin: 70,
-								extraStepXRate: .15,
+								spriteLeft: 2692,
+								spriteTop: 707,
+								spriteWidth: 112,
+								spriteHeight: 214,
+								spriteOrigin: 56,
+								do: function(_e) {
+									if(_e.finishTarget) {
+										return;
+										const _diff = MathAbs(_e.ORIGINLEFT - _e.finishTarget.ORIGINLEFT);
+										_e.GO = _diff;
+										_e.direction = _e.ORIGINLEFT > _e.finishTarget.ORIGINLEFT ? __left : __right;
+									}
+								},
 								speed: 10,
 								atk: {
-									hitTargetCount: 1,
-									yRange: 15,
-									hitTaken: 0,
 									rate: .1,
 									hurt: {
-										objects: [
-											{ 
-													key: 'bloodmouth',
-												position: 'middle',
-												yGap: 150,
-												still: false,
-												xGap:-50
-											}
-										],
+										catch: 'front',
 										props: {
 											skipHealthBar: true,
 											finishing: true,
-											drawHalf: true
-										},
-										imediateBreak: true,
-										key: 'hurtdead',
-										xGap: 50,
-										type: 'ground'
-									},
-									type: 'common'
-								},
-								def: {
-									iframe: true
-								}
-							},
-							{
-								spriteLeft: 453,
-								spriteTop: 233,
-								spriteWidth: 193,
-								spriteHeight: 178,
-								spriteOrigin: 70,
-								extraStepXRate: .15,
-								speed: 5,
-								def: {
-									iframe: true
-								}
-							},
-							{
-								spriteLeft: 453,
-								spriteTop: 233,
-								spriteWidth: 193,
-								spriteHeight: 178,
-								spriteOrigin: 70,
-								speed: 1,
-								def: {
-									iframe: true
-								}
-							},
-							{
-								spriteLeft: 453,
-								spriteTop: 233,
-								spriteWidth: 193,
-								spriteHeight: 178,
-								spriteOrigin: 70,
-								speed: 40,
-								def: {
-									iframe: true
-								},
-								atk: {
-									hitTargetCount: 1,
-									yRange: 15,
-									rate: .1,
-									hitTaken: 0,
-									hurt: {
-										props: {
 											dying: true,
+											drawPriority: .5,
 											immobilize: true
 										},
-										sound: 'bloodsplat',
-										objects: [
-											{
-												key: 'finish',
-												positions: [{ key: 'back', x: -130, y: 5 }],
-												position: 'back'
-											}
-										],
-										key: 'hurtdead',
-										type: 'air'
+										imediateBreak: true,
+										key: 'hurthead',
+										type: 'ground'
 									},
 									type: 'common'
-								},
-							},
-							{
-								spriteLeft: 226,
-								spriteTop: 240,
-								spriteWidth: 190,
-								spriteHeight: 171,
-								spriteOrigin: 64,
-								src: './images/main/warrior/finish.png',
-								speed: 8,
-								def: {
-									iframe: true
-								}
-							},
-							{
-								spriteLeft: 40,
-								spriteTop: 237,
-								spriteWidth: 177,
-								spriteHeight: 174,
-								src: './images/main/warrior/finish.png',
-								spriteOrigin: 64,
-								extraStepXRate: -.15,
-								speed: 10,
-								atk: {
-									rate: .1,
-									hurt: {
-										imediateBreak: true,
-										key: 'hurtheadoff',
-										type: 'ground'
-									}
 								},
 								def: {
 									iframe: true
@@ -6942,8 +6841,11 @@ function createCharacter(_settings) {
 								spriteWidth: 222,
 								spriteHeight: 153,
 								spriteOrigin: 142,
-								src: './images/main/warrior/sprite.png',
-								speed: 6,
+								speed: 10,
+								do: function(e) {
+									if(e.finishTarget)
+										e.finishTarget.throwAroundEnemies(25, e, 50);
+								},
 								def: {
 									iframe: true
 								}
@@ -6954,11 +6856,7 @@ function createCharacter(_settings) {
 								spriteWidth: 170,
 								spriteHeight: 173,
 								spriteOrigin: 112,
-								src: './images/main/warrior/sprite.png',
-								speed: 6,
-								def: {
-									iframe: true
-								}
+								speed: 10,
 							},
 							{
 								spriteLeft: 1752,
@@ -6966,8 +6864,7 @@ function createCharacter(_settings) {
 								spriteWidth: 148,
 								spriteHeight: 181,
 								spriteOrigin: 98,
-								src: './images/main/warrior/sprite.png',
-								speed: 6,
+								speed: 10,
 								def: {
 									iframe: true
 								}
@@ -6978,27 +6875,230 @@ function createCharacter(_settings) {
 								spriteWidth: 220,
 								spriteHeight: 250,
 								spriteOrigin: 60,
-								src: './images/main/warrior/sprite.png',
-								speed: 6,
+								speed: 10,
 								sound: { key: 'headoff', volume: .75 },
 								def: {
 									iframe: true
 								}
 							}
-							// {
-							// 	spriteLeft: 453,
-							// 	spriteTop: 233,
-							// 	spriteWidth: 193,
-							// 	spriteHeight: 178,
-							// 	spriteOrigin: 70,
-							// 	speed: 1,
-							// 	finish: true,
-							// 	def: {
-							// 		iframe: true
-							// 	}
-							// }
 						]
 					},
+					// finishhead: {
+					// 	key: 'finishhead',
+					// 	type: 'skill',
+					// 	attack: true,
+					// 	finishingMove: true,
+					// 	interactive: true,
+					// 	push: true,
+					// 	order: 9,
+					// 	priority: 1,
+					// 	minRange: 2,
+					// 	maxRange: 9,
+					// 	src: './images/main/warrior/finish.png',
+					// 	frames: [
+					// 		{
+					// 			spriteLeft: 40,
+					// 			spriteTop: 233,
+					// 			spriteWidth: 178,
+					// 			spriteHeight: 178,
+					// 			spriteOrigin: 60,
+					// 			speed: 4,
+					// 			def: {
+					// 				iframe: true
+					// 			}
+					// 		},
+					// 		{
+					// 			spriteLeft: 453,
+					// 			spriteTop: 233,
+					// 			spriteWidth: 193,
+					// 			spriteHeight: 178,
+					// 			spriteOrigin: 70,
+					// 			extraStepXRate: .15,
+					// 			speed: 10,
+					// 			atk: {
+					// 				hitTargetCount: 1,
+					// 				yRange: 15,
+					// 				hitTaken: 0,
+					// 				rate: .1,
+					// 				hurt: {
+					// 					objects: [
+					// 						{ 
+					// 								key: 'bloodmouth',
+					// 							position: 'middle',
+					// 							yGap: 150,
+					// 							still: false,
+					// 							xGap:-50
+					// 						}
+					// 					],
+					// 					props: {
+					// 						skipHealthBar: true,
+					// 						finishing: true,
+					// 						drawHalf: true
+					// 					},
+					// 					imediateBreak: true,
+					// 					key: 'hurtdead',
+					// 					xGap: 50,
+					// 					type: 'ground'
+					// 				},
+					// 				type: 'common'
+					// 			},
+					// 			def: {
+					// 				iframe: true
+					// 			}
+					// 		},
+					// 		{
+					// 			spriteLeft: 453,
+					// 			spriteTop: 233,
+					// 			spriteWidth: 193,
+					// 			spriteHeight: 178,
+					// 			spriteOrigin: 70,
+					// 			extraStepXRate: .15,
+					// 			speed: 5,
+					// 			def: {
+					// 				iframe: true
+					// 			}
+					// 		},
+					// 		{
+					// 			spriteLeft: 453,
+					// 			spriteTop: 233,
+					// 			spriteWidth: 193,
+					// 			spriteHeight: 178,
+					// 			spriteOrigin: 70,
+					// 			speed: 1,
+					// 			def: {
+					// 				iframe: true
+					// 			}
+					// 		},
+					// 		{
+					// 			spriteLeft: 453,
+					// 			spriteTop: 233,
+					// 			spriteWidth: 193,
+					// 			spriteHeight: 178,
+					// 			spriteOrigin: 70,
+					// 			speed: 40,
+					// 			def: {
+					// 				iframe: true
+					// 			},
+					// 			atk: {
+					// 				hitTargetCount: 1,
+					// 				yRange: 15,
+					// 				rate: .1,
+					// 				hitTaken: 0,
+					// 				hurt: {
+					// 					props: {
+					// 						dying: true,
+					// 						immobilize: true
+					// 					},
+					// 					sound: 'bloodsplat',
+					// 					objects: [
+					// 						{
+					// 							key: 'finish',
+					// 							positions: [{ key: 'back', x: -130, y: 5 }],
+					// 							position: 'back'
+					// 						}
+					// 					],
+					// 					key: 'hurtdead',
+					// 					type: 'air'
+					// 				},
+					// 				type: 'common'
+					// 			},
+					// 		},
+					// 		{
+					// 			spriteLeft: 226,
+					// 			spriteTop: 240,
+					// 			spriteWidth: 190,
+					// 			spriteHeight: 171,
+					// 			spriteOrigin: 64,
+					// 			src: './images/main/warrior/finish.png',
+					// 			speed: 8,
+					// 			def: {
+					// 				iframe: true
+					// 			}
+					// 		},
+					// 		{
+					// 			spriteLeft: 40,
+					// 			spriteTop: 237,
+					// 			spriteWidth: 177,
+					// 			spriteHeight: 174,
+					// 			src: './images/main/warrior/finish.png',
+					// 			spriteOrigin: 64,
+					// 			extraStepXRate: -.15,
+					// 			speed: 10,
+					// 			atk: {
+					// 				rate: .1,
+					// 				hurt: {
+					// 					imediateBreak: true,
+					// 					key: 'hurtheadoff',
+					// 					type: 'ground'
+					// 				}
+					// 			},
+					// 			def: {
+					// 				iframe: true
+					// 			}
+					// 		},
+					// 		{
+					// 			spriteLeft: 1331,
+					// 			spriteTop: 140,
+					// 			spriteWidth: 222,
+					// 			spriteHeight: 153,
+					// 			spriteOrigin: 142,
+					// 			src: './images/main/warrior/sprite.png',
+					// 			speed: 6,
+					// 			def: {
+					// 				iframe: true
+					// 			}
+					// 		},
+					// 		{
+					// 			spriteLeft: 1559,
+					// 			spriteTop: 120,
+					// 			spriteWidth: 170,
+					// 			spriteHeight: 173,
+					// 			spriteOrigin: 112,
+					// 			src: './images/main/warrior/sprite.png',
+					// 			speed: 6,
+					// 			def: {
+					// 				iframe: true
+					// 			}
+					// 		},
+					// 		{
+					// 			spriteLeft: 1752,
+					// 			spriteTop: 112,
+					// 			spriteWidth: 148,
+					// 			spriteHeight: 181,
+					// 			spriteOrigin: 98,
+					// 			src: './images/main/warrior/sprite.png',
+					// 			speed: 6,
+					// 			def: {
+					// 				iframe: true
+					// 			}
+					// 		},
+					// 		{
+					// 			spriteLeft: 1963,
+					// 			spriteTop: 44,
+					// 			spriteWidth: 220,
+					// 			spriteHeight: 250,
+					// 			spriteOrigin: 60,
+					// 			src: './images/main/warrior/sprite.png',
+					// 			speed: 6,
+					// 			sound: { key: 'headoff', volume: .75 },
+					// 			def: {
+					// 				iframe: true
+					// 			}
+					// 		}
+					// 		// {
+					// 		// 	spriteLeft: 453,
+					// 		// 	spriteTop: 233,
+					// 		// 	spriteWidth: 193,
+					// 		// 	spriteHeight: 178,
+					// 		// 	spriteOrigin: 70,
+					// 		// 	speed: 1,
+					// 		// 	finish: true,
+					// 		// 	def: {
+					// 		// 		iframe: true
+					// 		// 	}
+					// 		// }
+					// 	]
+					// },
 					deadhead: {
 						key: 'deadhead',
 						type: 'skill',
@@ -18050,7 +18150,8 @@ const _allEnemies = {
 				// 		speed: 10
 				// 	}]
 				// },
-				knockbackair: createKnockBackAir({
+				knockbackair: function() { 
+					const _kb = createKnockBackAir({
 					spriteLeft: 1387,
 					spriteTop: 919,
 					spriteWidth: 140,
@@ -18063,23 +18164,53 @@ const _allEnemies = {
 					spriteWidth: 292,
 					spriteHeight: 64,
 					spriteOrigin: 192
-				}),
-				knockbackground: createKnockBackGround(
-					{
-						spriteLeft: 102,
-						spriteTop: 647,
-						spriteWidth: 107,
-						spriteHeight: 234,
-						spriteOrigin: 54
-					}, 
-					{
-						spriteLeft: 970,
-						spriteTop: 819,
-						spriteWidth: 292,
-						spriteHeight: 64,
-						spriteOrigin: 192
+					});
+					
+					const _frames = _kb.frames.filter(x => x.lay);
+					if(_frames?.[0]) {
+						const _lastLay = _frames[_frames.length - 1];
+						_lastLay.do = function(_e) {
+							if(_e.canFinish()){
+								_lastLay.oldSpeed = _lastLay.speed;
+								_lastLay.speed = 60;
+							}
+							else if(_lastLay.oldSpeed)
+								_lastLay.speed = _lastLay.oldSpeed;
+						}
+
 					}
-				),
+					return _kb;
+				}(),
+				knockbackground: function() {
+					const _kb = createKnockBackGround(
+						{
+							spriteLeft: 102,
+							spriteTop: 647,
+							spriteWidth: 107,
+							spriteHeight: 234,
+							spriteOrigin: 54
+						}, 
+						{
+							spriteLeft: 970,
+							spriteTop: 819,
+							spriteWidth: 292,
+							spriteHeight: 64,
+							spriteOrigin: 192
+						});
+					const _frames = _kb.frames.filter(x => x.lay);
+					if(_frames?.[0]) {
+						const _lastLay = _frames[_frames.length - 1];
+						_lastLay.do = function(_e) {
+							if(_e.canFinish()){
+								_lastLay.oldSpeed = _lastLay.speed;
+								_lastLay.speed = 60;
+							}
+							else if(_lastLay.oldSpeed)
+								_lastLay.speed = _lastLay.oldSpeed;
+						}
+					}
+					return _kb;
+				}(),
 				hurtdead3: {
 					key: 'hurtdead3',
 					type: 'skill',
@@ -18338,6 +18469,357 @@ const _allEnemies = {
 								iframe: true
 							}
 						}]
+				},
+				hurthead: {
+					key: 'hurthead',
+					type: 'skill',
+					hurt: 'head',
+					interactive: true,
+					frames: [
+						{
+							spriteLeft: 246,
+							spriteTop: 1012,
+							spriteWidth: 162,
+							spriteHeight: 142,
+							spriteOrigin: 70,
+							speed: 40
+						},
+						{
+							spriteLeft: 246,
+							spriteTop: 1228,
+							spriteWidth: 160,
+							spriteHeight: 120,
+							spriteOrigin: 70,
+							speed: 1,
+							do: function(_e) {
+								if(cssAnimations.forceimpact(_e, _e.direction === __right ? __left : __right))
+									cssAnimations.zoomquickred(_e);
+							},
+							props: {
+								killingBy: undefined,
+								finishTarget: undefined,
+								dead: true
+							},
+							positions: [{ key: 'neck', x: -170, y: -160 }],
+							objects: [
+								{
+									key: 'bloodstar',
+									position: 'over-head'
+								},
+								{
+									key: 'bloodhead1',
+									position: 'over-head'
+								},
+								{
+									key: 'bloodhead1',
+									position: 'over-head',
+									speed: 4
+								},
+								{
+									key: 'bloodhead1',
+									position: 'over-head',
+									speed: 8
+								},
+								{
+									key: 'bloodhead2',
+									position: 'over-head'
+								},
+								{
+									key: 'bloodhead2',
+									position: 'over-head',
+									speed: 4
+								},
+								{
+									key: 'bloodhead2',
+									position: 'over-head',
+									speed: 8
+								}
+							],
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 246,
+							spriteTop: 1228,
+							spriteWidth: 160,
+							spriteHeight: 120,
+							spriteOrigin: 70,
+							speed: 11,
+							spell: {
+								key: 'teberhead',
+								xGap: -150,
+								pierce: true
+							},
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 437,
+							spriteTop: 1223,
+							spriteWidth: 151,
+							spriteHeight: 125,
+							spriteOrigin: 70,
+							speed: 12,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 628,
+							spriteTop: 1274,
+							spriteWidth: 243,
+							spriteHeight: 74,
+							spriteOrigin: 70,
+							speed: 12,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							speed: 15,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							speed: 12,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							speed: 25,
+							objects: [
+								{
+									key: 'bloodmouth',
+									position: 'front-feet',
+									speed: 5
+								}
+							],
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							speed: 25,
+							objects: [
+								{ key: 'bloodnecksmall', position: 'front-feet' },
+								{
+									key: 'bloodmouth',
+									position: 'front-feet',
+									speed: 5
+								}
+							],
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							speed: 12,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							speed: 25,
+							objects: [{
+								key: 'bloodmouth',
+								position: 'front-feet',
+								speed: 5
+							}],
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							speed: 25,
+							objects: [
+								{ key: 'bloodneck', position: 'front-feet' },
+								{
+									key: 'bloodmouth',
+									position: 'front-feet',
+									speed: 5
+								}],
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							speed: 12,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							speed: 12,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							speed: 12,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							speed: 12,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							speed: 12,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							alpha: true,
+							speed: 12,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							speed: 12,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							speed: 12,
+							alpha: true,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							speed: 12,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							alpha: true,
+							speed: 12,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 904,
+							spriteTop: 1303,
+							spriteWidth: 251,
+							spriteHeight: 45,
+							spriteOrigin: 70,
+							speed: 12,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 1,
+							spriteHeight: 1,
+							spriteOrigin: 1,
+							speed: 1,
+							props: {
+								remove: true
+							},
+							def: {
+								iframe: true
+							}
+						}
+					]
 				},
 				deadhead: {
 					key: 'deadhead',
@@ -18868,6 +19350,7 @@ const _allEnemies = {
 			minDmg: 1,
 			maxDmg: 2,
 			enemy: true,
+			bleed: true,
 			defRate: 0,
 			critRate: 0,
 			stepX: 8,
@@ -18875,6 +19358,11 @@ const _allEnemies = {
 			title: 'Newbie',
 			bagSlots: 100,
 			stepXRate: .25,
+			finishableWith: 'head',
+			finishAfter: 50,
+			finishWhen: function(_e) {
+				return _e.getCurrentFrame()?.lay;
+			},
 			src: './images/sprites/ep02/',
 			immunities: [ 'fire', 'shadow' ],
 			buffs: []
@@ -73892,7 +74380,7 @@ const _allEnemies = {
 							spriteWidth: 563,
 							spriteHeight: 540,
 							spriteOrigin: 282,
-							speed: 360
+							speed: 200
 						}
 					]
 				},
@@ -80918,7 +81406,7 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 		MathRound((_redSprite ?? _sprite1).spriteWidth / 24), 
 		MathRound((_redSprite ?? _sprite1).spriteWidth / 12)
 	);
-	const _r = window.innerWidth * .01;
+	const _r = window.innerHeight * .01;
 	var result = {
 		key: 'hurtground1',
 		type: 'skill',

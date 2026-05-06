@@ -612,7 +612,7 @@ window.addEventListener('keydown', function (event) {
 			return;
 		}
 		else if(!episode || episode.end) {
-			const _btn = document.querySelector('.quick-space-btn');
+			const _btn = document.querySelector('.quick-space-btn:not(.disabled,.inactivated)');
 			if(_btn && _btn.onexactclick) {
 				_btn.onexactclick();
 				return;

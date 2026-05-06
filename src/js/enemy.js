@@ -5905,8 +5905,9 @@ function enemy(_e) {
 						delete x.killedBy;
 						const _animaKeys = Object.keys(x.animations);
 						_animaKeys.forEach(y => x.animations[y].next = x.animations[y].realNext);
-						x.animate('idle',1);
 						x.removeBuffs();
+						x.animate('idle',1);
+						x.swapAnimation('idle');
 						x.attackerCount = x.hitTakenCount = 0;
 						x.setHealth(x.maxHP);
 						x.commonItem = undefined;
@@ -6024,7 +6025,7 @@ function enemy(_e) {
 		if (_f.atk.hurt) {
 			let _decreaseHP;
 			_e.removeBuffByKey('invisibility');
-			if(_e.sleep) {
+			if(_e.sleep && !_e.curse) {
 				_e.removeBuffByKey('sleep');
 				delete _e.sleep;
 			}
@@ -7731,11 +7732,14 @@ function enemy(_e) {
 		const _xDiff = ((_reversed ? -1 : 1) * (this.ZOOM * (_frame.leftGap ?? 0))) + ((_reversed ? 1 : -1) * (_frame.spriteOrigin * this.ZOOM));
 
 		let _left = this.left + _xDiff;
-		const _top = (episode.cHeight - (_frame.spriteHeight * this.ZOOM) + (this.pushY ?? 0) +
-		MathRound((_frame.bottomGap ?? 0) * this.ZOOM)) - _stepY - this.yPosition;
+		let _py = this.pushY;
+		if(_py && this.animation.startsWith('hurt'))
+			_py = 0;
+		const _top = (episode.cHeight - (_frame.spriteHeight * this.ZOOM) + (_py ?? 0) +
+		MathRound((this.pushY ? 0 :_frame.bottomGap ?? 0) * this.ZOOM)) - _stepY - this.yPosition;
 		if(this.pushY) {
 			if(!this.pushYStep)
-				this.pushYStep = MathRound((episode.cHeight * .3) / 100);
+				this.pushYStep = MathRound((episode.cHeight * .5) / 100);
 			if(this.pushY > 0) {
 				this.pushY -= this.pushYStep;
 				if(this.pushY < 0)

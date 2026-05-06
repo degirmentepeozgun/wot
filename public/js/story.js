@@ -4930,7 +4930,8 @@ const __stories = [
 							x.dead = x.dying = true;
 							x.animate('dead', 1);
 						});
-						episode.mobs = episode.respawners = [];
+						episode.mobs = [];
+						episode.respawners = [];
 						//episode.loadCharacterSprites(function() {}, [37,38], null, 1);
 						episode.playSound({key:'bossalert', volume: .5});
 						warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
@@ -6442,7 +6443,8 @@ const __stories = [
 							x.dead = x.dying = true;
 							x.animate('dead', 1);
 						});
-						episode.mobs = episode.respawners = [];
+						episode.mobs = [];
+						episode.respawners = [];
 						episode.phase = 2;
 						stopWeather();
 						episode.isSupporterAlive = _coopMembers?.[0] && !_coopMembers[0].isDead();
@@ -6783,7 +6785,8 @@ const __stories = [
 								x.dead = x.dying = true;
 								x.animate('dead', 1);
 							});
-							episode.mobs = episode.respawners = [];
+							episode.mobs = [];
+							episode.respawners = [];
 							episode.phase = 102;
 							episode.pauseBgMusic();
 							episode.pauseAmbianceMusic();
@@ -6974,7 +6977,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		//startScene: 1,
+		//startScene: 2,
 		scenes: [
 			{
 				when: function() {
@@ -6984,6 +6987,7 @@ const __stories = [
 					localStorage.setItem('qp-tutorial2', '1');
 					return true;
 				},
+				noArtifact: true,
 				lang: [
 					{
 						title : {
@@ -7659,6 +7663,7 @@ const __stories = [
 			},
 			{
 				map: 36,
+				noArtifact: true,
 				leaderBoards: {
 					calculate: function() {
 						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
@@ -7733,6 +7738,8 @@ const __stories = [
 					mainCharacter.experience = 0;
 					mainCharacter.maxExperience = 833;
 					setCharacterLevel(1, null, 1);
+					mainCharacter.animations.tag.disabled = true;
+					resetSkills(null, 1, mainCharacter);
 					//setCharacterLevel(8, null, 1);
 					addClass(_gameUI, 'demo-playing');
 					episode.pauseBgMusic(1);
@@ -7784,8 +7791,22 @@ const __stories = [
 						removeClass(x, 'd-none'));
 					platformX = episode.cWidth;
 					mainCharacter.left = mainCharacter.LEFT = MathRound(episode.cWidth / 2);
-					episode.mobs.push(structuredClone2(__storyScene.mobs[0]));
-					episode.mobs[episode.mobs.length - 1].experience = 1000;
+					// episode.mobs.push(structuredClone2(__storyScene.mobs[0]));
+					// episode.mobs[episode.mobs.length - 1].experience = 1000;
+					mainCharacter.maxHP = mainCharacter.MAXHP = mainCharacter.health = 150;
+					mainCharacter.setHealth(mainCharacter.health);
+					__story.lastHeroLevel = 1;
+					// episode.enemies.forEach(x => {
+					// 	const _keys = Object.keys(x.animations);
+					// 	for(let _k of _keys) {
+					// 		const _an = x.animations[_k];
+					// 		_an.frames.forEach(f => {
+					// 			if(!f.def)
+					// 				f.def = {};
+					// 			f.def.iframe = true;
+					// 		});
+					// 	}
+					// });
 				},
 				actions: [
 					{
@@ -7844,7 +7865,8 @@ const __stories = [
 								x.dead = x.dying = true;
 								x.animate('dead', 1);
 							});
-							episode.mobs = episode.respawners = [];
+							episode.mobs = [];
+							episode.respawners = [];
 							// setTimeout(function() {
 							// 	episode.loadCharacterSprites(function() {}, [37,38], null, 1);
 							// }, 20);
@@ -7933,46 +7955,68 @@ const __stories = [
 							return mainCharacter.level > episode.phase;
 						},
 						do: function() {
-							episode.phase++;
+							episode.phase = mainCharacter.level;
+							__story.lastHeroLevel = mainCharacter.level;
+							mainCharacter.maxHP = mainCharacter.MAXHP = mainCharacter.health = mainCharacter.level * 150;
+							mainCharacter.setHealth(mainCharacter.health);
 							const _mainPosition = mainCharacter.HURTLEFT + platformX;
 							const _minX = _mainPosition < (episode.width / 2) ? _mainPosition + episode.cWidth : _mainPosition - (2 * episode.cWidth);
 							const _maxX = _mainPosition < (episode.width / 2) ? _mainPosition + (2 * episode.cWidth) : _mainPosition - episode.cWidth;
-							for(let x of __storyScene.mobs){
-								if(x.skipSummon)
-									continue;
-								x.minX = _minX;
-								x.maxX = _maxX;
-								let y = summonMobWithJson(structuredClone2(x),0,1);
-								y.experience = mainCharacter.level * 350;
-								if(y.experience < 1000)
-									y.experience = 1000;
-								const _mob = episode.mobs.find(m => m.id === y.id);
-								if(_mob){
-									_mob.experience = y.experience;
-									_mob.minX = 0;
-									_mob.maxX = 6000;
+							if((mainCharacter.level % 2) === 0)
+								//for(let x of __storyScene.mobs)
+								{
+									const _mob = episode.mobs[0];
+									_mob.count = 1;
+									const exp =
+									mainCharacter.level > 9 ? 
+									mainCharacter.level * 1400 :
+									(mainCharacter.level > 4 ?
+										mainCharacter.level * 250 :
+										mainCharacter.level * 350);
+									_mob.experience = exp;
+									const x = structuredClone2(_mob);
+									// if(x.skipSummon)
+									// 	continue;
+									x.minX = 144;
+									x.maxX = 6000;
+									// const _smn = structuredClone2(x);
+									// _smn.count = 1;
+									// delete _smn.spawn;
+									// let y = summonMobWithJson(_smn,0,1);
+									x.experience = exp;
+									// if(y.experience < 1000)
+									// 	y.experience = 1000;
+									// const _mob = episode.mobs.find(m => m.id === y.id);
+									// if(_mob){
+									// 	_mob.experience = y.experience;
+									// 	_mob.minX = 0;
+									// 	_mob.maxX = 6000;
+									// }
+									x.count = 1;
+									x.hp = mainCharacter.level * 70;
+									summonMobWithJson(x, 1,1);
+									//y.setHealth(y.maxHP);
 								}
-								y.maxHP = y.MAXHP = mainCharacter.level * 60;
-								y.setHealth(y.maxHP);
-							}
 							if(mainCharacter.level === 2) {
-								__storyScene.mobs.push({
-									id: 620,
-									minX: _minX,
-									maxX: _maxX,
-									count: 2,
-									sight: 1000,
-									spawn: 10,
-									skipSummon: true,
-									experience: mainCharacter.level * 1500
-								});
-								let y = summonMobWithJson(structuredClone2(__storyScene.mobs[__storyScene.mobs.length - 1]));
+								//episode.mobs.push();
+								let y = summonMobWithJson(
+									{
+										id: 620,
+										minX: _minX,
+										maxX: _maxX,
+										count: 2,
+										sight: 1000,
+										spawn: 10,
+										skipSummon: true,
+										experience: mainCharacter.level * 1500
+									}
+								);
 								y.count = 1;
 								y.maxHP = y.MAXHP = mainCharacter.level * 80;
 								y.setHealth(y.maxHP);
 							}
 							if(mainCharacter.level < 12 && episode.phase === mainCharacter.level && (mainCharacter.level % 4) === 0) {
-								episode.mobs.push({
+								const _musc = {
 									id: 621,
 									minX: _minX,
 									maxX: _maxX,
@@ -7981,8 +8025,8 @@ const __stories = [
 									grade:2,
 									difficulty: __account.difficulty - 1,
 									experience: mainCharacter.level * 4000
-								});
-								let y = summonMobWithJson(structuredClone2(episode.mobs[episode.mobs.length - 1]),0,1);
+								};
+								let y = summonMobWithJson(structuredClone2(_musc),0,1);
 								y.maxHP = y.MAXHP = mainCharacter.level * 60;
 								y.name = y.displayName = '';
 								y.setHealth(y.maxHP);
@@ -8012,33 +8056,27 @@ const __stories = [
 							// 	});
 							// }
 						}
-					},
-					// {
-					// 	when: function() {
-					// 		if(episode.phase !== 100 || episode.oneBossDown)
-					// 			return false;
-					// 		const _bosses = episode.enemies.filter(x => x.class === 'boss');
-					// 		const _result = _bosses?.length === 1;
-					// 		if(_result) {
-					// 			episode.oneBossDown = 1;
-					// 			const _counter = __storyScene.bossQuest.kills.find(x => x.enemy[0] !== _bosses[0].id);
-					// 			if(_counter && _counter.count !== 1) {
-					// 				_counter.count = 1;
-					// 				updateQuestArea(null, __storyScene.bossQuest);
-					// 			}
-					// 		}
-					// 		return _result;
-					// 	},
-					// 	do: function() {
-
-					// 	}
-					// },
+					},	
 					{
 						when: function() {
-							return episode.phase === 100 && !episode.enemies.filter(x => x.class === 'boss')?.length;
+							const _boss = episode.enemies.find(x => x.class === 'boss');
+							return episode.phase === 100 && _boss && 
+							_boss.health <= 0;
 						},
 						do: function() {
 							episode.phase = 101;
+							episode.pauseBgMusic();
+							PlaySound({ key:'deepimpact', volume: 1 });
+							if(mainCharacter)
+								cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
+						}
+					},			
+					{
+						when: function() {
+							return episode.phase === 101 && !episode.enemies.filter(x => x.class === 'boss')?.length;
+						},
+						do: function() {
+							episode.phase = 102;
 							const _counters = __storyScene.bossQuest.kills.filter(x => x.count !== 1);
 							if(_counters?.[0]) {
 								_counters.forEach(x => {
@@ -8082,10 +8120,7 @@ const __stories = [
 											_portal.animations.after.frames.forEach(y => delete y.do);
 											if(_e.toucher.relatedObjects)
 												_e.toucher.relatedObjects.length = 0;
-											// let _platX = _e.left - (episode.cWidth * .25);
-											// if(_platX < 0)
-											// 	_platX = 0;
-											// platformX = _platX;
+											_e.toucher.drawPriority = .1;
 											_e.toucher.addObject(
 											{ 
 												key: 'zoom2x', 
@@ -8097,14 +8132,6 @@ const __stories = [
 												__storyPlaying = false;
 												installStoryFinish();
 											}, 3, 1);
-											// setTimeout(() => {
-											// 	//_e.toucher.remove = true;
-											// 	//requestAnimationFrame(() => {
-											// 		//switchStoryScene();
-											// 		__storyPlaying = false;
-											// 		installStoryFinish();
-											// 	//});
-											// }, 250);
 										}
 									}
 								});
@@ -8227,6 +8254,7 @@ const __stories = [
 			},
 			{
 				map: 11,
+				noArtifact: true,
 				leaderBoards: {
 					calculate: function() {
 						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
@@ -8284,7 +8312,7 @@ const __stories = [
 						'necklace', 'chest', 'ring', 'boots', 'weapon'
 					];
 					removeCoopCharacter();
-					setCharacterLevel(12, null, 1);
+					setCharacterLevel(__story.lastHeroLevel ?? 12, null, 1);
 					//setCharacterLevel(8, null, 1);
 					addClass(_gameUI, 'demo-playing');
 					//episode.pauseBgMusic(1);
@@ -8339,6 +8367,8 @@ const __stories = [
 					_gameUI.appendChild(_desc);
 					episode.hasSkippableScreen = 1;
 					mainCharacter.disableSkill('tag');
+					mainCharacter.maxHP = mainCharacter.MAXHP = mainCharacter.health = mainCharacter.level * 120;
+					mainCharacter.setHealth(mainCharacter.health);
 				},
 				actions: [
 					{
@@ -8484,10 +8514,7 @@ const __stories = [
 											_portal.animations.after.frames.forEach(y => delete y.do);
 											if(_e.toucher.relatedObjects)
 												_e.toucher.relatedObjects.length = 0;
-											// let _platX = _e.left - (episode.cWidth * .25);
-											// if(_platX < 0)
-											// 	_platX = 0;
-											// platformX = _platX;
+											_e.toucher.drawPriority = .1;
 											_e.toucher.addObject(
 											{ 
 												key: 'zoom2x', 
@@ -8520,7 +8547,8 @@ const __stories = [
 								x.dead = x.dying = true;
 								x.animate('dead', 1);
 							});
-							episode.mobs = episode.respawners = [];
+							episode.mobs = [];
+							episode.respawners = [];
 							const _mob = episode.installMob({
 								id: 1002,
 								minX: MathRound((_e.LEFT + platformX) / __zoom),
@@ -8560,51 +8588,8 @@ const __stories = [
 								x.dead = x.dying = true;
 								x.animate('dead', 1);
 							});
-							episode.mobs = episode.respawners = [];
-							return;
-							episode.playSound({key:'bossalert', volume: .5});
-							warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
-						
-							setTimeout(() => {
-								episode.playSound({key:'sistersenter', volume:1});
-								setTimeout(() => {
-									if(episode?.id !== 11)
-										return;
-									const installBoss = function(_b, _name) {
-										const _boss = summonMobWithJson({
-											id: _b,
-											level: mainCharacter.level,
-											name: _name,
-											atk: mainCharacter.atk,
-											grade: 4
-										});
-										//_boss.health = _boss.maxHP = 1;
-										_boss.class = 'boss';
-										_boss.important = 1;
-										_boss.experience = 0;
-										_boss.setDifficulty(__account.difficulty - 1);
-										_boss.acceptChanges();
-										_boss.pickNewTarget();
-									}
-									installBoss(37, 'Yecüc');
-									requestAnimationFrame(() => {
-										installBoss(38, 'Mecüc');
-									});
-									mainCharacter.maxHP = mainCharacter.MAXHP =
-									mainCharacter.maxHP * 1;
-									mainCharacter.setHealth(mainCharacter.MAXHP);
-									requestAnimationFrame(() => {
-										episode.phase = 101;
-									});
-
-									episode.pauseAmbianceMusic();
-									episode.pauseBgMusic(1);
-									episode.createBgMusic(null, null, null, 'boss-fight-1', .5);
-									episode.playBgMusic();
-								}, 1000);
-								takeQuest(2, null, null, 'progress', 1);
-								__storyScene.bossQuest = __account.questStatus.quest;
-							}, 4000);
+							episode.mobs = [];
+							episode.respawners = [];
 						}
 					},
 					{
@@ -8749,6 +8734,7 @@ const __stories = [
 																			id: _b,
 																			level: mainCharacter.level,
 																			name: _name,
+																			hp: 600,
 																			atk: mainCharacter.atk,
 																			grade: 4
 																		});
@@ -8841,6 +8827,7 @@ const __stories = [
 																					}
 																					mainCharacter.enableSkills();
 																					mainCharacter.animate('tag', 1);
+																					episode.tagSkillUsed = 1;
 																					_yec.animate('hurtair', 1);
 																					_mec.animate('hurtair', 1);
 																					disposeFocus();
@@ -8876,6 +8863,31 @@ const __stories = [
 								});
 							}, 1200);
 						}
+					},
+					{
+						when: function() {
+							return episode?.tagSkillUsed;
+						},
+						do: function() {
+							const _tagChar = episode.enemies.find(x => x.id === 47);
+							if(_tagChar) {
+								const _hyennas = episode.enemies.filter(x => x.id === 1);
+								const _tagCenterX = _tagChar.HURTLEFT + _tagChar._HURTBOX_half;
+								//hyennas dizisi elemanlarının HURTBOX ı Y ekseninde _tagCenterX koordinatı ile çakışıyor mu?
+								let i = 0;
+								for(const _h of _hyennas) {
+									if(_h.HURTLEFT < _tagCenterX) {
+										if(_h.animation !== 'hurtfeet')
+											_h.smash(mainCharacter);
+									}
+									if(_h.animation === 'hurtfeet') {
+										i++;
+									}
+								}
+								if(i === _hyennas.length) 
+									delete episode.tagSkillUsed;
+							}
+						}
 					}
 				],
 				mobs: [
@@ -8886,56 +8898,57 @@ const __stories = [
 						count: 1,
 						sight: 1000,
 						grade: 11,
-						hp: 2000,
+						hp:1800,
 						zoom: .34,
 						yPosition: function() {
 							return MathRound(groundheight * .5);
 						}
 					},
-					// {
-					// 	id: 35,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 4,
-					// 	sight: 1000,
-					// 	spawn: 10,
-					// 	hp:300,
-					// 	experience: 0
-					// },
-					// {
-					// 	id: 7,
-					// 	minX: 2000,
-					// 	maxX: 3200,
-					// 	count: 2,
-					// 	sight: 1000,
-					// 	spawn: 10,
-					// 	hp:300,
-					// 	experience: 0
-					// },
-					// {
-					// 	id: 2,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 6,
-					// 	sight: 1000,
-					// 	spawn: 10,
-					// 	hp:300,
-					// 	experience: 0
-					// },
-					// {
-					// 	id: 33,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 1,
-					// 	sight: 1000,
-					// 	spawn: 10,
-					// 	hp:300,
-					// 	experience: 0
-					// }
+					{
+						id: 35,
+						minX: 1580,
+						maxX: 4800,
+						count: 2,
+						sight: 1000,
+						spawn: 10,
+						hp:300,
+						experience: 0
+					},
+					{
+						id: 7,
+						minX: 2000,
+						maxX: 3200,
+						count: 2,
+						sight: 1000,
+						spawn: 10,
+						hp:300,
+						experience: 0
+					},
+					{
+						id: 2,
+						minX: 1580,
+						maxX: 4800,
+						count: 3,
+						sight: 1000,
+						spawn: 10,
+						hp:300,
+						experience: 0
+					},
+					{
+						id: 33,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						sight: 1000,
+						spawn: 10,
+						hp:300,
+						experience: 0
+					}
 				]
 			},
 			{
 				map: 42,
+				noArtifact: true,
 				leaderBoards: {
 					calculate: function() {
 						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
@@ -8978,6 +8991,7 @@ const __stories = [
 					}
 				},
 				enableCommonSkills: true,
+				loadingCharacterIds: [10, 48, 625, 626, 627, 628, 629, 630, 631],
 				actions: [	
 					{
 						when: function() {
@@ -9047,6 +9061,7 @@ const __stories = [
 								count:1,
 								experience: 0
 							}, 0, 1, 1);
+							_parachute.package = true;
 							_parachute.animate('start', 1);
 						}
 					},
@@ -9119,8 +9134,11 @@ const __stories = [
 								x.pvpRespawn = true;
 								x.maxHP = x.MAXHP = x.health = mainCharacter.maxHP = 1000;
 								x.setHealth(x.health);
+								x.immunities = [];
 							});
 						}
+						const _objects = mapSprites.find(x => x.id === __storyScene.map).objectMobs;
+						episode.installMobs(_objects);
 					});
 				}
 			}
@@ -9732,10 +9750,10 @@ function switchStoryScene(_func, _newOrder) {
 		if(_func)
 			_func();
 	}
-
-	switchMap(__storyScene.map, null, null, null, __storyScene, function() {
-		_afterStart();
-	});
+	if(__storyScene)
+		switchMap(__storyScene.map, null, null, null, __storyScene, function() {
+			_afterStart();
+		});
 }
 function checkPC () {
 	removeClass(document.body, 'pc-mission');
@@ -10995,6 +11013,8 @@ function delay(ms) {
 // }, 15000);
 
 function createPromoScreen() {
+	playClick();
+	hideMyModalPopUp(1);
 	const _data = [
 		{
 			section: 1,
@@ -11297,6 +11317,7 @@ function createPromoScreen() {
 		</div>`;
 	addClass(_gameUI, 'disable-ui');
 	_gameUI.appendChild(_desc);
+	detachModule();
 }
 
 function prevPromoSection(_max) {
