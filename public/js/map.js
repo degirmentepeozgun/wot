@@ -2671,7 +2671,12 @@ function map(_m) {
 			this._colorizeCtx.imageSmoothingEnabled = false;
 		}
 		const _osc = this._colorizeCanvas;
-		const ctx = this._colorizeCtx;
+		let ctx = this._colorizeCtx;
+		if(!ctx) {
+			this._colorizeCtx = this._colorizeCanvas.getContext('2d');
+			this._colorizeCtx.imageSmoothingEnabled = false;
+			ctx = this._colorizeCtx;
+		}
 		_osc.width = _item.spriteWidth;
 		_osc.height = _item.spriteHeight;
 		ctx.clearRect(0, 0, _osc.width, _osc.height);
@@ -4074,7 +4079,7 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 								_item.char.hasIframe = false;
 						}
 						if(_drawParticles && _item.char.particles)
-							this.drawHitParticles(_item);
+							this.drawHitParticles(_item.char);
 						if(_item.char.text)
 						{
 							let _restored;

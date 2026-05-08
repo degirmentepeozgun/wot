@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EntityTemplates")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d74457013ce81e7e2fff4adc0d3a771681f1a24d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+30b8799b42893cdb155caef8fa833b969c27d9cf")]
 [assembly: System.Reflection.AssemblyProductAttribute("EntityTemplates")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EntityTemplates")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

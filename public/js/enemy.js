@@ -477,14 +477,19 @@ function enemy(_e) {
 			let _chosenRange;
 			for (var _key of _keys) {
 				let _k = _key, _itIsOk;
-				if(this.ultimate && !_k.endsWith('modified') && this.animations[_k + 'modified'] &&
+				let _modified = _k.endsWith('modified');
+				if(this.ultimate && !_modified && this.animations[_k + 'modified'] &&
 					(this.animations[_k + 'modified']?.coolDownLeft > 0 ||
 						this.skills?.[_k + 'modified']?.locked
 					))
 					continue;
 				else if(this.skills?.[_k]?.locked)
 					continue;
+				if(_modified && !this.ultimate)
+					continue;
 				let _anima = this.animations[_k];
+				if(_anima.disabled)
+					continue;
 				if(_anima.before && !this.skills?.[_anima.before]?.locked)
 					if(!_noCD && _anima.coolDownLeft > 0) {
 						_k = _anima.before;
@@ -2953,7 +2958,6 @@ function enemy(_e) {
 			this.target.setProps(_frame.target);
 		let _removeEnemy = false;
 		this.updateVariables();
-		this.render(_frame, _queue);
 		
 		
 		let _goOn;
@@ -2964,7 +2968,6 @@ function enemy(_e) {
 			else
 				this.autoCommand2();
 		}
-		
 		//this.TESTSLOTS();
 		
 		if (this.autoMode && this.important) {
@@ -3285,6 +3288,9 @@ function enemy(_e) {
 		if (_removeEnemy && !episode.pvp) {
 			this.remove = true;
 		}
+		
+		
+		this.render(_frame, _queue);
 	}
 	this.checkSpawn = function() {
 		if(this.respawnAfterSeconds && !this.respawnRequested) {
@@ -7632,7 +7638,7 @@ function enemy(_e) {
 		if(this.lastYStepTime > (_gameTick - 500))
 			return this.lastYStep;
 		this.lastYStepTime = _gameTick;
-		this.lastYStep = MathRound(episode.cHeight / (this.alp ? 120 : getRandomValue(80, 120)));
+		this.lastYStep = MathRound((episode.cHeight / (this.alp ? 120 : getRandomValue(80, 120))) * (this.zoomYRate ?? 1));
 		return this.lastYStep;
 	}
 	this.calculateYStepAndMove = function (_solidity, _touch) {

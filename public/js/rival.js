@@ -77713,6 +77713,63 @@ const _allEnemies = {
 	enemy1000: function () {
 		return {
 			animations: {
+				air2: {
+						key: 'air2',
+						type: 'skill',
+						rage: __maxRageCount,
+						order: 6,
+						attack: true,
+						ultimate: true,
+						cooldown: 10000,
+						priority: 1,
+						src: './images/sprites/ep1000/attack.png',
+						frames: [
+							{
+								spriteLeft: 932,
+								spriteTop: 56,
+								spriteWidth: 416,
+								spriteHeight: 511 - 56,
+								spriteOrigin: 101,
+								speed: 10
+							},
+							{
+								spriteLeft: 1397,
+								spriteTop: 0,
+								spriteWidth: 444,
+								spriteHeight: 511,
+								spriteOrigin: 101,
+								speed: 1,
+								objects: [
+									{
+										key: 'dark',
+										position: 'css'
+									},
+									{ 
+										key: 'halo', 
+										position: 'canvas', 
+										p1: {
+											ms: 1000,
+											y:135
+										} 
+									}
+								],
+								def: {
+									iframe: true
+								}
+							},
+							{
+								spriteLeft: 1397,
+								spriteTop: 0,
+								spriteWidth: 444,
+								spriteHeight: 511,
+								spriteOrigin: 101,
+								speed: 39,
+								def: {
+									iframe: true
+								}
+							}
+						]
+					},
 				release: createRelease(
 					{
 						spriteLeft: 1656,
@@ -78488,6 +78545,87 @@ const _allEnemies = {
 					mobilityY: true,
 					src: './images/sprites/ep1000/run.png',
 					priority: 5,
+					alternateFrames: [
+							{ rate: 1, when: function(_e) {
+								return _e.ultimate;
+							}, frames: [
+								{
+									spriteLeft: 425,
+									spriteTop: 3232,
+									spriteWidth: 483,
+									spriteHeight: 568,
+									spriteOrigin: 325,
+									def: {
+										iframe: true
+									},
+									src: './images/sprites/ep1000/transform1.png',
+									speed: 8
+								},
+								{
+									spriteLeft: 425,
+									spriteTop: 3232,
+									spriteWidth: 483,
+									spriteHeight: 568,
+									spriteOrigin: 325,
+									def: {
+										iframe: true
+									},
+									src: './images/sprites/ep1000/transform1.png',
+									speed: 8
+								},
+								{
+									spriteLeft: 1933,
+									spriteTop: 3232,
+									spriteWidth: 475,
+									spriteHeight: 568,
+									spriteOrigin: 317,
+									def: {
+										iframe: true
+									},
+									src: './images/sprites/ep1000/transform1.png',
+									speed: 8
+								},
+								{
+									spriteLeft: 1933,
+									spriteTop: 3232,
+									spriteWidth: 475,
+									spriteHeight: 568,
+									spriteOrigin: 317,
+									def: {
+										iframe: true
+									},
+									src: './images/sprites/ep1000/transform1.png',
+									speed: 8
+								},
+								{
+									spriteLeft: 3437,
+									spriteTop: 3232,
+									spriteWidth: 471,
+									spriteHeight: 568 + 15,
+									spriteOrigin: 313,
+									bottomGap: -15,
+									def: {
+										iframe: true
+									},
+									src: './images/sprites/ep1000/transform1.png',
+									speed: 8
+								},
+								{
+									spriteLeft: 3437,
+									spriteTop: 3232,
+									spriteWidth: 471,
+									spriteHeight: 568 + 15,
+									spriteOrigin: 313,
+									bottomGap: -15,
+									def: {
+										iframe: true
+									},
+									src: './images/sprites/ep1000/transform1.png',
+									speed: 8
+								},
+							]
+						}
+					],
 					frames: [
 						{
 							spriteLeft: 87,
@@ -78547,6 +78685,93 @@ const _allEnemies = {
 					mobilityY: true,
 					src: './images/sprites/ep1000/run.png',
 					priority: 5,
+					alternateFrames: [
+							{ rate: 1, when: function(_e) {
+								return _e.ultimate;
+							}, frames: [
+								{
+									spriteLeft: 425,
+									spriteTop: 3232,
+									spriteWidth: 483,
+									spriteHeight: 568,
+									spriteOrigin: 325,
+									extraStepXRate: .25,
+									def: {
+										iframe: true
+									},
+									src: './images/sprites/ep1000/transform1.png',
+									speed: 8
+								},
+								{
+									spriteLeft: 425,
+									spriteTop: 3232,
+									spriteWidth: 483,
+									spriteHeight: 568,
+									spriteOrigin: 325,
+									extraStepXRate: .25,
+									def: {
+										iframe: true
+									},
+									src: './images/sprites/ep1000/transform1.png',
+									speed: 8
+								},
+								{
+									spriteLeft: 1933,
+									spriteTop: 3232,
+									spriteWidth: 475,
+									spriteHeight: 568,
+									spriteOrigin: 317,
+									extraStepXRate: .25,
+									def: {
+										iframe: true
+									},
+									src: './images/sprites/ep1000/transform1.png',
+									speed: 8
+								},
+								{
+									spriteLeft: 1933,
+									spriteTop: 3232,
+									spriteWidth: 475,
+									spriteHeight: 568,
+									spriteOrigin: 317,
+									extraStepXRate: .25,
+									def: {
+										iframe: true
+									},
+									src: './images/sprites/ep1000/transform1.png',
+									speed: 8
+								},
+								{
+									spriteLeft: 3437,
+									spriteTop: 3232,
+									spriteWidth: 471,
+									spriteHeight: 568 + 15,
+									spriteOrigin: 313,
+									bottomGap: -15,
+									extraStepXRate: .25,
+									def: {
+										iframe: true
+									},
+									src: './images/sprites/ep1000/transform1.png',
+									speed: 8
+								},
+								{
+									spriteLeft: 3437,
+									spriteTop: 3232,
+									spriteWidth: 471,
+									spriteHeight: 568 + 15,
+									spriteOrigin: 313,
+									bottomGap: -15,
+									extraStepXRate: .25,
+									def: {
+										iframe: true
+									},
+									src: './images/sprites/ep1000/transform1.png',
+									speed: 8
+								},
+							]
+						}
+					],
 					frames: [
 						{
 							spriteLeft: 87,
@@ -78602,6 +78827,49 @@ const _allEnemies = {
 					key: 'idle',
 					type: 'skill',
 					imediateBreak: true,
+					alternateFrames: [
+							{ rate: 1, when: function(_e) {
+								return _e.ultimate;
+							}, frames: [
+								{
+									spriteLeft: 441,
+									spriteTop: 2232,
+									spriteWidth: 363,
+									spriteHeight: 568,
+									spriteOrigin: 309,
+									def: {
+										iframe: true
+									},
+									src: './images/sprites/ep1000/transform1.png',
+									speed: 16
+								},
+								{
+									spriteLeft: 1935,
+									spriteTop: 2232,
+									spriteWidth: 357,
+									spriteHeight: 568,
+									spriteOrigin: 315,
+									def: {
+										iframe: true
+									},
+									src: './images/sprites/ep1000/transform1.png',
+									speed: 16
+								},
+								{
+									spriteLeft: 3432,
+									spriteTop: 2232,
+									spriteWidth: 366,
+									spriteHeight: 568,
+									spriteOrigin: 318,
+									def: {
+										iframe: true
+									},
+									src: './images/sprites/ep1000/transform1.png',
+									speed: 16
+								},
+							]
+						}
+					],
 					frames: [
 						{
 							spriteLeft: 0,
@@ -78617,7 +78885,15 @@ const _allEnemies = {
 							spriteWidth: 298,
 							spriteHeight: 426,
 							spriteOrigin: 150,
-							speed: 32
+							speed: 16
+						},
+						{
+							spriteLeft: 349,
+							spriteTop: 0,
+							spriteWidth: 298,
+							spriteHeight: 426,
+							spriteOrigin: 150,
+							speed: 16
 						}
 					]
 				},
@@ -78689,7 +78965,7 @@ const _allEnemies = {
 							spriteOrigin: 101,
 							speed: 40,
 							knockback: true,
-							sound: 'alhit',
+							sound: { key: 'alhit', volume:1},
 							objects: [
 								{ key: 'slam', position: 'under-feet', xGap: -40 },
 								{ key: 'shake', position: 'css' }
@@ -78726,7 +79002,7 @@ const _allEnemies = {
 										difficulty: _char.difficulty,
 										sight: 99,
 										count: 1,
-										yPosition: 1,
+										yPosition: _char.yPosition - MathRound(getGroundHeight() / 5),
 										minLevel: 1,
 										maxLevel: 2
 									},
@@ -78737,7 +79013,7 @@ const _allEnemies = {
 										difficulty: _char.difficulty,
 										sight: 99,
 										count: 1,
-										yPosition: MathRound(getGroundHeight() / 2),
+										yPosition: _char.yPosition,
 										minLevel: 1,
 										maxLevel: 2
 									},
@@ -78748,7 +79024,7 @@ const _allEnemies = {
 										difficulty: _char.difficulty,
 										sight: 99,
 										count: 1,
-										yPosition: getGroundHeight(),
+										yPosition: _char.yPosition + MathRound(getGroundHeight() / 5),
 										minLevel: 1,
 										maxLevel: 2
 									},
@@ -78759,7 +79035,7 @@ const _allEnemies = {
 										difficulty: _char.difficulty,
 										sight: 99,
 										count: 1,
-										yPosition: 1,
+										yPosition: _char.yPosition - MathRound(getGroundHeight() / 5),
 										minLevel: 1,
 										maxLevel: 2
 									},
@@ -78770,7 +79046,7 @@ const _allEnemies = {
 										difficulty: _char.difficulty,
 										sight: 99,
 										count: 1,
-										yPosition: MathRound(getGroundHeight() / 2),
+										yPosition: _char.yPosition,
 										minLevel: 1,
 										maxLevel: 2
 									},
@@ -78781,7 +79057,7 @@ const _allEnemies = {
 										difficulty: _char.difficulty,
 										sight: 99,
 										count: 1,
-										yPosition: getGroundHeight(),
+										yPosition: _char.yPosition + MathRound(getGroundHeight() / 5),
 										minLevel: 1,
 										maxLevel: 2
 									},
@@ -78792,7 +79068,7 @@ const _allEnemies = {
 										difficulty: _char.difficulty,
 										sight: 99,
 										count: 1,
-										yPosition: 1,
+										yPosition: _char.yPosition - MathRound(getGroundHeight() / 5),
 										minLevel: 1,
 										maxLevel: 2
 									},
@@ -78803,7 +79079,7 @@ const _allEnemies = {
 										difficulty: _char.difficulty,
 										sight: 99,
 										count: 1,
-										yPosition: MathRound(getGroundHeight() / 2),
+										yPosition: _char.yPosition,
 										minLevel: 1,
 										maxLevel: 2
 									},
@@ -78814,7 +79090,7 @@ const _allEnemies = {
 										difficulty: _char.difficulty,
 										sight: 99,
 										count: 1,
-										yPosition: getGroundHeight(),
+										yPosition: _char.yPosition + MathRound(getGroundHeight() / 5),
 										minLevel: 1,
 										maxLevel: 2
 									}
@@ -78849,6 +79125,8 @@ const _allEnemies = {
 												_e.skipHealthBar = _e.noLoot = _e.looted = _e.noCC = true;
 												_e.experience = 0;
 												_e.zoom /= 2;
+												_e.important = true;
+												_e.zoomYRate = 2;
 												if (_e.autoTarget && _e.autoTarget.isDead())
 													_e.remove = true;
 												_e.health = 1;
@@ -78868,6 +79146,225 @@ const _allEnemies = {
 							}
 						},
 
+					]
+				},
+				attackmodified: {
+					key: 'attackmodified',
+					order: 1,
+					type: 'skill',
+					hold: true,
+					move: true,
+					attack: true,
+					priority: 1,
+					imediateBreak: true,
+					cooldown: 2000,
+					next: 'attack2modified',
+					src: './images/sprites/ep1000/transform1.png',
+					frames: [
+						{
+							spriteLeft: 324,
+							spriteTop: 232,
+							spriteWidth: 891,
+							spriteHeight: 568,
+							spriteOrigin: 426,
+							def: {
+								iframe: true
+							},
+							speed: 12
+						},
+						{
+							spriteLeft: 1743,
+							spriteTop: 232,
+							spriteWidth: 823,
+							spriteHeight: 568 + 18,
+							spriteOrigin: 507,
+							bottomGap: -18,
+							speed: 12,
+							def: {
+								iframe: true
+							},
+							sound: {key:'reaperhit', volume: 1, reset: true },
+							atk: {
+								yRange: 15,
+								rate: 5,
+								type: 'common',
+								push: 3,
+								hurt: {
+									key: 'hurtground1',
+									sound: {key:'reaperhithurt', volume: 1, reset: true },
+									type: 'ground'
+								}
+							}
+						},
+						{
+							spriteLeft: 3243,
+							spriteTop: 232,
+							spriteWidth: 566,
+							spriteHeight: 568 + 15,
+							bottomGap: -15,
+							spriteOrigin: 507,
+							def: {
+								iframe: true
+							},
+							speed: 12
+						}
+					]
+				},
+				attack2modified: {
+					key: 'attack2modified',
+					type: 'skill',
+					bleed: 'up',
+					hold: true,
+					move: true,
+					attack: true,
+					baseKey: 'attackmodified',
+					next: 'attack3modified',
+					priority: 1,
+					comboOrder:2,
+					cooldown: 2000,
+					imediateBreak: true,
+					src: './images/sprites/ep1000/transform1.png',
+					frames: [
+						{
+							spriteLeft: 263,
+							spriteTop: 1232,
+							spriteWidth: 545,
+							spriteHeight: 568,
+							spriteOrigin: 487,
+							def: {
+								iframe: true
+							},
+							speed: 12
+						},
+						{
+							spriteLeft: 1537,
+							spriteTop: 1232,
+							spriteWidth: 1108,
+							spriteHeight: 568,
+							bottomGap: -43,
+							spriteOrigin: 2250 - 1537,
+							speed: 12,
+							def: {
+								iframe: true
+							},
+							sound: {key:'reaperhit', volume: 1, reset: true },
+							atk: {
+								yRange: 15,
+								rate: 5,
+								type: 'common',
+								push: 3,
+								hurt: {
+									key: 'hurtground1',
+									sound: {key:'reaperhithurt', volume: 1, reset: true },
+									type: 'ground'
+								}
+							}
+						},
+						{
+							spriteLeft: 3321,
+							spriteTop: 1232,
+							spriteWidth: 721,
+							spriteHeight: 568,
+							spriteOrigin: 3750 - 3321,
+							def: {
+								iframe: true
+							},
+							speed: 12
+						}
+					]
+				},
+				attack3modified: {
+					key: 'attack3modified',
+					type: 'skill',
+					bleed: 'up',
+					hold: true,
+					move: true,
+					attack: true,
+					baseKey: 'attackmodified',
+					priority: 1,
+					comboOrder:3,
+					maxRepeat:3,
+					cooldown: 2000,
+					imediateBreak: true,
+					src: './images/sprites/ep1000/transform2.png',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 1024,
+							spriteHeight: 1024,
+							spriteOrigin: 512,
+							extraStepXRate: .75,
+							def: {
+								iframe: true
+							},
+							sound: {key:'reaperhit', volume: 1, reset: true },
+							speed: 6
+						},
+						{
+							spriteLeft: 1024,
+							spriteTop: 0,
+							spriteWidth: 1024,
+							spriteHeight: 1024,
+							spriteOrigin: 512,
+							extraStepXRate: .75,
+							def: {
+								iframe: true
+							},
+							atk: {
+								yRange: 15,
+								rate: 5,
+								aoe: 500,
+								reset: true,
+								type: 'common',
+								push: 3,
+								hurt: {
+									key: 'hurtair',
+									sound: {key:'reaperhithurt', volume: 1, reset: true },
+									type: 'air',
+									reset: true
+								}
+							},
+							speed: 6
+						},
+						{
+							spriteLeft: 1024 * 2,
+							spriteTop: 0,
+							spriteWidth: 1024,
+							spriteHeight: 1024,
+							spriteOrigin: 512,
+							extraStepXRate: .75,
+							def: {
+								iframe: true
+							},
+							speed: 6
+						},
+						{
+							spriteLeft: 1024 * 3,
+							spriteTop: 0,
+							spriteWidth: 1024,
+							spriteHeight: 1024,
+							spriteOrigin: 512,
+							extraStepXRate: .75,
+							def: {
+								iframe: true
+							},
+							atk: {
+								yRange: 15,
+								rate: 5,
+								aoe: 500,
+								reset: true,
+								type: 'common',
+								push: 3,
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									sound: {key:'reaperhithurt', volume: 1, reset: true },
+									reset: true
+								}
+							},
+							speed: 6
+						}
 					]
 				},
 				// ground2: {
@@ -79626,6 +80123,38 @@ const _allEnemies = {
 			key: 'al-' + Math.random().toString().replace(/[.]/g, ''),
 			yGap: 10,
 			id: 1000,
+			do: function(_e) {
+				if(_e.ultimateStarted && !_e.ultimate) {
+					_e.swapAnimation('idle');
+					_e.swapAnimation('run');
+					_e.swapAnimation('walk');
+					for(var key in _e.animations) {
+						const _anima = _e.animations[key];
+						if(!_anima.transformDisabled)
+							continue;
+						else {
+							_anima.disabled = false;
+							delete _anima.transformDisabled;
+						}
+					}
+					delete _e.ultimateStarted;
+				}
+				else if(_e.ultimate && !_e.ultimateStarted) {
+					_e.ultimateStarted = _gameTick;
+					_e.swapAnimation('idle');
+					_e.swapAnimation('run');
+					_e.swapAnimation('walk');
+					const _transformKeys = ['run', 'walk', 'idle', 'attackmodified', 'attack2modified', 'attack3modified'];
+					for(var key in _e.animations) {
+						if(_transformKeys.includes(key))
+							continue;
+						const _anima = _e.animations[key];
+						if(!_anima.disabled) {
+							_anima.disabled = _anima.transformDisabled = true;
+						}
+					}
+				}
+			},
 			healtbarGap: 25,
 			class: 'al',
 			size: 'big',

@@ -3165,6 +3165,8 @@ const soundFiles = {
 	eggfall: './images/sounds/egg-fall.mp3',
 	iframe: './images/sounds/iframe.mp3',
 	cliff: './images/sounds/cliff.mp3',
+	reaperhithurt: './images/sounds/reaper-hit-hurt.mp3',
+	reaperhit: './images/sounds/reaper-hit.mp3',
 	goblinkingtongue: './images/sounds/goblin-king-tongue.mp3',
 	goblinkingrelease: './images/sounds/goblin-king-release.mp3',
 	goblinkingenter: './images/sounds/goblin-king-enter.mp3',
