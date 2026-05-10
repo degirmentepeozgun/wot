@@ -6977,7 +6977,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		startScene: 1,
+		//startScene: 1,
 		scenes: [
 			{
 				when: function() {
@@ -7662,7 +7662,7 @@ const __stories = [
 				]
 			},
 			{
-				map: 11,
+				map: 36,
 				noArtifact: true,
 				leaderBoards: {
 					calculate: function() {
@@ -8160,7 +8160,7 @@ const __stories = [
 					// 	experience: 1
 					// },
 					{
-						id: 10,
+						id: 619,
 						minX: 4000,
 						maxX: 6000,
 						count: 2,
