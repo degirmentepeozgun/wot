@@ -2135,8 +2135,8 @@ const relatedObjects = [
 		zoom: 1.45, totalFrames: 1, speed: 6, singleton: true
 	},
 	{
-		id: 'web', key: 'web', width: 225, height: 82, color: '#f7f7f7ec',
-		zoom: 1, totalFrames: 1, speed: 120, singleton: true, still: true
+		id: 'web', key: 'web', width: 230, height: 80, reversable: false,
+		zoom: 1, totalFrames: 1, speed: 100, singleton: true, still: true
 	},
 	{
 		id: 'witch', key: 'witch', width: 2560, height: 1024,
@@ -3152,6 +3152,7 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	shapeshift: './images/sounds/shapeshift.mp3',
 	packagegain: './images/sounds/package-gain.wav',
 	woodland: './images/sounds/wood-land2.mp3',
 	comebackwin: './images/sounds/comeback-win.mp3',
@@ -3574,6 +3575,8 @@ const soundFiles = {
 	eat: './images/sounds/eat.mp3',
 	curse: './images/sounds/curse.mp3',
 	alhand: './images/sounds/al-hand.mp3',
+	alslash: './images/sounds/al-slash.mp3',
+	alslashhit: './images/sounds/al-slash-hit.mp3',
 	alhit: './images/sounds/al-hit.mp3',
 	alhurt1: './images/sounds/alhurt1.mp3',
 	alhurt2: './images/sounds/alhurt2.mp3',
@@ -6297,7 +6300,7 @@ function createFrames(_speed, _count, _width, _height, _col, _atkFrame, _sound) 
 const spells = {
 	lasershow: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: .85,
 		width: 76,
 		invulnerable: true,
@@ -6769,7 +6772,7 @@ const spells = {
 	warriorhead: {
 		src: './images/main/warrior/Death.png',
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		noRelation: true,
@@ -7057,7 +7060,7 @@ const spells = {
 	teberhead: {
 		src: './images/sprites/ep02/sprite.png',
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.35,
 		invulnerable: true,
 		noRelation: true,
@@ -7338,7 +7341,7 @@ const spells = {
 	dynamite: {
 		src: './images/sprites/ep92/tnt.png',
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.5,
 		invulnerable: true,
 		class: __spell,
@@ -7471,7 +7474,7 @@ const spells = {
 	dynamiteshort: {
 		src: './images/sprites/ep92/tnt.png',
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.5,
 		invulnerable: true,
 		class: __spell,
@@ -7604,7 +7607,7 @@ const spells = {
 	earthspikes: {
 		src: './images/main/warrior/wave2.png',
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: .65,
 		invulnerable: true,
 		still: true,
@@ -7786,7 +7789,7 @@ const spells = {
 	earthspikes2: {
 		src: './images/main/warrior/spikes.png',
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		class: __spell,
@@ -8061,7 +8064,7 @@ const spells = {
 	earthspikes3: {
 		src: './images/main/warrior/spikes2.png',
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		still: true,
@@ -8295,7 +8298,7 @@ const spells = {
 	},
 	tnt: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		src: './images/sprites/ep29/tnt.png',
 		invulnerable: true,
@@ -8505,7 +8508,7 @@ const spells = {
 	},
 	fireclaw: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		src: './images/sprites/ep29/fire-claw.png?v=2',
 		invulnerable: true,
@@ -8735,7 +8738,7 @@ const spells = {
 	},
 	emegenspit: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		src: './images/sprites/ep03/spit.png',
 		invulnerable: true,
@@ -8887,7 +8890,7 @@ const spells = {
 	},
 	suicide: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2.5,
 		noRemove: true,
 		src: './images/sprites/ep623/eplosion.png',
@@ -9092,7 +9095,7 @@ const spells = {
 	},
 	emegenspit2: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: .6,
 		src: './images/sprites/ep03/spit2.png',
 		invulnerable: true,
@@ -9294,7 +9297,7 @@ const spells = {
 	},
 	itbu1: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.6,
 		src: './images/sprites/ep29/sprite2.png',
 		invulnerable: true,
@@ -9480,7 +9483,7 @@ const spells = {
 	},
 	itbu2: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.6,
 		src: './images/sprites/ep29/sprite2.png',
 		invulnerable: true,
@@ -9666,7 +9669,7 @@ const spells = {
 	},
 	itbu3: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.6,
 		src: './images/sprites/ep29/sprite2.png',
 		invulnerable: true,
@@ -9853,7 +9856,7 @@ const spells = {
 	},
 	itbu4: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.6,
 		src: './images/sprites/ep29/sprite2.png',
 		invulnerable: true,
@@ -10043,7 +10046,7 @@ const spells = {
 	},
 	itbu1faster: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.6,
 		src: './images/sprites/ep29/sprite2.png',
 		invulnerable: true,
@@ -10229,7 +10232,7 @@ const spells = {
 	},
 	itbu2faster: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.6,
 		src: './images/sprites/ep29/sprite2.png',
 		invulnerable: true,
@@ -10415,7 +10418,7 @@ const spells = {
 	},
 	itbu3faster: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.6,
 		src: './images/sprites/ep29/sprite2.png',
 		invulnerable: true,
@@ -10602,7 +10605,7 @@ const spells = {
 	},
 	itbu4faster: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.6,
 		src: './images/sprites/ep29/sprite2.png',
 		invulnerable: true,
@@ -10792,7 +10795,7 @@ const spells = {
 	},
 	poisoncloud: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		src: './images/sprites/ep07/poison.png',
 		invulnerable: true,
@@ -11326,7 +11329,7 @@ const spells = {
 	},
 	rasengan: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2.3,
 		src: './images/sprites/ep83/rasengan.png',
 		invulnerable: true,
@@ -11667,7 +11670,7 @@ const spells = {
 	},
 	poisonbubbles: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		src: './images/sprites/ep07/bubbles.png',
 		invulnerable: true,
@@ -12081,7 +12084,7 @@ const spells = {
 	},
 	poisonball: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		src: './images/sprites/ep30/poison-bolt.png',
 		invulnerable: true,
@@ -12347,7 +12350,7 @@ const spells = {
 	},
 	web: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		src: './images/sprites/ep10/web.png',
 		invulnerable: true,
@@ -12388,6 +12391,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: 2,
+							reset: true,
 							hurt: {
 								buffs: [{
 									level: 1,
@@ -12413,6 +12417,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: 2,
+							reset: true,
 							hurt: {
 								buffs: [{
 									level: 1,
@@ -12438,6 +12443,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: 2,
+							reset: true,
 							hurt: {
 								buffs: [{
 									level: 1,
@@ -12463,6 +12469,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: 2,
+							reset: true,
 							hurt: {
 								buffs: [{
 									level: 1,
@@ -12488,6 +12495,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: 2,
+							reset: true,
 							hurt: {
 								buffs: [{
 									level: 1,
@@ -12508,7 +12516,7 @@ const spells = {
 	},
 	timestop: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.91,
 		width: 520,
 		invulnerable: true,
@@ -13076,7 +13084,7 @@ const spells = {
 	},
 	lestatthunder: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.5,
 		width: 450,
 		invulnerable: true,
@@ -13290,7 +13298,7 @@ const spells = {
 	},
 	earthrock: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		width: 400,
 		invulnerable: true,
@@ -13339,7 +13347,7 @@ const spells = {
 	},
 	corpseexplode: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 4,
 		width: 48,
 		invulnerable: true,
@@ -13688,7 +13696,7 @@ const spells = {
 	},
 	icespike: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 2,
 		width: 256,
 		invulnerable: true,
@@ -13971,7 +13979,7 @@ const spells = {
 	},
 	darkbolt: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 4,
 		width: 64,
 		invulnerable: true,
@@ -14140,7 +14148,7 @@ const spells = {
 	},
 	mine: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		width: 160,
 		invulnerable: true,
@@ -14565,7 +14573,7 @@ const spells = {
 	},
 	poisonpuff2: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		width: 71,
 		invulnerable: true,
@@ -14675,7 +14683,7 @@ const spells = {
 	},
 	poisonpuff: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		width: 200,
 		invulnerable: true,
@@ -14913,7 +14921,7 @@ const spells = {
 	},
 	poisonpuff3: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2.2,
 		width: 71,
 		invulnerable: true,
@@ -15022,7 +15030,7 @@ const spells = {
 	},
 	poisonpuff4: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.8,
 		width: 71,
 		invulnerable: true,
@@ -15131,7 +15139,7 @@ const spells = {
 	},
 	fatalityrock1: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: .8,
 		width: 570,
 		invulnerable: true,
@@ -15440,7 +15448,7 @@ const spells = {
 	},
 	fireexplosion: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 2.4,
 		width: 252,
 		invulnerable: true,
@@ -15643,7 +15651,7 @@ const spells = {
 	},
 	rockfall: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		width: 96,
 		invulnerable: true,
@@ -16037,7 +16045,7 @@ const spells = {
 	},
 	groundexplosion: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		pierce: true,
 		invulnerable: true,
@@ -16188,7 +16196,7 @@ const spells = {
 	},
 	groundexplosionsmash: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		pierce: true,
 		invulnerable: true,
@@ -16284,7 +16292,7 @@ const spells = {
 	},
 	sonicwave: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.5,
 		invulnerable: true,
 		knockback: true,
@@ -16470,7 +16478,7 @@ const spells = {
 	},
 	tugarrow: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -16626,7 +16634,7 @@ const spells = {
 	},
 	tugflameeagle: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -16798,7 +16806,7 @@ const spells = {
 	},
 	hurlingbomb: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.66,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -17158,7 +17166,7 @@ const spells = {
 	},
 	shamanboomerang: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -17803,7 +17811,7 @@ const spells = {
 	},
 	greenarrowright: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.4,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -18020,7 +18028,7 @@ const spells = {
 	},
 	archerarrow: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -18076,7 +18084,7 @@ const spells = {
 	},
 	lightningarrow: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 3,
 		invulnerable: true,
 		class: __spell,
@@ -18334,7 +18342,7 @@ const spells = {
 	},
 	archerupperarrow: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -18425,7 +18433,7 @@ const spells = {
 	},
 	archerdownrightarrow: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -18483,7 +18491,7 @@ const spells = {
 	},
 	archerdownleftarrow: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -18542,7 +18550,7 @@ const spells = {
 	},
 	archerdownarrow: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -18600,7 +18608,7 @@ const spells = {
 	},
 	archerarrowtop: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		knockback: true,
@@ -18718,7 +18726,7 @@ const spells = {
 	},
 	archerarrowbottom: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		knockback: true,
@@ -18836,7 +18844,7 @@ const spells = {
 	},
 	archerarrowmiddle: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -18893,7 +18901,7 @@ const spells = {
 	},
 	archerarrowfire: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -18958,7 +18966,7 @@ const spells = {
 	},
 	warriorspell: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * .75,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -19172,7 +19180,7 @@ const spells = {
 	},
 	teberweapon: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -19304,7 +19312,7 @@ const spells = {
 	},
 	electricbolt: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 2,
 		invulnerable: true,
 		pierce: true,
@@ -19626,7 +19634,7 @@ const spells = {
 	},
 	electricboltsmall: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -19762,7 +19770,7 @@ const spells = {
 	},
 	electricboltsmall2: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2.66,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -19933,7 +19941,7 @@ const spells = {
 	},
 	firespray: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.5,
 		invulnerable: true,
 		pierce: true,
@@ -20175,7 +20183,7 @@ const spells = {
 	},
 	firewall: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		invulnerable: true,
 		pierce: true,
@@ -20516,7 +20524,7 @@ const spells = {
 	},
 	firewall2: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		invulnerable: true,
 		pierce: true,
@@ -20630,7 +20638,7 @@ const spells = {
 	},
 	firewall3: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		invulnerable: true,
 		pierce: true,
@@ -20746,7 +20754,7 @@ const spells = {
 	},
 	firewall4: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		invulnerable: true,
 		pierce: true,
@@ -21732,7 +21740,7 @@ const spells = {
 	},
 	toxicwall: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		invulnerable: true,
 		pierce: true,
@@ -22718,7 +22726,7 @@ const spells = {
 	},
 	fireball: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		class: __spell,
@@ -22864,7 +22872,7 @@ const spells = {
 	},
 	waterwave: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		pierce: true,
@@ -23079,7 +23087,7 @@ const spells = {
 	},
 	waterwavehit: {
 		defaultDirection: __left,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 1.5,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -23246,7 +23254,7 @@ const spells = {
 	},
 	gear: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 1.5,
 		invulnerable: true,
 		knockback: 5,
@@ -23549,7 +23557,7 @@ const spells = {
 	},
 	star: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * .65,
 		invulnerable: true,
 		height: 54 * .65,
@@ -23696,7 +23704,7 @@ const spells = {
 	},
 	chain: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 3,
 		invulnerable: true,
 		push: true,
@@ -24169,7 +24177,7 @@ const spells = {
 	},
 	hurricane2: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.3,
 		invulnerable: true,
 		height: 250,
@@ -24316,7 +24324,7 @@ const spells = {
 	},
 	hurricane: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 1.5,
 		invulnerable: true,
 		height: 182 * 1.5,
@@ -24516,7 +24524,7 @@ const spells = {
 	},
 	lightningball2: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.35,
 		invulnerable: true,
 		height: 600 * 1.35,
@@ -25123,7 +25131,7 @@ const spells = {
 	},
 	lightningball: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		height: 1365,
@@ -25591,7 +25599,7 @@ const spells = {
 	},
 	beyblade: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * .75,
 		invulnerable: true,
 		class: __spell,
@@ -25947,7 +25955,7 @@ const spells = {
 	},
 	horse: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.25,
 		invulnerable: true,
 		class: __spell,
@@ -26320,7 +26328,7 @@ const spells = {
 	},
 	wolf: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.33,
 		invulnerable: true,
 		class: __spell,
@@ -26636,7 +26644,7 @@ const spells = {
 	},
 	wolf2: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.33,
 		invulnerable: true,
 		class: __spell,
@@ -26952,7 +26960,7 @@ const spells = {
 	},
 	bats: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 1.5,
 		invulnerable: true,
 		class: __spell,
@@ -27050,7 +27058,7 @@ const spells = {
 	},
 	bat: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		class: __spell,
@@ -27235,7 +27243,7 @@ const spells = {
 	},
 	medusabolt: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -27416,7 +27424,7 @@ const spells = {
 	},
 	medusabubble: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		invulnerable: true,
 		pierce: true,
@@ -27633,7 +27641,7 @@ const spells = {
 	},
 	shamanravens: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -27992,7 +28000,7 @@ const spells = {
 	},
 	shamanbreath: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -28268,7 +28276,7 @@ const spells = {
 	},
 	shamanbreathrage: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.1,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -28592,7 +28600,7 @@ const spells = {
 	},
 	shamanfire: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -28774,7 +28782,7 @@ const spells = {
 	},
 	shamanskull: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -29003,7 +29011,7 @@ const spells = {
 	},
 	roots: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.35,
 		invulnerable: true,
 		class: __spell,
@@ -29168,7 +29176,7 @@ const spells = {
 	},
 	tentacles: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		class: __spell,
@@ -29434,7 +29442,7 @@ function addSlingStoneSpells() {
     for (let i = 1; i < 8; i++) {
         spells['slingstone' + i] = {
             defaultDirection: __right,
-            defaultAnimationKey: 'run',
+            defaultAnimationKey: 'idle',
             zoom: 1,
             src: './images/sprites/ep620/sapantas' + i + '.png',
             invulnerable: true,

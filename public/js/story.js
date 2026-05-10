@@ -6977,7 +6977,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		//startScene: 2,
+		startScene: 1,
 		scenes: [
 			{
 				when: function() {
@@ -7627,7 +7627,7 @@ const __stories = [
 					{
 						when: function() {
 							return episode.tutorialEnded
-							&& (_gameTick - episode.lastTutorialTime) > 500;
+							&& (_gameTick - (episode.lastTutorialTime ?? 8)) > 500;
 						},
 						do: function() {
 							episode.tutorialOrder = 19;
@@ -7662,7 +7662,7 @@ const __stories = [
 				]
 			},
 			{
-				map: 36,
+				map: 11,
 				noArtifact: true,
 				leaderBoards: {
 					calculate: function() {
@@ -7714,6 +7714,11 @@ const __stories = [
 				startsWith: 1,
 				save: true,
 				loadingCharacterIds: [622, 619, 620, 621, 623],
+				before: function() {
+					if(episode?.ambiancePath){
+						delete episode.ambiancePath;
+					}
+				},
 				start: function() {
 					// setTimeout(() => {
 					// 	const _k = summonMobWithJson({
@@ -8140,8 +8145,22 @@ const __stories = [
 					}
 				],
 				mobs: [
+					// {
+					// 	id: 1000,
+					// 	minX: 5000,
+					// 	maxX: 5000,
+					// 	count: 1,
+					// 	sight: 1000,
+					// 	spawn: 5,
+					// 	hp:600,
+					// 	do: function(_e)  {
+					// 		_e.rageCount = _e.getMaxRageCount();
+					// 		_e.yPosition = MathRound(getGroundHeight() / 2);
+					// 	},
+					// 	experience: 1
+					// },
 					{
-						id: 619,
+						id: 10,
 						minX: 4000,
 						maxX: 6000,
 						count: 2,
@@ -9704,6 +9723,8 @@ function switchStoryScene(_func, _newOrder) {
 	}
 
 	const _afterStart = function() {
+		if(__storyScene?.before)
+			__storyScene.before();
 		if(__storyScene.tiles?.[0])
 			episode.loadLayers(__storyScene.tiles);
 		if(__storyScene.mobs?.[0])

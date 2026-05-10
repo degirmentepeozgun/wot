@@ -1822,7 +1822,7 @@ function enemy(_e) {
 		if (this.keyboard || this.sleep || this.harmless || (episode.realTime && this.alp))
 			return;
 		if(!this.animationFinished && this.animations[this.animation]?.attack){
-			if(!this.chargimg && this.autoTarget && this.getCurrentFrame()?.directionChangeEnabled && this.start <= 1) {
+			if(!this.chargimg && this.autoTarget && this.start <= 1 && this.getCurrentFrame()?.directionChangeEnabled) {
 				const _thisOrigin = this.HURTLEFT + this._HURTBOX_half;
 				const _targetOrigin = this.autoTarget.HURTLEFT + this.autoTarget._HURTBOX_half;
 				const _diff = _targetOrigin - _thisOrigin;
@@ -1921,7 +1921,7 @@ function enemy(_e) {
 		let _dir = this.direction;
 		if (this.autoAttacking) {
 			if(this.autoTarget) {
-				if(!this.chargimg && this.getCurrentFrame()?.directionChangeEnabled && this.start <= 1) {
+				if(!this.chargimg && this.start <= 1 && this.getCurrentFrame()?.directionChangeEnabled) {
 					const _thisOrigin = this.HURTLEFT + this._HURTBOX_half;
 					const _targetOrigin = this.autoTarget.HURTLEFT + this.autoTarget._HURTBOX_half;
 					const _diff = _targetOrigin - _thisOrigin;
@@ -2753,7 +2753,7 @@ function enemy(_e) {
 	}
 	this.setVolume = function(_sound) {
 		if(_sound && !this.main/* && _sf.range*/) {
-
+			
 			if(_sound.startVolume === undefined)
 				_sound.startVolume = _sound.volume;
 
@@ -2768,7 +2768,10 @@ function enemy(_e) {
 			else
 				volume *= (1 - (r / MAX_RANGE));
 			volume = Math.max(volume, minAudible);
-			_sound.gain.value = volume;
+			if(!Number.isFinite(volume))
+				volume = minAudible;
+			if(_sound.gain)
+				_sound.gain.value = volume;
 
 			// PAN (ekran referanslı)
 			const dx = this.ORIGINLEFT - mainCharacter.ORIGINLEFT;
@@ -2789,7 +2792,7 @@ function enemy(_e) {
 
 			if(pan < 0.05 && pan > -0.05) pan = 0;
 
-			if(_sound.pannerNode)
+			if(_sound.pannerNode && Number.isFinite(pan))
 				_sound.pannerNode.pan.value = pan;
 		}
 	}
@@ -3289,7 +3292,7 @@ function enemy(_e) {
 			this.remove = true;
 		}
 		
-		
+		//_frame = this.getCurrentFrame();
 		this.render(_frame, _queue);
 	}
 	this.checkSpawn = function() {
@@ -4521,7 +4524,7 @@ function enemy(_e) {
 			this.MAXHP = _mhp;
 		const _frame = this.getCurrentFrame();
 		if (!_frame)
-			return console.warn(this.key + ' missing frame');
+			return console.warn(this.key + ' missing frame ' + this.frame + ' ' + this.animation);
 		const zoom = this.getZoom();
 		if(zoom !== this.ZOOM)
 			this.ZOOM = zoom;
@@ -4568,8 +4571,13 @@ function enemy(_e) {
 		if(_el !== this.EXACTLEFT)
 			this.EXACTLEFT = _el;
 		const _ol = this.SCREENLEFT + originPx;
-		if(_ol !== this.ORIGINLEFT)
+		if(_ol !== this.ORIGINLEFT) {
 			this.ORIGINLEFT = _ol;
+			if(isNaN(this.ORIGINLEFT))
+			{
+				console.warn(this.key + ' left ' + this.left + ' plat ' + platformX + ' screenLeft ' + this.SCREENLEFT + ' originDist ' + this.ORIGINDIST + ' originLeft ' + _ol);
+			}
+		}
 		const _ox = (this.LEFT >= __minLeft ? this.LEFT : this.left) +
 			(this.ORIGINDIST >= 0 ? this.ORIGINDIST : ((this.WIDTH >= 0 ? this.WIDTH : this.width) / 2));
 		if(_ox !== this.ORIGINX)
@@ -5598,8 +5606,15 @@ function enemy(_e) {
 					// 	_e.pushDirection = undefined;
 					else
 						_e.pushDirection = _knocker.direction;
-					const _range = episode.pvp ? 0 : this.getRangeBetween(_e);
+					let _range = episode.pvp ? 0 : this.getRangeBetween(_e);
+					if(_range > 10)
+						_range = 10;
 					_e.pushRate = ((!_e.animations[_skillName] && !_e.attackingOnlyBy && _e.defaultDirection === __right) ? -1 : 1) * (_step + (_range / 10));
+					if(_e.pushRate > .5)
+						_e.pushRate = .5;
+					else if(_e.pushRate  < -.5)
+						_e.pushRate = -.5;
+					//console.log('PR ' + _e.pushRate + ' step: ' + _step + ' speed ' + _f.speed + ' ks ' + _knocker.start);
 					if(_e.critDead)
 						_e.pushRate *= _e.critDead;
 				}
@@ -6556,7 +6571,7 @@ function enemy(_e) {
 			_t.attackedUnitTime = _gameTick;
 			_t.attackedUnitCount = 1;
 		}
-		if (_f.atk?.pushY)
+		if (_f.atk?.pushY && _e.class !== __spell && _e.animation.startsWith('huyrt'))
 			_e.pushY = MathRound((episode.cHeight * _f.atk.pushY) / 100);
 		return {criticalHit: _critHitTaken};
 	}
@@ -7325,6 +7340,9 @@ function enemy(_e) {
 				_spell.top = episode.cHeight - (_enemy ?? this).yPosition - ((_enemy ?? this).ZOOM * ((_enemy ?? this).yGap - _sp.bottomGap - (_spell.height ?? 0)));
 			else
 				_spell.top = episode.cHeight - (_enemy ?? this).yPosition - ((_enemy ?? this).ZOOM * ((_enemy ?? this).yGap)) - (_enemy ?? this).HEIGHT;
+			
+			if(!_spell.animations[_spell.defaultAnimationKey])
+				_spell.defaultAnimationKey = 'idle';
 			const _en = new enemy(_spell);
 			const _animKeys = _en._animationKeys;
 			for(let _key of _animKeys)
@@ -7743,7 +7761,6 @@ function enemy(_e) {
 			if(_solidity && _solidity.moveX === 0)
 				_stepX = 0;
 		}
-		//let _oldLeft = this.left;
 		this.left = this.left + (((_reversed || _anima.reversed) && !(_reversed && _anima.reversed)) ? -1 * _stepX : _stepX);
 		const _maxY = this.getMaxYPosition();
 		const yy = this.yPosition / _maxY;
@@ -9198,7 +9215,10 @@ function enemy(_e) {
 		if(!_dontResetFrame && !(oldAnima?.key === 'idle' && anima.key === 'idle'))
 			this.start = this.frame = 0;
 		this.animationFinished = this.iframe = false;
-		this.startCooldown(anima.chargeKey ? this.animations[anima.chargeKey] : anima);
+		const _a = anima.chargeKey ? this.animations[anima.chargeKey] : anima;
+		if(_a.chainOrder)
+			this.pushDirection = this.pushingBy = this.pushback = this.knockbacking = this.pushRate = undefined;
+		this.startCooldown(_a);
 		if (!anima.hold)
 			if (this.keyboard)
 				this.keyboard.removeSkill?.(_skill);

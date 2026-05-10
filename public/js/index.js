@@ -82,7 +82,7 @@ function animate(_tick) {
 	if(__storyTell)
 		__storyTell.render();
 	
-	const _moved = episode.tinyMoveCamera();
+	const _moved =  episode.tinyMoveCamera();
 	if(_moved)
 		prevPlatformX = undefined;
 	requestAnimationFrame(animate);
@@ -705,7 +705,6 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 			mainCharacter.animate('idle', 1);
 			mainCharacter.lastActivity = _gameTick;
 			mainCharacter.enableSkillUI();
-			episode.playAmbianceMusic();
 			let _mapDiscovered;
 			if (!_isBattleGround && !episode.dungeon && !_isMission && __account.visitedMaps.indexOf(episode.subMap ?? episode.id) === -1) {
 				_client.upgradeVisitedMaps(episode.id);
@@ -808,6 +807,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 				resetTouchPad();
 				checkPC();
 				clearStatusBoard();
+				episode.playAmbianceMusic();
 			}, 2000);
 		});
 	});

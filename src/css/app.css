@@ -11183,7 +11183,7 @@ body.pc-mission .move-to-place::after{
 }
 /* Version yazısı */
 .opening-cover::after {
-    content: "Version 1.0002";
+    content: "Version 1.0003";
     position: absolute;
     bottom: 2vh;
     left: 3vh;
