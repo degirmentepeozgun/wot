@@ -8886,11 +8886,15 @@ function enemy(_e) {
 				else {
 					let _newAnima = this.animations[_skill];
 					if (!_newAnima.chain && this.immobilize && !_newAnima.useInCC) {
-
 					}
-					if (_newAnima.chain || _frame.imediateBreak || (_anima.imediateBreak && !this.charging) || this.animationFinished || _anima.channeling || (_newAnima.useInCC && _anima.hurt))
-						if (!this.animate(_skill) && this.animation !== 'run' && this.animation !== 'walk')
-							this.idle(7);
+					if (_newAnima.chain || _frame.imediateBreak || (_anima.imediateBreak && (!this.charging || !_anima.attack)) || this.animationFinished || _anima.channeling || (_newAnima.useInCC && _anima.hurt))
+					{
+						const _isMoving = this.animation === 'run' || this.animation === 'walk';
+						if (!this.animate(_skill)) {
+							if(!_isMoving)
+								this.idle(7);
+						}
+					}
 				}
 			}
 			if (!_move) {
@@ -9055,7 +9059,7 @@ function enemy(_e) {
 			try {
 				if ((_sk.coolDownLeft > 0 && !_sk.charge) || _sk.charge <= 0) {
 					if(_sk.before && _skill !== this.animation &&
-						!this.skills[_sk.before].locked
+						!this.skills[_sk.before]?.locked
 					) {
 						const _osk = _skill;
 						_skill = _sk.before;

@@ -74425,6 +74425,7 @@ const _allEnemies = {
 								_e.yPosition - 5);
 								_mob.updateVariables();
 								_mob.atk = _e.atk;
+								_mob.important = true;
 								_mob.def = _e.def;
 								_mob.sight = _e.sight;
 							},
@@ -77580,7 +77581,7 @@ const _allEnemies = {
 			noDirection: true,
 			noLoot: true,
 			still: true,
-			solid: true,
+			//solid: true,
 			invulnerable: true,
 			src: './images/sprites/ep106/',
 			buffs: []

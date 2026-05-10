@@ -1452,8 +1452,9 @@ function map(_m) {
 				}
 				if(!this.hasSolid && sprite.solid)
 					this.hasSolid = 1;
-				sprite.out = isNaN(sprite.EXACTLEFT) || (((sprite.EXACTLEFT) + sprite.WIDTH) < 0 ||
-						(sprite.EXACTLEFT) > this.cWidth);
+				let _skipIfUnseen = !sprite.pvpRespawn || (sprite.pvpRespawn && !sprite.isDead());
+				sprite.out = (_skipIfUnseen && (isNaN(sprite.EXACTLEFT) || (((sprite.EXACTLEFT) + sprite.WIDTH) < 0 ||
+						(sprite.EXACTLEFT) > this.cWidth)));
 				sprite.unseen = sprite.out && !sprite.npc && sprite.dropType !== 'quest-item';
 				if(sprite.unseen && !sprite.main) {
 					if(sprite.autoTarget && !sprite.invulnerable && !sprite.friendly && 
