@@ -155,11 +155,6 @@ function tryResetBindKey(_elem) {
 		_elem.value = previousKeyBindValue === ' ' ? 'SPACE' : previousKeyBindValue;
   	activeInput = null;
 }
-function formatKeyName(e) {
-  if (e.code === "Space") return "SPACE";
-  if (e.key.length === 1) return e.key.toUpperCase();
-  return e.key.toUpperCase();
-}
 
 function isKeyAlreadyUsed(key, currentInput) {
   let used = false;
@@ -461,15 +456,13 @@ function keyboard(_character, _keys) {
 		//}
 	}
 	this.fatality = function(_force) {
-		if(this.character.hasAdvicedItem){
-			wearStatusItem();
-			return;
-		}
 		let _skillName = 'finish' + (this.character.upcomingFinishingMove ?? '');
 		if(!_force && this.character.animations[_skillName]?.keyCombination)
 			return;
 		if (this.character.target || this.character.action)
 			self.addKey(self.keys[18], _skillName);
+		else if(this.character.hasAdvicedItem)
+			wearStatusItem();
 	}
 	this.action = function (_key) {
 		if((this.character && !__storyTell && (this.character.deadTime || this.character.isDead())) || keyboardHeight > 0)
@@ -600,7 +593,7 @@ function keyboard(_character, _keys) {
 	}
 }
 window.addEventListener('keydown', function (event) {
-	const kRaw = event.key?.toLowerCase?.();
+	const kRaw = String(event.key || '').toLowerCase();
 	if(kRaw === ' ') {
 		if(episode?.hasFocusUIDoneBtn) {
 			const _skippableScreen = document.querySelector('.black-screen-ok-btn');
@@ -623,7 +616,10 @@ window.addEventListener('keydown', function (event) {
 		mainCharacter.holdingKeys = [];
 		return;
 	}
-	if (event.repeat) return;
+	if (event.repeat) {
+		console.log('tekrar eden tuş:', event.key);
+		return;
+	}
 	try {
   		if(kRaw === ' ' && episode?.hasSkippableScreen) {
 			const _skippableScreen = document.querySelector('.quick-play-desc-container');
@@ -643,7 +639,7 @@ window.addEventListener('keydown', function (event) {
 			mainCharacter.keyboard.mouseDown(event.key.toLocaleLowerCase());
 		}
 	} catch (e) {
-
+		console.log(e.message);
 	}
 });
 window.addEventListener('keyup', function (event) {
@@ -1125,7 +1121,7 @@ function activateTouchPad() {
 function pressSkill(e) {
 	if(e.repeat)
 		return;
-	let key = formatKeyName(e).toLowerCase();
+	let key = formatKeyName(e);
 	const slot = document.querySelector('[data-key="' + key + '"]:not(.v-none)');
 	if(!slot)
 		return;
@@ -1134,7 +1130,18 @@ function pressSkill(e) {
 
     addClass(slot, 'skill-pressed');
 
-    slot.addEventListener("animationend", () => {
-    	removeClass(slot, 'skill-pressed');
-    }, { once:true });
+	slot.onanimationend = null;
+
+	slot.onanimationend = () => {
+		removeClass(slot, 'skill-pressed');
+	};
+}
+function formatKeyName(e) {
+
+    const key = String(e?.key || '').toLowerCase();
+
+    if (e.code === "Space")
+        return "space";
+
+    return key;
 }

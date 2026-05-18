@@ -6977,7 +6977,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		startScene: 2,
+		//startScene: 2,
 		scenes: [
 			{
 				when: function() {
@@ -7076,6 +7076,10 @@ const __stories = [
 					{
 						en: "Spot on! Now you are ready",
 						tr: "İnanılmaz! Artık hazırsın"
+					},
+					{
+						en: "Basat, one of the Alps raised on wolf's milk, sets out on a journey to defeat the demons of Erlik Han, the lord of evil, on the orders of Dede Korkut...",
+						tr: "Kurt sütü ile büyütülen Alp 'lerden biri olan Basat, Dede Korkut 'un görevlendirmesiyle Kötülükler lordu Erlik Han' ın iblislerini defetmek için yola koyulur..."
 					}
 				],
 				map: 9998,
@@ -7632,7 +7636,14 @@ const __stories = [
 						do: function() {
 							episode.tutorialOrder = 19;
 							episode.tutorialEnded = false;
-							switchStoryScene();
+							episode.pauseBgMusic(1);
+							_game.suspended = true;
+							episode.pauseAmbianceMusic();
+							episode.enemies.forEach(x => x.stopStepSound());
+							cssAnimations.black(null, 6000, __storyScene.lang[14][getLang()], function() {
+								switchStoryScene();
+							});
+							
 							const _box = document.querySelector('.tutorial-box');
 							if(_box)
 								_box.remove();
@@ -8054,11 +8065,11 @@ const __stories = [
 							// 	delete mainCharacter.animations.tag.disabled;
 							// 	mainCharacter.tagSkillSet = 1;
 							// 	resetSkill('tag', mainCharacter);
-							// 	PlaySound({key:'conquer', volume:.6});
-							// 	getImage('./images/main/avatars/cyclops.png', function(_img) {
-							// 		const url = _img.toDataURL();
-							// 		warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
-							// 	});
+							// 	//PlaySound({key:'conquer', volume:.6});
+							// 	// getImage('./images/main/avatars/cyclops.png', function(_img) {
+							// 	// 	const url = _img.toDataURL();
+							// 	// 	warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
+							// 	// });
 							// }
 						}
 					},	
@@ -8324,7 +8335,7 @@ const __stories = [
 				],
 				startWith: 1,
 				save: true,
-				loadingCharacterIds: [47, 1, 111, 33, 35, 2, 7, 37, 38],
+				loadingCharacterIds: [72, 1, 111, 33, 35, 2, 7, 37, 38, 1003, 73],
 				start: function() {
 					episode.itemDropOrder = [ 
 						'belt', 'gloves', 'bracers', 'helmet', 'leggings',
@@ -8334,9 +8345,6 @@ const __stories = [
 					setCharacterLevel(__story.lastHeroLevel ?? 12, null, 1);
 					//setCharacterLevel(8, null, 1);
 					addClass(_gameUI, 'demo-playing');
-					//episode.pauseBgMusic(1);
-					//episode.createBgMusic(null, null, null, 'training');
-					//episode.playBgMusic();
 					const _es = episode.enemies.filter(x => x.enemy);
 					_es.forEach(_e => 
 						{
@@ -8358,16 +8366,11 @@ const __stories = [
 						mainCharacter.tagSkillSet = 1;
 						resetSkill('tag', mainCharacter);
 					}
-					//PlaySound({key:'conquer', volume:.6});
-					//episode.lastItemDropTime = _gameTick;
-					//takeQuest(1, 1, null, null, 1);
+					
 					episode.boss = episode.enemies.find(x => x.id === 111);
 					episode.phase = episode.boss.grade;
+
 					removeClass(_gameUI, 'disable-ui');
-					// getImage('./images/main/avatars/cyclops.png', function(_img) {
-					// 	const url = _img.toDataURL();
-					// 	warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
-					// });
 					const _desc = document.createElement('div');
 					_desc.className = 'flex show-ui full quick-play-desc-container fade-me';
 					let _html = '';
@@ -8388,8 +8391,61 @@ const __stories = [
 					mainCharacter.disableSkill('tag');
 					mainCharacter.maxHP = mainCharacter.MAXHP = mainCharacter.health = mainCharacter.level * 120;
 					mainCharacter.setHealth(mainCharacter.health);
+					// setTimeout(() => {
+					// 	cssAnimations.black(null, 6000, getLangData('Meanwhile, deep in the sewers... Meanwhile, deep in the sewers... Meanwhile, deep in the sewers... Meanwhile, deep in the sewers...'), function() {
+					// 		switchStoryScene();
+					// 	});
+					// 	renderChestOpeningScreen();
+					// }, 5000);
 				},
 				actions: [
+					{
+						when: function() {
+							return episode.allLooted === 1 && mainCharacter.hasAdvicedItem;
+						},
+						do: function() {
+							//const _items = document.querySelectorAll('div[data-status-item-id]');
+							const _items = getItems().filter(x => !x.weared);
+							_items.forEach(x => {
+								wearStatusItem(x.id, null, 1);
+							});
+							episode.allLooted = 2;
+						}
+					},
+					{
+						when: function() {
+							//KOVAN ÖLDÜĞÜNDE
+							return (episode.boss?.health <= 0 && !episode.allLooted);
+						},
+						do: function() {
+							episode.enemies.filter(x => x.class === 'object' && !x.remove).forEach(x => {
+								x.yPosition = mainCharacter.yPosition;
+								x.animations.idle.frames.forEach(f => {
+									delete f.bottomGap;
+								});
+								x.left = (mainCharacter.HURTLEFT + platformX + mainCharacter._HURTBOX_half) - x._HURTBOX_half;
+								// const _item = x.inventory?.[0];
+								// switch(_item?.type) {
+								// 	case "gold": {
+								// 		mainCharacter.grabGold();
+								// 		break;
+								// 	}
+								// 	case "item": {
+								// 		mainCharacter.grabItem(_item);
+								// 		__storyScene.actions.find(x => x.key === 'grab-item')?.do?.();
+								// 		break;	
+								// 	}
+								// }
+							});
+							const _items = document.querySelectorAll('div[data-status-item-id]');
+							_items.forEach(x => {
+								const _id = parseInt(x.getAttribute('data-status-item-id'));
+								wearStatusItem(_id, null, 1);
+							});
+							episode.allLooted = 1;
+							addClass(document.querySelector('.game-status-screen'), 'v-none');
+						}
+					},
 					{
 						when: function() {
 							return mainCharacter?.lastItemLootedTime === _gameTick;
@@ -8403,44 +8459,49 @@ const __stories = [
 							}
 							episode.lastItemDropTime = _gameTick;
 							const _inventory = getItems().filter(x => !x.weared);
-							const _item = _inventory[_inventory.length - 1];
-							const _icon = getItemIcon(_item);
-							let _title = getLangData(_item.type);
-							const _newPower = getPowerOfItem(_item.id);
-							const _wearedItemId = _inventory.find(x => x.type === _item.type && x.weared)?.id;
-							const _oldPower = _wearedItemId ? getPowerOfItem(_wearedItemId) : 0;
-							const _powerDiff = MathRound(_newPower - _oldPower);
-							_title = _title[0].toLocaleUpperCase(getLang()) + _title.substring(1);
+							//const _item = _inventory[_inventory.length - 1];
+							for(let _item of _inventory) {
+								if(_item.shown)
+									continue;
+								_item.shown = true;
+								const _icon = getItemIcon(_item);
+								let _title = getLangData(_item.type);
+								const _newPower = getPowerOfItem(_item.id);
+								const _wearedItemId = _inventory.find(x => x.type === _item.type && x.weared)?.id;
+								const _oldPower = _wearedItemId ? getPowerOfItem(_wearedItemId) : 0;
+								const _powerDiff = MathRound(_newPower - _oldPower);
+								_title = _title[0].toLocaleUpperCase(getLang()) + _title.substring(1);
 
-							const frag = document.createDocumentFragment();
-							const _subDiv = document.createElement('div');
-							_subDiv.innerHTML = `<div data-status-item-id="${_item.id}" class="flex status-item-container w-50 flex flex-ai-start">
-								<div class="status-item-icon-container">`
-									+ _icon +
-								`</div>
-								<div class="status-item-action-container flex">
-									<div class="item-title-wrapper flex w-50">
-										${_title}
-									</div>
-									<div class="item-title-wrapper flex w-50">
-										<img style="height:80%;max-height:2.6vh" src="./images/icons/power-up.png" />${_powerDiff}
-									</div>
-									<div class="item-action-wrapper flex flex-jc-start w-100">
-										<div class="game-menu-button animate-me flex" onexactclick="wearStatusItem(${_item.id}, ${_powerDiff})">
-											<div class="flex">${getLangData('WEAR')}<span class="flex">(${getNewKeyboardKey('U').baseKey})</span></div>
+								const frag = document.createDocumentFragment();
+								const _subDiv = document.createElement('div');
+								_subDiv.innerHTML = `<div data-status-item-id="${_item.id}" class="flex status-item-container w-50 flex flex-ai-start">
+									<div class="status-item-icon-container">`
+										+ _icon +
+									`</div>
+									<div class="status-item-action-container flex">
+										<div class="item-title-wrapper flex w-50">
+											${_title}
+										</div>
+										<div class="item-title-wrapper flex w-50">
+											<img style="height:80%;max-height:2.6vh" src="./images/icons/power-up.png" />${_powerDiff}
+										</div>
+										<div class="item-action-wrapper flex flex-jc-start w-100">
+											<div class="game-menu-button animate-me flex" onexactclick="wearStatusItem(${_item.id}, ${_powerDiff})">
+												<div class="flex">${getLangData('WEAR')}<span class="flex">(${getNewKeyboardKey('U').baseKey})</span></div>
+											</div>
 										</div>
 									</div>
-								</div>
-							</div>`;
+								</div>`;
 
-							frag.appendChild(_subDiv.firstElementChild);
-							_div.prepend(frag);
+								frag.appendChild(_subDiv.firstElementChild);
+								_div.prepend(frag);
+							}
 							mainCharacter.hasAdvicedItem = 1;
 						}
 					},
 					{
 						when: function() {
-							return (episode.boss?.gradeLeft + 1) < episode.phase && episode.phase < 100;
+							return episode.phase > 1 && (episode.boss?.gradeLeft + 1) < episode.phase && episode.phase < 100;
 						},
 						do: function() {
 							if(episode.boss) {
@@ -8474,8 +8535,9 @@ const __stories = [
 							episode.phase = 102;
 							episode.pauseBgMusic();
 							PlaySound({ key:'deepimpact', volume: 1 });
-							if(mainCharacter)
+							if(mainCharacter){
 								cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
+							}
 						}
 					},
 					// {
@@ -8490,25 +8552,252 @@ const __stories = [
 					// 	}
 					// },
 					{
-						// when: function() {
-						// 	return episode.phase === 100 && !episode.enemies.filter(x => x.class === 'boss')?.length;
-						// },
+						when: function() {
+							return episode.phase === 102.6;
+						},
+						do: function() {
+							episode.phase = 102.7;
+							blurKeyboard();
+							mainCharacter.disableKeyboard = true;
+							mainCharacter.still = mainCharacter.immobilize = true;
+							mainCharacter.stopRage();
+							mainCharacter.swapAnimation('idle');
+							const _father = episode.enemies.find(x => x.id === 72);
+							const _tank = episode.enemies.find(x => x.id === 73);
+							const _ranger = episode.enemies.find(x => x.id === 10002);
+							cssAnimations.film(null, 
+								[
+								{
+									do: function() {
+										createBubbleText({
+											id: 20,
+											location: { map: episode.id }, ms: 2000,
+											owner: mainCharacter.key,
+											text: "We put them down"
+										});
+									},
+									ms: 1000
+								},
+								{
+									do: function() {
+										createBubbleText({
+											id: 21,
+											location: { map: episode.id }, ms: 2000,
+											owner: _father.key,
+											text: "There can be more"
+										});
+									},
+									ms: 3200
+								},
+								{
+									do: function() {
+										createBubbleText({
+											id: 22,
+											location: { map: episode.id }, ms: 1200,
+											owner: _tank.key,
+											text: "More?",
+											onend: function() {
+												episode.openPortal = 1;
+											}
+										});
+									},
+									ms: 5300
+								},
+								{
+									do: function() {
+										createBubbleText({
+											id: 23,
+											location: { map: episode.id }, ms: 2000,
+											owner: _ranger.key,
+											text: "There! The gate of demons",
+											onend: function() {
+												mainCharacter.direction =
+												mainCharacter.direction === __left ? __right : __left;
+											}
+										});
+									},
+									ms: 7100
+								},
+								{
+									do: function() {
+										createBubbleText({
+											id: 24,
+											location: { map: episode.id }, ms: 2000,
+											owner: mainCharacter.key,
+											text: "Won't be easy this time"
+										});
+									},
+									ms: 9200
+								},
+								{
+									do: function() {
+										createBubbleText({
+											id: 25,
+											location: { map: episode.id }, ms: 2000,
+											owner: _father.key,
+											text: "Take Alkin with you"
+										});
+									},
+									ms: 11400
+								}
+							], 12700, function() {
+								mainCharacter.immobilize = mainCharacter.still = false;
+								delete mainCharacter.disableKeyboard;
+								const _Y = _ranger.yPosition;
+								const _L = _ranger.left;
+								_ranger.remove = true;
+								const _char = addCoopCharacter(null, 'arc');
+								_char.direction = episode.sceneAfterProps.side === __left ? __right : __left;
+								_char.yPosition = _Y;
+								_char.left = _L;
+								_char.updateVariables();
+							});
+						}
+					},
+					{
+						when: function() {
+							const _phase = episode.phase === 102.5;
+							if(_phase) {
+								const _left = mainCharacter.HURTLEFT + platformX;
+								if(episode.sceneAfterProps.side === __left) {
+									if(_left < episode.sceneAfterProps.x) 
+									{
+										platformX = 0;
+										mainCharacter.direction = __left;
+										mainCharacter.left = episode.sceneAfterProps.x;
+										mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
+										mainCharacter.updateVariables();
+										return true;
+									}
+								}
+								else {
+									if(_left > episode.sceneAfterProps.x) {
+										platformX = episode.cWidth * 2;
+										mainCharacter.direction = __right;
+										mainCharacter.left = episode.sceneAfterProps.x - platformX;
+										mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
+										mainCharacter.updateVariables();
+										return true;
+									}
+								}
+							}
+							return false;
+						},
+						do: function() {
+							episode.phase = 102.6;
+							episode.removeLocationHand();
+						}
+					},
+					{
 						when: function() {
 							return episode.phase === 102 && !episode.enemies.filter(x => x.class === 'boss')?.length;
 						},
 						do: function() {
-							episode.phase = 103;
+							episode.phase = 102.5;
+							mainCharacter.disableSkill('tag');
+							const _left = mainCharacter.HURTLEFT + platformX;
+							const _center = episode.cWidth * 1.5;
+							let _dir, _p1, _p2;
+							if(_left < _center){
+								episode.showLocationHand('right');
+								_dir = __left;
+								const _base = MathRound(((episode.cWidth * 3) / __zoom) * .94);
+								_p1 = _base;
+								_p2 = _base + 80;
+								episode.sceneAfterProps = {
+									x:MathRound(((episode.cWidth * 3)) * .9),
+									side:__right
+								}
+							}
+							else{
+								episode.showLocationHand('left');
+								_dir = __right;
+								const _base = MathRound(((episode.cWidth * 3) / __zoom) * .06);
+								_p1 = _base;
+								_p2 = _base - 80;
+								episode.sceneAfterProps = {
+									x:MathRound(((episode.cWidth * 3)) * .1),
+									side:__left
+								}
+							}
+							episode.msNow = 501;
+							const _father = summonMobWithJson({
+								id: 72,
+								minX: _p2,
+								maxX: _p2,
+								count: 1,
+								props: {
+									friendly: true,
+									noDirection: true,
+									direction: _dir,
+									invulnerable: true,
+									reversed: _dir !== __right,
+									npc: true,
+									immobilize: true
+								},
+								yPosition: MathRound(getGroundHeight() / 2),
+							}, null, null, 1);
+							_father.swapAnimation('idle');
+							const _tank = summonMobWithJson({
+								id: 73,
+								minX: _p1,
+								maxX: _p1,
+								count: 1,
+								zoom: .9,
+								props: {
+									friendly: true,
+									noDirection: true,
+									reversed: _dir !== __right,
+									direction: _dir,
+									invulnerable: true,
+									npc: true,
+									immobilize: true
+								},
+								yPosition: MathRound(getGroundHeight() / 1.5),
+							}, null, null, 1);
+							const _archer = summonMobWithJson({
+								id: 10002,
+								minX: _p1,
+								maxX: _p1,
+								count: 1,
+								zoom: .9,
+								props: {
+									friendly: true,
+									noDirection: true,
+									reversed: _dir !== __right,
+									direction: _dir,
+									invulnerable: true,
+									npc: true,
+									immobilize: true
+								},
+								yPosition: MathRound(getGroundHeight() / 2.9),
+							}, null, null, 1);
+						}
+					},
+					{
+						when: function() {
+							return episode.openPortal;
+						},
+						do: function() {
+							episode.phase = 104;
+							delete episode.openPortal;
 							updateQuestArea();
 							episode.pauseBgMusic(1);
-							let _x = MathRound((mainCharacter.left + platformX + (mainCharacter.WIDTH * 3 * (mainCharacter.direction === __left ? -1 : 1))) / __zoom);
-							const _maxX = MathRound((episode.width - (episode.cWidth * .5)) / __zoom);
-							if(_x > _maxX)
-								_x = _maxX;
-							else {
-								const _minX = MathRound((episode.cWidth * .5) / __zoom);
-								if(_x < _minX)
-									_x = _minX;
-							}
+							let _x;
+							if(episode.sceneAfterProps.side === __left)
+								_x = MathRound((mainCharacter.HURTLEFT + platformX + (episode.cWidth * .33)) / __zoom);
+							else
+								_x = MathRound((mainCharacter.HURTLEFT + platformX - (episode.cWidth * .33)) / __zoom);
+
+							// let _x = MathRound((mainCharacter.left + platformX + (mainCharacter.WIDTH * 3 * (mainCharacter.direction === __left ? -1 : 1))) / __zoom);
+							// const _maxX = MathRound((episode.width - (episode.cWidth * .5)) / __zoom);
+							// if(_x > _maxX)
+							// 	_x = _maxX;
+							// else {
+							// 	const _minX = MathRound((episode.cWidth * .5) / __zoom);
+							// 	if(_x < _minX)
+							// 		_x = _minX;
+							// }
 							const _portal = summonMob(113, 
 								_x, 
 								MathRound(groundheight * .5), 1);
@@ -8553,23 +8842,40 @@ const __stories = [
 					},
 					{
 						when: function() {
+							//KOVAN ÖLDÜĞÜNDE
 							return (episode.boss?.health <= 0 && episode.phase < 10) || episode.phase === 200;
 						},
 						do: function() {
 							episode.phase = 100;
+
 							const _e = episode.boss;
 							if(__account?.questStatus?.quest?.timer)
 								delete __account.questStatus.quest.timer;
 							episode.enemies.filter(x => !x.main && !x.tag && !x.friendly).forEach(x => {
-								x.stopSpawn();
-								x.health = x.experience = 0;
-								x.dead = x.dying = true;
-								x.animate('dead', 1);
+								if(x.class === 'object' && !x.remove) {
+									// const _item = x.inventory?.[0];
+									// switch(_item?.type) {
+									// 	case "gold":
+									// 	case "item": {
+									// 		episode.loot = { loots: [_item] };
+									// 		console.log('LOOT ' + _item.type);
+									// 		mainCharacter.checkLoot({});
+									// 		break;	
+									// 	}
+									// }
+									//x.remove = true;
+								}
+								else if(x.class !== 'object'){
+									x.stopSpawn();
+									x.health = x.experience = 0;
+									x.dead = x.dying = true;
+									x.animate('dead', 1);
+								}
 							});
 							episode.mobs = [];
 							episode.respawners = [];
 							const _mob = episode.installMob({
-								id: 1002,
+								id: 1003,
 								minX: MathRound((_e.LEFT + platformX) / __zoom),
 								maxX: MathRound((_e.LEFT + platformX) / __zoom),
 								sight: 1000,
@@ -8601,7 +8907,7 @@ const __stories = [
 							delete episode.boss;
 							if(__account?.questStatus?.quest?.timer)
 								delete __account.questStatus.quest.timer;
-							episode.enemies.filter(x => !x.main && !x.tag && !x.friendly).forEach(x => {
+							episode.enemies.filter(x => !x.main && !x.tag && !x.friendly && x.class !== 'object').forEach(x => {
 								x.stopSpawn();
 								x.health = x.experience = 0;
 								x.dead = x.dying = true;
@@ -8846,9 +9152,26 @@ const __stories = [
 																					}
 																					mainCharacter.enableSkills();
 																					mainCharacter.animate('tag', 1);
+																					// mainCharacter.immobilize = mainCharacter.still = true;
+																					// blurKeyboard();
+																					// mainCharacter.disableKeyboard = true;
+																					// setTimeout(() => {
+																					// 		createBubbleText({
+																					// 			id: 14,
+																					// 			location: { map: episode.id }, ms: 2000,
+																					// 			owner: mainCharacter.key,
+																					// 			text: 'Woooow!'
+																					// 		});
+																					// }, 600);
+																					// mainCharacter.animations.tag.end = function() {
+																					// 	mainCharacter.immobilize = mainCharacter.still = mainCharacter.disableKeyboard = false;
+																					// }
+																					episode.enemies.forEach(x => {
+																						x.mustDraw = true;
+																					});
 																					episode.tagSkillUsed = 1;
-																					_yec.animate('hurtair', 1);
-																					_mec.animate('hurtair', 1);
+																					// _yec.animate('hurtair', 1);
+																					// _mec.animate('hurtair', 1);
 																					disposeFocus();
 																				}, null, getLangData('Use support skill to save yourself'),null,1);
 																			}, 150);
@@ -8916,9 +9239,9 @@ const __stories = [
 						maxX: 2580,
 						count: 1,
 						sight: 1000,
-						grade: 11,
-						hp:1800,
-						zoom: .34,
+						grade: 12,
+						hp:1650,
+						zoom: .33,
 						yPosition: function() {
 							return MathRound(groundheight * .5);
 						}
@@ -9573,6 +9896,126 @@ const __stories = [
 	// 	]
 	// }
 ];
+function closeChestOpeningScreen() {
+	const _scr = document.querySelector('.chest-open-scene-wrapper');
+	if(!_scr || hasClass(_scr, 'fade-out'))
+		return;
+	playClick(1);
+	removeClass(_scr, 'fade-me');
+	addClass(_scr, 'fade-out');
+	removeClass(_gameUI, 'disable-ui');
+	_scr.onanimationend = function(event) {
+		if(event.animationName === 'fade-out-me') {
+			event.target.remove();
+			_game.suspended = false;
+			episode.supportFound = 1;
+		}
+	}
+}
+function renderChestOpeningScreen(_gift) {
+	episode.pauseBgMusic();
+	episode.pauseAmbianceMusic();
+	if(episode.enemies?.length)
+		episode.enemies.forEach(x => x.stopStepSound());
+	const _reward = getRewardIcon(1, 'fragment', 'tank');
+
+	const _wrapper = document.createElement('div');
+	_wrapper.onexactclick = openGiftChestWithAnimation;
+	_wrapper.className = 'flex show-ui full chest-open-scene-wrapper fade-me';
+	_wrapper.innerHTML =
+	`<div class="chest-open-scene">
+		<div class="chest-open-bg-glow"></div>
+
+		<div class="chest-open-chest-wrapper" id="chest-open-wrapper">
+
+			<div class="chest-open-chest-shadow"></div>
+
+			<div class="chest-open-chest-glow"></div>
+
+			<img
+				src="./images/sprites/ep56/sprite.png"
+				class="chest-open-chest"
+				id="chest-open-chest"
+				draggable="false"
+			>
+
+			<!-- GIFT -->
+			<img
+				src="${_reward.src}"
+				class="chest-open-gift"
+				id="chest-open-gift"
+				draggable="false"
+			>
+
+			<div class="chest-open-reward-text" id="reward-text">
+				<div class="reward-unlocked">
+					${getLangData('SUPPORT CHARACTER UNLOCKED')}
+				</div>
+
+				<div class="reward-name">
+					DELİ DUMRUL
+				</div>
+			</div>
+		</div>
+		<div onclick="closeChestOpeningScreen()" id="chest-open-ok-button" class="flex game-btn2 d-none">${getLangData('Get Reward')}</div>
+
+		<div class="chest-open-flash" id="chest-open-flash"></div>
+
+	</div>`;
+	//`<div onexactclick="takeQuest(1, 1, null, null, 1);skipQuickPlayTutorial()" class="quick-play-desc-skip flex glow">&lt;&nbsp;${getLangData('UNDERSTOOD')}&nbsp;&gt;</div>`;
+	addClass(_gameUI, 'disable-ui');
+	requestAnimationFrame(() => {
+		_game.suspended = true;
+	});
+	_gameUI.appendChild(_wrapper);
+	//episode.hasSkippableScreen = 1;
+	_gameUI.sound = PlaySound({key:'chestbg', volume:.8, loop: true});
+}
+function openGiftChestWithAnimation(){
+	const chestWrapper = document.getElementById("chest-open-wrapper");
+    if(hasClass(chestWrapper,'opening')) 
+		return;
+	const chest = document.getElementById("chest-open-chest");
+	if(!chest)
+		return;
+	SoundManager.stopAll();
+	delete _gameUI.sound;
+	const flash = document.getElementById("chest-open-flash");
+	const gift = document.getElementById("chest-open-gift");
+	const rewardText = document.getElementById("reward-text");
+	PlaySound({key:'chime', volume:1});
+    addClass(chestWrapper, "opening");
+
+    setTimeout(() => {
+
+        addClass(flash, "active");
+
+    }, 250);
+
+    setTimeout(() => {
+		if(chest)
+        	chest.src = "./images/sprites/ep56/open.png";
+
+    }, 520);
+
+    /*
+        beyazlık fadeout olurken
+        gift ortaya çıkıyor
+    */
+    setTimeout(() => {
+
+        addClass(gift, "show");
+        addClass(rewardText, "show");
+		setTimeout(() => {
+			PlaySound({key:'ding', volume:1});
+			removeClass(_btn, 'd-none');
+			addClass(_btn, 'fade-me');
+		},600);
+		addClass(chestWrapper, "opened");
+		const _btn = document.getElementById('chest-open-ok-button');
+    }, 1050);
+
+}
 function finishStory() {
 	__account.questStatus.lastStoryFinishTime = _gameTick;
 	__account.questStatus.lastStoryFinishHP = mainCharacter.health;
@@ -9648,20 +10091,20 @@ function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 	mainCharacter.heartCount = __story.heartCount ?? 1;
 	if(_client.quickPlay) {
 		const _char = __account.characters.find(x => x.class === mainCharacter.class);
-		_char.tag = {id:1, grade:1};
+		_char.tag = {id:7, grade:1};
 		resetSkills(null, 1, mainCharacter);
 		delete mainCharacter.animations.tag.delay;
 		mainCharacter.animations.tag.modify = function(_e) {
-			_e.animations.ground1.priority = 1;
-			delete _e.animations.idle.alternateFrames;
-			_e.animations.ground1.frames.forEach(x => {
-				if(x.atk){
-					x.atk.ignoreDef = true;
-					x.atk.rate = 2;
-					if(x.atk.hurt)
-						x.atk.hurt.smash = true;
-				}
-			});
+			_e.animations.attack.priority = 1;
+			//delete _e.animations.idle.alternateFrames;
+			// _e.animations.attack.frames.forEach(x => {
+			// 	if(x.atk){
+			// 		x.atk.ignoreDef = true;
+			// 		x.atk.rate = 2;
+			// 		if(x.atk.hurt)
+			// 			x.atk.hurt.smash = true;
+			// 	}
+			// });
 		}
 		mainCharacter.animations.tag.disabled = true;
 		resetSkills(null, 1, mainCharacter);

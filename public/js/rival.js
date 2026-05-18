@@ -21,6 +21,8 @@ function getCharacterColor(_class) {
 			return '#228B22';
 		case 'wizard': 
 			return '#E4D00A';
+		case 'tank': 
+			return '#814b2c';
 	}
 	return '#f7f7f7';
 }
@@ -40,6 +42,8 @@ function getCharacterChatColor(_class) {
 			return '#228B22';
 		case 'wizard': 
 			return '#E4D00A';
+		case 'tank': 
+			return '#814b2c';
 	}
 	return '#f7f7f7';
 }
@@ -3451,9 +3455,9 @@ function createCharacter(_settings) {
 							},
 							{
 								spriteLeft: 2820,
-								spriteTop: 710,
+								spriteTop: 707,
 								spriteWidth: 112,
-								spriteHeight: 211,
+								spriteHeight: 214,
 								spriteOrigin: 56,
 								speed: 14
 							},
@@ -3467,9 +3471,9 @@ function createCharacter(_settings) {
 							},
 							{
 								spriteLeft: 3076,
-								spriteTop: 710,
+								spriteTop: 707,
 								spriteWidth: 112,
-								spriteHeight: 211,
+								spriteHeight: 214,
 								spriteOrigin: 56,
 								speed: 14
 							},
@@ -40042,7 +40046,9 @@ const _allEnemies = {
 							spriteHeight: 264,
 							spriteOrigin: 76,
 							bottomGap: 0,
-							sound:{key:'woodland', volume:1},
+							do: function(_e) {
+								PlaySound({key:'woodland', volume:1});	
+							},
 							speed: 16
 						}
 					]
@@ -40070,6 +40076,7 @@ const _allEnemies = {
 			weight: 1000,
 			stepXRate: 0,
 			noDirection: true,
+			mustDraw: true,
 			skipHealthBar: true,
 			src: './images/sprites/ep631/',
 			buffs: []
@@ -46032,8 +46039,8 @@ const _allEnemies = {
 						spriteOrigin: 53,
 					}, { key: 'rathurt,rathurt2,rathurt3', volume: .2, reset: true }
 				),
-				hurtfeet: createHurtFeet(),
-				hurthip: createHurtHip(),
+				// hurtfeet: createHurtFeet(),
+				// hurthip: createHurtHip(),
 				knockbackground: createKnockBackGround(
 					{
 						spriteLeft: 725,
@@ -48237,7 +48244,7 @@ const _allEnemies = {
 							spell: { key: 'itbu1faster' }
 						},
 						{
-							spriteLeft: 1342 * 1.5,
+							spriteLeft: 2013,
 				 			spriteTop: 70,
 				 			spriteWidth: 142 * 1.5,
 				 			spriteHeight: 172 * 1.5,
@@ -69922,38 +69929,704 @@ const _allEnemies = {
 				idle: {
 					key: 'idle',
 					type: 'skill',
+					alternateFrames: [
+						{ 
+							rate: 1, 
+							when: function(_e) {
+								return _e.class === 'minion';
+							}, 
+							frames: [
+								{
+									spriteLeft: 181,
+									spriteTop: 3825,
+									spriteWidth: 263,
+									spriteHeight: 375,
+									spriteOrigin: 119,
+									speed: 24 * 2,
+									def: {
+										iframe: true
+									}
+								},
+								{
+									spriteLeft: 782,
+									spriteTop: 3825,
+									spriteWidth: 262,
+									spriteHeight: 375,
+									spriteOrigin: 118,
+									speed: 24,
+									def: {
+										iframe: true
+									}
+								}
+							]
+						}
+					],
 					frames: [
 						{
-							spriteLeft: 0,
-							spriteTop: 0,
-							spriteWidth: 205,
-							spriteHeight: 206,
-							spriteOrigin: 103,
-							speed: 24
+							spriteLeft: 743,
+							spriteTop: 168,
+							spriteWidth: 334,
+							spriteHeight: 333,
+							spriteOrigin: 157,
+							speed: 24 * 2
 						},
 						{
-							spriteLeft: 206,
-							spriteTop: 0,
-							spriteWidth: 205,
-							spriteHeight: 206,
-							spriteOrigin: 103,
+							spriteLeft: 1343,
+							spriteTop: 171,
+							spriteWidth: 333,
+							spriteHeight: 331,
+							spriteOrigin: 157,
 							speed: 24
 						},
+						// {
+						// 	spriteLeft: 0,
+						// 	spriteTop: 0,
+						// 	spriteWidth: 205,
+						// 	spriteHeight: 206,
+						// 	spriteOrigin: 103,
+						// 	speed: 24
+						// },
+						// {
+						// 	spriteLeft: 206,
+						// 	spriteTop: 0,
+						// 	spriteWidth: 205,
+						// 	spriteHeight: 206,
+						// 	spriteOrigin: 103,
+						// 	speed: 24
+						// },
+						// {
+						// 	spriteLeft: 412,
+						// 	spriteTop: 0,
+						// 	spriteWidth: 205,
+						// 	spriteHeight: 206,
+						// 	spriteOrigin: 103,
+						// 	speed: 24
+						// },
+						// {
+						// 	spriteLeft: 617,
+						// 	spriteTop: 0,
+						// 	spriteWidth: 205,
+						// 	spriteHeight: 206,
+						// 	spriteOrigin: 103,
+						// 	speed: 24
+						// }
+					]
+				},
+				attack: {
+					key: 'attack',
+					type: 'skill',	
+					order: 1,
+					attack: true,
+					priority: 1,
+					frames: [
 						{
-							spriteLeft: 412,
-							spriteTop: 0,
-							spriteWidth: 205,
-							spriteHeight: 206,
-							spriteOrigin: 103,
-							speed: 24
+							spriteLeft: 119,
+							spriteTop: 2181,
+							spriteWidth: 474,
+							spriteHeight: 319,
+							spriteOrigin: 181,
+							extraStepXRate: -.3,
+							speed: 4,
+							sound: {key:'ultimate', volume: .5},
+							def: {
+								iframe: true
+							},
+							objects: [
+								{
+									key: 'cloudground',
+									position: 'front-feet',
+									reversed: false
+								}
+							]
 						},
 						{
-							spriteLeft: 617,
-							spriteTop: 0,
-							spriteWidth: 205,
-							spriteHeight: 206,
-							spriteOrigin: 103,
-							speed: 24
+							spriteLeft: 119,
+							spriteTop: 2181,
+							spriteWidth: 474,
+							spriteHeight: 319,
+							spriteOrigin: 181,
+							extraStepXRate: -.3,
+							speed: 4,
+							def: {
+								iframe: true
+							},
+							// do: function(_char) {
+							// 	if(episode?.realTime)
+							// 		return;
+							// 	const _others = episode.enemies.filter(x => x.fps !== 6 && x !== _char);
+							// 	if(_others?.[0])
+							// 		for(let _o of _others)
+							// 			_o.fps = (_o.alp || _o.villain) ? 2 : 6;
+							// }
+						},
+						{
+							spriteLeft: 119,
+							spriteTop: 2181,
+							spriteWidth: 474,
+							spriteHeight: 319,
+							spriteOrigin: 181,
+							extraStepXRate: -.275,
+							def: {
+								iframe: true
+							},
+							speed: 8,
+						},
+						{
+							spriteLeft: 119,
+							spriteTop: 2181,
+							spriteWidth: 474,
+							spriteHeight: 319,
+							spriteOrigin: 181,
+							extraStepXRate: -.25,
+							def: {
+								iframe: true
+							},
+							speed: 8,
+						},
+						{
+							spriteLeft: 777,
+							spriteTop: 2160,
+							spriteWidth: 315,
+							spriteHeight: 340,
+							spriteOrigin: 123,
+							shadow: 'red',
+							speed: 8,
+							sound: { key:'tankslashes', volume:1 },
+							def: {
+								iframe: true
+							},
+							directionChangeEnabled: true,
+							spell: { key: 'tank1' }
+						},
+						{
+							spriteLeft: 1876,
+				 			spriteTop: 2165,
+				 			spriteWidth: 394,
+				 			spriteHeight: 335,
+				 			spriteOrigin: 224,
+							shadow: 'red',
+							def: {
+								iframe: true
+							},
+							speed: 8
+						},
+						{
+							spriteLeft: 110,
+							spriteTop: 1607,
+							spriteWidth: 338,
+							spriteHeight: 393,
+							spriteOrigin: 190,
+							shadow: 'red',
+							speed: 8,
+							def: {
+								iframe: true
+							},
+							directionChangeEnabled: true,
+							spell: { key: 'tank2' }
+						},
+						{
+							spriteLeft: 1357,
+							spriteTop: 1652,
+							spriteWidth: 354,
+							spriteHeight: 348,
+							spriteOrigin: 143,
+							shadow: 'red',
+							def: {
+								iframe: true
+							},
+							speed: 8
+						},
+						{
+							spriteLeft: 139,
+							spriteTop: 1179,
+							spriteWidth: 279,
+							spriteHeight: 321,
+							spriteOrigin: 161,
+							shadow: 'red',
+							speed: 8,
+							def: {
+								iframe: true
+							},
+							directionChangeEnabled: true,
+							spell: { key: 'tank3' }
+						},
+						{
+							spriteLeft: 1240,
+							spriteTop: 1147,
+							spriteWidth: 480,
+							spriteHeight: 353,
+							spriteOrigin: 260,
+							shadow: 'red',
+							def: {
+								iframe: true
+							},
+							speed: 8
+						},
+						{
+							spriteLeft: 105,
+							spriteTop: 618,
+							spriteWidth: 301,
+							spriteHeight: 382,
+							spriteOrigin: 195,
+							shadow: 'red',
+							speed: 8,
+							def: {
+								iframe: true
+							},
+							directionChangeEnabled: true,
+							spell: { key: 'tank4' }
+						},
+						{
+							spriteLeft: 1373,
+							spriteTop: 726,
+							spriteWidth: 273,
+							spriteHeight: 284,
+							bottomGap:10,
+							spriteOrigin: 127,
+							shadow: 'red',
+							def: {
+								iframe: true
+							},
+							speed: 8
+						},
+						{
+							spriteLeft: 777,
+							spriteTop: 2160,
+							spriteWidth: 315,
+							spriteHeight: 340,
+							spriteOrigin: 123,
+							shadow: 'red',
+							speed: 6,
+							def: {
+								iframe: true
+							},
+							directionChangeEnabled: true,
+							spell: { key: 'tank1faster' }
+						},
+						{
+							spriteLeft: 1876,
+				 			spriteTop: 2165,
+				 			spriteWidth: 394,
+				 			spriteHeight: 335,
+				 			spriteOrigin: 224,
+							shadow: 'red',
+							def: {
+								iframe: true
+							},
+							speed: 6
+						},
+						{
+							spriteLeft: 110,
+							spriteTop: 1607,
+							spriteWidth: 338,
+							spriteHeight: 393,
+							spriteOrigin: 190,
+							shadow: 'red',
+							speed: 6,
+							def: {
+								iframe: true
+							},
+							directionChangeEnabled: true,
+							spell: { key: 'tank2faster' }
+						},
+						{
+							spriteLeft: 1357,
+							spriteTop: 1652,
+							spriteWidth: 354,
+							spriteHeight: 348,
+							spriteOrigin: 143,
+							shadow: 'red',
+							def: {
+								iframe: true
+							},
+							speed: 6
+						},
+						{
+							spriteLeft: 139,
+							spriteTop: 1179,
+							spriteWidth: 279,
+							spriteHeight: 321,
+							spriteOrigin: 161,
+							shadow: 'red',
+							speed: 6,
+							def: {
+								iframe: true
+							},
+							directionChangeEnabled: true,
+							spell: { key: 'tank3faster' }
+						},
+						{
+							spriteLeft: 1240,
+							spriteTop: 1147,
+							spriteWidth: 480,
+							spriteHeight: 353,
+							spriteOrigin: 260,
+							shadow: 'red',
+							def: {
+								iframe: true
+							},
+							speed: 6
+						},
+						{
+							spriteLeft: 105,
+							spriteTop: 618,
+							spriteWidth: 301,
+							spriteHeight: 382,
+							spriteOrigin: 195,
+							shadow: 'red',
+							speed: 6,
+							def: {
+								iframe: true
+							},
+							directionChangeEnabled: true,
+							spell: { key: 'tank4faster' }
+						},
+						{
+							spriteLeft: 1373,
+							spriteTop: 726,
+							spriteWidth: 273,
+							spriteHeight: 284,
+							bottomGap:10,
+							spriteOrigin: 127,
+							shadow: 'red',
+							def: {
+								iframe: true
+							},
+							speed: 6
+						},
+						{
+							spriteLeft: 777,
+							spriteTop: 2160,
+							spriteWidth: 315,
+							spriteHeight: 340,
+							spriteOrigin: 123,
+							shadow: 'red',
+							speed: 6,
+							def: {
+								iframe: true
+							},
+							directionChangeEnabled: true,
+							spell: { key: 'tank1faster' }
+						},
+						{
+							spriteLeft: 1876,
+				 			spriteTop: 2165,
+				 			spriteWidth: 394,
+				 			spriteHeight: 335,
+				 			spriteOrigin: 224,
+							shadow: 'red',
+							def: {
+								iframe: true
+							},
+							speed: 6
+						},
+						{
+							spriteLeft: 110,
+							spriteTop: 1607,
+							spriteWidth: 338,
+							spriteHeight: 393,
+							spriteOrigin: 190,
+							shadow: 'red',
+							speed: 6,
+							def: {
+								iframe: true
+							},
+							directionChangeEnabled: true,
+							spell: { key: 'tank2faster' }
+						},
+						{
+							spriteLeft: 1357,
+							spriteTop: 1652,
+							spriteWidth: 354,
+							spriteHeight: 348,
+							spriteOrigin: 143,
+							shadow: 'red',
+							def: {
+								iframe: true
+							},
+							speed: 6
+						},
+						{
+							spriteLeft: 139,
+							spriteTop: 1179,
+							spriteWidth: 279,
+							spriteHeight: 321,
+							spriteOrigin: 161,
+							shadow: 'red',
+							speed: 6,
+							def: {
+								iframe: true
+							},
+							directionChangeEnabled: true,
+							spell: { key: 'tank3faster' }
+						},
+						{
+							spriteLeft: 1240,
+							spriteTop: 1147,
+							spriteWidth: 480,
+							spriteHeight: 353,
+							spriteOrigin: 260,
+							shadow: 'red',
+							def: {
+								iframe: true
+							},
+							speed: 6
+						},
+						{
+							spriteLeft: 105,
+							spriteTop: 618,
+							spriteWidth: 301,
+							spriteHeight: 382,
+							spriteOrigin: 195,
+							shadow: 'red',
+							speed: 6,
+							def: {
+								iframe: true
+							},
+							directionChangeEnabled: true,
+							spell: { key: 'tank4faster' }
+						},
+						{
+							spriteLeft: 1373,
+							spriteTop: 726,
+							spriteWidth: 273,
+							spriteHeight: 284,
+							bottomGap:10,
+							spriteOrigin: 127,
+							shadow: 'red',
+							def: {
+								iframe: true
+							},
+							speed: 6
+						},
+
+						{
+							spriteLeft: 13,
+							spriteTop: 3117,
+							spriteWidth: 589,
+							spriteHeight: 434 + 75,
+							spriteOrigin: 287,
+							shadow: 'red',
+							sound: {key:'movespin', volume: 1 },
+							extraStepXRate: 1.25,
+							extraStepYRate: .4,
+							speed: 6,
+							objects: [
+								{
+									key: 'jump',
+									position: 'behind-feet'
+								}
+							],
+							push: true,
+							atk: {
+								yRange: 10,
+								rate: .2,
+								hitTaken: .1,
+								reset:1,
+								push: 5,
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									objects: [
+										{
+											key: 'claw',
+											position: 'css',
+											p2: 2000,
+											p4: 1,
+											main: true
+										}
+									]
+								},
+								type: 'common'
+							},
+							directionChangeEnabled: true,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 618,
+							spriteTop: 3126,
+							spriteWidth: 579,
+							spriteHeight: 425 + 150,
+							spriteOrigin: 282,
+							shadow: 'red',
+							extraStepXRate:  1.25,
+							extraStepYRate: .3,
+							sound: { key: 'jump', volume: 1 },
+							speed: 6,
+							push: true,
+							atk: {
+								yRange: 10,
+								rate: .4,
+								hitTaken: .1,
+								reset:1,
+								push: 5,
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									objects: [
+										{
+											key: 'claw',
+											position: 'css',
+											p2: 2000,
+											p4: 1,
+											main: true
+										}
+									]
+								},
+								type: 'common'
+							},
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 1211,
+							spriteTop: 3117,
+							spriteWidth: 564,
+							spriteHeight: 434 + 150,
+							spriteOrigin: 289,
+							shadow: 'red',
+							extraStepXRate: 1.75,
+							extraStepYRate: -.45,
+							speed: 4,
+							push: true,
+							atk: {
+								yRange: 10,
+								rate: .4,
+								hitTaken: .1,
+								reset:1,
+								push: 5,
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									objects: [
+										{
+											key: 'claw',
+											position: 'css',
+											p2: 2000,
+											p4: 1,
+											main: true
+										}
+									]
+								},
+								type: 'common'
+							},
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 1813,
+							spriteTop: 3117,
+							spriteWidth: 587,
+							spriteHeight: 434 + 75,
+							spriteOrigin: 287,
+							shadow: 'red',
+							extraStepXRate: 1.4,
+							extraStepYRate: -.6,
+							speed: 4,
+							push: true,
+							objects: [
+								{ key: 'slowMotion', position: 'css' }
+							],
+							atk: {
+								yRange: 10,
+								rate: .4,
+								hitTaken: .1,
+								reset:1,
+								push: 5,
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									objects: [
+										{
+											key: 'claw',
+											position: 'css',
+											p2: 2000,
+											p4: 1,
+											main: true
+										}
+									]
+								},
+								type: 'common'
+							},
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 772 - 23,
+							spriteTop: 647,
+							spriteWidth: 287 + 47,
+							spriteHeight: 366,
+							spriteOrigin: 128 + 23,
+							bottomGap: 13,
+							shadow: 'red',
+							speed: 12,
+							push: true,
+							sound: { key: 'rockslam', volume: 1 },
+							objects: [
+								{ key: 'debris', scale:.6, xGap:140, position: 'middle-feet' },
+								{ key: 'debris2',xGap:400, position: 'middle-feet' },
+								{ key: 'shakevert', position: 'css'},
+								{ key: 'whiteblood', position: 'css' }
+							],
+							knockback: true,
+							atk: {
+								yRange: 15,
+								rate: .4,
+								hitTaken: .1,
+								reset: true,
+								push: 5,
+								aoe: 200,
+								ignoreDef: true,
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									smash: true,
+									sound: { key:'heavyflesh', volume:1},
+									knockback: 3,
+									hitStop:4,
+									skipTinyCameraMove: 12,
+									objects: [
+										{
+											key: 'claw',
+											position: 'css',
+											p2: 2000,
+											p4: 1,
+											main: true
+										}
+									]
+								},
+								type: 'common'
+							},
+							// do: function(_char) {
+							// 	if(episode?.realTime)
+							// 		return;
+							// 	const _others = episode.enemies.filter(x => x.fps > 1);
+							// 	if(_others?.[0])
+							// 		for(let _o of _others)
+							// 			_o.fps = 1;
+							// },
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 1372 - 23,
+							spriteTop: 726,
+							spriteWidth: 287 + 47,
+							spriteHeight: 284,
+							bottomGap:10,
+							spriteOrigin: 128 + 23,
+							speed: 12,
+							sound: { key:'tankhaha', volume: 2 },
+							shadow: 'red',
+							def: {
+								iframe: true
+							}
 						}
 					]
 				}
@@ -69970,9 +70643,9 @@ const _allEnemies = {
 			direction: 'left',
 			defaultDirection: 'right',
 			defaultAnimationKey: 'idle',
-			zoom: 1.3,
-			height: 206,
-			width: 205,
+			zoom: 1,
+			height: 333,
+			width: 333,
 			stepX: 0,
 			weight: 1000,
 			stepXRate: 0,
@@ -80881,6 +81554,288 @@ const _allEnemies = {
 			buffs: []
 		};
 	},
+	enemy1003: function () {
+		return {
+			animations: {
+				start: {
+					key: 'start',
+					type: 'skill',
+					interactive: true,
+					next: 'idle',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 213,
+							spriteHeight: 174,
+							spriteOrigin: 107,
+							bottomGap:-200,
+							extraStepXRate: .5,
+							//objects: [{key:'respawn', position: 'middle'}],
+							speed: 4,
+							//sound:{key:'weaponswing', volume:.3},
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 213,
+							spriteHeight: 174,
+							spriteOrigin: 107,
+							bottomGap:-233,
+							extraStepXRate: .45,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 213,
+							spriteHeight: 174,
+							spriteOrigin: 107,
+							bottomGap:-266,
+							extraStepXRate: .4,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 213,
+							spriteHeight: 174,
+							spriteOrigin: 107,
+							bottomGap:-233,
+							extraStepXRate: .35,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 213,
+							spriteHeight: 174,
+							spriteOrigin: 107,
+							bottomGap:-200,
+							extraStepXRate: .3,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 213,
+							spriteHeight: 174,
+							spriteOrigin: 107,
+							bottomGap:-166,
+							extraStepXRate: .25,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 213,
+							spriteHeight: 174,
+							spriteOrigin: 107,
+							bottomGap:-133,
+							extraStepXRate: .2,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 213,
+							spriteHeight: 174,
+							spriteOrigin: 107,
+							bottomGap:-100,
+							extraStepXRate: .15,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 213,
+							spriteHeight: 174,
+							spriteOrigin: 107,
+							bottomGap:-66,
+							extraStepXRate: .1,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 213,
+							spriteHeight: 174,
+							spriteOrigin: 107,
+							bottomGap:-33,
+							extraStepXRate: .05,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 213,
+							spriteHeight: 174,
+							spriteOrigin: 107,
+							speed: 1,
+							sound: { key:'eggfall', volume: .4 },
+							do : function(_e) {
+								//warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/kill.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Weapon found') + '!</span></div>', null, null, 1);
+								//warn('<div class="flex heading" style="position:relative"><img style="position:absolute;z-index:-1;left:-40%;width:180%" src="./images/icons/banner.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Weapon found') + '!</span></div>', 'level-up');
+							},
+							def: {
+								iframe: true
+							}
+						},
+						// {
+						// 	spriteLeft: 46,
+						// 	spriteTop: 25,
+						// 	spriteWidth: 107,
+						// 	spriteHeight: 148,
+						// 	spriteOrigin: 54,
+						// 	speed: 3,
+						// 	def: {
+						// 		iframe: true
+						// 	}
+						// },
+						// {
+						// 	spriteLeft: 46,
+						// 	spriteTop: 25,
+						// 	spriteWidth: 107,
+						// 	spriteHeight: 148,
+						// 	spriteOrigin: 54,
+						// 	speed: 4,
+						// 	def: {
+						// 		iframe: true
+						// 	}
+						// }
+					]
+				},
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					imediateBreak: true,
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 213,
+							spriteHeight: 174,
+							spriteOrigin: 107,
+							objects: [
+								{
+									key: 'questshine',
+									position: 'middle',
+									yGap: 100,
+									bind: true
+								}
+							],
+							speed: 999
+						}
+					]
+				},
+				dead: {
+					key: 'dead',
+					type: 'skill',
+					interactive: true,
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 0,
+							spriteHeight: 0,
+							spriteOrigin: 0,
+							do: function(_e) {
+								PlaySound({ key: 'loot', volume: 1 });
+								//episode.supportFound = 1;
+								requestAnimationFrame(function() {
+									renderChestOpeningScreen();
+								});
+								// mainCharacter.still = mainCharacter.immobilize = mainCharacter.disableKeyboard = true;
+								// blurKeyboard();
+								// focusMe('#skill12', function() {
+								// 	playClick();
+								// 	mainCharacter.still = mainCharacter.immobilize = false;
+								// 	delete mainCharacter.disableKeyboard;
+								// 	disposeFocus();
+								// }, null, getLangData('You unlocked a support skill. You can use it for support anytime you need'), 1, null, null, 'bottom');
+							},
+							props: {
+								killingBy: undefined,
+								finishTarget: undefined,
+								dead: true
+							},
+							speed: 1
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 213,
+							spriteHeight: 174,
+							spriteOrigin: 107,
+							props: {
+								remove: true
+							},
+							speed: 1
+						}
+					]
+				}
+			},
+			key: 'spprtchst-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 10,
+			id: 1002,
+			skipHealthBar: true,
+			name: 'Support Chest',
+			class: 'object',
+			level: 1,
+			health: 1,
+			maxHP: 1,
+			health: 1,
+			direction: 'left',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: .75,
+			width: 213,
+			height: 174,
+			stepX: 1.5,
+			weight: 1000,
+			stepXRate: .15,
+			bleed: false,
+			noDirection: true,
+			noLoot: true,
+			harmless: true,
+			noCC: true,
+			experience: 0,
+			invulnerable: true,
+			touchDead: true,
+			src: './images/sprites/ep56/sprite.png',
+			buffs: []
+		};
+	},
 	enemy1999: function () {
 		return {
 			animations: {
@@ -83351,14 +84306,17 @@ function createGroundRelease(_sprite1, _sprite2, _src) {
 		]
 	};
 }
-function createHurtFeetAndBurn(_z) {
+function createHurtFeetAndBurn(_c) {
+	const _cw = _c.HURTWIDTH;
+	let _z = _cw / 130;
+	_z /= _c.ZOOM;
 	return {
 		key: 'hurtfeet',
 		type: 'skill',
 		hurt: 'feet',
 		interactive: true,
 		src: './images/sprites/ep02/burn.png',
-		zoom: (_z ?? 1) / 2,
+		zoom: _z / 2,
 		frames: [
 			{
 				spriteLeft: 610,
@@ -83567,16 +84525,21 @@ function createHurtFeetAndFreeze(_z) {
 		]
 	};
 }
-function createHurtFeetWithKnockback(_z, _color, _r) {
+function createHurtFeetWithKnockback(_c, _r) {
 	if(!_r)
 		_r = 1;
+	const _cw = _c.HURTWIDTH;
+	let _z = _cw / 90;
+	_z /= _c.ZOOM;
+	_r /= _z;
+	const _color = _c.bloodColor;
 	return {
 		key: 'hurtfeet',
 		type: 'skill',
 		hurt: 'feet',
 		interactive: true,
 		src: './images/related/bodoff' + (_color ?? '') + '.png',
-		zoom: (_z ?? 1.5) / 1.5,
+		zoom: _z / 1.5,
 		frames: [
 			{
 				spriteLeft: 0,

@@ -626,9 +626,12 @@ function createBubbleText(_dialog) {
 		_d = document.createElement('div');
 		_d.className = 'talk-bubble show-ui';
 		if(_dialog.owner) {
-			const _borderColor = getCharacterChatColor(episode.enemies?.find(x => x.key === _dialog.owner)?.class);
+			const _charClass = episode.enemies?.find(x => x.key === _dialog.owner)?.class;
+			const _borderColor = getCharacterChatColor(_charClass);
 			if(_borderColor && (_borderColor !== '#f7f7f7'))
 				_d.style.borderColor = _borderColor;
+			if(_charClass)
+				_d.className += ' talk-bubble-' + _charClass;
 		}
 		if (_dialog.id)
 			_d.setAttribute('data-id', _dialog.id);

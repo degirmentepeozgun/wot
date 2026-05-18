@@ -182,7 +182,8 @@ function map(_m) {
 		}
 		if(_char.lastSprite)
 			_char.lastSprite = _char.lastSpriteKey = undefined;
-		console.log(_key + ' sprite bulunamadı');
+		if(_char.class !== 'object')
+			console.log(_key + ' sprite bulunamadı');
 		return undefined;
 	}
 	this.loadCharacterSprites = async function(_func, _extraIds, _kk, _excludeMain, _useCurrentEnemies) {
@@ -1480,7 +1481,7 @@ function map(_m) {
 							mainCharacter.hasRightPackage = 1;
 					}
 				}
-				if(!sprite.unseen && updateUnseen && !sprite.remove){
+				if((!sprite.unseen || sprite.mustDraw) && updateUnseen && !sprite.remove){
 					this.seenEnemies.push(sprite);
 					if(sprite.class === __spell)
 						this.activeSpells.push(sprite);
@@ -1492,7 +1493,7 @@ function map(_m) {
 				if (!sprite.located && sprite.animations.run)
 					sprite.located = true;
 				if (!episode.end || (episode.end && sprite.class !== __spell))
-					if (!sprite.unseen || sprite.started || sprite.socketId || (this.pvp || this.dungeon))
+					if (!sprite.unseen || sprite.mustDraw || sprite.started || sprite.socketId || (this.pvp || this.dungeon))
 						sprite.draw(_queue);
 				if(sprite.hitStop > 0)
 					sprite.hitStop--;
@@ -3591,7 +3592,7 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 		_char.ripples = [];
 
 	// ---------------- SPAWN (rate limitli) ----------------
-	if (_char.hasIframe) {
+	if (_char.hasIframe && !_char.ripples?.[0]) {
 
 		if (!_char._lastRipple || (_gameTick - _char._lastRipple) > 6) {
 
@@ -4752,8 +4753,9 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 			'#7CB342',
 			'#C13A4A',
 			'#7470bbff',
-			'#C7CCD6',
-			'#3d354b'
+			'#d706d7',
+			'#178778',
+			'#FFB347'
 		];
 
 		let mainColor = fantasy[_char.gradeLeft + 1];
@@ -5389,7 +5391,7 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 			if (anim?.interactive && !this?.fatality) 
 				continue;
 
-			if (!this.pvp && _iv && !isObjectInVisibleRectangle(x))
+			if (!this.pvp && _iv && !x.mustDraw && !isObjectInVisibleRectangle(x))
 				continue;
 			if(_isMinion && x.class === 'object')
 				continue;

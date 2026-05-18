@@ -1454,8 +1454,8 @@ function unWearItem(_id) {
     resetItemsUI();
     checkUpdateAvailable2(1);
 }
-function wearStatusItem(_id, _power) {
-    if(mainCharacter.lastItemEquipTime > (_gameTick - 500))
+function wearStatusItem(_id, _power, _force) {
+    if(!_force && mainCharacter.lastItemEquipTime > (_gameTick - 500))
         return;
     if(!_id) { 
         const _child = document.querySelector('.status-item-container .game-menu-button');

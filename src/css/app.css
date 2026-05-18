@@ -2076,7 +2076,364 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	left: calc(50% - .8vh);
 	bottom: -.8vh
 }
+/* =========================
+   WIZARD - Crimson Arcane
+========================= */
 
+.talk-bubble-wizard {
+	background: #c9a7a1;
+	border-color: #4b1f26 !important;
+	box-shadow: .5vh .5vh 1vh #2a0f14;
+}
+
+.talk-bubble-wizard::before {
+	border: 1px groove #6b2d38aa;
+	box-shadow: 1px 1px 6px #3a121880;
+	border-color: #6b2d38aa !important;
+}
+
+.talk-bubble-wizard *,
+.talk-bubble-wizard .talk-bubble-inner {
+	background: #c9a7a1;
+	color: #2a1616 !important;
+}
+
+.talk-bubble-wizard .corner {
+	border-left: .2vh solid #6b2d38;
+	border-bottom: .2vh solid #6b2d38;
+}
+
+
+
+/* =========================
+   ARCHER - Golden Sand
+========================= */
+
+.talk-bubble-archer {
+	background: #d9c28f;
+	border-color: #5b4522 !important;
+	box-shadow: .5vh .5vh 1vh #3a2a12;
+}
+
+.talk-bubble-archer::before {
+	border: 1px groove #7a5b2faa;
+	box-shadow: 1px 1px 6px #4b341480;
+	border-color: #7a5b2faa !important;
+}
+
+.talk-bubble-archer *,
+.talk-bubble-archer .talk-bubble-inner {
+	background: #d9c28f;
+	color: #2c2417 !important;
+}
+
+.talk-bubble-archer .corner {
+	border-left: .2vh solid #8a6a34;
+	border-bottom: .2vh solid #8a6a34;
+}
+
+
+
+/* =========================
+   TANK - Iron Brown
+========================= */
+
+.talk-bubble-tank {
+	background: #b49b86;
+	border-color: #3c2b1f !important;
+	box-shadow: .5vh .5vh 1vh #24180f;
+}
+
+.talk-bubble-tank::before {
+	border: 1px groove #5a4330aa;
+	box-shadow: 1px 1px 6px #2a1c1280;
+	border-color: #5a4330aa !important;
+}
+
+.talk-bubble-tank *,
+.talk-bubble-tank .talk-bubble-inner {
+	background: #b49b86;
+	color: #241d18 !important;
+}
+
+.talk-bubble-tank .corner {
+	border-left: .2vh solid #6b4e38;
+	border-bottom: .2vh solid #6b4e38;
+}
+/* =========================
+   WHITE - Holy / Priest
+========================= */
+
+.talk-bubble-white {
+	background: #e7e2dc;
+	border-color: #5e5a57 !important;
+	box-shadow: .5vh .5vh 1vh #3d3936;
+}
+
+.talk-bubble-white::before {
+	border: 1px groove #8f8a84aa;
+	box-shadow: 1px 1px 6px #55504a60;
+	border-color: #8f8a84aa !important;
+}
+
+.talk-bubble-white *,
+.talk-bubble-white .talk-bubble-inner {
+	background: #e7e2dc;
+	color: #2c2927 !important;
+}
+
+.talk-bubble-white .corner {
+	border-left: .2vh solid #9d958d;
+	border-bottom: .2vh solid #9d958d;
+}
+
+
+
+/* =========================
+   BLACK - Rogue / Dark
+========================= */
+
+.talk-bubble-black {
+	background: #3a3534;
+	border-color: #120f0f !important;
+	box-shadow: .5vh .5vh 1vh #000;
+}
+
+.talk-bubble-black::before {
+	border: 1px groove #5a5250aa;
+	box-shadow: 1px 1px 6px #00000080;
+	border-color: #5a5250aa !important;
+}
+
+.talk-bubble-black *,
+.talk-bubble-black .talk-bubble-inner {
+	background: #3a3534;
+	color: #f0e7dd !important;
+	text-shadow: 1px 1px 1px rgba(0,0,0,0.9);
+}
+
+.talk-bubble-black .corner {
+	border-left: .2vh solid #5c5351;
+	border-bottom: .2vh solid #5c5351;
+}
+
+
+
+/* =========================
+   PURPLE - Arcane Mystic
+========================= */
+
+.talk-bubble-purple {
+	background: #b7a1c9;
+	border-color: #3f234d !important;
+	box-shadow: .5vh .5vh 1vh #24112d;
+}
+
+.talk-bubble-purple::before {
+	border: 1px groove #6c3e84aa;
+	box-shadow: 1px 1px 6px #3b1c4c80;
+	border-color: #6c3e84aa !important;
+}
+
+.talk-bubble-purple *,
+.talk-bubble-purple .talk-bubble-inner {
+	background: #b7a1c9;
+	color: #24182d !important;
+}
+
+.talk-bubble-purple .corner {
+	border-left: .2vh solid #70408a;
+	border-bottom: .2vh solid #70408a;
+}
+
+
+/* =========================
+   ORANGE - Berserker / Fire
+========================= */
+
+.talk-bubble-orange {
+	background: #d8ae84;
+	border-color: #5a2d16 !important;
+	box-shadow: .5vh .5vh 1vh #2f170b;
+}
+
+.talk-bubble-orange::before {
+	border: 1px groove #9a5a2baa;
+	box-shadow: 1px 1px 6px #5a2d1680;
+	border-color: #9a5a2baa !important;
+}
+
+.talk-bubble-orange *,
+.talk-bubble-orange .talk-bubble-inner {
+	background: #d8ae84;
+	color: #2c1a12 !important;
+}
+
+.talk-bubble-orange .corner {
+	border-left: .2vh solid #b56a33;
+	border-bottom: .2vh solid #b56a33;
+}
+
+/* =========================
+   BLUE - Ice / Knight
+========================= */
+
+.talk-bubble-blue {
+	background: #a9bfd3;
+	border-color: #22394d !important;
+	box-shadow: .5vh .5vh 1vh #12202c;
+}
+
+.talk-bubble-wizard::before {
+	border: 1px groove #416485aa;
+	box-shadow: 1px 1px 6px #1d324480;
+	border-color: #416485aa !important;
+}
+
+.talk-bubble-blue *,
+.talk-bubble-blue .talk-bubble-inner {
+	background: #a9bfd3;
+	color: #18232d !important;
+}
+
+.talk-bubble-blue .corner {
+	border-left: .2vh solid #4d7398;
+	border-bottom: .2vh solid #4d7398;
+}
+
+/* =========================
+   GOLD - King / Legendary
+========================= */
+
+.talk-bubble-gold {
+	background: #d9c07a;
+	border-color: #6a4f1d !important;
+	box-shadow: .5vh .5vh 1vh #35270d;
+}
+
+.talk-bubble-gold::before {
+	border: 1px groove #b08a38aa;
+	box-shadow: 1px 1px 6px #6a4f1d80;
+	border-color: #b08a38aa !important;
+}
+
+.talk-bubble-gold *,
+.talk-bubble-gold .talk-bubble-inner {
+	background: #d9c07a;
+	color: #2d220f !important;
+}
+
+.talk-bubble-gold .corner {
+	border-left: .2vh solid #c89a3c;
+	border-bottom: .2vh solid #c89a3c;
+}
+/* =========================
+   SILVER - Knight / Noble
+========================= */
+
+.talk-bubble-silver {
+	background: #c8c9cc;
+	border-color: #4a4d52 !important;
+	box-shadow: .5vh .5vh 1vh #23262b;
+}
+
+.talk-bubble-silver::before {
+	border: 1px groove #8e949baa;
+	box-shadow: 1px 1px 6px #4a4d5280;
+	border-color: #8e949baa !important;
+}
+
+.talk-bubble-silver *,
+.talk-bubble-silver .talk-bubble-inner {
+	background: #c8c9cc;
+	color: #202328 !important;
+}
+
+.talk-bubble-silver .corner {
+	border-left: .2vh solid #9ea4ab;
+	border-bottom: .2vh solid #9ea4ab;
+}
+
+/* =========================
+   LIME - Toxic / Nature Energy
+========================= */
+
+.talk-bubble-lime {
+	background: #c8d87a;
+	border-color: #4a5f14 !important;
+	box-shadow: .5vh .5vh 1vh #232d09;
+}
+
+.talk-bubble-lime::before {
+	border: 1px groove #89a92faa;
+	box-shadow: 1px 1px 6px #4a5f1480;
+	border-color: #89a92faa !important;
+}
+
+.talk-bubble-lime *,
+.talk-bubble-lime .talk-bubble-inner {
+	background: #c8d87a;
+	color: #222b0f !important;
+}
+
+.talk-bubble-lime .corner {
+	border-left: .2vh solid #9fc93b;
+	border-bottom: .2vh solid #9fc93b;
+}
+
+/* =========================
+   SAGE - Wise Elder
+========================= */
+
+.talk-bubble-wizard {
+	background: #bcc7b8;
+	border-color: #4d5b4b !important;
+	box-shadow: .5vh .5vh 1vh #273026;
+}
+
+.talk-bubble-wizard::before {
+	border: 1px groove #73806faa;
+	box-shadow: 1px 1px 6px #42503f60;
+	border-color: #73806faa !important;
+}
+
+.talk-bubble-wizard *,
+.talk-bubble-wizard .talk-bubble-inner {
+	background: #bcc7b8;
+	color: #232a22 !important;
+}
+
+.talk-bubble-wizard .corner {
+	border-left: .2vh solid #7f8f7b;
+	border-bottom: .2vh solid #7f8f7b;
+}
+
+/* =========================
+   GREEN - Nature / Druid
+========================= */
+
+.talk-bubble-druid {
+	background: #b7c6a3;
+	border-color: #2c4424 !important;
+	box-shadow: .5vh .5vh 1vh #172412;
+}
+
+.talk-bubble-druid::before {
+	border: 1px groove #537246aa;
+	box-shadow: 1px 1px 6px #2d462480;
+	border-color: #537246aa !important;
+}
+
+.talk-bubble-druid *,
+.talk-bubble-druid .talk-bubble-inner {
+	background: #b7c6a3;
+	color: #1d2819 !important;
+}
+
+.talk-bubble-druid .corner {
+	border-left: .2vh solid #5f8250;
+	border-bottom: .2vh solid #5f8250;
+}
 .shine {
 	position: absolute;
 	top: 2%;
@@ -6716,7 +7073,7 @@ img.dmmg.toxic-dmmg {
 	line-height: 5vh !important;
   }
   .black-screen-ok-btn {
-	padding-bottom: 10vh
+	padding-bottom: 14vh
   }
 
 #game-ui .skill.atk-sf:after {
@@ -8683,7 +9040,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 
 .tag-char-area-wrapper {
 	position: relative;
-	height: 33vh !important
+	height: 25vh !important
 }
 
 .tag-char-area-wrapper-outer.rtl {
@@ -8753,8 +9110,9 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 .tag-char-concept {
 	position: absolute;
 	right: 200%;
-	height: 140%;
-	top: -12%;
+	height:115%;
+	bottom:0;
+	top:-7vh;
 	filter: drop-shadow(-2vh 0 2vh #000);
 	animation: shake-tag-area 0.5s infinite;
 	-webkit-animation: shake-tag-area 0.5s infinite
@@ -11183,10 +11541,1673 @@ body.pc-mission .move-to-place::after{
 }
 /* Version yazısı */
 .opening-cover::after {
-    content: "Version 1.0003";
+    content: "Version 1.0004";
     position: absolute;
     bottom: 2vh;
     left: 3vh;
     color: #f3f4f5ab !important;
     font-size: 2.6vh
+}
+
+.intro-screen{
+	position:absolute;
+	inset:0;
+
+	padding-left:10%;
+	padding-right:10%;
+
+	background:
+		radial-gradient(circle at center,
+			rgba(120,90,40,0.18) 0%,
+			rgba(0,0,0,0.95) 65%),
+		#000;
+
+	overflow:hidden;
+}
+
+/* Hafif noise / mist hissi */
+.intro-screen::before{
+	content:"";
+
+	position:absolute;
+	inset:0;
+
+	background:
+		radial-gradient(circle at 20% 30%, rgba(255,220,140,0.04), transparent 25%),
+		radial-gradient(circle at 80% 70%, rgba(255,220,140,0.03), transparent 30%),
+		radial-gradient(circle at 50% 50%, rgba(255,255,255,0.02), transparent 60%);
+
+	filter:blur(6vh);
+	transform:scale(1.2);
+
+	animation:fogMove calc(var(--black-duration) * 1.5) ease-in-out infinite alternate;
+}
+
+/* Kenar karartma */
+.intro-screen::after{
+	content:"";
+
+	position:absolute;
+	inset:0;
+
+	background:
+		radial-gradient(circle,
+			transparent 35%,
+			rgba(0,0,0,0.45) 100%);
+}
+
+.intro-screen .intro-text{
+	position:relative;
+	z-index:2;
+
+	max-width:80%;
+
+	text-align:center !important;
+
+	color:#f3e7c1 !important;
+
+	font-size:clamp(1.4rem, 4vh, 2.8rem) !important;
+
+	line-height:1.8 !important;
+
+	letter-spacing:0.08em !important;
+
+	text-shadow:
+		0 0 0.5rem rgba(255,220,120,0.15),
+		0 0 1.4rem rgba(255,180,60,0.08),
+		0 0 2.5rem rgba(0,0,0,1);
+
+	animation:introAnim var(--black-duration) ease forwards;
+}
+
+@keyframes introAnim{
+	0%{
+		opacity:0;
+		transform:translateY(1.5vh) scale(0.985);
+		filter:blur(1vh);
+	}
+
+	15%{
+		opacity:1;
+		transform:translateY(0) scale(1);
+		filter:blur(0);
+	}
+
+	80%{
+		opacity:1;
+		transform:translateY(0) scale(1);
+		filter:blur(0);
+	}
+
+	100%{
+		opacity:0;
+		transform:translateY(-1vh) scale(1.01);
+		filter:blur(.5vh);
+	}
+}
+
+@keyframes fogMove{
+	from{
+		transform:scale(1.2) translateX(-2%);
+	}
+
+	to{
+		transform:scale(1.25) translateX(2%);
+	}
+}
+
+.chest-open-scene{
+    position:absolute;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(255,255,255,0.15) 0%,
+            rgba(0,140,255,0.25) 18%,
+            rgba(0,0,0,0.92) 55%,
+            #000 100%
+        );
+}
+.chest-open-scene-wrapper {
+	background:#000;
+	position:absolute;
+	width:100%;
+	height:100%
+}
+/* ========================================= */
+/* BG GLOW */
+/* ========================================= */
+
+.chest-open-bg-glow{
+    position:absolute;
+    left:50%;
+    top:50%;
+
+    width:70vmin;
+    height:70vmin;
+
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+
+    background:
+        radial-gradient(circle,
+            rgba(0,170,255,0.28) 0%,
+            rgba(0,140,255,0.12) 30%,
+            rgba(255,255,255,0.03) 58%,
+            transparent 74%);
+
+    filter:blur(4vmin);
+
+    animation:bgPulse 4s ease-in-out infinite;
+}
+
+@keyframes bgPulse{
+
+    0%{
+        transform:translate(-50%,-50%) scale(1);
+        opacity:0.75;
+    }
+
+    50%{
+        transform:translate(-50%,-50%) scale(1.08);
+        opacity:1;
+    }
+
+    100%{
+        transform:translate(-50%,-50%) scale(1);
+        opacity:0.75;
+    }
+
+}
+
+/* ========================================= */
+/* CHEST WRAPPER */
+/* ========================================= */
+
+.chest-open-chest-wrapper{
+    position:absolute;
+    left:50%;
+    top:50%;
+
+    width:40vmin;
+    height:40vmin;
+
+    min-width:14rem;
+    min-height:14rem;
+
+    transform:translate(-50%,-50%);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+    user-select:none;
+    touch-action:manipulation;
+}
+
+/* ========================================= */
+/* SHADOW */
+/* ========================================= */
+
+.chest-open-chest-shadow{
+    position:absolute;
+    bottom:8%;
+
+    width:65%;
+    height:10%;
+
+    border-radius:50%;
+
+    background:rgba(0,0,0,0.75);
+
+    filter:blur(1.8vmin);
+
+    animation:shadowIdle 2.8s linear infinite;
+}
+
+@keyframes shadowIdle{
+
+    0%{
+        transform:scaleX(1);
+        opacity:0.4;
+    }
+
+    24%{
+        transform:scaleX(0.84);
+        opacity:0.22;
+    }
+
+    29%{
+        transform:scaleX(1.03);
+        opacity:0.5;
+    }
+
+    74%{
+        transform:scaleX(0.78);
+        opacity:0.18;
+    }
+
+    79%{
+        transform:scaleX(1.08);
+        opacity:0.55;
+    }
+
+    100%{
+        transform:scaleX(1);
+        opacity:0.4;
+    }
+
+}
+
+/* ========================================= */
+/* CHEST GLOW */
+/* ========================================= */
+
+.chest-open-chest-glow{
+    position:absolute;
+
+    width:70%;
+    height:70%;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(circle,
+            rgba(255,255,255,0.75) 0%,
+            rgba(0,170,255,0.35) 24%,
+            rgba(0,170,255,0.12) 48%,
+            transparent 72%);
+
+    filter:blur(2.2vmin);
+
+    animation:glowIdle 2s ease-in-out infinite;
+}
+
+@keyframes glowIdle{
+
+    0%{
+        transform:scale(1);
+        opacity:0.7;
+    }
+
+    50%{
+        transform:scale(1.12);
+        opacity:1;
+    }
+
+    100%{
+        transform:scale(1);
+        opacity:0.7;
+    }
+
+}
+
+/* ========================================= */
+/* CHEST */
+/* ========================================= */
+
+.chest-open-chest{
+
+    position:relative;
+    z-index:5;
+
+    width:70%;
+    max-width:100%;
+
+    transform-origin:center 82%;
+
+    filter:
+        drop-shadow(0 0 2vmin rgba(255,255,255,0.2))
+        drop-shadow(0 0 6vmin rgba(0,170,255,0.6));
+
+    animation:chestIdle 2.8s linear infinite;
+}
+
+@keyframes chestIdle{
+
+    0%{
+        transform:
+            translateY(0%)
+            rotate(-0.4deg)
+            skewX(0deg)
+            scaleX(1)
+            scaleY(1);
+    }
+
+    7%{
+        transform:
+            translateY(-0.7%)
+            rotate(0.8deg)
+            skewX(0.2deg)
+            scaleX(1.003)
+            scaleY(0.997);
+    }
+
+    14%{
+        transform:
+            translateY(0%)
+            rotate(-0.3deg)
+            skewX(0deg)
+            scaleX(1)
+            scaleY(1);
+    }
+
+    24%{
+        transform:
+            translateY(-2.4%)
+            rotate(-0.7deg)
+            skewX(-0.35deg)
+            scaleX(0.996)
+            scaleY(1.01);
+    }
+
+    29%{
+        transform:
+            translateY(0.5%)
+            rotate(0.6deg)
+            skewX(0.5deg)
+            scaleX(1.01)
+            scaleY(0.988);
+    }
+
+    35%{
+        transform:
+            translateY(0%)
+            rotate(0deg)
+            skewX(0deg)
+            scaleX(1)
+            scaleY(1);
+    }
+
+    45%{
+        transform:
+            translateY(-1%)
+            rotate(-1deg)
+            skewX(-0.3deg)
+            scaleX(0.997)
+            scaleY(1.004);
+    }
+
+    49%{
+        transform:
+            translateY(-0.4%)
+            rotate(0.9deg)
+            skewX(0.25deg)
+            scaleX(1.002)
+            scaleY(0.998);
+    }
+
+    52%{
+        transform:
+            translateY(-1%)
+            rotate(-1deg)
+            skewX(-0.3deg)
+            scaleX(0.997)
+            scaleY(1.004);
+    }
+
+    56%{
+        transform:
+            translateY(-0.4%)
+            rotate(0.9deg)
+            skewX(0.25deg)
+            scaleX(1.002)
+            scaleY(0.998);
+    }
+
+    63%{
+        transform:
+            translateY(0%)
+            rotate(0deg)
+            skewX(0deg)
+            scaleX(1)
+            scaleY(1);
+    }
+
+    74%{
+        transform:
+            translateY(-3.2%)
+            rotate(0.8deg)
+            skewX(0.2deg)
+            scaleX(1.004)
+            scaleY(1.008);
+    }
+
+    79%{
+        transform:
+            translateY(0.8%)
+            rotate(-0.6deg)
+            skewX(-0.55deg)
+            scaleX(1.014)
+            scaleY(0.984);
+    }
+
+    84%{
+        transform:
+            translateY(-0.7%)
+            rotate(0.3deg)
+            skewX(0.15deg)
+            scaleX(1.002)
+            scaleY(0.998);
+    }
+
+    100%{
+        transform:
+            translateY(0%)
+            rotate(-0.4deg)
+            skewX(0deg)
+            scaleX(1)
+            scaleY(1);
+    }
+
+}
+
+/* ========================================= */
+/* OPENING */
+/* ========================================= */
+
+.chest-open-chest-wrapper.opening .chest-open-chest{
+    animation:openChest 1.9s cubic-bezier(.15,.8,.2,1) forwards;
+}
+
+@keyframes openChest{
+
+    0%{
+        transform:
+            translateY(0)
+            rotate(0deg)
+            scale(1);
+    }
+
+    10%{
+        transform:
+            translateY(-4%)
+            rotate(-5deg)
+            scale(1.03);
+    }
+
+    20%{
+        transform:
+            translateY(0%)
+            rotate(5deg)
+            scale(1.04);
+    }
+
+    30%{
+        transform:
+            translateY(-6%)
+            rotate(-7deg)
+            scale(1.05);
+    }
+
+    40%{
+        transform:
+            translateY(0%)
+            rotate(7deg)
+            scale(1.06);
+    }
+
+    50%{
+        transform:
+            translateY(-8%)
+            rotate(-9deg)
+            scale(1.08);
+    }
+
+    60%{
+        transform:
+            translateY(0%)
+            rotate(9deg)
+            scale(1.1);
+    }
+
+    75%{
+        transform:
+            translateY(-10%)
+            rotate(0deg)
+            scale(1.18);
+    }
+
+    100%{
+        transform:
+            translateY(0%)
+            rotate(0deg)
+            scale(1.15);
+    }
+
+}
+
+.chest-open-chest-wrapper.opening .chest-open-chest-glow{
+    animation:explodeGlow 1s ease forwards;
+}
+
+@keyframes explodeGlow{
+
+    0%{
+        transform:scale(1);
+        opacity:0.7;
+    }
+
+    100%{
+        transform:scale(5);
+        opacity:1;
+    }
+
+}
+/* ========================================= */
+/* GIFT */
+/* ========================================= */
+.chest-open-gift{
+    position:absolute;
+    left:50%;
+    bottom:78%;
+    width:68%;
+    opacity:0;
+    pointer-events:none;
+    z-index:15;
+
+    transform:translateX(-50%) translateY(0%);
+
+    animation:
+        giftFloat 3.2s ease-in-out infinite,
+        glowPulse 2.8s ease-in-out infinite;
+
+    /* 🔥 optimize edilmiş glow (tek zincir, daha az compute) */
+    filter:
+        drop-shadow(0 0 0.6vmin rgba(255,255,255,0.85))
+        drop-shadow(0 0 1.4vmin rgba(255,255,255,0.55))
+        drop-shadow(0 0 2.2vmin rgba(255,210,90,0.55))
+        drop-shadow(0 0 4.5vmin rgba(255,170,40,0.25));
+}
+.chest-open-gift::before{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:50%;
+
+    width:240%;
+    aspect-ratio:1;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    z-index:0;
+
+    background: repeating-conic-gradient(
+        from 0deg,
+        rgba(255,255,255,0.9) 0deg 8deg,
+        rgba(255,190,90,0.9) 8deg 16deg
+    );
+
+    filter:
+        blur(0.3vmin);
+
+    opacity:0.65;
+
+    animation:
+        spin 14s linear infinite;
+}
+.chest-open-gift::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:50%;
+
+    width:260%;
+    aspect-ratio:1;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    z-index:-2;
+
+    background: conic-gradient(
+        from 0deg,
+        rgba(255,255,255,0),
+        rgba(255,255,255,0.55),
+        rgba(255,225,140,1),
+        rgba(255,180,60,1),
+        rgba(255,255,255,0)
+    );
+
+    filter: blur(1.5vmin);
+
+    opacity:0.85;
+
+    will-change: transform, opacity;
+
+    animation:
+        spin 10s linear infinite,
+        haloPulse 3.5s ease-in-out infinite;
+}
+
+@keyframes glowPulse{
+    0%,100%{
+        filter:
+            drop-shadow(0 0 0.6vmin rgba(255,255,255,0.9))
+            drop-shadow(0 0 2vmin rgba(255,240,200,0.5))
+            drop-shadow(0 0 4vmin rgba(255,180,60,0.35));
+    }
+    50%{
+        filter:
+            drop-shadow(0 0 1vmin rgba(255,255,255,1))
+            drop-shadow(0 0 3.5vmin rgba(255,235,170,0.8))
+            drop-shadow(0 0 7vmin rgba(255,170,40,0.6));
+    }
+}
+
+@keyframes haloPulse{
+    0%,100%{
+        opacity:0.55;
+    }
+    50%{
+        opacity:0.9;
+    }
+}
+
+
+/* ========================================= */
+/* SHOW */
+/* ========================================= */
+
+.chest-open-gift.show{
+
+    animation:
+        giftReveal 2s cubic-bezier(.2,.9,.2,1) forwards,
+        giftFloat 3.2s ease-in-out infinite;
+}
+
+.chest-open-gift.show::before,
+.chest-open-gift.show::after{
+    opacity:1;
+}
+
+/* ========================================= */
+/* REVEAL */
+/* ========================================= */
+
+@keyframes giftReveal{
+
+    0%{
+
+        opacity:0;
+		width:50%;
+		bottom:60%;
+        transform:
+            translateX(-50%)
+            translateY(18%)
+            scale(0.4);
+		filter:none
+    }
+	10% {
+        opacity:.1;
+		width:50%;
+		bottom:60%;
+	}
+	40% {
+		bottom:78%;
+
+		width:68%;
+	}
+    55%{
+
+        opacity:1;
+
+        transform:
+            translateX(-50%)
+            translateY(-4%)
+            scale(1.06);
+    }
+
+    100%{
+
+        opacity:1;
+
+        transform:
+            translateX(-50%)
+            translateY(0%)
+            scale(1);
+		filter:
+        drop-shadow(0 0 0.6vmin rgba(255,255,255,0.85))
+        drop-shadow(0 0 1.4vmin rgba(255,255,255,0.55))
+        drop-shadow(0 0 2.2vmin rgba(255,210,90,0.55))
+        drop-shadow(0 0 4.5vmin rgba(255,170,40,0.25));
+    }
+
+}
+
+/* ========================================= */
+/* FLOAT */
+/* ========================================= */
+
+@keyframes giftFloat{
+    0%{
+        transform:translateX(-50%) translateY(0%) rotate(-0.6deg);
+    }
+    50%{
+        transform:translateX(-50%) translateY(-4%) rotate(0.6deg);
+    }
+    100%{
+        transform:translateX(-50%) translateY(0%) rotate(-0.6deg);
+    }
+}
+
+/* ========================================= */
+/* WHEEL MOTION */
+/* ========================================= */
+
+/* ========================================= */
+/* OUTER AURA */
+/* ========================================= */
+
+@keyframes outerAuraPulse{
+
+    0%{
+        transform:
+            translate(-50%,-50%)
+            scale(1);
+
+        opacity:0.45;
+    }
+
+    50%{
+        transform:
+            translate(-50%,-50%)
+            scale(1.08);
+
+        opacity:0.82;
+    }
+
+    100%{
+        transform:
+            translate(-50%,-50%)
+            scale(1);
+
+        opacity:0.45;
+    }
+
+}
+
+/* ========================================= */
+/* FLASH */
+/* ========================================= */
+
+.chest-open-flash{
+    position:absolute;
+    inset:0;
+
+    background:#fff;
+
+    opacity:0;
+    pointer-events:none;
+
+    z-index:999;
+}
+
+.chest-open-flash.active{
+    animation:flashAnim 1.2s ease forwards;
+}
+@keyframes flashAnim{
+
+    0%{
+        opacity:0;
+    }
+
+    35%{
+        opacity:1;
+    }
+
+    60%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:0;
+    }
+
+}
+
+
+.chest-open-scene{
+    position:absolute;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+	z-index:99999;
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(255,255,255,0.15) 0%,
+            rgba(0,140,255,0.25) 18%,
+            rgba(0,0,0,0.92) 55%,
+            #000 100%
+        );
+}
+.chest-open-scene-wrapper {
+	background:#000;
+	position:absolute;
+	width:100%;
+	height:100%
+}
+/* ========================================= */
+/* BG GLOW */
+/* ========================================= */
+
+.chest-open-bg-glow{
+    position:absolute;
+    left:50%;
+    top:50%;
+
+    width:70vmin;
+    height:70vmin;
+
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+
+    background:
+        radial-gradient(circle,
+            rgba(0,170,255,0.28) 0%,
+            rgba(0,140,255,0.12) 30%,
+            rgba(255,255,255,0.03) 58%,
+            transparent 74%);
+
+    filter:blur(4vmin);
+
+    animation:bgPulse 4s ease-in-out infinite;
+}
+
+@keyframes bgPulse{
+
+    0%{
+        transform:translate(-50%,-50%) scale(1);
+        opacity:0.75;
+    }
+
+    50%{
+        transform:translate(-50%,-50%) scale(1.08);
+        opacity:1;
+    }
+
+    100%{
+        transform:translate(-50%,-50%) scale(1);
+        opacity:0.75;
+    }
+
+}
+
+/* ========================================= */
+/* CHEST WRAPPER */
+/* ========================================= */
+
+.chest-open-chest-wrapper{
+    position:absolute;
+    left:50%;
+    top:50%;
+
+    width:40vmin;
+    height:40vmin;
+
+    min-width:14rem;
+    min-height:14rem;
+
+    transform:translate(-50%,-50%);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+    user-select:none;
+    touch-action:manipulation;
+}
+
+/* ========================================= */
+/* SHADOW */
+/* ========================================= */
+
+.chest-open-chest-shadow{
+    position:absolute;
+    bottom:8%;
+
+    width:65%;
+    height:10%;
+
+    border-radius:50%;
+
+    background:rgba(0,0,0,0.75);
+
+    filter:blur(1.8vmin);
+
+    animation:shadowIdle 2.8s linear infinite;
+}
+
+@keyframes shadowIdle{
+
+    0%{
+        transform:scaleX(1);
+        opacity:0.4;
+    }
+
+    24%{
+        transform:scaleX(0.84);
+        opacity:0.22;
+    }
+
+    29%{
+        transform:scaleX(1.03);
+        opacity:0.5;
+    }
+
+    74%{
+        transform:scaleX(0.78);
+        opacity:0.18;
+    }
+
+    79%{
+        transform:scaleX(1.08);
+        opacity:0.55;
+    }
+
+    100%{
+        transform:scaleX(1);
+        opacity:0.4;
+    }
+
+}
+
+/* ========================================= */
+/* CHEST GLOW */
+/* ========================================= */
+
+.chest-open-chest-glow{
+    position:absolute;
+
+    width:70%;
+    height:70%;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(circle,
+            rgba(255,255,255,0.75) 0%,
+            rgba(0,170,255,0.35) 24%,
+            rgba(0,170,255,0.12) 48%,
+            transparent 72%);
+
+    filter:blur(2.2vmin);
+
+    animation:glowIdle 2s ease-in-out infinite;
+}
+
+@keyframes glowIdle{
+
+    0%{
+        transform:scale(1);
+        opacity:0.7;
+    }
+
+    50%{
+        transform:scale(1.12);
+        opacity:1;
+    }
+
+    100%{
+        transform:scale(1);
+        opacity:0.7;
+    }
+
+}
+
+/* ========================================= */
+/* CHEST */
+/* ========================================= */
+
+.chest-open-chest{
+
+    position:relative;
+    z-index:5;
+
+    width:70%;
+    max-width:100%;
+
+    transform-origin:center 82%;
+
+    filter:
+        drop-shadow(0 0 2vmin rgba(255,255,255,0.2))
+        drop-shadow(0 0 6vmin rgba(0,170,255,0.6));
+
+    animation:chestIdle 2.8s linear infinite;
+}
+
+@keyframes chestIdle{
+
+    0%{
+        transform:
+            translateY(0%)
+            rotate(-0.4deg)
+            skewX(0deg)
+            scaleX(1)
+            scaleY(1);
+    }
+
+    7%{
+        transform:
+            translateY(-0.7%)
+            rotate(0.8deg)
+            skewX(0.2deg)
+            scaleX(1.003)
+            scaleY(0.997);
+    }
+
+    14%{
+        transform:
+            translateY(0%)
+            rotate(-0.3deg)
+            skewX(0deg)
+            scaleX(1)
+            scaleY(1);
+    }
+
+    24%{
+        transform:
+            translateY(-2.4%)
+            rotate(-0.7deg)
+            skewX(-0.35deg)
+            scaleX(0.996)
+            scaleY(1.01);
+    }
+
+    29%{
+        transform:
+            translateY(0.5%)
+            rotate(0.6deg)
+            skewX(0.5deg)
+            scaleX(1.01)
+            scaleY(0.988);
+    }
+
+    35%{
+        transform:
+            translateY(0%)
+            rotate(0deg)
+            skewX(0deg)
+            scaleX(1)
+            scaleY(1);
+    }
+
+    45%{
+        transform:
+            translateY(-1%)
+            rotate(-1deg)
+            skewX(-0.3deg)
+            scaleX(0.997)
+            scaleY(1.004);
+    }
+
+    49%{
+        transform:
+            translateY(-0.4%)
+            rotate(0.9deg)
+            skewX(0.25deg)
+            scaleX(1.002)
+            scaleY(0.998);
+    }
+
+    52%{
+        transform:
+            translateY(-1%)
+            rotate(-1deg)
+            skewX(-0.3deg)
+            scaleX(0.997)
+            scaleY(1.004);
+    }
+
+    56%{
+        transform:
+            translateY(-0.4%)
+            rotate(0.9deg)
+            skewX(0.25deg)
+            scaleX(1.002)
+            scaleY(0.998);
+    }
+
+    63%{
+        transform:
+            translateY(0%)
+            rotate(0deg)
+            skewX(0deg)
+            scaleX(1)
+            scaleY(1);
+    }
+
+    74%{
+        transform:
+            translateY(-3.2%)
+            rotate(0.8deg)
+            skewX(0.2deg)
+            scaleX(1.004)
+            scaleY(1.008);
+    }
+
+    79%{
+        transform:
+            translateY(0.8%)
+            rotate(-0.6deg)
+            skewX(-0.55deg)
+            scaleX(1.014)
+            scaleY(0.984);
+    }
+
+    84%{
+        transform:
+            translateY(-0.7%)
+            rotate(0.3deg)
+            skewX(0.15deg)
+            scaleX(1.002)
+            scaleY(0.998);
+    }
+
+    100%{
+        transform:
+            translateY(0%)
+            rotate(-0.4deg)
+            skewX(0deg)
+            scaleX(1)
+            scaleY(1);
+    }
+
+}
+
+/* ========================================= */
+/* OPENING */
+/* ========================================= */
+
+.chest-open-chest-wrapper.opening .chest-open-chest{
+    animation:openChest 1.9s cubic-bezier(.15,.8,.2,1) forwards;
+}
+
+@keyframes openChest{
+
+    0%{
+        transform:
+            translateY(0)
+            rotate(0deg)
+            scale(1);
+    }
+
+    10%{
+        transform:
+            translateY(-4%)
+            rotate(-5deg)
+            scale(1.03);
+    }
+
+    20%{
+        transform:
+            translateY(0%)
+            rotate(5deg)
+            scale(1.04);
+    }
+
+    30%{
+        transform:
+            translateY(-6%)
+            rotate(-7deg)
+            scale(1.05);
+    }
+
+    40%{
+        transform:
+            translateY(0%)
+            rotate(7deg)
+            scale(1.06);
+    }
+
+    50%{
+        transform:
+            translateY(-8%)
+            rotate(-9deg)
+            scale(1.08);
+    }
+
+    60%{
+        transform:
+            translateY(0%)
+            rotate(9deg)
+            scale(1.1);
+    }
+
+    75%{
+        transform:
+            translateY(-10%)
+            rotate(0deg)
+            scale(1.18);
+    }
+
+    100%{
+        transform:
+            translateY(0%)
+            rotate(0deg)
+            scale(1.15);
+    }
+
+}
+
+.chest-open-chest-wrapper.opening .chest-open-chest-glow{
+    animation:explodeGlow 1s ease forwards;
+}
+
+@keyframes explodeGlow{
+
+    0%{
+        transform:scale(1);
+        opacity:0.7;
+    }
+
+    100%{
+        transform:scale(5);
+        opacity:1;
+    }
+
+}
+/* ========================================= */
+/* GIFT */
+/* ========================================= */
+.chest-open-gift{
+    position:absolute;
+    left:50%;
+    bottom:78%;
+    width:68%;
+    opacity:0;
+    pointer-events:none;
+    z-index:15;
+
+    transform:translateX(-50%) translateY(0%);
+
+    animation:
+        giftFloat 3.2s ease-in-out infinite,
+        glowPulse 2.8s ease-in-out infinite;
+
+    /* 🔥 optimize edilmiş glow (tek zincir, daha az compute) */
+    filter:
+        drop-shadow(0 0 0.6vmin rgba(255,255,255,0.85))
+        drop-shadow(0 0 1.4vmin rgba(255,255,255,0.55))
+        drop-shadow(0 0 2.2vmin rgba(255,210,90,0.55))
+        drop-shadow(0 0 4.5vmin rgba(255,170,40,0.25));
+}
+.chest-open-gift::before{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:50%;
+
+    width:240%;
+    aspect-ratio:1;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    z-index:0;
+
+    background: repeating-conic-gradient(
+        from 0deg,
+        rgba(255,255,255,0.9) 0deg 8deg,
+        rgba(255,190,90,0.9) 8deg 16deg
+    );
+
+    filter:
+        blur(0.3vmin);
+
+    opacity:0.65;
+
+    animation:
+        spin 14s linear infinite;
+}
+.chest-open-gift::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:50%;
+
+    width:260%;
+    aspect-ratio:1;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    z-index:-2;
+
+    background: conic-gradient(
+        from 0deg,
+        rgba(255,255,255,0),
+        rgba(255,255,255,0.55),
+        rgba(255,225,140,1),
+        rgba(255,180,60,1),
+        rgba(255,255,255,0)
+    );
+
+    filter: blur(1.5vmin);
+
+    opacity:0.85;
+
+    will-change: transform, opacity;
+
+    animation:
+        spin 10s linear infinite,
+        haloPulse 3.5s ease-in-out infinite;
+}
+
+@keyframes glowPulse{
+    0%,100%{
+        filter:
+            drop-shadow(0 0 0.6vmin rgba(255,255,255,0.9))
+            drop-shadow(0 0 2vmin rgba(255,240,200,0.5))
+            drop-shadow(0 0 4vmin rgba(255,180,60,0.35));
+    }
+    50%{
+        filter:
+            drop-shadow(0 0 1vmin rgba(255,255,255,1))
+            drop-shadow(0 0 3.5vmin rgba(255,235,170,0.8))
+            drop-shadow(0 0 7vmin rgba(255,170,40,0.6));
+    }
+}
+
+@keyframes haloPulse{
+    0%,100%{
+        opacity:0.55;
+    }
+    50%{
+        opacity:0.9;
+    }
+}
+
+
+/* ========================================= */
+/* SHOW */
+/* ========================================= */
+
+.chest-open-gift.show{
+
+    animation:
+        giftReveal 2s cubic-bezier(.2,.9,.2,1) forwards,
+        giftFloat 3.2s ease-in-out infinite;
+}
+
+.chest-open-gift.show::before,
+.chest-open-gift.show::after{
+    opacity:1;
+}
+
+/* ========================================= */
+/* REVEAL */
+/* ========================================= */
+
+@keyframes giftReveal{
+
+    0%{
+
+        opacity:0;
+		width:50%;
+		bottom:60%;
+        transform:
+            translateX(-50%)
+            translateY(18%)
+            scale(0.4);
+		filter:none
+    }
+	10% {
+        opacity:.1;
+		width:50%;
+		bottom:60%;
+	}
+	40% {
+		bottom:78%;
+
+		width:68%;
+	}
+    55%{
+
+        opacity:1;
+
+        transform:
+            translateX(-50%)
+            translateY(-4%)
+            scale(1.06);
+    }
+
+    100%{
+
+        opacity:1;
+
+        transform:
+            translateX(-50%)
+            translateY(0%)
+            scale(1);
+		filter:
+        drop-shadow(0 0 0.6vmin rgba(255,255,255,0.85))
+        drop-shadow(0 0 1.4vmin rgba(255,255,255,0.55))
+        drop-shadow(0 0 2.2vmin rgba(255,210,90,0.55))
+        drop-shadow(0 0 4.5vmin rgba(255,170,40,0.25));
+    }
+
+}
+
+/* ========================================= */
+/* FLOAT */
+/* ========================================= */
+
+@keyframes giftFloat{
+    0%{
+        transform:translateX(-50%) translateY(0%) rotate(-0.6deg);
+    }
+    50%{
+        transform:translateX(-50%) translateY(-4%) rotate(0.6deg);
+    }
+    100%{
+        transform:translateX(-50%) translateY(0%) rotate(-0.6deg);
+    }
+}
+
+/* ========================================= */
+/* WHEEL MOTION */
+/* ========================================= */
+
+/* ========================================= */
+/* OUTER AURA */
+/* ========================================= */
+
+@keyframes outerAuraPulse{
+
+    0%{
+        transform:
+            translate(-50%,-50%)
+            scale(1);
+
+        opacity:0.45;
+    }
+
+    50%{
+        transform:
+            translate(-50%,-50%)
+            scale(1.08);
+
+        opacity:0.82;
+    }
+
+    100%{
+        transform:
+            translate(-50%,-50%)
+            scale(1);
+
+        opacity:0.45;
+    }
+
+}
+
+/* ========================================= */
+/* FLASH */
+/* ========================================= */
+
+.chest-open-flash{
+    position:absolute;
+    inset:0;
+
+    background:#fff;
+
+    opacity:0;
+    pointer-events:none;
+
+    z-index:999;
+}
+
+.chest-open-flash.active{
+    animation:flashAnim 1.2s ease forwards;
+}
+@keyframes flashAnim{
+
+    0%{
+        opacity:0;
+    }
+
+    35%{
+        opacity:1;
+    }
+
+    60%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:0;
+    }
+
+}
+.chest-open-chest-wrapper.opened .chest-open-chest-shadow{
+
+    animation:none;
+
+    opacity:0;
+
+    transform:scaleX(0.6) scaleY(0.5);
+
+    filter:blur(2.5vmin);
+
+    transition:
+        opacity 420ms ease-out,
+        transform 420ms ease-out,
+        filter 420ms ease-out;
+}
+.chest-open-chest-wrapper.opened .chest-open-chest-glow{
+    animation:none;
+    opacity:0.55;
+}
+.chest-open-scene #chest-open-ok-button {
+	position: absolute !important;
+	top: 75% !important;
+	left:50%;
+	transform:translateX(-50%)
+}
+/* =========================================
+   REWARD TEXT
+========================================= */
+
+.chest-open-reward-text{
+
+    position:absolute;
+
+    left:50%;
+    top:82%;
+
+    transform:
+        translateX(-50%)
+        translateY(2vmin)
+        scale(0.92);
+
+    width:200%;
+
+    text-align:center;
+
+    z-index:40;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:
+        opacity 700ms ease,
+        transform 900ms cubic-bezier(.15,.8,.2,1);
+}
+
+.chest-open-reward-text.show{
+
+    opacity:1;
+
+    transform:
+        translateX(-50%)
+        translateY(0)
+        scale(1);
+}
+
+/* üst yazı */
+
+.reward-unlocked{
+
+    font-size:1.8vmin;
+    font-weight:700;
+    letter-spacing:0.45vmin;
+
+    color:#f7d98a;
+
+    opacity:0.95;
+
+    text-shadow:
+        0 0 0.5vmin rgba(255,220,120,0.7),
+        0 0 1.5vmin rgba(255,180,50,0.45);
+
+    margin-bottom:0.8vmin;
+}
+
+/* isim */
+
+.reward-name{
+
+    font-size:5.8vmin;
+    font-weight:900;
+
+    letter-spacing:0.25vmin;
+
+    text-transform:uppercase;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #fff7d6 0%,
+            #ffe08a 35%,
+            #ffbf47 60%,
+            #fff2be 100%
+        );
+
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+
+    filter:
+        drop-shadow(0 0 0.8vmin rgba(255,230,140,0.65))
+        drop-shadow(0 0 2vmin rgba(255,180,60,0.45));
+
+    text-shadow:
+        0 0 1vmin rgba(255,230,140,0.7);
+
+    animation:
+        rewardNamePulse 3s ease-in-out infinite;
+}
+
+@keyframes rewardNamePulse{
+
+    0%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.025);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+
 }

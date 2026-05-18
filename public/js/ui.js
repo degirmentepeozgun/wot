@@ -487,7 +487,7 @@ function loadWindowEvents() {
 					episodeVisibilityHidden = false;
 					if(episode && episode.bgMusic)
 						episode.playBgMusic();
-					if(episode && episode.bgSound)
+					if(episode && episode.bgSound && !_gameUI.sound)
 						episode.resumeAmbianceMusic();
 					if(__weather?.sound)
 						__weather.sound.play();
@@ -553,7 +553,7 @@ function loadWindowEvents() {
 				episodeVisibilityHidden = false;
 				if(episode && episode.bgMusic)
 					episode.playBgMusic();
-				if(episode && episode.bgSound)
+				if(episode && episode.bgSound && !_gameUI.sound)
 					episode.resumeAmbianceMusic();
 				if(__weather?.sound)
 					__weather.sound.play();
@@ -919,6 +919,7 @@ function createTagSkill(_char, _tag) {
 						_mob.friendly = _mob.invulnerable = _mob.puppetMode = _mob.alp = _mob.important = true;
 						_mob.puppetXMove = 0;
 						_mob.related = _mob.owner = _e;
+						_mob.mustDraw = true;
 						_mob.experience = 0;
 						_mob.class = 'minion';
 						_mob.direction = _dir;
@@ -942,7 +943,10 @@ function createTagSkill(_char, _tag) {
 							});
 							_mob.atk = MathRound(_c.atk * (_limit.atk / (100 * _arr.length)));
 							_mob.standBy();
+							if(_c.animations.tag.end)
+								_c.animations.tag.end(_mob);
 							_mob.still = true;
+							_mob.swapAnimation('idle');
 							_mob.animations.idle.imediateBreak = false;
 							_mob.animations.idle.after = function() {
 								if(!_mob)
@@ -986,7 +990,7 @@ function getTagSkillNode(_fr, _dir) {
 							</div>
 						</div>
 					</div>
-					<img src="./images/main/${_key}/concept.png" class="tag-char-concept" style="height:38vh;bottom:0;top:-7vh" />
+					<img src="./images/main/${_key}/concept.png" class="tag-char-concept" />
 					<div class="closer"></div>
 				</div>
 			</div>`;
@@ -1481,8 +1485,8 @@ function removeFromFriend(_id, _name) {
 		_client.saveState();
 	}
 }
-function playClick() {
-	PlaySound({key:'click', reset: true});
+function playClick(_volume) {
+	PlaySound({key:'click', reset: true, volume: _volume ?? .1});
 }
 function switchTipsUI(_inc) {
 	const _at = document.getElementById('all-tips');

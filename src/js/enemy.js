@@ -5856,7 +5856,7 @@ function enemy(_e) {
 			createHurtFeetAndBurn(this.zoom) 
 			: (_f.atk?.hurt?.knockback 
 				? 
-				createHurtFeetWithKnockback(this.zoom, this.bloodColor, _f.atk.hurt.knockback) 
+				createHurtFeetWithKnockback(this, _f.atk.hurt.knockback)  
 				: 
 				createHurtFeet(this.zoom, this.bloodColor, null, _f.bottomGap, _f.atk?.type)
 			)

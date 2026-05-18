@@ -10,6 +10,7 @@ function enemy(_e) {
 	this.start = 0;
 	this.npc = _e.npc;
 	this.class = _e.class;
+	this.mustDraw = _e.mustDraw;
 	this.noSmash = _e.noSmash;
 	this.noRemove = _e.noRemove;
 	this.villain = _e.villain;
@@ -3590,15 +3591,15 @@ function enemy(_e) {
 	this.dropItem = function (_type, _key, _alternateType) {
 		if(episode.pvp || episode.gold || episode.tower)
 			return;
-		const _prevDrops = episode.enemies?.filter(x => x.dropType && x.dropType === _type);
+		//const _prevDrops = episode.enemies?.filter(x => x.dropType && x.dropType === _type);
 		let _itemLimit;
 		if(_type === 'quest-item')
 		{
 			const _qItem = __account.questStatus?.quest?.loots?.find(x => x.key === _key);
 			_itemLimit = _qItem?.limit ?? 10;
 		}
-		if(_prevDrops?.length > (_itemLimit ?? 3))
-			return;
+		// if(_type !== 'item' && _prevDrops?.length > (_itemLimit ?? 3))
+		// 	return;
 		let _item, _isEquipment, _src;
 		switch (_type) {
 			case 'gold':
@@ -3982,11 +3983,54 @@ function enemy(_e) {
 			episode.killCount++;
 		}
 	}
+	this.grabGold = function(_noWarn) {
+		const _ch = mainCharacter;
+		if (_ch) {
+			const _maxAmount = _ch.level * 100;
+			const _minAmount = .25 * _maxAmount;
+			const _goldAmount = getRandomValue(_minAmount, _maxAmount);
+			updateGold(_goldAmount, _ch);
+			if(!_noWarn)
+				addDmgFrame({
+					item: { key: 'gold' },
+					val: _goldAmount,
+					from: _ch,
+					x: _ch.LEFT,
+					y: episode.cHeight - _ch.yPosition - _ch.HEIGHT
+				});
+		}
+	}
+	this.grabItem = function(_inv, _o) {
+		const _item = getRandomItem(_inv.grade, _inv.itemKey);
+		if(_item.type === 'weapon')
+		{
+			var _class = getRandomValue(1, Object.keys(_allEnemies).filter(x => x.startsWith('enemy0')).length);
+			_item.for = _allEnemies['enemy0' + _class]().class;
+		}
+		let _used = pushItemIntoInventory(_item);
+		if(_used) {
+			if(__storyPlaying)
+				__storyBonusItemCount++;
+			this.lastItemLootedTime = _gameTick;
+			//var _invitem = getLangData(_inv.itemKey).toProperCase();
+			// addDmgFrame({
+			// 	item: { key: _inv.itemKey, for: _item.for, grade: _inv.grade },
+			// 	//text: '<p data-text="' + _invitem + '">' + _invitem + '</p>',
+			// 	//class: 'dmg dmg-orange grade-' + _inv.grade,
+			// 	x: _char.LEFT,
+			// 	from: _char.key,
+			// 	y: episode.cHeight - _char.yPosition - _char.HEIGHT
+			// });
+		}
+		else if(this.main && _o && _o.animations.notallowed && _o.animation === 'idle')
+			_o.animate('notallowed', 1);
+		return _used;
+	}
 	this.checkLoot = function (_frame) {
 		const _char = episode.loot?.enemy ?? this;
 		if (episode.pvp || episode.tower || episode.gold || _char.looted || _char.noLoot)
 			return;
-		let _loots = _frame.loot ? [_frame.loot] : _frame.loots, _key = 'random';
+		let _loots = _frame?.loot ? [_frame?.loot] : _frame?.loots, _key = 'random';
 		if(!_loots){
 			if(episode.loot?.loots)
 				_loots = structuredClone2(episode.loot.loots);
@@ -4014,7 +4058,6 @@ function enemy(_e) {
 				}
 			}
 		}
-
 		if(_loots?.[0])
 			for(let _loot of _loots) {
 				_key = _loot?.key;
@@ -4052,8 +4095,10 @@ function enemy(_e) {
 					_char.dropItem(_loot.type, _key);
 				_char.looted = 1;
 			}
+		
 		if (_char.main) {
 			const _objects = episode.enemies?.filter(x => x.enemy == undefined && !x.remove && x.class === 'object' && x.invulnerable);
+			
 			if (_objects?.[0]) {
 				for (var _o of _objects) {
 					if (_o.getCurrentFrame().bottomGap)
@@ -4066,21 +4111,8 @@ function enemy(_e) {
 								if (_inv.type === 'pot')
 									_used = updatePot(1);
 								else if(_inv.type === 'gold') {
-									const _ch = mainCharacter;
-									if (_ch) {
-										const _maxAmount = _ch.level * 100;
-										const _minAmount = .25 * _maxAmount;
-										const _goldAmount = getRandomValue(_minAmount, _maxAmount);
-										updateGold(_goldAmount, _ch);
-										_used = 1;
-										addDmgFrame({
-											item: { key: 'gold' },
-											val: _goldAmount,
-											from: _ch,
-											x: _ch.LEFT,
-											y: episode.cHeight - _ch.yPosition - _ch.HEIGHT
-										});
-									}
+									_char.grabGold();
+									_used = 1;
 								}
 								else if (_inv.type === 'common') {
 									_used = _char.addCommonSkill(_inv);
@@ -4101,29 +4133,7 @@ function enemy(_e) {
 									}
 								}
 								else if (_inv.type === 'item') {
-									const _item = getRandomItem(_inv.grade, _inv.itemKey);
-									if(_item.type === 'weapon')
-									{
-										var _class = getRandomValue(1, Object.keys(_allEnemies).filter(x => x.startsWith('enemy0')).length);
-										_item.for = _allEnemies['enemy0' + _class]().class;
-									}
-									_used = pushItemIntoInventory(_item);
-									if(_used) {
-										if(__storyPlaying)
-											__storyBonusItemCount++;
-										_char.lastItemLootedTime = _gameTick;
-										//var _invitem = getLangData(_inv.itemKey).toProperCase();
-										// addDmgFrame({
-										// 	item: { key: _inv.itemKey, for: _item.for, grade: _inv.grade },
-										// 	//text: '<p data-text="' + _invitem + '">' + _invitem + '</p>',
-										// 	//class: 'dmg dmg-orange grade-' + _inv.grade,
-										// 	x: _char.LEFT,
-										// 	from: _char.key,
-										// 	y: episode.cHeight - _char.yPosition - _char.HEIGHT
-										// });
-									}
-									else if(_char.main && _o.animations.notallowed && _o.animation === 'idle')
-										_o.animate('notallowed', 1);
+									_used = _char.grabItem(_inv, _o);
 								}
 								else if (_inv.type === 'quest-item') {
 									const _q = __account.questStatus.quest.loots?.find(x => x.key === _inv.key);
@@ -5890,10 +5900,10 @@ function enemy(_e) {
 		this.animations.hurtfeet = new animation(
 			_f.atk?.hurt?.burn 
 			? 
-			createHurtFeetAndBurn(this.zoom) 
+			createHurtFeetAndBurn(this) 
 			: (_f.atk?.hurt?.knockback 
 				? 
-				createHurtFeetWithKnockback(this.zoom, this.bloodColor, _f.atk.hurt.knockback) 
+				createHurtFeetWithKnockback(this, _f.atk.hurt.knockback) 
 				: 
 				createHurtFeet(this.zoom, this.bloodColor, null, _f.bottomGap, _f.atk?.type)
 			)
@@ -8891,8 +8901,9 @@ function enemy(_e) {
 					{
 						const _isMoving = this.animation === 'run' || this.animation === 'walk';
 						if (!this.animate(_skill)) {
-							if(!_isMoving)
+							if(!_isMoving){
 								this.idle(7);
+							}
 						}
 					}
 				}

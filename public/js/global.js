@@ -655,6 +655,9 @@ const __fragments = [
 	] },
 	{ id:6, key: 'king', sound: {key:'knighttag', volume:.5}, name: 'King', charId:59, color:'#dc76bb', limits: [
 		{grade:1, limit:100, cost:10000, skill: 'attack', atk: 200}
+	] },
+	{ id:7, key: 'tank', sound: {key:'tanktag', volume:1}, name: 'Deli Dumrul', charId:73, color:'#80461B', limits: [
+		{grade:1, limit:100, cost:10000, skill: 'attack', atk: 200}
 	] }
 ];
 const _tips = [
@@ -2440,6 +2443,16 @@ const relatedObjects = [
 		id: 'groundbackdust', key: 'groundbackdust',
 		width: 202, height: 411/3, col:3, zoom: 1,
 		totalFrames: 8, speed: 3, singleton: true, still: true
+	},
+	{
+		id: 'debris', key: 'debris',
+		width: 384, height: 300, col:5, zoom: 1,
+		totalFrames: 13, speed: 4, singleton: true, still: true
+	},
+	{
+		id: 'debris2', key: 'debris2', reversed: true,
+		width: 384, height: 300, col:5, zoom: 1,
+		totalFrames: 13, speed: 4, singleton: true, still: true
 	}
 ];
 function setRelatedObjectSpeed() {
@@ -2463,6 +2476,12 @@ const relatedObjectImages = {
 	},
 	throw: function () {
 		return getImage('./images/related/throwdarker.png')
+	},
+	debris: function () {
+		return getImage('./images/related/debris.png')
+	},
+	debris2: function () {
+		return getImage('./images/related/debris.png')
 	},
 	sparks: function () {
 		return getImage('./images/related/sparks.png')
@@ -3152,7 +3171,17 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	ding: './images/sounds/ding.mp3',
+	heavyflesh: './images/sounds/heavy-flesh.mp3',
+	axehit: './images/sounds/axehit.mp3',
+	axewoosh: './images/sounds/axewoosh.mp3',
+	rockslam: './images/sounds/rock-slam.mp3',
+	movespin: './images/sounds/move-spin.mp3',
+	tankslashes: './images/sounds/tank-slashes.mp3',
+	chestbg: './images/sounds/chest-bgmusic.mp3',
+	chime: './images/sounds/chime.mp3',
 	shapeshift: './images/sounds/shapeshift.mp3',
+	tankhaha: './images/sounds/tank-haha.wav',
 	packagegain: './images/sounds/package-gain.wav',
 	woodland: './images/sounds/wood-land2.mp3',
 	comebackwin: './images/sounds/comeback-win.mp3',
@@ -3256,6 +3285,7 @@ const soundFiles = {
 	werewolfspin: './images/sounds/werewolf-spin.mp3?x=2',
 	bombertag: './images/sounds/bomber-tag.mp3',
 	knighttag: './images/sounds/knight-tag.mp3',
+	tanktag: './images/sounds/tanktag.wav',
 	altag: './images/sounds/al-tag.mp3',
 	tagimpact: './images/sounds/tag-impact.mp3',
 	geminsert: './images/sounds/gem-insert.mp3',
@@ -6195,8 +6225,9 @@ const grades = [
 	{ key: 8,  color: 'cyan',     hex: '#1FA6A0' }, // parlak turkuaz
 	{ key: 9,  color: 'lime',     hex: '#7CB342' }, // canlı ama kirli yeşil
 	{ key: 10, color: 'crimson',  hex: '#C13A4A' }, // açık elite red
-	{ key: 11, color: 'platinum', hex: '#C7CCD6' }, // açık metalik gri
-	{ key: 11, color: 'obsidian', hex: '#3d354b' } // açık metalik gri
+	{ key: 11, color: 'pink', hex: '#d706d7' }, // açık metalik gri
+	{ key: 12, color: 'teal', hex: '#178778' }, // açık metalik gri
+	{ key: 13, color: 'magenta', hex: '#450431' } // açık metalik gri
 ];
 function getGradeColor(_grade) {
 	return grades.find(x => x.key === _grade)?.color;
@@ -9289,6 +9320,1584 @@ const spells = {
 								type: 'ground'
 							},
 							type: 'toxic'
+						}
+					}
+				]
+			}
+		}
+	},
+	tank1faster: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 2,
+		src: './images/sprites/ep73/sprite-blue.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		pierce: true,
+		class: __spell,
+		name: 'Tank Slash 1 Fast',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				frames: [
+					{
+						spriteLeft: 257,
+						spriteTop: 2693,
+						spriteWidth: 107,
+						spriteHeight: 207,
+						spriteOrigin: 43,
+						shadow: 'red',
+						sound: { key: 'axewoosh', reset: true, volume: 1 },
+						extraStepXRate: 3,
+						extraStepYRate: .5,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							aoe: 100,
+							rate: .1,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 851,
+						spriteTop: 2689,
+						spriteWidth: 99,
+						spriteHeight: 211 + 10,
+						spriteOrigin: 49,
+						shadow: 'red',
+						extraStepXRate: 3,
+						extraStepYRate: .35,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							aoe: 100,
+							rate: .1,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 1427,
+						spriteTop: 2693,
+						spriteWidth: 107,
+						spriteHeight: 207 + 10,
+						spriteOrigin: 73,
+						shadow: 'red',
+						extraStepXRate: 3,
+						extraStepYRate: -.35,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 2051,
+						spriteTop: 2693,
+						spriteWidth: 99,
+						spriteHeight: 207,
+						spriteOrigin: 49,
+						shadow: 'red',
+						extraStepXRate: 3,
+						extraStepYRate: -.5,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 257,
+						spriteTop: 2693,
+						spriteWidth: 107,
+						spriteHeight: 207 - 10,
+						spriteOrigin: 43,
+						shadow: 'red',
+						speed: 6,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					}
+				]
+			}
+		}
+	},
+	tank2faster: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		src: './images/sprites/ep73/sprite-blue.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		pierce: true,
+		class: __spell,
+		name: 'Tank Slash 2 Fast',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				frames: [
+					{
+						spriteLeft: 596,
+						spriteTop: 1651,
+						spriteWidth: 514,
+						spriteHeight: 350,
+						spriteOrigin: 304,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .5,
+						sound: { key: 'axewoosh', reset: true, volume: 1 },
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 596,
+						spriteTop: 1651,
+						spriteWidth: 514,
+						spriteHeight: 350,
+						spriteOrigin: 304,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .35,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 596,
+						spriteTop: 1651,
+						spriteWidth: 514,
+						spriteHeight: 350,
+						spriteOrigin: 304,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.35,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 596,
+						spriteTop: 1651,
+						spriteWidth: 514,
+						spriteHeight: 350,
+						spriteOrigin: 304,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.5,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 1357,
+						spriteTop: 1652,
+						spriteWidth: 354,
+						spriteHeight: 350,
+						spriteOrigin: 143,
+						shadow: 'red',
+						speed: 6,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					}
+				]
+			}
+		}
+	},
+	tank3faster: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		src: './images/sprites/ep73/sprite-blue.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		pierce: true,
+		class: __spell,
+		name: 'Tank Slash 3 Fast',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				frames: [
+					{
+						spriteLeft: 642,
+						spriteTop: 1147,
+						spriteWidth: 555,
+						spriteHeight: 353,
+						spriteOrigin: 258,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .5,
+						sound: { key: 'axewoosh', reset: true, volume: 1 },
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 642,
+						spriteTop: 1147,
+						spriteWidth: 555,
+						spriteHeight: 353,
+						spriteOrigin: 258,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .35,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 642,
+						spriteTop: 1147,
+						spriteWidth: 555,
+						spriteHeight: 353,
+						spriteOrigin: 258,
+						extraStepXRate: 2,
+						extraStepYRate: -.35,
+						shadow: 'red',
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 642,
+						spriteTop: 1147,
+						spriteWidth: 555,
+						spriteHeight: 353,
+						spriteOrigin: 258,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.5,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 1240,
+						spriteTop: 1147,
+						spriteWidth: 480,
+						spriteHeight: 353,
+						spriteOrigin: 260,
+						shadow: 'red',
+						speed: 6,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					}
+				]
+			}
+		}
+	},
+	tank4faster: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		src: './images/sprites/ep73/sprite-blue.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		pierce: true,
+		class: __spell,
+		name: 'Tank Slash 4 Fast',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				frames: [
+					{
+						spriteLeft: 772,
+						spriteTop: 647,
+						spriteWidth: 287,
+						spriteHeight: 366,
+						spriteOrigin: 128,
+						bottomGap: 13,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .5,
+						sound: { key: 'axewoosh', reset: true, volume: 1 },
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 772,
+						spriteTop: 647,
+						spriteWidth: 287,
+						spriteHeight: 366,
+						spriteOrigin: 128,
+						bottomGap: 13,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .35,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 772,
+						spriteTop: 647,
+						spriteWidth: 287,
+						spriteHeight: 366,
+						spriteOrigin: 128,
+						bottomGap: 13,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.35,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 772,
+						spriteTop: 647,
+						spriteWidth: 287,
+						spriteHeight: 366,
+						spriteOrigin: 128,
+						bottomGap: 13,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.5,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 1373,
+						spriteTop: 726,
+						spriteWidth: 273,
+						spriteHeight: 284,
+						bottomGap:10,
+						spriteOrigin: 127,
+						shadow: 'red',
+						speed: 6,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					}
+				]
+			}
+		}
+	},
+	tank1: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 2,
+		src: './images/sprites/ep73/sprite-blue.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		pierce: true,
+		class: __spell,
+		name: 'Tank Slash 1',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				frames: [
+					{
+						spriteLeft: 257,
+						spriteTop: 2693,
+						spriteWidth: 107,
+						spriteHeight: 307,
+						spriteOrigin: 43,
+						shadow: 'red',
+						sound: { key: 'axewoosh', reset: true, volume: 1 },
+						extraStepXRate: 2.25,
+						extraStepYRate: .5,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 851,
+						spriteTop: 2689,
+						spriteWidth: 99,
+						spriteHeight: 311 + 10,
+						spriteOrigin: 49,
+						shadow: 'red',
+						extraStepXRate: 2.25,
+						extraStepYRate: .35,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 1427,
+						spriteTop: 2693,
+						spriteWidth: 107,
+						spriteHeight: 307 + 10,
+						spriteOrigin: 73,
+						shadow: 'red',
+						extraStepXRate: 2.25,
+						extraStepYRate: -.35,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 2051,
+						spriteTop: 2693,
+						spriteWidth: 99,
+						spriteHeight: 307,
+						spriteOrigin: 49,
+						shadow: 'red',
+						extraStepXRate: 2.25,
+						extraStepYRate: -.5,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 257,
+						spriteTop: 2693,
+						spriteWidth: 107,
+						spriteHeight: 307 - 10,
+						spriteOrigin: 43,
+						shadow: 'red',
+						speed: 8,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					}
+				]
+			}
+		}
+	},
+	tank2: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		src: './images/sprites/ep73/sprite-blue.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		pierce: true,
+		class: __spell,
+		name: 'Tank Slash 2',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				frames: [
+					{
+						spriteLeft: 596,
+						spriteTop: 1651,
+						spriteWidth: 514,
+						spriteHeight: 350,
+						spriteOrigin: 304,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .5,
+						sound: { key: 'axewoosh', reset: true, volume: 1 },
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 596,
+						spriteTop: 1651,
+						spriteWidth: 514,
+						spriteHeight: 350,
+						spriteOrigin: 304,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .35,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 596,
+						spriteTop: 1651,
+						spriteWidth: 514,
+						spriteHeight: 350,
+						spriteOrigin: 304,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.35,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 596,
+						spriteTop: 1651,
+						spriteWidth: 514,
+						spriteHeight: 350,
+						spriteOrigin: 304,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.5,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 1357,
+						spriteTop: 1652,
+						spriteWidth: 354,
+						spriteHeight: 350,
+						spriteOrigin: 143,
+						shadow: 'red',
+						speed: 8,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					}
+				]
+			}
+		}
+	},
+	tank3: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		src: './images/sprites/ep73/sprite-blue.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		pierce: true,
+		class: __spell,
+		name: 'Tank Slash 3',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				frames: [
+					{
+						spriteLeft: 642,
+						spriteTop: 1147,
+						spriteWidth: 555,
+						spriteHeight: 353,
+						spriteOrigin: 258,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .5,
+						sound: { key: 'axewoosh', reset: true, volume: 1 },
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 642,
+						spriteTop: 1147,
+						spriteWidth: 555,
+						spriteHeight: 353,
+						spriteOrigin: 258,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .35,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 642,
+						spriteTop: 1147,
+						spriteWidth: 555,
+						spriteHeight: 353,
+						spriteOrigin: 258,
+						extraStepXRate: 2,
+						extraStepYRate: -.35,
+						shadow: 'red',
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 642,
+						spriteTop: 1147,
+						spriteWidth: 555,
+						spriteHeight: 353,
+						spriteOrigin: 258,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.5,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 1240,
+						spriteTop: 1147,
+						spriteWidth: 480,
+						spriteHeight: 353,
+						spriteOrigin: 260,
+						shadow: 'red',
+						speed: 8,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					}
+				]
+			}
+		}
+	},
+	tank4: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		src: './images/sprites/ep73/sprite-blue.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		pierce: true,
+		class: __spell,
+		name: 'Tank Slash 4',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				frames: [
+					{
+						spriteLeft: 772,
+						spriteTop: 647,
+						spriteWidth: 287,
+						spriteHeight: 366,
+						spriteOrigin: 128,
+						bottomGap: 13,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .5,
+						sound: { key: 'axewoosh', reset: true, volume: 1 },
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 772,
+						spriteTop: 647,
+						spriteWidth: 287,
+						spriteHeight: 366,
+						spriteOrigin: 128,
+						bottomGap: 13,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .35,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 772,
+						spriteTop: 647,
+						spriteWidth: 287,
+						spriteHeight: 366,
+						spriteOrigin: 128,
+						bottomGap: 13,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.35,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 772,
+						spriteTop: 647,
+						spriteWidth: 287,
+						spriteHeight: 366,
+						spriteOrigin: 128,
+						bottomGap: 13,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.5,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 1373,
+						spriteTop: 726,
+						spriteWidth: 273,
+						spriteHeight: 284,
+						bottomGap:10,
+						spriteOrigin: 127,
+						shadow: 'red',
+						speed: 8,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
 						}
 					}
 				]
@@ -32703,7 +34312,7 @@ const cssAnimations = {
 		else {
 			_a = document.createElement('div');
 			_a.className = 'full flex animate-me-2000 screen-claw-final';
-			const _img = document.createElement('img');
+			const _img = document.createElemeNt('img');
 			_img.style.height = '70%';
 			_img.style.opacity = .6;
 			_img.src = './images/bloods/claw' + (_char.direction === __left ? 23 : 22) + '.png';
@@ -32951,7 +34560,7 @@ const cssAnimations = {
 							_after();
 					}
 				}
-				_elem.innerText = '';
+				_elem.innerHTML = '';
 				if(_func) 
 					_func();
 				delete cssAnimationProps.black;
@@ -32977,7 +34586,7 @@ const cssAnimations = {
 				addClass(_elem, 'black-bg');
 				addClass(_elem, 'flex');
 			}
-			_elem.innerText = _text ?? '';
+			_elem.innerHTML = '<div class="full flex fade-me intro-screen"><div class="intro-text">' + (_text ?? '') + '</div></div>';
 			addClass(_gameUI, 'd-none');
 			cssAnimationProps.black = { start: _gameTick, p1: _c, p2: (_ms ?? 4000) + (_delay ?? 0), p3: _text, p4: _func, p5: _delay, p6:_after };
 		}
@@ -33305,6 +34914,74 @@ const cssAnimations = {
 				start: _gameTick,
 				p1: _char,
 				p2: _ms ?? 1000,
+				p3: null,
+				p4: 0,
+				p5: fc
+			};
+		}
+		return true;
+	},
+	whiteblood: function (_char, _ms, _ctx, _opacity, _cnvs) {
+		if (cssAnimationProps.whiteblood) {
+			var fc = document.getElementById('filter-canvas');
+			if(!fc)
+				return false;
+			if (_ms > 0 && ((_gameTick - cssAnimationProps.whiteblood.start) > _ms)) {
+				_opacity -= (100 - _opacity) * 0.45;
+				if(_opacity < 0){
+					delete cssAnimationProps.whiteblood;
+					fc.remove();
+					return false;
+				}
+			}
+			else
+				_opacity += (100 - _opacity) * 0.45;
+
+			if (_opacity <= 100) {
+				cssAnimationProps.whiteblood.p4 = _opacity;
+				const alpha = _opacity / 100;
+				fc.style.background =
+					`radial-gradient(circle at center,
+					rgba(255,245,220,${alpha}) 0%,
+					rgba(255,255,255,${alpha * 0.7}) 35%,
+					rgba(255,255,255,0) 100%)`;
+				//c9.style.opacity = _canvasF.style.opacity = (1 - alpha) * 1.2;
+				const exposure = 1 - (alpha * 0.35);
+				c9.style.opacity = exposure;
+				_canvasF.style.opacity = exposure;
+				_canvasBRB.style.opacity = 1 - (alpha * 0.15);
+				_canvasBRB.style.opacity = (1 - alpha) * .85;
+				// const blurAmount =
+				// 	Math.min(
+				// 		episode.cWidth * 0.0022,
+				// 		episode.cHeight * 0.003
+				// 	) * alpha;
+
+				// fc.style.backdropFilter = `blur(${blurAmount}px)`;
+			}
+
+			return false;
+		}
+		else {
+			var fc = document.getElementById('filter-canvas');
+
+			if (!fc) {
+				fc = document.createElement("div");
+				fc.id = 'filter-canvas';
+
+				fc.style.position = 'absolute';
+				fc.style.left = '0';
+				fc.style.top = '0';
+				fc.style.width = '100%';
+				fc.style.height = '100%';
+				fc.style.background = 'rgba(255,255,255,0)';
+				fc.style.pointerEvents = 'none';
+				_css.appendChild(fc);
+			}
+			cssAnimationProps.whiteblood = {
+				start: _gameTick,
+				p1: _char,
+				p2: 333,
 				p3: null,
 				p4: 0,
 				p5: fc
