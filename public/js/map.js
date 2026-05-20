@@ -683,13 +683,20 @@ function map(_m) {
 			if(!__storyScene?.leaderBoards)
 				pvpCounter.innerText = __locations.find(x => x.mapId === _mapSprite.id)?.titles?.[getLang()] ?? getLangData( _mapSprite.coords.title);
 			else
-				pvpCounter.innerHTML = '<div class="flex" style="color:#F4BB44">' + getLangData('Stage') + ' ' + __storySceneOrder + '</div><div class="flex w-100">' + getLangData('Score') + ': ' + (__story.point ?? 0).formatWithDots() + '</div>'; 
+				this.updateStoryPoint();
 			_gameUI.appendChild(pvpCounter);
 		}
 		else if((_gameTick - this.nameWriten) > 2399) {
 			this.nameWriten *= 2;
 			removeClass(pvpCounter, 'countdown');
 		}
+	}
+	this.updateStoryPoint = function(_add) {
+		if(_add)
+			__story.point += _add;
+		pvpCounter.innerHTML = '<div class="flex" style="color:#F4BB44">' + 
+				getLangData('Stage') + ' ' + __storySceneOrder + '</div><div class="flex w-100">' + 
+				getLangData('Score') + ': ' + (__story.point ?? 0).formatWithDots() + '</div>'; 
 	}
 	this.checkGoldResult = function(_timeIsUp, _diff) {
 		let _end;

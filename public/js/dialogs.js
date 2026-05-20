@@ -651,7 +651,7 @@ function createBubbleText(_dialog) {
 			episode.bubbles = [];
 		episode.bubbles.push({key:_c.key, elem: _d});
 		if(__story)
-			PlaySound({key:'st' + __story.id + 'sc' + __storySceneOrder + 'id' + _dialog.id, volume:.5 })
+			PlaySound({path:'./images/scene/sounds/st' + __story.id + 'sc' + __storySceneOrder + 'id' + _dialog.id + '.mp3', volume:.75 })
 	}
 	if(!_c.still || _dialog.move || _firstCreation) {
 		let _left, _top;

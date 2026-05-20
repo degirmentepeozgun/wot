@@ -464,7 +464,7 @@ function loadWindowEvents() {
 					mainCharacter.stopStepSound();
         			SoundManager.suspend();
 					pauseQuestTimer();
-					if(episode.hasGoSound)
+					if(episode?.hasGoSound)
 						episode.stopGoSound();	
 					episodeVisibilityHidden = _closeOpeningMusic = true;
 				} else {
@@ -480,7 +480,7 @@ function loadWindowEvents() {
 										_anm.coolDownStart2 += _diff;
 								}
 							});
-						if(episode.mobPhaseTick)
+						if(episode?.mobPhaseTick)
 							episode.mobPhaseTick += _diff;
 					}
 					organizeModules();
@@ -491,12 +491,15 @@ function loadWindowEvents() {
 						episode.resumeAmbianceMusic();
 					if(__weather?.sound)
 						__weather.sound.play();
-					if(episode.hasGoSound)
+					if(episode?.hasGoSound)
 						PlaySound({key:'go', force: true, loop:true, volume:.5});
         			SoundManager.resume();
 					resumeQuestTimer();
 
 					window.SoundManager.warmAudio();
+						
+					if(__account?.gameOpening && _openingSound?.paused)
+						_openingSound.play();
 				}
 			}
 			catch(e) {
@@ -557,13 +560,15 @@ function loadWindowEvents() {
 					episode.resumeAmbianceMusic();
 				if(__weather?.sound)
 					__weather.sound.play();
-				if(episode.hasGoSound)
+				if(episode?.hasGoSound)
 					PlaySound({key:'go', force: true, loop:true, volume:.5});
 				if (window.plugins && window.plugins.insomnia)
 					window.plugins.insomnia.keepAwake();
         		SoundManager.resume();
 				resumeQuestTimer();
 				window.SoundManager.warmAudio();
+				if(__account?.gameOpening && _openingSound?.paused)
+					_openingSound.play();
 			}
 			catch(ex) {
 
@@ -1194,6 +1199,7 @@ function updateExperience(_value, _levelup, _char, _noWarn) {
 		return;
 	}
 	if (_levelup) {
+		_c.hbBars = undefined;
 		_c.setHealth(_c.MAXHP);
 		updateLevelUI(_c);
 		if (_c.main) {

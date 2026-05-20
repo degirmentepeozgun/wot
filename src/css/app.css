@@ -5085,7 +5085,7 @@ body:has(#cutscene) #skip-cs * {
 	box-shadow:0 0 4vh #000 !important;
 	font-weight: 600 !important;
 }
-.framed-btn.disabled2 {
+.disabled2 {
 	-webkit-filter: grayscale(50%);
 	filter: grayscale(50%);
 	color: revert !important;
@@ -11541,7 +11541,7 @@ body.pc-mission .move-to-place::after{
 }
 /* Version yazısı */
 .opening-cover::after {
-    content: "Version 1.0004";
+    content: "Version 1.0005";
     position: absolute;
     bottom: 2vh;
     left: 3vh;
@@ -13210,4 +13210,55 @@ body.pc-mission .move-to-place::after{
         transform:scale(1);
     }
 
+}
+
+.press-any-key-wrapper {
+  position: relative;
+  margin-top: 11.6%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.press-any-key-text {
+  font-size: 6vh;
+  letter-spacing: 1vh;
+  color: #f3d48a;
+
+  text-shadow:
+    0 0 .3vh rgba(255, 220, 120, 0.25),
+    0 0 .8vh rgba(255, 200, 80, 0.18);
+
+  opacity: 1;
+}
+.press-any-key-text:not(.disabled2) {
+  animation: pressAnyKeyBlink 2.4s ease-in-out infinite;
+}
+@keyframes pressAnyKeyBlink {
+  0% {
+    opacity: 0.3;
+    transform: scale(1);
+    text-shadow:
+      0 0 .2vh rgba(255, 220, 120, 0.12);
+  }
+
+  50% {
+    opacity: .9;
+    transform: scale(1.015);
+
+    text-shadow:
+      0 0 .5vh rgba(255, 230, 160, 0.35),
+      0 0 1.2vh rgba(255, 210, 100, 0.22);
+  }
+
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+
+    text-shadow:
+      0 0 .2vh rgba(255, 220, 120, 0.12);
+  }
+}
+
+.game-title-text {
+	margin-right: 42%
 }

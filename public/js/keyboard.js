@@ -428,10 +428,6 @@ function keyboard(_character, _keys) {
 			case self.keys[2]:
 			case self.keys[14]:
 				{
-					//key = self.keys[2];
-					//const move = self.getLastMove();
-					//if (move?.key === key)
-					//	moveHoldDate = move.date;
 					self.removeKey(self.keys[2], 1);
 				}
 				break;
@@ -441,19 +437,6 @@ function keyboard(_character, _keys) {
 			default:
 				break;
 		}
-		//if (key === self.lastAction.key) {
-		//	if (key === self.keys[0] || key === self.keys[2]) {
-		//		if ((new Date() - (moveHoldDate ?? self.lastAction.date)) < 200) {
-		//			self.addKey('dash', 'dash');
-		//			self.lastAction = {};
-		//			return;
-		//		}
-		//	}
-		//}
-		//if (self.character.animation === 'idle' || self.character.animation === 'run') {
-		//	self.lastAction.key = key;
-		//	self.lastAction.date = new Date();
-		//}
 	}
 	this.fatality = function(_force) {
 		let _skillName = 'finish' + (this.character.upcomingFinishingMove ?? '');
@@ -581,18 +564,33 @@ function keyboard(_character, _keys) {
 		console.log(_note);
 	}
 	this.mouseDown = function (_key) {
-		// const _btns = document.querySelectorAll('.skill[data-key="' + _key + '"]');
-		// if (_btns?.[0])
-		// 	for (var _btn of _btns) {
-		// 		addClass(_btn, 'pop-out-short');
-		// 		setTimeout(function () {
-		// 			removeClass(_btn, 'pop-out-short');
-		// 		}, 200);
-		// 	}
 		this.action(_key);
 	}
 }
+const ignoredKeys = [
+  "Escape",
+  "Shift",
+  "Control",
+  "Alt",
+  "Meta",
+  "CapsLock",
+  "NumLock",
+  "ScrollLock",
+  "Tab"
+];
 window.addEventListener('keydown', function (event) {
+	if(__account?.gameOpening)
+	{
+		const _modal = document.querySelectorAll('.inventory-question, .settings-before-play');
+		if(!_modal?.[0]) {
+			if (ignoredKeys.includes(event.key)) 
+				return;
+  			if (/^F\d+$/.test(event.key)) 
+				return;
+			delete __account.gameOpening;
+			activateGameStart(1,1);
+		}
+	}
 	const kRaw = String(event.key || '').toLowerCase();
 	if(kRaw === ' ') {
 		if(episode?.hasFocusUIDoneBtn) {
@@ -651,175 +649,12 @@ window.addEventListener('keyup', function (event) {
 		if (event?.key) {
 			if (event.which === 9)
 				event.preventDefault();
-			// if(!mainCharacter.keyboard)
-			// 	switchAutoMode();
 			mainCharacter.keyboard.mouseUp(event.key.toLowerCase());
 		}
 	} catch (e) {
 
 	}
 });
-// window.addEventListener("blur", () => {
-// 	if(mainCharacter?.keyboard)
-// 		mainCharacter.keyboard.holdingKeys = [];
-// });
-
-
-
-
-// let physicalKeys = new Set();
-
-// function normalizeKey(key) {
-//   const _k = key?.toLowerCase?.() || null;
-//   switch (_k) {
-//     case 'arrowleft': return 'a';
-//     case 'arrowup': return 'w';
-//     case 'arrowdown': return 's';
-//     case 'arrowright': return 'd';
-//   }
-//   return _k;
-// }
-
-// window.addEventListener('keydown', (e) => {
-//   console.log('KEY DOWN <----------');
-//   if (mainCharacter?.disableKeyboard) return;
-//   const k = e.key.toLowerCase();
-//   physicalKeys.add(k);
-// });
-
-// window.addEventListener('keyup', (e) => {
-//   console.log('KEY UP');
-//   const k = e.key.toLowerCase();
-//   physicalKeys.delete(k);
-// });
-
-// window.addEventListener('blur', () => {
-// 	physicalKeys.clear();
-// 	if (mainCharacter?.keyboard) 
-// 		mainCharacter.keyboard.holdingKeys = [];
-// });
-
-// // 🔥 her frame'de logical key set oluştur ve karakterle senkronize et
-// function syncKeys() {
-// 	if (!mainCharacter?.keyboard) 
-// 		return requestAnimationFrame(syncKeys);
-
-// 	// normalize edilmiş logical set (ör: ['a','w'])
-// 	const logicalKeys = new Set(Array.from(physicalKeys, normalizeKey));
-
-// 	const holding = mainCharacter.keyboard.holdingKeys.map(x => x.key);
-
-// 	// yeni basılanları bul
-// 	for (const key of logicalKeys)
-// 		if (!holding.includes(key))
-// 			mainCharacter.keyboard.mouseDown(key);
-
-// 	// bırakılanları bul
-// 	for (const key of holding)
-// 		if (!logicalKeys.has(key))
-// 			mainCharacter.keyboard.mouseUp(key);
-
-// 	requestAnimationFrame(syncKeys);
-// }
-// syncKeys();
-
-// const physicalKeys = new Set();
-// const lastDown = {};
-// const lastUp = {};
-// const antiGhostMsDir = 50; // yön tuşları için
-// const antiGhostMsOther = 10; // diğer tüm tuşlar için daha düşük
-
-// function normalizeKey(key) {
-//   const _k = key?.toLowerCase?.() || null;
-//   switch (_k) {
-//     case 'arrowleft': return 'a';
-//     case 'arrowup': return 'w';
-//     case 'arrowdown': return 's';
-//     case 'arrowright': return 'd';
-//   }
-//   return _k;
-// }
-
-// // Yön tuşları seti
-// const directionKeys = new Set(['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright']);
-
-// window.addEventListener('keydown', (e) => {
-//   if (mainCharacter?.disableKeyboard) return;
-
-//   const kRaw = e.key?.toLowerCase?.();
-//   if (!kRaw) return;
-
-//   const now = performance.now();
-//   const lastUpTime = lastUp[kRaw] || 0;
-
-//   const antiGhostMs = directionKeys.has(kRaw)
-//     ? antiGhostMsDir
-//     : antiGhostMsOther;
-
-//   // Ghost engelleme
-//   if (now - lastUpTime < antiGhostMs)
-//     return;
-
-//   lastDown[kRaw] = now;
-//   physicalKeys.add(kRaw);
-// });
-
-// window.addEventListener('keyup', (e) => {
-//   const kRaw = e.key?.toLowerCase?.();
-//   if (!kRaw) return;
-//   lastUp[kRaw] = performance.now();
-//   physicalKeys.delete(kRaw);
-// });
-// function blurKeyboard() {
-// 	physicalKeys.clear();
-// 	for (const k in lastDown) delete lastDown[k];
-// 	for (const k in lastUp) delete lastUp[k];
-//   	if (mainCharacter?.keyboard)
-//     	mainCharacter.keyboard.holdingKeys = [];
-// }
-// window.addEventListener('blur', () => {
-// 	blurKeyboard();
-// });
-
-// let frameCounter = 0;
-// function syncKeysRobust() {
-//   if (!mainCharacter?.keyboard)
-//     return requestAnimationFrame(syncKeysRobust);
-
-//   // Mobilde her frame, PC'de 3 frame'de bir
-//   const doSync = !__isPC || (frameCounter++ % 3 === 0);
-
-//   if (doSync) {
-//     const logicalKeys = new Set(Array.from(physicalKeys, normalizeKey));
-//     const desiredHolding = [];
-
-//     for (const k of logicalKeys) {
-//       let bestTime = 0;
-//       for (const raw of physicalKeys) {
-//         if (normalizeKey(raw) === k) {
-//           const t = lastDown[raw] || 0;
-//           if (t > bestTime) bestTime = t;
-//         }
-//       }
-//       if (k) desiredHolding.push({ key: k, time: bestTime });
-//     }
-
-//     desiredHolding.sort((a, b) => a.time - b.time);
-//     const desiredKeysArr = desiredHolding.map(x => x.key);
-//     const holdingKeys = mainCharacter.keyboard.holdingKeys.map(x => x.key);
-
-//     for (const k of desiredKeysArr)
-//       if (!holdingKeys.includes(k))
-//         mainCharacter.keyboard.mouseDown(k);
-
-//     for (const k of holdingKeys)
-//       if (!desiredKeysArr.includes(k))
-//         mainCharacter.keyboard.mouseUp(k);
-//   }
-
-//   requestAnimationFrame(syncKeysRobust);
-// }
-// syncKeysRobust();
 
 // --- GLOBAL KEY STATE SYSTEM ---
 const physicalKeys = new Set();
@@ -842,55 +677,8 @@ function normalizeKey(key) {
 
 const directionKeys = new Set(['w','a','s','d','arrowleft','arrowright','arrowup','arrowdown']);
 
-// window.addEventListener('keydown', (e) => {
-//   const kRaw = e.key?.toLowerCase?.();
-//   if(kRaw === ' ' && episode?.hasSkippableScreen) {
-// 		const _skippableScreen = document.querySelector('.quick-play-desc-container');
-// 		if(_skippableScreen) {
-// 			const _click = _skippableScreen.querySelector('[onexactclick]');
-// 			if(_click)
-// 				_click.onexactclick();
-// 		}
-// 		return;
-//   }
-//   if(e.repeat) {
-// 	if(!physicalKeys.has(kRaw))
-// 		return;
-//   }
-//   if (mainCharacter?.disableKeyboard || mainCharacter?.stop) {
-// 	blurKeyboard();
-// 	return;
-//   }
-
-  
-//   if (!kRaw) return;
-
-//   const now = performance.now();
-//   const lastUpTime = lastUp[kRaw] || 0;
-
-//   const antiGhostMs = directionKeys.has(kRaw)
-//     ? antiGhostMsDir
-//     : antiGhostMsOther;
-
-//   // Ghost engelleme (çok hızlı basılıp bırakılmış gibi olaylar)
-//   if (now - lastUpTime < antiGhostMs)
-//     return;
-//   pressSkill(e);
-//   lastDown[kRaw] = now;
-//   physicalKeys.add(kRaw);
-// });
-
-// window.addEventListener('keyup', (e) => {
-//   const kRaw = e.key?.toLowerCase?.();
-//   if (!kRaw) return;
-
-//   lastUp[kRaw] = performance.now();
-//   physicalKeys.delete(kRaw);
-// });
-
 // Blur'da tüm tuşları temizleyelim
 function blurKeyboard() {
-  //physicalKeys.clear();
   for (const k in lastDown) delete lastDown[k];
   for (const k in lastUp) delete lastUp[k];
 

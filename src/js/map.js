@@ -684,6 +684,7 @@ function map(_m) {
 			else
 				pvpCounter.innerHTML = '<div class="flex" style="color:#F4BB44">' + getLangData('Stage') + ' ' + __storySceneOrder + '</div><div class="flex w-100">' + getLangData('Score') + ': ' + (__story.point ?? 0).formatWithDots() + '</div>'; 
 			_gameUI.appendChild(pvpCounter);
+			this.pvpCounter = pvpCounter;
 		}
 		else if((_gameTick - this.nameWriten) > 2399) {
 			this.nameWriten *= 2;

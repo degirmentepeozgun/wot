@@ -6977,7 +6977,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		//startScene: 2,
+		//startScene: 1,
 		scenes: [
 			{
 				when: function() {
@@ -7537,8 +7537,10 @@ const __stories = [
 								const g3 = mainCharacter.animations.ground3;
 								let g3LastAttackFrame;
 								for(let _frame of g3.frames) {
-									if(_frame.atk)										
+									if(_frame.atk){								
 										g3LastAttackFrame = _frame;
+										_frame.atk.aoe = 1000;
+									}
 								}
 								g3LastAttackFrame.knockback = true;
 								g3LastAttackFrame.atk.push = 5;
@@ -7674,6 +7676,7 @@ const __stories = [
 			},
 			{
 				map: 36,
+				scorePerKill: 10,
 				noArtifact: true,
 				leaderBoards: {
 					calculate: function() {
@@ -8285,6 +8288,7 @@ const __stories = [
 			{
 				map: 11,
 				noArtifact: true,
+				scorePerLoot: { key:'gold', value: 10 },
 				leaderBoards: {
 					calculate: function() {
 						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
@@ -8562,6 +8566,7 @@ const __stories = [
 							mainCharacter.still = mainCharacter.immobilize = true;
 							mainCharacter.stopRage();
 							mainCharacter.swapAnimation('idle');
+							mainCharacter.animate('idle', 1);
 							const _father = episode.enemies.find(x => x.id === 72);
 							const _tank = episode.enemies.find(x => x.id === 73);
 							const _ranger = episode.enemies.find(x => x.id === 10002);
@@ -8571,7 +8576,7 @@ const __stories = [
 									do: function() {
 										createBubbleText({
 											id: 20,
-											location: { map: episode.id }, ms: 2000,
+											location: { map: episode.id }, ms: 3000,
 											owner: mainCharacter.key,
 											text: "We put them down"
 										});
@@ -8582,32 +8587,32 @@ const __stories = [
 									do: function() {
 										createBubbleText({
 											id: 21,
-											location: { map: episode.id }, ms: 2000,
+											location: { map: episode.id }, ms: 4000,
 											owner: _father.key,
 											text: "There can be more"
 										});
 									},
-									ms: 3200
+									ms: 4200
 								},
 								{
 									do: function() {
 										createBubbleText({
 											id: 22,
-											location: { map: episode.id }, ms: 1200,
+											location: { map: episode.id }, ms: 2200,
 											owner: _tank.key,
-											text: "More?",
+											text: "More? What exactly?",
 											onend: function() {
 												episode.openPortal = 1;
 											}
 										});
 									},
-									ms: 5300
+									ms: 8300
 								},
 								{
 									do: function() {
 										createBubbleText({
 											id: 23,
-											location: { map: episode.id }, ms: 2000,
+											location: { map: episode.id }, ms: 3000,
 											owner: _ranger.key,
 											text: "There! The gate of demons",
 											onend: function() {
@@ -8616,31 +8621,31 @@ const __stories = [
 											}
 										});
 									},
-									ms: 7100
+									ms: 11100
 								},
 								{
 									do: function() {
 										createBubbleText({
 											id: 24,
-											location: { map: episode.id }, ms: 2000,
+											location: { map: episode.id }, ms: 3000,
 											owner: mainCharacter.key,
 											text: "Won't be easy this time"
 										});
 									},
-									ms: 9200
+									ms: 14200
 								},
 								{
 									do: function() {
 										createBubbleText({
 											id: 25,
-											location: { map: episode.id }, ms: 2000,
+											location: { map: episode.id }, ms: 3000,
 											owner: _father.key,
 											text: "Take Alkin with you"
 										});
 									},
-									ms: 11400
+									ms: 17400
 								}
-							], 12700, function() {
+							], 19700, function() {
 								mainCharacter.immobilize = mainCharacter.still = false;
 								delete mainCharacter.disableKeyboard;
 								const _Y = _ranger.yPosition;
@@ -8672,7 +8677,7 @@ const __stories = [
 								}
 								else {
 									if(_left > episode.sceneAfterProps.x) {
-										platformX = episode.cWidth * 2;
+										platformX = episode.width - episode.cWidth;
 										mainCharacter.direction = __right;
 										mainCharacter.left = episode.sceneAfterProps.x - platformX;
 										mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
@@ -8701,22 +8706,22 @@ const __stories = [
 							if(_left < _center){
 								episode.showLocationHand('right');
 								_dir = __left;
-								const _base = MathRound(((episode.cWidth * 3) / __zoom) * .94);
+								const _base = MathRound((episode.width / __zoom) * .95);
 								_p1 = _base;
 								_p2 = _base + 80;
 								episode.sceneAfterProps = {
-									x:MathRound(((episode.cWidth * 3)) * .9),
+									x:MathRound(((episode.width)) * .91),
 									side:__right
 								}
 							}
 							else{
 								episode.showLocationHand('left');
 								_dir = __right;
-								const _base = MathRound(((episode.cWidth * 3) / __zoom) * .06);
+								const _base = MathRound((episode.width / __zoom) * .05);
 								_p1 = _base;
 								_p2 = _base - 80;
 								episode.sceneAfterProps = {
-									x:MathRound(((episode.cWidth * 3)) * .1),
+									x:MathRound(((episode.width)) * .09),
 									side:__left
 								}
 							}
@@ -9151,7 +9156,11 @@ const __stories = [
 																						delete _anima.alreadyDisabled;
 																					}
 																					mainCharacter.enableSkills();
+																					mainCharacter.yPosition--;
 																					mainCharacter.animate('tag', 1);
+																					setTimeout(() => {
+																						_yec.animate('hurtair', 1);
+																					}, 500);
 																					// mainCharacter.immobilize = mainCharacter.still = true;
 																					// blurKeyboard();
 																					// mainCharacter.disableKeyboard = true;
@@ -11831,4 +11840,13 @@ function nextPromoSection(_max) {
 		}
 	}
 	document.getElementById('quick-play-title').innerText = decodeURIComponent(_qp.querySelectorAll('.quick-play-slide')[_order].getAttribute('data-baslik'));
+}
+async function playNow() {
+	await BuildVoice(1, "archer", "Hey man how is going on", "energetic");
+	await BuildVoice(2, "warrior", "Same as always how about you", "normal");
+
+	PlayVoice(1);
+	setTimeout(() => {
+		PlayVoice(2);	
+	}, 5000);
 }

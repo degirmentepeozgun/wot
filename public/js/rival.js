@@ -36381,6 +36381,7 @@ const _allEnemies = {
 							spriteWidth: 215,
 							spriteHeight: 251,
 							spriteOrigin: 155 - 36,
+							sound: { key: 'musclegoblinattack1', volume:.5 },
 							speed: 12
 						},
 						{
@@ -36441,6 +36442,7 @@ const _allEnemies = {
 							spriteHeight: 219,
 							spriteOrigin: 120,
 							speed: 10,
+							sound: { key: 'musclegoblinattack2', volume:.5 },
 							def: {
 								rate: .8
 							}
@@ -36475,6 +36477,7 @@ const _allEnemies = {
 							spriteOrigin: 128,
 							speed: 12,
 							directionChangeEnabled: true,
+							sound: { key: 'musclegoblinattack1', volume:.5 },
 							def: {
 								rate: .8
 							}
@@ -36568,6 +36571,7 @@ const _allEnemies = {
 							spriteHeight: 300,
 							spriteOrigin: 129,
 							speed: 4,
+							sound: { key: 'musclegoblinslam', volume:.5 },
 							directionChangeEnabled: true,
 							def: {
 								iframe: true
@@ -36725,7 +36729,7 @@ const _allEnemies = {
 						invisibleWhenLay: true
 					},
 					null,
-					{ key: 'goblinhurt1,goblinhurt2,goblinhurt3,goblinhurt4,goblinhurt5,goblinhurt6,goblinhurt7', volume:.5, reset: true }
+					{ key: 'musclegoblinhurt3,musclegoblinhurt1,musclegoblinhurt4', volume:1, reset: true }
 				),
 				hurtground2: function() { 
 					const _hurt = createHurtGround(
@@ -36751,7 +36755,7 @@ const _allEnemies = {
 						// 	spriteHeight: 274,
 						// 	spriteOrigin: 124
 						// },
-						{ key: 'goblinhurt1,goblinhurt2,goblinhurt3,goblinhurt4,goblinhurt5,goblinhurt6,goblinhurt7', volume:.5, reset: true }
+						{ key: 'musclegoblinhurt3,musclegoblinhurt1,musclegoblinhurt4', volume:1, reset: true }
 					);
 					_hurt.key = 'hurtground2';
 					return _hurt;
@@ -36769,7 +36773,7 @@ const _allEnemies = {
 						spriteWidth: 324,
 						spriteHeight: 121,
 						spriteOrigin: 126
-					}, { key: 'goblinhurt1,goblinhurt2,goblinhurt3,goblinhurt4,goblinhurt5,goblinhurt6,goblinhurt7', volume: .5, reset: true }
+					}, { key: 'musclegoblinhurt1,musclegoblinhurt3,musclegoblinhurt4', volume: 1, reset: true }
 				),
 				// hurtair2: function() {
 				// 	const _ha = createHurtAir(
@@ -37251,6 +37255,7 @@ const _allEnemies = {
 							spriteWidth: 411,
 							spriteHeight: 452,
 							spriteOrigin: 280 - 63,
+							sound: {key:'musclegoblinattack1', volume:1},
 							speed: 12
 						},
 						{
@@ -37310,6 +37315,7 @@ const _allEnemies = {
 							spriteWidth: 568,
 							spriteHeight: 391,
 							spriteOrigin: 219,
+							sound: {key:'musclegoblinattack2', volume:1},
 							speed: 10,
 							def: {
 								rate: .8
@@ -37365,6 +37371,7 @@ const _allEnemies = {
 							spriteHeight: 541,
 							spriteOrigin: 266,
 							speed: 4,
+							sound: {key:'musclegoblinslam', volume:1},
 							directionChangeEnabled: true,
 							def: {
 								iframe: true
@@ -37861,6 +37868,7 @@ const _allEnemies = {
 							spriteHeight: 541,
 							spriteOrigin: 266,
 							speed: 4,
+							sound: {key:'musclegoblinslam', volume:1},
 							directionChangeEnabled: true,
 							def: {
 								iframe: true
@@ -38033,6 +38041,7 @@ const _allEnemies = {
 							spriteOrigin: 170,
 							src: './images/sprites/ep622/kick.png',
 							speed: 8,
+							sound: {key:'musclegoblinslash', volume:1},
 							def: {
 								iframe: true
 							}
@@ -70025,7 +70034,7 @@ const _allEnemies = {
 							spriteWidth: 474,
 							spriteHeight: 319,
 							spriteOrigin: 181,
-							extraStepXRate: -.3,
+							extraStepXRate: -.4,
 							speed: 4,
 							sound: {key:'ultimate', volume: .5},
 							def: {
@@ -70045,7 +70054,8 @@ const _allEnemies = {
 							spriteWidth: 474,
 							spriteHeight: 319,
 							spriteOrigin: 181,
-							extraStepXRate: -.3,
+							extraStepXRate: -.4,
+							sound: { key: 'tankfriction', volume: 1 },
 							speed: 4,
 							def: {
 								iframe: true
@@ -70065,7 +70075,7 @@ const _allEnemies = {
 							spriteWidth: 474,
 							spriteHeight: 319,
 							spriteOrigin: 181,
-							extraStepXRate: -.275,
+							extraStepXRate: -.3,
 							def: {
 								iframe: true
 							},
@@ -70077,7 +70087,7 @@ const _allEnemies = {
 							spriteWidth: 474,
 							spriteHeight: 319,
 							spriteOrigin: 181,
-							extraStepXRate: -.25,
+							extraStepXRate: -.2,
 							def: {
 								iframe: true
 							},
@@ -77457,7 +77467,7 @@ const _allEnemies = {
 			hasShadow: true,
 			noDirection: true,
 			still: true,
-			solid: true,
+			//solid: true,
 			bloodColor: 'green',
 			immunities: [ 'toxic' ],
 			src: './images/sprites/ep104/',
@@ -81770,11 +81780,9 @@ const _allEnemies = {
 							spriteHeight: 0,
 							spriteOrigin: 0,
 							do: function(_e) {
-								PlaySound({ key: 'loot', volume: 1 });
+								PlaySound({ key: 'pickheavy', volume: 1, end: renderChestOpeningScreen });
 								//episode.supportFound = 1;
-								requestAnimationFrame(function() {
-									renderChestOpeningScreen();
-								});
+								
 								// mainCharacter.still = mainCharacter.immobilize = mainCharacter.disableKeyboard = true;
 								// blurKeyboard();
 								// focusMe('#skill12', function() {

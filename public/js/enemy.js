@@ -2589,10 +2589,10 @@ function enemy(_e) {
 		}
 	}
 	this.checkAutoFillHP = function () {
-		if (!this.main && !this.friendly)
-			return;
-		if (!this.important || episode.lobby)
-			return;
+		// if (!this.main && !this.friendly)
+		// 	return;
+		// if (!this.important || episode.lobby)
+		// 	return;
 		// const _maxHP = this.MAXHP;
 		// if (this.health < _maxHP && this.health > 0) {
 		// 	if (!this.lastAutoFillHPTime)
@@ -3998,7 +3998,9 @@ function enemy(_e) {
 					x: _ch.LEFT,
 					y: episode.cHeight - _ch.yPosition - _ch.HEIGHT
 				});
+			return 'gold';
 		}
+		return false;
 	}
 	this.grabItem = function(_inv, _o) {
 		const _item = getRandomItem(_inv.grade, _inv.itemKey);
@@ -4024,7 +4026,7 @@ function enemy(_e) {
 		}
 		else if(this.main && _o && _o.animations.notallowed && _o.animation === 'idle')
 			_o.animate('notallowed', 1);
-		return _used;
+		return _used ? 'item' : false;
 	}
 	this.checkLoot = function (_frame) {
 		const _char = episode.loot?.enemy ?? this;
@@ -4110,10 +4112,8 @@ function enemy(_e) {
 							for (var _inv of _o.inventory) {
 								if (_inv.type === 'pot')
 									_used = updatePot(1);
-								else if(_inv.type === 'gold') {
-									_char.grabGold();
-									_used = 1;
-								}
+								else if(_inv.type === 'gold')
+									_used = _char.grabGold();
 								else if (_inv.type === 'common') {
 									_used = _char.addCommonSkill(_inv);
 									if(!_used && _char.main && _o.animations.notallowed && _o.animation === 'idle')
@@ -4166,6 +4166,7 @@ function enemy(_e) {
 							_o.animate('dead', null, null, 5);
 						}
 						if (_used) {
+							_char.setLootScore(_used);
 							_o.remove = true;
 							PlaySound({ key: 'inventory', volume: .5 });
 						}
@@ -5927,6 +5928,7 @@ function enemy(_e) {
 			});
 	}
 	this.smash = function(_t, _f) {
+		_t.setKillScore(this);
 		_f = _f ?? this.getCurrentFrame();
 		this.smasher = _t.owner ?? _t;
 		//if(!this.animations.hurtfeet)
@@ -5983,6 +5985,22 @@ function enemy(_e) {
 				}
 			});
 		});
+	}
+	this.setKillScore = function(_enemy) {
+		if(__storyScene?.scorePerKill && this.main && !_enemy.scored) {
+			if(_enemy.class !== 'minion' && _enemy.class !== 'object' && _enemy.class !== 'boss' && _enemy.class !== __spell)
+			{
+				_enemy.scored = true;
+				episode.updateStoryPoint(__storyScene.scorePerKill * (_enemy.grade ?? 1));
+			}
+		}
+	}
+	this.setLootScore = function(_key) {
+		if(__storyScene?.scorePerLoot && this.main) {
+			if(__storyScene.scorePerLoot.key === _key) {
+				episode.updateStoryPoint(__storyScene.scorePerLoot.value);
+			}
+		}
 	}
 	this.hurtEnemy = function(_anima, _f, _e, _ef, _ea, _tp, _ep) {
 		const _t = this;
@@ -6486,8 +6504,10 @@ function enemy(_e) {
 										_t.start -= _t.hitStop;
 								}
 							}
-							if(_e.isDead())
+							if(_e.isDead()) {
+								_t.setKillScore(_e);
 								_e.relatedObjects = _e.relatedObjects.filter(x => x.key !== 'stun');
+							}
 						}
 						if (_f.objects)
 							for (var _o of _f.objects)
@@ -9595,13 +9615,15 @@ function enemy(_e) {
 		this.fatique += _val ?? fatiqueDecreasement;
 		if (this.fatique > this.maxFatique)
 			this.fatique = this.maxFatique;
-		if (!this.enemy) {
+		if (!this.enemy || (episode.pvp && this.important)) {
 			try {
 				const _bar = document.querySelector('#char-' + this.key + ' .defbar-value');
-				_bar.style.transform = 'scaleX(' + (this.fatique / this.maxFatique) + ')';
+				if(_bar)
+					_bar.style.transform = 'scaleX(' + (this.fatique / this.maxFatique) + ')';
 			}
 			catch (ex) { }
-			_client.setFatique(this);
+			if(this.main)
+				_client.setFatique(this);
 		}
 	}
 	this.startCooldown = function (_skill, _continueCooldown, _atStart) {

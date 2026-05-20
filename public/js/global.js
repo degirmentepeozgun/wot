@@ -3171,6 +3171,8 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	pickheavy: './images/sounds/pick-heavy.mp3',
+	tankfriction: './images/sounds/tank-friction.mp3',
 	ding: './images/sounds/ding.mp3',
 	heavyflesh: './images/sounds/heavy-flesh.mp3',
 	axehit: './images/sounds/axehit.mp3',
@@ -3197,6 +3199,13 @@ const soundFiles = {
 	cliff: './images/sounds/cliff.mp3',
 	reaperhithurt: './images/sounds/reaper-hit-hurt.mp3',
 	reaperhit: './images/sounds/reaper-hit.mp3',
+	musclegoblinattack1: './images/sounds/muscle-goblin-attack1.mp3',
+	musclegoblinattack2: './images/sounds/muscle-goblin-attack2.mp3',
+	musclegoblinslam: './images/sounds/muscle-goblin-slam.mp3',
+	musclegoblinslash: './images/sounds/muscle-goblin-slash.mp3',
+	musclegoblinhurt1: './images/sounds/muscle-goblin-hurt1.mp3',
+	musclegoblinhurt3: './images/sounds/muscle-goblin-hurt3.mp3',
+	musclegoblinhurt4: './images/sounds/muscle-goblin-hurt4.mp3',
 	goblinkingtongue: './images/sounds/goblin-king-tongue.mp3',
 	goblinkingrelease: './images/sounds/goblin-king-release.mp3',
 	goblinkingenter: './images/sounds/goblin-king-enter.mp3',
@@ -5110,7 +5119,7 @@ const mapSprites = [
 		ground: { width: 6144, height: 1080, zoom: 1.06 * __scale, yRate: 2.2 }
 	},
 	{
-		id: 11, ambianceVolume: .3, coords: { left: '16%', top: '32%', title: 'Swamp' }, 
+		id: 11, ambianceVolume: .03, coords: { left: '16%', top: '32%', title: 'Swamp' }, 
 		theme: 'lush', distance: 1, width: MathFloor(6144 * 1.065),
 		minLevel: 1, 
 		// itemGrade: 3,

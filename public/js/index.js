@@ -793,8 +793,8 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 				}
 				removeClass(_gameUI, 'ghost');
 				disposeFocus();
-				if(__particles)
-					__particles.cancel();
+				// if(__particles)
+				// 	__particles.cancel();
 				if(episode.war)
 					_gameUI.setAttribute('data-mapid', 'war');
 				else if(_gameUI.hasAttribute('data-mapid'))
@@ -2312,8 +2312,9 @@ function playOpeningMusic() {
 	else
 		_openingSound.preload = 'auto';
 	_openingSound.volume = .5;
+	_openingSound.loop = true;
 	_openingSound.currentTime = 0;
-	_openingSound.src = "./images/sounds/opening3.mp3";
+	_openingSound.src = "./images/sounds/wind-menu.mp3"; // "./images/sounds/opening3.mp3";
 	_openingSound.play();
 	_openingSound.onended = function() {
 		_openingSound = _closeOpeningMusic = null;
@@ -2346,6 +2347,7 @@ function activateGameStart(_quickPlay, _force) {
 	__account.difficulty = 6 - __account.difficulty;
 	addClass(document.getElementById('connect-btn'), 'disabled2'); 
 	addClass(document.getElementById('qp-btn'), 'disabled2'); 
+	addClass(document.getElementById('pak-btn'), 'disabled2'); 
 	document.getElementById('mini-menu').innerHTML = '<div onexactclick="askExitApp()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/pause.png);background-size: cover"></div>'; // '<div onexactclick="activatePowerSaveMode()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/power-save.png);background-size: cover"></div>';
 	openGame();
 }
@@ -2432,7 +2434,7 @@ function selectOpeningLanguage(_key) {
 }
 function askChangeLanguage() {
 	playClick();
-	let _modal = `<div class="full fade-me show-ui flex inventory-question">
+	let _modal = `<div class="full fade-me show-ui flex inventory-question settings-before-play">
 		<div class="inventory-modal flex" style="width:50vh;aspect-ratio:1/1;flex-direction:column">`
 			+
 			`<div style="padding:6vh 4vh 2vh 4vh" class="flex w-100">
@@ -2546,7 +2548,7 @@ function getKeyboardPromo(_force) {
 	if(_force)
 		playClick();
 	const _desc = document.createElement('div');
-	_desc.className = 'flex show-ui full keyboard-promo-container quick-play-desc-container fade-me-99 animate-me';
+	_desc.className = 'flex show-ui full keyboard-promo-container quick-play-desc-container fade-me-99 animate-me settings-before-play';
 	_desc.style = 'position:absolute;top:0;left:0;overflow:hidden;z-index:1499';
 	//let _html = '<div style="height:calc(100% - 9vh);position:relative" class="w-100 flex"><img src="./images/icons/keys.png" style="border:.2vh solid #F3F4F599;border-top:0;position:absolute;object-fit:cover;max-width:100%;max-height:100%" /></div>';
 	// _desc.innerHTML = _html +
@@ -2598,10 +2600,11 @@ function getKeyboardPromo(_force) {
 		_parent = document.querySelector('#menu-ui') ?? _gameUI;
 	_parent.appendChild(_desc);
 }
-let __particles;
+//let __particles;
 function installOpeningScreen(_instant, _lateOpening) {
 	const _current = parseInt(localStorage.getItem(__difficultyKey) ?? 3);
 	__account.difficulty = _current;
+	__account.gameOpening = true;
 	var _img = new Image();
 	var _bg = document.getElementById('splash');
 	var _opening = document.getElementById('first-splash');
@@ -2612,6 +2615,9 @@ function installOpeningScreen(_instant, _lateOpening) {
 			</div>
 			<div onexactclick="askChangeLanguage()" class="opening-lang-icon flex flex-jc-end">
 				<img src="./images/icons/lang.png" /><span>${getLang().toUpperCase()}</span>
+			</div>
+			<div class="game-title-text">
+				<img src="./images/icons/text.png" />
 			</div>
 			<div style="height:20%;width:100%;padding-bottom:30vh;z-index:2" class="flex">
 				<div class="game-difficulty-wrapper flex w-100 d-none">
@@ -2624,9 +2630,14 @@ function installOpeningScreen(_instant, _lateOpening) {
 						</div>
 					</div>
 				</div>
-				<div class="flex">
+				<div class="flex d-none">
 					<div id="qp-btn" class="framed-btn flex" onexactclick="activateGameStart(1)">${getLangData('QUICK PLAY')}</div>
 					<div id="connect-btn" class="d-none framed-btn flex" onexactclick="activateGameStart()">${getLangData('DEMO PLAY')}</div>
+				</div>
+				<div class="press-any-key-wrapper">
+					<div id="pak-btn" class="press-any-key-text" onexactclick="activateGameStart(1,1)">
+						${getLangData('PRESS ANY KEY')}
+					</div>
 				</div>
 				<div style="padding-top:1vh;width:100%;color:#f8f8f880 !important;font-size:2.8vh!important" class="flex" id="assets-progress"></div>
 			</div>`;
@@ -2651,12 +2662,13 @@ function installOpeningScreen(_instant, _lateOpening) {
 	}
 	_img.onload = function() {
 		const renderOpeningUI = function() {
-			if(__particles)
-				__particles.cancel();
-			__particles = new dustParticles();
+			// if(__particles)
+			// 	__particles.cancel();
+			// __particles = new dustParticles();
 			_opening.style.opacity = 0;
 			document.getElementById('connect-btn').innerText = getLangData('DEMO PLAY');
 			document.getElementById('qp-btn').innerText = getLangData('QUICK PLAY');
+			document.getElementById('pak-btn').innerText = getLangData('PRESS ANY KEY');
 			removeClass(_opening, 'd-none');
 			removeClass(_opening, 'v-none');
 			// _opening.style.background = 'url(./images/loading/00.png), linear-gradient(0deg, #000, #000)'
@@ -2665,7 +2677,7 @@ function installOpeningScreen(_instant, _lateOpening) {
 			// _opening.style.backgroundPosition = 'center, center';
 			const _cover = document.createElement('div');
 			_cover.className = 'opening-cover';
-			_cover.innerHTML = '<img src="./images/loading/00.gif" />';
+			_cover.innerHTML = '<img src="./images/loading/001.gif" />';
 			_opening.appendChild(_cover)
 			addClass(_opening, 'fade-start');
 			if(!_instant)
@@ -2686,7 +2698,7 @@ function installOpeningScreen(_instant, _lateOpening) {
 		else
 			renderOpeningUI();
 	}
-	_img.src = './images/loading/00.gif';
+	_img.src = './images/loading/001.gif';
 	// if(__isPC && !_lateOpening && !_instant)
 	// 	setTimeout(() => {
 	// 		getKeyboardPromo();
