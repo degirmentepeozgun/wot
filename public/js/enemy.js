@@ -5879,23 +5879,77 @@ function enemy(_e) {
 			});
 		}
 	}
-	this.talk = function() {
-		if(!__storyCutScenePlaying && this.talkCount && (_gameTick - (this.lastTalkTime ?? 0) > 10000)) {
+	this.talk = function(_key) {
+		const _talkCount = __gibTalks[_key ?? this.class]?.length;
+		if(!__storyCutScenePlaying && _talkCount && (_gameTick - (this.lastTalkTime ?? 0) > 10000)) {
 			if(this.animation.startsWith('counter'))
 				return;
 			this.lastTalkTime = _gameTick;
 			let _talkId;
 			while(true) {
-				_talkId = getRandomValue2(1, this.talkCount);
-				if(this.talkCount === 1)
+				_talkId = getRandomValue2(1, _talkCount);
+				if(_talkCount === 1)
 					break;
 				if(_talkId !== this.lastTalkId){
 					this.lastTalkId = _talkId;
 					break;
 				}
 			}
-			PlaySound({path:'./images/talks/' + this.class + '/' + _talkId + '.mp3', volume: 1 });
+			PlaySound({path:'./images/talks/' + this.class + '/gib' + _talkId + '.mp3', volume: 1 });
+			this.renderTalk(_talkId, _key);
 		}
+	}
+	this.renderTalk = function(_order, _key) {
+		const _exist = document.querySelector('.status-item-container:not(.talk-avatar-render)');
+		if(_exist)
+			return;
+		const _text = __gibTalks[_key ?? this.class][_order - 1][getLang()];
+		if(!_text)
+			return;
+		const _path = './images/avatar/' + this.class + '-smile.png';
+		//_path teki görsel load edilirse bir html render edilecek error verirse işlem yapılmayacak
+		const _img = new Image();
+		const _me = this.class;
+		_img.onload = function() {
+			let _div = document.querySelector('.game-status-screen');
+			let _talk;
+			if(!_div) {
+				_div = document.createElement('div');
+				_div.className = 'flex game-status-screen';
+				_gameUI.appendChild(_div);
+			}
+			else {
+				_talk = document.querySelector('.talk-avatar-render');
+				if(_talk)
+					_talk.remove();
+			}
+			_talk = document.createElement('div');
+			const _icon = "<img class='talk-avatar-render-image' src='" + _path + "' />";
+			const _class = _me[0].toLocaleUpperCase(getLang()) + _me.substring(1);
+			let _title = getLangData(_class);
+			const frag = document.createDocumentFragment();
+
+			_talk.innerHTML = `<div class="flex talk-avatar-render status-item-container w-50 flex flex-ai-start">
+				<div class="status-item-icon-container">`
+					+ _icon +
+				`</div>
+				<div class="status-item-action-container flex">
+					<div class="item-title-wrapper flex w-100 flex-jc-start">
+						${_title}
+					</div>
+					<div class="item-action-wrapper flex flex-jc-start w-100">
+						${_text}
+					</div>
+				</div>
+			</div>`;
+
+			const element = _talk.firstElementChild;
+
+			frag.appendChild(element);
+			_div.prepend(frag);
+			episode.lastTalkAttached = { elem: element, time: _gameTick };
+		}
+		_img.src = _path;
 	}
 	this.installHurtFeet = function(_f) {
 		this.animations.hurtfeet = new animation(

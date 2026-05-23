@@ -3032,6 +3032,7 @@ function installDungeonUI() {
 	});
 }
 function installStoryFinish(_failed, _extraGain, _content) {
+	window.SoundManager.clearLoops();
 	if(__storyScene?.leaderBoards)
 	{
 		installQuickPlayStageFinish(_failed);

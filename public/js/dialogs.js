@@ -9,6 +9,26 @@ const _conceptArts = {
 	tank: { direction: 'right', title: 'Deli Dumrul' },
 	stables: { direction: 'right', title: 'Stable Master' }
 };
+const __gibTalks = {
+	warrior: [
+		{ en: 'Somebody call a doctor', tr: 'Biri doktor çağırsın' },
+		{ en: 'Oh my god', tr: 'Aman Tanrım' },
+		{ en: "Now that's gonna leave a mark", tr: 'Bu iz bırakacak' },
+		{ en: "Owww damn!", tr: 'Ayy kahretsin!' },
+		{ en: "Holy crap what a beating", tr: 'Vay canına, ne dayak!' },
+		{ en: "Damn i felt that one", tr: 'Kahretsin, bunu hissettim' },
+		{ en: "Well that's unfortunate", tr: 'Bu talihsiz bir durum' },
+		{ en: "That looks painful", tr: 'Bu acı verici görünüyor' },
+		{ en: "I definitely heard a crack", tr: 'Kesinlikle bir çatlama duydum' },
+		{ en: "Absolute blood bath", tr: 'Tam bir kan banyosu' },
+		{ en: "Ohh it's gonna hurt", tr: 'Ayy, bu acıyacak' },
+		{ en: "[Laughs]", tr: '[Gülüyor]' },
+		{ en: "[Laughs]", tr: '[Gülüyor]' }
+	],
+	cyclopsair: [
+		{ en: 'Back off before i crush you', tr: 'Seni ezmeden geri çekil' }
+	]
+}
 let _dialogAppeared;
 function updateQuestArea(_skipIfNoUI, _qq, _force) {
 	let _elm = document.getElementById('quest-status');

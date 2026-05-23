@@ -788,7 +788,7 @@ function characterSkill() {
 					'<div class="flex flex-jc-start skill-card-title" style="height:50%;width:100%">' + _skill.names[getLang()] + '</div>' +
 					(_level > 0 ?
 						'<div class="flex flex-jc-start skill-card-level"><span id="skill-' + _skill.key + '-level">' + _level + '</span>&nbsp;/&nbsp;' + _skill.props.length + '</div>' :
-						'<div class="flex flex-jc-start skill-card-state">' + getLangData('Unlock') + ':&nbsp;<span style="color:#ff6c00 !important">' + getLangData('Level') + ' ' + _skill.unlockLevel + '</span></div>') +
+						'<div class="flex flex-jc-start skill-card-state">' + getLangData('Unlocked') + ':&nbsp;<span style="color:#ff6c00 !important">' + getLangData('Level') + ' ' + _skill.unlockLevel + '</span></div>') +
 					'</div>' +
 					'</div>';
 				_i++;
@@ -861,7 +861,7 @@ function characterSkill() {
 				'<div class="skill-icon-wrapper flex"><img src="./images/skills/' + _skill.key + '.png" /></div>' +
 				'<div style="flex:1;height:100%">' +
 				'<div class="flex flex-jc-start" style="height:50%;width:100%">' + _skill.names[getLang()] + '</div>' +
-				'<div class="flex flex-jc-start" style="height:50%;width:100%">' + (!_active ? getLangData('Unlock') + ':&nbsp;<span style="color:#ff6c00 !important">' + getLangData('Level') + ' ' + _skill.unlockLevel  + '</span>': '') + '</div>' +
+				'<div class="flex flex-jc-start" style="height:50%;width:100%">' + (!_active ? getLangData('Unlocked') + ':&nbsp;<span style="color:#ff6c00 !important">' + getLangData('Level') + ' ' + _skill.unlockLevel  + '</span>': '') + '</div>' +
 				'</div>' +
 				'</div>';
 			_i++;

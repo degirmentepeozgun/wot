@@ -6977,7 +6977,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		//startScene: 1,
+		//startScene: 2,
 		scenes: [
 			{
 				when: function() {
@@ -8403,6 +8403,58 @@ const __stories = [
 					// }, 5000);
 				},
 				actions: [
+					{
+						when: function() {
+							return episode.lockedChestLooted;
+						},
+						do: function() {
+							episode.lockedChestLooted = false;
+							let _div = document.querySelector('.game-status-screen');
+							if(_div)
+								_div.remove();
+							
+							_div = document.createElement('div');
+							_div.className = 'flex game-status-screen';
+							_gameUI.appendChild(_div);
+							
+							const _icon = `<span class="item-in-slot full grade2-item" style="display:inline-block;position:relative"><img style="background:#010101" class="item-img" src="./images/icons/chest2.png"/></span>`;
+							let _title = getLangData('Strongbox');
+							const frag = document.createDocumentFragment();
+							const _subDiv = document.createElement('div');
+							_subDiv.innerHTML = `<div id='looted-strongbox' data-status-item-id="strongbox" class="flex status-item-container w-50 flex flex-ai-start">
+								<div class="status-item-icon-container">`
+									+ _icon +
+								`</div>
+								<div class="status-item-action-container flex">
+									<div class="item-title-wrapper flex flex-jc-start w-100">
+										${_title}
+									</div>
+									<div class="item-action-wrapper flex flex-jc-start w-100">
+										<div id="strongbox-unlock-btn" class="game-menu-button animate-me flex" onexactclick="renderChestOpeningScreen()">
+											<div class="flex">${getLangData('UNLOCK')}</div>
+										</div>
+									</div>
+								</div>
+							</div>`;
+							PlaySound({key:'questaccepted', volume: .8});
+							warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/present.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Strongbox Found') + '</span></div>', null, null, 1);
+							
+							frag.appendChild(_subDiv.firstElementChild);
+							_div.prepend(frag);
+							mainCharacter.animate('idle', 1);
+							blurKeyboard();
+							mainCharacter.disableKeyboard = true;
+							mainCharacter.still = mainCharacter.immobilize = true;
+							requestAnimationFrame(() => {
+								focusMe('#looted-strongbox', function() {
+									removeFocus();
+									disposeFocus();
+									renderChestOpeningScreen();
+								}, true, null, null, 1, null, null, 1);
+							});
+									
+						}
+					},
 					{
 						when: function() {
 							return episode.allLooted === 1 && mainCharacter.hasAdvicedItem;
@@ -9922,10 +9974,14 @@ function closeChestOpeningScreen() {
 	}
 }
 function renderChestOpeningScreen(_gift) {
+	playClick(1);
 	episode.pauseBgMusic();
 	episode.pauseAmbianceMusic();
 	if(episode.enemies?.length)
 		episode.enemies.forEach(x => x.stopStepSound());
+	const _sb = document.getElementById('looted-strongbox');
+	if(_sb)
+		_sb.remove();
 	const _reward = getRewardIcon(1, 'fragment', 'tank');
 
 	const _wrapper = document.createElement('div');
@@ -10585,8 +10641,8 @@ function storyBonus(_func, _instant) {
 // 	});
 // }, 2000);
 
-function focusMe(_selector, _func, _transparent, _text, _doneBtn, _fingerFade, _circle, _noFinger) {
-	new cssAnimations.focusui(_selector, _func, _transparent, _text, _doneBtn, null, _fingerFade, _circle, _noFinger);
+function focusMe(_selector, _func, _transparent, _text, _doneBtn, _fingerFade, _circle, _noFinger, _fingerUp) {
+	new cssAnimations.focusui(_selector, _func, _transparent, _text, _doneBtn, null, _fingerFade, _circle, _noFinger, _fingerUp);
 	if(!_transparent) {
 		mainCharacter.disableSkills(1);
 		mainCharacter.immobilize = mainCharacter.still = true;

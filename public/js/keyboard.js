@@ -615,11 +615,10 @@ window.addEventListener('keydown', function (event) {
 		return;
 	}
 	if (event.repeat) {
-		console.log('tekrar eden tuş:', event.key);
 		return;
 	}
 	try {
-  		if(kRaw === ' ' && episode?.hasSkippableScreen) {
+  		if(episode?.hasSkippableScreen && kRaw === ' ') {
 			const _skippableScreen = document.querySelector('.quick-play-desc-container');
 			if(_skippableScreen) {
 				const _click = _skippableScreen.querySelector('[onexactclick]');

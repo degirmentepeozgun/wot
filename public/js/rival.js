@@ -59735,7 +59735,7 @@ const _allEnemies = {
 							spriteOrigin: 158 / 2,
 							speed: 9,
 							do: function(_e){
-								_e.talk();
+								_e.talk('cyclopsair');
 								//PlaySound({path:'./images/talks/cyclops/' + getRandomValue(1, _e.talkCount) + '.mp3', volume: 1 });
 							},
 							def: {
@@ -81713,10 +81713,6 @@ const _allEnemies = {
 							spriteOrigin: 107,
 							speed: 1,
 							sound: { key:'eggfall', volume: .4 },
-							do : function(_e) {
-								//warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/kill.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Weapon found') + '!</span></div>', null, null, 1);
-								//warn('<div class="flex heading" style="position:relative"><img style="position:absolute;z-index:-1;left:-40%;width:180%" src="./images/icons/banner.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Weapon found') + '!</span></div>', 'level-up');
-							},
 							def: {
 								iframe: true
 							}
@@ -81780,7 +81776,9 @@ const _allEnemies = {
 							spriteHeight: 0,
 							spriteOrigin: 0,
 							do: function(_e) {
-								PlaySound({ key: 'pickheavy', volume: 1, end: renderChestOpeningScreen });
+								PlaySound({ key: 'pickheavy', volume: 1, end: function() {
+									episode.lockedChestLooted = 1;
+								} });
 								//episode.supportFound = 1;
 								
 								// mainCharacter.still = mainCharacter.immobilize = mainCharacter.disableKeyboard = true;

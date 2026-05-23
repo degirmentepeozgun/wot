@@ -1,362 +1,424 @@
 ﻿window.SoundManager = (function () {
+
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
   const soundBuffers = {};
   const preloaded = new Set();
 
   const COOLDOWN_MS = 200;
 
-  // Pool: id -> GainNode[]
-  const gainNodePools = {};
-
-  // Playing kaydı: id -> { source, gain, startedAt, durationMs }
+  // aktif sesler
+  // key -> playback object
   const playing = {};
 
-  // Normalize cache (sadece kullanılanlar doldurulur)
-  const audioNormalizeCache = {}; // id -> { peak, normGain }
+  // normalize cache
+  const audioNormalizeCache = {};
 
-  // Peak Analizi (ultra hızlı)
+  // ---------------------------------------------------
+  // PEAK ANALYZE
+  // ---------------------------------------------------
+
   function computePeak(buffer) {
     const data = buffer.getChannelData(0);
+
     let peak = 0;
+
     for (let i = 0; i < data.length; i++) {
       const v = Math.abs(data[i]);
       if (v > peak) peak = v;
     }
+
     return peak;
   }
 
-  // Normalize Gain Hesapla (0.7 referans)
   function getNormalizedGain(id, buffer) {
-    if (audioNormalizeCache[id]) return audioNormalizeCache[id].normGain;
+
+    if (audioNormalizeCache[id])
+      return audioNormalizeCache[id].normGain;
 
     const peak = computePeak(buffer);
+
     const reference = 0.7;
-    let normGain = peak > 0 ? reference / peak : 1;
 
-    // Abartmasın diye güvenlik sınırı
-    if (normGain > 4) normGain = 4;
+    let normGain = peak > 0
+      ? reference / peak
+      : 1;
 
-    audioNormalizeCache[id] = { peak, normGain };
+    if (normGain > 4)
+      normGain = 4;
+
+    audioNormalizeCache[id] = {
+      peak,
+      normGain
+    };
+
     return normGain;
   }
 
-  // ---------------------------------------------------------
+  // ---------------------------------------------------
+  // BUFFER LOAD
+  // ---------------------------------------------------
+
   async function loadBuffer(id, url) {
+
     const response = await fetch(url);
+
     const arrayBuffer = await response.arrayBuffer();
+
     const buffer = await ctx.decodeAudioData(arrayBuffer);
+
     soundBuffers[id] = buffer;
   }
 
-  function getGainNode(id) {
-    if (!gainNodePools[id]) gainNodePools[id] = [];
-    const pool = gainNodePools[id];
-    for (const gain of pool) {
-      if (!gain._inUse) return gain;
-    }
-    const gain = ctx.createGain();
-    gain.connect(ctx.destination);
-    gain._inUse = false;
-    pool.push(gain);
-    return gain;
+  // ---------------------------------------------------
+  // NODE CLEANUP
+  // ---------------------------------------------------
+
+  function cleanupPlayback(id, playback) {
+
+    if (!playback) return;
+
+    try {
+      playback.source.onended = null;
+    } catch (_) {}
+
+    try {
+      playback.source.stop(0);
+    } catch (_) {}
+
+    try {
+      playback.source.disconnect();
+    } catch (_) {}
+
+    try {
+      playback.panner?.disconnect();
+    } catch (_) {}
+
+    try {
+      playback.gain?.disconnect();
+    } catch (_) {}
+
+    delete playing[id];
+
+    playback.end?.();
   }
+
+  // ---------------------------------------------------
+  // API
+  // ---------------------------------------------------
 
   return {
 
+    // -----------------------------------------
+    // audio warmup
+    // -----------------------------------------
+
     warmAudio() {
+
       ctx.resume().then(() => {
+
         const osc = ctx.createOscillator();
+
         const gain = ctx.createGain();
+
         gain.gain.value = 0;
+
         osc.connect(gain).connect(ctx.destination);
+
         osc.start();
+
         osc.stop(ctx.currentTime + 0.01);
+
       });
+
     },
 
+    // -----------------------------------------
+    // preload
+    // -----------------------------------------
+
     async preload(id, url) {
-      if (preloaded.has(id)) return;
+
+      if (!id)
+        id = url;
+
+      if (preloaded.has(id))
+        return;
+
       await loadBuffer(id, url);
+
       preloaded.add(id);
     },
 
-    // ---------------------------------------------------------
-    async play(id, url = null, volume = 1, loop = false, rate = 1, reset = false, force = false, end = null, bind = false) {
+    // -----------------------------------------
+    // play
+    // -----------------------------------------
 
-      if (!id || !soundBuffers[id]) {
-        if (!url) url = soundFiles?.[id];
-        if (!url) return undefined;
-        if (!id && url) id = url;
+    async play(
+      id,
+      url = null,
+      volume = 1,
+      loop = false,
+      rate = 1,
+      reset = false,
+      force = false,
+      end = null,
+      bind = false
+    ) {
+
+      // -----------------------------
+      // resolve id
+      // -----------------------------
+
+      if (!id)
+        id = url;
+
+      if (!url)
+        url = soundFiles?.[id];
+
+      if (!id || !url)
+        return undefined;
+
+      // -----------------------------
+      // preload
+      // -----------------------------
+
+      if (!soundBuffers[id]) {
         await this.preload(id, url);
       }
 
-      const now = performance.now();
       const buffer = soundBuffers[id];
-      const durationMs = loop ? Infinity : (buffer.duration / rate) * 1000;
 
-      // Reset / cooldown sistemi (dokunmadım)
+      if (!buffer)
+        return undefined;
+
+      const now = performance.now();
+
+      const durationMs = loop
+        ? Infinity
+        : (buffer.duration / rate) * 1000;
+
+      // -----------------------------
+      // previous playback
+      // -----------------------------
+
       const prev = playing[id];
+
       if (prev) {
+
         const elapsed = now - prev.startedAt;
+
         const stillPlaying = elapsed < prev.durationMs;
 
         if (stillPlaying) {
-          if (!reset) return undefined;
 
-          if (reset && !end && !force && elapsed < COOLDOWN_MS) 
+          // reset false → ignore
+          if (!reset)
             return undefined;
 
-          try { prev.source.stop(); } catch (_) {}
-          prev.gain._inUse = false;
-          delete playing[id];
+          // cooldown
+          if (
+            reset &&
+            !force &&
+            !end &&
+            elapsed < COOLDOWN_MS
+          ) {
+            return undefined;
+          }
+
+          cleanupPlayback(id, prev);
         }
       }
 
-      // Source node
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.loop = loop;
-      source.playbackRate.value = rate;
-      
-      // Gain node pool
-      const gain = getGainNode(id);
+      // -----------------------------
+      // create source
+      // -----------------------------
 
-      //Normalize gain ile user volume çarpıldı
+      const source = ctx.createBufferSource();
+
+      source.buffer = buffer;
+
+      source.loop = loop;
+
+      source.playbackRate.value = rate;
+
+      // -----------------------------
+      // gain
+      // -----------------------------
+
+      const gain = ctx.createGain();
+
       const normGain = getNormalizedGain(id, buffer);
+
       gain.gain.value = volume * normGain;
-      gain._inUse = true;
+
+      // -----------------------------
+      // stereo panner
+      // -----------------------------
 
       const panner = ctx.createStereoPanner();
-      panner.pan.value = 0; // başlangıç değeri
 
-      // Zincir
+      panner.pan.value = 0;
+
+      // -----------------------------
+      // chain
+      // -----------------------------
+
       source.connect(panner);
+
       panner.connect(gain);
 
-      source.start(0);
-      playing[id] = {
+      gain.connect(ctx.destination);
+
+      // -----------------------------
+      // playback object
+      // -----------------------------
+
+      const playback = {
+        id,
         source,
         gain,
         panner,
         startedAt: now,
         durationMs,
-        ended: end
+        end
       };
 
-      const cleanup = () => {
-        end?.();
-        if (playing[id]?.source === source){
-          gain._inUse = false;
-          delete playing[id];
+      playing[id] = playback;
+
+      // -----------------------------
+      // ended
+      // -----------------------------
+
+      source.onended = () => {
+
+        if (playing[id]?.source === source) {
+          cleanupPlayback(id, playback);
         }
+
       };
 
-      source.onended = cleanup;
+      // -----------------------------
+      // start
+      // -----------------------------
+
+      source.start(0);
+
+      // helper refs
+
       source.volume = gain.gain.value;
+
       source.gain = gain.gain;
+
       source.pannerNode = panner;
-      return Promise.resolve(source);
+
+      return bind
+        ? Promise.resolve(source)
+        : undefined;
     },
-    
+
+    // -----------------------------------------
+    // stop
+    // -----------------------------------------
+
+    stop(id) {
+
+      if (!id)
+        return;
+
+      const playback = playing[id];
+
+      if (!playback)
+        return;
+
+      cleanupPlayback(id, playback);
+    },
+
+    // -----------------------------------------
+    // stop all
+    // -----------------------------------------
+
+    stopAll() {
+
+      const ids = Object.keys(playing);
+
+      for (const id of ids) {
+
+        const playback = playing[id];
+
+        if (playback) {
+          cleanupPlayback(id, playback);
+        }
+
+      }
+    },
+
+    // -----------------------------------------
+    // suspend
+    // -----------------------------------------
+
     suspend() {
       ctx.suspend();
     },
 
+    // -----------------------------------------
+    // resume
+    // -----------------------------------------
+
     resume() {
-        ctx.resume();
+      ctx.resume();
     },
 
-    stop(id) {
-      const p = playing[id];
-      if (p) {
-        try { p.source.stop(); } catch (_) {}
-        p.gain._inUse = false;
-        delete playing[id];
-      }
-    },
+    // -----------------------------------------
+    // clear loops
+    // -----------------------------------------
 
-    stopAll() {
-      for (const id in playing) {
-        this.stop(id);
-      }
-    },
     clearLoops() {
-      preloaded.clear();
-      for(let id in playing){
-         const p = playing[id];
-          if (p?.source?.loop) {
-            try { p.source.stop(); } catch (_) {}
-            p.gain._inUse = false;
-            delete playing[id];
-            const gn = gainNodePools?.[id];
-            if(gn)
-              gn.length = 0;
-            delete soundBuffers[id];
-            delete audioNormalizeCache[id];
-          }
+
+      const ids = Object.keys(playing);
+
+      for (const id of ids) {
+
+        const p = playing[id];
+
+        if (p?.source?.loop) {
+
+          cleanupPlayback(id, p);
+
+          delete soundBuffers[id];
+
+          delete audioNormalizeCache[id];
+
+          preloaded.delete(id);
+        }
       }
     },
+
+    // -----------------------------------------
+    // clear all
+    // -----------------------------------------
+
     clearAll() {
+
       this.stopAll();
-      for (const k in soundBuffers) delete soundBuffers[k];
+
+      for (const k in soundBuffers)
+        delete soundBuffers[k];
+
+      for (const k in audioNormalizeCache)
+        delete audioNormalizeCache[k];
+
       preloaded.clear();
-
-      for (const id in gainNodePools) {
-        gainNodePools[id].length = 0;
-      }
-
-      //Normalize cache de temizlensin
-      for (const k in audioNormalizeCache) delete audioNormalizeCache[k];
     },
+
+    // -----------------------------------------
+    // get playing
+    // -----------------------------------------
+
     getPlaying(id) {
-        return playing[id] || playing[soundFiles?.[id]] || null;
+      return playing[id] || null;
     }
+
   };
+
 })();
-
-// window.SoundManager = (function () {
-//   const ctx = new (window.AudioContext || window.webkitAudioContext)();
-//   const soundBuffers = {};
-//   const preloaded = new Set();
-
-//   const COOLDOWN_MS = 200;
-
-//   // Pool: id -> GainNode[]
-//   const gainNodePools = {};
-
-//   // Playing kaydı: id -> { source, gain, startedAt, durationMs }
-//   const playing = {};
-
-//   async function loadBuffer(id, url) {
-//     const response = await fetch(url);
-//     const arrayBuffer = await response.arrayBuffer();
-//     const buffer = await ctx.decodeAudioData(arrayBuffer);
-//     soundBuffers[id] = buffer;
-//   }
-
-//   function getGainNode(id) {
-//     if (!gainNodePools[id]) gainNodePools[id] = [];
-//     const pool = gainNodePools[id];
-//     // Boşta gain node var mı?
-//     for (const gain of pool) {
-//       if (!gain._inUse) return gain;
-//     }
-//     // Yoksa yeni yarat
-//     const gain = ctx.createGain();
-//     gain.connect(ctx.destination);
-//     gain._inUse = false;
-//     pool.push(gain);
-//     return gain;
-//   }
-
-//   return {
-    
-//     warmAudio() {
-//       ctx.resume().then(() => {
-//         // çok kısa, sessiz bir ses üret → motoru ısıt
-//         const osc = ctx.createOscillator();
-//         const gain = ctx.createGain();
-//         gain.gain.value = 0; // sessiz
-//         osc.connect(gain).connect(ctx.destination);
-//         osc.start();
-//         osc.stop(ctx.currentTime + 0.01);
-//       });
-//     },
-
-//     async preload(id, url) {
-//       if (preloaded.has(id)) return;
-//       await loadBuffer(id, url);
-//       preloaded.add(id);
-//     },
-
-//     async play(id, url = null, volume = 1, loop = false, rate = 1, reset = false, force = false, end = null, bind = false) {
-//       if (!id || !soundBuffers[id]) {
-//         if (!url) url = soundFiles?.[id];
-//         if (!url) return;
-//         if(!id && url)
-//           id = url;
-//         await this.preload(id, url);
-//       }
-//       const now = performance.now();
-//       const buffer = soundBuffers[id];
-//       const durationMs = (buffer.duration / rate) * 1000;
-
-//       const prev = playing[id];
-//       if (prev) {
-//         const elapsed = now - prev.startedAt;
-//         const stillPlaying = elapsed < prev.durationMs;
-
-//         if (stillPlaying) {
-//           if (!reset) return; // reset = false ve öncekini yok say
-
-//           if (reset && !end && !force && elapsed < COOLDOWN_MS) return; // cooldown dolmadı
-
-//           // reset=true ve cooldown doldu, önceki sesi durdur
-//           try {
-//             prev.source.stop();
-//           } catch (_) {}
-//           prev.gain._inUse = false;
-//           delete playing[id];
-//         }
-//       }
-
-//       // Yeni AudioBufferSourceNode yarat
-//       const source = ctx.createBufferSource();
-//       source.buffer = buffer;
-//       source.loop = loop;
-//       source.playbackRate.value = rate;
-
-//       // GainNode poolundan al
-//       const gain = getGainNode(id);
-//       gain.gain.value = volume;
-//       gain._inUse = true;
-
-//       source.connect(gain);
-
-//       source.start(0);
-//       playing[id] = {
-//         source,
-//         gain,
-//         startedAt: now,
-//         durationMs,
-//         ended: end
-//       };
-
-//       const cleanup = () => { 
-//         end?.();
-//         gain._inUse = false;
-//         if (playing[id]?.source === source)
-//           delete playing[id];
-//       }; 
-
-//       source.onended = cleanup;
-
-//       return bind ? Promise.resolve(source) : undefined;
-//     },
-
-//     stop(id) {
-//       const p = playing[id];
-//       if (p) {
-//         try { p.source.stop(); } catch (_) {}
-//         p.gain._inUse = false;
-//         delete playing[id];
-//       }
-//     },
-
-//     stopAll() {
-//       for (const id in playing) {
-//         this.stop(id);
-//       }
-//     },
-
-//     clearAll() {
-//       this.stopAll();
-//       for (const k in soundBuffers) delete soundBuffers[k];
-//       preloaded.clear();
-//       // Gain node poolu temizleme isteğe bağlı, yoksa kalabilir
-//       for (const id in gainNodePools) {
-//         gainNodePools[id].length = 0;
-//       }
-//     }
-//   };
-// })();

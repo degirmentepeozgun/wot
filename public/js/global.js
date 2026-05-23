@@ -34383,7 +34383,7 @@ const cssAnimations = {
 			cssAnimationProps.crack = { start: _gameTick };
 		}
 	},
-	focusui: function (_selector, _func, _transparent, _text, _doneBtn, _blackBG, _fingerFade, _circle, _noFinger) {
+	focusui: function (_selector, _func, _transparent, _text, _doneBtn, _blackBG, _fingerFade, _circle, _noFinger, _fingerUp) {
 		_focusMode = 1;
 		let _curt = document.createElement('div');
 		_curt.id = 'focus-ui';
@@ -34478,7 +34478,7 @@ const cssAnimations = {
 		if(!_noFinger) {
 			_finger = document.createElement('img');
 			_finger.className = 'push-me-finger';
-			if(__isPC && (hasClass(_elem, 'skill') || hasClass(_elem, 'main-menu-btn')) && !_elem.id.startsWith('chain-skill'))
+			if(_fingerUp || (__isPC && (hasClass(_elem, 'skill') || hasClass(_elem, 'main-menu-btn')) && !_elem.id.startsWith('chain-skill')))
 				_finger.className += ' finger-top';
 			if(_fingerFade)
 				_finger.className += ' fade-me';
@@ -34551,6 +34551,13 @@ const cssAnimations = {
 		if(!_noFinger) {
 			_finger.style.left = (_rect.left - _extraX) + 'px';
 			_finger.style.top = ((_rect.top - _extraY) + MathRound(.5 * _elem.offsetHeight)) + 'px';
+			_finger.onload = function() {
+				const gifWidth = _finger.offsetWidth;
+				if(W > gifWidth){
+					const offsetX = (W - gifWidth) / 2;
+					_finger.style.left = (_rect.left - _extraX + offsetX) + 'px';
+				}
+			}
 			_finger.src = './images/icons/push-me.gif';
 			_container.appendChild(_finger);
 		}

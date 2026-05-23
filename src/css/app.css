@@ -11541,7 +11541,7 @@ body.pc-mission .move-to-place::after{
 }
 /* Version yazısı */
 .opening-cover::after {
-    content: "Version 1.0005";
+    content: "Version 1.0006";
     position: absolute;
     bottom: 2vh;
     left: 3vh;
@@ -11673,6 +11673,7 @@ body.pc-mission .move-to-place::after{
 .chest-open-scene-wrapper {
 	background:#000;
 	position:absolute;
+	z-index: 99999 !important;
 	width:100%;
 	height:100%
 }
@@ -13261,4 +13262,41 @@ body.pc-mission .move-to-place::after{
 
 .game-title-text {
 	margin-right: 42%
+}
+.talk-avatar-render {
+	width:92%
+}
+body.pc-mission #game-ui .game-status-screen .talk-avatar-render .status-item-icon-container {
+	height:90% !important;
+	background:url(./../images/ui/square7.png), linear-gradient(0deg, #000, #000);
+	background-size: 100% 100%, 100% 100% !important;
+}
+body.pc-mission #game-ui .game-status-screen .talk-avatar-render .status-item-action-container * {
+	line-height:1px !important;
+	padding-left:2vh !important;
+}
+body.pc-mission #game-ui .game-status-screen .talk-avatar-render .status-item-icon-container {
+	height: 100% !important
+}
+body.pc-mission #game-ui .game-status-screen .talk-avatar-render .status-item-action-container .item-action-wrapper:last-child {
+	color:#f3f4f5cc !important;
+	font-size:3vh !important;
+	overflow:hidden
+}
+body.pc-mission #game-ui .game-status-screen .talk-avatar-render .status-item-icon-container img{
+	width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  object-fit: contain !important;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  position: relative !important;
+  z-index: 99999 !important;
+
+  image-rendering: auto !important;
+
+  filter: none !important;
+  mix-blend-mode: normal !important;
 }

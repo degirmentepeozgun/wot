@@ -1405,6 +1405,12 @@ function map(_m) {
 			this.lastUnseenCheck = _gameTick;
 			this.seenEnemies.length = 0;
 		}
+		if(this.lastTalkAttached && ((_gameTick - this.lastTalkAttached.time) > 3000)) {
+			let _sttsScr = this.lastTalkAttached.elem;
+			if(_sttsScr)
+				try { _sttsScr.remove(); } catch(_){}
+			delete this.lastTalkAttached;
+		}
 		this.limitedEffects.length = this.activeSpells.length = 0;
 		if(mainCharacter)
 			mainCharacter.hasLeftEnemy = mainCharacter.hasRightEnemy =
@@ -5507,6 +5513,10 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 			delete this.challangeStarted;
 		if(this.pvpResult)
 			this.pvpResult.remove();
+		let _sttsScr = document.querySelector('.game-status-screen');
+		if(_sttsScr)
+			_sttsScr.remove();
+		delete this.lastTalkAttached;
 		this.removeBubbles();
 		this.pauseBgMusic(1);
 		this.pauseAmbianceMusic();
