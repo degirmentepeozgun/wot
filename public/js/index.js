@@ -198,6 +198,7 @@ function loadAsset(src, _checkObj, _callback, _global, _zoom) {
 		if(_checkObj) {
 			_checkObj.order++;
 			_assetsProgress.innerText = _checkObj.order + ' / ' + _checkObj.limit;
+			document.getElementById('assets-progressbar-inner').style.width = (_checkObj.order / _checkObj.limit * 100) + '%';
 			if (_checkObj.order === _checkObj.limit)
 				_callback();
 		}
@@ -206,6 +207,7 @@ function loadAsset(src, _checkObj, _callback, _global, _zoom) {
 	getImage(src, function () {
 		if(_checkObj) {
 			_checkObj.order++;
+			document.getElementById('assets-progressbar-inner').style.width = (_checkObj.order / _checkObj.limit * 100) + '%';
 			_assetsProgress.innerText = _checkObj.order + ' / ' + _checkObj.limit;
 			if (_checkObj.order === _checkObj.limit)
 				_callback();
@@ -599,7 +601,7 @@ function setTip() {
 	}
 	return _splash;
 }
-function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
+function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 	if(__switchingMap)
 		return;
 	_game.suspended = 1;
@@ -776,7 +778,9 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 					mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
 				else if(_startWith === 0)
 					mainCharacter = undefined;
-				if(__storyScene?.afterInit)
+				if(_afterInit)
+					_afterInit();
+				else if(__storyScene?.afterInit)
 					__storyScene.afterInit();
 				if(!_storySceneSwitching)
 					_game.suspended = false;
@@ -922,6 +926,7 @@ function openGame() {
 	if(gameopening)
 		return;
 	gameopening = 1;
+	removeClass(document.getElementById('assets-progressbar'), 'd-none');
 	//launchIntoFullscreen(document.documentElement);
 	setTimeout(async function () {
 		const _isHEDevice = await isHighEndDevice();
@@ -1041,6 +1046,8 @@ function setKeyBoard(_c) {
 }
 function addEvent(_id, _char) {
 	const _skillbtn = document.getElementById(_id);
+	if(!_skillbtn)
+		return;
 	_skillbtn.addEventListener("mousedown", function() {
 		mainCharacter.keyboard.mouseDown(_char);
 	});
@@ -2222,6 +2229,7 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 	}
 }
 document.addEventListener("deviceready", onDeviceReady, false);
+let _socialSharing = null;
 function getDeviceId() {
     // mobile
     if (window.device?.uuid) {
@@ -2239,20 +2247,34 @@ function getDeviceId() {
     return id;
 }
 function onDeviceReady() {
+
     try {
 
-        const isElectron = navigator.userAgent.includes("Electron");
+        _socialSharing = window.plugins?.socialsharing ?? null;
 
-        if (!isElectron && window.StatusBar) {
-            StatusBar.hide();
-        }
+        const isElectron = navigator.userAgent.includes("Electron");
 
         if (!isElectron && window.plugins?.insomnia) {
             window.plugins.insomnia.keepAwake();
         }
 
-        if (!isElectron && window.NavigationBar) {
-            window.NavigationBar.backgroundColorByHexString("#000000");
+        if (!isElectron && window.StatusBar) {
+
+            try {
+                StatusBar.overlaysWebView(false);
+            } catch (e) {}
+
+            try {
+                StatusBar.backgroundColorByHexString("#000000");
+            } catch (e) {}
+
+            try {
+                StatusBar.hide();
+            } catch (e) {}
+        }
+
+        if (screen?.orientation?.lock) {
+            screen.orientation.lock("landscape").catch(() => {});
         }
 
         __deviceId = getDeviceId();
@@ -2261,15 +2283,58 @@ function onDeviceReady() {
         _client.loadState();
 
     } catch (ex) {
+
         console.error(ex);
 
-        // fallback (kritik)
         __deviceId = getDeviceId();
 
         _client = new dataOperations();
         _client.loadState();
     }
+
+    if (window.cordova) {
+        const s = document.createElement('script');
+        s.src = './js/html2canvas.js';
+        document.head.appendChild(s);
+    }
 }
+// function onDeviceReady() {
+//     try {
+// 		 _socialSharing = window.plugins?.socialsharing ?? null;
+//         const isElectron = navigator.userAgent.includes("Electron");
+
+//         // if (!isElectron && window.StatusBar) {
+//         //     StatusBar.hide();
+//         // }
+
+//         if (!isElectron && window.plugins?.insomnia) {
+//             window.plugins.insomnia.keepAwake();
+//         }
+
+//         if (!isElectron && window.NavigationBar) {
+//             window.NavigationBar.backgroundColorByHexString("#000000");
+// 			NavigationBar.backgroundColorByHexString("#000000");
+// 			NavigationBar.navigationBarVisibility("hide");
+//         }
+// 		if(screen?.orientation?.lock)
+// 			screen.orientation.lock("landscape").catch(() => {});
+//         __deviceId = getDeviceId();
+
+//         _client = new dataOperations();
+//         _client.loadState();
+//     } catch (ex) {
+//         console.error(ex);
+//         __deviceId = getDeviceId();
+
+//         _client = new dataOperations();
+//         _client.loadState();
+//     }
+// 	if (window.cordova) {
+// 		const s = document.createElement('script');
+// 		s.src = './js/html2canvas.js';
+// 		document.head.appendChild(s);
+// 	}
+// }
 function floatDusts() {
 	return;
 	var speed = 400;
@@ -2302,7 +2367,7 @@ function floatDusts() {
 		twinkleLoop(i);
 }
 var _openingSound;
-function playOpeningMusic() {
+function playOpeningMusic(_path, _volume) {
 	if(episodeVisibilityHidden || document.hidden)
 		return;
 	_openingSound = document.createElement("audio");
@@ -2311,16 +2376,25 @@ function playOpeningMusic() {
 		_openingSound.autoPlay = false;
 	else
 		_openingSound.preload = 'auto';
-	_openingSound.volume = .5;
+	_openingSound.volume = _volume ?? .5;
 	_openingSound.loop = true;
 	_openingSound.currentTime = 0;
-	_openingSound.src = "./images/sounds/wind-menu.mp3"; // "./images/sounds/opening3.mp3";
+	_openingSound.src = _path ?? "./images/sounds/wind-menu.mp3"; // "./images/sounds/opening3.mp3";
 	_openingSound.play();
 	_openingSound.onended = function() {
 		_openingSound = _closeOpeningMusic = null;
 	}
 }
-
+function switchOpeningMusic(_path, _volume) {
+	if(_openingSound || _path) {
+		if(_openingSound) {
+			_openingSound.pause();
+			_openingSound.currentTime = 0;
+		}
+		_closeOpeningMusic = null;
+		playOpeningMusic(_path, _volume);
+	}
+}
 function activateGameStart(_quickPlay, _force) {
 	__story = undefined;
 	if(_quickPlay){
@@ -2389,6 +2463,10 @@ function changeDifficulty(_step){
 	_val.innerText = __difficulties[__account.difficulty - 1].text[getLang()];
 }
 function resetOpeningScreen() {
+	if(_openingSound){
+		_openingSound.pause();
+		_openingSound.currentTime= 0;
+	}
 	_game.suspended = 1;
 	removeClass(_gamePad, 'ghost-mode');
 	__queue.length = 0;
@@ -2600,6 +2678,770 @@ function getKeyboardPromo(_force) {
 		_parent = document.querySelector('#menu-ui') ?? _gameUI;
 	_parent.appendChild(_desc);
 }
+function isElectron(){
+    return !!window._cdvElectronIpc;
+}
+let generatedImage = null;
+async function takePhotoOfScreen(_fromMenu){
+ 	const _wrapper = document.body;
+	if(hasClass(_wrapper, 'share-capture-mode'))
+		return;
+	addClass(_wrapper, 'share-capture-mode');
+    try{
+        await new Promise(resolve=>{
+            requestAnimationFrame(()=>{
+                requestAnimationFrame(resolve);
+            });
+        });
+		// if(__isPC)
+		// 	generatedImage = await window._cdvElectronIpc.capturePage();
+		// else
+		// 	generatedImage = 
+		await takePhotoOfScreenForMobile();
+        //document.getElementById('sharePreviewImage').src = generatedImage;
+    }
+	catch(err){
+        console.log(err.message ?? err);
+    }
+    addClass(document.getElementById('shareOverlay'), 'show');
+	removeClass(_wrapper, 'share-capture-mode');
+}
+let isSharing = false;
+async function shareGeneratedImage(base64, _fromMenu) {
+    if (isSharing) return;
+    isSharing = true;
+
+    try {
+
+        if (__isPC) {
+			_cdvElectronIpc.copyImage(base64);
+			warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/film.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Photo copied to clipboard') + '!</span></div>', null, null, 1, null, null, _fromMenu ? document.getElementById('shareOverlay') : null);
+
+        } else {
+
+            const _base64 = base64.replace(
+                /^data:image\/png;base64,/,
+                ''
+            );
+
+            AndroidBridge.share(
+                "Warriors Of Tengri",
+                _base64
+            );
+        }
+
+    } catch (e) {
+        alert(e?.message ?? e);
+    } finally {
+        setTimeout(() => {
+            isSharing = false;
+        }, 1500);
+    }
+}
+
+async function takePhotoOfScreenForMobile(){
+	PlaySound({key:'photo', volume:1});
+	const _img = document.getElementById(
+		'sharePreviewImage'
+	);
+	const _st = document.querySelector('.share-text');
+	_img.imageLoaded = false;
+	addClass(_img, 'v-none');
+	addClass(_st, 'v-none');
+	removeClass(_img, 'fade-me');
+	getCreditsScreenLightBase64().then(async base64 => {
+		if(_img){
+			removeClass(_img, 'v-none');
+			_img.src = base64;
+			addClass(_img, 'fade-me');
+			_img.imageLoaded = true;
+			removeClass(_st, 'v-none');
+		}
+	});
+}
+// function shareToWithPlugin() {
+// 	try{
+// 		window.plugins.socialsharing.share(
+// 			getLangData('My legendary moment'),
+// 			'Warriors of Tengri',
+// 			generatedImage,
+// 			null
+// 		);
+// 	} 
+// 	catch(_){
+// 		alert(_?.message ?? _);
+// 	}
+// }
+function shareToWithPlugin(_fromMenu) {
+	shareGeneratedImage(generatedImage, _fromMenu);
+}
+// async function shareToWithPlugin() {
+//     try {
+//         const result =
+//             await _cdvElectronIpc.share({
+
+//                 text:
+//                     getLangData(
+//                         'My legendary moment'
+//                     ),
+
+//                 title:
+//                     'Warriors of Tengri',
+
+//                 image:
+//                     generatedImage,
+
+//                 url:
+//                     null
+//             });
+//     }
+//     catch(e){
+//         console.log('HATA: '+ (e.message ?? e));
+//     }
+// }
+function closeShareUI(){
+    removeClass(document.getElementById('shareOverlay'), 'show');
+}
+function closeCredits(_fromMenu){
+	const _wrapper = document.querySelector('.credits-bg-wrapper');
+	if(_wrapper)
+		_wrapper.remove();
+	if(_fromMenu)
+		switchOpeningMusic();
+	generatedImage = null;
+}
+function getCreditsScreenLightHtml() {
+	let _w, _h;
+	if(_gameUI.clientWidth > 800) {
+		const _rate = 800 / _gameUI.clientWidth;
+		_w = 800;
+		_h = MathRound(_gameUI.clientHeight * _rate);
+	}
+	else
+	{
+		_w = _gameUI.clientWidth;
+		_h = _gameUI.clientHeight;
+	}
+	let _scr = document.createElement('div');
+	_scr.style = 'z-index:999999;position:absolute;overflow:hidden;width:' + _w
+	+ 'px;height:' + _h + 'px;background-color:#000';
+	_scr.innerHTML = 
+	`<img style='width:100%;left:0;top:0;position:absolute' 
+	crossorigin="anonymous" src="./images/texture/lobbymobile-ground.png" />
+	<img style='width:8.5%;
+	right:30.5%;
+	bottom:28%;
+	position:absolute;
+	z-index:3' crossorigin="anonymous" src="./images/gifs/source2.png" />
+	<img style='width:7.5%;
+	right:39%;
+	bottom:23%;
+	position:absolute;
+	z-index:3' crossorigin="anonymous" src="./images/sprites/ep87/sprite.png" />
+	<img style='width:7%;
+	right:20%;
+	bottom:25.5%;
+	position:absolute;
+	z-index:1' crossorigin="anonymous" src="./images/sprites/ep87/dark.png" />
+	<img style='width:14%;
+	right:10%;
+	bottom:20%;
+	position:absolute;
+	z-index:2' crossorigin="anonymous" src="./images/gifs/warrior2.png" />
+	<img style='width:13%;
+	right:28%;
+	bottom:33%;
+	position:absolute;
+	transform:scale(-1,1);
+	-webkit-transform:scale(-1,1)' crossorigin="anonymous" src="./images/gifs/archer2.png" />
+	<img style='width:14%;
+	right:16%;
+	bottom:31%;
+	position:absolute' crossorigin="anonymous" src="./images/gifs/tank2.png" />
+	<img style='width:11%;
+	right:39%;
+	bottom:31%;
+	position:absolute' crossorigin="anonymous" src="./images/gifs/wizard2.png" />
+	<img style='width:17%;
+	right:10.6%;
+	bottom:31%;
+	position:absolute;
+	z-index:5' crossorigin="anonymous" src="./images/gifs/zzz2.png" />
+	<img style='width:14%;
+	left:2%;
+	bottom:2%;
+	position:absolute;
+	z-index:1' crossorigin="anonymous" src="./images/icons/watermark.png" />
+	<div style="
+	position:absolute;
+	left:50%;
+	bottom:0;
+	transform:translateX(-50%);
+	width:50%;
+	height:14%;
+	background:rgba(0,0,0,0.75);
+	display:flex;
+	flex-direction:column;
+	justify-content:center;
+	align-items:center;
+	box-sizing:border-box;
+	z-index:999">
+		<div style="
+		font-size:1.4rem;
+		font-weight:900;
+		color:#FFD86B;
+		text-shadow:
+			0 2px 0 #000,
+			0 0 10px rgba(0,0,0,.8);
+		line-height:1;">
+		#${(mainCharacter?.storyOrder ?? 214).formatWithDots()} - ${(mainCharacter?.storyScore ?? 1942881).formatWithDots()}
+		</div>
+		<div style="
+		margin-top:.25rem;
+		font-size:1.25rem;
+		font-weight:700;
+		color:#FFFFFF;
+		text-shadow:
+			0 2px 0 #000,
+			0 0 8px rgba(0,0,0,.8);
+		line-height:1">
+		${getLangData('Lvl') + ' ' + (mainCharacter?.level ?? 1) + ' - ' + (mainCharacter ? getLangData(mainCharacter.class).toProperCase() : getLangData('warrior').toProperCase())}
+		</div>
+	</div>`;
+	return _scr;
+}
+async function getCreditsScreenLightBase64() {
+
+    const el = getCreditsScreenLightHtml();
+
+    document.body.appendChild(el);
+
+    try {
+
+        // bütün img'lerin yüklenmesini bekle
+        await Promise.all(
+            [...el.querySelectorAll('img')].map(img => {
+
+                if (img.complete) {
+                    return Promise.resolve();
+                }
+
+                return new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = reject;
+                });
+
+            })
+        );
+
+        const canvas = await html2canvas(el, {
+            backgroundColor: '#000000',
+            useCORS: true,
+            scale: 1
+        });
+
+        generatedImage = canvas.toDataURL('image/png');
+		return generatedImage;
+
+    }
+    finally {
+
+        el.remove();
+
+    }
+
+}
+function openCredits(_fromMenu) {
+	if(__switchingMap || (_fromMenu && gameopening))
+		return;
+	playClick();
+	switchOpeningMusic('./images/music/lobby.mp3', .3);
+	//switchMap(-1, 1, null, null, null, function() {
+		// if(mainCharacter){
+		// 	mainCharacter.left = MathRound(1735 * __zoom);
+		// 	mainCharacter.direction = __right;
+		// 	mainCharacter.skipHealthBar = true;
+		// 	mainCharacter.noDirection = true;
+		// 	blurKeyboard();
+		// 	mainCharacter.disableKeyboard = mainCharacter.immobilize = true;
+		// 	mainCharacter.animate('idlelobby',1);
+		// }
+		// const _fire = episode.enemies.find(x => x.id === 5);
+		// _fire.animations.idle.frames.forEach(x => delete x.sound);
+		// _fire.animations.idle.frames[0].sound = { key: 'bonefire', volume:.1, bind: true, loop: true };
+		let _scr = document.createElement('div');
+		_scr.className = 'full flex show-ui fade-me credits-bg-wrapper';
+		let _parent = document.getElementById('first-splash');
+		if(hasClass(_parent, 'v-none'))
+			_parent = document.querySelector('#menu-ui') ?? _gameUI;
+		const _wrapper = document.createElement('div');
+		_wrapper.className = 'full flex credits-bg';
+		_wrapper.id = "shareMomentWrapper";
+		_wrapper.innerHTML = `<img crossorigin="anonymous" id="credits-fire-gif" src="./images/gifs/source.gif" />
+		<div class="credits-fire-glow"></div>
+		<img crossorigin="anonymous" id="credits-seat1" src="./images/sprites/ep87/sprite.png" />
+		<img crossorigin="anonymous" id="credits-seat2" src="./images/sprites/ep87/dark.png" />
+		<img crossorigin="anonymous" id="credits-warrior-gif" src="./images/gifs/warrior.gif" />
+		<img crossorigin="anonymous" id="credits-archer-gif" src="./images/gifs/archer.gif" />
+		<img crossorigin="anonymous" id="credits-tank-gif"  src="./images/gifs/tank.gif" />
+		<img crossorigin="anonymous" id="credits-wizard-gif" src="./images/gifs/wizard.gif" />
+		<img crossorigin="anonymous" id="credits-zzz-gif" src="./images/gifs/zzz.gif" />
+		<div class="share-moment-stats-panel${_fromMenu ? '' : ''}">
+			<div class="share-moment-level-block">
+				<div class="share-moment-label d-none">
+					${getLangData('World Ranking')}
+				</div>
+				<div class="share-moment-level-value">
+					#${(mainCharacter?.storyOrder ?? 214).formatWithDots()}
+				</div>
+			</div>
+			<div class="share-moment-info-card">
+				<div class="share-moment-card-title">
+					${getLangData('Character Level')}
+				</div>
+				<div class="share-moment-card-value">
+					${getLangData('Lvl') + ' ' + (mainCharacter?.level ?? 1) + ' - ' + (mainCharacter ? getLangData(mainCharacter.class).toProperCase() : getLangData('warrior').toProperCase())}
+				</div>
+			</div>
+			<div class="share-moment-info-card">
+				<div class="share-moment-card-title">
+					${getLangData('Total Score')}
+				</div>
+				<div class="share-moment-card-value">
+					${(mainCharacter?.storyScore ?? 1942881).formatWithDots()}
+				</div>
+			</div>
+			<div class="share-moment-info-buttons">
+				<div class="share-moment-card-title">
+					<div class="share-button" onexactclick="takePhotoOfScreen(${_fromMenu ? 1 : 0})">
+						${getLangData('Capture Moment')}
+					</div>
+				</div>
+				<div class="share-moment-card-value">
+					<div class="share-button" onexactclick="createPromoScreen(${_fromMenu ? 1 : 0})">
+						${getLangData('Learn More')}
+					</div>
+				</div>
+			</div>
+		</div>`;
+		const _splash = document.getElementById('splash');
+		addClass(_splash, 'd-none');
+		addClass(_gameUI, 'disable-ui');
+		const _btn = document.createElement('div');
+		_btn.className = 'flex share-moment-overlay';
+		_btn.id = 'shareOverlay';
+		_btn.innerHTML = `<div>
+			<div class="share-moment-photo-card" onclick="shareToWithPlugin(${_fromMenu ? 1 : 0})">
+				<div id="sharePreviewImage-parent">
+					<img class="share-moment-photo-image" id="sharePreviewImage">
+				</div>
+				<div class="share-text">${getLangData(__isPC ? 'TAP TO COPY' : 'TAP TO SHARE')}</div>
+				<div class="share-moment-actions" onclick="event.stopPropagation(); closeShareUI()">
+					<img src="./images/icons/close.png" />
+				</div>
+			</div>
+		</div>`;
+		const _div = document.createElement('div');
+		_div.className = 'flex credits-screen';
+		_div.innerHTML = `<div class="credits-scroll${__isPC ? '': ' credits-scroll-mobile'}">
+				<div class="credits-title">
+					${getLangData('CREDITS', __creditsLangData)}
+				</div>
+				<div class="credits-section">
+					<div class="credits-subtitle">
+						${getLangData('CREATIVE DIRECTOR', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Özgün Değirmentepe
+					</div>
+					<div class="credits-role-list">
+						<div class="credits-role">
+							${getLangData('GAME DESIGN', __creditsLangData)}
+						</div>
+						<div class="credits-role">
+							${getLangData('PROGRAMMING', __creditsLangData)}
+						</div>
+						<div class="credits-role">
+							${getLangData('TECHNICAL DIRECTION', __creditsLangData)}
+						</div>
+						<div class="credits-role">
+							${getLangData('LEVEL DESIGN', __creditsLangData)}
+						</div>
+						<div class="credits-role">
+							${getLangData('CUSTOM ENGINE DEVELOPMENT', __creditsLangData)}
+						</div>
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle">
+						${getLangData('ART DIRECTION & ANIMATION', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Mehmet Canpolat
+					</div>
+					<div class="credits-role-list">
+						<div class="credits-role">
+							${getLangData('CHARACTER DESIGN', __creditsLangData)}
+						</div>					
+						<div class="credits-role">
+							${getLangData('SPRITE ART', __creditsLangData)}
+						</div>				
+						<div class="credits-role">
+							${getLangData('CONCEPT ART', __creditsLangData)}
+						</div>
+						<div class="credits-role">
+							${getLangData('UI DESIGN', __creditsLangData)}
+						</div>
+						<div class="credits-role">
+							${getLangData('WORLDBUILDING & LORE', __creditsLangData)}
+						</div>
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle">
+						${getLangData('INSPIRED BY', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						NORAD
+						<span class="credits-role">
+							${getLangData('WRITTEN BY', __creditsLangData)} Mehmet Canpolat
+						</span>
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+				
+				<div class="credits-section">
+
+					<div class="credits-subtitle">
+						${getLangData('CULTUREL INSPIRATION', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						${getLangData('Inspired by Turkic mythology, Anatolian folklore and ancient legends', __creditsLangData)}
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle">
+						${getLangData('STRATEGY & PUBLISHING ADVISOR', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Egemen Kağan Duman
+					</div>
+					<div class="credits-role-list">
+						<div class="credits-role">
+							${getLangData('MARKETING STRATEGY', __creditsLangData)}
+						</div>
+						<div class="credits-role">
+							${getLangData('COMMUNITY GUIDANCE', __creditsLangData)}
+						</div>
+						<div class="credits-role">
+							${getLangData('INVESTOR RELATIONS', __creditsLangData)}
+						</div>
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle">
+						${getLangData('CREATIVE CONSULTING', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Buğra Güven Günbatı
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle">
+						${getLangData('TRAILER PRODUCTION', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Özgün Değirmentepe
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle">
+						${getLangData('TRAILER VISUAL DESIGN', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Mehmet Canpolat
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+				<div class="credits-section">
+
+					<div class="credits-subtitle">
+						${getLangData('SOCIAL MEDIA', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Özgün Değirmentepe
+					</div>
+
+					<div class="credits-name">
+						Mehmet Canpolat
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle">
+						${getLangData('WEBSITE DEVELOPMENT', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Özgün Değirmentepe
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle">
+						${getLangData('WEBSITE VISUAL DESIGN', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Mehmet Canpolat
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle">
+						${getLangData('MAP ASSETS', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Theon James
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle">
+						${getLangData('UI ELEMENTS', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Rexard
+						<span class="credits-role">
+							${getLangData('Assets from GameDevMarket', __creditsLangData)}
+						</span>
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle">
+						${getLangData('AI VOICE TECHNOLOGY', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						ElevenLabs
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+					<div class="credits-subtitle">
+						${getLangData('AI MUSIC GENERATION', __creditsLangData)}
+					</div>
+					<div class="credits-name">
+						Suno
+					</div>
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+					<div class="credits-subtitle">
+						${getLangData('SOUND EFFECTS', __creditsLangData)}
+					</div>
+					<div class="credits-name">
+						Pixabay
+					</div>
+					<div class="credits-name">
+						Mixit
+					</div>
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle">
+						${getLangData('QA TESTERS', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Murat Ergün
+					</div>
+
+					<div class="credits-name">
+						Tolga Canpolat
+					</div>
+
+					<div class="credits-name">
+						Yiğit Kuyucu
+					</div>
+
+					<div class="credits-name">
+						Hasan Yanılmaz
+					</div>
+
+					<div class="credits-name">
+						Eren Deniz Çerkeş
+					</div>
+
+					<div class="credits-name">
+						Amil Salonke
+					</div>
+
+					<div class="credits-name">
+						Volkan Kocataşkın
+					</div>
+					
+					<div class="credits-name">
+						Özüm Değirmentepe
+					</div>
+					
+					<div class="credits-name">
+						Barış Alagöz
+					</div>
+					
+					<div class="credits-name">
+						Yiğit Gürsoy
+					</div>
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<!-- SPECIAL THANKS -->
+
+				<div class="credits-section">
+					<div class="credits-subtitle">
+						${getLangData('SPECIAL THANKS', __creditsLangData)}
+					</div>
+					<div class="credits-name">
+						Facebook/Indie Game Devs
+					</div>
+					<div class="credits-name">
+						Linkedin/Yeni Oyun Gazetesi
+					</div>
+					<div class="credits-name">
+						Facebook/Indie Game Devs
+					</div>
+					<div class="credits-name">
+						${getLangData('Everyone who supported the project', __creditsLangData)}
+					</div>
+				</div>
+				<div class="credits-section">
+					<div class="credits-subtitle">
+						${getLangData('FOR FOLLOW & SUPPORT', __creditsLangData)}
+					</div>
+					<div class="credits-name">
+						www.warriorsoftengri.com
+					</div>
+					<div class="credits-name">
+						youtube#warriorsoftengri
+					</div>
+					<div class="credits-name">
+						instagram#warriors_of_tengri
+					</div>
+					<div class="credits-name">
+						x.com/warriorsoftengri
+					</div>
+				</div>
+
+				<div class="credits-divider${_fromMenu ? ' d-none' : ''}"></div>
+
+				<div class="credits-section${_fromMenu ? ' d-none' : ''}">
+
+					<div class="credits-subtitle">
+						${getLangData('Thanks for playing', __creditsLangData)}...
+					</div>
+				</div>
+				
+			</div>`;
+		// const _share = document.createElement('div');
+		// _share.className = 'take-photo-button share-button';
+		// _share.onexactclick = function() {
+		// 	takePhotoOfScreen(_fromMenu);
+		// }
+		// _share.innerText = getLangData('Capture Moment');
+		const _back = document.createElement('div');
+		_back.className = 'share-back-button share-button secondary';
+		_back.onexactclick = function() {
+			playClick();
+			if(!_fromMenu)
+				resetOpeningScreen();
+			else
+				closeCredits(_fromMenu);
+		}
+		_back.innerHTML = '<img class="right-to-left" src="./images/icons/nav.png" />';
+		_scr.appendChild(_wrapper);
+		// if(!_fromMenu)
+		// 	_scr.appendChild(_share);
+		_scr.appendChild(_back);
+		_scr.appendChild(_btn);
+		_scr.appendChild(_div);
+		_parent.appendChild(_scr);
+	//});
+}
 //let __particles;
 function installOpeningScreen(_instant, _lateOpening) {
 	const _current = parseInt(localStorage.getItem(__difficultyKey) ?? 3);
@@ -2619,6 +3461,17 @@ function installOpeningScreen(_instant, _lateOpening) {
 			<div class="game-title-text">
 				<img src="./images/icons/text.png" />
 			</div>
+			<div class="game-opening-screen-menu">
+				<div class="game-opening-screen-menu-item" onexactclick="tryOpenGame()">
+					${getLangData('NEW GAME', __openingScreenLangData)}
+				</div>
+				<div class="game-opening-screen-menu-item" onexactclick="openCredits(1)">
+					${getLangData('CREDITS', __openingScreenLangData)}
+				</div>
+				<div class="game-opening-screen-menu-item" onexactclick="quitGame()">
+					${getLangData('QUIT', __openingScreenLangData)}
+				</div>
+			</div>
 			<div style="height:20%;width:100%;padding-bottom:30vh;z-index:2" class="flex">
 				<div class="game-difficulty-wrapper flex w-100 d-none">
 					<div class="game-difficulty-content flex">
@@ -2634,12 +3487,16 @@ function installOpeningScreen(_instant, _lateOpening) {
 					<div id="qp-btn" class="framed-btn flex" onexactclick="activateGameStart(1)">${getLangData('QUICK PLAY')}</div>
 					<div id="connect-btn" class="d-none framed-btn flex" onexactclick="activateGameStart()">${getLangData('DEMO PLAY')}</div>
 				</div>
-				<div class="press-any-key-wrapper">
+				<div class="press-any-key-wrapper d-none">
 					<div id="pak-btn" class="press-any-key-text" onexactclick="activateGameStart(1,1)">
 						${getLangData('PRESS ANY KEY')}
 					</div>
 				</div>
-				<div style="padding-top:1vh;width:100%;color:#f8f8f880 !important;font-size:2.8vh!important" class="flex" id="assets-progress"></div>
+				<div class="flex flex-jc-start d-none" id="assets-progressbar">
+					<div class="flex" id="assets-progressbar-inner">
+					</div>
+				</div>
+				<div class="flex" id="assets-progress"></div>
 			</div>`;
 	if(!_opening) {
 		setTimeout(() => {
@@ -3154,3 +4011,12 @@ async function isHighEndDevice() {
     fps >= 50
   );
 }
+
+// setTimeout(() => {
+//     if (window.AndroidBridge) {
+//         AndroidBridge.test();
+//     }
+//     else {
+//         alert("bridge yok");
+//     }
+// }, 3000);

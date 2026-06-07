@@ -59,6 +59,8 @@ const __langData = [
 	{ key: 'Score', tr: 'Puan' },
 	{ key: 'Final Score', tr: 'Genel Toplam' },
 	{ key: 'Total Score', tr: 'Toplam Puan' },
+	{ key: 'World Ranking', tr: 'Dünya Sıralaması' },
+	{ key: 'Character Level', tr: 'Karakter Seviyesi' },
 	{ key: 'Leaderboard', tr: 'Lider Tablosu' },
 	{ key: 'New Record', tr: 'Yeni Rekor' },
 	{ key: 'Supply Incoming', tr: 'Tedarik Geliyor' },
@@ -234,6 +236,7 @@ const __langData = [
 	{ key: 'Honor Point', tr: 'Onur Puanı'},
 	{ key: 'Active Duel', tr: 'Aktif Düello'},
 	{ key: 'PVP Order', tr: 'PVP Sırası'},
+	{ key: 'TAP TO UNLOCK', tr: 'BAS VE KİLİDİ AÇ'},
 	{ key: 'Watch Video', tr: 'Videoyu İzle'},
 	{ key: 'Duel limit reached', tr: 'Düello limitine ulaşıldı'},
 	{ key: 'Friend limit reached', tr: 'Arkadaşlık limitine ulaşıldı'},
@@ -404,14 +407,20 @@ const __langData = [
 	{ key: 'Item Is Ready', tr: 'Ekipman Hazır'},
 	{ key: 'KEEP OLD STATS', tr: 'ESKİ HALİNİ KORU'},
 	{ key: 'READY', tr: 'HAZIR'},
+	{ key: 'SHARE', tr: 'PAYLAŞ'},
 	{ key: 'It might be hard for you', tr: 'Senin için zor olabilir'},
 	{ key: 'Minium adviced level is', tr: 'Tavsiye edilen en düşük seviye'},
 	{ key: 'New gem possibilities', tr: 'Yeni taş olasılıkları'},
 	{ key: 'Melt places are full', tr: 'Eritme yuvaları dolu'},
 	{ key: 'All gems must be in same grade', tr: 'Tüm taşlar aynı seviye olmalıdır' },
 	{ key: 'Not started', tr: 'Başlamadı' },
+	{ key: 'My legendary moment', tr: 'Efsanevi anım' },
+	{ key: 'Capture Moment', tr: 'Anı Yakala' },
+	{ key: 'Share Your Legend', tr: 'Efsanevi Anımı Paylaş' },
 	{ key: 'Pick a gem for socket', tr: 'Yuva için bir taş seçin' },
 	{ key: 'USE NEW STATS', tr: 'YENİ HALİNİ KULLAN'},
+	{ key: 'TAP TO COPY', tr: 'BAS VE KOPYALA'},
+	{ key: 'TAP TO SHARE', tr: 'BAS VE PAYLAŞ'},
 	{ key: 'Coop Content', tr: 'Coop İçeriği'},
 	{ key: 'Old Version', tr: 'Eski Versiyon'},
 	{ key: 'New Version', tr: 'Yeni Versiyon'},
@@ -441,6 +450,7 @@ const __langData = [
 	{ key: 'RESET', tr: 'SIFIRLA' },
 	{ key: 'Rage', tr: 'Öfke' },
 	{ key: 'Controls', tr: 'Kontroller' },
+	{ key: 'Photo copied to clipboard', tr: 'Fotoğraf panoya kopyalandı' },
 	{ key: 'Reset to default settings', tr: 'Varsayılan ayarlara geri dön' },
 	{ key: 'Affected Target', tr: 'Etkilenen Hedef' },
 	{ key: 'Reset talent build?', tr: 'Beceri ağacını sıfırla?' },
@@ -453,6 +463,7 @@ const __langData = [
 	{ key: 'Crit Damage Resist Rate', tr: 'Kritik Hasar Direnç Oranı' },
 	{ key: 'ACTIVATE', tr: 'AKTİF ET' },
 	{ key: 'Act', tr: 'Perde' },
+	{ key: 'Learn More', tr: 'Daha Fazla Bilgi' },
 	{ key: 'Attack Speed', tr: 'Saldırı Hızı' },
 	{ key: 'Health Point', tr: 'Sağlık Puanı' },
 	{ key: 'Crit Rate', tr: 'Kritik Oranı' },
@@ -595,16 +606,184 @@ const __langData = [
 		tr: 'Harika! Görevi bitirdin. Şimdi istikametimiz Köy'
 	},
 	{ key: 'grade talisman, adds bonus attributes when you combine with other set pieces', tr: 'seviye tılsım, diğer set parçaları ile kombinlendiğinde size ekstra güç verir' }
+];
+const __openingScreenLangData = [
+	{ 
+		key: 'NEW GAME',
+		tr: 'YENİ OYUN'
+	},
+	{
+		key: 'CREDITS',
+		tr: 'JENERİK'
+	},
+	{
+		key: 'QUIT',
+		tr: 'ÇIKIŞ'
+	}
+]
+const __creditsLangData = [
+	{
+		key: 'CREDITS',
+		tr: 'JENERİK'
+	},
+	{
+		key: 'CREATIVE DIRECTOR',
+		tr: 'YARATICI DİREKTÖR'
+	},
+	{
+		key: 'GAME DESIGN',
+		tr: 'OYUN TASARIMI'
+	},
+	{
+		key: 'PROGRAMMING',
+		tr: 'PROGRAMLAMA'
+	},
+	{
+		key: 'TECHNICAL DIRECTION',
+		tr: 'TEKNİK DİREKTÖRLÜK'
+	},
+	{
+		key: 'LEVEL DESIGN',
+		tr: 'SEVİYE TASARIMI'
+	},
+	{
+		key: 'CUSTOM ENGINE DEVELOPMENT',
+		tr: 'ÖZEL OYUN MOTORU GELİŞTİRME'
+	},
+	{
+		key: 'ART DIRECTION & ANIMATION',
+		tr: 'SANAT DİREKTÖRLÜĞÜ ve ANİMASYON'
+	},
+	{
+		key: 'CHARACTER DESIGN',
+		tr: 'KARAKTER TASARIMI'
+	},
+	{
+		key: 'SPRITE ART',
+		tr: 'SPRITE SANATI'
+	},
+	{
+		key: 'CONCEPT ART',
+		tr: 'KONSEPT SANATI'
+	},
+	{
+		key: 'UI DESIGN',
+		tr: 'KULLANICI ARAYÜZÜ TASARIMI'
+	},
+	{
+		key: 'WORLDBUILDING & LORE',
+		tr: 'EVREN TASARIMI ve HİKAYE'
+	},
+	{
+		key: 'INSPIRED BY',
+		tr: 'ESİN KAYNAĞI'
+	},
+	{
+		key: 'WRITTEN BY',
+		tr: 'YAZAN'
+	},
+	{
+		key: 'STRATEGY & PUBLISHING ADVISOR',
+		tr: 'STRATEJİ ve YAYIN DANIŞMANI'
+	},
+	{
+		key: 'MARKETING STRATEGY',
+		tr: 'PAZARLAMA STRATEJİSİ'
+	},
+	{
+		key: 'COMMUNITY GUIDANCE',
+		tr: 'TOPLULUK YÖNETİMİ'
+	},
+	{
+		key: 'INVESTOR RELATIONS',
+		tr: 'YATIRIMCI İLİŞKİLERİ'
+	},
+	{
+		key: 'CREATIVE CONSULTING',
+		tr: 'YARATICI DANIŞMANLIK'
+	},
+	{
+		key: 'FOR FOLLOW & SUPPORT',
+		tr: 'TAKİP ve DESTEK İÇİN'
+	},
+	{
+		key: 'Everyone who supported the project',
+		tr: 'Projeye destek veren herkes'
+	},
+	{
+		key: 'SPECIAL THANKS',
+		tr: 'ÖZEL TEŞEKKÜRLER'
+	},
+	{
+		key: 'QA TESTERS',
+		tr: 'TEST EKİBİ'
+	},
+	{
+		key: 'SOUND EFFECTS',
+		tr: 'SES EFEKTLERİ'
+	},
+	{
+		key: 'AI MUSIC GENERATION',
+		tr: 'YAPAY ZEKA MÜZİK OLUŞTURMA'
+	},
+	{
+		key: 'AI VOICE TECHNOLOGY',
+		tr: 'YAPAY ZEKA SES TEKNOLOJİSİ'
+	},
+	{
+		key: 'Assets from GameDevMarket',
+		tr: 'GameDevMarket\'ten Alınan Varlıklar'
+	},
+	{
+		key: 'UI ELEMENTS',
+		tr: 'KULLANICI ARAYÜZÜ ÖGELERİ'
+	},
+	{
+		key: 'MAP ASSETS',
+		tr: 'HARİTA VARLIKLARI'
+	},
+	{
+		key: 'WEBSITE VISUAL DESIGN',
+		tr: 'WEB SİTESİ GÖRSEL TASARIMI'
+	},
+	{
+		key: 'WEBSITE DEVELOPMENT',
+		tr: 'WEB SİTESİ GELİŞTİRME'
+	},
+	{
+		key: 'SOCIAL MEDIA',
+		tr: 'SOSYAL MEDYA'
+	},
+	{
+		key: 'TRAILER VISUAL DESIGN',
+		tr: 'FRAGMAN GÖRSEL TASARIMI'
+	},
+	{
+		key: 'TRAILER PRODUCTION',
+		tr: 'FRAGMAN PRODÜKSİYONU'
+	},
+	{
+		key: 'CULTUREL INSPIRATION',
+		tr: 'KÜLTÜREL ESİN KAYNAĞI'
+	},
+	{
+		key: 'Inspired by Turkic mythology, Anatolian folklore and ancient legends',
+		tr: 'Türk mitolojisi, Anadolu folkloru ve eski efsanelerden esinlenilmiştir'
+	},
+	{
+		key: 'Thanks for playing',
+		tr: 'Oyunu oynadığınız için teşekkürler'
+	}
 ]
 function getLang() {
 	return __account.lang ?? __defaultLang;
 }
-function getLangData(_key) {
+function getLangData(_key, _array) {
 	if(getLang() === __defaultLang)
 		return _key;
 	const _k = _key.replace(/[?]/g, '[?]');
 	var _rex = new RegExp('^' + _k + '$', "i");
-	return __langData.find(x => _rex.test(x.key))?.[__account.lang] ?? _key;
+	return (_array ?? __langData).find(x => _rex.test(x.key))?.[__account.lang] ?? _key;
 }
 function getLangDataFromArray(_arr, _lang) {
 	return _arr?.[_lang] ?? _arr['en'];

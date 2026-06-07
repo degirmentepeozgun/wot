@@ -13,15 +13,19 @@
   "author": "Apache Cordova Team",
   "license": "Apache-2.0",
   "devDependencies": {
-    "cordova-android": "^14.0.1",
+    "cordova-android": "^13.0.0",
     "cordova-electron": "^4.0.0",
     "cordova-plugin-device": "^3.0.0",
     "cordova-plugin-exit": "^1.0.3",
     "cordova-plugin-file": "^8.1.3",
     "cordova-plugin-insomnia": "^4.3.0",
     "cordova-plugin-ionic-keyboard": "^2.2.0",
+    "cordova-plugin-navigationbar-color": "^0.1.0",
+    "cordova-plugin-screenshot": "^1.0.1",
     "cordova-plugin-statusbar": "^4.0.0",
-    "cordova-plugin-websocket": "^0.12.2"
+    "cordova-plugin-websocket": "^0.12.2",
+    "cordova-plugin-x-socialsharing": "^6.0.4",
+    "es6-promise-plugin": "^4.2.2"
   },
   "cordova": {
     "plugins": {
@@ -30,13 +34,18 @@
       "cordova-plugin-insomnia": {},
       "cordova-plugin-ionic-keyboard": {},
       "cordova-plugin-exit": {},
-      "cordova-plugin-file": {},
+      "cordova-plugin-file": {
+        "ANDROIDX_WEBKIT_VERSION": "1.4.0"
+      },
       "cordova-plugin-device": {},
-      "cordova-plugin-statusbar": {}
+      "cordova-plugin-statusbar": {},
+      "cordova-plugin-x-socialsharing": {},
+      "cordova-plugin-screenshot": {},
+      "cordova-plugin-navigationbar-color": {}
     },
     "platforms": [
-      "android",
-      "electron"
+      "electron",
+      "android"
     ]
   },
   "dependencies": {

@@ -10,7 +10,7 @@
 	  * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
 		* Enable inline JS: add 'unsafe-inline' to default-src
 	-->
-	<meta http-equiv="Content-Security-Policy" content="connect-src * wss://webapi.kitap12.com/gamehub/ ws://localhost:5173/ wss://localhost:5173/ ws://webapi.kitap12.com/ wss://webapi.kitap12.com/; worker-src * 'self' blob:; font-src 'self' data:; default-src * data: blob: file:; img-src * data:; media-src * 'self' blob:; style-src * 'self' 'unsafe-inline' 'unsafe-eval' blob: data: file:; script-src-elem * 'self' 'unsafe-inline' 'unsafe-eval' blob: data: file:; style-src-elem * 'self' 'unsafe-inline' 'unsafe-eval' blob: data: file:; script-src * 'self' 'unsafe-inline' 'unsafe-eval'  blob: data: file:">
+	<meta http-equiv="Content-Security-Policy" content="connect-src * wss://webapi.kitap12.com/gamehub/ ws://localhost:5173/ wss://localhost:5173/ ws://webapi.kitap12.com/ wss://webapi.kitap12.com/; worker-src * 'self' blob:; font-src 'self' data:; default-src * data: blob: file:; img-src * data: blob:; media-src * 'self' blob:; style-src * 'self' 'unsafe-inline' 'unsafe-eval' blob: data: file:; script-src-elem * 'self' 'unsafe-inline' 'unsafe-eval' blob: data: file:;  style-src-elem * 'self' 'unsafe-inline' 'unsafe-eval' blob: data: file:; script-src * 'self' 'unsafe-inline' 'unsafe-eval'  blob: data: file:">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
 
 	<meta name="theme-color" content="#fff">
@@ -18,7 +18,7 @@
 	<meta name="msapplication-tap-highlight" content="no">
 	<link rel="preload" as="image" href="./images/ui/book1.png" />
 	<link rel="preload" as="image" href="./images/ui/tag/speed-no-color.gif">
-	<link rel="preload" as="image" href="./images/loading/001.gif" />
+	<!-- <link rel="preload" as="image" href="./images/loading/001.gif" /> -->
 	<link rel="preload" as="image" href="./images/loading/1.png" />
 	<link rel="preload" as="image" href="./images/loading/2.png" />
 	<link rel="preload" as="image" href="./images/loading/3.png" />
@@ -27,14 +27,12 @@
 	<link rel="preload" as="image" href="./images/loading/6.png" />
 	<link rel="preload" as="image" href="./images/loading/7.png" />
 	<title>Warriors Of Tengri</title>
-
-	<!-- built styles file will be auto injected -->
 </head>
 <body oncontextmenu="return false" style="height:100vh;width:100vw;background:#000;overflow:hidden">
 	<button id="play-os" onclick="playOpeningMusic()"></button>
 	<div id="app" style="margin:auto"></div>
 	<% if (TARGET === 'cordova') { %>
-	<script src="cordova.js"></script>
+		<script src="cordova.js"></script>
 	<% } %>
 	<script>
 		function getRandomValue(min, max) {
@@ -116,7 +114,7 @@
 	<script src="./js/dataoperations.js"></script>
 	<script src="./js/lobby.js"></script>
 	<script src="./js/leaderboards.js"></script>
-	<script src="./js/voice.js"></script>
+	<script src="./js/html2canvas.js"></script>
 	<span id="scripts"></span>
 	<script>
 		const _rootPath = 'https://cdn.kitap12.com/document/getgamejs/game';
@@ -153,7 +151,7 @@
 		// 	'dialogs', 'enemy', 'map', 'keyboard', 'skill', 'rival', 'storegame', 'buff', 
 		// 	'socket', 'index'
 		// ]);
-		resetStyles(['index']);
+		//resetStyles(['index']);
 		// window.FunctionCallTracker = (function () {
 		// 	let counts = {};
 		// 	const originalFunctions = new WeakMap();

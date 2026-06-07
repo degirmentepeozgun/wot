@@ -175,7 +175,7 @@ function stopListening() {
 function setBindKey(_elem, e) {
 	removeClass(_elem, "error");
     if (!activeInput) return;
-	
+
     // TAB -> doğal davranış + sonraki inputa geçiş
     if (e.key === "Tab") {
       stopListening();
@@ -240,7 +240,7 @@ function keyboard(_character, _keys) {
 				{
 					let _inc = 1;
 					for(let j = i + 1; j < i + _kc.length; j++) {
-						if(_kc[_inc] !== this.recordingKeys?.[j]?.name) 
+						if(_kc[_inc] !== this.recordingKeys?.[j]?.name)
 							break;
 						_inc++;
 					}
@@ -253,14 +253,22 @@ function keyboard(_character, _keys) {
 	this.addKey = function (_k, _name) {
 		if ((this.character?.immobilize || __storyTell || this.character?.sleep || _dialogAppeared) && !_focusMode)
 			return;
-		const _key = this.holdingKeys.find(x => x.key === _k);
-		if (_key)
+		const KEYS = this.holdingKeys;
+		const index = KEYS.findIndex(x => x.key === _k);
+
+		if (index !== -1)
+		{
+			// zaten sondaysa işlem yapma
+			if (index !== KEYS.length - 1)
+				KEYS.push(KEYS.splice(index, 1)[0]);
+
 			return;
+		}
 		const _end = this.keyStates[_k]?.lastEnd;
 		this.removeKey(_k, null, 1);
 
 		// end/cancel’den sonra çok erken start gelirse ignore
-		if (performance.now() - _end < 40) 
+		if (performance.now() - _end < 40)
 			return;
 
 		if (!this.keyStates[_k]?.isDown)
@@ -578,19 +586,25 @@ const ignoredKeys = [
   "ScrollLock",
   "Tab"
 ];
-window.addEventListener('keydown', function (event) {
+function tryOpenGame() {
 	if(__account?.gameOpening)
 	{
 		const _modal = document.querySelectorAll('.inventory-question, .settings-before-play');
 		if(!_modal?.[0]) {
-			if (ignoredKeys.includes(event.key)) 
+			if (ignoredKeys.includes(event.key))
 				return;
-  			if (/^F\d+$/.test(event.key)) 
+  			if (/^F\d+$/.test(event.key))
 				return;
 			delete __account.gameOpening;
 			activateGameStart(1,1);
+			return true;
 		}
 	}
+	return false;
+}
+window.addEventListener('keydown', function (event) {
+	if(tryOpenGame())
+		return;
 	const kRaw = String(event.key || '').toLowerCase();
 	if(kRaw === ' ') {
 		if(episode?.hasFocusUIDoneBtn) {
@@ -614,9 +628,9 @@ window.addEventListener('keydown', function (event) {
 		mainCharacter.holdingKeys = [];
 		return;
 	}
-	if (event.repeat) {
-		return;
-	}
+	// if (event.repeat) {
+	// 	return;
+	// }
 	try {
   		if(episode?.hasSkippableScreen && kRaw === ' ') {
 			const _skippableScreen = document.querySelector('.quick-play-desc-container');
@@ -674,7 +688,6 @@ function normalizeKey(key) {
   return _k;
 }
 
-const directionKeys = new Set(['w','a','s','d','arrowleft','arrowright','arrowup','arrowdown']);
 
 // Blur'da tüm tuşları temizleyelim
 function blurKeyboard() {
@@ -683,6 +696,7 @@ function blurKeyboard() {
 
   if (mainCharacter?.keyboard)
     mainCharacter.keyboard.holdingKeys = [];
+  resetDPadKeyCommands();
 }
 
 window.addEventListener('blur', blurKeyboard);
@@ -706,11 +720,11 @@ function resetDPadKeyCommands() {
 	mainCharacter.keyboard.mouseUp('a');
 	mainCharacter.keyboard.mouseUp('s');
 	mainCharacter.keyboard.mouseUp('d');
+	mainCharacter.keyboard.lastDirection = null;
+
 }
 let lastAngle = null;
 let lastDirKeys = new Set();
-const directionThreshold = 18;  // açı farkı bu değeri aşmadıkça yön değişmez
-//const deadZone = 10;            // dokunmatik merkez ölü bölge yarıçapı
 
 function calculateSin(currentX, currentY) {
 	const dx = currentX - touch_startX;
@@ -722,50 +736,103 @@ function calculateSin(currentX, currentY) {
 	const angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
 	//resetDPadKeyCommands();
-	const _directionChangeable = mainCharacter && (mainCharacter.animation === 'idle' ||
-		mainCharacter.animation === 'run' || mainCharacter.animation === 'walk'
-	);
-	if(_directionChangeable) {
-		if(angle > -85 && angle < 85)
-			mainCharacter.direction = __right;
-		else if(angle > 95 || angle < -95)
-			mainCharacter.direction = __left;
-	}
-	if (angle >= -30 && angle < 30) {
+
+	// const _directionChangeable = mainCharacter && (mainCharacter.animation === 'idle' ||
+	// 	mainCharacter.animation === 'run' || mainCharacter.animation === 'walk'
+	// );
+	// if(_directionChangeable) {
+	// 	if(angle > -85 && angle < 85)
+	// 		mainCharacter.direction = __right;
+	// 	else if(angle > 95 || angle < -95)
+	// 		mainCharacter.direction = __left;
+	// }
+	if (angle >= -25 && angle < 25) {
 		// sağ
 		mainCharacter.keyboard.mouseDown('d');
+		if(mainCharacter.keyboard.lastDirection === 'sağ')
+			return;
+		mainCharacter.keyboard.mouseUp('w');
+		mainCharacter.keyboard.mouseUp('a');
+		mainCharacter.keyboard.mouseUp('s');
+		//console.log('sağ ' + angle);
+		mainCharacter.keyboard.lastDirection = 'sağ';
 	}
-	else if (angle >= 30 && angle < 65) {
+	else if (angle >= 25 && angle < 70) {
 		// sağ-alt
 		mainCharacter.keyboard.mouseDown('d');
 		mainCharacter.keyboard.mouseDown('s');
+		if(mainCharacter.keyboard.lastDirection === 'sağ-alt')
+			return;
+		mainCharacter.keyboard.mouseUp('w');
+		mainCharacter.keyboard.mouseUp('a');
+		//console.log('sağ-alt ' + angle);
+		mainCharacter.keyboard.lastDirection = 'sağ-alt';
 	}
-	else if (angle >= 65 && angle < 115) {
+	else if (angle >= 70 && angle < 110) {
 		// alt
 		mainCharacter.keyboard.mouseDown('s');
+		if(mainCharacter.keyboard.lastDirection === 'alt')
+			return;
+		mainCharacter.keyboard.mouseUp('w');
+		mainCharacter.keyboard.mouseUp('a');
+		mainCharacter.keyboard.mouseUp('d');
+		//console.log('alt ' + angle);
+		mainCharacter.keyboard.lastDirection = 'alt';
 	}
-	else if (angle >= 115 && angle < 150) {
+	else if (angle >= 110 && angle < 155) {
 		// sol-alt
 		mainCharacter.keyboard.mouseDown('s');
 		mainCharacter.keyboard.mouseDown('a');
+		if(mainCharacter.keyboard.lastDirection === 'sol-alt')
+			return;
+		mainCharacter.keyboard.mouseUp('w');
+		mainCharacter.keyboard.mouseUp('d');
+		//console.log('sol-alt ' + angle);
+		mainCharacter.keyboard.lastDirection = 'sol-alt';
 	}
-	else if (angle >= 150 || angle < -150) {
+	else if (angle >= 155 || angle < -155) {
 		// sol
 		mainCharacter.keyboard.mouseDown('a');
+		if(mainCharacter.keyboard.lastDirection === 'sol')			
+			return;
+		mainCharacter.keyboard.mouseUp('w');
+		mainCharacter.keyboard.mouseUp('s');
+		mainCharacter.keyboard.mouseUp('d');
+		//console.log('sol ' + angle);
+		mainCharacter.keyboard.lastDirection = 'sol';
 	}
-	else if (angle >= -150 && angle < -115) {
+	else if (angle >= -155 && angle < -110) {
 		// sol-üst
 		mainCharacter.keyboard.mouseDown('a');
 		mainCharacter.keyboard.mouseDown('w');
+		if(mainCharacter.keyboard.lastDirection === 'sol-üst')
+			return;
+		mainCharacter.keyboard.mouseUp('s');
+		mainCharacter.keyboard.mouseUp('d');
+		//console.log('sol-üst ' + angle);
+		mainCharacter.keyboard.lastDirection = 'sol-üst';
 	}
-	else if (angle >= -115 && angle < -65) {
+	else if (angle >= -110 && angle < -70) {
 		// üst
 		mainCharacter.keyboard.mouseDown('w');
+		if(mainCharacter.keyboard.lastDirection === 'üst')
+			return;
+		mainCharacter.keyboard.mouseUp('a');
+		mainCharacter.keyboard.mouseUp('s');
+		mainCharacter.keyboard.mouseUp('d');
+		//console.log('üst ' + angle);
+		mainCharacter.keyboard.lastDirection = 'üst';
 	}
-	else if (angle >= -65 && angle < -30) {
+	else if (angle >= -70 && angle < -25) {
 		// sağ-üst
 		mainCharacter.keyboard.mouseDown('w');
 		mainCharacter.keyboard.mouseDown('d');
+		if(mainCharacter.keyboard.lastDirection === 'sağ-üst')
+			return;
+		mainCharacter.keyboard.mouseUp('a');
+		mainCharacter.keyboard.mouseUp('s');
+		//console.log('sağ-üst ' + angle);
+		mainCharacter.keyboard.lastDirection = 'sağ-üst';
 	}
 }
 let deadZone, touch_startX, touch_startY;
@@ -813,15 +880,15 @@ function activateTouchPad() {
 		calculateSin(_newTouches.x, _newTouches.y);
 		const _diffX = _newTouches.x - touch_startX;
 		let _left = _diffX;
-		if (_left > _maxLeft) 
+		if (_left > _maxLeft)
 			_left = _maxLeft;
-		else if (_left < -_maxLeft) 
+		else if (_left < -_maxLeft)
 			_left = -_maxLeft;
 		const _diffY = _newTouches.y - touch_startY;
 		let _top = _diffY;
-		if (_top > _maxTop) 
+		if (_top > _maxTop)
 			_top = _maxTop;
-		 else if(_top  < -_maxTop) 
+		 else if(_top  < -_maxTop)
 			_top = -_maxTop;
 		if (!(_dPad.lastMoveTime > (_gameTick - __globalMS))) {
 			_dPad.style.transform = `translate3d(${_left}px, ${_top}px, 0)`;

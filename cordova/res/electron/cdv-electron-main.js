@@ -147,3 +147,19 @@ ipcMain.handle('cdv-plugin-exec', async (_, serviceName, action, ...args) => {
         return Promise.reject(new Error(`Service not found`));
     }
 });
+
+ipcMain.handle(
+    'capture-page',
+    async(event)=>{
+
+        const win =
+            BrowserWindow.fromWebContents(
+                event.sender
+            );
+
+        const image =
+            await win.webContents.capturePage();
+
+        return image.toDataURL();
+    }
+);

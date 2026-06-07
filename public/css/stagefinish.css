@@ -24,6 +24,10 @@
 	transform: translate(-50%,-50%);
 	-webkit-transform: translate(-50%,-50%);
 }
+body.mobile-device #story-finish.finish {
+	box-shadow: none !important;
+	border:0 !important;
+}
 #story-finish.animate .fade-me,
 #story-finish.animate.fade-me {
 	animation: fade-me .5s ease;

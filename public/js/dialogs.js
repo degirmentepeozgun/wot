@@ -27,6 +27,9 @@ const __gibTalks = {
 	],
 	cyclopsair: [
 		{ en: 'Back off before i crush you', tr: 'Seni ezmeden geri çekil' }
+	],
+	alair: [
+		{ en: 'I will eat your souls', tr: 'Ruhlarınızı yiyeceğim' }
 	]
 }
 let _dialogAppeared;

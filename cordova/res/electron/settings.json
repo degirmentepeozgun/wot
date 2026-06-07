@@ -1,8 +1,9 @@
 {
     "browserWindow": {
-	"autoHideMenuBar": true,
+		"autoHideMenuBar": true,
         "resizable": false,
         "fullscreen": true,
+		"backgroundColor": "#000000",
         "webPreferences": {
         	"nodeIntegration": true,
             	"devTools": false,

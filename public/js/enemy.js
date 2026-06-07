@@ -1563,10 +1563,9 @@ function enemy(_e) {
             const _touch = isObjectsInTouch(_area, _target);
 			//const _canAttack = (_target.attackerCount ?? 0) < 2 && !this.slot?.support;
 			let _canAttack = false, _isPlacing = false;	
-			if(this.autoTarget?.lastHitTime && (_gameTick - this.autoTarget.lastHitTime) < 
-				(this.getAttackMsByDifficulty() * (this.ranged ? .66 : 1))) {
+			const _lht = this.ranged ? this.autoTarget?.lastRangedHitTime : this.autoTarget?.lastMeleeHitTime;
+			if(_lht && (_gameTick - _lht) < (this.getAttackMsByDifficulty() * (this.ranged ? .66 : 1)))
 				_canAttack = false;
-			}
 			else {
 				if(!this.nextAttackTime || _gameTick > this.nextAttackTime){
 					if(this.ranged)
@@ -2409,20 +2408,6 @@ function enemy(_e) {
 				this.lastAttackSlot = undefined;
 			}
 		}
-		if(this.autoAttacking && this.slot && !this.bestRing) {
-			this.slot.attacking = false;
-			const _target = this.autoTarget;
-			if(_target && _target.attackers)
-			{
-				const _difficultyMS = this.getAttackMsByDifficulty();
-				this.nextAttackTime = _gameTick + (_difficultyMS === 0 ? 0 : _difficultyMS + getRandomValue2(0, 120));
-				const _ranged = this.ranged;
-				if(_ranged)		
-					_target.attackers.rangeds = _target.attackers.rangeds.filter(x => x !== this) ?? [];
-				else
-					_target.attackers.melees = _target.attackers.melees.filter(x => x !== this) ?? [];
-			}
-		}
 		this.autoAttacking = false;
 		if(this.pushDirection || this.pushback)
 			this.pushDirection = this.pushback = undefined;
@@ -2720,9 +2705,9 @@ function enemy(_e) {
 	// 		this.soundPlaying = undefined;
 	// }
 	this.setSound = async function(_sf,_anima) {
-
+		if(_sf.possibility && getRandomValue2(1, 100) > _sf.possibility)
+			return;
 		let _volumeRate = 1;
-
 		if(this.soundVolumeRate) {
 			_volumeRate *= this.soundVolumeRate;
 			delete this.soundVolumeRate;
@@ -3295,6 +3280,48 @@ function enemy(_e) {
 		
 		//_frame = this.getCurrentFrame();
 		this.render(_frame, _queue);
+		if (this.attackers) {
+			// if(this.autoAttacking && this.slot && !this.bestRing) {
+			// 	this.slot.attacking = false;
+			// 	const _target = this.autoTarget;
+			// 	if(_target && _target.attackers)
+			// 	{
+			// 		const _difficultyMS = this.getAttackMsByDifficulty();
+			// 		this.nextAttackTime = _gameTick + (_difficultyMS === 0 ? 0 : _difficultyMS + getRandomValue2(0, 120));
+			// 		const _ranged = this.ranged;
+			// 		if(_ranged)		
+			// 			_target.attackers.rangeds = _target.attackers.rangeds.filter(x => x !== this) ?? [];
+			// 		else
+			// 			_target.attackers.melees = _target.attackers.melees.filter(x => x !== this) ?? [];
+			// 	}
+			// }
+			if (this.attackers.melees)
+				this.attackers.melees = this.attackers.melees.filter(x => { 
+					if(!x.autoAttacking) {
+						if(x.autoTarget) {
+							const _difficultyMS = x.getAttackMsByDifficulty();
+							x.nextAttackTime = _gameTick + (_difficultyMS === 0 ? 0 : _difficultyMS + getRandomValue2(0, 120));
+						}
+						if(x.slot)
+							x.slot.attacking = false;
+						return false;
+					}
+					return x.autoTarget === this; 
+				});
+			if (this.attackers.rangeds)
+				this.attackers.rangeds = this.attackers.rangeds.filter(x => { 
+					if(!x.autoAttacking) {
+						if(x.autoTarget) {
+							const _difficultyMS = x.getAttackMsByDifficulty();
+							x.nextAttackTime = _gameTick + (_difficultyMS === 0 ? 0 : _difficultyMS + getRandomValue2(0, 120));
+						}
+						if(x.slot)
+							x.slot.attacking = false;
+						return false;
+					}
+					return x.autoTarget === this; 
+				});
+		}
 	}
 	this.checkSpawn = function() {
 		if(this.respawnAfterSeconds && !this.respawnRequested) {
@@ -5909,6 +5936,7 @@ function enemy(_e) {
 		const _path = './images/avatar/' + this.class + '-smile.png';
 		//_path teki görsel load edilirse bir html render edilecek error verirse işlem yapılmayacak
 		const _img = new Image();
+		const _isEnemy = this.enemy;
 		const _me = this.class;
 		_img.onload = function() {
 			let _div = document.querySelector('.game-status-screen');
@@ -5924,25 +5952,39 @@ function enemy(_e) {
 					_talk.remove();
 			}
 			_talk = document.createElement('div');
-			const _icon = "<img class='talk-avatar-render-image' src='" + _path + "' />";
+			const _icon = "<img class='talk-avatar-render-image" + (_isEnemy ? " right-to-left" : "") + "' src='" + _path + "' />";
 			const _class = _me[0].toLocaleUpperCase(getLang()) + _me.substring(1);
 			let _title = getLangData(_class);
 			const frag = document.createDocumentFragment();
-
-			_talk.innerHTML = `<div class="flex talk-avatar-render status-item-container w-50 flex flex-ai-start">
-				<div class="status-item-icon-container">`
-					+ _icon +
-				`</div>
-				<div class="status-item-action-container flex">
-					<div class="item-title-wrapper flex w-100 flex-jc-start">
-						${_title}
+			if(!_isEnemy)
+				_talk.innerHTML = `<div class="flex talk-avatar-render status-item-container w-50 flex flex-ai-start">
+					<div class="status-item-icon-container">`
+						+ _icon +
+					`</div>
+					<div class="status-item-action-container flex">
+						<div class="item-title-wrapper flex w-100 flex-jc-start">
+							${_title}
+						</div>
+						<div class="item-action-wrapper flex flex-jc-start w-100">
+							${_text}
+						</div>
 					</div>
-					<div class="item-action-wrapper flex flex-jc-start w-100">
-						${_text}
+				</div>`;
+			else
+				_talk.innerHTML = `<div class="flex talk-avatar-render status-item-container w-50 flex flex-ai-start">
+					
+					<div class="status-item-action-container flex">
+						<div class="item-title-wrapper flex w-100 flex-jc-end">
+							${_title}
+						</div>
+						<div class="item-action-wrapper flex flex-jc-end w-100">
+							${_text}
+						</div>
 					</div>
-				</div>
-			</div>`;
-
+					<div class="status-item-icon-container">`
+						+ _icon +
+					`</div>
+				</div>`;
 			const element = _talk.firstElementChild;
 
 			frag.appendChild(element);
@@ -6013,12 +6055,13 @@ function enemy(_e) {
 						x.swapAnimation('idle');
 						x.attackerCount = x.hitTakenCount = 0;
 						x.setHealth(x.maxHP);
-						x.commonItem = undefined;
+						x.commonItem = x.moveDirection = undefined;
 						resetSkills(null, null,x);
 						if(x.main) {
 							let _div = document.querySelector('.game-status-screen');
 							if(_div) 
 								_div.remove();
+							blurKeyboard();
 						}
 						x.addBuff({ key: 'release', level: 3, ms: 3000, end: function(_c) {
 							_c.still = _c.immobilize = _c.disableKeyboard = false;
@@ -6443,6 +6486,7 @@ function enemy(_e) {
 									atkType: _f.atk?.type ?? _dmgEffect ?? 'common',
 									val: _dmg,
 									crit: _t.criticalHit,
+									dir: _t.direction,
 									heavy: _charged || _f.atk?.hurt?.slam || _f.atk.rate > 2 || _t.criticalHit,
 									x: _e.LEFT,
 									from:_t,
@@ -6452,6 +6496,7 @@ function enemy(_e) {
 								addDmgFrame({
 									atkType: 'hurt',
 									val: _dmg,
+									dir: _t.direction,
 									x: _e.LEFT,
 									from:_t,
 									y:episode.cHeight - _e.yPosition - _e.HEIGHT
@@ -6522,7 +6567,10 @@ function enemy(_e) {
 								//_e.addObject({key:'hit' + getRandomValue2(1,5), position: 'middle'});
 								//successfull hit
 								_e.lastHitSkill = _tr.animation;
-								_e.lastHitTime = _gameTick;
+								if(_t.ranged)
+									_e.lastRangedHitTime = _gameTick;
+								else
+									_e.lastMeleeHitTime = _gameTick;
 								if(_e.isDead())
 								{
 									if(_t.tag || _f.atk.hurt.smashIfDead) {
@@ -8975,7 +9023,7 @@ function enemy(_e) {
 					{
 						const _isMoving = this.animation === 'run' || this.animation === 'walk';
 						if (!this.animate(_skill)) {
-							if(!_isMoving){
+							if(!_isMoving && !(_anima.attack && !this.animationFinished)){
 								this.idle(7);
 							}
 						}

@@ -144,6 +144,8 @@ function drawDmgFrames() {
 					_frame.platformX = platformX;
 					_frame.totalStepY = getRandomValue2(15, 23);
 					_frame.maxStepY = _frame.totalStepY;
+					if(_frame.dir)
+						_frame.stepX = _frame.dir === __left ? -1 : 1;
 					if(_frame.crit){
 						_frame.zoom = 2;
 						_frame.stepY = 2;
@@ -194,6 +196,7 @@ function renderText(_frame, _i) {
 		x: _frame.x,
 		crit: _frame.text === 'crit',
 		frame: _frame,
+		height: MathRound((episode.dmgFrameHeight) * _frame.zoom),
 		from: _frame.from,
 		images: getDmgFrameNumbers2(_frame),
 		ms: 1000
@@ -249,11 +252,18 @@ function getDmgFrameNumbers2(_frame) {
 
 function renderTextElement2(_settings) {
 	if(_settings.images?.[0]){
-		let _l = _settings.x, i = 0, _settingsY = (_settings.frame.maxStepY - _settings.frame.totalStepY);
+		if(_settings.frame.stepX) {
+			if (!_settings.frame.startStepX)
+				_settings.frame.startStepX = _settings.frame.stepX;
+			else
+				_settings.frame.startStepX += _settings.frame.stepX;
+			_settings.frame.stepX -= (_settings.frame.stepX < 0 ? -.02 : .02);
+		}
+		let _l = _settings.x + (_settings.frame.startStepX ?? 0), i = 0, _settingsY = (_settings.frame.maxStepY - _settings.frame.totalStepY);
 		for(let _sprite of _settings.images)
 			if(_sprite) {
 				const _sim = _sprite.img ?? _sprite;
-				const _spriteHeight = MathRound((episode.dmgFrameHeight) * _settings.frame.zoom);
+				const _spriteHeight = _settings.height;
 				const _y =  _settings.frame.startY - 
 				(_settings.frame.zoom > 1  ? 0 : MathRound(_settingsY * 
 				((_spriteHeight / _settings.frame.stepY))));
@@ -264,7 +274,8 @@ function renderTextElement2(_settings) {
 				const _spriteWidth = (_sim.width *  _spriteHeight) / _sim.height;
 				let _sWidth = _spriteWidth;//  MathRound(_spriteWidth * _settings.frame.zoom);
 				episode.offDmgCtx.drawImage(_sim, 
-					(_l + (_settings.frame.platformX - platformX)) - MathRound(i * (_spriteHeight / 5)) - MathRound((_sWidth - _spriteWidth) / 2),
+					(_l + (_settings.frame.platformX - platformX)) 
+					- MathRound(i * (_spriteHeight / 5)) - MathRound((_sWidth - _spriteWidth) / 2),
 					_y, _sWidth, _spriteHeight);
 				_l += _spriteWidth;
 				i++;
@@ -425,6 +436,18 @@ function loadUI() {
 		document.head.appendChild(link);
 	});
 	organizeScreenResize();
+	setNativeMethods();
+}
+function setNativeMethods() {
+	window.platformAPI = {
+		share(text, base64) {
+			if (window.AndroidBridge?.share)
+				return window.AndroidBridge.share(text, base64);
+			if (window.electronAPI?.share)
+				return window.electronAPI.share(text, base64);
+			//console.log("share fallback");
+		}
+	};
 }
 function loadWindowEvents() {
 	window.addEventListener('keyboardDidShow', (e) => {

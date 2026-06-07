@@ -3171,6 +3171,9 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	photo: './images/sounds/photo.mp3',
+	bonefire: './images/sounds/bonefire.mp3',
+	goblincackle: './images/sounds/goblin-cackle.mp3?x=2',
 	pickheavy: './images/sounds/pick-heavy.mp3',
 	tankfriction: './images/sounds/tank-friction.mp3',
 	ding: './images/sounds/ding.mp3',
@@ -4926,6 +4929,99 @@ const mapSprites = [
 			{ name: 'bg', width: 2048, height: 1152, zoom: .96, rate: .85, bottom: -400, count:1 },
 		],
 		ground: { width: 2048, height: 1152, zoom: 1.06, yRate: .9 }
+	},
+	{
+		id: -1, still: true, coords: { left: '20%', top: '60%', title: 'Credits' },
+		theme: __scale >= 2 ? 'lobbymobile' : 'lobby', distance: 1, width: MathFloor(4096 * .48 * __scale), 
+		ambiancePath: './images/music/lobby.mp3',
+		ambianceVolume: .5,
+		mobs: [
+			{
+				id: 72,
+				minX: 1175,
+				maxX: 1175,
+				count: 1,
+				do: function(_e) {
+					episode.msNow = 1;
+					_e.direction = 'right';
+					_e.noDirection = true;
+					_e.swapAnimation('idle');
+					_e.positionable = true;
+				},
+				yPosition: function() {
+					return MathRound(groundheight * 1.7);
+				}
+			},
+			{
+				id: 2002,
+				minX: 1400,
+				maxX: 1400,
+				count: 1,
+				do: function(_e) {
+					_e.npc = true;
+					_e.reversed = true;
+					_e.direction = 'left';
+					_e.noDirection = true;
+					_e.positionable = true;
+				},
+				yPosition: function() {
+					return MathRound(groundheight * 1.85);
+				}
+			},
+			{
+				id: 5,
+				minX: 1380,
+				maxX: 1380,
+				count: 1,
+				do: function(_e) {
+					_e.positionable = true;
+				},
+				yPosition: function() {
+					return MathRound(groundheight * 1.6);
+				}
+			},
+			{
+				id: 87,
+				minX: 1620,
+				maxX: 1620,
+				count: 1,
+				zoom: .9,
+				do: function(_e) {
+					_e.positionable = true;
+				},
+				yPosition: function() {
+					return MathRound(groundheight * .82);
+				}
+			},
+			{
+				id: 87,
+				minX: 1250,
+				maxX: 1250,
+				count: 1,
+				zoom: .85,
+				do: function(_e) {
+					_e.positionable = true;
+				},
+				yPosition: function() {
+					return MathRound(groundheight * 1.2);
+				}
+			}
+		],
+		objects : [
+			{ id: 'ff1', src:'./images/texture/farm-fireflies.gif', totalFrames: 2, key: 'fireflies', width: 400, height: 300, zoom: 1.2, locate: { left: 1100 , bottom: 200} },
+		],
+		tiles: [
+			{ 
+				name: 'ground',
+				count: 1, 
+				height: 2296, 
+				zoom: .48 * __scale, 
+				rate: 1, 
+				width: 4096, 
+				bottom: -350 
+			}
+		],
+		ground: { width: 4096, height: 2296, zoom: .48 * __scale }
 	},
 	// {
 	// 	id: 800, disabled: true, battleGround: true, coords: { left: '4%', top: '22%', title: 'Battleground', icon: 'battleground' }, theme: 'cave', distance: 1, width: 6144,
@@ -31065,6 +31161,8 @@ function addSlingStoneSpells() {
             src: './images/sprites/ep620/sapantas' + i + '.png',
             invulnerable: true,
             extraStepXRate: 1,
+			width: 60,
+			height: 60,
             class: __spell,
             lightColor: _colors[i - 1],
             name: 'SlingStone' + i,
@@ -31148,12 +31246,13 @@ function addSlingStoneSpells() {
 								_stoneReverse(_e);
 							},
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: { possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -31168,12 +31267,13 @@ function addSlingStoneSpells() {
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][0],
                             speed: 5,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -31198,12 +31298,13 @@ function addSlingStoneSpells() {
                             }] : null,
                             speed: 6,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -31228,12 +31329,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -31258,12 +31360,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -31288,12 +31391,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -31318,12 +31422,13 @@ function addSlingStoneSpells() {
                             }] : null,
                             speed: 6,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -31348,12 +31453,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -31378,12 +31484,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -31408,12 +31515,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -31438,12 +31546,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -31468,12 +31577,13 @@ function addSlingStoneSpells() {
                             }] : null,
                             speed: 6,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -31498,12 +31608,13 @@ function addSlingStoneSpells() {
                             }] : null,
                             speed: 6,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -31528,12 +31639,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -31558,12 +31670,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -31588,12 +31701,13 @@ function addSlingStoneSpells() {
                             }] : null,
                             speed: 6,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -31635,8 +31749,8 @@ function getSound(src, key, _load, _noCache) {
 			return load.sound;
 		if (!src)
 			src = soundFiles[key];
-		if (!src && !_load)
-			return;
+		if (!src)
+			return undefined;
 		const sound = document.createElement("audio");
 		sound.crossOrigin = 'anonymous';
 		if ("src" in sound)
@@ -31647,7 +31761,10 @@ function getSound(src, key, _load, _noCache) {
 		}
 		sound.volume = 0;
 		sound.src = src;
-		sound.play();
+		//console.log("AUDIO FILE =", src);
+		sound.play().catch(e => {
+			console.error("PLAY FAILED", e, sound.src);
+		});
 		if(key && !_noCache)
 			loadedSounds.push({ sound: sound, key: key });
 		//audioPreloader.appendChild(sound);
@@ -34522,6 +34639,7 @@ const cssAnimations = {
 <div class='overlay-black show-ui fade-me' style="
   position:absolute;
   left:${R}px;
+  height:${T + H}px;
   right:0;
   top:0;
   bottom:0;
@@ -35699,6 +35817,8 @@ function ligthenGradientColored2(x, y, radius, ctx, _color) {
     ctx.fill();
 }
 async function PlaySound(_s, _alternateKeys, _volumeRate) {
+	if(_s.possibility && getRandomValue2(1, 100) > _s.possibility)
+		return undefined;
 	const _hidden = !__account.options.sound || episode?.hasSkippableScreen || episodeVisibilityHidden || __batterySaveMode;
 	const _hasEnd = _s.end;
 	if((_hidden && !_hasEnd) || (_s?.force ? false : __switchingMap))
@@ -36280,6 +36400,7 @@ function askExitApp(){
 
 function exitApplication() {
 	closeInventoryQuestionModal();
+	quitGame();
 	try{
 		if (typeof globalThis.__APP_EXIT_HANDLER__ === "function") {
 			globalThis.__APP_EXIT_HANDLER__();
@@ -36289,7 +36410,58 @@ function exitApplication() {
 
 	}
 }
+function quitGame() {
 
+    try {
+
+        const isElectron = navigator.userAgent.includes("Electron");
+        if (isElectron) {
+
+            const electron = window.require('electron');
+            const ipcRenderer = electron.ipcRenderer;
+
+            ipcRenderer.send('force-close-game');
+            return;
+        }
+		try {
+			AndroidBridge.quit();
+			return;
+		}
+		catch(pluginEx) {
+			console.error(pluginEx);
+		}
+        // Android Cordova
+        if (window.plugins && window.plugins.exit) {
+            window.plugins.exit();
+            return;
+        }
+
+        // Eski Android fallback
+        if (navigator.app) {
+            navigator.app.exitApp();
+            return;
+        }
+
+        window.close();
+
+    } catch (err) {
+
+        console.error(err);
+
+        try {
+
+            if (navigator.app) {
+                navigator.app.exitApp();
+                return;
+            }
+
+            window.close();
+
+        } catch (e) {
+            console.error(e);
+        }
+    }
+}
 var extractDigit = function(a, bitMask, shiftRightAmount) {
     return (a & bitMask) >>> shiftRightAmount;
 }

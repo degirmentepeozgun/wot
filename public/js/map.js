@@ -227,8 +227,10 @@ function map(_m) {
 						}
 						const _cKey = 'l' + _f.spriteLeft + 't' + _f.spriteTop + 'w' + _f.spriteWidth + 'h' + _f.spriteHeight;
 						let _src = _f.src ?? _anim.src ?? _e.src;
-						if(!_src)
+						if(!_src || typeof _src !== 'string' || _src !== 'undefined' || _src !== 'null' || _src !== ' ') {
+    						console.log('Invalid src: ' + _src);
 							continue;
+						}
 						if(episode.croppedSprites.get(_src)?.[_cKey])
 							continue;
 						else if(!_src.endsWith('.png'))
@@ -2164,6 +2166,7 @@ function map(_m) {
 		if((!__account.options.ambiance || __batterySaveMode) && !_force)
 			return;
 		try {
+			//console.log('AMBIANCE = ' + this.ambiancePath + ', ' + _src);
 			const _sound = getSound(this.ambiancePath, _src, 1, this.ambiancePath);
 			if (_sound) {
 				_sound.volume = this.ambianceVolume ?? .05;

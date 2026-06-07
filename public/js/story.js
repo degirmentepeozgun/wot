@@ -4964,9 +4964,9 @@ const __stories = [
 									_boss.acceptChanges();
 									_boss.pickNewTarget();
 								}
-								installBoss(37, 'Yecüc');
+								installBoss(37, 'Morya');
 								requestAnimationFrame(() => {
-									installBoss(38, 'Mecüc');
+									installBoss(38, 'Erlin');
 								});
 								mainCharacter.maxHP = mainCharacter.MAXHP =
 								mainCharacter.maxHP * 1;
@@ -5007,16 +5007,16 @@ const __stories = [
 						enemy: [37],
 						limit: 1,
 						descriptions: {
-							en: 'Yecüc Cleared',
-							tr: 'Yecüc Temizlendi'
+							en: 'Morya Cleared',
+							tr: 'Morya Temizlendi'
 						}
 					},
 					{ 
 						enemy: [38], 
 						limit: 1, 
 						descriptions: {
-							en: 'Mecüc Cleared',
-							tr: 'Mecüc Temizlendi'
+							en: 'Erlin Cleared',
+							tr: 'Erlin Temizlendi'
 						} 
 					}
 				],
@@ -6960,16 +6960,16 @@ const __stories = [
 						enemy: [37],
 						limit: 1,
 						descriptions: {
-							en: 'Yecüc Cleared',
-							tr: 'Yecüc Temizlendi'
+							en: 'Morya Cleared',
+							tr: 'Morya Temizlendi'
 						}
 					},
 					{ 
 						enemy: [38], 
 						limit: 1, 
 						descriptions: {
-							en: 'Mecüc Cleared',
-							tr: 'Mecüc Temizlendi'
+							en: 'Erlin Cleared',
+							tr: 'Erlin Temizlendi'
 						} 
 					}
 				],
@@ -6977,7 +6977,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		//startScene: 2,
+		startScene: 2,
 		scenes: [
 			{
 				when: function() {
@@ -7229,7 +7229,7 @@ const __stories = [
 								setTimeout(() => {
 									episode.boss.animate('ground1', 1);
 								}, 1000);
-							}, 1, null, null, 1, 1);
+							}, 1, null, null, 1, 1, null,1);
 						}
 					},
 					{
@@ -7918,8 +7918,8 @@ const __stories = [
 									// 	enemy: [38], 
 									// 	limit: 1, 
 									// 	descriptions: {
-									// 		en: 'Mecüc Cleared',
-									// 		tr: 'Mecüc Temizlendi'
+									// 		en: 'Erlin Cleared',
+									// 		tr: 'Erlin Temizlendi'
 									// 	} 
 									// }
 								],
@@ -7953,9 +7953,9 @@ const __stories = [
 										_boss.pickNewTarget();
 										_boss.releaseAfter = 25;
 									}
-									// installBoss(37, 'Yecüc');
+									// installBoss(37, 'Morya');
 									// requestAnimationFrame(() => {
-									// 	installBoss(38, 'Mecüc');
+									// 	installBoss(38, 'Erlin');
 									// });
 									installBoss(622, 'Goblin King');
 									mainCharacter.maxHP = mainCharacter.MAXHP =
@@ -7985,36 +7985,39 @@ const __stories = [
 								//for(let x of __storyScene.mobs)
 								{
 									const _mob = episode.mobs[0];
-									_mob.count = 1;
-									const exp =
-									mainCharacter.level > 9 ? 
-									mainCharacter.level * 1400 :
-									(mainCharacter.level > 4 ?
-										mainCharacter.level * 250 :
-										mainCharacter.level * 350);
-									_mob.experience = exp;
-									const x = structuredClone2(_mob);
-									// if(x.skipSummon)
-									// 	continue;
-									x.minX = 144;
-									x.maxX = 6000;
-									// const _smn = structuredClone2(x);
-									// _smn.count = 1;
-									// delete _smn.spawn;
-									// let y = summonMobWithJson(_smn,0,1);
-									x.experience = exp;
-									// if(y.experience < 1000)
-									// 	y.experience = 1000;
-									// const _mob = episode.mobs.find(m => m.id === y.id);
-									// if(_mob){
-									// 	_mob.experience = y.experience;
-									// 	_mob.minX = 0;
-									// 	_mob.maxX = 6000;
-									// }
-									x.count = 1;
-									x.hp = mainCharacter.level * 70;
-									summonMobWithJson(x, 1,1);
-									//y.setHealth(y.maxHP);
+									if(_mob) {
+
+										_mob.count = 1;
+										const exp =
+										mainCharacter.level > 9 ? 
+										mainCharacter.level * 1400 :
+										(mainCharacter.level > 4 ?
+											mainCharacter.level * 250 :
+											mainCharacter.level * 350);
+										_mob.experience = exp;
+										const x = structuredClone2(_mob);
+										// if(x.skipSummon)
+										// 	continue;
+										x.minX = 144;
+										x.maxX = 6000;
+										// const _smn = structuredClone2(x);
+										// _smn.count = 1;
+										// delete _smn.spawn;
+										// let y = summonMobWithJson(_smn,0,1);
+										x.experience = exp;
+										// if(y.experience < 1000)
+										// 	y.experience = 1000;
+										// const _mob = episode.mobs.find(m => m.id === y.id);
+										// if(_mob){
+										// 	_mob.experience = y.experience;
+										// 	_mob.minX = 0;
+										// 	_mob.maxX = 6000;
+										// }
+										x.count = 1;
+										x.hp = mainCharacter.level * 70;
+										summonMobWithJson(x, 1,1);
+										//y.setHealth(y.maxHP);
+									}
 								}
 							if(mainCharacter.level === 2) {
 								//episode.mobs.push();
@@ -8179,7 +8182,7 @@ const __stories = [
 						maxX: 6000,
 						count: 2,
 						sight: 1000,
-						spawn: 5,
+						spawn: 3,
 						hp:60,
 						experience: 500
 					},
@@ -8395,12 +8398,6 @@ const __stories = [
 					mainCharacter.disableSkill('tag');
 					mainCharacter.maxHP = mainCharacter.MAXHP = mainCharacter.health = mainCharacter.level * 120;
 					mainCharacter.setHealth(mainCharacter.health);
-					// setTimeout(() => {
-					// 	cssAnimations.black(null, 6000, getLangData('Meanwhile, deep in the sewers... Meanwhile, deep in the sewers... Meanwhile, deep in the sewers... Meanwhile, deep in the sewers...'), function() {
-					// 		switchStoryScene();
-					// 	});
-					// 	renderChestOpeningScreen();
-					// }, 5000);
 				},
 				actions: [
 					{
@@ -8474,9 +8471,9 @@ const __stories = [
 							return (episode.boss?.health <= 0 && !episode.allLooted);
 						},
 						do: function() {
-							episode.enemies.filter(x => x.class === 'object' && !x.remove).forEach(x => {
+							episode.enemies.filter(x => x.class === 'object' && !x.remove)?.forEach(x => {
 								x.yPosition = mainCharacter.yPosition;
-								x.animations.idle.frames.forEach(f => {
+								x.animations.idle?.frames?.forEach(f => {
 									delete f.bottomGap;
 								});
 								x.left = (mainCharacter.HURTLEFT + platformX + mainCharacter._HURTBOX_half) - x._HURTBOX_half;
@@ -8494,12 +8491,13 @@ const __stories = [
 								// }
 							});
 							const _items = document.querySelectorAll('div[data-status-item-id]');
-							_items.forEach(x => {
+							_items?.forEach(x => {
 								const _id = parseInt(x.getAttribute('data-status-item-id'));
 								wearStatusItem(_id, null, 1);
 							});
 							episode.allLooted = 1;
-							addClass(document.querySelector('.game-status-screen'), 'v-none');
+							clearStatusBoard();
+							//addClass(document.querySelector('.game-status-screen'), 'v-none');
 						}
 					},
 					{
@@ -8514,7 +8512,7 @@ const __stories = [
 								_gameUI.appendChild(_div);
 							}
 							episode.lastItemDropTime = _gameTick;
-							const _inventory = getItems().filter(x => !x.weared);
+							const _inventory = getItems().filter(x => !x.weared && x.grade === 2);
 							//const _item = _inventory[_inventory.length - 1];
 							for(let _item of _inventory) {
 								if(_item.shown)
@@ -9014,7 +9012,7 @@ const __stories = [
 							requestAnimationFrame(() => {
 								mainCharacter.still = mainCharacter.immobilize = mainCharacter.disableKeyboard = true;
 								blurKeyboard();
-								focusMe('#skill12', null, null, "<div class='full flex' style='flex-direction: column;'><div class='flex' style='padding-bottom:.5vh'>" + getLangData('You\'ve activated a support skill') + '</div><div class="flex">' + getLangData('It can be used even in danger') + "</div></div>", null, null, null, 1);
+								focusMe('#skill12', null, null, "<div class='full flex' style='flex-direction: column;'><div class='flex' style='padding-bottom:.5vh'>" + getLangData('You\'ve activated a support skill') + '</div><div class="flex">' + getLangData('It can be used even in danger') + "</div></div>", null, null, __isPC ? null : true, 1);
 								requestAnimationFrame(() => {
 									const _curt = document.getElementById('focus-ui');
 									_curt.appendChild(clone);
@@ -9120,7 +9118,7 @@ const __stories = [
 																			atk: mainCharacter.atk,
 																			grade: 4
 																		});
-																		//_boss.health = _boss.maxHP = 1;
+																		_boss.health = _boss.maxHP = 1;
 																		_boss.class = 'boss';
 																		_boss.important = 1;
 																		_boss.experience = 0;
@@ -9134,7 +9132,7 @@ const __stories = [
 																		});
 																		return _boss;
 																	}
-																	const _yec = installBoss(37, 'Yecüc');
+																	const _yec = installBoss(37, 'Morya');
 																	const _mainCenterX = mainCharacter.HURTLEFT + mainCharacter._HURTBOX_half;
 																	_yec.left = (_mainCenterX - MathRound(200 * __zoom)) + platformX;
 																	_yec.yPosition = mainCharacter.yPosition - 1;
@@ -9143,7 +9141,7 @@ const __stories = [
 																	_yec.animate('ground2', 1);
 																	mainCharacter.hitTakenCount = 0;
 																	requestAnimationFrame(() => {
-																		const _mec =installBoss(38, 'Mecüc');
+																		const _mec =installBoss(38, 'Erlin');
 																		_mec.left = (_mainCenterX + MathRound(200 * __zoom)) + platformX;
 																		_mec.yPosition = mainCharacter.yPosition - 1;	
 																		_mec.updateVariables();
@@ -9213,6 +9211,9 @@ const __stories = [
 																					setTimeout(() => {
 																						_yec.animate('hurtair', 1);
 																					}, 500);
+																					setTimeout(() => {
+																						_mec.animate('hurtair', 1);
+																					}, 650);
 																					// mainCharacter.immobilize = mainCharacter.still = true;
 																					// blurKeyboard();
 																					// mainCharacter.disableKeyboard = true;
@@ -9234,7 +9235,7 @@ const __stories = [
 																					// _yec.animate('hurtair', 1);
 																					// _mec.animate('hurtair', 1);
 																					disposeFocus();
-																				}, null, getLangData('Use support skill to save yourself'),null,1);
+																				}, null, getLangData('Use support skill to save yourself'),null,1, __isPC ? null : true);
 																			}, 150);
 																		}, 1650);
 																	});
@@ -9300,53 +9301,53 @@ const __stories = [
 						maxX: 2580,
 						count: 1,
 						sight: 1000,
-						grade: 12,
-						hp:1650,
+						//grade: 12,
+						hp:165, //0,
 						zoom: .33,
 						yPosition: function() {
 							return MathRound(groundheight * .5);
 						}
 					},
-					{
-						id: 35,
-						minX: 1580,
-						maxX: 4800,
-						count: 2,
-						sight: 1000,
-						spawn: 10,
-						hp:300,
-						experience: 0
-					},
-					{
-						id: 7,
-						minX: 2000,
-						maxX: 3200,
-						count: 2,
-						sight: 1000,
-						spawn: 10,
-						hp:300,
-						experience: 0
-					},
-					{
-						id: 2,
-						minX: 1580,
-						maxX: 4800,
-						count: 3,
-						sight: 1000,
-						spawn: 10,
-						hp:300,
-						experience: 0
-					},
-					{
-						id: 33,
-						minX: 1580,
-						maxX: 4800,
-						count: 1,
-						sight: 1000,
-						spawn: 10,
-						hp:300,
-						experience: 0
-					}
+					// {
+					// 	id: 35,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 2,
+					// 	sight: 1000,
+					// 	spawn: 10,
+					// 	hp:300,
+					// 	experience: 0
+					// },
+					// {
+					// 	id: 7,
+					// 	minX: 2000,
+					// 	maxX: 3200,
+					// 	count: 2,
+					// 	sight: 1000,
+					// 	spawn: 10,
+					// 	hp:300,
+					// 	experience: 0
+					// },
+					// {
+					// 	id: 2,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 3,
+					// 	sight: 1000,
+					// 	spawn: 10,
+					// 	hp:300,
+					// 	experience: 0
+					// },
+					// {
+					// 	id: 33,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 1,
+					// 	sight: 1000,
+					// 	spawn: 10,
+					// 	hp:300,
+					// 	experience: 0
+					// }
 				]
 			},
 			{
@@ -10011,7 +10012,7 @@ function renderChestOpeningScreen(_gift) {
 				id="chest-open-gift"
 				draggable="false"
 			>
-
+			<div class="chest-open-tap-text" id="tap-text">${getLangData('TAP TO UNLOCK')}</div>
 			<div class="chest-open-reward-text" id="reward-text">
 				<div class="reward-unlocked">
 					${getLangData('SUPPORT CHARACTER UNLOCKED')}
@@ -10048,6 +10049,8 @@ function openGiftChestWithAnimation(){
 	const flash = document.getElementById("chest-open-flash");
 	const gift = document.getElementById("chest-open-gift");
 	const rewardText = document.getElementById("reward-text");
+	const tapText = document.getElementById("tap-text");
+	tapText.remove();
 	PlaySound({key:'chime', volume:1});
     addClass(chestWrapper, "opening");
 
@@ -10274,6 +10277,8 @@ function switchStoryScene(_func, _newOrder) {
 				const _ps = document.querySelectorAll('.placed-skill');
 				_ps?.forEach(x => addClass(x, 'v-none'));
 				blurKeyboard();
+				if(mainCharacter)
+					mainCharacter.hbBars = undefined;
 			}, __storyScene.loadingCharacterIds);
 		}, 1000);
 		if(_func)
@@ -11541,7 +11546,7 @@ function delay(ms) {
 // 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/' + _giftOrder[3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
 // }, 15000);
 
-function createPromoScreen() {
+function createPromoScreen(_fromMenu) {
 	playClick();
 	hideMyModalPopUp(1);
 	const _data = [
@@ -11809,7 +11814,7 @@ function createPromoScreen() {
 	];
 	const _desc = document.createElement('div');
 	_desc.className = 'show-ui full quick-play-desc-container fade-me';
-	_desc.style = "overflow:hidden;position:relative";
+	_desc.style = "overflow:hidden;position:absolute;z-index:9999999";
 	_desc.setAttribute('data-order', 1);
 	let _html = '<div class="flex" style="width:100%;height:91%;flex-wrap: nowrap;will-change:transform;transition: transform 0.3s ease;transform:translateX(0);align-items:stretch;justify-content:flex-start">';
 	let j = 1;
@@ -11845,7 +11850,8 @@ function createPromoScreen() {
 			</div>
 		</div>`;
 	addClass(_gameUI, 'disable-ui');
-	_gameUI.appendChild(_desc);
+	let _parent = !_fromMenu ? _gameUI : document.getElementById('first-splash');
+	_parent.appendChild(_desc);
 	detachModule();
 }
 
@@ -11881,7 +11887,7 @@ function nextPromoSection(_max) {
 	if(_order === _max) {
 		playClick();
 		_qp.remove();
-		resetOpeningScreen();
+		//resetOpeningScreen();
 		return;
 	}
 	else {

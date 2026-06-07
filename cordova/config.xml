@@ -1,5 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="tr.wot.gameapp" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="tr.wot.gameapp" version="1.0.0"
+xmlns="http://www.w3.org/ns/widgets"
+xmlns:cdv="http://cordova.apache.org/ns/1.0"
+xmlns:android="http://schemas.android.com/apk/res/android">
     <name>Warriors Of Tengri</name>
     <description>Sample Apache Cordova App</description>
     <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
@@ -16,36 +19,67 @@
 
     <allow-navigation href="*" />
 <platform name="electron">
+	<preference name="ElectronBackgroundColor" value="#000000" />
     	<preference name="ElectronSettingsFilePath" value="res/electron/settings.json" />
 	<icon src="res/icon/electron/icon.png" />
         <preference name="ElectronDevTools" value="false" />
         <preference name="ElectronNodeIntegration" value="false" />
+	<hook type="after_prepare" src="hooks/after_prepare/fix-electron-close.js" />
 </platform>
     <platform name="android">
-	<preference name="StatusBarOverlaysWebView" value="false" />
+	<hook type="after_prepare" src="hooks/after_prepare/patch_mainactivity.js" />
+	 <config-file
+    target="AndroidManifest.xml"
+    parent="/manifest/application">
+
+    <provider
+        android:name="androidx.core.content.FileProvider"
+        android:authorities="${applicationId}.provider"
+        android:exported="false"
+        android:grantUriPermissions="true">
+
+        <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/file_paths" />
+
+    </provider>
+
+</config-file>
+	<preference name="AndroidWindowSplashScreenAnimatedIcon" value="" />
+	<preference name="StatusBarOverlaysWebView" value="true" />
+	<preference name="Fullscreen" value="true" />
+	<preference name="AndroidWindowLayoutInDisplayCutout" value="shortEdges" />
+	<preference name="NavigationBarColor" value="#000000" />
 	<resource-file src="res/drawable/ic_launcher.png" target="app/src/main/res/drawable/ic_launcher.png" />
-	<resource-file src="res/android/values/colors.xml" target="app/src/main/res/values/colors.xml" />
-	<resource-file src="res/android/values/themes.xml" target="app/src/main/res/values/themes.xml" />
+	<resource-file src="res/drawable/ic_cdv_splashscreen.xml" target="app/src/main/res/drawable/ic_cdv_splashscreen.xml" />
+	<preference name="AndroidWindowSplashScreenBackground" value="#000000" />
+      <preference name="AndroidWindowBackground" value="#000000" />
       <preference name="Orientation" value="landscape" />
 	<preference name="AndroidOverrideBackButton" value="true" />
 	<preference name="AndroidLaunchMode" value="singleTask" />
-      <preference name="AndroidWindowBackground" value="#000000" />
       <preference name="StatusBarBackgroundColor" value="#000000" />
       <preference name="StatusBarStyle" value="lightcontent" />
       <preference name="NavigationBarBackgroundColor" value="#000000" />
       <access origin="*" /> 
       <allow-navigation href="*" />
       <preference name="android-minSdkVersion" value="21" />
-      <preference name="android-targetSdkVersion" value="36" />
-      <preference name="android-compileSdkVersion" value="36" />
-      <preference name="android-buildToolsVersion" value="36.0.0" />
+      <preference name="android-compileSdkVersion" value="34" />
+	<preference name="android-targetSdkVersion" value="34" />
+	<preference name="android-buildToolsVersion" value="34.0.0" />
       <preference name="SplashMaintainAspectRatio" value="true" />
+	  <preference name="SplashScreen" value="none" />
+	<preference name="AutoHideSplashScreen" value="true" />
+	<preference name="SplashScreenDelay" value="0" />
+	<preference name="FadeSplashScreen" value="false" />
+	<preference name="ShowSplashScreenSpinner" value="false" />
       <icon src="res/icon/android/icon.png" density="ldpi" />
       <icon src="res/icon/android/icon.png" density="mdpi" />
       <icon src="res/icon/android/icon.png" density="hdpi" />
       <icon src="res/icon/android/icon.png" density="xhdpi" />
       <icon src="res/icon/android/icon.png" density="xxhdpi" />
-      <icon src="res/icon/android/icon.png" density="xxxhdpi" />
+      <icon src="res/icon/android/icon.png" density="xxxhdpi" /> 
+	  <resource-file src="res/xml/file_paths.xml" target="app/src/main/res/xml/file_paths.xml" />
+	  <resource-file src="native/android/java/AndroidBridge.java" target="app/src/main/java/tr/wot/gameapp/AndroidBridge.java" />
     </platform>
     <preference name="DisallowOverscroll" value="true" />
 <preference name="WebViewBounce" value="false" />
@@ -55,11 +89,9 @@
 <preference name="StatusBarBackgroundColor" value="#000000" />
 <preference name="NavigationBarBackgroundColor" value="#000000" />
 <preference name="StatusBarStyle" value="lightcontent" />
-<preference name="StatusBarOverlaysWebView" value="false" />
 	<preference name="SplashScreenDelay" value="0" />
 	<preference name="AutoHideSplashScreen" value="true" />
 	<preference name="ShowSplashScreenSpinner" value="false" />
 	<preference name="SplashScreen" value="none" />
-    <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
     <preference name="AllowInlineMediaPlayback" value="true" />
 </widget>

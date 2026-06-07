@@ -64,15 +64,27 @@ function animateStart(_failed) {
 					return;
 				_leaderboardsHTML = `<div class="w-100 fade-me flex flex-ai-end victory-header">${getLangData('Leaderboard')}</div>
 					<div class="quickplay-leaderboards flex fade-me flex-ai-start"><div class="full char slide-right">`;
-				for(let _player of _leadersData)
+				let _order = 1, player_order, player_score;
+				for(let _player of _leadersData) {
 					_leaderboardsHTML += `<div class="flex leaderboard-item${_player.me ? ' selected' : ''}">
-					<div class="flex flex-jc-start w-50 leaderboard-item-left">
-						${_player.me ? 'You' : _player.name}
-					</div>
-					<div class="flex flex-jc-end w-50 leaderboard-item-right">
-						${_player.point.formatWithDots()}
-					</div>
-				</div>`;
+						<div class="flex flex-jc-start w-50 leaderboard-item-left">
+							${_player.me ? 'You' : _player.name}
+						</div>
+						<div class="flex flex-jc-end w-50 leaderboard-item-right">
+							${_player.point.formatWithDots()}
+						</div>
+					</div>`;
+					if(_player.me) {
+						player_order = _order;
+						player_score = _player.point;
+					}
+					_order++;
+				}
+				if(mainCharacter)
+				{
+					mainCharacter.storyScore = player_score;
+					mainCharacter.storyOrder = player_order;
+				}
 				_leaderboardsHTML += '</div></div>';
 				_leadersList.innerHTML = _leaderboardsHTML;
 			});
@@ -164,7 +176,7 @@ function animateStart(_failed) {
 				<div class="flex w-100 ms2000 op-none" style="height: 10%">`
 					+ (_hasNext ? '' :
 					`<div class="w-33 flex" style="padding: 1%;height: 100%">
-						<div onexactclick="createPromoScreen()" id="quit-stage-btn" style="height:74%!important" class="btn quick-space-btn inactivated gray animate-me-500 flex">${getLangData('QUIT')}</div>
+						<div onexactclick="openCredits()" id="quit-stage-btn" style="height:74%!important" class="btn quick-space-btn inactivated gray animate-me-500 flex">${getLangData('CONTINUE')}</div>
 					</div>`)
 					+ (_hasNext ?
 					`<div id="next-stage-btn" class="quick-space-btn w-33 flex" style="padding: 1%;height: 100%" onexactclick="playClick();hideMyModalPopUp(1);checkStoryFinish(1, ${__stories.find(x => !x.passive && x.order > __story.order)?.id}, null, null, null, 1)">

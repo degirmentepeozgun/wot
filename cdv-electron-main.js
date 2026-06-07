@@ -11,6 +11,8 @@ const {
     BrowserWindow,
     protocol,
     ipcMain,
+	clipboard,
+	nativeImage,
     net,
     Menu
 } = require('electron');
@@ -146,4 +148,25 @@ ipcMain.handle('cdv-plugin-exec', async (_, serviceName, action, ...args) => {
     } else {
         return Promise.reject(new Error(`Service not found`));
     }
+});
+ipcMain.handle(
+    'capture-page',
+    async(event)=>{
+
+        const win =
+            BrowserWindow.fromWebContents(
+                event.sender
+            );
+
+        const image =
+            await win.webContents.capturePage();
+
+        return image.toDataURL();
+    }
+);
+ipcMain.on('copy-image', (event, base64) => {
+
+    const image = nativeImage.createFromDataURL(base64);
+
+    clipboard.writeImage(image);
 });

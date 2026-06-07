@@ -844,7 +844,6 @@ function normalizeKey(key) {
   return _k;
 }
 
-const directionKeys = new Set(['w','a','s','d','arrowleft','arrowright','arrowup','arrowdown']);
 
 // window.addEventListener('keydown', (e) => {
 //   const kRaw = e.key?.toLowerCase?.();
@@ -926,8 +925,6 @@ function resetDPadKeyCommands() {
 }
 let lastAngle = null;
 let lastDirKeys = new Set();
-const directionThreshold = 18;  // açı farkı bu değeri aşmadıkça yön değişmez
-//const deadZone = 10;            // dokunmatik merkez ölü bölge yarıçapı
 
 function calculateSin(currentX, currentY) {
 	const dx = currentX - touch_startX;

@@ -35413,7 +35413,7 @@ const _allEnemies = {
 							spriteOrigin: 85,
 							extraStepXRate: -1.25,
 							speed: 3,
-							sound: 'dash',
+							sound: { key: 'dash', volume: .5 },
 							push: true,
 							bottomGap: -20,
 							def: {
@@ -80931,6 +80931,7 @@ const _allEnemies = {
 						}
 					}
 					_e.ultimate = _oldUltimate;
+					_e.talk('alair');
 				}
 			},
 			healtbarGap: 25,
@@ -80940,7 +80941,7 @@ const _allEnemies = {
 			direction: 'left',
 			defaultDirection: 'right',
 			defaultAnimationKey: 'idle',
-			zoom: .8,
+			zoom: .85,
 			height: 426,
 			width: 297,
 			maxHP: 2000,
