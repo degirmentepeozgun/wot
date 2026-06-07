@@ -34522,11 +34522,17 @@ const cssAnimations = {
 				_btn.style = 'color:#f7f7f7cc !important;font-size:3vh !important';
 				_btn.className = "game-btn2 flex one-line";
 				_btn.innerText = getLangData('Done');
-				_btn.onexactclick = function() {
-					if(_func)
-						_func();
-					removeFocus();
-				};
+				if(__isPC)
+					_btn.onexactclick = function() {
+						if(_func)
+							_func();
+						removeFocus();
+					};
+				else
+					_btn.addEventListener('pointerdown', () => {
+						_func?.(_elem);
+						removeFocus();
+					});
 				_wrapper.appendChild(_txtWrapper);
 				_wrapper.appendChild(_btnWrapper);
 				_btnWrapper.appendChild(_btn);
@@ -34547,14 +34553,24 @@ const cssAnimations = {
 				const _shield = document.querySelectorAll('.focus-shield')?.[0];
 				if(_shield) {
 					const _s = _self;
-					_shield.onexactclick = function(event) {
-						event.stopPropagation();
-						event.preventDefault();
-						_func();
-						addClass(_elem, 'focus-clicked');
-						if(_s.keyboardHandler)
-							window.removeEventListener('keydown', _s.keyboardHandler);
-					}
+					if(__isPC)
+						_shield.onexactclick = function(event) {
+							event.stopPropagation();
+							event.preventDefault();
+							_func();
+							addClass(_elem, 'focus-clicked');
+							if(_s.keyboardHandler)
+								window.removeEventListener('keydown', _s.keyboardHandler);
+						}
+					else
+						_shield.addEventListener('pointerdown', function(event) {
+							event.stopPropagation();
+							event.preventDefault();
+							_func(_elem, _shield);
+							addClass(_elem, 'focus-clicked');
+							if(_s.keyboardHandler)
+								window.removeEventListener('keydown', _s.keyboardHandler);
+						});
 					if(_elem && __isPC) {
 						let _kbKey = _elem.getAttribute('data-key');
 						if(_kbKey) {

@@ -6977,7 +6977,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		startScene: 2,
+		//startScene: 1,
 		scenes: [
 			{
 				when: function() {
@@ -7280,12 +7280,12 @@ const __stories = [
 						},
 						do: function() {
 							_game.suspended = 1;
+							removeFocus();
 							const _inner = document.querySelector('.tutorial-box-inner');
 							_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[4].title[getLang()]}:</b>
 							<div class="w-100 fade-me">${__storyScene.lang[4][getLang()]}</div>`;
 							delete mainCharacter.disableKeyboard;
-							focusMe('#skill1', function() {
-								removeFocus();
+							focusMe('#skill1', function(_elem, _shield) {
 								delete _game.suspended;
 								delete mainCharacter.disableKeyboard;
 								mainCharacter.still = mainCharacter.immobilize = false;
@@ -7294,6 +7294,13 @@ const __stories = [
 								episode.boss.animations.ground1.disabled = true;
 								episode.tutorialOrder = 4;
 								episode.lastTutorialTime = _gameTick;
+								mainCharacter.keyboard.mouseDown(' ');
+								if(!__isPC && _shield) {
+									_shield.addEventListener('pointerup', function() {
+										console.log('UP');
+										mainCharacter.keyboard.mouseUp(' ');
+									});
+								}
 								disposeFocus();
 							}, 1, null, null, 1);
 						}
@@ -7335,6 +7342,7 @@ const __stories = [
 							blurKeyboard();
 							episode.lastTutorialTime = _gameTick;
 							episode.tutorialOrder = 5;
+							removeFocus();
 						}
 					},
 					{
@@ -9118,7 +9126,7 @@ const __stories = [
 																			atk: mainCharacter.atk,
 																			grade: 4
 																		});
-																		_boss.health = _boss.maxHP = 1;
+																		//_boss.health = _boss.maxHP = 1;
 																		_boss.class = 'boss';
 																		_boss.important = 1;
 																		_boss.experience = 0;
@@ -9301,53 +9309,53 @@ const __stories = [
 						maxX: 2580,
 						count: 1,
 						sight: 1000,
-						//grade: 12,
-						hp:165, //0,
+						grade: 12,
+						hp:1650,
 						zoom: .33,
 						yPosition: function() {
 							return MathRound(groundheight * .5);
 						}
 					},
-					// {
-					// 	id: 35,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 2,
-					// 	sight: 1000,
-					// 	spawn: 10,
-					// 	hp:300,
-					// 	experience: 0
-					// },
-					// {
-					// 	id: 7,
-					// 	minX: 2000,
-					// 	maxX: 3200,
-					// 	count: 2,
-					// 	sight: 1000,
-					// 	spawn: 10,
-					// 	hp:300,
-					// 	experience: 0
-					// },
-					// {
-					// 	id: 2,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 3,
-					// 	sight: 1000,
-					// 	spawn: 10,
-					// 	hp:300,
-					// 	experience: 0
-					// },
-					// {
-					// 	id: 33,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 1,
-					// 	sight: 1000,
-					// 	spawn: 10,
-					// 	hp:300,
-					// 	experience: 0
-					// }
+					{
+						id: 35,
+						minX: 1580,
+						maxX: 4800,
+						count: 2,
+						sight: 1000,
+						spawn: 10,
+						hp:300,
+						experience: 0
+					},
+					{
+						id: 7,
+						minX: 2000,
+						maxX: 3200,
+						count: 2,
+						sight: 1000,
+						spawn: 10,
+						hp:300,
+						experience: 0
+					},
+					{
+						id: 2,
+						minX: 1580,
+						maxX: 4800,
+						count: 3,
+						sight: 1000,
+						spawn: 10,
+						hp:300,
+						experience: 0
+					},
+					{
+						id: 33,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						sight: 1000,
+						spawn: 10,
+						hp:300,
+						experience: 0
+					}
 				]
 			},
 			{

@@ -10483,9 +10483,24 @@ body:not(.pc-mission) #game-ui .game-status-screen {
 	width:96% !important;
 	margin:0 !important;
 	padding:0 !important;
-	background: linear-gradient(90deg, transparent, #1f8f4a, #1f8f4a, transparent);
-	line-height: 2.6vh !important;
-	color:#F4BB44 !important
+	background: linear-gradient(#8b2b24, #5f1815);
+	line-height: 1px !important;
+	color:#F4BB44 !important;
+	 background:
+        linear-gradient(
+            to bottom,
+            #a5362d 0%,
+            #75221d 50%,
+            #4f1513 100%
+        );
+
+    border:.35vh solid #d0a14f;
+    color:#f7eed3;
+    text-shadow:0 1px 3px rgba(0,0,0,.7);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.25),
+        0 0 10px rgba(208,161,79,.25);
 }
 #game-ui .game-status-screen .status-item-action-container .game-menu-button span{
 	color:#f3f4f5 !important;
@@ -10497,9 +10512,11 @@ body:not(.pc-mission) #game-ui .game-status-screen {
 	height:100% !important;
 	font-size:2.6vh !important;
 	line-height: 2.6vh !important;
+	color: #f5e6c8 !important;
 }
 #game-ui .game-status-screen .status-item-action-container .item-title-wrapper{
 	height:50% !important;
+	color: #d8b46a !important;
 	padding:0 1vh
 }
 #game-ui .game-status-screen .status-item-action-container .item-action-wrapper{
@@ -12372,7 +12389,7 @@ body:not(.pc-mission) .chest-open-gift {
 	position: absolute !important;
 	top: 84% !important;
 	left:50%;
-	transform:translateX(-50%)
+	transform:translateX(-50%);
 }
 .chest-open-reward-text{
 
@@ -12742,9 +12759,11 @@ body.pc-mission #mini-menu {
 #assets-progress {
 	padding-top:2vh;
 	width:100%;
+	font-weight:500;
 	color:#f8f8f880 !important;
 	font-size:3vh!important
 }
+
 #assets-progressbar {
 	width: 33%;
 	height: 1.2vh;
@@ -13415,4 +13434,35 @@ body.pc-mission #mini-menu {
 	left:0;
 	line-height: 8vh !important;
 	text-align: center;
+}
+
+@media (max-width: 999px) {
+    /* Telefonlar */
+	#assets-progress {
+		font-size:4.5vh!important
+	}
+	#game-ui .game-status-screen {
+		transform: scale(1.35) !important;
+		-webkit-transform: scale(1.35) !important;
+		transform-origin: bottom center !important;
+	}
+	#focus-ui .overlay-black-text *{
+		font-size: 4.5vh !important;
+		line-height: 5vh !important;
+		font-weight: 400 !important;
+	}
+	.chest-open-scene #chest-open-ok-button{
+		font-size: 4vh !important;
+		height: 6vh !important;
+		top: 85% !important;
+	}
+	#focus-ui .black-screen-ok-btn {
+		top: 85% !important;
+	
+	}#focus-ui .black-screen-ok-btn * {
+		font-size: 4.5vh !important;
+		line-height: 5vh !important;
+		transform: scale(1.5) !important;
+		-webkit-transform: scale(1.5) !important;
+	}
 }
