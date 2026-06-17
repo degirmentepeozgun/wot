@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿'use strict';
+﻿﻿﻿﻿'use strict';
 const __attackTolerance = 2;
 
 function enemy(_e) {
@@ -37,7 +37,7 @@ function enemy(_e) {
 		this.slotPriority = _e.slotPriority;
 	this.moveDirection = undefined;
 	this.experience = 0; // _e.experience ?? 500;
-	this.healtbarGap = _e.healtbarGap;
+	this.healtbarGap = _e.healtbarGap ?? 0;
 	this.difficulty = _e.difficulty ?? __account.difficulty;
 	this.phased = _e.phased;
 	if(_e.healthBarWidthRate)
@@ -293,7 +293,7 @@ function enemy(_e) {
 	}
 	this.getTop = function () {
 		let _stepY = 0;
-		if (this.extraStepYRate && !this.stop)
+		if (this.extraStepYRate)
 			_stepY = MathRound(this.extraStepYRate * (_canvas.height / 100));
 		return MathRound((_canvas.height - this.yPosition - this.getHeight())) - _stepY;
 	}
@@ -2828,6 +2828,7 @@ function enemy(_e) {
 	this.draw = function (_queue) {
 		if(this.remove || (_game.suspended && !this.warm))
 			return;
+		this.oldHURTLEFT = this.HURTLEFT + platformX;
 		// if(!this.harmless && this.autoMode > 0 && this.animation === this.lastFinishedAttack)
 		// {
 		// 	const _a = this.animations[this.animation];
@@ -2890,14 +2891,40 @@ function enemy(_e) {
 						if(!x.def)
 							x.def = {};
 						//x.speed *= 2;
-						if(_knockDead && !_isImportant)
+						if(!x.def.iframe)
+							x.def.iframe = true;
+						let _knocking;
+						if(!_knockDead) {
+							//killedby ile öldüreni bul
+							const _killer = episode.enemies.find(e => e.key === this.killedBy);
+							const ohl = _killer?.oldHURTLEFT ? _killer.oldHURTLEFT - platformX : null;
+							if(ohl && _killer.HURTLEFT !== ohl) {
+								const _killerDir = _killer.direction;
+								const _killerCenterX = _killer.HURTLEFT + _killer._HURTBOX_half;
+								const _thisCenterX = this.HURTLEFT + this._HURTBOX_half;
+								if(_killerDir === __left && _thisCenterX < _killerCenterX && this.direction === __left)
+									this.direction = __right;
+								else if(_killerDir === __right && _thisCenterX > _killerCenterX && this.direction === __right)
+									this.direction = __left;
+								// if(_killerDir === this.direction)
+								// 	this.direction = _killerDir === __right ? __left : __right;
+								let _str = MathAbs(ohl - _killer.HURTLEFT);
+								if(_str < 2)
+									_str = 2;
+								else if(_str > 3)
+									_str = 3;
+								x.extraStepXRate = (-1 * getRandomValue2(150 * _str, 250 * _str)) / 1000;
+								_knocking = 1;
+							}
+							else
+								x.extraStepXRate = 0;
+						}
+						if(_knocking)
+							x.speed = MathCeil(x.speed * getRandomValue2(4, 6) / 100);
+						else if(_knockDead && !_isImportant)
 							x.speed = MathRound(x.speed * getRandomValue2(130, 150) / 100);
 						else if(!_isImportant)
 							x.speed = MathRound(x.speed * 1.2);
-						if(!x.def.iframe)
-							x.def.iframe = true;
-						if(!_knockDead)
-							x.extraStepXRate = 0;
 					});
 					const _fLen =  _anima.frames?.length ?? 0;
 					if(this.frame >= _fLen && _fLen > 0)
@@ -3086,6 +3113,7 @@ function enemy(_e) {
 			_frame.charge = undefined;
 			if (_frame.atk && (!this.attacking || (_frame.atk.reset && (this.frame !== this.attacking)))) {
 				this.attacking = this.frame;//this.class !== __spell;
+				// if()
 				this.attack(_anima, _frame);
 			}
 			else {
@@ -3115,7 +3143,7 @@ function enemy(_e) {
 					_volume = .5;
 				}
 				this.stepSound = getSound(null, _footstepKey);
-				this.stepSound.volume = _volume;
+				this.stepSound.volume = _volume * __volume;
 				this.stepSound.loop = true;
 				this.stepSound.crossOrigin = 'anonymous';
 			}
@@ -3427,7 +3455,7 @@ function enemy(_e) {
 				this.heartbeat = getSound(null, 'heartbeat');
 				this.heartbeat.crossOrigin = 'anonymous';
 				this.heartbeat.loop = true;
-				this.heartbeat.volume = 1;
+				this.heartbeat.volume = 1 * __volume;
 				this.heartbeat.play();
 			}
 		}
@@ -3615,7 +3643,7 @@ function enemy(_e) {
 				this.action = undefined;
 		}
 	}
-	this.dropItem = function (_type, _key, _alternateType) {
+	this.dropItem = function (_type, _key, _alternateType, _zoomRate) {
 		if(episode.pvp || episode.gold || episode.tower)
 			return;
 		//const _prevDrops = episode.enemies?.filter(x => x.dropType && x.dropType === _type);
@@ -3642,7 +3670,7 @@ function enemy(_e) {
 						addDmgFrame({
 							item: { key: 'gold' },
 							val: _goldAmount,
-							from: _ch.key,
+							from: _ch,
 							//text: _goldAmount + ' x &nbsp;<img src="./images/icons/gold.png" style="width:4vh" />',
 							//class: 'effect-miss',
 							x: _ch.LEFT,
@@ -3937,7 +3965,7 @@ function enemy(_e) {
 				direction: __right,
 				defaultDirection: __left,
 				defaultAnimationKey: 'idle',
-				zoom: _rate,
+				zoom: _rate * (_zoomRate ?? 1),
 				height: _size,
 				width: _size,
 				maxHP: 1,
@@ -4097,20 +4125,20 @@ function enemy(_e) {
 					if(episode.equipmentDropRates?.[0]) {
 						let _edr = [...episode.equipmentDropRates];
 						shuffle(_edr);
-						_char.dropItem('item', _edr[0].key);
+						_char.dropItem('item', _edr[0].key, null, _loot.zoom);
 					}
 					else {
 						const _itemChance = _loot.chance ?? 100;
 						if(getRandomValue2(1, 100) <= _itemChance)
-							_char.dropItem('item', _loot.key);
+							_char.dropItem('item', _loot.key, null, _loot.zoom);
 					}
 				}
 				if(_loot.type === 'pot' && _loot.chance && (getRandomValue2(1, 100) <= _loot.chance))
-					_char.dropItem('pot', 'pot');
+					_char.dropItem('pot', 'pot', null, _loot.zoom);
 				else if((_loot.type === 'pot' && !_loot.chance) || (!_loot.type && (getRandomValue2(1, 100) <= 10)))
-					_char.dropItem('pot', 'pot');
+					_char.dropItem('pot', 'pot', null, _loot.zoom);
 				if (_loot.type === 'gold' || (!_loot.type && (getRandomValue2(1, 100) <= (((_char.goldGainRate ?? 0) + _char.baseProps.goldGainRate) * (_char.goldEnabled ? 2 : 1)))))
-					_char.dropItem('gold');
+					_char.dropItem('gold', null, _loot.zoom);
 				if ((_loot.type === 'common' && !_loot.chance) || (_loot.type === 'common' && _loot.chance && (getRandomValue2(1, 100) <= _loot.chance)) || (!_loot.type && (getRandomValue2(1, 100) < 11))) {
 					let _availSkills = commonSkills.filter(x => x.forEnemy?.indexOf(_char.id) >= 0);
 					if (!_availSkills?.[0])
@@ -4118,10 +4146,10 @@ function enemy(_e) {
 					const _commonItem = (_key && _key !== 'random') ? _availSkills.find(x => x.key === _key) :
 						_availSkills[getRandomValue(0, _availSkills.length - 1)];
 					if(_commonItem)
-						_char.dropItem('common', _commonItem.key, _commonItem.type);
+						_char.dropItem('common', _commonItem.key, _commonItem.type, _loot.zoom);
 				}
 				if (_loot?.enemy)
-					_char.dropItem(_loot.type, _key);
+					_char.dropItem(_loot.type, _key, null, _loot.zoom);
 				_char.looted = 1;
 			}
 		
@@ -4573,7 +4601,7 @@ function enemy(_e) {
 		const _h = MathRound((_frame.spriteHeight + MathAbs(bottomGap)) * zoom);
 		if(_h !== this.HEIGHT)
 			this.HEIGHT = _h;
-		let stepY = this.extraStepYRate && !this.stop ? MathRound(this.extraStepYRate * (episode.cHeight / 100)) : 0;
+		let stepY = this.extraStepYRate ? MathRound(this.extraStepYRate * (episode.cHeight / 100)) : 0;
 		const _t = MathRound((episode.cHeight - this.yPosition - this.HEIGHT)) - stepY;
 		if(_t !== this.TOP)
 			this.TOP = _t;
@@ -5609,8 +5637,9 @@ function enemy(_e) {
 							_e.killedBy = _knocker.key;
 							_e.animate('deadfall', 1);
 						}
-						else
+						else{
 							_e.animate(_skillName);
+						}
 					}
 					(this.owner ?? this).talk();
 					_e.direction = _knocker.direction === __right ? __left : __right;
@@ -5961,7 +5990,7 @@ function enemy(_e) {
 					<div class="status-item-icon-container">`
 						+ _icon +
 					`</div>
-					<div class="status-item-action-container flex">
+					<div class="status-item-action-container talk-avatar-text flex">
 						<div class="item-title-wrapper flex w-100 flex-jc-start">
 							${_title}
 						</div>
@@ -5973,7 +6002,7 @@ function enemy(_e) {
 			else
 				_talk.innerHTML = `<div class="flex talk-avatar-render status-item-container w-50 flex flex-ai-start">
 					
-					<div class="status-item-action-container flex">
+					<div class="status-item-action-container talk-avatar-text flex">
 						<div class="item-title-wrapper flex w-100 flex-jc-end">
 							${_title}
 						</div>
@@ -6058,6 +6087,8 @@ function enemy(_e) {
 						x.commonItem = x.moveDirection = undefined;
 						resetSkills(null, null,x);
 						if(x.main) {
+							clearChainSkills();
+							delete x.chainStatus;
 							let _div = document.querySelector('.game-status-screen');
 							if(_div) 
 								_div.remove();
@@ -6481,7 +6512,7 @@ function enemy(_e) {
 								_dmg *= 2;
 							//_dmg = 1;
 							_tr.checkSteal(_dmg, _e);
-							if (!_e.main)
+							if (!_e.main && (_dmg > 1 || (_t?.owner ?? _t?.related ?? _t).level < 10))
 								addDmgFrame({
 									atkType: _f.atk?.type ?? _dmgEffect ?? 'common',
 									val: _dmg,
@@ -6492,7 +6523,7 @@ function enemy(_e) {
 									from:_t,
 									y: episode.cHeight - _e.yPosition - _e.HEIGHT
 								});
-							else
+							else if(_dmg > 1 || (_t?.owner ?? _t?.related ?? _t).level < 10)
 								addDmgFrame({
 									atkType: 'hurt',
 									val: _dmg,
@@ -6819,7 +6850,18 @@ function enemy(_e) {
 					}
 					if (_thisPriority < (_enemyPriority ?? 10)) {
 						if(_enemyPriority)
-							(this.owner ?? trt).talk();
+							if(_enemy.frame > 0 && (_enemyAnima.attack || _enemy.blocked)){
+								(this.owner ?? trt).talk();
+								addDmgFrame({
+									from: this,
+									text: _enemy.direction === __left ? 'break-right' : 'break-left',
+									x: _enemy.LEFT,
+									scale: 2.66,
+									heavy: true,
+									zoom: 1.33,
+									y: episode.cHeight - _enemy.yPosition - _enemy.HEIGHT
+								});
+							}
 						_enemyHurted = this.hurtEnemy(_anima, _frame, _enemy, _enemyFrame, _enemyAnima);
 						if (this.class === __spell && (!this.pierce) && this.animation !== 'dead')
 							this.animate('dead', null, null, 6);
@@ -7852,7 +7894,8 @@ function enemy(_e) {
 		const _fps = this.getFps();
 		if (_fps > 1 && !_anima.hurt)
 			_speedRate /= _fps;
-		this.extraStepYRate = this.stop ? 0 : (this.extraStepYRate ?? 0) + (_speedRate * (_frame.extraStepYRate ?? 0));
+		if(!this.stop)
+		this.extraStepYRate = (this.extraStepYRate ?? 0) + (_speedRate * (_frame.extraStepYRate ?? 0));
 		let _stepY = this.puppetMode ? 0 : MathRound(this.extraStepYRate * (episode.cHeight / 100));
 		const _solidity = this.isRunningAgainstSolidObject();
 		if (!_anima) {
@@ -8082,7 +8125,7 @@ function enemy(_e) {
 				delete _frame.hitZoom;
 		}
 		this.oldYPosition = this.yPosition;
-		this.oldHURTLEFT = this.HURTLEFT + platformX;
+		//this.oldHURTLEFT = this.HURTLEFT + platformX;
 	}
 	this.getCenterSolid = function() {
 		let _top = this.TOP;
@@ -9240,8 +9283,9 @@ function enemy(_e) {
 					warn('<span>' + getLangData('Skill is already active') + '</span>', 'warn');
 				return undefined;
 			}
-			if ((this.animation === _skill || _skill === oldAnima.baseKey) && oldAnima.hold && !this.animationFinished)
+			if ((this.animation === _skill || _skill === oldAnima.baseKey) && oldAnima.hold && !this.animationFinished) {
 				return oldAnima;
+			}
 			if ((this.animation === _skill || _skill === oldAnima.baseKey || (this.animationFinished && oldAnima.next)) && (this.animationFinished || oldAnima.imediateBreak))
 				if (oldAnima.next)
 					_skill = this.modifySkill(this.getNextSkill(oldAnima.next));
@@ -9285,8 +9329,9 @@ function enemy(_e) {
 			_skill = 'idle';
 			this.animation = _skill;
 			anima = this.animations[this.animation];
-			if(!anima)
+			if(!anima) {
 				return undefined;
+			}
 		}
 		else if((this.randomizeAirCoords || this.airFlow) && this.animation?.startsWith('hurtair')) {
 			this.randomAirCoords(anima, this.airFlow);
@@ -9405,8 +9450,9 @@ function enemy(_e) {
 			else if(!_finishTarget?.readyForFatality) {
 				this.animation = 'idle';
 				anima = this.getCurrentAnimation();
-				if(!anima)
+				if(!anima){
 					return undefined;
+				}
 			}
 		}
 		if(anima.do)

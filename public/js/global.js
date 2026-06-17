@@ -4616,7 +4616,7 @@ const mapSprites = [
 		id: 42, minLevel : 1,
 		coords: { 
 			title: 'Arena Ground',
-		 }, theme: 'arena', 
+		 }, theme: 'arena', hasMobile: true,
 		distance: 1, width: MathRound(6144 * 1.065),
 		playGrounds: [
 			{ min_X: 0, max_X:1700, bottom_Gap: 20, round: { rate: .44, dir: __right} },
@@ -5182,7 +5182,7 @@ const mapSprites = [
 	// },
 	{
 		id: 499, disabled: true, pvp: true, coords: { left: '5%', top: '40%', title: 'Arena', icon: 'battleground' }, 
-		theme: __scale >= 2 ? 'cavemobile' : 'cave', distance: 1, width: MathFloor(6144 * 1.06),
+		theme: 'cave', hasMobile: true, distance: 1, width: MathFloor(6144 * 1.06),
 		mobs: [
 			
 		],
@@ -5192,13 +5192,13 @@ const mapSprites = [
 		],
 		tiles: [
 			{ name: 'bg', count:1, width: 6144, height: 1080, zoom: 1.06 * __scale, rate: .5, count:1, bottom: -440 },
-			{ name: 'ground', width: 6144, height: 1080, zoom: 1.06 * __scale, rate: 1, bottom: -400, count:1 },
+			{ name: 'darkground', width: 6144, height: 1080, zoom: 1.06 * __scale, rate: 1, bottom: -400, count:1 },
 			{ name: 'foreground', count:1, width: 6144, height: 1080, bottom:-416, foreground: true, zoom: 1 * __scale, rate: 1 },
 		],
 		ground: { width: 6144, height: 1080, zoom: 1.06 * __scale, yRate: 2.2 }
 	},
 	{
-		id: 500, disabled: true, pvp: true, coords: { left: '5%', top: '40%', title: 'Arena', icon: 'battleground' }, theme: 'cave', distance: 1, 
+		id: 500, hasMobile: true, disabled: true, pvp: true, coords: { left: '5%', top: '40%', title: 'Arena', icon: 'battleground' }, theme: 'cave', distance: 1, 
 			width: 6144 * 1.06,
 		mobs: [
 			
@@ -5209,14 +5209,14 @@ const mapSprites = [
 		],
 		tiles: [
 			{ name: 'bg', count:1, width: 6144, height: 1080, zoom: 1.06 * __scale, rate: .5, count:1, bottom: -440 },
-			{ name: 'ground', width: 6144, height: 1080, zoom: 1.06 * __scale, rate: 1, bottom: -400, count:1 },
+			{ name: 'darkground', width: 6144, height: 1080, zoom: 1.06 * __scale, rate: 1, bottom: -400, count:1 },
 			{ name: 'foreground', count:1, width: 6144, height: 1080, bottom:-416, foreground: true, zoom: 1, rate: 1 },
 		],
 		ground: { width: 6144, height: 1080, zoom: 1.06 * __scale, yRate: 2.2 }
 	},
 	{
 		id: 11, ambianceVolume: .03, coords: { left: '16%', top: '32%', title: 'Swamp' }, 
-		theme: 'lush', distance: 1, width: MathFloor(6144 * 1.065),
+		theme: 'lush', hasMobile: true, distance: 1, width: MathFloor(6144 * 1.065),
 		minLevel: 1, 
 		// itemGrade: 3,
 		// equipmentDropRates: [
@@ -5323,7 +5323,7 @@ const mapSprites = [
 	{
 		id: 13, ambianceVolume: .3, 
 		coords: {  left: '21%', top: '21%', title: 'Swamp', dir: 'North' }, 
-		theme: __scale >= 2 ? 'lushmobile' : 'lush', distance: 1, width: MathFloor(6144 * 1.06),
+		theme:'lush', hasMobile:true, distance: 1, width: MathFloor(6144 * 1.06),
 		minLevel: 8, itemGrade: 3,
 		equipmentDropRates: [
 			{ key:'weapon', rate: 8 },
@@ -5867,7 +5867,7 @@ const mapSprites = [
 	},
 	{
 		id: 36, coords: { left: '5%', top: '40%', title: 'Arena', icon: 'battleground' }, 
-		theme: 'cave', distance: 1, width: MathFloor(6144 * 1.065), ambiancePath: './images/sounds/cave2.mp3',
+		theme: 'cave', hasMobile: true, distance: 1, width: MathFloor(6144 * 1.065), ambiancePath: './images/sounds/cave2.mp3',
 		ambianceVolume: .5,
 		mobs: [
 		],
@@ -5876,7 +5876,7 @@ const mapSprites = [
 		tiles: [
 			{ name: 'bg', count:1, width: 6144, height: 1080, zoom: 1.065, rate: .5, count:1, bottom: -440 },
 			{ name: 'parts2', width: 1920, height: 1080, count: 3, bottom: 500, zoom: 1, rate: .75 },
-			{ name: 'ground', width: 6144, height: 1080, zoom: 1.065, rate: 1, bottom: -400, count:1 }
+			{ name: 'darkground', width: 6144, height: 1080, zoom: 1.065, rate: 1, bottom: -400, count:1 }
 			//{ name: 'foreground', count:1, width: 6144, height: 1080, bottom:-416, foreground: true, zoom: 1, rate: 1 },
 		],
 		ground: { width: 6144, height: 1080, zoom: 1.065, yRate: 2.2 }
@@ -6467,6 +6467,7 @@ const spells = {
 				type: 'skill',
 				attack: true,
 				priority: 1,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -7505,6 +7506,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				useExtraStepXRate: true,
 				frames: [
 					{
@@ -7638,6 +7640,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				useExtraStepXRate: true,
 				frames: [
 					{
@@ -7771,6 +7774,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -7952,6 +7956,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 1377,
@@ -8230,6 +8235,7 @@ const spells = {
 				type: 'skill',
 				move: true,
 				priority: 1,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 206,
@@ -8675,6 +8681,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -8911,6 +8918,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -9056,6 +9064,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				priority: 1,
+				attack: true,
 				frames: [
 						{
 							spriteLeft: 137,
@@ -9305,6 +9314,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -9462,6 +9472,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -9659,6 +9670,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 596,
@@ -9855,6 +9867,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 642,
@@ -10051,6 +10064,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 772,
@@ -10252,6 +10266,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 257,
@@ -10448,6 +10463,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 596,
@@ -10643,6 +10659,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -10840,6 +10857,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 772,
@@ -12901,6 +12919,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -13074,6 +13093,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				priority: 1,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 12,
@@ -13722,6 +13742,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -13883,6 +13904,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 114,
@@ -14828,6 +14850,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 1,
 				frames: [
 					{
@@ -15043,6 +15066,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 2,
 				frames: createFrames(4, 45, 400, 400, 9,
 						{
@@ -15093,6 +15117,7 @@ const spells = {
 				type: 'skill',
 				move: true,
 				priority: 1,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -15441,6 +15466,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 2,
 				frames: [
 					{
@@ -15725,6 +15751,7 @@ const spells = {
 				type: 'skill',
 				move: true,
 				priority: 2,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -15898,6 +15925,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 1,
 				frames: [
 					{
@@ -16319,6 +16347,7 @@ const spells = {
 				type: 'skill',
 				move: true,
 				priority: 2,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 81,
@@ -16427,6 +16456,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				priority: 2,
 				frames: [
@@ -16666,6 +16696,7 @@ const spells = {
 				type: 'skill',
 				move: true,
 				priority: 2,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -16774,6 +16805,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 2,
 				frames: [
 					{
@@ -16916,6 +16948,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 1,
 				frames: [
 					{
@@ -17193,6 +17226,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 2,
 				frames: [
 					{
@@ -17396,6 +17430,7 @@ const spells = {
 				type: 'skill',
 				attack: true,
 				priority: 1,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -17770,6 +17805,7 @@ const spells = {
 		animations: {
 			idle: {
 				key: "idle",
+				attack: true,
 				type: 'skill',
 				frames: [
 					{
@@ -17922,6 +17958,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 19,
@@ -18007,13 +18044,14 @@ const spells = {
 	sonicwave: {
 		defaultDirection: __right,
 		defaultAnimationKey: 'idle',
-		zoom: 1.5,
+		zoom: 1.2,
+		pierce: true,
 		invulnerable: true,
 		knockback: true,
 		extraStepXRate: 1,
 		push: 'front',
 		class: __spell,
-		src: './images/sprites/ep1000/sonic-wave.png',
+		src: './images/sprites/ep1000/sonic-wave2.png',
 		name: 'Sonicwave',
 		animations: {
 			idle: {
@@ -18025,11 +18063,11 @@ const spells = {
 				priority: 1,
 				frames: [
 					{
-						spriteLeft: 0,
+						spriteLeft: 15,
 						spriteTop: 0,
-						spriteWidth: 230,
-						spriteHeight: 364,
-						spriteOrigin: 70,
+						spriteWidth: 228,
+						spriteHeight: 500,
+						spriteOrigin: 114,
 						extraStepXRate: 1.5,
 						speed: 8,
 						push: 15,
@@ -18054,11 +18092,11 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 230,
+						spriteLeft: 244,
 						spriteTop: 0,
-						spriteWidth: 230,
-						spriteHeight: 364,
-						spriteOrigin: 70,
+						spriteWidth: 178,
+						spriteHeight: 500,
+						spriteOrigin: 89,
 						extraStepXRate: 1.5,
 						speed: 8,
 						push: 15,
@@ -18083,11 +18121,11 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 230 * 2,
+						spriteLeft: 422,
 						spriteTop: 0,
-						spriteWidth: 230,
-						spriteHeight: 364,
-						spriteOrigin: 70,
+						spriteWidth: 210,
+						spriteHeight: 500,
+						spriteOrigin: 105,
 						extraStepXRate: 1.5,
 						speed: 8,
 						push: 15,
@@ -18112,11 +18150,11 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 230 * 3,
+						spriteLeft: 633,
 						spriteTop: 0,
-						spriteWidth: 230,
-						spriteHeight: 364,
-						spriteOrigin: 70,
+						spriteWidth: 200,
+						spriteHeight: 500,
+						spriteOrigin: 100,
 						extraStepXRate: 1.5,
 						speed: 8,
 						push: 15,
@@ -18141,11 +18179,11 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 230 * 4,
+						spriteLeft: 842,
 						spriteTop: 0,
-						spriteWidth: 230,
-						spriteHeight: 364,
-						spriteOrigin: 70,
+						spriteWidth: 158,
+						spriteHeight: 500,
+						spriteOrigin: 79,
 						extraStepXRate: 1.5,
 						speed: 8,
 						push: 15,
@@ -18204,6 +18242,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -18360,6 +18399,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -18531,6 +18571,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -18893,6 +18934,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				maxRepeat: 2,
 				next: 'ground1',
 				frames: [
@@ -19537,6 +19579,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 26,
@@ -19753,6 +19796,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -19809,6 +19853,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -20068,6 +20113,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -20158,6 +20204,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -20216,6 +20263,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -20275,6 +20323,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -20570,6 +20619,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -20628,6 +20678,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -20693,6 +20744,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -20906,6 +20958,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 66,
@@ -21039,6 +21092,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -21364,6 +21418,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -21499,6 +21554,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -24598,6 +24654,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -24813,6 +24870,7 @@ const spells = {
 				key: "idle",
 				move: true,
 				type: 'skill',
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 195,
@@ -24980,6 +25038,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -25282,6 +25341,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -25905,6 +25965,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				maxRepeat: 2,
 				frames: [
 					{
@@ -26052,6 +26113,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -26251,6 +26313,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 257 * 4,
@@ -26856,6 +26919,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -27324,6 +27388,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -27679,6 +27744,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -28054,6 +28120,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				maxRepeat: 2,
 				frames: [
 					{
@@ -28370,6 +28437,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				maxRepeat: 2,
 				frames: [
 					{
@@ -28686,6 +28754,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				maxRepeat: 12,
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -28784,6 +28853,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				maxRepeat: 12,
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -28968,6 +29038,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -29149,6 +29220,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -29367,6 +29439,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -29727,6 +29800,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 1330,
@@ -30003,6 +30077,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 1330 - 1299,
@@ -30326,6 +30401,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 2639,
@@ -30508,6 +30584,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 3236,
@@ -30742,6 +30819,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 1,
 				frames: [
 					{
@@ -30907,6 +30985,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 1,
 				frames: [
 					{
@@ -34524,12 +34603,15 @@ const cssAnimations = {
 				_btn.innerText = getLangData('Done');
 				if(__isPC)
 					_btn.onexactclick = function() {
+						if(_btn.pointerDownTriggered)
+							return;
 						if(_func)
 							_func();
 						removeFocus();
 					};
-				else
+				// else
 					_btn.addEventListener('pointerdown', () => {
+						_btn.pointerDownTriggered = 1;
 						_func?.(_elem);
 						removeFocus();
 					});
@@ -34557,13 +34639,16 @@ const cssAnimations = {
 						_shield.onexactclick = function(event) {
 							event.stopPropagation();
 							event.preventDefault();
+							if(_shield.pointerDownTriggered)
+								return;
 							_func();
 							addClass(_elem, 'focus-clicked');
 							if(_s.keyboardHandler)
 								window.removeEventListener('keydown', _s.keyboardHandler);
 						}
-					else
+					// else
 						_shield.addEventListener('pointerdown', function(event) {
+							_shield.pointerDownTriggered = 1;
 							event.stopPropagation();
 							event.preventDefault();
 							_func(_elem, _shield);
@@ -34673,7 +34758,7 @@ const cssAnimations = {
 "></div>
 
 <!-- FOCUS -->
-<div class='focus-shield${_circle ? ' circle' : ''} show-ui focus-shield-circle' style="
+<div class='focus-shield${(_circle && !_transparent) ? ' circle' : ''} show-ui focus-shield-circle' style="
   position:absolute;
   left:${L}px;
   top:${T}px;
@@ -34696,6 +34781,45 @@ const cssAnimations = {
 			_container.appendChild(_finger);
 		}
 		addClass(_gameUI, 'focus-ui-activated');
+	},
+	blackui: function (_c, _ms, _text, _func, _delay, _after) {
+		if(cssAnimationProps.blackui) {
+			if((_gameTick - cssAnimationProps.blackui.start) > ((cssAnimationProps.blackui.p2 ?? _ms ?? 4000) + (_delay ?? 0))) {
+				const _elem = _gameUI.querySelector('.intro-screen');
+				_gameUI.onanimationend = function(e) {
+					if(e.animationName === 'black-bg') {
+						removeClass(_gameUI, 'black-bg');
+						if(_after)
+							_after();
+						if(!__isPC)
+							removeClass(_gameUI, 'disable-ui');
+					}
+				}
+				if(_elem)
+					_elem.remove();
+				if(_func) 
+					_func();
+				delete cssAnimationProps.blackui;
+			}
+			else if(_delay && ((_gameTick - cssAnimationProps.blackui.start) > _delay)) {
+				delete cssAnimationProps.blackui.p5; 
+				addClass(_gameUI, 'black-bg');
+			}
+		}
+		else {
+			const __r = document.querySelector(':root');
+			__r.style.setProperty('--black-duration', ((_ms ?? 4000) + 1000).toString() + 'ms');
+			if(!_delay) {
+				addClass(_gameUI, 'black-bg');
+			}
+			const _b = document.createElement('div');
+			_b.className = 'full show-ui flex fade-me intro-screen';
+			_b.innerHTML = '<div class="intro-text">' + (_text ?? '') + '</div>';
+			_gameUI.appendChild(_b);
+			if(!__isPC)
+				addClass(_gameUI, 'disable-ui');
+			cssAnimationProps.blackui = { start: _gameTick, p1: _c, p2: (_ms ?? 4000) + (_delay ?? 0), p3: _text, p4: _func, p5: _delay, p6:_after };
+		}
 	},
 	black: function (_c, _ms, _text, _func, _delay, _after) {
 		if(cssAnimationProps.black) {
@@ -34737,7 +34861,8 @@ const cssAnimations = {
 				addClass(_elem, 'flex');
 			}
 			_elem.innerHTML = '<div class="full flex fade-me intro-screen"><div class="intro-text">' + (_text ?? '') + '</div></div>';
-			addClass(_gameUI, 'd-none');
+			if(!__isPC)
+				addClass(_gameUI, 'd-none');
 			cssAnimationProps.black = { start: _gameTick, p1: _c, p2: (_ms ?? 4000) + (_delay ?? 0), p3: _text, p4: _func, p5: _delay, p6:_after };
 		}
 	},
@@ -35871,7 +35996,7 @@ async function PlaySound(_s, _alternateKeys, _volumeRate) {
 	catch(cex) {
 		console.log(_alternateKeys);
 	}
-	return await window.SoundManager.play(_soundKey, _s.path, (_hasEnd && _hidden) ? 0 : (_s.volume ?? .1) * (_s.volumeRate ?? 1), _s.loop, _s.rate, _s.reset, _s.force, _s.end, _s.bind);
+	return await window.SoundManager.play(_soundKey, _s.path, (_hasEnd && _hidden) ? 0 : (_s.volume ?? .1) * (_s.volumeRate ?? 1) * __volume, _s.loop, _s.rate, _s.reset, _s.force, _s.end, _s.bind);
 }
 function flash(_count, _elem) {
 	setTimeout(function () {
@@ -36038,7 +36163,7 @@ function rain(_container, _noSound, _force) {
 	dancingInTheRain(_container);
 	if(!_noSound) {
 		__weather.sound = getSound(null, 'rain');
-		__weather.sound.volume = 1;
+		__weather.sound.volume = 1 * __volume;
 		__weather.sound.loop = true;
 		__weather.sound.play();
 	}

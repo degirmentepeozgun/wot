@@ -343,38 +343,104 @@ function getPowerOfItems() {
         _power += getPowerOfItem(_item.id);
     return _power;
 }
+// function getTotalPower(_char) {
+//     const _weared = getItems(_char)?.filter(x => x.weared === (_char ?? mainCharacter).class) ?? [];
+//     // const _summary = {
+//     //     atk: 0, //((mainCharacter.baseProps.minDmg + mainCharacter.baseProps.maxDmg) / 2) * mainCharacter.level,
+//     //     def: 0, //mainCharacter.baseProps.armor * mainCharacter.level,
+//     //     hp: mainCharacter.baseProps.maxHP * mainCharacter.level
+//     // };
+//     const _rates = {
+//         atk: 0,//mainCharacter.baseProps.critRate,
+//         def: 0,
+//         hp: 0
+//     };
+//     // for(let _w of _weared) {
+//     //     if(_w.type === 'weapon')
+//     //         _summary.atk += ((_w.baseProps[0].value + _w.baseProps[1].value) /2);
+//     //     else if(_w.baseProps[0].key === 'armor')
+//     //         _summary.def += parseFloat(_w.baseProps[0].value);
+//     //     else
+//     //         _summary.hp += parseFloat(_w.baseProps[0].value);
+//     // }
+//     for(let _w of _weared)
+//         for(let _prop of _w.props){
+//             const _p = __properties.find(x => x.key === _prop.key);
+//             if(!_p.group)
+//                 continue;
+//             const _ep = _equips[_w.type]['grade' + _w.grade].props.find(x => x.key === _prop.key); 
+//             _rates[_p.group] += parseFloat(_prop.value * _ep.power);
+//         }
+//     const _atk = MathRound(_rates.atk); // MathRound(_summary.atk + (_summary.atk * _rates.atk));
+//     const _def = MathRound(_rates.def); // MathRound(_summary.def + (_summary.def * _rates.def));
+//     //const _hp = MathRound(_summary.hp + (_summary.hp * _rates.hp));
+//     return { total: parseInt(_atk + _def), hp: 0, def: _def, atk: _atk };
+// }
 function getTotalPower(_char) {
-    const _weared = getItems(_char)?.filter(x => x.weared === (_char ?? mainCharacter).class) ?? [];
-    // const _summary = {
-    //     atk: 0, //((mainCharacter.baseProps.minDmg + mainCharacter.baseProps.maxDmg) / 2) * mainCharacter.level,
-    //     def: 0, //mainCharacter.baseProps.armor * mainCharacter.level,
-    //     hp: mainCharacter.baseProps.maxHP * mainCharacter.level
-    // };
-    const _rates = {
-        atk: 0,//mainCharacter.baseProps.critRate,
+
+    const char = _char ?? mainCharacter;
+    const items = getItems(char);
+
+    const rates = {
+        atk: 0,
         def: 0,
         hp: 0
     };
-    // for(let _w of _weared) {
-    //     if(_w.type === 'weapon')
-    //         _summary.atk += ((_w.baseProps[0].value + _w.baseProps[1].value) /2);
-    //     else if(_w.baseProps[0].key === 'armor')
-    //         _summary.def += parseFloat(_w.baseProps[0].value);
-    //     else
-    //         _summary.hp += parseFloat(_w.baseProps[0].value);
-    // }
-    for(let _w of _weared)
-        for(let _prop of _w.props){
-            const _p = __properties.find(x => x.key === _prop.key);
-            if(!_p.group)
+
+    if (!Array.isArray(items)) {
+        return { total: 0, atk: 0, def: 0, hp: 0 };
+    }
+
+    for (const item of items) {
+
+        if (!item || item.weared !== char.class)
+            continue;
+
+        const props = item.props;
+        if (!Array.isArray(props))
+            continue;
+
+        const equipGrade =
+            _equips?.[item.type]?.['grade' + item.grade];
+
+        if (!equipGrade?.props)
+            continue;
+
+        for (const prop of props) {
+
+            if (!prop)
                 continue;
-            const _ep = _equips[_w.type]['grade' + _w.grade].props.find(x => x.key === _prop.key); 
-            _rates[_p.group] += parseFloat(_prop.value * _ep.power);
+
+            const propMeta = __properties?.find(x => x.key === prop.key);
+            if (!propMeta?.group)
+                continue;
+
+            const equipProp = equipGrade.props.find(x => x.key === prop.key);
+            if (!equipProp)
+                continue;
+
+            const value = parseFloat(prop.value) || 0;
+            const power = parseFloat(equipProp.power) || 0;
+
+            const group = propMeta.group;
+
+            if (!rates[group])
+                rates[group] = 0;
+
+            rates[group] += value * power;
         }
-    const _atk = MathRound(_rates.atk); // MathRound(_summary.atk + (_summary.atk * _rates.atk));
-    const _def = MathRound(_rates.def); // MathRound(_summary.def + (_summary.def * _rates.def));
-    //const _hp = MathRound(_summary.hp + (_summary.hp * _rates.hp));
-    return { total: parseInt(_atk + _def), hp: 0, def: _def, atk: _atk };
+    }
+
+    const atk = MathRound(rates.atk || 0);
+    const def = MathRound(rates.def || 0);
+    const hp  = MathRound(rates.hp || 0);
+
+    return {
+        total: atk + def,
+        atk,
+        def,
+        hp
+    };
 }
 function getPowerOfItem(_id) {
     if(!_id)

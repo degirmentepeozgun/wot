@@ -261,15 +261,17 @@ function keyboard(_character, _keys) {
 			// zaten sondaysa işlem yapma
 			if (index !== KEYS.length - 1)
 				KEYS.push(KEYS.splice(index, 1)[0]);
-
+			//console.log('AHANDA BULDUM');
 			return;
 		}
 		const _end = this.keyStates[_k]?.lastEnd;
 		this.removeKey(_k, null, 1);
 
 		// end/cancel’den sonra çok erken start gelirse ignore
-		if (performance.now() - _end < 40)
+		if (performance.now() - _end < 20){
+			console.log('AHANDA BULDUM 2');
 			return;
+		}
 
 		if (!this.keyStates[_k]?.isDown)
 			this.keyStates[_k] = { isDown:true };
@@ -281,6 +283,7 @@ function keyboard(_character, _keys) {
 			key: _k,
 			name: _name
 		});
+		//console.log(JSON.stringify(this.holdingKeys));
 		this.character.lastActivity = _gameTick;
 	}
 	this.removeCommonSkill = function () {
@@ -353,7 +356,8 @@ function keyboard(_character, _keys) {
 					if(_s.before) {
 						const _sb = this.character.animations[_s.before];
 						if (_sb.coolDownLeft > 0) {
-							if (this.holdingKeys.find(x => x.name === _key) && this.character.main && !this.character.hurting && this.character.animation !== _key){
+							if (this.holdingKeys.find(x => x.name === _key) && this.character.main && 
+							!this.character.hurting && this.character.animation !== _key){
 								if(!(this.character.lastKeyWarned > (_gameTick - 1000))){
 									this.character.lastKeyWarned = _gameTick;
 									//warn('<span>' + getLangData('Skill not ready yet') + '</span>', 'warn');
@@ -363,7 +367,8 @@ function keyboard(_character, _keys) {
 						}
 					}
 					else {
-						if (this.holdingKeys.find(x => x.name === _key) && this.character.main && !this.character.hurting && this.character.animation !== _key)
+						if (this.holdingKeys.find(x => x.name === _key) && this.character.main && 
+						!this.character.hurting && this.character.animation !== _key)
 							if(!(this.character.lastKeyWarned > (_gameTick - 1000))){
 								this.character.lastKeyWarned = _gameTick;
 								//warn('<span>' + getLangData('Skill not ready yet') + '</span>', 'warn');
@@ -587,7 +592,7 @@ const ignoredKeys = [
   "Tab"
 ];
 function tryOpenGame() {
-	if(__account?.gameOpening)
+	if(__account?.gameOpening && gameIsReady)
 	{
 		const _modal = document.querySelectorAll('.inventory-question, .settings-before-play');
 		if(!_modal?.[0]) {
@@ -647,6 +652,7 @@ window.addEventListener('keydown', function (event) {
 			// if(!mainCharacter.keyboard)
 			// 	switchAutoMode();
 			pressSkill(event);
+			//console.log('mouse down');
 			mainCharacter.keyboard.mouseDown(event.key.toLocaleLowerCase());
 		}
 	} catch (e) {

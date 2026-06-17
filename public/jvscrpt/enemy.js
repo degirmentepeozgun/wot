@@ -4803,8 +4803,11 @@ function enemy(_e) {
 		if (!this.isDead() && !episode.end && !this.autoMode) {
 			const _move = this.keyboard?.getMove();
 			let _skill;
-			if (!this.ghost)
+			if (!this.ghost){
 				_skill = this.keyboard?.getSkill();
+				if(!_skill)
+					console.log('skill yok')
+			}
 			const _frame = this.getCurrentFrame();
 			if (!_skill && _move && (this.animationFinished || this.animation === 'idle' || this.animation === 'run' || _anima.channeling))
 				this.run(_anima, _move);

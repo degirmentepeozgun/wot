@@ -196,6 +196,10 @@ function animateStart(_failed) {
 		addClass(_sf,'animate');
 		addClass(_sf,'fade-me');
 		addClass(_sf,'show-ui');
+		if(mainCharacter && _hasNext) {
+			if(mainCharacter.HURTLEFT > (episode.cWidth / 2))
+				_sf.style.flexDirection = 'row-reverse';
+		}
 		episode.pauseAmbianceMusic();
 		PlaySound({key:'storyfinish', volume:1});
 		if(_failed)

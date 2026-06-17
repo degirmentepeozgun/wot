@@ -77,8 +77,9 @@ function map(_m) {
 	this.gold = _mapSprite.gold;
 	this.dungeon = _mapSprite.dungeon;
 	__maxRageCount = this.pvp ? 40 : 20;
-	this.theme = _mapSprite.theme;
+	this.theme = _mapSprite.theme + ((_mapSprite.hasMobile && isPhone() && __isHEDevice) ? 'mobile' : '');
 	this.assetPath = _mapSprite.assetPath ?? this.theme;
+	this.assets = [];
 	this.lobby = _mapSprite.lobby;
 	this.floors = _mapSprite.floors;
 	this.ambianceVolume = _mapSprite.ambianceVolume;
@@ -105,7 +106,7 @@ function map(_m) {
 	this.artifacts = [];
 	// this.cHeight = _canvas.height;
 	// this.cUIHeight = _canvas.height * __scale;
-	// this.cWidth = _canvas.width;
+	this.cWidth = _canvas.width;
 	// this.cUIWidth = _canvas.width * __scale;
 	// this.dmgFrameHeight = this.cHeight / 20;
 	// this.dmgFrameTopBoundary = MathRound(this.cHeight * .15);
@@ -161,135 +162,285 @@ function map(_m) {
 				locate: { left: getRandomValue2(256, _mapSprite.width - 256), bottom: -10 },
 			});
 	}
+// 	this.croppedSprites = new Map();
+// 	this.getCroppedSprite = function(_x, _y, _w,  _h, _char, _src, _fKey) {
+// 		const _key = _fKey ?? ('l' + _x + 't' + _y +'w' + _w  + 'h'+ _h);
+// 		if(_char.lastSpriteKey === _key)
+// 			return _char.lastSprite;
+// 		// let _map = this.croppedSprites.get(_src);
+// 		// if (_map) {
+// 		// 	let sprite = _map[_key];
+// 		// 	_char.lastSprite = sprite;
+// 		// 	_char.lastSpriteKey = _key;
+// 		// 	return sprite;
+// 		// }
+// 		let srcMap = this.croppedSprites.get(_src);
+// 		if (srcMap) {
+// 			let sprite = srcMap.get(_key);
+// 			_char.lastSprite = sprite;
+// 			_char.lastSpriteKey = _key;
+// 			return sprite;
+// 		}
+// 		if(_char.lastSprite)
+// 			_char.lastSprite = _char.lastSpriteKey = undefined;
+// 		if(_char.class !== 'object')
+// 			console.log(_key + ' sprite bulunamadı');
+// 		return undefined;
+// 	}
+// 	this.loadCharacterSprites = async function(_func, _extraIds, _kk, _excludeMain, _useCurrentEnemies) {
+// 		if(this.menu)
+// 		{
+// 			_func();
+// 			return;
+// 		}
+// 		if(!_kk)
+// 			this.disposing = 1;
+// 		const _ids = this.mobs.map(x => x.id);
+// 		if(mainCharacter && !_excludeMain)
+// 			_ids.push(mainCharacter.realId ?? mainCharacter.id);
+// 		if(_extraIds?.[0])
+// 			for(let _id of _extraIds)
+// 				if(_ids.indexOf(_id) === -1)
+// 					_ids.push(_id);
+// 		const _spls = [];
+// 		const _loadCharacterSprite = async function(_e) {
+// 			const _keys = _kk ?? Object.keys(_e.animations);
+// 			for(let _key of _keys) {
+// 				const _anim = _e.animations[_key];
+// 				// if(_key.startsWith('idle') || _key.startsWith('counter') || _key === 'release' || _key === 'before' || _key === 'start' ||
+// 				// 	_anim.type === 'move' || _anim.interactive || _anim.baseKey === 'finish' ||
+// 				// 	_anim.key.startsWith('dead') || _anim.key.startsWith('knockback'))
+// 				// 	continue;
+// 				if(!_anim) {
+// 					console.log('enemy' + _e?.id + ' ' + _key);
+// 					continue;
+// 				}
+// 				if(_anim.frames?.[0]){
+// 					for(let _f of _anim.frames) {
+// 						if(_f.spell?.key && _spls.indexOf(_f.spell.key) === -1) {
+// 							if(_f.spell.key.indexOf(',') !== -1) {
+// 								const _keys = _f.spell.key.split(',');
+// 								for(let _kk of _keys)
+// 									_spls.push(_kk);
+// 							}
+// 							else
+// 								_spls.push(_f.spell.key);
+// 						}
+// 						const _cKey = 'l' + _f.spriteLeft + 't' + _f.spriteTop + 'w' + _f.spriteWidth + 'h' + _f.spriteHeight;
+// 						let _src = _f.src ?? _anim.src ?? _e.src;
+// 						if(!_src || (typeof _src !== 'string' || _src === 'undefined' ||
+// 							 _src === 'null' || _src === ' ')) {
+//     						console.log('Invalid src: ' + _src);
+// 							continue;
+// 						}
+// 						if(episode.croppedSprites.get(_src)?.[_cKey])
+// 							continue;
+// 						else if(!_src.endsWith('.png'))
+// 							_src += 'sprite.png';
+// 						const _img = await getImagePromise(_src, 1);
+// 						const _cacheCAN = document.createElement('canvas');
+// 						_cacheCAN.width = _f.spriteWidth;
+// 						let _additionalHeight = 0;
+// 						let _rel, _relZoom;
+// 						// if(_e.hasShadow !== false){
+// 						// 	_rel = structuredClone2(relatedObjects.find(x => x.id === 'shadow'));
+// 						// 	_relZoom = _f.spriteWidth / _rel.width;
+// 						// 	const _shadowHeight = _relZoom * (_e.yGap < 5 ? 8 : _e.yGap) * 3;
+// 						// 	_additionalHeight = MathCeil(_shadowHeight / 2);
+							
+// 						// }
+// 						_cacheCAN.height = _f.spriteHeight + _additionalHeight;
+// 						const _cacheCTX = _cacheCAN.getContext('2d');
+// 						_cacheCAN.imageSmoothingEnabled = false;
+// 						if(_additionalHeight > 0) {
+// 							_cacheCTX.drawImage(
+// 								episode.FootShadow, 
+// 								_rel.left ?? 0, 
+// 								_rel.top ?? 0, 
+// 								_rel.width, 
+// 								_rel.height,
+// 								0,
+// 								_f.spriteHeight - _additionalHeight,
+// 								MathFloor(_rel.width * _relZoom), 
+// 								_additionalHeight * 2);
+// 						}
+// 						_cacheCTX.drawImage(_img, _f.spriteLeft, _f.spriteTop, 
+// 						_f.spriteWidth, _f.spriteHeight, 0, 0, _cacheCAN.width, _cacheCAN.height);
+// 						// if (!episode.croppedSprites.has(_src))
+// 						// 	episode.croppedSprites.set(_src, {});
+// 						// const _map = episode.croppedSprites.get(_src);
+// 						// if (!_map[_cKey])
+// 						// 	_map[_cKey] = _cacheCAN;
+// 						let srcMap = episode.croppedSprites.get(_src);
+// 						if (!srcMap) {
+// 							srcMap = new Map();
+// 							episode.croppedSprites.set(_src, srcMap);
+// 						}
+// 						if (!srcMap.has(_cKey)) {
+// 							srcMap.set(_cKey, _cacheCAN);
+// }
+// 					}
+// 				}
+// 			}
+// 		}
+// 		for(const id of _ids)
+// 			await _loadCharacterSprite(_useCurrentEnemies ? episode.enemies.find(x => x.id === id) : _allEnemies['enemy' + id]());
+// 		_spls.push('electricboltsmall');
+// 		for(const key of _spls)
+// 			await _loadCharacterSprite(new enemy(structuredClone2(spells[key])));
+// 		if(!_kk)
+// 			delete this.disposing;
+// 		_func();
+// 	}
 	this.croppedSprites = new Map();
-	this.getCroppedSprite = function(_x, _y, _w,  _h, _char, _src, _fKey) {
-		const _key = _fKey ?? ('l' + _x + 't' + _y +'w' + _w  + 'h'+ _h);
-		if(_char.lastSpriteKey === _key)
+	this.croppedSpritesOrder = [];
+	this.MAX_CROPPED_SPRITES = 800; // mobil-safe limit
+	this.getCroppedSprite = function (_x, _y, _w, _h, _char, _src, _fKey) {
+
+		const _key = _fKey ?? ('l' + _x + 't' + _y + 'w' + _w + 'h' + _h);
+
+		if (_char.lastSpriteKey === _key)
 			return _char.lastSprite;
-		// let _map = this.croppedSprites.get(_src);
-		// if (_map) {
-		// 	let sprite = _map[_key];
-		// 	_char.lastSprite = sprite;
-		// 	_char.lastSpriteKey = _key;
-		// 	return sprite;
-		// }
-		let srcMap = this.croppedSprites.get(_src);
+
+		const srcMap = this.croppedSprites.get(_src);
+
 		if (srcMap) {
-			let sprite = srcMap.get(_key);
+			const sprite = srcMap.get(_key);
 			_char.lastSprite = sprite;
 			_char.lastSpriteKey = _key;
 			return sprite;
 		}
-		if(_char.lastSprite)
-			_char.lastSprite = _char.lastSpriteKey = undefined;
-		if(_char.class !== 'object')
-			console.log(_key + ' sprite bulunamadı');
+
 		return undefined;
-	}
-	this.loadCharacterSprites = async function(_func, _extraIds, _kk, _excludeMain, _useCurrentEnemies) {
-		if(this.menu)
-		{
-			_func();
-			return;
+	};
+	this._storeCroppedSprite = function (_src, _key, canvas) {
+
+		let srcMap = this.croppedSprites.get(_src);
+
+		if (!srcMap) {
+			srcMap = new Map();
+			this.croppedSprites.set(_src, srcMap);
 		}
-		if(!_kk)
-			this.disposing = 1;
-		const _ids = this.mobs.map(x => x.id);
-		if(mainCharacter && !_excludeMain)
-			_ids.push(mainCharacter.realId ?? mainCharacter.id);
-		if(_extraIds?.[0])
-			for(let _id of _extraIds)
-				if(_ids.indexOf(_id) === -1)
-					_ids.push(_id);
-		const _spls = [];
-		const _loadCharacterSprite = async function(_e) {
-			const _keys = _kk ?? Object.keys(_e.animations);
-			for(let _key of _keys) {
-				const _anim = _e.animations[_key];
-				// if(_key.startsWith('idle') || _key.startsWith('counter') || _key === 'release' || _key === 'before' || _key === 'start' ||
-				// 	_anim.type === 'move' || _anim.interactive || _anim.baseKey === 'finish' ||
-				// 	_anim.key.startsWith('dead') || _anim.key.startsWith('knockback'))
-				// 	continue;
-				if(!_anim) {
-					console.log('enemy' + _e?.id + ' ' + _key);
-					continue;
-				}
-				if(_anim.frames?.[0]){
-					for(let _f of _anim.frames) {
-						if(_f.spell?.key && _spls.indexOf(_f.spell.key) === -1) {
-							if(_f.spell.key.indexOf(',') !== -1) {
-								const _keys = _f.spell.key.split(',');
-								for(let _kk of _keys)
-									_spls.push(_kk);
-							}
-							else
-								_spls.push(_f.spell.key);
-						}
-						const _cKey = 'l' + _f.spriteLeft + 't' + _f.spriteTop + 'w' + _f.spriteWidth + 'h' + _f.spriteHeight;
-						let _src = _f.src ?? _anim.src ?? _e.src;
-						if(!_src || typeof _src !== 'string' || _src !== 'undefined' || _src !== 'null' || _src !== ' ') {
-    						console.log('Invalid src: ' + _src);
-							continue;
-						}
-						if(episode.croppedSprites.get(_src)?.[_cKey])
-							continue;
-						else if(!_src.endsWith('.png'))
-							_src += 'sprite.png';
-						const _img = await getImagePromise(_src, 1);
-						const _cacheCAN = document.createElement('canvas');
-						_cacheCAN.width = _f.spriteWidth;
-						let _additionalHeight = 0;
-						let _rel, _relZoom;
-						// if(_e.hasShadow !== false){
-						// 	_rel = structuredClone2(relatedObjects.find(x => x.id === 'shadow'));
-						// 	_relZoom = _f.spriteWidth / _rel.width;
-						// 	const _shadowHeight = _relZoom * (_e.yGap < 5 ? 8 : _e.yGap) * 3;
-						// 	_additionalHeight = MathCeil(_shadowHeight / 2);
-							
-						// }
-						_cacheCAN.height = _f.spriteHeight + _additionalHeight;
-						const _cacheCTX = _cacheCAN.getContext('2d');
-						_cacheCAN.imageSmoothingEnabled = false;
-						if(_additionalHeight > 0) {
-							_cacheCTX.drawImage(
-								episode.FootShadow, 
-								_rel.left ?? 0, 
-								_rel.top ?? 0, 
-								_rel.width, 
-								_rel.height,
-								0,
-								_f.spriteHeight - _additionalHeight,
-								MathFloor(_rel.width * _relZoom), 
-								_additionalHeight * 2);
-						}
-						_cacheCTX.drawImage(_img, _f.spriteLeft, _f.spriteTop, 
-						_f.spriteWidth, _f.spriteHeight, 0, 0, _cacheCAN.width, _cacheCAN.height);
-						// if (!episode.croppedSprites.has(_src))
-						// 	episode.croppedSprites.set(_src, {});
-						// const _map = episode.croppedSprites.get(_src);
-						// if (!_map[_cKey])
-						// 	_map[_cKey] = _cacheCAN;
-						let srcMap = episode.croppedSprites.get(_src);
-						if (!srcMap) {
-							srcMap = new Map();
-							episode.croppedSprites.set(_src, srcMap);
-						}
-						if (!srcMap.has(_cKey)) {
-							srcMap.set(_cKey, _cacheCAN);
-}
-					}
-				}
+
+		// dedup: zaten varsa tekrar yazma
+		if (srcMap.has(_key))
+			return;
+
+		srcMap.set(_key, canvas);
+
+		const flatKey = _src + '|' + _key;
+
+		this.croppedSpritesOrder.push(flatKey);
+
+		// LRU cleanup
+		if (this.croppedSpritesOrder.length > this.MAX_CROPPED_SPRITES) {
+
+			const old = this.croppedSpritesOrder.shift();
+			const [src, key] = old.split('|');
+
+			const map = this.croppedSprites.get(src);
+
+			if (map) {
+				map.delete(key);
+
+				if (map.size === 0)
+					this.croppedSprites.delete(src);
 			}
 		}
-		for(const id of _ids)
-			await _loadCharacterSprite(_useCurrentEnemies ? episode.enemies.find(x => x.id === id) : _allEnemies['enemy' + id]());
-		_spls.push('electricboltsmall');
-		for(const key of _spls)
-			await _loadCharacterSprite(new enemy(structuredClone2(spells[key])));
-		if(!_kk)
-			delete this.disposing;
-		_func();
-	}
+	};
+	this.loadCharacterSprites = async function (_func, _extraIds, _kk, _excludeMain, _useCurrentEnemies) {
+
+		if (this.menu) {
+			_func?.();
+			return;
+		}
+
+		this.disposing = 1;
+
+		const _ids = this.mobs.map(x => x.id);
+
+		if (mainCharacter && !_excludeMain)
+			_ids.push(mainCharacter.realId ?? mainCharacter.id);
+
+		if (_extraIds?.length)
+			for (let id of _extraIds)
+				if (!_ids.includes(id))
+					_ids.push(id);
+
+		const enemies = _ids.map(id =>
+			_useCurrentEnemies
+				? episode.enemies.find(x => x.id === id)
+				: _allEnemies['enemy' + id]()
+		).filter(Boolean);
+
+		// ⚠ MOBILE SAFE: SERIAL LOAD (crash önler)
+		// for (const e of enemies) {
+		// 	await this._loadCharacterSprite(e, _kk);
+		// }
+		await Promise.all(
+			enemies.map(e => this._loadCharacterSprite(e, _kk))
+		);
+
+		delete this.disposing;
+
+		_func?.();
+	};
+	this._loadCharacterSprite = async function (_e, _kk) {
+
+		if (!_e) return;
+
+		const _keys = _kk ?? Object.keys(_e.animations);
+
+		for (let _key of _keys) {
+
+			const _anim = _e.animations[_key];
+			if (!_anim?.frames?.length) continue;
+
+			const _srcBase = _anim.src ?? _e.src;
+
+			for (let _f of _anim.frames) {
+				let _src = _f.src ?? _srcBase;
+				if (!_src) continue;
+
+				if (!_src.endsWith('.png'))
+					_src += 'sprite.png';
+
+				const key =
+					'l' + _f.spriteLeft +
+					't' + _f.spriteTop +
+					'w' + _f.spriteWidth +
+					'h' + _f.spriteHeight;
+
+				const srcMap = this.croppedSprites.get(_src);
+
+				if(srcMap?.has(key))
+					continue;
+
+				const img = await getImagePromise(_src, 1);
+
+				const canvas = document.createElement('canvas');
+				canvas.width = _f.spriteWidth;
+				canvas.height = _f.spriteHeight;
+
+				const ctx = canvas.getContext('2d');
+				ctx.imageSmoothingEnabled = false;
+
+				ctx.drawImage(
+					img,
+					_f.spriteLeft,
+					_f.spriteTop,
+					_f.spriteWidth,
+					_f.spriteHeight,
+					0,
+					0,
+					canvas.width,
+					canvas.height
+				);
+
+				this._storeCroppedSprite(_src, key, canvas);
+			}
+		}
+	};
 	this.setRepeat = function(_mSprite) {
 		if (_mSprite.do) {
 			if(_mSprite.repeat){
@@ -330,7 +481,9 @@ function map(_m) {
 	this.moveCamera = function(_endFunc, speed, force) {
 		if(!mainCharacter)
 			return;
-		if(!force && mainCharacter.left <= centerMinX) {
+		if(!force && 
+			(mainCharacter.left <= centerMinX) ||
+			((mainCharacter.left + mainCharacter.WIDTH) >= centerMaxX)){
 			if(_endFunc)
 				_endFunc();
 			return;
@@ -784,6 +937,11 @@ function map(_m) {
 		let _end, _diff;
 		if (!this.pvpStarted) {
 			this.pvpStarted = Date.now();
+			const _splash = document.getElementById('splash');
+			addClass(_splash, 'd-none');
+			const _ts = document.getElementById('tip-screen');
+			if(_ts)
+				_ts.remove();
 			this.missionCountDown = 1;
 			pvpCounter = document.createElement('div');
 			pvpCounter.className = 'flex animate-me countdown pop2';
@@ -1996,11 +2154,11 @@ function map(_m) {
 	}
 	this.setBgMusicPlayBackRate = function() {
 		return;
-		if(this.bgMusic.volume < .25) {
+		if(this.bgMusic.volume < (.25 * __volume)) {
 			if(this.bgMusic.playbackRate !== 1)
 				this.bgMusic.playbackRate = 1;
 		}
-		else if(this.bgMusic.volume < .5) {
+		else if(this.bgMusic.volume < (.5 * __volume)) {
 			if(this.bgMusic.playbackRate !== 1.05)
 				this.bgMusic.playbackRate = 1.05;
 		}
@@ -2013,7 +2171,7 @@ function map(_m) {
 		if(this.bgMusic  && !this.bgMusic.still)
 			if(this.bgMusic.volumeDown && this.bgMusic.volume > (this.minBgMusicVolume ?? .1))
 				if ((_gameTick - 500) > this.bgMusic.lastVolumeChangeTime){
-					this.bgMusic.volume -= .02;
+					this.bgMusic.volume -= (.02 * __volume);
 					this.bgMusic.lastVolumeChangeTime = _gameTick;
 					this.setBgMusicPlayBackRate();
 				}
@@ -2039,7 +2197,7 @@ function map(_m) {
 		if(this.bgMusic?.playRequestSent)
 			return;
 		try {
-			this.bgMusic.volume = (this.minBgMusicVolume ?? .1);
+			this.bgMusic.volume = (this.minBgMusicVolume ?? .1) * __volume;
 			this.bgMusic.crossOrigin = 'anonymous';
 			if(!_once)
 				this.bgMusic.loop = true;
@@ -2053,13 +2211,13 @@ function map(_m) {
 				delete episode.bgMusicTimer;
 			}
 			this.bgMusicTimer = setInterval(function() {
-				if(!episode.bgMusic || episode.bgMusic.volume >= (episode.bgMusicVolume ?? (episode.minBgMusicVolume ?? .1))) {
-					episode.bgMusic.volume = episode.bgMusicVolume ?? (episode.minBgMusicVolume ?? .1);
+				if(!episode.bgMusic || episode.bgMusic.volume >= ((episode.bgMusicVolume ?? (episode.minBgMusicVolume ?? .1)) * __volume)) {
+					episode.bgMusic.volume = (episode.bgMusicVolume ?? (episode.minBgMusicVolume ?? .1)) * __volume;
 					clearInterval(episode.bgMusicTimer);
 					delete episode.bgMusicTimer;
 					return;
 				}
-				episode.bgMusic.volume += .01;
+				episode.bgMusic.volume += .01 * __volume;
 			}, 100);
 		} catch (e) {
 
@@ -2130,10 +2288,10 @@ function map(_m) {
 				return;
 			}
 
-			if (this.bgMusic.volume <= 0.01) {
+			if (this.bgMusic.volume <= (0.01 * __volume)) {
 				this.bgMusic.volume = 0;
 				this.bgMusic.pause();
-
+				delete this.bgMusic.playRequestSent;
 				clearInterval(this.bgMusicTimer);
 				this.bgMusicTimer = null;
 				return;
@@ -2169,7 +2327,7 @@ function map(_m) {
 			//console.log('AMBIANCE = ' + this.ambiancePath + ', ' + _src);
 			const _sound = getSound(this.ambiancePath, _src, 1, this.ambiancePath);
 			if (_sound) {
-				_sound.volume = this.ambianceVolume ?? .05;
+				_sound.volume = (this.ambianceVolume ?? .05) * __volume;
 				_sound.crossOrigin = 'anonymous';
 				_sound.loop = true;
 				if (this.bgSound) {
@@ -2195,7 +2353,7 @@ function map(_m) {
 		if(_sound && (_sound.lastUsed > (_gameTick - 100)))
 			return undefined;
 		if (_sound && (_sound.paused || _sound.currentTime === 0 || _play)) {
-			const _vol = (_volumeRate ?? 1) * (_s.volume ?? .1);
+			const _vol = (_volumeRate ?? 1) * (_s.volume ?? .1) * __volume;
 			if(_sound.volume !== _vol)
 				_sound.volume = _vol;
 			if (_s.loop && !_sound.loop)
@@ -3437,20 +3595,62 @@ function map(_m) {
 const SIN_LUT = new Float32Array(360);
 for (let i = 0; i < 360; i++)
  SIN_LUT[i] = Math.sin(i * Math.PI / 180);
-this.drawHitParticles = function(_char, x, y, direction, color, strength, reversed, _key) {
-	if (!_char.particles) 
+let particleScale = Math.max(0.25, Math.min(2, this.cWidth / 1152));
+// ---------------- TUNING ----------------
+
+let BASE_SPEED_MIN = 2 * particleScale;
+let BASE_SPEED_MAX = 3.6 * particleScale;
+let RANDOM_VX = 0.6 * particleScale;
+let RANDOM_VY = 0.4 * particleScale;
+let RADIUS_MIN = 1.05 * particleScale;
+let RADIUS_RANGE = 2.2 * particleScale;
+let GRAVITY_MIN = 0.28;
+let GRAVITY_RANGE = 0.5;
+let WOBBLE_STRENGTH = 0.4;
+
+const SPEED_VARIANCE_BASE = 0.6;
+const SPEED_VARIANCE_MULT = 1.6;
+
+const NORMAL_HIT_SPEED_BOOST = 1.1;
+const SLAM_VERTICAL_BOOST = 0.8;
+
+const RX_MIN = 0.8;
+const RX_MAX = 2.2;
+
+const RY_MIN = 0.8;
+const RY_MAX = 1.2;
+
+const LIFE_MIN = 0.80;
+const LIFE_MAX = 1.10;
+
+const DECAY_MIN = 0.035;
+const DECAY_RANGE = 0.05;
+
+const DOWNWARD_BIAS_MIN = 18;
+const DOWNWARD_BIAS_RANGE = 6;
+
+const FAST_SPEED_MULT = 2.25;
+const FAST_SIZE_MULT = 1.25;
+
+const AIR_RESISTANCE = 0.96;
+
+const PARTICLE_SPEED_START = 1.5;
+const PARTICLE_SPEED_RECOVER = 0.1;
+this.drawHitParticles = function(_char, x, y, direction, color, strength, reversed, _key)
+{
+	if (!_char.particles)
 		_char.particles = [];
- 	if (x) {
-  		strength = Math.max(1, Math.min(3, strength - 1));
+
+	if (x)
+	{
+		strength = Math.max(1, Math.min(3, strength - 1));
 
 		let _countRate = 1;
+
 		if (strength >= 2 && strength < 3)
 			_countRate = getRandomValue2(100, 300) / 100;
 		else if (strength >= 3)
 			_countRate = 4;
-
-		// if (_char.particles.length > 0 && _countRate < 4)
-		// 	return;
 
 		const sizeFactor = (_char.width * _char.ZOOM) / 30;
 
@@ -3463,55 +3663,101 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			strength * 20;
 
 		const baseSpeed =
-			(getRandomValue2(25, 45) / 10) +
+			(getRandomValue2(
+				BASE_SPEED_MIN * 10,
+				BASE_SPEED_MAX * 10
+			) / 10)
+			+
 			_countRate * (sizeFactor / (2 + _countRate));
 
-		const downwardBias = 18 + Math.random() * 6;
+		const downwardBias =
+			DOWNWARD_BIAS_MIN +
+			Math.random() * DOWNWARD_BIAS_RANGE;
+
 		const radMul = Math.PI / 180;
-		_char.particleSpeed = 1.5;
-		for (let i = 0; i < count; i++) {
+
+		_char.particleSpeed = PARTICLE_SPEED_START;
+
+		for (let i = 0; i < count; i++)
+		{
 			const angle =
 				direction +
 				downwardBias +
 				(Math.random() * spread - spread * 0.5);
 
 			const rad = angle * radMul;
-			const _isHeavyHit = (_key === 'heavy' || _key === 'slam');
+
+			const _isHeavyHit =
+				(_key === 'heavy' || _key === 'slam');
+
 			const speedVariance = Math.random();
+
 			let speed =
-			baseSpeed *
-			(0.6 + speedVariance * speedVariance * 1.6);
+				baseSpeed *
+				(
+					SPEED_VARIANCE_BASE +
+					speedVariance * speedVariance * SPEED_VARIANCE_MULT
+				);
+
 			if (!_isHeavyHit)
-				speed *= 1.1; // %10 boost
+				speed *= NORMAL_HIT_SPEED_BOOST;
+
 			let vx = Math.cos(rad) * speed;
 			let vy = Math.sin(rad) * speed;
 
 			if (_key === 'slam')
-				vy -= speed * 0.8;
+				vy -= speed * SLAM_VERTICAL_BOOST;
 
-			vx += (Math.random() - 0.5) * 0.6;
-			vy += (Math.random() - 0.5) * 0.4;
+			vx += (Math.random() - 0.5) * RANDOM_VX;
+			vy += (Math.random() - 0.5) * RANDOM_VY;
 
 			_char.particles.push({
-			x,
-			y,
-			vx,
-			vy,
-			p: platformX,
+				x,
+				y,
+				vx,
+				vy,
+				p: platformX,
 
-			radius: 1.5 + Math.random() * 3.2,
+				radius:
+					RADIUS_MIN +
+					Math.random() * RADIUS_RANGE,
 
-			rx: (getRandomValue2(8, 24) / 10),
-			ry: (getRandomValue2(8, 12) / 10),
+				rx:
+					getRandomValue2(
+						RX_MIN * 10,
+						RX_MAX * 10
+					) / 10,
 
-			life: getRandomValue2(80, 110) / 100,
-			decay: 0.035 + Math.random() * 0.05,
+				ry:
+					getRandomValue2(
+						RY_MIN * 10,
+						RY_MAX * 10
+					) / 10,
 
-			frame: 0,
-			gravity: 0.28 + Math.random() * 0.5,
-			wobble: Math.random() * 360 | 0,
-			airTime: _isHeavyHit ? 6 : 0,
-			color: randomShade(color)
+				life:
+					getRandomValue2(
+						LIFE_MIN * 100,
+						LIFE_MAX * 100
+					) / 100,
+
+				decay:
+					DECAY_MIN +
+					Math.random() * DECAY_RANGE,
+
+				frame: 0,
+
+				gravity:
+					GRAVITY_MIN +
+					Math.random() * GRAVITY_RANGE,
+
+				wobble:
+					Math.random() * 360 | 0,
+
+				airTime:
+					_isHeavyHit ? 6 : 0,
+
+				color:
+					randomShade(color)
 			});
 		}
 	}
@@ -3519,85 +3765,121 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 	const arr = _char.particles;
 
 	const oldAlpha = offCtx.globalAlpha;
-	const _reversed = (offCtx.reversed && !reversed) || (!offCtx.reversed && reversed);
+
+	const _reversed =
+		(offCtx.reversed && !reversed)
+		||
+		(!offCtx.reversed && reversed);
 
 	let lastColor = null;
 	let lastAlpha = -1;
-	const hitSlow = _char.hitStop ? 0.9 : _char.particleSpeed;
-	if(_char.particleSpeed > 1)
-		_char.particleSpeed -= .1;
-	else if(_char.particleSpeed < 1)
-		_char.particleSpeed += .1;
-	for (let i = arr.length - 1; i >= 0; i--) {
 
+	const hitSlow =
+		_char.hitStop
+			? 0.9
+			: _char.particleSpeed;
+
+	if (_char.particleSpeed > 1)
+		_char.particleSpeed -= PARTICLE_SPEED_RECOVER;
+	else if (_char.particleSpeed < 1)
+		_char.particleSpeed += PARTICLE_SPEED_RECOVER;
+
+	for (let i = arr.length - 1; i >= 0; i--)
+	{
 		const p = arr[i];
-		
+
 		const fast = p.frame < 2;
-		const speedMul = fast ? 2.5 : 1;
-		const sizeMul  = fast ? 1.5 : 1;
 
-		p.x += (p.vx * speedMul) * hitSlow
-		+ SIN_LUT[(p.frame + p.wobble) % 360] * 0.4 * hitSlow;
+		const speedMul =
+			fast
+				? FAST_SPEED_MULT
+				: 1;
 
-		p.y += (p.vy * speedMul) * hitSlow;
+		const sizeMul =
+			fast
+				? FAST_SIZE_MULT
+				: 1;
+
+		p.x +=
+			(p.vx * speedMul) * hitSlow
+			+
+			SIN_LUT[(p.frame + p.wobble) % 360]
+			*
+			WOBBLE_STRENGTH
+			*
+			hitSlow;
+
+		p.y +=
+			(p.vy * speedMul)
+			*
+			hitSlow;
 
 		if (p.airTime > 0)
 			p.airTime--;
 		else
 			p.vy += p.gravity;
-		p.vx *= 0.96;
+
+		p.vx *= AIR_RESISTANCE;
 
 		p.life -= p.decay;
+
 		p.frame++;
 
-		const killY = (this.cHeight - _char.yPosition) + _char.yGap;
+		const killY =
+			(this.cHeight - _char.yPosition)
+			+
+			_char.yGap;
 
-		if (p.life <= 0 || p.y > killY) {
+		if (p.life <= 0 || p.y > killY)
+		{
 			arr[i] = arr[arr.length - 1];
 			arr.pop();
 			continue;
 		}
 
-
-		if (p.life !== lastAlpha) {
+		if (p.life !== lastAlpha)
+		{
 			offCtx.globalAlpha = p.life;
 			lastAlpha = p.life;
 		}
 
-		if (p.color !== lastColor) {
+		if (p.color !== lastColor)
+		{
 			offCtx.fillStyle = p.color;
 			lastColor = p.color;
 		}
 
 		offCtx.beginPath();
+
 		offCtx.ellipse(
 			p.x - ((_reversed ? -1 : 1) * (platformX - p.p)),
 			p.y,
 			p.radius * sizeMul * p.rx,
 			p.radius * sizeMul * p.ry,
-			0, 0, Math.PI * 2
+			0,
+			0,
+			Math.PI * 2
 		);
+
 		offCtx.fill();
 	}
 
- 	offCtx.globalAlpha = oldAlpha;
+	offCtx.globalAlpha = oldAlpha;
 
- 	if (arr.length === 0)
-  		delete _char.particles;
+	if (arr.length === 0)
+		delete _char.particles;
 
-
- // ---------------- COLOR ----------------
-
- 	function randomShade(hex) {
-		let r = parseInt(hex.substr(1,2),16);
-		let g = parseInt(hex.substr(3,2),16);
-		let b = parseInt(hex.substr(5,2),16);
+	function randomShade(hex)
+	{
+		let r = parseInt(hex.substr(1, 2), 16);
+		let g = parseInt(hex.substr(3, 2), 16);
+		let b = parseInt(hex.substr(5, 2), 16);
 
 		r += Math.random() * 35 - 15;
 		g += Math.random() * 25 - 10;
 		b += Math.random() * 20 - 5;
 
-		return `rgb(${r|0},${g|0},${b|0})`;
+		return `rgb(${r | 0},${g | 0},${b | 0})`;
 	}
 }
 this.animateIFrameRipple = function (_item, _wDiff) {
@@ -4866,7 +5148,7 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 			const _hLeft = MathRound(_item.char.EXACTLEFT + _xGap);
 			const isWarPlayer = _item.char.enemy;
 			const _extraTop = isWarPlayer ? MathRound(-40 * __zoom * __scale) : MathRound(-10 * __zoom * __scale);
-			let _hHeight = this.cHeight / 75;
+			let _hHeight = this.cUIHeight / 75;
 			if (_item.char.healthBarHeightRate)
 				_hHeight *= _item.char.healthBarHeightRate;
 
@@ -5510,99 +5792,236 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 		// Objeyi sil
 		this.lightradius2 = null;
 	}
+	this.clearEpisodeMemory = function () {
 
-	this.dispose = function() {
-		if(this.challangeStarted)
-			delete this.challangeStarted;
-		if(this.pvpResult)
-			this.pvpResult.remove();
-		let _sttsScr = document.querySelector('.game-status-screen');
-		if(_sttsScr)
-			_sttsScr.remove();
-		delete this.lastTalkAttached;
-		this.removeBubbles();
-		this.pauseBgMusic(1);
-		this.pauseAmbianceMusic();
-		if(this.after)
-			this.after();
+		this.croppedSprites.clear();
+		this.croppedSpritesOrder.length = 0;
+
+		episode.assets = [];
+		loadedEpisodeImages = {};
+
+		this.mobs.length = 0;
+		this.enemies = [];
+	};
+	// this.dispose = function() {
+	// 	if(this.challangeStarted)
+	// 		delete this.challangeStarted;
+	// 	if(this.pvpResult)
+	// 		this.pvpResult.remove();
+	// 	let _sttsScr = document.querySelector('.game-status-screen');
+	// 	if(_sttsScr)
+	// 		_sttsScr.remove();
+	// 	delete this.lastTalkAttached;
+	// 	this.removeBubbles();
+	// 	this.pauseBgMusic(1);
+	// 	this.pauseAmbianceMusic();
+	// 	if(this.after)
+	// 		this.after();
+	// 	this.disposing = 1;
+	// 	if(this.bgMusicTimer)
+	// 		clearInterval(this.bgMusicTimer);
+	// 	if(this.goSound){
+	// 		if(!this.goSound.paused)
+	// 			this.goSound.pause();
+	// 		this.goSound = null;
+	// 	}
+	// 	const _bgAudios = [];
+	// 	if(this.bgMusic)
+	// 		_bgAudios.push(this.bgMusic);
+	// 	if(this.bgSound)
+	// 		_bgAudios.push(this.bgSound);
+	// 	clearAudioCache(_bgAudios);
+	// 	if(mainCharacter.heartbeat) {
+	// 		mainCharacter.heartbeat.pause();
+	// 		mainCharacter.heartbeat = undefined;
+	// 	}
+	// 	if(episode.enemies)
+	// 		episode.enemies.forEach(e => {
+	// 			e.stopStepSound();
+	// 		});
+	// 	// if(episode.mobs?.find(x => !x.listed))
+	// 	// 	episode.mobs = episode.mobs.filter(x => x.listed);
+	// 	this.mobs = [];
+	// 	this.respawners = [];
+	// 	this.cliffs = undefined;
+	// 	this.playGrounds = undefined;
+	// 	if(episode.phase)
+	// 		delete episode.phase;
+	// 	if(episode.boss)
+	// 		delete episode.boss;
+	// 	this.removeLocationHand();
+	// 	for(let _elem of document.querySelectorAll('.dmg'))
+	// 		_elem.remove();
+	// 	if(this.offCanvas) {
+	// 		this.offCanvas.width = 0;
+	// 		this.offCanvas.height = 0;
+	// 		this.offCanvas = null;
+	// 	}
+	// 	if(this.offDmgCanvas) {
+	// 		this.offDmgCanvas.width = 0;
+	// 		this.offDmgCanvas.height = 0;
+	// 		this.offDmgCanvas = null;
+	// 	}
+	// 	if(this.offGoreCanvas) {
+	// 		this.offGoreCanvas.width = 0;
+	// 		this.offGoreCanvas.height = 0;
+	// 		this.offGoreCanvas = null;
+	// 	}
+	// 	for(let _sp of this.sprites)
+	// 		if(_sp.animation.sprites?.[0])
+	// 			for(let _asp of _sp.animation.sprites)
+	// 				if(_asp.image) {
+	// 					_asp.image.remove();
+	// 					_asp.image = null;
+	// 					delete _asp.image;
+	// 					_sp = null;
+	// 				}
+	// 	for(let _sp of this.enemies)
+	// 		if(_sp.sprite?.image) {
+	// 			if(_sp.castContainer)
+	// 				_sp.castContainer.remove();
+	// 			_sp.sprite.image.remove();
+	// 			_sp.sprite.image = null;
+	// 			delete _sp.sprite.image;
+	// 			_sp = null;
+	// 		}
+	// 	addClass(this.enemyRightArrow, 'v-none');
+	// 	addClass(this.enemyLeftArrow, 'v-none');
+	// 	this.layersDrawn = 0;
+	// 	const _wrappers = document.querySelectorAll('.wrapper-3d');
+	// 	_wrappers?.forEach(x => x.remove());
+	// 	stopWeather();
+	// 	this.seenEnemies.length = 0;
+	// 	window.SoundManager.clearLoops();
+	// 	this.disposeLightRadiusLayer();
+	// 	this.clearEpisodeMemory();
+	// }
+	this.dispose = function () {
+
 		this.disposing = 1;
-		if(this.bgMusicTimer)
+
+		// 🔴 async loader cancel flag (çok kritik fix)
+		this._disposeToken = (this._disposeToken ?? 0) + 1;
+		const _token = this._disposeToken;
+
+		// UI / state flags
+		this.challangeStarted = undefined;
+		this.pvpResult?.remove?.();
+		this.pvpResult = null;
+
+		const _sttsScr = document.querySelector('.game-status-screen');
+		_sttsScr?.remove?.();
+
+		this.lastTalkAttached = undefined;
+		this.removeBubbles?.();
+
+		this.pauseBgMusic?.(1);
+		this.pauseAmbianceMusic?.();
+
+		this.after?.();
+
+		// timers
+		if (this.bgMusicTimer)
 			clearInterval(this.bgMusicTimer);
-		if(this.goSound){
-			if(!this.goSound.paused)
-				this.goSound.pause();
-			this.goSound = null;
-		}
+
+		this.bgMusicTimer = null;
+
+		// audio cleanup
 		const _bgAudios = [];
-		if(this.bgMusic)
-			_bgAudios.push(this.bgMusic);
-		if(this.bgSound)
-			_bgAudios.push(this.bgSound);
-		clearAudioCache(_bgAudios);
-		if(mainCharacter.heartbeat) {
-			mainCharacter.heartbeat.pause();
+		if (this.bgMusic) _bgAudios.push(this.bgMusic);
+		if (this.bgSound) _bgAudios.push(this.bgSound);
+		clearAudioCache?.(_bgAudios);
+
+		if (mainCharacter?.heartbeat) {
+			mainCharacter.heartbeat.pause?.();
 			mainCharacter.heartbeat = undefined;
 		}
-		if(episode.enemies)
-			episode.enemies.forEach(e => {
-				e.stopStepSound();
-			});
-		// if(episode.mobs?.find(x => !x.listed))
-		// 	episode.mobs = episode.mobs.filter(x => x.listed);
+
+		episode?.enemies?.forEach?.(e => e.stopStepSound?.());
+
+		// core reset
 		this.mobs = [];
+		this.enemies = [];
 		this.respawners = [];
 		this.cliffs = undefined;
 		this.playGrounds = undefined;
-		if(episode.phase)
-			delete episode.phase;
-		if(episode.boss)
-			delete episode.boss;
-		this.removeLocationHand();
-		for(let _elem of document.querySelectorAll('.dmg'))
-			_elem.remove();
-		if(this.offCanvas) {
-			this.offCanvas.width = 0;
-			this.offCanvas.height = 0;
-			this.offCanvas = null;
+
+		delete episode.phase;
+		delete episode.boss;
+
+		this.removeLocationHand?.();
+
+		// DOM cleanup (safe batch)
+		document.querySelectorAll('.dmg')?.forEach?.(x => x.remove());
+
+		// canvases HARD invalidate (important)
+		const _killCanvas = (c) => {
+			if (!c) return;
+			try {
+				c.width = 0;
+				c.height = 0;
+			} catch (_) {}
+		};
+
+		_killCanvas(this.offCanvas);
+		_killCanvas(this.offDmgCanvas);
+		_killCanvas(this.offGoreCanvas);
+
+		this.offCanvas = null;
+		this.offDmgCanvas = null;
+		this.offGoreCanvas = null;
+
+		// sprite memory release (GC friendly)
+		for (let _sp of (this.sprites ?? [])) {
+			_sp?.animation?.sprites?.forEach?.(a => {
+				if (a?.image) {
+					try { a.image.remove?.(); } catch (_) {}
+					a.image = null;
+				}
+			});
 		}
-		if(this.offDmgCanvas) {
-			this.offDmgCanvas.width = 0;
-			this.offDmgCanvas.height = 0;
-			this.offDmgCanvas = null;
-		}
-		if(this.offGoreCanvas) {
-			this.offGoreCanvas.width = 0;
-			this.offGoreCanvas.height = 0;
-			this.offGoreCanvas = null;
-		}
-		for(let _sp of this.sprites)
-			if(_sp.animation.sprites?.[0])
-				for(let _asp of _sp.animation.sprites)
-					if(_asp.image) {
-						_asp.image.remove();
-						_asp.image = null;
-						delete _asp.image;
-						_sp = null;
-					}
-		for(let _sp of this.enemies)
-			if(_sp.sprite?.image) {
-				if(_sp.castContainer)
-					_sp.castContainer.remove();
-				_sp.sprite.image.remove();
+
+		for (let _sp of (this.enemies ?? [])) {
+			if (_sp?.castContainer) _sp.castContainer.remove?.();
+			if (_sp?.sprite?.image) {
+				try { _sp.sprite.image.remove?.(); } catch (_) {}
 				_sp.sprite.image = null;
-				delete _sp.sprite.image;
-				_sp = null;
 			}
-		addClass(this.enemyRightArrow, 'v-none');
-		addClass(this.enemyLeftArrow, 'v-none');
-		this.layersDrawn = 0;
-		const _wrappers = document.querySelectorAll('.wrapper-3d');
-		_wrappers?.forEach(x => x.remove());
-		stopWeather();
+		}
+
+		// kill CSS wrappers
+		document.querySelectorAll('.wrapper-3d')?.forEach(x => x.remove());
+
+		// sound / systems
+		window.SoundManager?.clearLoops?.();
+		stopWeather?.();
+
 		this.seenEnemies.length = 0;
-		window.SoundManager.clearLoops();
-		this.disposeLightRadiusLayer();
-	}
+
+		// 🔴 CRITICAL: async loaders will now self-abort
+		this.loadCharacterSprites = async function () {
+			return; // dead after dispose
+		};
+
+		this._loadCharacterSprite = async function () {
+			return; // dead after dispose
+		};
+
+		// cropp cache clear (IMPORTANT: memory leak fix)
+		this.croppedSprites?.clear?.();
+		this.croppedSpritesOrder = [];
+
+		// safety: prevent draw loops continuing mid-frame
+		this.drawEnemies = function () {};
+		this.drawLayers7 = function () {};
+		this.drawCharacterQueue = function () {};
+
+		// light system cleanup
+		this.disposeLightRadiusLayer?.();
+		this.clearEpisodeMemory?.();
+
+		setBusyState?.(false);
+	};
 	setBusyState(!(this.menu || this.lobby));
 	this.initLightRadiusLayer();
 	this.getMinPositionY = function(_e) {
@@ -5642,6 +6061,18 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 		return { y:minPositionY };
 	}
 	this.resize = function() {
+		particleScale = Math.max(0.25, Math.min(2, this.cWidth / 1152));
+		// ---------------- TUNING ----------------
+
+		BASE_SPEED_MIN = 2 * particleScale;
+		BASE_SPEED_MAX = 3.6 * particleScale;
+		RANDOM_VX = 0.6 * particleScale;
+		RANDOM_VY = 0.4 * particleScale;
+		RADIUS_MIN = 1.05 * particleScale;
+		RADIUS_RANGE = 2.2 * particleScale;
+		GRAVITY_MIN = 0.28;
+		GRAVITY_RANGE = 0.5;
+		WOBBLE_STRENGTH = 0.4 ;
 		const _ms = mapSprites.find(x => x.id == this.season);
 		this.width = MathRound((_ms.width) * __zoom);
 		if(this.width < _canvas.width)

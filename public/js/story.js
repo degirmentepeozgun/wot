@@ -6977,7 +6977,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		//startScene: 1,
+		//startScene: 2,
 		scenes: [
 			{
 				when: function() {
@@ -7215,6 +7215,9 @@ const __stories = [
 								episode.boss.disableSkill('attack');
 								episode.boss.enableSkill('ground1');
 								const _inner = document.querySelector('.tutorial-box-inner');
+								const _current = _inner.querySelector('.fire,.toxic');
+								if(_current)
+									_current.remove();
 								const _div = document.createElement('div');
 								_div.className = "w-100 pt-3 toxic fade-me flex w-100 flex-jc-start";
 								_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[1][getLang()]}!`;
@@ -7259,7 +7262,9 @@ const __stories = [
 								mainCharacter.animate(mainCharacter.chains[1].key, 1);
 								mainCharacter.counterLearned = 1;
 								const _inner = document.querySelector('.tutorial-box-inner');
-								
+								const _current = _inner.querySelector('.fire,.toxic');
+								if(_current)
+									_current.remove();
 								const _div = document.createElement('div');
 								_div.className = "w-100 pt-3 toxic fade-me flex w-100 flex-jc-start";
 								_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[3][getLang()]}!`;
@@ -7291,11 +7296,18 @@ const __stories = [
 								mainCharacter.still = mainCharacter.immobilize = false;
 								//mainCharacter.enableSkills();
 								mainCharacter.animate('attack', 1);
+								const _kb = episode.boss.animations.knockbackair;
+								_kb.frames.forEach(f => {
+									if(f.extraStepXRate) {
+										f.oldExtraStepXRate = f.extraStepXRate;
+										f.extraStepXRate *= 1.33;
+									}
+								});
 								episode.boss.animations.ground1.disabled = true;
 								episode.tutorialOrder = 4;
 								episode.lastTutorialTime = _gameTick;
 								mainCharacter.keyboard.mouseDown(' ');
-								if(!__isPC && _shield) {
+								if(_shield) {
 									_shield.addEventListener('pointerup', function() {
 										console.log('UP');
 										mainCharacter.keyboard.mouseUp(' ');
@@ -7314,6 +7326,9 @@ const __stories = [
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
 							const _div = document.createElement('div');
+							const _current = _inner.querySelector('.fire,.toxic');
+							if(_current)
+								_current.remove();
 							_div.className = "w-100 pt-3 fire fade-me flex w-100 flex-jc-start";
 							_div.innerHTML = `<img src="./images/icons/cross.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[5][getLang()]}!`;
 							_inner.appendChild(_div);
@@ -7333,6 +7348,9 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
+							const _current = _inner.querySelector('.fire,.toxic');
+							if(_current)
+								_current.remove();
 							const _div = document.createElement('div');
 							_div.className = "w-100 pt-3 toxic fade-me flex w-100 flex-jc-start";
 							_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[6][getLang()]}!`;
@@ -7359,6 +7377,11 @@ const __stories = [
 							delete mainCharacter.disableKeyboard;
 							focusMe('#skill1', function() {
 								removeFocus();
+								const _kb = episode.boss.animations.knockbackair;
+								_kb.frames.forEach(f => {
+									if(f.extraStepXRate)
+										f.extraStepXRate = f.oldExtraStepXRate;
+								});
 								delete _game.suspended;
 								delete mainCharacter.disableKeyboard;
 								mainCharacter.still = mainCharacter.immobilize = false;
@@ -7381,6 +7404,9 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
+							const _current = _inner.querySelector('.fire,.toxic');
+							if(_current)
+								_current.remove();
 							const _div = document.createElement('div');
 							_div.className = "w-100 pt-3 toxic fade-me flex w-100 flex-jc-start";
 							_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[8][getLang()]}!`;
@@ -7616,6 +7642,9 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
+							const _current = _inner.querySelector('.fire,.toxic');
+							if(_current)
+								_current.remove();
 								_inner.innerHTML = `<div class="w-100 pt-3 toxic fade-me flex w-100 flex-jc-start flex-ai-start">
 										<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[13][getLang()]}!
 								</div>`;
@@ -7650,7 +7679,7 @@ const __stories = [
 							_game.suspended = true;
 							episode.pauseAmbianceMusic();
 							episode.enemies.forEach(x => x.stopStepSound());
-							cssAnimations.black(null, 6000, __storyScene.lang[14][getLang()], function() {
+							cssAnimations.blackui(null, 6000, __storyScene.lang[14][getLang()], function() {
 								switchStoryScene();
 							});
 							
@@ -7733,9 +7762,19 @@ const __stories = [
 					{type:'pot', key:'pot', chance:1},
 					{type:'common', key:'corpseexplode', chance:1}
 				],
+				getAssets: function() { 
+					return [
+					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[0].id + '.png',
+					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[1].id + '.png',
+					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[2].id + '.png',
+					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[3].id + '.png',
+					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[4].id + '.png',
+					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[5].id + '.png'
+				]},
 				startsWith: 1,
 				save: true,
-				loadingCharacterIds: [622, 619, 620, 621, 623],
+				lazyLoadingCharacterIds : [621, 622, 623],
+				loadingCharacterIds: [619, 620],
 				before: function() {
 					if(episode?.ambiancePath){
 						delete episode.ambiancePath;
@@ -7790,7 +7829,7 @@ const __stories = [
 						delete mainCharacter.tagContainer;
 					}
 					const _desc = document.createElement('div');
-					_desc.className = 'flex show-ui full quick-play-desc-container fade-me';
+					_desc.className = 'flex show-ui full quick-play-desc-container';
 					let _html = '';
 					for(let i = 0; i < 6; i++) {
 						const _tip = __quickTips[i];
@@ -7801,7 +7840,8 @@ const __stories = [
 							_skillHtml += '<div class="quick-play-desc-skill-icon" style="background-image:url(./images/main/skill-icons/warrior/' + _sk + '.png);background-size:cover"></div>';
 						}
 						_skillHtml = `<div class="quick-play-desc-skill-icons flex">` + _skillHtml + '</div>';
-						_html += `<div class="quick-play-desc-item quick-play-desc-item${_tip.id}">`
+						_html += `<div class="quick-play-desc-item" style="background:url(./images/ui/full-border-vert.png) !important;background-size: 100% auto !important;background-repeat: no-repeat !important;overflow:hidden;position:relative">
+								<img src="./images/${!isPhone() ? '_' : ''}quicktips/${_tip.id}.png" style="width:100%;z-index:-1;top:0;left:0;position:absolute;inset:0" />`
 							+ _skillHtml +
 					 		`<div class="quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
 					   </div>`;
@@ -8138,30 +8178,35 @@ const __stories = [
 										x.bottomGap += MathRound(x.spriteHeight / 20);
 										PlaySound({key:'portalclose', volume:.3 });
 										if(_e.toucher) {
-											_e.toucher.yPosition = _e.yPosition - 1;
+											_e.toucher.yPosition = _e.yPosition - MathRound(groundheight * .05);
+											_e.toucher.stopRage();
+											_e.toucher.swapAnimation('idle');
 											_e.toucher.standBy();
 											_e.toucher.updateVariables();
-											const _oldLeft = _e.toucher.left;
-											_e.toucher.left = _e.left - MathRound((_e.toucher.WIDTH - _e.WIDTH) / 2) - platformX;
-											if(_e.toucher.left < _oldLeft && _e.toucher.direction === __right)
-												_e.toucher.direction = __left;
-											else if(_e.toucher.left > _oldLeft && _e.toucher.direction === __left)
-												_e.toucher.direction = __right;
-											_portal.animations.after.frames.forEach(y => delete y.do);
-											if(_e.toucher.relatedObjects)
-												_e.toucher.relatedObjects.length = 0;
-											_e.toucher.drawPriority = .1;
-											_e.toucher.addObject(
-											{ 
-												key: 'zoom2x', 
-												position: 'css', 
-												p1: 1.3, 
-												p2: 10000
+											requestAnimationFrame(() => {
+												const _oldLeft = _e.toucher.left;
+												_e.toucher.left = _e.left - MathRound((_e.toucher.WIDTH - _e.WIDTH) / 2) - platformX;
+												if(_e.toucher.left < _oldLeft && _e.toucher.direction === __right)
+													_e.toucher.direction = __left;
+												else if(_e.toucher.left > _oldLeft && _e.toucher.direction === __left)
+													_e.toucher.direction = __right;
+												_portal.animations.after.frames.forEach(y => delete y.do);
+												if(_e.toucher.relatedObjects)
+													_e.toucher.relatedObjects.length = 0;
+												_e.toucher.drawPriority = .1;
+												_e.toucher.addObject(
+												{ 
+													key: 'zoom2x', 
+													position: 'css', 
+													p1: 1.3, 
+													p2: 10000
+												});
+												addClass(_gameUI, 'disable-ui');
+												episode.moveCamera(function() {
+													__storyPlaying = false;
+													installStoryFinish();
+												}, 3, 1);
 											});
-											episode.moveCamera(function() {
-												__storyPlaying = false;
-												installStoryFinish();
-											}, 3, 1);
 										}
 									}
 								});
@@ -8298,6 +8343,15 @@ const __stories = [
 			},
 			{
 				map: 11,
+				getAssets: function() { 
+					return [
+					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[6].id + '.png',
+					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[7].id + '.png',
+					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[8].id + '.png',
+					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[9].id + '.png',
+					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[10].id + '.png',
+					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[11].id + '.png'
+				]},
 				noArtifact: true,
 				scorePerLoot: { key:'gold', value: 10 },
 				leaderBoards: {
@@ -8350,8 +8404,10 @@ const __stories = [
 				],
 				startWith: 1,
 				save: true,
-				loadingCharacterIds: [72, 1, 111, 33, 35, 2, 7, 37, 38, 1003, 73],
+				lazyLoadingCharacterIds: [72,73, 37, 38, 1003],
+				loadingCharacterIds: [1, 111, 33, 35, 2, 7],
 				start: function() {
+					clearAudioCache(loadedSounds);
 					episode.itemDropOrder = [ 
 						'belt', 'gloves', 'bracers', 'helmet', 'leggings',
 						'necklace', 'chest', 'ring', 'boots', 'weapon'
@@ -8387,11 +8443,11 @@ const __stories = [
 
 					removeClass(_gameUI, 'disable-ui');
 					const _desc = document.createElement('div');
-					_desc.className = 'flex show-ui full quick-play-desc-container fade-me';
+					_desc.className = 'flex show-ui full quick-play-desc-container';
 					let _html = '';
 					for(let i = 6; i < 12; i++) {
 						const _tip = __quickTips[i];
-						_html += `<div style="background-image:url(./images/ui/full-border-vert.png), url(./images/quicktips/${_tip.id}.png) !important;background-size: 100% auto !important;background-repeat: no-repeat !important" class="quick-play-desc-item quick-play-desc-item${_tip.id}">
+						_html += `<div style="background-image:url(./images/ui/full-border-vert.png), url(./images/${__isPC ? '_' : ''}quicktips/${_tip.id}.png) !important;background-size: 100% auto !important;background-repeat: no-repeat !important" class="quick-play-desc-item quick-play-desc-item${_tip.id}">
 									<div class="quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
 								</div>`;
 					}
@@ -8406,6 +8462,10 @@ const __stories = [
 					mainCharacter.disableSkill('tag');
 					mainCharacter.maxHP = mainCharacter.MAXHP = mainCharacter.health = mainCharacter.level * 120;
 					mainCharacter.setHealth(mainCharacter.health);
+					// setTimeout(function() {
+					// 	__storyPlaying = false;
+					// 	installStoryFinish();
+					// }, 5000);
 				},
 				actions: [
 					{
@@ -8541,15 +8601,17 @@ const __stories = [
 										+ _icon +
 									`</div>
 									<div class="status-item-action-container flex">
-										<div class="item-title-wrapper flex w-50">
-											${_title}
-										</div>
-										<div class="item-title-wrapper flex w-50">
-											<img style="height:80%;max-height:2.6vh" src="./images/icons/power-up.png" />${_powerDiff}
+										<div class="item-title-container w-100 flex">
+											<div class="item-title-wrapper flex w-50">
+												${_title}
+											</div>
+											<div class="item-title-wrapper flex w-50">
+												<img style="height:80%;max-height:2.6vh" src="./images/icons/power-up.png" />${_powerDiff}
+											</div>
 										</div>
 										<div class="item-action-wrapper flex flex-jc-start w-100">
 											<div class="game-menu-button animate-me flex" onexactclick="wearStatusItem(${_item.id}, ${_powerDiff})">
-												<div class="flex">${getLangData('WEAR')}<span class="flex">(${getNewKeyboardKey('U').baseKey})</span></div>
+												<div class="flex">${getLangData('WEAR')}<span class="flex${__isPC ? '' : ' d-none'}">(${getNewKeyboardKey('U').baseKey})</span></div>
 											</div>
 										</div>
 									</div>
@@ -8571,7 +8633,7 @@ const __stories = [
 								episode.loot = {
 									enemy: episode.boss,
 									loots: [
-										{type:'item',key:episode.itemDropOrder[episode.boss.grade - episode.phase], grade:2},
+										{zoom: 1.2, type:'item',key:episode.itemDropOrder[episode.boss.grade - episode.phase], grade:2},
 										{type:'gold'},
 										{type:'gold'},
 										{type:'gold'},
@@ -8764,11 +8826,11 @@ const __stories = [
 							if(_left < _center){
 								episode.showLocationHand('right');
 								_dir = __left;
-								const _base = MathRound((episode.width / __zoom) * .95);
+								const _base = MathRound((episode.width / __zoom) * (__isPC ? .95 : .89));
 								_p1 = _base;
 								_p2 = _base + 80;
 								episode.sceneAfterProps = {
-									x:MathRound(((episode.width)) * .91),
+									x:MathRound(((episode.width)) * (__isPC ? .91 : .85)),
 									side:__right
 								}
 							}
@@ -8873,30 +8935,35 @@ const __stories = [
 										x.bottomGap += MathRound(x.spriteHeight / 20);
 										PlaySound({key:'portalclose', volume:.3 });
 										if(_e.toucher) {
-											_e.toucher.yPosition = _e.yPosition - 1;
+											_e.toucher.yPosition = _e.yPosition - MathRound(groundheight * .05);
+											_e.toucher.stopRage();
+											_e.toucher.swapAnimation('idle');
 											_e.toucher.standBy();
 											_e.toucher.updateVariables();
-											const _oldLeft = _e.toucher.left;
-											_e.toucher.left = _e.left - MathRound((_e.toucher.WIDTH - _e.WIDTH) / 2) - platformX;
-											if(_e.toucher.left < _oldLeft && _e.toucher.direction === __right)
-												_e.toucher.direction = __left;
-											else if(_e.toucher.left > _oldLeft && _e.toucher.direction === __left)
-												_e.toucher.direction = __right;
-											_portal.animations.after.frames.forEach(y => delete y.do);
-											if(_e.toucher.relatedObjects)
-												_e.toucher.relatedObjects.length = 0;
-											_e.toucher.drawPriority = .1;
-											_e.toucher.addObject(
-											{ 
-												key: 'zoom2x', 
-												position: 'css', 
-												p1: 1.3, 
-												p2: 10000
+											requestAnimationFrame(() => {
+												const _oldLeft = _e.toucher.left;
+												_e.toucher.left = _e.left - MathRound((_e.toucher.WIDTH - _e.WIDTH) / 2) - platformX;
+												if(_e.toucher.left < _oldLeft && _e.toucher.direction === __right)
+													_e.toucher.direction = __left;
+												else if(_e.toucher.left > _oldLeft && _e.toucher.direction === __left)
+													_e.toucher.direction = __right;
+												_portal.animations.after.frames.forEach(y => delete y.do);
+												if(_e.toucher.relatedObjects)
+													_e.toucher.relatedObjects.length = 0;
+												_e.toucher.drawPriority = .1;
+												_e.toucher.addObject(
+												{ 
+													key: 'zoom2x', 
+													position: 'css', 
+													p1: 1.3, 
+													p2: 10000
+												});
+												addClass(_gameUI, 'disable-ui');
+												episode.moveCamera(function() {
+													__storyPlaying = false;
+													installStoryFinish();
+												}, 3, 1);
 											});
-											episode.moveCamera(function() {
-												__storyPlaying = false;
-												installStoryFinish();
-											}, 3, 1);
 										}
 									}
 								});
@@ -9014,6 +9081,8 @@ const __stories = [
 							// clone (true → içeriğiyle birlikte)
 							const clone = original.cloneNode(true);
 							clone.className = 'move-to-place';
+							if(!__isPC)
+								clone.style.borderRadius = '999px';
 							clone.removeAttribute('id');
 							// absolute pozisyon ver
 							clone.style.position = 'absolute';
@@ -9158,8 +9227,8 @@ const __stories = [
 																		PlaySound({key:'doggrunt', volume:1});
 																		summonMobWithJson({
 																			id: 1,
-																			minX: MathRound((_mec.left + 176) / __zoom),
-																			maxX: MathRound((_mec.left + 176) / __zoom),
+																			minX: MathRound((_mec.left + (176 / __scale)) / __zoom),
+																			maxX: MathRound((_mec.left + (176 / __scale)) / __zoom),
 																			sight: 1000,
 																			count: 1,
 																			direction: __left,
@@ -9215,6 +9284,7 @@ const __stories = [
 																					}
 																					mainCharacter.enableSkills();
 																					mainCharacter.yPosition--;
+																					mainCharacter.direction = __right;
 																					mainCharacter.animate('tag', 1);
 																					setTimeout(() => {
 																						_yec.animate('hurtair', 1);
@@ -9312,6 +9382,26 @@ const __stories = [
 						grade: 12,
 						hp:1650,
 						zoom: .33,
+						do: function(_e) {
+							const _z = _e.getZoom();
+							const _h = _z * _e.height;
+							const _rest = _canvas.height - MathRound(groundheight * .5);
+							const _gap = MathCeil((_rest - _h) / _z);
+							if(_gap < 0)
+								return;
+							const _keys = Object.keys(_e.animations);
+							for(let _k of _keys) {
+								const _anim = _e.animations[_k];
+								_anim.frames.forEach(_f => {
+									_f.bottomGap = (_f.bottomGap ?? 0) - _gap;
+								});
+								if(_anim.alternateFrames)
+									for(let _af of _anim.alternateFrames)
+										_af.frames?.forEach(_f => {
+											_f.bottomGap = (_f.bottomGap ?? 0) - _gap;
+										});
+							}
+						},
 						yPosition: function() {
 							return MathRound(groundheight * .5);
 						}
@@ -9320,7 +9410,7 @@ const __stories = [
 						id: 35,
 						minX: 1580,
 						maxX: 4800,
-						count: 2,
+						count: 1,
 						sight: 1000,
 						spawn: 10,
 						hp:300,
@@ -9340,7 +9430,7 @@ const __stories = [
 						id: 2,
 						minX: 1580,
 						maxX: 4800,
-						count: 3,
+						count: 2,
 						sight: 1000,
 						spawn: 10,
 						hp:300,
@@ -9403,7 +9493,7 @@ const __stories = [
 					}
 				},
 				enableCommonSkills: true,
-				loadingCharacterIds: [10, 48, 625, 626, 627, 628, 629, 630, 631],
+				loadingCharacterIds: [],
 				actions: [	
 					{
 						when: function() {
@@ -9432,15 +9522,17 @@ const __stories = [
 									+ _icon +
 								`</div>
 								<div class="status-item-action-container flex">
-									<div class="item-title-wrapper flex w-50">
-										${_title}
-									</div>
-									<div class="item-title-wrapper flex w-50">
-										
+									<div class="item-title-container w-100 flex">
+										<div class="item-title-wrapper flex w-50">
+											${_title}
+										</div>
+										<div class="item-title-wrapper flex w-50">
+											
+										</div>
 									</div>
 									<div class="item-action-wrapper flex flex-jc-start w-100">
 										<div class="game-menu-button animate-me flex" onexactclick="mainCharacter.useCommonSkill(1)">
-											<div class="flex">${getLangData('USE')}<span class="flex">(${getNewKeyboardKey('1').baseKey})</span></div>
+											<div class="flex">${getLangData('USE')}<span class="flex${__isPC ? '' : ' d-none'}">(${getNewKeyboardKey('1').baseKey})</span></div>
 										</div>
 									</div>
 								</div>
@@ -9531,8 +9623,11 @@ const __stories = [
 						_e.pvpName = _pvpNames[i];
 						opponents.push(_e);
 					}
-					episode.loadCharacterSprites(function() {}, [10, 48], null, 1);
-					createWar(opponents, 42, 1, 1, 300, function() {
+					requestAnimationFrame(() => {
+						episode.loadCharacterSprites(function() {}, [10, 48], null, 1);
+					});
+					createWar(opponents, 42, 1, 1, 180, function() {
+						clearAudioCache(loadedSounds);
 						mainCharacter.startPlatformX = platformX;
 						episode.skipPvPFinalScreen = 1;
 						episode.phase = 1;
@@ -10164,7 +10259,7 @@ function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 			__story.endTime = undefined;
 		}
 	});
-	mainCharacter.heartCount = __story.heartCount ?? 1;
+	mainCharacter.heartCount = __story?.heartCount ?? 1;
 	if(_client.quickPlay) {
 		const _char = __account.characters.find(x => x.class === mainCharacter.class);
 		_char.tag = {id:7, grade:1};
@@ -10187,8 +10282,8 @@ function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 		const warmupAll = async function() {
 			await warmupSpriteSheet("./images/related/boom.png");
 			await warmupSpriteSheet("./images/related/boomgreen.png");
-			await warmupSpriteSheet("./images/sprites/ep47/attack1.png");
-			await warmupSpriteSheet("./images/sprites/ep47/sprite.png");
+			//await warmupSpriteSheet("./images/sprites/ep47/attack1.png");
+			//await warmupSpriteSheet("./images/sprites/ep47/sprite.png");
 		}
 		warmupAll();
 		mainCharacter.direction = __left;
@@ -10264,30 +10359,49 @@ function switchStoryScene(_func, _newOrder) {
 				_navbar.innerHTML = avatarTemplate(mainCharacter);
 			}
 			//if(__storyScene.leaderBoards)
-			episode.loadCharacterSprites(function() {
-				addClass(_splash, 'd-none');
-				const _ts = document.getElementById('tip-screen');
-				if(_ts)
-					_ts.remove();
-				if(__storyCheckPoint?.warn) {
-					//warn('<div class="flex heading achievement achievement-system" style="position:relative"><img src="./images/icons/loader.gif" /><span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Checkpoint Marked') + '</span></div>', 'level-up',null, 1);
-					delete __storyCheckPoint.warn;
-				}
-				removeFocus();
-				__account.commonInventory = [];
-				if(mainCharacter && !__storyScene?.enableCommonSkills)
-					mainCharacter.disableCommonInventory();
-				removeClass(_gameUI, 'demo-playing');
-				if(__storyScene.start)
-					__storyScene.start();
-				_storySceneSwitching = false;
-				_game.suspended = false;
-				const _ps = document.querySelectorAll('.placed-skill');
-				_ps?.forEach(x => addClass(x, 'v-none'));
-				blurKeyboard();
-				if(mainCharacter)
-					mainCharacter.hbBars = undefined;
-			}, __storyScene.loadingCharacterIds);
+			Promise.all(
+				(__storyScene.getAssets?.() ?? []).map(getImagePromise)
+			).then(images => {
+				episode.assets = images;
+
+				episode.loadCharacterSprites(function() {
+					addClass(_splash, 'd-none');
+					const _ts = document.getElementById('tip-screen');
+					if(_ts)
+						_ts.remove();
+					if(__storyCheckPoint?.warn) {
+						//warn('<div class="flex heading achievement achievement-system" style="position:relative"><img src="./images/icons/loader.gif" /><span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Checkpoint Marked') + '</span></div>', 'level-up',null, 1);
+						delete __storyCheckPoint.warn;
+					}
+					removeFocus();
+					__account.commonInventory = [];
+					if(mainCharacter && !__storyScene?.enableCommonSkills)
+						mainCharacter.disableCommonInventory();
+					removeClass(_gameUI, 'demo-playing');
+					if(__storyScene.start)
+						__storyScene.start();
+					_storySceneSwitching = false;
+					_game.suspended = false;
+					const _ps = document.querySelectorAll('.placed-skill');
+					_ps?.forEach(x => addClass(x, 'v-none'));
+					blurKeyboard();
+					if(mainCharacter)
+						mainCharacter.hbBars = undefined;
+					// if(__storyScene.lazyLoadingCharacterIds)
+					// 	requestIdleCallback(() => {
+					// 		episode.loadCharacterSprites(function(){}, __storyScene.lazyLoadingCharacterIds);
+					// 	});
+					if (__storyScene.lazyLoadingCharacterIds) {
+						requestIdleCallback(() => {
+							episode.loadCharacterSprites(
+								function(){},
+								__storyScene.lazyLoadingCharacterIds
+							);
+						});
+					}
+				}, __storyScene.loadingCharacterIds);
+
+			});
 		}, 1000);
 		if(_func)
 			_func();
@@ -10458,7 +10572,7 @@ function story(_id, _func, _noBlack, _desc, _after) {
 		if(this.skipped || ((_gameTick - this.start) > item?.ms))
 		{
 			if(this.order === 1) {
-				episode.playSound({key:'story', volume: .5});
+				PlaySound({key:'story', volume: .5});
 			}
 			if(!item.finish) {
 				const _box = document.createElement('div');
@@ -10613,7 +10727,7 @@ function storyBonus(_func, _instant) {
 				_title.innerHTML = '';
 				_title.innerText = _cardTitle;
 				removeClass(_s.btn, 'disabled');
-				episode.playSound({key:'select2', volume:.5});
+				PlaySound({key:'select2', volume:.5});
 				_wrapper.classList.add('selected');
 				document.querySelectorAll('.story-gift .match-card').forEach(x =>
 					x.classList.add('flip-card'));
@@ -10737,9 +10851,9 @@ function createStoryResultScreen(_failed) {
 		// 		__story.resultStars[i].failed = true;
 		const _fail = !__story.resultStars.filter(x => !x.failed)?.length;
 		if(!_fail)
-			episode.playSound({ key: 'victory', volume: .3 });
+			PlaySound({ key: 'victory', volume: .3 });
 		else{
-			episode.playSound({ key: 'failure', volume: .3 });
+			PlaySound({ key: 'failure', volume: .3 });
 			episode.enemies.forEach(x => x.standBy());
 		}
 		let _table = '<div class="flex full pvp-result-table story-result"><div class="flex" style="width:100%;height:16vh;position:relative"><img src="./images/ui/wood.png" style="height:30%;margin-top:5vh;z-index:2;filter:drop-shadow(.5vh 1vh 1.5vh black);-webkit-filter:drop-shadow(.5vh 1vh 1.5vh black);position:absolute' + (_fail ? ';-webkit-filter:grayscale(66%);filter:grayscale(66%)': '') + '"' + (_fail ? ' class="gray"': '') + ' /><span style="z-index:2;margin-top:4.5vh;font-size:3.5vh!important;font-weight:600;text-shadow:0px 0px 1vh #000;color:' + (_fail ? 'crimson' : '#F4BB44') + ' !important">' + getLangData('Story' + (_fail ? ' Failed' : ' Cleared')) + '</span></div><div class="game-over-results"><div style="width:100%" class="flex"><span>';
@@ -11525,7 +11639,7 @@ async function createStoryPassScreen(_amount) {
 	// satır satır ekle
 	for (let i = 0; i < _results.length; i++) {
 		if(!__storyAutoPassSkip)
-			episode.playSound({key:'autopass', volume:.4});
+			PlaySound({key:'autopass', volume:.4});
 		const row = document.createElement('div');
 		row.className = 'w-100 flex flex-jc-start auto-pass-result-item fade-me';
 		row.innerHTML = _results[i];

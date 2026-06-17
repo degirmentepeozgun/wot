@@ -1642,6 +1642,7 @@ function playOpeningMusic() {
 }
 
 function installOpeningScreen() {
+	alert(1);
 	var _img = new Image();
 	var _bg = document.getElementById('splash');
 	var _opening = document.getElementById('first-splash');

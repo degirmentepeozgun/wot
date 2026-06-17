@@ -150,6 +150,9 @@ function drawDmgFrames() {
 						_frame.zoom = 2;
 						_frame.stepY = 2;
 					}
+					else if(_frame.zoom) {
+						_frame.stepY = 2;
+					}
 					else{
 						_frame.zoom = getRandomValue2(10,13) / 10;
 						if(_frame.zoom < 1.1)
@@ -262,16 +265,17 @@ function renderTextElement2(_settings) {
 		let _l = _settings.x + (_settings.frame.startStepX ?? 0), i = 0, _settingsY = (_settings.frame.maxStepY - _settings.frame.totalStepY);
 		for(let _sprite of _settings.images)
 			if(_sprite) {
+				const _scale = _settings.frame.scale ?? 1;
 				const _sim = _sprite.img ?? _sprite;
-				const _spriteHeight = _settings.height;
+				const _spriteHeight = _settings.height * _scale;
 				const _y =  _settings.frame.startY - 
 				(_settings.frame.zoom > 1  ? 0 : MathRound(_settingsY * 
-				((_spriteHeight / _settings.frame.stepY))));
+				((_settings.height / _settings.frame.stepY))));
 				if(_y < episode.dmgFrameTopBoundary){
 					_settings.frame.remove = true;
 					return;
 				}
-				const _spriteWidth = (_sim.width *  _spriteHeight) / _sim.height;
+				const _spriteWidth = ((_sim.width *  _settings.height) / _sim.height) * _scale;
 				let _sWidth = _spriteWidth;//  MathRound(_spriteWidth * _settings.frame.zoom);
 				episode.offDmgCtx.drawImage(_sim, 
 					(_l + (_settings.frame.platformX - platformX)) 
@@ -774,8 +778,11 @@ function resetSkills(_ultimate, _keepCD, _char, _k, _endOfRage, _force) {
 			if ((!_keepCD && !_k && !_skill.chain && !_skill.maxCharge) || _force) {
 				if (_skill.coolDownLeft != undefined)
 					_skill.coolDownLeft = _force ? 1 : undefined;
-				if (_skill.coolDownStart2 != undefined)
+				if (_skill.coolDownStart2 != undefined) {
 					_skill.coolDownStart2 = undefined;
+					if(_skill.maxCharge)
+						_skill.charge = _skill.maxCharge;
+				}
 			}
 			if (!(_c.ultimate || _ultimate) && _skill.skillOrder && !_k)
 				continue;
@@ -804,7 +811,7 @@ function resetSkills(_ultimate, _keepCD, _char, _k, _endOfRage, _force) {
 						if(_elem)
 							if(_skill.before)
 							{
-								if(!_elem.swapTime || ((_gameTick - _elem.swapTime) > 400)) {
+								if(!_elem.swapTime || _endOfRage || ((_gameTick - _elem.swapTime) > 400)) {
 									if(hasClass(_elem, 'swap-skill')) {
 										removeClass(_elem, 'swap-skill');
 										addClass(_elem, 'swap-skill2');
@@ -950,6 +957,7 @@ function createTagSkill(_char, _tag) {
 						_mob.mustDraw = true;
 						_mob.experience = 0;
 						_mob.class = 'minion';
+						_mob.noDirection = false;
 						_mob.direction = _dir;
 						if(_c.animations.tag.modify)
 							_c.animations.tag.modify(_mob);
@@ -2258,8 +2266,13 @@ function setWindowVariables() {
 		//const __rs = getComputedStyle(__r);
 	// if(!_gamePad)
 	// 	_gamePad = document.getElementById('game-pad');
+	const _w = MathRound(_gamePad.offsetWidth / __scale);
+	let _wr = 1;
+	if(__scale === 1 && _w > 1152)
+		_wr = 1152 / _w;
+	__scale /= _wr;
 	_canvas.width = _canvas1.width = _canvasB.width = _canvasGore.width = _canvasBRB.width = _canvasSPB.width = _canvas3.width = _canvas5.width = 
-	_canvasF.width = _canvasS.width = _canvasDMG.width = _canvasR.width = MathRound(_gamePad.offsetWidth / __scale);
+	_canvasF.width = _canvasS.width = _canvasDMG.width = _canvasR.width = MathRound(_w * _wr)
 	const root = document.querySelector(':root');
 	root.style.setProperty('--scale', __scale);
 	root.style.setProperty('--canvas-width', (_canvas.width * __scale)+ "px");
@@ -2271,6 +2284,11 @@ function setWindowVariables() {
 	_canvasS.height = _canvasSPB.height = _canvasBRB.height = _canvasF.height = _canvasR.height = MathRound(_gamePad.offsetHeight / __scale);
 	
 	__zoom = _canvas.width / 2048;
+	// if(_canvas.width > 1152){
+	// 	const _rate = _canvas.width / 1152;
+	// 	__scale *= _rate;
+	// 	__zoom /= _rate;
+	// }
 	__dmgFrameDistance = MathRound(100 * __zoom);
 	groundheight = MathRound(200 * __zoom);
 	idealground_height = groundheight;

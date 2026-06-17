@@ -41,7 +41,7 @@ function animate(_tick) {
 	}
 	if(_closeOpeningMusic && _openingSound?.volume > 0)
 	{
-		const _vol = _openingSound.volume - .025;
+		const _vol = _openingSound.volume - (.025 * __volume);
 		if(_vol <=0) {
 			_openingSound.volume = 0;
 			if(!_openingSound.paused) {
@@ -732,7 +732,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 			setTimeout(function() {
 				if(_onEnd)
 					_onEnd();
-				else {
+				else if(!episode.pvp && !episode.war){
 					addClass(_splash, 'd-none');
 					const _ts = document.getElementById('tip-screen');
 					if(_ts)
@@ -799,10 +799,16 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 				disposeFocus();
 				// if(__particles)
 				// 	__particles.cancel();
-				if(episode.war)
-					_gameUI.setAttribute('data-mapid', 'war');
-				else if(_gameUI.hasAttribute('data-mapid'))
-					_gameUI.removeAttribute('data-mapid');
+				if(episode.war || episode.pvp){
+					addClass(_gameUI, 'war-map');
+					//document.querySelector('.enemy-profile').style.setProperty('width', '40vw', 'important');
+					//document.getElementById('top-nav').style.setProperty('width', '40vw', 'important');
+				}
+				else {
+					removeClass(_gameUI, 'war-map');
+				//	document.querySelector('.enemy-profile').style.removeProperty('width');
+				//	document.getElementById('top-nav').style.removeProperty('width');
+				}
 				for(let i = 1; i < 5; i++) {
 					const cfc = chainSkills['skill' + i].firstChild;
 					cfc.removeAttribute("src");
@@ -920,17 +926,22 @@ function getGroundHeight() {
 	}
 	return groundheight;
 }
-
-var _closeOpeningMusic, gameopening;
+function isPhone() {
+    return (
+        navigator.maxTouchPoints > 0 &&
+        Math.min(window.innerWidth, window.innerHeight) < 600
+    );
+}
+var _closeOpeningMusic, gameopening, __isHEDevice, gameIsReady = false;
 function openGame() {
-	if(gameopening)
+	if(gameopening || !gameIsReady)
 		return;
 	gameopening = 1;
 	removeClass(document.getElementById('assets-progressbar'), 'd-none');
 	//launchIntoFullscreen(document.documentElement);
 	setTimeout(async function () {
-		const _isHEDevice = await isHighEndDevice();
-		if(!_isHEDevice)
+		__isHEDevice = await isHighEndDevice();
+		if(!__isHEDevice)
 			__scale = 2;
 		if(_openingSound)
 			_closeOpeningMusic = 1;
@@ -2194,6 +2205,15 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 		}
 		//if(episode?.id !== _mapId)
 			switchMap(_mapId, 1, function() {
+				const _ids = _opponents.map(x => x.id);
+				const _firstIds = [];
+				const _lastIds = [];
+				for(let i = 0; i < _ids.length; i++) {
+					if(i < (_ids.length / 2))
+						_firstIds.push(_ids[i]);
+					else
+						_lastIds.push(_ids[i]);
+				}
 				episode.loadCharacterSprites(function() {
 					_setMapVariables();
 					// const _splash = document.getElementById('splash');
@@ -2222,7 +2242,11 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 					}
 					if(_after)
 						_after();
-				}, _opponents.map(x => x.id));
+					requestIdleCallback(() => {
+						episode.loadCharacterSprites(function() {
+						}, _lastIds);
+					});
+				}, _firstIds);
 			});
 		//else
 		//	_setMapVariables();
@@ -2376,7 +2400,8 @@ function playOpeningMusic(_path, _volume) {
 		_openingSound.autoPlay = false;
 	else
 		_openingSound.preload = 'auto';
-	_openingSound.volume = _volume ?? .5;
+	_openingSound.oldVolume = _volume ?? .5;
+	_openingSound.volume = _openingSound.oldVolume * __volume;
 	_openingSound.loop = true;
 	_openingSound.currentTime = 0;
 	_openingSound.src = _path ?? "./images/sounds/wind-menu.mp3"; // "./images/sounds/opening3.mp3";
@@ -2414,6 +2439,7 @@ function activateGameStart(_quickPlay, _force) {
 	}
 	PlaySound({key:'enter', volume:.5});
 	addClass(document.querySelector('.opening-controls-icon'), 'd-none');
+	addClass(document.querySelector('.volume-panel'), 'd-none');
 	addClass(document.querySelector('.opening-lang-icon'), 'd-none');
 	addClass(document.getElementById('game-difficulty-down'), 'disabled');
 	addClass(document.getElementById('game-difficulty-up'), 'disabled');
@@ -2479,6 +2505,7 @@ function resetOpeningScreen() {
 	detachModule();
 	episode?.dispose?.();
 	gameopening = false;
+	gameIsReady = false;
 	setTip();
 	installOpeningScreen(null, 1);
 	episode = __story = mainCharacter = null;
@@ -2714,9 +2741,10 @@ async function shareGeneratedImage(base64, _fromMenu) {
     try {
 
         if (__isPC) {
-			_cdvElectronIpc.copyImage(base64);
-			warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/film.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Photo copied to clipboard') + '!</span></div>', null, null, 1, null, null, _fromMenu ? document.getElementById('shareOverlay') : null);
-
+			if(window._cdvElectronIpc) {
+				window._cdvElectronIpc.copyImage(base64);
+				warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/film.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Photo copied to clipboard') + '!</span></div>', null, null, 1, null, null, _fromMenu ? document.getElementById('shareOverlay') : null);
+			}
         } else {
 
             const _base64 = base64.replace(
@@ -3497,6 +3525,26 @@ function installOpeningScreen(_instant, _lateOpening) {
 					</div>
 				</div>
 				<div class="flex" id="assets-progress"></div>
+				<div class="volume-panel">
+					<div class="volume-title">
+						<img src="./images/icons/volume.png" />
+					</div>
+					<div class="volume-bars" id="bars">
+						<div onexactclick="setGameVolume(this)" class="bar active" data-level="1"></div>
+						<div onexactclick="setGameVolume(this)" class="bar active" data-level="2"></div>
+						<div onexactclick="setGameVolume(this)" class="bar active" data-level="3"></div>
+						<div onexactclick="setGameVolume(this)" class="bar active" data-level="4"></div>
+						<div onexactclick="setGameVolume(this)" class="bar active" data-level="5"></div>
+						<div onexactclick="setGameVolume(this)" class="bar" data-level="6"></div>
+						<div onexactclick="setGameVolume(this)" class="bar" data-level="7"></div>
+						<div onexactclick="setGameVolume(this)" class="bar" data-level="8"></div>
+						<div onexactclick="setGameVolume(this)" class="bar" data-level="9"></div>
+						<div onexactclick="setGameVolume(this)" class="bar" data-level="10"></div>
+					</div>
+					<div class="volume-text">
+						${getLangData('Level')} <span class="level" id="volumeValue">${__volume * 10}</span>/10
+					</div>
+				</div>
 			</div>`;
 	if(!_opening) {
 		setTimeout(() => {
@@ -3542,10 +3590,12 @@ function installOpeningScreen(_instant, _lateOpening) {
 					_opening.style.opacity = 1;
 					_bg.style.background = '#000';
 					document.getElementById('play-os').click();
+					gameIsReady = true;
 				}, 1000);
 			else {
 				_opening.style.opacity = 1;
 				document.getElementById('play-os').click();
+				gameIsReady = true;
 			}
 		}
 		if(!_instant)
@@ -3586,7 +3636,22 @@ setTimeout(function() {
 			askExitApp();
 	}, false);
 }, 2000);
-
+function setGameVolume(elm) {
+	playClick();
+	const bars = document.querySelectorAll(".volume-panel .bar");
+	const volumeValue = document.getElementById("volumeValue");
+	const level = Number(elm.dataset.level);
+	bars.forEach((b,index)=>{
+		if(index < level)
+			b.classList.add("active");
+		else
+			b.classList.remove("active");
+	});
+	volumeValue.textContent = level;
+	__volume = level / 10;
+	if(_openingSound)
+		_openingSound.volume = _openingSound.oldVolume *__volume;
+}
 function dustParticles() {
 	const c = document.getElementById("particles");
     const ctx = c.getContext("2d");

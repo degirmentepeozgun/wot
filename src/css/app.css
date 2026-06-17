@@ -434,7 +434,6 @@ body {
 }
 .inventory-tab,
 .quest-tab {
-	cursor:pointer;
 	font-size:3vh !important;
 	position: relative;
 }
@@ -665,8 +664,7 @@ canvas:not(.parallax canvas), .canvas, .parallax {
 	box-shadow: 0 0 1vh #000;
 	will-change: transform;
 	transform: translateZ(0);
-	-webkit-transform: translateZ(0);
-	cursor: pointer;
+	-webkit-transform: translateZ(0)
 }
 #game-ui .placed-skill:not(.v-none) {
 	z-index: 2
@@ -727,7 +725,6 @@ canvas:not(.parallax canvas), .canvas, .parallax {
 	z-index: 2;
 	border-radius: 99px;
 	box-shadow: 0 0 1vh #000;
-	cursor: pointer;
 	border: .2vh solid #f7f7f7ab
 }
 #game-ui:has(.skill-charge.passive-charge) .skill-charge:not(.passive-charge) {
@@ -963,12 +960,10 @@ svg#use-progress.use-in-progress circle {
 
 .glow {
 	opacity: 1 !important;
-	cursor: pointer;
 	animation: glow .6s infinite alternate
 }
 .glow-dark {
 	opacity: 1 !important;
-	cursor: pointer;
 	animation: glowdark .6s infinite alternate
 }
 .glow-quest-item {
@@ -984,7 +979,6 @@ svg#use-progress.use-in-progress circle {
 }
 .glow-1000 {
 	opacity: 1 !important;
-	cursor: pointer;
 	animation: glow 1s infinite alternate
 }
 
@@ -1006,7 +1000,6 @@ svg#use-progress.use-in-progress circle {
 #mini-menu .mini-menu-icon {
 	height: 100%;
 	margin:0 .25%;
-	cursor: pointer;
 	aspect-ratio: 1/1 !important;
 	filter:drop-shadow(0 0 .35vh #000);
 	-webkit-filter:drop-shadow(0 0 .35vh #000)
@@ -1343,7 +1336,8 @@ svg#use-progress.use-in-progress circle {
 	right:1%;
 	width:20.2vw !important;
 	transform:scale(-1, 1) !important;
-	-webkit-transform:scale(-1, 1) !important
+	-webkit-transform:scale(-1, 1) !important;
+    flex-wrap:nowrap !important;
 }
 #chat-board {
 	position: absolute;
@@ -1378,7 +1372,6 @@ svg#use-progress.use-in-progress circle {
 	color: #f7f7f780 !important;
 	font-size: 3vh !important;
 	font-family: Arial, Helvetica, sans-serif !important;
-	cursor: pointer;
 	font-weight: 600
 }
 #chat-board .cb-top-nav #cb-expand::before{
@@ -1413,8 +1406,7 @@ svg#use-progress.use-in-progress circle {
 	border-radius: 50%;
 	filter: drop-shadow(0 0 1vh #000);
 	-webkit-filter: drop-shadow(0 0 1vh #000);
-	border: .6vh solid #ffffff80;
-	cursor: pointer
+	border: .6vh solid #ffffff80
 }
 
 #game-ui .healthbar {
@@ -1471,8 +1463,7 @@ svg#use-progress.use-in-progress circle {
 	z-index: 1;
 	opacity: .5;
 	width: 16vh;
-	height: 16vh;
-	cursor: pointer
+	height: 16vh
 }
 
 	#game-ui .arrow img {
@@ -1650,7 +1641,6 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	border-top-right-radius: 1.2vh;
 	border-bottom-right-radius: 1.2vh;
 	line-height: 0vw;
-	cursor: pointer;
 	position: absolute;
 	top: -2px;
 	right: -3vw;
@@ -1716,8 +1706,7 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	height: 7.2vh;
 	border-radius: 100% !important;
 	overflow: hidden;
-	box-shadow: 0 0 .8vh #00000099;
-	cursor: pointer
+	box-shadow: 0 0 .8vh #00000099
 }
 
 .ui-btn {
@@ -1728,7 +1717,6 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	background: #262626 !important;
 	color: #f8f8f8 !important;
 	opacity: .85;
-	cursor: pointer;
 	box-shadow: .8vh .8vh 1.5vh #000
 }
 
@@ -1937,7 +1925,6 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 .tab {
 	opacity: .35;
 	background: #171717;
-	cursor: pointer;
 	box-shadow: inset 1vh .4vh .8vh #00000080
 }
 
@@ -2067,10 +2054,6 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 		filter: drop-shadow(0 0 4vh #FFD700);
 		-webkit-filter: drop-shadow(0 0 4vh #FFD700)
 	}
-
-.quest-item-left.level-up img {
-	cursor: pointer
-}
 
 .my-toast.power-down * {
 	color: #fc0204 !important;
@@ -2523,8 +2506,7 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	border-radius: 1.5vh;
 	border-radius: 1.5vh;
 	box-shadow: 0 0 1.5vh #000;
-	border: .2vh solid silver;
-	cursor: pointer
+	border: .2vh solid silver
 }
 
 .pet-item {
@@ -2564,8 +2546,7 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	height: 11.6vh;
 	width: 11.6vh;
 	margin: 1vh;
-	position: relative;
-	cursor: pointer
+	position: relative
 }
 
 .pet-food-count {
@@ -2628,8 +2609,7 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	max-width: 16vh;
 	max-height: 16vh;
 	filter: drop-shadow(0 0 .4vh #fff);
-	-webkit-filter: drop-shadow(0 0 .4vh #fff);
-	cursor: pointer
+	-webkit-filter: drop-shadow(0 0 .4vh #fff)
 }
 
 .episode-play-btn, .pet-activate-btn {
@@ -3550,7 +3530,6 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	}
 
 .my-pop-up-close {
-	cursor: pointer;
 	font-size: xx-large !important
 }
 
@@ -3652,7 +3631,6 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 		border-top-left-radius: 1.2vh;
 		border-bottom-left-radius: 1.2vh;
 		opacity: .65;
-		cursor: pointer;
 		transition: opacity .3s;
 		-webkit-transition: opacity .3s
 	}
@@ -3741,8 +3719,7 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	border:.5vh solid #262626;
 	border-radius: 10%;
 	aspect-ratio: 1/1;
-	height: 6vh;
-	cursor: pointer;
+	height: 6vh
 }
 .my-check.selected div {
 	background: #954535;
@@ -3755,8 +3732,7 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	border:.5vh solid #262626;
 	border-radius: 100%;
 	aspect-ratio: 1/1;
-	height: 6vh;
-	cursor: pointer;
+	height: 6vh
 }
 .my-radio.selected div {
 	background: #954535;
@@ -3829,7 +3805,6 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	background-size: 100% 100% !important;
 	background-repeat: no-repeat !important;
 	height: 5vh;
-	cursor: pointer
 }
 .game-btn2 {
 	aspect-ratio: 360/66;
@@ -3837,7 +3812,6 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	background-size: 100% 100% !important;
 	background-repeat: no-repeat !important;
 	height: 5vh;
-	cursor: pointer;
 	pointer-events: auto !important
 }
 .game-btn2.disabled {
@@ -3946,7 +3920,6 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	margin: .5vh 0 1vh 0;
 	position: relative;
 	color:#9d987f !important;
-	cursor: pointer;
 	border-radius: .2vh;
 }
 	.skill-card .skill-icon-wrapper {
@@ -4029,7 +4002,6 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	height: 12vh;
 	background: linear-gradient(60deg, #9d987f80, #00000040, #00000040, #9d987f30) !important;
 	color:#9d987f !important;
-	cursor: pointer;
 	border-radius: .2vh;
 	width: calc(100% - 2vh);
 	margin: 1vh !important;
@@ -4078,8 +4050,7 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 }
 .chat-right-tab {
 	height:100%;
-	padding:10px 15px 0 15px;
-	cursor: pointer;
+	padding:10px 15px 0 15px
 }
 .chat-right-tab.selected {
 	background:#262626
@@ -4356,19 +4327,16 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 #menu-ui .game-menu-button:active,
 .shining-item .game-menu-button:active {
 	background:linear-gradient(90deg, #f3f4f520, #f3f4f530, #f3f4f540, #f3f4f540, #f3f4f530, #f3f4f520) !important;
-	color:#F4BB44 !important;
-	cursor: pointer;
+	color:#F4BB44 !important
 }
 #menu-ui .inventory-question .inventory-modal .game-menu-button:active,
 #menu-ui .item-info-container .game-menu-button:active {
-	background: #f3f4f530 !important;
-	cursor: pointer;
+	background: #f3f4f530 !important
 }
 #menu-ui .inventory-action-btns .game-menu-button:active {
 	background: #00000050 !important;
 	box-shadow: inset 0 0 1px #000 !important;
-	opacity: .75;
-	cursor: pointer;
+	opacity: .75
 }
 
 .d-s {
@@ -4423,8 +4391,7 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	top:0;
 	font-size: 4.5vh !important;
 	right:0;
-	padding:5.25% 7%;
-	cursor: pointer;
+	padding:5.25% 7%
 }
 .inventory-question.show-info .show-info-title {
 	color:#F4BB44 !important
@@ -4564,7 +4531,6 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
     right: 0;
     color: #F4BB4499 !important;
     font-size: 5vh !important;
-	cursor: pointer;
     padding: 3.5vh 4vh
 }
 .spin-me {
@@ -5361,7 +5327,6 @@ body:has(#quest-dialog:not(.d-none)) #skill10 {
 	font-size:5vh!important;
 	line-height:3.5vh !important;
 	color:#f3f4f580 !important;
-	cursor: pointer;
 	transition: all .3s ease;
 	-webkit-transition: all .3s ease
 }
@@ -6200,7 +6165,6 @@ video::-webkit-media-controls-start-playback-button {
 }
 .pvp-opponent-item {
 	position: relative;
-	cursor: pointer;
 	overflow: hidden;
 	height: 10vh;
 	width: 100%;
@@ -7258,7 +7222,6 @@ body:not(.pc-mission) .tag-sf.bgless {
 }
 
 .story-gift .card-front {
-    cursor: pointer;
 	max-width: 80%;
 	margin: 0 auto;
 	width:auto;
@@ -7432,7 +7395,6 @@ body:not(.pc-mission) .tag-sf.bgless {
 .fragment-swap-question .fragment-list-item {
 	width:14.25%;
 	aspect-ratio: 1 / 1;
-	cursor:pointer;
 	overflow: hidden;
 }
 .fragment-swap-question .taken-fragment-count {
@@ -7504,8 +7466,7 @@ body:not(.pc-mission) .tag-sf.bgless {
 }
 .main-menu-btn img {
 	max-width: 100%;
-	max-height: 100%;
-	cursor: pointer;
+	max-height: 100%
 }
 .menu-modal-right {
 	z-index:10;
@@ -7614,7 +7575,6 @@ body:not(.pc-mission) .tag-sf.bgless {
 	border-radius: .4vh !important;
 	box-shadow: -.6vh .6vh 1vh #000;
 	border:.2vh solid var(--ui-light) !important;
-	cursor:pointer;
 	line-height:4.6vh!important;
 	font-size:3vh!important
 }
@@ -7898,8 +7858,7 @@ body:not(.pc-mission) .tag-sf.bgless {
 }
 .menu-left .menu-sub-button {
 	z-index: 1499;
-	position: absolute;
-	cursor: pointer;
+	position: absolute
 }
 .menu-left .menu-sub-button.active {
 	opacity: 1;
@@ -7936,8 +7895,7 @@ body:not(.pc-mission) .tag-sf.bgless {
 }
 .menu-right .menu-sub-button {
 	z-index: 1499;
-	position: absolute;
-	cursor: pointer;
+	position: absolute
 }
 .menu-right .menu-sub-button.active {
 	opacity: 1;
@@ -8062,8 +8020,7 @@ body:not(.pc-mission) .tag-sf.bgless {
     max-height: fit-content !important;
     z-index: 9;
     filter: grayscale(.9);
-    -webkit-filter: grayscale(.9);
-	cursor: pointer;
+    -webkit-filter: grayscale(.9)
 }
 .top-menu-close:active {
 	filter: grayscale(.5);
@@ -8328,7 +8285,7 @@ box-shadow:
 	position:absolute;margin:auto;filter:drop-shadow(0px 0px 1vh #000)
 }
 #spinner-btn {
-	color:#f7f7f7cc!important;font-size:4vh !important;font-weight:600;width:20%;height:20%;position: absolute;top:40%;left:41%;border-radius: 100%;box-shadow: 0px 0px 1vh #000;background:radial-gradient(black, #2C3539, #00000080, #7e3c19aa, #2C3539, #2C3539);cursor:pointer
+	color:#f7f7f7cc!important;font-size:4vh !important;font-weight:600;width:20%;height:20%;position: absolute;top:40%;left:41%;border-radius: 100%;box-shadow: 0px 0px 1vh #000;background:radial-gradient(black, #2C3539, #00000080, #7e3c19aa, #2C3539, #2C3539);
 }
 .menu-sub-button img {
 	max-height: 100%;
@@ -8519,8 +8476,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 .menu-top-item span {
 	color:#f3f4f5ab !important;
 	font-size: 3vh !important;
-	margin-left:1.5vh !important;
-	cursor: pointer;
+	margin-left:1.5vh !important
 }
 .menu-top-item img {
 	margin-right:.5vh !important
@@ -9304,10 +9260,6 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 		transform: translate(.2vh, -.4vh) rotate(-2deg) !important
 	}
 }
-#game-ui[data-mapid="war"] .enemy-profile,
-#game-ui[data-mapid="war"] #top-nav {
-	width:42% !important
-}
 .red {
 	color:#ff6c00 !important
 }
@@ -9367,8 +9319,8 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 
 .enemy-profile .war-player-card,
 #top-nav .war-player-card {
-	width: 32% !important;
-	margin-right:1.33% !important;
+    flex: 0 0 32%;
+	width: auto !important;
 	position:relative;
 	height:9vh !important;
 	margin-bottom:1vh;
@@ -9386,6 +9338,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	width: 3.5vh;
 	margin-bottom:1.5vh;
 	aspect-ratio: 1 / 1;
+	display: block;
 	filter:drop-shadow(-.3vh .3vh .4vh #000)
 }
 .enemy-profile .war-player-card .war-player-card-right,
@@ -9679,7 +9632,6 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	font-size: 4vh !important;
 	color:#f3f4f5ab !important;
 	font-weight: 600;
-	cursor: pointer;
 	transition: color .3s ease;
 	-webkit-transition: color .3s ease;
 }
@@ -9766,7 +9718,6 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
     border-radius: 2vh;
     border:.2vh solid #ffffff30;
     padding: 2vh;
-    cursor: pointer;
     margin-top:2vh
 }
 .story-card:first-child {
@@ -9805,7 +9756,6 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
     border-radius: .2vh;
     background:#00000099;
     border:1px solid #ffffff20;
-    cursor:pointer;
     opacity: .9;
 }
 .lobby-navbar-left {
@@ -9871,7 +9821,6 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 }
 .story-detail-close img {
     height: 5vh;
-    cursor: pointer;
     opacity: .8;
 }
 .story-detail-close img:active {
@@ -9939,8 +9888,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
     color: #f3f4f5cc !important
 }
 .menu-icon-wrapper {
-    height:100%;
-    cursor: pointer;
+    height:100%
 }
 .menu-icon-wrapper img {
     opacity: .85;
@@ -9993,8 +9941,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	height:19%;
 	margin:.5%;
 	background:#ffffff40;
-	overflow:hidden;
-    cursor: pointer;
+	overflow:hidden
 }
 .menu-left-opener-item:active {
 	background:#ffffff50;
@@ -10017,7 +9964,6 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 }
 .glow-jump {
 	opacity: 1 !important;
-	cursor: pointer;
 	position: relative;
 	will-change: transform, filter !important;
 	animation: glow-jump 2s infinite linear
@@ -10050,7 +9996,6 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	background-size: 100% 100% !important;
 	background-repeat: no-repeat !important;
 	height: 60%;
-	cursor: pointer;
 	pointer-events: auto !important;
 	color:#F4BB44cc !important
 }
@@ -10116,37 +10061,50 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	position: relative;
 }
 .quick-play-desc-item1 {
-	background-image: url(./../images/ui/full-border-vert.png), url(./../images/quicktips/1.png) !important;
 	background-size: 100% auto !important;
 	background-repeat: no-repeat !important;
 }
 .quick-play-desc-item2 {
-	background-image: url(./../images/ui/full-border-vert.png), url(./../images/quicktips/2.png) !important;
 	background-size: 100% auto !important;
 	background-repeat: no-repeat !important;
 }
 .quick-play-desc-item3 {
-	background-image: url(./../images/ui/full-border-vert.png), url(./../images/quicktips/3.png) !important;
 	background-size: 100% auto !important;
 	background-repeat: no-repeat !important;
 }
 .quick-play-desc-item4 {
-	background-image: url(./../images/ui/full-border-vert.png), url(./../images/quicktips/4.png) !important;
 	background-size: 100% auto !important;
 	background-repeat: no-repeat !important;
 }
 .quick-play-desc-item5 {
-	background-image: url(./../images/ui/full-border-vert.png), url(./../images/quicktips/5.png) !important;
-	background-size: 100% auto !important;
-	background-repeat: no-repeat !important;
-}
-.quick-play-desc-item6 {
-	background-image: url(./../images/ui/full-border-vert.png), url(./../images/quicktips/6.png) !important;
 	background-size: 100% auto !important;
 	background-repeat: no-repeat !important;
 }
 .quick-play-desc-item7 {
-	background-image: url(./../images/ui/full-border-vert.png), url(./../images/quicktips/7.png) !important;
+	background-size: 100% auto !important;
+	background-repeat: no-repeat !important;
+}
+.quick-play-desc-item1-pc {
+	background-size: 100% auto !important;
+	background-repeat: no-repeat !important;
+}
+.quick-play-desc-item2-pc {
+	background-size: 100% auto !important;
+	background-repeat: no-repeat !important;
+}
+.quick-play-desc-item3-pc {
+	background-size: 100% auto !important;
+	background-repeat: no-repeat !important;
+}
+.quick-play-desc-item4-pc {
+	background-size: 100% auto !important;
+	background-repeat: no-repeat !important;
+}
+.quick-play-desc-item5-pc {
+	background-size: 100% auto !important;
+	background-repeat: no-repeat !important;
+}
+.quick-play-desc-item7-pc {
 	background-size: 100% auto !important;
 	background-repeat: no-repeat !important;
 }
@@ -10513,6 +10471,9 @@ body:not(.pc-mission) #game-ui .game-status-screen {
 	font-size:2.6vh !important;
 	line-height: 2.6vh !important;
 	color: #f5e6c8 !important;
+}
+#game-ui .game-status-screen .status-item-action-container .item-title-container{
+	height:50% !important;
 }
 #game-ui .game-status-screen .status-item-action-container .item-title-wrapper{
 	height:50% !important;
@@ -11562,7 +11523,6 @@ pointer-events: "auto";
 	right: 3.5%;
 	width:14%;
 	color: #f3f4f5ba !important;
-	cursor: pointer;
 	font-size: 3.2vh !important;
 	line-height: 4vh !important;
 	background: url(./../images/ui/toast1.png);
@@ -11679,7 +11639,7 @@ body.pc-mission .move-to-place::after{
 
 	color:#f3e7c1 !important;
 
-	font-size:clamp(1.4rem, 4vh, 2.8rem) !important;
+	font-size:4vh !important;
 
 	line-height:1.8 !important;
 
@@ -11807,7 +11767,6 @@ body.pc-mission .move-to-place::after{
     align-items:center;
     justify-content:center;
 
-    cursor:pointer;
     user-select:none;
     touch-action:manipulation;
 }
@@ -12389,6 +12348,7 @@ body:not(.pc-mission) .chest-open-gift {
 	position: absolute !important;
 	top: 84% !important;
 	left:50%;
+	color:rgba(247, 247, 247, 0.8) !important;
 	transform:translateX(-50%);
 }
 .chest-open-reward-text{
@@ -13436,7 +13396,75 @@ body.pc-mission #mini-menu {
 	text-align: center;
 }
 
-@media (max-width: 999px) {
+.volume-panel{
+    /* background:
+        linear-gradient(to bottom,#241c16,#17120e);
+    border:2px solid #5f4a2f;
+    box-shadow:
+        inset 0 0 20px rgba(255,220,150,.05),
+        0 0 30px rgba(0,0,0,.8);
+    padding:20px;
+    width:360px; */
+	position:absolute;
+	right:2vh;
+	bottom:1vh;
+	z-index:9999999
+}
+.volume-panel .volume-title {
+	width:100%;
+	text-align:center
+}
+.volume-panel .volume-title img{
+    height: 5.6vh
+}
+
+.volume-panel .volume-bars{
+    display:flex;
+    justify-content:center;
+    gap:.5vh;
+}
+
+.volume-panel .bar{
+    width:3vh;
+    height:2vh;
+    background:
+        linear-gradient(to bottom,#2f2821,#1a1511);
+
+    border:1px solid #564229;
+
+    transition:.15s;
+}
+
+.volume-panel .bar:hover{
+    transform:translateY(-2px);
+}
+
+.volume-panel .bar.active{
+    background:
+        linear-gradient(to bottom,#d8bb80,#8a6330);
+
+    border-color:#e7cf9f;
+
+    box-shadow:
+        0 0 1vh rgba(255,190,90,.4);
+}
+
+.volume-panel .volume-text{
+    margin-top:1.5vh;
+    text-align:center;
+    color:#d8d0be;
+    font-size:2.8vh !important;
+    letter-spacing:1px;
+}
+
+.volume-panel .level{
+    color:#f3d495;
+    font-size:3vh !important;
+}
+@media
+    (hover: none),
+    (pointer: coarse),
+    (max-width: 1024px) {
     /* Telefonlar */
 	#assets-progress {
 		font-size:4.5vh!important
@@ -13444,25 +13472,44 @@ body.pc-mission #mini-menu {
 	#game-ui .game-status-screen {
 		transform: scale(1.35) !important;
 		-webkit-transform: scale(1.35) !important;
-		transform-origin: bottom center !important;
+		transform-origin: bottom center !important
 	}
 	#focus-ui .overlay-black-text *{
 		font-size: 4.5vh !important;
 		line-height: 5vh !important;
-		font-weight: 400 !important;
+		font-weight: 400 !important
 	}
 	.chest-open-scene #chest-open-ok-button{
 		font-size: 4vh !important;
 		height: 6vh !important;
-		top: 85% !important;
+		top: 85% !important
 	}
 	#focus-ui .black-screen-ok-btn {
-		top: 85% !important;
-	
-	}#focus-ui .black-screen-ok-btn * {
+		top: 85% !important
+	}
+	#focus-ui .black-screen-ok-btn * {
 		font-size: 4.5vh !important;
 		line-height: 5vh !important;
 		transform: scale(1.5) !important;
-		-webkit-transform: scale(1.5) !important;
+		-webkit-transform: scale(1.5) !important
 	}
+	#story-finish .side-right {
+		transform: scale(1.3) !important;
+		-webkit-transform: scale(1.3) !important;
+		margin-top: 7%
+	}
+	#story-finish .stage-achievement-item-right-top {
+		font-size: 3vh !important
+	}
+	#game-ui .game-status-screen .status-item-action-container:not(.talk-avatar-text){
+		flex-direction:column-reverse !important
+	}
+}
+body.pc-mission  #game-ui .intro-screen {
+	z-index: 9 !important
+}
+#game-ui.war-map .enemy-profile,
+#game-ui.war-map #top-nav {
+	width:42% !important;
+    flex-wrap:nowrap !important;
 }

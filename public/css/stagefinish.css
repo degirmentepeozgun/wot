@@ -228,3 +228,23 @@ body.mobile-device #story-finish.finish {
 	0 0 1px #FFB300,
 	0 0 2px rgba(255,180,0,0.7);
 }
+@media (max-width: 999px) {
+	 #story-finish .side-right {
+		transform: scale(1.2) !important;
+		-webkit-transform: scale(1.2) !important;
+		margin-top: 7%
+	 }
+	 #story-finish .stage-achievement-item-right-top {
+		font-size: 3.4vh !important;
+	 }
+	 #story-finish .stage-achievement-item-right-bottom {
+		font-size: 3.6vh !important;
+	 }
+	 #story-finish .stage-achievement-item-left img {
+		height: 5vh !important;
+	}
+	#story-finish.finish {
+		max-height:100% !important;
+		min-height:100% !important;
+	}
+}
