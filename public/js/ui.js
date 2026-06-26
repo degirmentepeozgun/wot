@@ -512,19 +512,19 @@ function loadWindowEvents() {
 					}
 					organizeModules();
 					episodeVisibilityHidden = false;
-					if(episode && episode.bgMusic)
-						episode.playBgMusic();
-					if(episode && episode.bgSound && !_gameUI.sound)
-						episode.resumeAmbianceMusic();
-					if(__weather?.sound)
-						__weather.sound.play();
-					if(episode?.hasGoSound)
-						PlaySound({key:'go', force: true, loop:true, volume:.5});
+					if(!_openingSound) {
+						if(episode && episode.bgMusic)
+							episode.playBgMusic();
+						if(episode && episode.bgSound && !_gameUI.sound)
+							episode.resumeAmbianceMusic();
+						if(__weather?.sound)
+							__weather.sound.play();
+						if(episode?.hasGoSound)
+							PlaySound({key:'go', force: true, loop:true, volume:.5});
+					}
         			SoundManager.resume();
 					resumeQuestTimer();
-
 					window.SoundManager.warmAudio();
-						
 					if(__account?.gameOpening && _openingSound?.paused)
 						_openingSound.play();
 				}
@@ -581,14 +581,16 @@ function loadWindowEvents() {
 							episode.mobPhaseTick += _diff;
 				}
 				episodeVisibilityHidden = false;
-				if(episode && episode.bgMusic)
-					episode.playBgMusic();
-				if(episode && episode.bgSound && !_gameUI.sound)
-					episode.resumeAmbianceMusic();
-				if(__weather?.sound)
-					__weather.sound.play();
-				if(episode?.hasGoSound)
-					PlaySound({key:'go', force: true, loop:true, volume:.5});
+				if(!_openingSound) {
+					if(episode && episode.bgMusic)
+						episode.playBgMusic();
+					if(episode && episode.bgSound && !_gameUI.sound)
+						episode.resumeAmbianceMusic();
+					if(__weather?.sound)
+						__weather.sound.play();
+					if(episode?.hasGoSound)
+						PlaySound({key:'go', force: true, loop:true, volume:.5});
+				}
 				if (window.plugins && window.plugins.insomnia)
 					window.plugins.insomnia.keepAwake();
         		SoundManager.resume();
@@ -723,22 +725,8 @@ function warn(_html, _class, _ms, _new, _buttons, _important, _container) {
 function shine(_ms, _elem) {
 	addUpgradeEffect();
 	return true;
-	const _name = 'shine' + (_ms ? '-' + _ms.toString() : '');
-	const _shine = _elem ? _elem.querySelector('#shine') : document.getElementById('shine');
-	if (_shine && !_shine.shining) {
-		_shine.shining = true;
-		addClass(_shine, _name);
-		PlaySound({ key: 'upgrade', volume: .5, reset: true, force: true });
-		_shine.onanimationend = function(event) {
-			if(event.animationName === 'shine') {
-				_shine.shining = false;
-				removeClass(_shine, _name);
-			}
-		};
-		return true;
-	}
-	return false;
 }
+
 function hasActiveActions() {
 	for (let i = 0; i < actionButtons.length; i++) {
 		const el = actionButtons[i];
@@ -776,12 +764,14 @@ function resetSkills(_ultimate, _keepCD, _char, _k, _endOfRage, _force) {
 			if(_endOfRage && _skill.key === 'tag')
 				continue;
 			if ((!_keepCD && !_k && !_skill.chain && !_skill.maxCharge) || _force) {
-				if (_skill.coolDownLeft != undefined)
-					_skill.coolDownLeft = _force ? 1 : undefined;
-				if (_skill.coolDownStart2 != undefined) {
-					_skill.coolDownStart2 = undefined;
-					if(_skill.maxCharge)
-						_skill.charge = _skill.maxCharge;
+				if(_key !== 'tag'){
+					if (_skill.coolDownLeft != undefined)
+						_skill.coolDownLeft = _force ? 1 : undefined;
+					if (_skill.coolDownStart2 != undefined) {
+						_skill.coolDownStart2 = undefined;
+						if(_skill.maxCharge)
+							_skill.charge = _skill.maxCharge;
+					}
 				}
 			}
 			if (!(_c.ultimate || _ultimate) && _skill.skillOrder && !_k)
@@ -799,7 +789,7 @@ function resetSkills(_ultimate, _keepCD, _char, _k, _endOfRage, _force) {
 						addClass(_elem, 'bgless');
 					}
 					else {
-						if (_counter)
+						if (_counter && _key !== 'tag')
 							_counter.remove();
 						if ((_skill.coolDownLeft > 0) && _keepCD)
 							_c.startCooldown(_skill, 1);
@@ -2095,8 +2085,18 @@ function applyAppliedRulesPreserveInlineFast(sourceEl, targetEl, options = {}) {
   return { matchedRules, appliedProps, skippedPropsBecauseInline, candidates: rulesToCheck.length };
 }
 
-
+let activeUpgradeEffect = null;
 function addUpgradeEffect() {
+
+  if (activeUpgradeEffect) {
+    clearTimeout(activeUpgradeEffect.timer1);
+    clearTimeout(activeUpgradeEffect.timer2);
+
+    activeUpgradeEffect.overlay?.remove();
+    activeUpgradeEffect.ghostWrap?.remove();
+
+    activeUpgradeEffect = null;
+  }
 
   const _area   = document.querySelector('.shine-area');
   if(!_area) return;
@@ -2216,11 +2216,32 @@ requestAnimationFrame(() => {
   }, 400);
 
   /* CLEAN */
-  setTimeout(() => {
-    overlay.remove();
-    ghostWrap.remove();
-  	removeClass(_item,'shining-item');
-  }, 1000);
+	const timer1 = setTimeout(() => {
+		ghost.style.transform = "scale(1)";
+		glow.style.opacity = "0";
+		ghostWrap.style.opacity = "0";
+		overlay.style.opacity = "0";
+	}, 400);
+
+
+	const timer2 = setTimeout(() => {
+		overlay.remove();
+		ghostWrap.remove();
+		removeClass(_item,'shining-item');
+
+		if(activeUpgradeEffect?.ghostWrap === ghostWrap){
+			activeUpgradeEffect = null;
+		}
+
+	}, 1000);
+
+
+	activeUpgradeEffect = {
+		overlay,
+		ghostWrap,
+		timer1,
+		timer2
+	};
 
 }
 function organizeScreenResize() {

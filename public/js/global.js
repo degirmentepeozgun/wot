@@ -30504,12 +30504,6 @@ const spells = {
 							type: 'fire'
 						}
 					},
-				]
-			},
-			dead: {
-				key: "dead",
-				type: 'skill',
-				frames: [
 					{
 						spriteLeft: 2622,
 						spriteTop: 1446,
@@ -30517,7 +30511,18 @@ const spells = {
 						spriteHeight: 126,
 						spriteOrigin: 120,
 						bottomGap: -95,
-						speed: 6
+						extraStepXRate: 1,
+						speed: 6,
+						atk: {
+							yRange: 10,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'fire'
+						}
 					},
 					{
 						spriteLeft: 2887,
@@ -30526,7 +30531,18 @@ const spells = {
 						spriteHeight: 126,
 						spriteOrigin: 113,
 						bottomGap: -95,
-						speed: 6
+						extraStepXRate: .75,
+						speed: 6,
+						atk: {
+							yRange: 10,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'fire'
+						}
 					},
 					{
 						spriteLeft: 3171,
@@ -30534,8 +30550,19 @@ const spells = {
 						spriteWidth: 112,
 						spriteHeight: 126,
 						spriteOrigin: 98,
+						extraStepXRate: .5,
 						bottomGap: -95,
-						speed: 6
+						speed: 6,
+						atk: {
+							yRange: 10,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'fire'
+						}
 					},
 					{
 						spriteLeft: 3483,
@@ -30544,7 +30571,18 @@ const spells = {
 						spriteHeight: 126,
 						spriteOrigin: 28,
 						bottomGap: -95,
-						speed: 6
+						extraStepXRate: .25,
+						speed: 6,
+						atk: {
+							yRange: 10,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'fire'
+						}
 					},
 					{
 						spriteLeft: 3733,
@@ -30555,6 +30593,12 @@ const spells = {
 						bottomGap: -95,
 						speed: 6
 					},
+				]
+			},
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
 					{
 						spriteLeft: 0,
 						spriteTop: 0,

@@ -601,7 +601,10 @@ function tryOpenGame() {
   			if (/^F\d+$/.test(event.key))
 				return;
 			delete __account.gameOpening;
-			activateGameStart(1,1);
+			if(_presentationMode)
+				activateGameStart();
+			else
+				activateGameStart(1,1);
 			return true;
 		}
 	}

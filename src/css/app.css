@@ -1575,13 +1575,13 @@ body {
 @media (max-aspect-ratio: 16/9) {
 	#wrapper {
 		width: 100vw;
-		height: calc(100vw * (9/16))
+		height: round(up, calc(100vw * (9 / 16)), 1px)
 	}
 }
 
 @media (min-aspect-ratio: 16/9) {
 	#wrapper {
-		width: calc(100vh * (16/9));
+		width: round(up, calc(100vh * (16 / 9)), 1px);
 		height: 100vh
 	}
 }
@@ -10114,7 +10114,6 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	padding:0 2vh;
 	color:#f3f4f5cc !important;
 	font-size: 3.8vh !important;
-	padding: 2vh;
 	height:9%
 }
 .quick-play-desc-bottom, .quick-play-desc-top {
@@ -10144,7 +10143,8 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	width: 24vh
 }
 .quick-play-desc-bottom {
-	bottom:-1vh
+	bottom:-1vh;
+	min-height:8vh
 }
 
 .quick-play-desc-top {
@@ -10696,13 +10696,17 @@ body.pc-mission #game-ui.disable-ui #pc-bottom-ui {
 body.pc-mission #game-ui.disable-ui .skill,
 body.pc-mission #game-ui.disable-ui .skill.bgless,
 body.pc-mission #game-ui .bgless,
+body.pc-mission #game-ui.disable-ui .skill *,
 body.pc-mission #game-ui .disabled-skill,
 body.pc-mission #game-ui.disable-ui .skill.disabled-skill,
-body.pc-mission #game-ui.disable-ui .skill * {
+body.mobile-device #game-ui.disable-ui .skill *,
+body.mobile-device #game-ui .disabled-skill,
+body.mobile-device #game-ui.disable-ui .skill.disabled-skill
+ {
 	display: flex !important;
 	pointer-events: none !important;
-	-webkit-filter: grayscale(100%);
-	filter: grayscale(100%);
+	-webkit-filter: grayscale(100%) !important;
+	filter: grayscale(100%) !important;
 }
 body.pc-mission #game-ui .skill.bgless,
 body.pc-mission #game-ui .bgless * {
@@ -10719,6 +10723,22 @@ body.pc-mission-without-skillui .skill:not(.action.talk-btn),
 body.pc-mission-without-skillui .skill-charge,
 body.pc-mission-without-skillui .skill:not(.action.talk-btn) * {
 	display: none !important;
+}
+.cb-square {
+	width:2.8vh;
+	height:2.8vh;
+	margin:0 2vh;
+	border: .35vh solid #f3f4f599;
+	position:relative
+}
+.cb-square.checked::after {
+	content:'';
+	position:absolute;
+	top:.35vh;
+	left:.35vh;
+	width:1.4vh;
+	height:1.4vh;
+	background-color:#f3f4f599
 }
 /* @keyframes zd-light-right {
   0%   { transform: scale(1) translate(0,0); }
@@ -13500,9 +13520,6 @@ body.pc-mission #mini-menu {
 	}
 	#story-finish .stage-achievement-item-right-top {
 		font-size: 3vh !important
-	}
-	#game-ui .game-status-screen .status-item-action-container:not(.talk-avatar-text){
-		flex-direction:column-reverse !important
 	}
 }
 body.pc-mission  #game-ui .intro-screen {

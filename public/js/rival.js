@@ -54886,6 +54886,7 @@ const _allEnemies = {
 					attack: true,
 					cooldown: 5000,
 					priority: 2,
+					skipHealthBar: true,
 					frames: [
 						{
 							spriteLeft: 104,
@@ -55304,6 +55305,7 @@ const _allEnemies = {
 					type: 'skill',
 					attack: true,
 					cooldown: 5000,
+					skipHealthBar: true,
 					priority: 2,
 					frames: [
 						{

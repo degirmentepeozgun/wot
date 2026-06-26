@@ -449,6 +449,7 @@ const __langData = [
 	{ key: 'Progress', tr: 'Durum' },
 	{ key: 'RESET', tr: 'SIFIRLA' },
 	{ key: 'Rage', tr: 'Öfke' },
+	{ key: 'Presentation', tr: 'Tanıtım' },
 	{ key: 'Controls', tr: 'Kontroller' },
 	{ key: 'Photo copied to clipboard', tr: 'Fotoğraf panoya kopyalandı' },
 	{ key: 'Reset to default settings', tr: 'Varsayılan ayarlara geri dön' },

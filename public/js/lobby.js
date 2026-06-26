@@ -55,9 +55,22 @@ function openSideMenu() {
 	document.querySelector('#game-ui').appendChild(_div.firstChild); 
 	document.addEventListener("click", outsideClick, true);
 }
+
 function createMenu() {
-	 if (document.querySelector('.lobby-navbar'))
+	if (document.querySelector('.lobby-navbar'))
         return;
+	if(_presentationMode === 1) {
+		_presentationMode = 2;
+		__fragments.forEach(x =>
+		updateFragment(x.key, 1500));
+		updateGem('fire', 1, 5);
+		updateGem('ice', 1, 5);
+		updateGem('shadow', 1, 5);
+		updateGem('lightning', 1, 5);
+		updateGem('toxic', 1, 5);
+		__account.gold = 0;
+		updateGold(1000000);
+	}
 	const _upperDiv = document.createElement('div');
 	_upperDiv.className = 'flex flex-jc-end show-ui lobby-navbar fade-in';
 	const _div = document.createElement('div');

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿'use strict';
+﻿﻿﻿'use strict';
 const __attackTolerance = 2;
 
 function enemy(_e) {
@@ -3262,7 +3262,7 @@ function enemy(_e) {
 						this.animate(this.getNextSkill(_anima.next));
 						this.frame = 0;
 						_anima = this.getCurrentAnimation();
-						_frame = this.getCurrentFrame();
+						//_frame = this.getCurrentFrame();
 						_hasNextSkill = 1;
 					}
 					if (this.attacker) {
@@ -3300,6 +3300,7 @@ function enemy(_e) {
 						 && this.autoMode > 0 && this.animation && this.animations[this.animation]?.attack)
 						this.animation = 'idle';
 				}
+				_frame = this.getCurrentFrame();
 			}
 		}
 		if (_removeEnemy && !episode.pvp) {
@@ -6629,6 +6630,7 @@ function enemy(_e) {
 											_e.knockDead = 1;
 										}
 									}
+									_e.skinColor = _e.hurtColor = '#FFFFFF';
 								}
 								if(_canStop && _e.animation.startsWith('hurt')) {
 									if(_e.hitStop)
@@ -6881,6 +6883,17 @@ function enemy(_e) {
 				else if (_enemy.animations['counter'] && _enemy.newBlocked > 0 && _enemy.newBlocked <= counterAttackTolerance) {
 					_enemy.newBlocked = _enemy.blocked = false;
 					_enemy.animate('counter');
+					const _kbDir = _enemy.getKeyboardXMove();
+					if(!_kbDir || _kbDir !== _enemy.direction) {
+						const counterOrigin = _enemy.HURTLEFT + _enemy._HURTBOX_half;
+						const enemyOrigin = this.HURTLEFT + this._HURTBOX_half;
+						if(counterOrigin > enemyOrigin && _enemy.direction !== __left) {
+							_enemy.setDirection(__left);
+						}
+						else if(counterOrigin < enemyOrigin && _enemy.direction !== __right) {
+							_enemy.setDirection(__right);
+						}
+					}
 					if(_enemy.alp) {
 						const _pcctv = _enemy.getTalentValue('passive-counter-cooldown');
 						if(_pcctv) {
@@ -9987,6 +10000,8 @@ function enemy(_e) {
 			i++;
 			if(_aks.finishingMove && _aks.maxRange && (this.maxFinishingMoveRange ?? 30) < _aks.maxRange)
 				this.maxFinishingMoveRange = _aks.maxRange;
+			if(_aks.frames && !_aks.frames.find(x => !x.def?.iframe))
+				_aks.skipHealthBar = true;
 			const _addSuperArmor = (this.alp) && _aks.attack;
 			if(_ak === 'release')
 			{

@@ -3014,7 +3014,7 @@ function openCredits(_fromMenu) {
 		<img crossorigin="anonymous" id="credits-tank-gif"  src="./images/gifs/tank.gif" />
 		<img crossorigin="anonymous" id="credits-wizard-gif" src="./images/gifs/wizard.gif" />
 		<img crossorigin="anonymous" id="credits-zzz-gif" src="./images/gifs/zzz.gif" />
-		<div class="share-moment-stats-panel${_fromMenu ? '' : ''}">
+		<div class="share-moment-stats-panel${_fromMenu ? ' d-none' : ''}">
 			<div class="share-moment-level-block">
 				<div class="share-moment-label d-none">
 					${getLangData('World Ranking')}
@@ -3513,7 +3513,7 @@ function installOpeningScreen(_instant, _lateOpening) {
 				</div>
 				<div class="flex d-none">
 					<div id="qp-btn" class="framed-btn flex" onexactclick="activateGameStart(1)">${getLangData('QUICK PLAY')}</div>
-					<div id="connect-btn" class="d-none framed-btn flex" onexactclick="activateGameStart()">${getLangData('DEMO PLAY')}</div>
+					<div id="connect-btn" class="framed-btn flex" onexactclick="activateGameStart()">${getLangData('DEMO PLAY')}</div>
 				</div>
 				<div class="press-any-key-wrapper d-none">
 					<div id="pak-btn" class="press-any-key-text" onexactclick="activateGameStart(1,1)">

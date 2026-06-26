@@ -1,8 +1,8 @@
 ﻿'use strict';
 function dataOperations(_quickPlay) {
-	this.quickPlay = _quickPlay;
+	this.quickPlay = _presentationMode ? undefined : _quickPlay;
 	this.mails = [];
-	this.storageKey = 'com-bi-frame-wot-wrath-of-erlik'; //(__deviceId ?? 411191);// + '-' + (_dataId ?? '08');
+	this.storageKey = 'com-bi-frame-wot-wrath-of-erlik' + (_presentationMode ? '' : '-demo'); //(__deviceId ?? 411191);// + '-' + (_dataId ?? '08');
 	this.localData = {
 		warrior: {
 			hp: undefined,
@@ -260,8 +260,8 @@ function dataOperations(_quickPlay) {
 		});
 		this.saveMailState();
 	}
-	this.loadMails = function() {
-		let _json = JSON.parse(localStorage.getItem(this.storageKey + '-mails') ?? '[]');
+	this.loadMails = function(_reset) {
+		let _json = _reset ? [] : JSON.parse(localStorage.getItem(this.storageKey + '-mails') ?? '[]');
 		if(_json.length === 0)
 		{
 			_json = [
@@ -300,9 +300,11 @@ function dataOperations(_quickPlay) {
 		this.mails = _json;
 	}
 	this.loadState = function (_reset) {
+		if(!_reset && _presentationMode)
+			_reset = true;
 		let _r = this.quickPlay ?? _reset;
 		let _json = JSON.parse(localStorage.getItem(this.storageKey) ?? '{}');
-		if(_json?.version !== this.getDefaultData().version){
+		if(_presentationMode || _json?.version !== this.getDefaultData().version){
 			localStorage.removeItem(this.storageKey);
 			_json = {};
 			_r = 1;
@@ -317,7 +319,9 @@ function dataOperations(_quickPlay) {
 		}
 		if(_kb && !__account.keyboard)
 			__account.keyboard = _kb;
-		this.loadMails();
+		this.loadMails(_presentationMode);
+		if(_presentationMode)
+			__account.lastLobbyUsage = new Date();
 	}
 	this.loadItems = function(hasMainCharacter) {
 		applyCharacterStats(hasMainCharacter);

@@ -43,7 +43,7 @@ function getLobbyScene() {
 						sceneOrder: __storySceneOrder
 					}
 					_client.saveState();
-					if(__account.tutorials?.indexOf('invento-item-equipt') >= 0)
+					if(_presentationMode || __account.tutorials?.indexOf('invento-item-equipt') >= 0)
 						return;
 					if(!__account.tutorials)
 						__account.tutorials = [];
@@ -96,6 +96,7 @@ function getLobbyScene() {
 				//});
 			},
 			afterInit: function() {
+				mainCharacter.positionable = true;
 				mainCharacter.yPosition = MathRound(getGroundHeight() * 1.3);
 			},
 			save: true,
@@ -108,7 +109,7 @@ function getLobbyScene() {
 					do: function(_e) {
 						episode.msNow = 1;
 						_e.direction = 'right';
-						_e.noDirection = true;
+						_e.noDirection = _e.positionable = true;
 						_e.swapAnimation('idle');
 					},
 					yPosition: function() {
@@ -124,7 +125,7 @@ function getLobbyScene() {
 						_e.npc = true;
 						_e.reversed = true;
 						_e.direction = 'left';
-						_e.noDirection = true;
+						_e.noDirection = _e.positionable = true;
 					},
 					yPosition: function() {
 						return MathRound(groundheight * 1.85);
@@ -135,6 +136,9 @@ function getLobbyScene() {
 					minX: 1380,
 					maxX: 1380,
 					count: 1,
+					do: function(_e) {
+						_e.positionable = true;
+					},
 					yPosition: function() {
 						return MathRound(groundheight * 1.6);
 					}
@@ -145,6 +149,9 @@ function getLobbyScene() {
 					maxX: 1600,
 					count: 1,
 					zoom: .8,
+					do: function(_e) {
+						_e.positionable = true;
+					},
 					yPosition: function() {
 						return MathRound(groundheight * 1.65);
 					}
@@ -155,6 +162,9 @@ function getLobbyScene() {
 					maxX: 1250,
 					count: 1,
 					zoom: .85,
+					do: function(_e) {
+						_e.positionable = true;
+					},
 					yPosition: function() {
 						return MathRound(groundheight * 1.2);
 					}
@@ -6977,7 +6987,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		//startScene: 2,
+		//startScene: 1,
 		scenes: [
 			{
 				when: function() {
@@ -7211,6 +7221,7 @@ const __stories = [
 								delete mainCharacter.disableKeyboard;
 								mainCharacter.still = mainCharacter.immobilize = false;
 								//mainCharacter.enableSkills();
+								mainCharacter.animations.dash.frames.forEach(x => x.extraStepXRate *= .66);
 								mainCharacter.animate('dash', 1);
 								episode.boss.disableSkill('attack');
 								episode.boss.enableSkill('ground1');
@@ -7806,7 +7817,7 @@ const __stories = [
 					setCharacterLevel(1, null, 1);
 					mainCharacter.animations.tag.disabled = true;
 					resetSkills(null, 1, mainCharacter);
-					//setCharacterLevel(8, null, 1);
+					//setCharacterLevel(12, null, 1);
 					addClass(_gameUI, 'demo-playing');
 					episode.pauseBgMusic(1);
 					episode.createBgMusic(null, null, null, 'training');
@@ -7828,32 +7839,43 @@ const __stories = [
 						mainCharacter.tagContainer.remove();
 						delete mainCharacter.tagContainer;
 					}
-					const _desc = document.createElement('div');
-					_desc.className = 'flex show-ui full quick-play-desc-container';
-					let _html = '';
-					for(let i = 0; i < 6; i++) {
-						const _tip = __quickTips[i];
-						let _skillHtml = '';
-						for(let _sk of _tip.skills) {
-							if(_skillHtml !== '')
-								_skillHtml += '<img src="./images/icons/swap-right.png" class="quick-play-desc-skill-swap" />';
-							_skillHtml += '<div class="quick-play-desc-skill-icon" style="background-image:url(./images/main/skill-icons/warrior/' + _sk + '.png);background-size:cover"></div>';
+					const _qps = localStorage.getItem('quickplayskip');
+					let _json = [];
+					if(_qps) {
+						try {
+							_json = JSON.parse(_qps);
 						}
-						_skillHtml = `<div class="quick-play-desc-skill-icons flex">` + _skillHtml + '</div>';
-						_html += `<div class="quick-play-desc-item" style="background:url(./images/ui/full-border-vert.png) !important;background-size: 100% auto !important;background-repeat: no-repeat !important;overflow:hidden;position:relative">
-								<img src="./images/${!isPhone() ? '_' : ''}quicktips/${_tip.id}.png" style="width:100%;z-index:-1;top:0;left:0;position:absolute;inset:0" />`
-							+ _skillHtml +
-					 		`<div class="quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
-					   </div>`;
+						catch(_e) {}
 					}
-					_desc.innerHTML = _html +
-					   `<div onexactclick="takeQuest(0, 1, null, null, 1);skipQuickPlayTutorial()" class="quick-play-desc-skip flex glow">&lt;&nbsp;${getLangData('UNDERSTOOD')}&nbsp;&gt;</div>`;
-					addClass(_gameUI, 'disable-ui');
-					requestAnimationFrame(() => {
-						_game.suspended = true;
-					});
-					_gameUI.appendChild(_desc);
-					episode.hasSkippableScreen = 1;
+					const _skipped = _json.indexOf(1) !== -1;
+					if(_skipped) {
+						const _desc = document.createElement('div');
+						_desc.className = 'flex show-ui full quick-play-desc-container';
+						let _html = '';
+						for(let i = 0; i < 6; i++) {
+							const _tip = __quickTips[i];
+							let _skillHtml = '';
+							for(let _sk of _tip.skills) {
+								if(_skillHtml !== '')
+									_skillHtml += '<img src="./images/icons/swap-right.png" class="quick-play-desc-skill-swap" />';
+								_skillHtml += '<div class="quick-play-desc-skill-icon" style="background-image:url(./images/main/skill-icons/warrior/' + _sk + '.png);background-size:cover"></div>';
+							}
+							_skillHtml = `<div class="quick-play-desc-skill-icons flex">` + _skillHtml + '</div>';
+							_html += `<div class="quick-play-desc-item" style="background:url(./images/ui/full-border-vert.png) !important;background-size: 100% auto !important;background-repeat: no-repeat !important;overflow:visible;position:relative">
+									<div class="flex" style="overflow:hidden;z-index:-1;top:0;left:0;position:absolute;inset:0"><img class="w-100" src="./images/${!isPhone() ? '_' : ''}quicktips/${_tip.id}.png" /></div>`
+								+ _skillHtml +
+								`<div class="quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
+						</div>`;
+						}
+						_desc.innerHTML = _html +
+						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2vh" class="w-50 h-100 flex flex-jc-start" onclick="doNotShowAgain(this,event)"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2vh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(0, 1, null, null, 1);skipQuickPlayTutorial(1)">&lt;&nbsp;${getLangData('UNDERSTOOD')}&nbsp;&gt;</div></div>`;
+						_gameUI.appendChild(_desc);
+						episode.hasSkippableScreen = 1;
+						addClass(_gameUI, 'disable-ui');
+						requestAnimationFrame(() => {
+							_game.suspended = true;
+						});
+					}
 					document.querySelectorAll('.top-ui-item').forEach(x => 
 						removeClass(x, 'd-none'));
 					platformX = episode.cWidth;
@@ -8173,28 +8195,30 @@ const __stories = [
 								_portal.important = 1;
 								_portal.animations.after.frames.forEach(x => {
 									x.do = function(_e) {
+										_e.animations.after.frames.forEach(y => delete y.do);
 										x.zoom = 1.1;
 										x.health = 0;
+										x.class = 'portal';
 										x.bottomGap += MathRound(x.spriteHeight / 20);
 										PlaySound({key:'portalclose', volume:.3 });
 										if(_e.toucher) {
-											_e.toucher.yPosition = _e.yPosition - MathRound(groundheight * .05);
-											_e.toucher.stopRage();
-											_e.toucher.swapAnimation('idle');
-											_e.toucher.standBy();
-											_e.toucher.updateVariables();
+											const _et = _e.toucher;
+											_et.yPosition = _e.yPosition - MathRound(groundheight * .05);
+											_et.stopRage();
+											_et.swapAnimation('idle');
+											_et.standBy();
+											_et.updateVariables();
 											requestAnimationFrame(() => {
-												const _oldLeft = _e.toucher.left;
-												_e.toucher.left = _e.left - MathRound((_e.toucher.WIDTH - _e.WIDTH) / 2) - platformX;
-												if(_e.toucher.left < _oldLeft && _e.toucher.direction === __right)
-													_e.toucher.direction = __left;
-												else if(_e.toucher.left > _oldLeft && _e.toucher.direction === __left)
-													_e.toucher.direction = __right;
-												_portal.animations.after.frames.forEach(y => delete y.do);
-												if(_e.toucher.relatedObjects)
-													_e.toucher.relatedObjects.length = 0;
-												_e.toucher.drawPriority = .1;
-												_e.toucher.addObject(
+												const _oldLeft = _et.left;
+												_et.left = _e.left - MathRound((_et.WIDTH - _e.WIDTH) / 2) - platformX;
+												if(_et.left < _oldLeft && _et.direction === __right)
+													_et.direction = __left;
+												else if(_et.left > _oldLeft && _et.direction === __left)
+													_et.direction = __right;
+												if(_et.relatedObjects)
+													_et.relatedObjects.length = 0;
+												_et.drawPriority = .1;
+												_et.addObject(
 												{ 
 													key: 'zoom2x', 
 													position: 'css', 
@@ -8442,23 +8466,34 @@ const __stories = [
 					episode.phase = episode.boss.grade;
 
 					removeClass(_gameUI, 'disable-ui');
-					const _desc = document.createElement('div');
-					_desc.className = 'flex show-ui full quick-play-desc-container';
-					let _html = '';
-					for(let i = 6; i < 12; i++) {
-						const _tip = __quickTips[i];
-						_html += `<div style="background-image:url(./images/ui/full-border-vert.png), url(./images/${__isPC ? '_' : ''}quicktips/${_tip.id}.png) !important;background-size: 100% auto !important;background-repeat: no-repeat !important" class="quick-play-desc-item quick-play-desc-item${_tip.id}">
-									<div class="quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
-								</div>`;
+					const _qps = localStorage.getItem('quickplayskip');
+					let _json = [];
+					if(_qps) {
+						try {
+							_json = JSON.parse(_qps);
+						}
+						catch(_e) {}
 					}
-					_desc.innerHTML = _html +
-					   `<div onexactclick="takeQuest(1, 1, null, null, 1);skipQuickPlayTutorial()" class="quick-play-desc-skip flex glow">&lt;&nbsp;${getLangData('UNDERSTOOD')}&nbsp;&gt;</div>`;
-					addClass(_gameUI, 'disable-ui');
-					requestAnimationFrame(() => {
-						_game.suspended = true;
-					});
-					_gameUI.appendChild(_desc);
-					episode.hasSkippableScreen = 1;
+					const _skipped = _json.indexOf(2) !== -1;
+					if(_skipped) {
+						const _desc = document.createElement('div');
+						_desc.className = 'flex show-ui full quick-play-desc-container';
+						let _html = '';
+						for(let i = 6; i < 12; i++) {
+							const _tip = __quickTips[i];
+							_html += `<div style="background-image:url(./images/ui/full-border-vert.png), url(./images/${__isPC ? '_' : ''}quicktips/${_tip.id}.png) !important;background-size: 100% auto !important;background-repeat: no-repeat !important" class="quick-play-desc-item quick-play-desc-item${_tip.id}">
+										<div class="quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
+									</div>`;
+						}
+						_desc.innerHTML = _html +
+						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2vh" class="w-50 h-100 flex flex-jc-start" onclick="doNotShowAgain(this,event)"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2vh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(1, 1, null, null, 1);skipQuickPlayTutorial(2)">&lt;&nbsp;${getLangData('UNDERSTOOD')}&nbsp;&gt;</div></div>`;
+						addClass(_gameUI, 'disable-ui');
+						requestAnimationFrame(() => {
+							_game.suspended = true;
+						});
+						_gameUI.appendChild(_desc);
+						episode.hasSkippableScreen = 1;
+					}
 					mainCharacter.disableSkill('tag');
 					mainCharacter.maxHP = mainCharacter.MAXHP = mainCharacter.health = mainCharacter.level * 120;
 					mainCharacter.setHealth(mainCharacter.health);
@@ -8473,6 +8508,10 @@ const __stories = [
 							return episode.lockedChestLooted;
 						},
 						do: function() {
+							if(mainCharacter.rageCount > 0 || mainCharacter.ultimate) {
+								mainCharacter.rageCount = 0;
+								mainCharacter.updateRageSkillUI();
+							}
 							episode.lockedChestLooted = false;
 							let _div = document.querySelector('.game-status-screen');
 							if(_div)
@@ -8596,7 +8635,7 @@ const __stories = [
 
 								const frag = document.createDocumentFragment();
 								const _subDiv = document.createElement('div');
-								_subDiv.innerHTML = `<div data-status-item-id="${_item.id}" class="flex status-item-container w-50 flex flex-ai-start">
+								_subDiv.innerHTML = `<div data-status-item-id="${_item.id}" class="flex status-item-container w-50 flex flex-ai-start"${__isPC ? '' : ' ontouchstart="wearStatusItem(' + _item.id + ', ' + _powerDiff + ')"'}>
 									<div class="status-item-icon-container">`
 										+ _icon +
 									`</div>
@@ -8610,7 +8649,7 @@ const __stories = [
 											</div>
 										</div>
 										<div class="item-action-wrapper flex flex-jc-start w-100">
-											<div class="game-menu-button animate-me flex" onexactclick="wearStatusItem(${_item.id}, ${_powerDiff})">
+											<div class="game-menu-button animate-me flex"${!__isPC ? '' : ' onexactclick="wearStatusItem(' + _item.id + ', ' + _powerDiff + ')"'}>
 												<div class="flex">${getLangData('WEAR')}<span class="flex${__isPC ? '' : ' d-none'}">(${getNewKeyboardKey('U').baseKey})</span></div>
 											</div>
 										</div>
@@ -8625,25 +8664,32 @@ const __stories = [
 					},
 					{
 						when: function() {
-							return episode.phase > 1 && (episode.boss?.gradeLeft + 1) < episode.phase && episode.phase < 100;
+							return episode.phase > 1 && 
+							(episode.boss?.gradeLeft + 1) < episode.phase && 
+							episode.phase < 100;
 						},
 						do: function() {
 							if(episode.boss) {
-								delete episode.boss.looted;
-								episode.loot = {
-									enemy: episode.boss,
-									loots: [
-										{zoom: 1.2, type:'item',key:episode.itemDropOrder[episode.boss.grade - episode.phase], grade:2},
-										{type:'gold'},
-										{type:'gold'},
-										{type:'gold'},
-										{type:'gold'},
-										{type:'gold'},
-										{type:'gold'},
-										{type:'gold'},
-										{type:'gold'},
-										{type:'gold'}
-									]
+								if(!episode.bossLootedCount)
+									episode.bossLootedCount = 0;
+								episode.bossLootedCount++;
+								if(episode.bossLootedCount <= 10) {
+									delete episode.boss.looted;
+									episode.loot = {
+										enemy: episode.boss,
+										loots: [
+											{zoom: 1.2, type:'item',key:episode.itemDropOrder[episode.boss.grade - episode.phase], grade:2},
+											{type:'gold'},
+											{type:'gold'},
+											{type:'gold'},
+											{type:'gold'},
+											{type:'gold'},
+											{type:'gold'},
+											{type:'gold'},
+											{type:'gold'},
+											{type:'gold'}
+										]
+									}
 								}
 								episode.phase--;
 							}
@@ -8930,28 +8976,30 @@ const __stories = [
 								_portal.important = 1;
 								_portal.animations.after.frames.forEach(x => {
 									x.do = function(_e) {
+										_e.animations.after.frames.forEach(y => delete y.do);
 										x.zoom = 1.1;
 										x.health = 0;
+										x.class = 'portal';
 										x.bottomGap += MathRound(x.spriteHeight / 20);
 										PlaySound({key:'portalclose', volume:.3 });
 										if(_e.toucher) {
-											_e.toucher.yPosition = _e.yPosition - MathRound(groundheight * .05);
-											_e.toucher.stopRage();
-											_e.toucher.swapAnimation('idle');
-											_e.toucher.standBy();
-											_e.toucher.updateVariables();
+											const _et = _e.toucher;
+											_et.yPosition = _e.yPosition - MathRound(groundheight * .05);
+											_et.stopRage();
+											_et.swapAnimation('idle');
+											_et.standBy();
+											_et.updateVariables();
 											requestAnimationFrame(() => {
-												const _oldLeft = _e.toucher.left;
-												_e.toucher.left = _e.left - MathRound((_e.toucher.WIDTH - _e.WIDTH) / 2) - platformX;
-												if(_e.toucher.left < _oldLeft && _e.toucher.direction === __right)
-													_e.toucher.direction = __left;
-												else if(_e.toucher.left > _oldLeft && _e.toucher.direction === __left)
-													_e.toucher.direction = __right;
-												_portal.animations.after.frames.forEach(y => delete y.do);
-												if(_e.toucher.relatedObjects)
-													_e.toucher.relatedObjects.length = 0;
-												_e.toucher.drawPriority = .1;
-												_e.toucher.addObject(
+												const _oldLeft = _et.left;
+												_et.left = _e.left - MathRound((_et.WIDTH - _e.WIDTH) / 2) - platformX;
+												if(_et.left < _oldLeft && _et.direction === __right)
+													_et.direction = __left;
+												else if(_et.left > _oldLeft && _et.direction === __left)
+													_et.direction = __right;
+												if(_et.relatedObjects)
+													_et.relatedObjects.length = 0;
+												_et.drawPriority = .1;
+												_et.addObject(
 												{ 
 													key: 'zoom2x', 
 													position: 'css', 
@@ -9382,6 +9430,7 @@ const __stories = [
 						grade: 12,
 						hp:1650,
 						zoom: .33,
+						experience: 0,
 						do: function(_e) {
 							const _z = _e.getZoom();
 							const _h = _z * _e.height;
@@ -9511,13 +9560,12 @@ const __stories = [
 							const _ci = commonSkills.find(x => x.key === _item.key);
 							const _title = _ci.title[getLang()];
 							const _icon = `<span class="item-in-slot full grade3-item" 
-								style="display:inline-block;position:relative" 
-								onexactclick="mainCharacter.useCommonSkill(1)">
+								style="display:inline-block;position:relative">
 								<img style="background:#010101" class="item-img" src="./images/common/icons/${_ci.key}.png"/></span>`;
     
 							const frag = document.createDocumentFragment();
 							const _subDiv = document.createElement('div');
-							_subDiv.innerHTML = `<div data-status-item-id="${_item.id ?? _item.key}" class="flex status-item-container w-50 flex flex-ai-start">
+							_subDiv.innerHTML = `<div${!__isPC ? ' ontouchstart="mainCharacter.useCommonSkill(1)"' : ''} data-status-item-id="${_item.id ?? _item.key}" class="flex status-item-container w-50 flex flex-ai-start">
 								<div class="status-item-icon-container">`
 									+ _icon +
 								`</div>
@@ -9531,7 +9579,7 @@ const __stories = [
 										</div>
 									</div>
 									<div class="item-action-wrapper flex flex-jc-start w-100">
-										<div class="game-menu-button animate-me flex" onexactclick="mainCharacter.useCommonSkill(1)">
+										<div class="game-menu-button animate-me flex"${__isPC ? ' onexactclick="mainCharacter.useCommonSkill(1)"' : ''}>
 											<div class="flex">${getLangData('USE')}<span class="flex${__isPC ? '' : ' d-none'}">(${getNewKeyboardKey('1').baseKey})</span></div>
 										</div>
 									</div>
@@ -10061,6 +10109,16 @@ const __stories = [
 	// 	]
 	// }
 ];
+function doNotShowAgain(elem, event) {
+	event.preventDefault();
+	event.stopPropagation();
+	const _cb = elem.querySelector('.cb-square');
+	playClick();
+	if(hasClass(_cb, 'checked'))
+		removeClass(_cb, 'checked');
+	else
+		addClass(_cb, 'checked');
+}
 function closeChestOpeningScreen() {
 	const _scr = document.querySelector('.chest-open-scene-wrapper');
 	if(!_scr || hasClass(_scr, 'fade-out'))
@@ -10812,10 +10870,25 @@ function portTo(_id) {
 			switchMap(_id);
 	}
 }
-function skipQuickPlayTutorial() {
+function skipQuickPlayTutorial(_order) {
 	delete episode.hasSkippableScreen;
 	const _cont = document.querySelector('.quick-play-desc-container');
 	if(_cont) {
+		const _dns = _cont.querySelector('.cb-square.checked');
+		if(_dns) {
+			const _qps = localStorage.getItem('quickplayskip');
+			let _json;
+			if(_qps) {
+				try {
+					_json = JSON.parse(_qps);
+				}
+				catch(_e) {}
+			}
+			if(!_json)
+				_json = [];
+			_json.push(_order);
+			localStorage.setItem('quickplayskip', JSON.stringify(_json));
+		}
 		playClick();
 		_cont.remove();
 		requestAnimationFrame(() => {
