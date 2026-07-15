@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CryptoOrganizer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6ac07438f077847f053e2648193291220ebaa6fb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1b2a8662fc60b19706d810e59112a10c23dd2209")]
 [assembly: System.Reflection.AssemblyProductAttribute("CryptoOrganizer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CryptoOrganizer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

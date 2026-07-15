@@ -1202,6 +1202,19 @@ function updateLevelUI(_c) {
 			_lvl.innerText = _c.level;
 	}
 }
+
+function calculateExperienceByLevel(_level) {
+	if(_level === 1)
+		return 0;
+	let _totalExp = 1000;
+	let _maxExp = 1000;
+	for(let i=2; i < _level; i++) {
+		_maxExp = MathRound(_maxExp * 1.2);
+		_totalExp += _maxExp;
+	}
+	return _totalExp;
+}
+
 function updateExperience(_value, _levelup, _char, _noWarn) {
 	if (!_mainExpBar && (!_char || _char.main))
 		_mainExpBar = document.getElementById('main-exp-bar');

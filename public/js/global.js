@@ -2937,7 +2937,7 @@ const relatedObjectImages = {
 		return getImage('./images/related/stun-animated.png')
 	},
 	shadow: function () {
-		return getImage('./images/related/shadow3.png')
+		return getImage('./images/related/shadow-dark.png')
 	},
 	ouch: function () {
 		return getImage('./images/related/ouch-animated.png')
@@ -3472,6 +3472,8 @@ const soundFiles = {
 	cavalierground1: './images/sounds/cavalier-ground1.mp3',
 	cavalierattack: './images/sounds/cavalier-attack.mp3',
 	tughurt: './images/sounds/tughurt.mp3',
+	tughurt1: './images/sounds/tughurt1.mp3',
+	tughurt2: './images/sounds/tughurt2.mp3',
 	tugarrow: './images/sounds/tugarrow.mp3',
 	fireball: './images/sounds/fireball.mp3',
 	impact: './images/sounds/impact.mp3',
@@ -9040,6 +9042,7 @@ const spells = {
 		src: './images/sprites/ep623/eplosion.png',
 		invulnerable: true,
 		pierce: true,
+		hasShadow: false,
 		class: __spell,
 		name: 'Suicide',
 		animations: {
@@ -17008,6 +17011,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: 3.1,
+							aoe: 100,
 							hurt: {
 								slam: true,
 								smashIfDead: true,
@@ -17062,6 +17066,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: 3.1,
+							aoe: 100,
 							hurt: {
 								slam: true,
 								knockback: 1,
@@ -17112,6 +17117,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: 3.1,
+							aoe: 100,
 							hurt: {
 								slam: true,
 								smashIfDead: true,
@@ -35075,6 +35081,30 @@ const cssAnimations = {
 		else {
 			addClass(_gamePad, 'shake-vert');
 			cssAnimationProps.shakevert = { start: _gameTick, p1: _c, p2: _ms, p3: _infinite};
+		}
+	},
+	shakevertbelow: function (_c, _ms, _infinite) {
+		if(cssAnimationProps.shakevertbelow) {
+			if((_gameTick - cssAnimationProps.shakevertbelow.start) > (_ms ?? 1000)) {
+				removeClass(_gamePad, 'shake-vert-below');
+				delete cssAnimationProps.shakevertbelow;
+			}
+		}
+		else {
+			addClass(_gamePad, 'shake-vert-below');
+			cssAnimationProps.shakevertbelow = { start: _gameTick, p1: _c, p2: _ms, p3: _infinite};
+		}
+	},
+	shakevertbelowtiny: function (_c, _ms, _infinite) {
+		if(cssAnimationProps.shakevertbelowtiny) {
+			if((_gameTick - cssAnimationProps.shakevertbelowtiny.start) > (_ms ?? 1000)) {
+				removeClass(_gamePad, 'shake-vert-below-tiny');
+				delete cssAnimationProps.shakevertbelowtiny;
+			}
+		}
+		else {
+			addClass(_gamePad, 'shake-vert-below-tiny');
+			cssAnimationProps.shakevertbelowtiny = { start: _gameTick, p1: _c, p2: _ms, p3: _infinite};
 		}
 	},
 	shakevertical: function (_c, _ms, _infinite) {

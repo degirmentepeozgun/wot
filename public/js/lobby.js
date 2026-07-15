@@ -60,6 +60,7 @@ function createMenu() {
 	if (document.querySelector('.lobby-navbar'))
         return;
 	if(_presentationMode === 1) {
+		__account.name = getLangData('Presentation');
 		_presentationMode = 2;
 		__fragments.forEach(x =>
 		updateFragment(x.key, 1500));
@@ -68,8 +69,12 @@ function createMenu() {
 		updateGem('shadow', 1, 5);
 		updateGem('lightning', 1, 5);
 		updateGem('toxic', 1, 5);
+		const _actIds = __stories.filter(x => x.listed !== false && !x.mission).map(x => x.id);
+		__account.storyResults = [];
+		_actIds.forEach(x => __account.storyResults.push({id:x, stars: [1,2,4], perfect:true}));
 		__account.gold = 0;
 		updateGold(1000000);
+		connectSocket();
 	}
 	const _upperDiv = document.createElement('div');
 	_upperDiv.className = 'flex flex-jc-end show-ui lobby-navbar fade-in';

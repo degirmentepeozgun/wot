@@ -37,7 +37,7 @@ function map(_m) {
 	c85 = document.getElementById('droad85');
 	c90 = document.getElementById('droad90');
 	c9 = document.getElementById('dobj-foreground');
-	this.FootShadow = getImage('./images/related/shadow3.png');
+	this.FootShadow = getImage('./images/related/shadow-dark.png');
 	this.HBMob = getImage('./images/icons/hbmob.png');
 	this.HBBoss = getImage('./images/icons/hbboss.png');
 	let _sb = document.getElementById('score-board');
@@ -1471,8 +1471,42 @@ function map(_m) {
 			this.lastStoryTicketTimerCheck = _gameTick;
 		}
 	}
+	this.tryMoveMainCamera = function() {
+		if(this.cameraMoveStep){
+			if(mainCharacter.left > centerMinX) {
+				prevPlatformX = undefined;
+				platformX += this.cameraMoveStep;
+				mainCharacter.left -= this.cameraMoveStep;
+				mainCharacter.platformX = platformX;
+				if(mainCharacter.left <= centerMinX){
+					mainCharacter.direction = __right;
+					delete this.cameraMoveStep;
+					mainCharacter.disableKeyboard = mainCharacter.immobilize = false;
+					if(this.cameraMoveEndFunc) {
+						this.cameraMoveEndFunc();
+						delete this.cameraMoveEndFunc;
+					}
+				}
+			}
+			else {
+				prevPlatformX = undefined;
+				platformX -= this.cameraMoveStep;
+				mainCharacter.left += this.cameraMoveStep;
+				mainCharacter.platformX = platformX;
+				if(mainCharacter.left >= centerMinX){
+					mainCharacter.direction = __left;
+					delete this.cameraMoveStep;
+					mainCharacter.disableKeyboard = mainCharacter.immobilize = false;
+					if(this.cameraMoveEndFunc) {
+						this.cameraMoveEndFunc();
+						delete this.cameraMoveEndFunc;
+					}
+				}
+			}
+		}
+	}
 	this.tinyMoveCamera = function() {
-		if(__storyCutScenePlaying || this.end || _dialogAppeared || _game.suspended)
+		if(__storyCutScenePlaying || this.end || _dialogAppeared || this.cameraMoveStep || _game.suspended)
 			return false;
 		if(this.skipTinyCameraMove) {
 			this.skipTinyCameraMove--;
@@ -2142,14 +2176,18 @@ function map(_m) {
 		if(this.bgMusic && !this.bgMusic.still) {
 			if(this.bgMusic.volumeDown)
 				delete this.bgMusic.volumeDown;
-			if(!(this.bgMusic.lastVolumeChangeTime > (_gameTick - 300)))
-				if((this.bgMusic.volume <= .5 && _new > 0 && _new <= .5) || _force)
+			if(!(this.bgMusic.lastVolumeChangeTime > (_gameTick - 300))){
+				let _musicVolume = .5 * __volume;
+				if(_musicVolume < .2)
+					_musicVolume = .2;
+				if((this.bgMusic.volume <= _musicVolume && _new > 0 && _new <= _musicVolume) || _force)
 					if(this.bgMusic.volume !== _new){
 						this.bgMusic.volume = _new;
 						this.bgMusic.lastVolumeChangeTime = _gameTick;
 						if(!_noRate)
 							this.setBgMusicPlayBackRate();
 					}
+			}
 		}
 	}
 	this.setBgMusicPlayBackRate = function() {
@@ -3630,7 +3668,7 @@ const DOWNWARD_BIAS_MIN = 18;
 const DOWNWARD_BIAS_RANGE = 6;
 
 const FAST_SPEED_MULT = 2.25;
-const FAST_SIZE_MULT = 1.25;
+const FAST_SIZE_MULT = 1.5;
 
 const AIR_RESISTANCE = 0.96;
 
@@ -4071,17 +4109,23 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 				const _rel = _item.char.shadow;
 				const _relZoom = _item.char.WIDTH / (_rel.width);
 				const _shadowHeight = _item.char.ZOOM * (_item.char.yGap < 5 ? 8 : _item.char.yGap) * 3;
-				if(!__batterySaveMode)
+				if(!__batterySaveMode && !(_item.char.SHADOWWIDTHRATE <= 0)){
+					let _shadowZoomRate = 1;
+					if(_item.char.SHADOWWIDTHRATE > 0)
+						_shadowZoomRate = _item.char.SHADOWWIDTHRATE;
+					const _shadowWidth = MathFloor(_rel.width * _relZoom);
+					const _shadowZoomedWidth = MathFloor(_shadowWidth * _shadowZoomRate);
 					offCtx.drawImage(this.FootShadow, _rel.left ?? 0, _rel.top ?? 0, _rel.width, _rel.height,
-						_item.char.LEFT,
+						_item.char.LEFT + MathRound((_shadowWidth - _shadowZoomedWidth) / 2),
 						MathRound(this.cHeight - _item.char.yPosition - (_item.char.yGap < 5 ? _shadowHeight / 2 : ((_shadowHeight * 3) / 4))),
-						MathFloor(_rel.width * _relZoom), MathFloor(_shadowHeight));
+						_shadowZoomedWidth, MathFloor(_shadowHeight));
+				}
 			}
 		}
 		let i = 0;
 		offCtx.reversed = c10.reversed = offGoreCtx.reversed = false;// = _cNPC.cleared = false;
 		//let _zoomRate, _zoomedWidth, _zoomedHeight, _zoomedLeft, _zoomedTop, 
-		let _hurt, _hurted, _rotate, _wDiff, _hDiff, _hurtedCount = 0, _bounceCount = 0;
+		let _hurt, _hurted, _rotate, rotateX, rotateY, _wDiff, _hDiff, _hurtedCount = 0, _bounceCount = 0;
 		let _preDraws = [], _backgrounds = [], _relateds = [], _afterCanvasAnimations = [], _out;
 		for (var _item of _queue) {
 			if (_item.unseen || _item.char.remove || _item.char.unseen)
@@ -4187,11 +4231,17 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 								_shadowItemOrder += 50;
 							}
 						}
-						_rotate = _item.char.animations ? _anim?.rotate : null;
+						_rotate = _item.char.rotateAngle ? (_item.char.rotateAngle * Math.PI / 180) :
+						 	(_item.char.animations ? _anim?.rotate : null);
 						if(_rotate) {
-							offCtx.translate(MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff - (_item.width / 2)) : (_item.left + _wDiff + (_item.width / 2))), 
-							MathRound(_item.top + _hDiff + (_item.height / 2)));  
-							offCtx.rotate(_rotate);  
+							offCtx.save();
+							rotateX = (offCtx.reversed ? -1 : 1) * (_item.char.HURTLEFT + _item.char._HURTBOX_half);
+							rotateY = _item.char.TOP + _item.char.HURTHEIGHT * (_item.char.rotateVerticalRate ?? 0.72);
+							offCtx.translate(rotateX ,rotateY);  
+							offCtx.rotate(-_rotate * (_item.char.rotateDir === _item.char.direction ? -1 : 1));  
+						}
+						else {
+							rotateX = rotateY = 0;
 						}
 						// _zoomRate = this.getPerspectiveRate(_item.char, null, _item.animation);
 						// _zoomedWidth = MathRound(_item.width * _zoomRate);
@@ -4201,16 +4251,20 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 						//_colorized = false;
 						let _drawParticles = 1;
 						let _w, _x, _h, _y, _coordsSet;
-						if((_hurted && _anim.hurt && _item.char.frame < 2 && (_hurtedCount < 4 || _item.char.main)) || _item.skinColor) {
+						_y = MathRound(_item.top + _hDiff) - rotateY;
+						_w = MathRound(_item.width * (_item.zoom ?? 1));
+						_h = MathRound(_item.height * (_item.zoom ?? 1));
+						if((_hurted && _anim.hurt && _item.char.hurtingStart < 3 && (_hurtedCount < 4 || _item.char.main)) || _item.skinColor) {
 							//if(!_item.char.colorized) {
 								//_item.char.colorized = _colorized = true;
+								 _item.char.hurtingStart++;
 								const _hurtSprite = this.colorizeSprite4(_item, null, _item.skinColor ? 1 : null);
 								if(_hurtSprite?.width > 0)
 									offCtx.drawImage(_hurtSprite,
-										MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff)), 
-										MathRound(_item.top + _hDiff), 
-										MathRound(_item.width * (_item.zoom ?? 1) * 1.02),
-										MathRound(_item.height * (_item.zoom ?? 1) * 1.02));
+										MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff)) - rotateX, 
+										_y, 
+										_w * 1.02,
+										_h * 1.02);
 								_hurtedCount++;
 							// }
 							// else if(_item.char.colorized)
@@ -4243,8 +4297,8 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 								if(_borderSprite?.width > 0)
 									offCtx.drawImage(_borderSprite,
 										MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff + _zoomedBLeft) : 
-										(_item.left + _wDiff - _zoomedBLeft)), 
-										MathRound(_item.top + _hDiff - _zoomedBTop), 
+										(_item.left + _wDiff - _zoomedBLeft)) - rotateX, 
+										MathRound(_item.top + _hDiff - _zoomedBTop) - rotateY, 
 										MathRound(_zoomedBWidth * (_item.zoom ?? 1)),
 										MathRound(_zoomedBHeight * (_item.zoom ?? 1)));
 							}
@@ -4284,18 +4338,15 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 								if(!cFGA.drawHappened)
 									cFGA.drawHappened = true;
 							}
+							_x = MathRound(_charCan.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff)) - rotateX;
 							if(!_cropped)
 								_charCan.drawImage(_item.sprite, _item.spriteX, _item.spriteY,
 									_item.spriteWidth, _item.spriteHeight,
-									MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff)), 
-									MathRound(_item.top + _hDiff), 
-									MathRound(_item.width * (_item.zoom ?? 1)),
-									MathRound(_item.height * (_item.zoom ?? 1)));
+									_x,
+									_y, 
+									_w,
+									_h);
 							else if(_cropped.width > 0) {
-								_x = MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff));
-								_y = MathRound(_item.top + _hDiff);
-								_w = MathRound(_item.width * (_item.zoom ?? 1));
-								_h = MathRound(_item.height * (_item.zoom ?? 1));
 								_coordsSet = 1;
 								this.drawCharacterGhost(_item,_cropped,_x,_y,_w,_h);
 								_charCan.drawImage(_cropped,_x,_y,_w,_h);
@@ -4352,6 +4403,19 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 									}
 								}
 							}
+							if(_item.char.isDead() && !_item.char.animation.startsWith('dead') && _item.char.class !== 'object' && _item.char.class !== 'spell')
+							{
+								_charCan.save();
+    							_charCan.globalCompositeOperation = "source-atop";
+								_charCan.globalAlpha=.18;
+								_charCan.fillStyle="#000";
+								_charCan.fillRect(
+									_x, _y, _w, _h);
+								_charCan.restore();
+							}
+						}
+						if(_rotate) { 
+							offCtx.restore();
 						}
 						if(_item.char.hurtingStrength) {
 							if(!_coordsSet) {
@@ -4399,11 +4463,6 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 								offCtx.save();
 								offCtx.scale(-1, 1);
 							}				
-						}
-						if(_rotate) { 
-							offCtx.rotate(-_rotate);  
-							offCtx.translate(-1 * MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff - (_item.width / 2)) : (_item.left + _wDiff + (_item.width / 2))), 
-							-1 * MathRound(_item.top + _hDiff + (_item.height / 2)));  
 						}
 					}
 				}
@@ -4460,38 +4519,6 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 			if(offGoreCtx.reversed)
 				offGoreCtx.restore();
 			cGore.drawImage(this.offGoreCanvas, 0, 0);
-		}
-		if(this.cameraMoveStep){
-			if(mainCharacter.left > centerMinX) {
-				prevPlatformX = platformX;
-				platformX += this.cameraMoveStep;
-				mainCharacter.left -= this.cameraMoveStep;
-				mainCharacter.platformX = platformX;
-				if(mainCharacter.left <= centerMinX){
-					mainCharacter.direction = __right;
-					delete this.cameraMoveStep;
-					mainCharacter.disableKeyboard = mainCharacter.immobilize = false;
-					if(this.cameraMoveEndFunc) {
-						this.cameraMoveEndFunc();
-						delete this.cameraMoveEndFunc;
-					}
-				}
-			}
-			else {
-				prevPlatformX = platformX;
-				platformX -= this.cameraMoveStep;
-				mainCharacter.left += this.cameraMoveStep;
-				mainCharacter.platformX = platformX;
-				if(mainCharacter.left >= centerMinX){
-					mainCharacter.direction = __left;
-					delete this.cameraMoveStep;
-					mainCharacter.disableKeyboard = mainCharacter.immobilize = false;
-					if(this.cameraMoveEndFunc) {
-						this.cameraMoveEndFunc();
-						delete this.cameraMoveEndFunc;
-					}
-				}
-			}
 		}
 		this.checkUnseenEnemyPointer();
 		this.checkSceneActions();

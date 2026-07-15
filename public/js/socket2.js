@@ -1972,13 +1972,14 @@ async function connectSocket() {
     //		accessTokenFactory: () => _socketId
     //	}).withAutomaticReconnect([0, 1000, 5000, 10000, 30000])
     //	.build();
-    _my_hub = new signalR.HubConnectionBuilder().withUrl('wss://webapi.kitap12.com/gamehub?n=' + //'https://localhost:7298/gamehub?n=' + 
+    _my_hub = new signalR.HubConnectionBuilder().withUrl('wss://api.warriorsoftengri.com/gamehub?n=' + //'https://localhost:7298/gamehub?n=' + 
     encodeURIComponent(__account.name) + (mainCharacter?.oldSocketId ? '&s=' + mainCharacter.oldSocketId : '') + ((!episode || episode.menu || episode.lobby) ? '' : '&b=1'), {
         //accessTokenFactory: () => _socketId,
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets
     }).withAutomaticReconnect([0, 1000, 5000, 10000, 30000]).build();
     _my_hub.on("AssignId", (assignedId) => {
+        resetOnlineDetection();
         mainCharacter.socketId = __socketId = assignedId;
         if (!mainCharacter.oldSocketId)
             mainCharacter.oldSocketId = __socketId;
@@ -2228,7 +2229,8 @@ window.onbeforeunload = function(e) {
 async function fetchOnlineUsers() {
     if (episode?.menu || episode?.lobby)
         try {
-            __onlineUsers = await _my_hub.invoke("GetOnlineUsers");
+             if (_my_hub && _my_hub.q === 'Connected')
+                __onlineUsers = await _my_hub.invoke("GetOnlineUsers");
         } catch (err) {
             console.warn(err);
         }

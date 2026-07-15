@@ -10,7 +10,7 @@
 	  * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
 		* Enable inline JS: add 'unsafe-inline' to default-src
 	-->
-	<meta http-equiv="Content-Security-Policy" content="connect-src * wss://webapi.kitap12.com/gamehub/ ws://localhost:5173/ wss://localhost:5173/ ws://webapi.kitap12.com/ wss://webapi.kitap12.com/; worker-src * 'self' blob:; font-src 'self' data:; default-src * data: blob: file:; img-src * data: blob:; media-src * 'self' blob:; style-src * 'self' 'unsafe-inline' 'unsafe-eval' blob: data: file:; script-src-elem * 'self' 'unsafe-inline' 'unsafe-eval' blob: data: file:;  style-src-elem * 'self' 'unsafe-inline' 'unsafe-eval' blob: data: file:; script-src * 'self' 'unsafe-inline' 'unsafe-eval'  blob: data: file:">
+	<meta http-equiv="Content-Security-Policy" content="connect-src * wss://api.warriorsoftengri.com/gamehub/ ws://localhost:5173/ wss://localhost:5173/ ws://api.warriorsoftengri.com/ wss://api.warriorsoftengri.com/; worker-src * 'self' blob:; font-src 'self' data:; default-src * data: blob: file:; img-src * data: blob:; media-src * 'self' blob:; style-src * 'self' 'unsafe-inline' 'unsafe-eval' blob: data: file:; script-src-elem * 'self' 'unsafe-inline' 'unsafe-eval' blob: data: file:;  style-src-elem * 'self' 'unsafe-inline' 'unsafe-eval' blob: data: file:; script-src * 'self' 'unsafe-inline' 'unsafe-eval'  blob: data: file:">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
 
 	<meta name="theme-color" content="#fff">
@@ -61,7 +61,7 @@
 		let __scale = 1, __isPC = undefined;
 		var MathCeil = Math.ceil,
 		MathAbs = Math.abs;
-		let _presentationMode = false; //1;
+		let _presentationMode = 1; //1;
 		let chainSkills, actionButtons, __maxAttackedCount = 5, __batterySaveMode, __account, _css, _cssF, _canvas1, c2, 
 		_canvasB, c5, _canvasR, cc, __volume = .5,
 		c3, c50, c85, c90, _canvas3, c6, _canvasS, _cNPC, _canvasAnimated90, _canvas4,
@@ -118,36 +118,36 @@
 	<script src="./js/html2canvas.js"></script>
 	<span id="scripts"></span>
 	<script>
-		const _rootPath = 'https://cdn.kitap12.com/document/getgamejs/game';
-		const _rootPathCss = 'https://cdn.kitap12.com/document/getgamecss/game';
-		function resetScript(_name) {
-			var xhrObj = new XMLHttpRequest();
-			xhrObj.open('GET', _rootPath + _name + '/?v=' + Math.random(), false);
-			xhrObj.send('');
-			var se = document.createElement('script');
-			se.type = "text/javascript";
-			se.text = xhrObj.responseText;
-			document.getElementById('scripts').appendChild(se);
-		}
-		function resetScripts(_names) {
-			_names.forEach(x => resetScript(x));
-		}
+		// const _rootPath = 'https://cdn.kitap12.com/document/getgamejs/game';
+		// const _rootPathCss = 'https://cdn.kitap12.com/document/getgamecss/game';
+		// function resetScript(_name) {
+		// 	var xhrObj = new XMLHttpRequest();
+		// 	xhrObj.open('GET', _rootPath + _name + '/?v=' + Math.random(), false);
+		// 	xhrObj.send('');
+		// 	var se = document.createElement('script');
+		// 	se.type = "text/javascript";
+		// 	se.text = xhrObj.responseText;
+		// 	document.getElementById('scripts').appendChild(se);
+		// }
+		// function resetScripts(_names) {
+		// 	_names.forEach(x => resetScript(x));
+		// }
 
-		function resetStyle(_name) {
-			try	{
-				if(navigator.connection.type === "none" || !navigator.onLine)
-					throw "";
-				var _link = document.createElement('link');
-				_link.rel = 'stylesheet';
-				_link.href = _rootPathCss + _name + '/?v=' + Math.random();
-				document.head.appendChild(_link);
-			}
-			catch(ex) {
-			}
-		}
-		function resetStyles(_names) {
-			_names.forEach(x => resetStyle(x));
-		}
+		// function resetStyle(_name) {
+		// 	try	{
+		// 		if(navigator.connection.type === "none" || !navigator.onLine)
+		// 			throw "";
+		// 		var _link = document.createElement('link');
+		// 		_link.rel = 'stylesheet';
+		// 		_link.href = _rootPathCss + _name + '/?v=' + Math.random();
+		// 		document.head.appendChild(_link);
+		// 	}
+		// 	catch(ex) {
+		// 	}
+		// }
+		// function resetStyles(_names) {
+		// 	_names.forEach(x => resetStyle(x));
+		// }
 		// resetScripts(['items', 'lang', 'inventory', 'quest', 'data', 'ui', 'snow', 'global', 'animation',
 		// 	'dialogs', 'enemy', 'map', 'keyboard', 'skill', 'rival', 'storegame', 'buff', 
 		// 	'socket', 'index'

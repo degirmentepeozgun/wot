@@ -35,6 +35,8 @@ function animation(_a) {
 		this.maxAttackedCount = _a.maxAttackedCount;
 	if(_a.shake)
 		this.shake = _a.shake;
+	if(_a.rotateRate)
+		this.rotateRate = _a.rotateRate;
 	this.ultimate = _a.ultimate;
 	this.rage = _a.rage;
 	this.hitStop = _a.hitStop;

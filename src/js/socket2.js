@@ -1940,7 +1940,7 @@ function resetOnlineDetection() {
     if (!onlineUsersInterval || !onlineUsersInterval.isActive())
         onlineUsersInterval = createInterval(fetchOnlineUsers, 5000);
 }
-resetOnlineDetection();
+//resetOnlineDetection();
 const _selectableChars = [{
     class: 'warrior',
     grade: 3,

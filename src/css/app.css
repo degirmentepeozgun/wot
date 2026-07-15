@@ -4590,6 +4590,14 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	animation: shake-vert 0.5s ease-out;
 	-webkit-animation: shake-vert 0.5s ease-out
 }
+.shake-vert-below {
+	animation: shake-vert-below 0.25s ease-out;
+	-webkit-animation: shake-vert-below 0.25s ease-out
+}
+.shake-vert-below-tiny {
+	animation: shake-vert-below 0.25s ease-out;
+	-webkit-animation: shake-vert-below 0.25s ease-out
+}
 .shake-v {
 	animation: shake-v 0.5s;
 	-webkit-animation: shake-v 0.5s
@@ -4615,6 +4623,15 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	0% { transform:  translate(0, -4vh) }
 	25% { transform:translate(0, 0) }
 	60% { transform:  translate(0, -2vh) }
+	100% { transform:translate(0, 0) }
+  }
+  @keyframes shake-vert-below {
+	0% { transform:  translate(0, -2vh) }
+	50% { transform:translate(0, -1vh) }
+	100% { transform:translate(0, 0) }
+  }
+  @keyframes shake-vert-below-tiny {
+	0% { transform:  translate(0, -1vh) }
 	100% { transform:translate(0, 0) }
   }
   @keyframes shake-vert {

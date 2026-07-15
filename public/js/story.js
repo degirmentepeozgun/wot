@@ -33,8 +33,10 @@ function getLobbyScene() {
 					blurKeyboard();
 					mainCharacter.disableKeyboard = mainCharacter.immobilize = true;
 					mainCharacter.animate('idlelobby',1);
+					if(_presentationMode)
+						setCharacterLevel(20, mainCharacter, 1);
 				}
-				resetOnlineDetection();
+				//resetOnlineDetection();
 				//injectModule('lobby', function() {
 					__storyPlaying = false;
 					createMenu();
@@ -6798,7 +6800,7 @@ const __stories = [
 							episode.mobs = [];
 							episode.respawners = [];
 							episode.phase = 102;
-							episode.pauseBgMusic();
+							episode.pauseBgMusic(1);
 							episode.pauseAmbianceMusic();
 							PlaySound({ key:'deepimpact', volume: 1 });
 							if(mainCharacter)
@@ -6987,7 +6989,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		//startScene: 1,
+		startScene: 1,
 		scenes: [
 			{
 				when: function() {
@@ -7221,7 +7223,10 @@ const __stories = [
 								delete mainCharacter.disableKeyboard;
 								mainCharacter.still = mainCharacter.immobilize = false;
 								//mainCharacter.enableSkills();
-								mainCharacter.animations.dash.frames.forEach(x => x.extraStepXRate *= .66);
+								mainCharacter.animations.dash.frames.forEach(x => {
+									if(x.extraStepXRate)
+										x.extraStepXRate *= .66;
+								});
 								mainCharacter.animate('dash', 1);
 								episode.boss.disableSkill('attack');
 								episode.boss.enableSkill('ground1');
@@ -8157,7 +8162,8 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 101;
-							episode.pauseBgMusic();
+							episode.pauseBgMusic(1);
+							episode.pauseAmbianceMusic();
 							PlaySound({ key:'deepimpact', volume: 1 });
 							if(mainCharacter)
 								cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
@@ -8188,53 +8194,8 @@ const __stories = [
 								if(_x < _minX)
 									_x = _minX;
 							}
-							const _portal = summonMob(113, 
-								_x, 
-								MathRound(groundheight * .5), 1);
-							setTimeout(() => {
-								_portal.important = 1;
-								_portal.animations.after.frames.forEach(x => {
-									x.do = function(_e) {
-										_e.animations.after.frames.forEach(y => delete y.do);
-										x.zoom = 1.1;
-										x.health = 0;
-										x.class = 'portal';
-										x.bottomGap += MathRound(x.spriteHeight / 20);
-										PlaySound({key:'portalclose', volume:.3 });
-										if(_e.toucher) {
-											const _et = _e.toucher;
-											_et.yPosition = _e.yPosition - MathRound(groundheight * .05);
-											_et.stopRage();
-											_et.swapAnimation('idle');
-											_et.standBy();
-											_et.updateVariables();
-											requestAnimationFrame(() => {
-												const _oldLeft = _et.left;
-												_et.left = _e.left - MathRound((_et.WIDTH - _e.WIDTH) / 2) - platformX;
-												if(_et.left < _oldLeft && _et.direction === __right)
-													_et.direction = __left;
-												else if(_et.left > _oldLeft && _et.direction === __left)
-													_et.direction = __right;
-												if(_et.relatedObjects)
-													_et.relatedObjects.length = 0;
-												_et.drawPriority = .1;
-												_et.addObject(
-												{ 
-													key: 'zoom2x', 
-													position: 'css', 
-													p1: 1.3, 
-													p2: 10000
-												});
-												addClass(_gameUI, 'disable-ui');
-												episode.moveCamera(function() {
-													__storyPlaying = false;
-													installStoryFinish();
-												}, 3, 1);
-											});
-										}
-									}
-								});
-							}, 100);
+							const _portal = summonMob(113, _x, MathRound(groundheight * .5), 1);
+							activatePortal(_portal);
 						}
 					}
 				],
@@ -8474,6 +8435,9 @@ const __stories = [
 						}
 						catch(_e) {}
 					}
+					episode.pauseBgMusic(1);
+					episode.createBgMusic(null, null, null, 'cyclops1');
+					episode.playBgMusic();
 					const _skipped = _json.indexOf(2) !== -1;
 					if(_skipped) {
 						const _desc = document.createElement('div');
@@ -8703,7 +8667,8 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 102;
-							episode.pauseBgMusic();
+							episode.pauseBgMusic(1);
+							episode.pauseAmbianceMusic();
 							PlaySound({ key:'deepimpact', volume: 1 });
 							if(mainCharacter){
 								cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
@@ -8969,53 +8934,8 @@ const __stories = [
 							// 	if(_x < _minX)
 							// 		_x = _minX;
 							// }
-							const _portal = summonMob(113, 
-								_x, 
-								MathRound(groundheight * .5), 1);
-							setTimeout(() => {
-								_portal.important = 1;
-								_portal.animations.after.frames.forEach(x => {
-									x.do = function(_e) {
-										_e.animations.after.frames.forEach(y => delete y.do);
-										x.zoom = 1.1;
-										x.health = 0;
-										x.class = 'portal';
-										x.bottomGap += MathRound(x.spriteHeight / 20);
-										PlaySound({key:'portalclose', volume:.3 });
-										if(_e.toucher) {
-											const _et = _e.toucher;
-											_et.yPosition = _e.yPosition - MathRound(groundheight * .05);
-											_et.stopRage();
-											_et.swapAnimation('idle');
-											_et.standBy();
-											_et.updateVariables();
-											requestAnimationFrame(() => {
-												const _oldLeft = _et.left;
-												_et.left = _e.left - MathRound((_et.WIDTH - _e.WIDTH) / 2) - platformX;
-												if(_et.left < _oldLeft && _et.direction === __right)
-													_et.direction = __left;
-												else if(_et.left > _oldLeft && _et.direction === __left)
-													_et.direction = __right;
-												if(_et.relatedObjects)
-													_et.relatedObjects.length = 0;
-												_et.drawPriority = .1;
-												_et.addObject(
-												{ 
-													key: 'zoom2x', 
-													position: 'css', 
-													p1: 1.3, 
-													p2: 10000
-												});
-												addClass(_gameUI, 'disable-ui');
-												episode.moveCamera(function() {
-													__storyPlaying = false;
-													installStoryFinish();
-												}, 3, 1);
-											});
-										}
-									}
-								});
-							}, 100);
+							const _portal = summonMob(113,  _x,  MathRound(groundheight * .5), 1);
+							activatePortal(_portal);
 						}
 					},
 					{
@@ -9025,7 +8945,7 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 100;
-
+							episode.pauseBgMusic(1);
 							const _e = episode.boss;
 							if(__account?.questStatus?.quest?.timer)
 								delete __account.questStatus.quest.timer;
@@ -10137,7 +10057,7 @@ function closeChestOpeningScreen() {
 }
 function renderChestOpeningScreen(_gift) {
 	playClick(1);
-	episode.pauseBgMusic();
+	episode.pauseBgMusic(1);
 	episode.pauseAmbianceMusic();
 	if(episode.enemies?.length)
 		episode.enemies.forEach(x => x.stopStepSound());
@@ -12098,12 +12018,49 @@ function nextPromoSection(_max) {
 	}
 	document.getElementById('quick-play-title').innerText = decodeURIComponent(_qp.querySelectorAll('.quick-play-slide')[_order].getAttribute('data-baslik'));
 }
-async function playNow() {
-	await BuildVoice(1, "archer", "Hey man how is going on", "energetic");
-	await BuildVoice(2, "warrior", "Same as always how about you", "normal");
-
-	PlayVoice(1);
+function activatePortal(_portal) {
 	setTimeout(() => {
-		PlayVoice(2);	
-	}, 5000);
+		_portal.important = 1;
+		_portal.animations.after.frames.forEach(x => {
+			x.do = function(_e) {
+				_e.animations.after.frames.forEach(y => delete y.do);
+				x.zoom = 1.1;
+				_e.health = 0;
+				_e.class = 'portal';
+				x.bottomGap += MathRound(x.spriteHeight / 20);
+				PlaySound({key:'portalclose', volume:.3 });
+				if(_e.toucher) {
+					const _et = _e.toucher;
+					_et.yPosition = _e.yPosition - MathRound(groundheight * .06);
+					_et.stopRage();
+					_et.swapAnimation('idle');
+					_et.standBy();
+					_et.updateVariables();
+					requestAnimationFrame(() => {
+						const _oldLeft = _et.left;
+						_et.left = _e.left - MathRound((_et.WIDTH - _e.WIDTH) / 2) - platformX;
+						if(_et.left < _oldLeft && _et.direction === __right)
+							_et.direction = __left;
+						else if(_et.left > _oldLeft && _et.direction === __left)
+							_et.direction = __right;
+						if(_et.relatedObjects)
+							_et.relatedObjects.length = 0;
+						_et.drawPriority = .1;
+						_et.addObject(
+						{ 
+							key: 'zoom2x', 
+							position: 'css', 
+							p1: 1.3, 
+							p2: 10000
+						});
+						addClass(_gameUI, 'disable-ui');
+						episode.moveCamera(function() {
+							__storyPlaying = false;
+							installStoryFinish();
+						}, 1, 1);
+					});
+				}
+			}
+		});
+	}, 100);
 }

@@ -57,8 +57,10 @@ function animate(_tick) {
 	episode.check = true;
 	__queue.length = 0;
 	_cNPC.clearRect(0, 0, _canvasS.width, _canvasS.height);
-	if(mainCharacter)
+	if(mainCharacter){
+		episode.tryMoveMainCamera();
 		mainCharacter.draw(__queue);
+	}
 	const _sameCoords = (platformX === prevPlatformX);
 	episode.checkWeatherEffect();
 	episode.checkForgeDone();
@@ -963,7 +965,7 @@ function openGame() {
 		_client.loadGold();
 		_client.loadPots();
 		__account.onlineStart = Date.now();
-		if(__account.name)
+		if(__account.name !== '')
 			connectSocket();
 		_client.saveState();
 		updateQuestArea();
