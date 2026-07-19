@@ -64,7 +64,7 @@ function animate(_tick) {
 	const _sameCoords = (platformX === prevPlatformX);
 	episode.checkWeatherEffect();
 	episode.checkForgeDone();
-	if (!_sameCoords && !episode?.effect) {
+	if (!_sameCoords || episode?.effect) {
 		episode.drawLayers();
 		episode.drawObjects();
 		episode.drawSpriteObjects();

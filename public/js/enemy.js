@@ -2810,24 +2810,26 @@ function enemy(_e) {
 						if(!_knockDead) {
 							//killedby ile öldüreni bul
 							const _killer = episode.enemies.find(e => e.key === this.killedBy);
-							const ohl = _killer?.oldHURTLEFT ? _killer.oldHURTLEFT - platformX : null;
-							const _moveMUL = (ohl && _killer.HURTLEFT !== ohl) ? 2 : 1;
-							const _killerDir = _killer.direction;
-							const _killerCenterX = _killer.HURTLEFT + _killer._HURTBOX_half;
-							const _thisCenterX = this.HURTLEFT + this._HURTBOX_half;
-							if(_killerDir === __left && _thisCenterX < _killerCenterX && this.direction === __left)
-								this.direction = __right;
-							else if(_killerDir === __right && _thisCenterX > _killerCenterX && this.direction === __right)
-								this.direction = __left;
-							// if(_killerDir === this.direction)
-							// 	this.direction = _killerDir === __right ? __left : __right;
-							let _str = MathAbs(ohl - _killer.HURTLEFT);
-							if(_str < 2)
-								_str = 2;
-							else if(_str > 3)
-								_str = 3;
-							x.extraStepXRate = (-1 * getRandomValue2((75 * _moveMUL) * _str, (125 * _moveMUL) * _str)) / 1000;
-							_knocking = _moveMUL > 1;
+							if(_killer) {
+								const ohl = _killer.oldHURTLEFT !== undefined ? _killer.oldHURTLEFT - platformX : null;
+								const _moveMUL = (ohl && _killer.HURTLEFT !== ohl) ? 2 : 1;
+								const _killerDir = _killer.direction;
+								const _killerCenterX = _killer.HURTLEFT + _killer._HURTBOX_half;
+								const _thisCenterX = this.HURTLEFT + this._HURTBOX_half;
+								if(_killerDir === __left && _thisCenterX < _killerCenterX && this.direction === __left)
+									this.direction = __right;
+								else if(_killerDir === __right && _thisCenterX > _killerCenterX && this.direction === __right)
+									this.direction = __left;
+								// if(_killerDir === this.direction)
+								// 	this.direction = _killerDir === __right ? __left : __right;
+								let _str = MathAbs(ohl - _killer.HURTLEFT);
+								if(_str < 2)
+									_str = 2;
+								else if(_str > 3)
+									_str = 3;
+								x.extraStepXRate = (-1 * getRandomValue2((75 * _moveMUL) * _str, (125 * _moveMUL) * _str)) / 1000;
+								_knocking = _moveMUL > 1;
+							}
 						}
 						if(_knocking)
 							x.speed = MathCeil(x.speed * getRandomValue2(4, 6) / 100);
@@ -5965,6 +5967,8 @@ function enemy(_e) {
 		_img.src = _path;
 	}
 	this.installHurtFeet = function(_f) {
+		if(!_f.atk?.hurt?.knockback)
+			this.extraStepXRate = 0;
 		this.animations.hurtfeet = new animation(
 			_f.atk?.hurt?.burn 
 			? 
@@ -5973,7 +5977,7 @@ function enemy(_e) {
 				? 
 				createHurtFeetWithKnockback(this, _f.atk.hurt.knockback) 
 				: 
-				createHurtFeet(this.zoom, this.bloodColor, null, _f.bottomGap, _f.atk?.type)
+				createHurtFeet(this.zoom, this.bloodColor, null, _f.bottomGap, _f.atk?.type, this.width)
 			)
 		);
 	}

@@ -83555,6 +83555,10 @@ function createKnockBackGround(_sprite1, _sprite2, _src) {
 							key: 'throw',
 							position: 'under-feet',
 							yGap: 10
+						},
+						{
+							key: 'shakevertbelowtiny',
+							position: 'css'
 						}
 					],
 					sound: { key:'landing', volume:.8 },
@@ -83800,6 +83804,9 @@ function createRelease(_sprite1, _sprite2, _src) {
 					{
 						key: 'landing',
 						position: 'under-feet'
+					}, {
+						key: 'shakevertbelow',
+						position: 'css'
 					}
 				],
 				def: { iframe: true }
@@ -83878,6 +83885,9 @@ function createRelease(_sprite1, _sprite2, _src) {
 					{
 						key: 'landing',
 						position: 'under-feet'
+					}, {
+						key: 'shakevertbelowtiny',
+						position: 'css'
 					}
 				],
 				def: { iframe: true }
@@ -84532,7 +84542,11 @@ function createHurtFeetWithKnockback(_c, _r) {
 		]
 	};
 }
-function createHurtFeet(_z, _c0l0r, _key, _bottomGap, _atkType) {
+function createHurtFeet(_z, _c0l0r, _key, _bottomGap, _atkType, _hurtUnscaledWidth) {
+	if(_hurtUnscaledWidth !== undefined) {
+		const _needZoom = MathRound(_hurtUnscaledWidth / 60);
+		_z = _needZoom;
+	}
 	if(_atkType === 'ice')
 		return createHurtFeetAndFreeze(_z);
 	const _gaps = [0, 0, 0];
@@ -84548,7 +84562,7 @@ function createHurtFeet(_z, _c0l0r, _key, _bottomGap, _atkType) {
 		hurt: _key ? undefined : 'feet',
 		interactive: true,
 		src: './images/related/boom' + (_c0l0r ?? '') + '.png',
-		zoom: 2 * (_z < 1 ? 1 / _z : 1),
+		zoom: (_z < 1 ? 1 : _z),
 		frames: [
 			{
 				spriteLeft: 11,
@@ -84620,9 +84634,9 @@ function createHurtFeet(_z, _c0l0r, _key, _bottomGap, _atkType) {
 				}
 			},
 			{
-				spriteLeft: 236,
+				spriteLeft: 235,
 				spriteTop: 34,
-				spriteWidth: 57,
+				spriteWidth: 58,
 				spriteHeight: 36,
 				spriteOrigin: 29,
 				speed: 4,
@@ -84631,9 +84645,9 @@ function createHurtFeet(_z, _c0l0r, _key, _bottomGap, _atkType) {
 				}
 			},
 			{
-				spriteLeft: 299,
+				spriteLeft: 298,
 				spriteTop: 43,
-				spriteWidth: 57,
+				spriteWidth: 58,
 				spriteHeight: 29,
 				spriteOrigin: 29,
 				speed: 4,
@@ -84642,9 +84656,9 @@ function createHurtFeet(_z, _c0l0r, _key, _bottomGap, _atkType) {
 				}
 			},
 			{
-				spriteLeft: 362,
+				spriteLeft: 361,
 				spriteTop: 53,
-				spriteWidth: 57,
+				spriteWidth: 58,
 				spriteHeight: 22,
 				spriteOrigin: 29,
 				speed: 4,
@@ -84653,22 +84667,22 @@ function createHurtFeet(_z, _c0l0r, _key, _bottomGap, _atkType) {
 				}
 			},
 			{
-				spriteLeft: 428,
+				spriteLeft: 427,
 				spriteTop: 53,
 				spriteWidth: 59,
 				spriteHeight: 22,
 				spriteOrigin: 29,
-				speed: 3,
+				speed: 4,
 				def: {
 					iframe: true
 				}
 			},
 			{
-				spriteLeft: 428,
-				spriteTop: 53,
-				spriteWidth: 59,
-				spriteHeight: 22,
-				spriteOrigin: 29,
+				spriteLeft: 0,
+				spriteTop: 0,
+				spriteWidth: 0,
+				spriteHeight: 0,
+				spriteOrigin: 0,
 				speed: 1,
 				props: {
 					remove: true
@@ -84814,10 +84828,10 @@ function createHurtHip(_z) {
 }
 function getRandomAirCoords() {
 	const _arrs = [ 
-		[-20, -40, -55, -67, -78, -88, -100, -110, -120],
+		[-20, -40, -55, -67, -78, -89, -100, -111, -122],
 		[-15, -30, -42, -54, -64, -80, -90, -96, -102],
 	 	[-20, -35, -48, -59, -69, -78, -85, -91, -96],
-	 	[-15, -31, -46, -60, -73, -84, -91, -98, -103] 
+	 	[-15, -31, -46, -60, -73, -84, -92, -100, -113] 
 	];
 	return _arrs[getRandomValue2(0, _arrs.length - 1)];
 }
@@ -85105,13 +85119,22 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteTop: _sprite1.spriteTop,
 				spriteWidth: _sprite1.spriteWidth,
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin,
+				spriteOrigin: _sprite1.spriteOrigin + 10,
 				src: _sprite1.src,
 				bottomGap: 10,
 				props: {
 					randomizeAirCoords: true
 				},
-				speed: 4
+				speed: 3
+			},
+			{
+				spriteLeft: _sprite1.spriteLeft,
+				spriteTop: _sprite1.spriteTop,
+				spriteWidth: _sprite1.spriteWidth,
+				spriteHeight: _sprite1.spriteHeight,
+				spriteOrigin: _sprite1.spriteOrigin + 6,
+				src: _sprite1.src,
+				speed: 3
 			},
 			{
 				spriteLeft: _sprite1.spriteLeft,
@@ -85207,6 +85230,16 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: _arr[8],
+				speed: 5
+			},
+			{
+				spriteLeft: _sprite1.spriteLeft,
+				spriteTop: _sprite1.spriteTop,
+				spriteWidth: _sprite1.spriteWidth,
+				spriteHeight: _sprite1.spriteHeight,
+				spriteOrigin: _sprite1.spriteOrigin + 4,
+				src: _sprite1.src,
+				bottomGap: _arr[8],
 				speed: 4
 			},
 			{
@@ -85214,17 +85247,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteTop: _sprite1.spriteTop,
 				spriteWidth: _sprite1.spriteWidth,
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin,
-				src: _sprite1.src,
-				bottomGap: _arr[8],
-				speed: 3
-			},
-			{
-				spriteLeft: _sprite1.spriteLeft,
-				spriteTop: _sprite1.spriteTop,
-				spriteWidth: _sprite1.spriteWidth,
-				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin,
+				spriteOrigin: _sprite1.spriteOrigin + 10,
 				src: _sprite1.src,
 				bottomGap: _arr[7],
 				speed: 3
@@ -85234,27 +85257,27 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteTop: _sprite1.spriteTop,
 				spriteWidth: _sprite1.spriteWidth,
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin,
+				spriteOrigin: _sprite1.spriteOrigin + 10,
 				src: _sprite1.src,
 				bottomGap: _arr[6],
-				speed: 3
+				speed: 2
 			},
 			{
 				spriteLeft: _sprite1.spriteLeft,
 				spriteTop: _sprite1.spriteTop,
 				spriteWidth: _sprite1.spriteWidth,
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin,
+				spriteOrigin: _sprite1.spriteOrigin + 10,
 				src: _sprite1.src,
 				bottomGap: _arr[5],
-				speed: 3
+				speed: 2
 			},
 			{
 				spriteLeft: _sprite1.spriteLeft,
 				spriteTop: _sprite1.spriteTop,
 				spriteWidth: _sprite1.spriteWidth,
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin,
+				spriteOrigin: _sprite1.spriteOrigin + 10,
 				src: _sprite1.src,
 				bottomGap: _arr[4],
 				speed: 2
@@ -85264,17 +85287,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteTop: _sprite1.spriteTop,
 				spriteWidth: _sprite1.spriteWidth,
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin,
-				src: _sprite1.src,
-				bottomGap: _arr[3],
-				speed: 2
-			},
-			{
-				spriteLeft: _sprite1.spriteLeft,
-				spriteTop: _sprite1.spriteTop,
-				spriteWidth: _sprite1.spriteWidth,
-				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin,
+				spriteOrigin: _sprite1.spriteOrigin + 10,
 				src: _sprite1.src,
 				bottomGap: _arr[2],
 				speed: 2
@@ -85284,32 +85297,22 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteTop: _sprite1.spriteTop,
 				spriteWidth: _sprite1.spriteWidth,
 				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin,
-				src: _sprite1.src,
-				bottomGap: _arr[1],
-				speed: 1
-			},
-			{
-				spriteLeft: _sprite1.spriteLeft,
-				spriteTop: _sprite1.spriteTop,
-				spriteWidth: _sprite1.spriteWidth,
-				spriteHeight: _sprite1.spriteHeight,
-				spriteOrigin: _sprite1.spriteOrigin,
+				spriteOrigin: _sprite1.spriteOrigin + 10,
 				src: _sprite1.src,
 				bottomGap: _arr[0],
-				speed: 1
+				speed: 2
 			},
 			{
 				spriteLeft: _sprite2.spriteLeft,
 				spriteTop: _sprite2.spriteTop,
 				spriteWidth: _sprite2.spriteWidth,
 				spriteHeight: _sprite2.spriteHeight,
-				spriteOrigin: _sprite2.spriteOrigin,
+				spriteOrigin: _sprite2.spriteOrigin + 10,
 				bottomGap: _sprite2.bottomGap ?? 0,
 				invisibleWhenLay: true,
 				src: _sprite2.src,
 				speed: 3,
-				sound: { key:'landing', volume: 1 },
+				sound: { key:'landing', volume: .5 },
 				objects: [{
 					key: 'landing',
 					position: 'under-feet'
@@ -85323,10 +85326,10 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteTop: _sprite2.spriteTop,
 				spriteWidth: _sprite2.spriteWidth,
 				spriteHeight: _sprite2.spriteHeight,
-				spriteOrigin: _sprite2.spriteOrigin,
+				spriteOrigin: _sprite2.spriteOrigin + 10,
 				bottomGap: _sprite2.bottomGap ?? 0,
 				src: _sprite2.src,
-				speed: 1,
+				speed: 2,
 				invisibleWhenLay: true,
 				invisibleWhenDead: true
 			}

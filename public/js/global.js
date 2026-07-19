@@ -35087,11 +35087,13 @@ const cssAnimations = {
 		if(cssAnimationProps.shakevertbelow) {
 			if((_gameTick - cssAnimationProps.shakevertbelow.start) > (_ms ?? 1000)) {
 				removeClass(_gamePad, 'shake-vert-below');
+				episode.removeEffect('shake');
 				delete cssAnimationProps.shakevertbelow;
 			}
 		}
 		else {
 			addClass(_gamePad, 'shake-vert-below');
+			episode.addEffect('shake', { rate: 2 });
 			cssAnimationProps.shakevertbelow = { start: _gameTick, p1: _c, p2: _ms, p3: _infinite};
 		}
 	},
@@ -35099,11 +35101,13 @@ const cssAnimations = {
 		if(cssAnimationProps.shakevertbelowtiny) {
 			if((_gameTick - cssAnimationProps.shakevertbelowtiny.start) > (_ms ?? 1000)) {
 				removeClass(_gamePad, 'shake-vert-below-tiny');
+				episode.removeEffect('shake');
 				delete cssAnimationProps.shakevertbelowtiny;
 			}
 		}
 		else {
 			addClass(_gamePad, 'shake-vert-below-tiny');
+			episode.addEffect('shake', { rate: 1 });
 			cssAnimationProps.shakevertbelowtiny = { start: _gameTick, p1: _c, p2: _ms, p3: _infinite};
 		}
 	},

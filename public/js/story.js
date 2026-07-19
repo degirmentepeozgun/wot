@@ -1417,7 +1417,7 @@ const __stories = [
 										if(_e.isDead())
 											return;
 										if(!_e.animations.hurtfeet)
-											_e.animations.hurtfeet = new animation(createHurtFeet(_e.zoom, _e.bloodColor));
+											_e.animations.hurtfeet = new animation(createHurtFeet(_e.zoom, _e.bloodColor, null, null, null, _e.width));
 										_e.animate('hurtfeet', 1);
 									}
 									mainCharacter.animate('roll', 1);
@@ -6989,7 +6989,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		startScene: 1,
+		//startScene: 1,
 		scenes: [
 			{
 				when: function() {
@@ -7297,7 +7297,7 @@ const __stories = [
 						when: function() {
 							return !_game.suspended 
 							&& episode.tutorialOrder === 3
-							&& (_gameTick - episode.lastTutorialTime) > 1000;
+							&& (_gameTick - episode.lastTutorialTime) > 900;
 						},
 						do: function() {
 							_game.suspended = 1;
@@ -7776,7 +7776,7 @@ const __stories = [
 				},
 				loots: [
 					{type:'pot', key:'pot', chance:1},
-					{type:'common', key:'corpseexplode', chance:1}
+					{type:'common', key:'corpseexplode', chance:100}
 				],
 				getAssets: function() { 
 					return [
@@ -7831,7 +7831,7 @@ const __stories = [
 					const _es = episode.enemies.filter(x => x.enemy);
 					_es.forEach(_e => 
 						{
-							_e.animations.hurtfeet = new animation(createHurtFeet(_e.zoom, _e.bloodColor));
+							_e.animations.hurtfeet = new animation(createHurtFeet(_e.zoom, _e.bloodColor, null, null, null,_e.width));
 						}
 					);
 					episode.loadCharacterSprites(function() {}, null, ['hurtfeet'],1,1);
@@ -8404,7 +8404,7 @@ const __stories = [
 					const _es = episode.enemies.filter(x => x.enemy);
 					_es.forEach(_e => 
 						{
-							_e.animations.hurtfeet = new animation(createHurtFeet(_e.zoom, _e.bloodColor));
+							_e.animations.hurtfeet = new animation(createHurtFeet(_e.zoom, _e.bloodColor, null, null, null, _e.width));
 						}
 					);
 					episode.loadCharacterSprites(function() {}, null, ['hurtfeet'],1,1);

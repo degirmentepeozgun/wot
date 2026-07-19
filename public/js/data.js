@@ -129,8 +129,8 @@ function dataOperations(_quickPlay) {
 				effect: 1,
 				weather: 1,
 				request: 1,
-				sound: 0,
-				ambiance: 0
+				sound: 1,
+				ambiance: 1
 			},
 			id: _id,
 			gold: 0,

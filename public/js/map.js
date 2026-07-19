@@ -1789,6 +1789,18 @@ function map(_m) {
 			}
 		}
 	}
+	this.addEffect = function(_key, _props){
+		if(!this.effect)
+			this.effect = {};
+		this.effect[_key] = structuredClone2(_props);
+	}
+	this.removeEffect = function(_key){
+		if(!this.effect)
+			return;
+		delete this.effect[_key];
+		if(Object.keys(this.effect).length === 0)
+			delete this.effect;
+	}
 	this.checkWeatherEffect = function() {
 		if(__weather.status === 'autumn') {
 			const _leaves = document.querySelectorAll('img.leaf');
@@ -1817,98 +1829,112 @@ function map(_m) {
 	}
 	this.drawLayers7 = async function () {
 
-	if (this.disposing || __batterySaveMode)
-		return;
+		if (this.disposing || __batterySaveMode)
+			return;
 
-	const layers = this.layers;
-	const scale = __scale;
-	const zoom = __zoom;
-	const platX = platformX;
+		const layers = this.layers;
+		const scale = __scale;
+		const zoom = __zoom;
+		const platX = platformX;
 
-	let firstDraw = !this.layersDrawn;
+		let firstDraw = !this.layersDrawn;
 
-	for (let i = 0, len = layers.length; i < len; i++) {
+		for (let i = 0, len = layers.length; i < len; i++) {
 
-		const _lay = layers[i];
+			const _lay = layers[i];
 
-		// -------- TARGET CONTAINER --------
+			// -------- TARGET CONTAINER --------
 
-		let _c;
+			let _c;
 
-		if (_lay.foreground)
-			_c = c9;
-		else if (_lay.rate >= .9)
-			_c = c90;
-		else if (_lay.rate >= .75)
-			_c = c85;
-		else if (_lay.rate <= .5)
-			_c = c50;
-		else
-			_c = c3;
+			if (_lay.foreground)
+				_c = c9;
+			else if (_lay.rate >= .9)
+				_c = c90;
+			else if (_lay.rate >= .75)
+				_c = c85;
+			else if (_lay.rate <= .5)
+				_c = c50;
+			else
+				_c = c3;
 
-		// -------- PARALLAX POSITION --------
+			// -------- PARALLAX POSITION --------
 
-		const rate = _lay.rate || 1;
-		const p = MathRound(platX * rate * scale);
+			const rate = _lay.rate || 1;
+			const p = MathRound(platX * rate * scale);
 
-		// -------- FIRST LOAD --------
+			// -------- FIRST LOAD --------
 
-		if (firstDraw) {
+			if (firstDraw) {
 
-			let _img = _lay._cachedImg;
+				let _img = _lay._cachedImg;
 
-			if (!_img) {
+				if (!_img) {
 
-				const srcImg = await getImagePromise(_lay.src);
-				if (!srcImg) return;
+					const srcImg = await getImagePromise(_lay.src);
+					if (!srcImg) return;
 
-				if (_lay.new) {
+					if (_lay.new) {
 
-					const copyc = document.createElement('canvas');
-					copyc.width = srcImg.width;
-					copyc.height = srcImg.height;
+						const copyc = document.createElement('canvas');
+						copyc.width = srcImg.width;
+						copyc.height = srcImg.height;
 
-					const copyctx = copyc.getContext("2d");
-					copyctx.imageSmoothingEnabled = false;
-					copyctx.drawImage(srcImg, 0, 0);
+						const copyctx = copyc.getContext("2d");
+						copyctx.imageSmoothingEnabled = false;
+						copyctx.drawImage(srcImg, 0, 0);
 
-					_img = copyc;
+						_img = copyc;
 
-				} else {
+					} else {
 
-					_img = srcImg;
+						_img = srcImg;
+					}
+
+					// ---------- STATIC STYLE ONCE ----------
+
+					if (_lay.marginTop || _lay.marginLeft) {
+
+						_img.style.position = 'absolute';
+
+						if (_lay.marginTop)
+							_img.style.top =
+								MathFloor(_lay.marginTop * scale * zoom * _lay.zoom) + 'px';
+
+						if (_lay.marginLeft)
+							_img.style.left =
+								MathFloor(_lay.marginLeft * scale * zoom * _lay.zoom) + 'px';
+
+						_img.style.width = MathRound(_img.width * scale) + 'px';
+						_img.style.height = MathRound(_img.height * scale) + 'px';
+					}
+
+					_lay._cachedImg = _img;
+					_c.appendChild(_img);
 				}
-
-				// ---------- STATIC STYLE ONCE ----------
-
-				if (_lay.marginTop || _lay.marginLeft) {
-
-					_img.style.position = 'absolute';
-
-					if (_lay.marginTop)
-						_img.style.top =
-							MathFloor(_lay.marginTop * scale * zoom * _lay.zoom) + 'px';
-
-					if (_lay.marginLeft)
-						_img.style.left =
-							MathFloor(_lay.marginLeft * scale * zoom * _lay.zoom) + 'px';
-
-					_img.style.width = MathRound(_img.width * scale) + 'px';
-					_img.style.height = MathRound(_img.height * scale) + 'px';
-				}
-
-				_lay._cachedImg = _img;
-				_c.appendChild(_img);
 			}
+
+			// -------- FAST TRANSFORM --------
+
+			if(this.effect?.shake && !_lay.foreground && rate < 1) {
+				let _yGap = this.effect.shake.yGap;
+				if(_yGap === undefined) {
+					const _yRate = this.effect.shake.rate;
+					const _yGap = (this.cHeight * _yRate) / 100;
+					this.effect.shake.yGap = _yGap;
+				}
+				else {
+					_yGap *= .85;
+					this.effect.shake.yGap = _yGap;
+				}
+				_c.style.transform = `translate3d(${-p}px,${_yGap}px,0)`;
+			}
+			else
+				_c.style.transform = `translate3d(${-p}px,0,0)`;
 		}
 
-		// -------- FAST TRANSFORM --------
-
-		_c.style.transform = `translate3d(${-p}px,0,0)`;
-	}
-
-	this.layersDrawn = 1;
-};
+		this.layersDrawn = 1;
+	};
 
 	// this.drawLayers5 = function () {
 	// 	for (let _lay of this.layers) {
@@ -5975,6 +6001,7 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 
 		delete episode.phase;
 		delete episode.boss;
+		delete episode.effect;
 
 		this.removeLocationHand?.();
 
