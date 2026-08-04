@@ -4606,6 +4606,10 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	animation: shake-tiny .3s;
 	-webkit-animation: shake-tiny .3s
 }
+.shake-stomp {
+	animation: shake-stomp .2s;
+	-webkit-animation: shake-stomp .2s
+}
 @keyframes shake {
 	0% { transform: translate(.2vh, .2vh) }
 	10% { transform: translate(-.2vh, -.4vh) }
@@ -4647,7 +4651,14 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	80% { transform: translate(.2vh, 0) rotate(-.5deg); }
 	100% { transform: translate(0, -.2vh) rotate(0deg); }
   }
-
+@keyframes shake-stomp {
+	0%   { transform: translate(0, 0) rotate(0deg); }
+	15%  { transform: translate(.12vh, .03vh) rotate(.08deg); }
+	35%  { transform: translate(-.55vh, .15vh) rotate(-.15deg); }
+	55%  { transform: translate(.28vh, .06vh) rotate(.08deg); }
+	75%  { transform: translate(-.14vh, .02vh) rotate(-.04deg); }
+	100% { transform: translate(0, 0) rotate(0deg); }
+}
  /* @keyframes charge-impact-left {
     10% { transform: translate(0vw, -2vh) rotate(-1deg); }
     10% { transform: translate(-0.28vw, -0.14vh) rotate(-1deg); }

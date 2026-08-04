@@ -6989,7 +6989,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		//startScene: 1,
+		//startScene: 2,
 		scenes: [
 			{
 				when: function() {
@@ -7125,6 +7125,7 @@ const __stories = [
 					_enemy.enableSkill('attack');
 					_enemy.upcomingAnimation = 'attack';
 					delete _enemy.animations.ground1.cooldown;
+					delete _enemy.animations.counterair;
 					_enemy.animations.ground1.chargingDistance = structuredClone2(_enemy.animations.ground1.chargeDistance);
 					delete _enemy.animations.ground1.chargeDistance;
 					blurKeyboard();
@@ -7776,7 +7777,7 @@ const __stories = [
 				},
 				loots: [
 					{type:'pot', key:'pot', chance:1},
-					{type:'common', key:'corpseexplode', chance:100}
+					{type:'common', key:'corpseexplode', chance:1}
 				],
 				getAssets: function() { 
 					return [
@@ -8162,6 +8163,15 @@ const __stories = [
 						},
 						do: function() {
 							episode.phase = 101;
+							delete episode.mobPhaseTick;
+							episode.enemies.filter(x => !x.main && !x.tag && !x.friendly && x.class !== 'object' && x.class !== 'boss').forEach(x => {
+								x.stopSpawn();
+								x.health = x.experience = 0;
+								x.dead = x.dying = true;
+								x.animate('dead', 1);
+							});
+							episode.mobs = [];
+							episode.respawners = [];
 							episode.pauseBgMusic(1);
 							episode.pauseAmbianceMusic();
 							PlaySound({ key:'deepimpact', volume: 1 });
@@ -8196,6 +8206,39 @@ const __stories = [
 							}
 							const _portal = summonMob(113, _x, MathRound(groundheight * .5), 1);
 							activatePortal(_portal);
+						}
+					},
+					{
+						when: function() {
+							if(episode.phase !== 100)
+								return false;
+							const _st = episode.mobPhaseTick ?? 1;
+							if(_st) {
+								return (_gameTick - _st) > 30000; 
+							}
+							return false;
+						},
+						do: function() {
+							episode.mobPhaseTick = _gameTick;
+							const _mainPosition = mainCharacter.HURTLEFT + platformX;
+							const _minX = _mainPosition < (episode.width / 2) ? _mainPosition + episode.cWidth : _mainPosition - (2 * episode.cWidth);
+							const _maxX = _mainPosition < (episode.width / 2) ? _mainPosition + (2 * episode.cWidth) : _mainPosition - episode.cWidth;
+							const _ids = [619, 620];
+							_ids.forEach(_id => {
+								let y = summonMobWithJson(
+									{
+										id: _id,
+										minX: _minX,
+										maxX: _maxX,
+										count: 2,
+										sight: 1000,
+										skipSummon: true,
+										experience: 0
+									}
+								);
+								y.maxHP = y.MAXHP = 800;
+								y.setHealth(y.maxHP);
+							});
 						}
 					}
 				],

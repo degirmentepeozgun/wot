@@ -1,4 +1,4 @@
-﻿﻿﻿﻿'use strict';
+﻿﻿﻿'use strict';
 
 function createMainCharacter(_x) {
 	if (_x?.class)
@@ -1479,14 +1479,6 @@ function createCharacter(_settings) {
 								spriteHeight: 145,
 								spriteOrigin: 140,
 								speed: 1,
-								objects: [
-									{
-										key: 'trail',
-										position: 'front-feet',
-										xGap: 150,
-										yGap: -5
-									}
-								],
 								def: {
 									iframe: true
 								}
@@ -1499,6 +1491,14 @@ function createCharacter(_settings) {
 								spriteOrigin: 140,
 								extraStepXRate: 1,
 								speed: 3,
+								objects: [
+									{
+										key: 'trail',
+										position: 'front-feet',
+										xGap: 150,
+										yGap: -5
+									}
+								],
 								def: {
 									iframe: true
 								}
@@ -1523,6 +1523,7 @@ function createCharacter(_settings) {
 								atk: {
 									yRange: 15,
 									rate: 2,
+									originX: 10,
 									hurt: {
 										key: 'hurtair',
 										type: 'air',
@@ -1621,9 +1622,10 @@ function createCharacter(_settings) {
 								sound: { key: 'rockdestroy', volume:.35},
 								objects: [
 									{
-										key: 'explode',
+										key: 'explode2',
 										position: 'middle-feet',
-										still: true
+										still: true,
+										yGap: -75
 									},
 									{
 										key: 'blur', position: 'css'
@@ -1914,9 +1916,10 @@ function createCharacter(_settings) {
 								sound: { key: 'rockdestroy', volume:.35},
 								objects: [
 									{
-										key: 'explode',
+										key: 'explode2',
 										position: 'middle-feet',
-										still: true
+										still: true,
+										yGap: -75
 									},
 									{
 										key: 'blur', position: 'css'
@@ -1937,7 +1940,7 @@ function createCharacter(_settings) {
 								spriteOrigin: 35,
 								speed: 17,
 								spell: {
-									key: 'earthspikes2',
+									key: 'earthspikes4',
 									pierce: true
 								},
 								do: function() {
@@ -20999,6 +21002,27 @@ const _allEnemies = {
 					},
 					'./images/sprites/ep07/hurt.png'
 				),
+				knockbackair: createKnockBackAir(
+					{
+						spriteLeft: 35,
+						spriteTop: 11,
+						spriteWidth: 150,
+						spriteHeight: 173,
+						spriteOrigin: 60,
+						bottomGap: -140,
+						src: './images/sprites/ep07/hurt-air1.png'
+					},
+					{
+						spriteLeft: 82,
+						spriteTop: 75,
+						spriteWidth: 255 - 82,
+						spriteHeight: 237 - 75,
+						spriteOrigin: 93,
+						bottomGap: -140,
+						src: './images/sprites/ep07/hurt-air2.png',
+						invisibleWhenLay: true
+					}
+				),
 				hurtground1: createHurtGround(
 					{
 						spriteLeft: 304,
@@ -21020,7 +21044,29 @@ const _allEnemies = {
 					null,
 					{ key: 'wasphurt', volume:.4, reset: true},
 					'./images/sprites/ep07/hurt.png'
-				),		
+				),	
+				hurtair: createHurtAir(
+					{
+						spriteLeft: 35,
+						spriteTop: 11,
+						spriteWidth: 150,
+						spriteHeight: 173,
+						spriteOrigin: 60,
+						bottomGap: -140,
+						src: './images/sprites/ep07/hurt-air1.png'
+					},
+					{
+						spriteLeft: 82,
+						spriteTop: 75,
+						spriteWidth: 255 - 82,
+						spriteHeight: 237 - 75,
+						spriteOrigin: 93,
+						bottomGap: -140,
+						src: './images/sprites/ep07/hurt-air2.png',
+						invisibleWhenLay: true
+					},
+					{ key: 'wasphurt', volume:.4, reset: true}
+				),	
 				hurtground2: function() {
 					const _hg = createHurtGround({
 							spriteLeft: 323,
@@ -36953,6 +36999,93 @@ const _allEnemies = {
 						}
 					]
 				},
+				counterair: {
+					key: 'counterair',
+					type: 'skill',
+					chain: true,
+					chainOrder: 4,
+					cooldown: 20000,
+					attack: true,
+					push: true,
+					baseKey: 'counterground',
+					src: './images/sprites/ep622/kick.png',
+					priority: 1,
+					frames: [
+						{
+							spriteLeft: 5188,
+							spriteTop: 24,
+							spriteWidth: 778,
+							spriteHeight: 776,
+							spriteOrigin: 212,
+							speed: 4,
+							directionChangeEnabled: true,
+							knockback: true,
+							sound: {key:'goblinkingkick', volume:.5},
+							objects: [
+								{ key: 'slowMotion', position: 'css' }
+							],
+							atk: {
+								yRange: 15,
+								rate: 4,
+								hitStop:6,
+								knockback: 2,
+								hurt: {
+									sound: {key:'goblinkingkickhurt', volume:.5},
+									key: 'hurtair',
+									type: 'air'
+								},
+								type: 'common'
+							},
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 3926,
+							spriteTop: 251,
+							spriteWidth: 574,
+							spriteHeight: 549,
+							spriteOrigin: 274,
+							speed: 4,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 2830,
+							spriteTop: 146,
+							spriteWidth: 387,
+							spriteHeight: 654,
+							spriteOrigin: 170,
+							speed: 8,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 1633,
+							spriteTop: 184,
+							spriteWidth: 298,
+							spriteHeight: 616,
+							spriteOrigin: 177,
+							speed: 8,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 400,
+							spriteTop: 388,
+							spriteWidth: 492,
+							spriteHeight: 412,
+							spriteOrigin: 200,
+							speed: 8,
+							def: {
+								iframe: true
+							}
+						}
+					]
+				},
 				run: {
 					key: 'run',
 					type: 'move',
@@ -37114,6 +37247,494 @@ const _allEnemies = {
 							speed: 12,
 							stc: './images/sprites/ep622/idle.png'
 						}
+					]
+				},
+				air1: {
+					order:5,
+					//chainOrder: 2,
+					//chain: true,
+					do: function(_e) {
+						const _anima = _e.animations[_e.animation];
+						let baseXGap = 0;
+						let index = 0;
+						_anima.frames
+							.filter(x => x.spell)
+							.forEach(x => {
+
+								if (index % 3 === 0) {
+									baseXGap = getRandomValue2(300, 500);
+								} else {
+									baseXGap += getRandomValue2(300, 500);
+								}
+
+								x.spell.xGap = baseXGap;
+								x.spell.bottomGap = getRandomValue2(-100, 100);
+
+								index++;
+							});
+					},
+					key: 'air1',
+					type: 'skill',
+					attack: true,
+					cooldown: 30000,
+					src: './images/sprites/ep622/ranged.png',
+					totalRange: 50,
+					priority: 1,
+					maxRepeat: 4,
+					frames: [	
+						{
+							spriteLeft: 155,
+							spriteTop: 72,
+							spriteWidth: 415,
+							spriteHeight: 528,
+							spriteOrigin: 195,
+							directionChangeEnabled: true,
+							speed: 7,
+							spell: {
+								key: 'rockfall',
+								xGap: 300,
+								reset: true,
+								bottomGap: -50
+							},
+						},
+						{
+							spriteLeft: 155,
+							spriteTop: 72,
+							spriteWidth: 415,
+							spriteHeight: 528,
+							spriteOrigin: 195,
+							speed: 7,
+							spell: {
+								key: 'rockfall',
+								xGap: 700,
+								reset: true,
+								bottomGap: -50
+							},
+						},
+						{
+							spriteLeft: 855,
+							spriteTop: 180,
+							spriteWidth: 1325 - 855,
+							spriteHeight: 420,
+							spriteOrigin: 195,
+							speed: 6,
+							sound: { key: 'stomp', volume:1, reset: true },
+							objects: [
+								{
+									key: 'shakestomp', position: 'css'
+								}
+							],
+							spell: {
+								key: 'rockfall',
+								xGap: 1100,
+								reset: true,
+								bottomGap: -50
+							},
+							push: 10,
+							atk: {
+								yRange: 15,
+								rate: 2,
+								aoe: 200,
+								type: 'common',
+								hurt: {
+									key: 'hurtair',
+									type: 'air'
+								}
+							}
+						},
+						{
+							spriteLeft: 1555,
+							spriteTop: 180,
+							spriteWidth: 2025 - 1555,
+							spriteHeight: 420,
+							spriteOrigin: 195,
+							// spell: {
+							// 	bottomGap:-45,
+							// 	xGap: -20,
+							// 	key: 'stomp'
+							// },
+							// objects: [
+							// 	{ 
+							// 		key: 'mud',  
+							// 		position: 'front-feet',
+							// 		xGap: -200,
+							// 		yGap: 50,
+							// 		scale: 1.25
+							// 	}
+							// ],
+							speed: 6
+						},
+						{
+							spriteLeft: 2255,
+							spriteTop: 85,
+							spriteWidth: 2725 - 2255,
+							spriteHeight: 515,
+							spriteOrigin: 195,
+							speed: 7,
+							spell: {
+								key: 'rockfall',
+								xGap: 400,
+								scale: .95,
+								reset: true,
+								bottomGap: 50
+							},
+							directionChangeEnabled: true
+						},
+							{
+							spriteLeft: 2255,
+							spriteTop: 85,
+							spriteWidth: 2725 - 2255,
+							spriteHeight: 515,
+							spriteOrigin: 195,
+							speed: 7,
+							spell: {
+								key: 'rockfall',
+								xGap: 750,
+								scale: .95,
+								reset: true,
+								bottomGap: 50
+							}
+						},
+						{
+							spriteLeft: 2955,
+							spriteTop: 170,
+							spriteWidth: 3558 - 2955,
+							spriteHeight: 430,
+							spriteOrigin: 195,
+							speed: 6,
+							push: 10,
+							sound: { key: 'stomp', volume:1, reset: true },
+							objects: [
+								{
+									key: 'shakestomp', position: 'css'
+								}
+							],
+							spell: {
+								key: 'rockfall',
+								xGap: 1100,
+								scale: .95,
+								reset: true,
+								bottomGap: 50
+							},
+							atk: {
+								yRange: 15,
+								rate: 2,
+								aoe: 200,
+								type: 'common',
+								hurt: {
+									key: 'hurtair',
+									type: 'air'
+								}
+							}
+						},
+						{
+							spriteLeft: 3655,
+							spriteTop: 170,
+							spriteWidth: 4095 - 3655,
+							spriteHeight: 430,
+							spriteOrigin: 195,
+							// spell: {
+							// 	key: 'stomp',
+							// 	xGap: 220,
+							// 	zoomRate: .85,
+							// 	bottomGap: 35,
+							// },
+							// objects: [
+							// 	{ 
+							// 		key: 'mud',  
+							// 		position: 'front-feet',
+							// 		xGap: -200,
+							// 		yGap: -50,
+							// 		scale: 1.5
+							// 	}
+							// ],
+							speed: 6
+						},
+						// {
+						// 	spriteLeft: 155,
+						// 	spriteTop: 72,
+						// 	spriteWidth: 415,
+						// 	spriteHeight: 528,
+						// 	spriteOrigin: 195,
+						// 	speed: 14,
+						// 	directionChangeEnabled: true
+						// },
+						// {
+						// 	spriteLeft: 855,
+						// 	spriteTop: 180,
+						// 	spriteWidth: 1325 - 855,
+						// 	spriteHeight: 420,
+						// 	spriteOrigin: 195,
+						// 	speed: 6,
+						// 	sound: { key: 'stomp', volume:1, reset: true },
+						// 	objects: [
+						// 		{
+						// 			key: 'shakestomp', position: 'css'
+						// 		}
+						// 	],
+						// 	push: 10,
+						// 	atk: {
+						// 		yRange: 15,
+						// 		rate: 2,
+						// 		aoe: 200,
+						// 		type: 'common',
+						// 		hurt: {
+						// 			key: 'hurtair',
+						// 			type: 'air'
+						// 		}
+						// 	}
+						// },
+						// {
+						// 	spriteLeft: 1555,
+						// 	spriteTop: 180,
+						// 	spriteWidth: 2025 - 1555,
+						// 	spriteHeight: 420,
+						// 	spriteOrigin: 195,
+						// 	spell: {
+						// 		bottomGap:-45,
+						// 		xGap: -20,
+						// 		key: 'stomp'
+						// 	},
+						// 	speed: 6
+						// },
+						// {
+						// 	spriteLeft: 2255,
+						// 	spriteTop: 85,
+						// 	spriteWidth: 2725 - 2255,
+						// 	spriteHeight: 515,
+						// 	spriteOrigin: 195,
+						// 	speed: 14,
+						// 	directionChangeEnabled: true
+						// },
+						// {
+						// 	spriteLeft: 2955,
+						// 	spriteTop: 170,
+						// 	spriteWidth: 3558 - 2955,
+						// 	spriteHeight: 430,
+						// 	spriteOrigin: 195,
+						// 	speed: 6,
+						// 	push: 10,
+						// 	sound: { key: 'stomp', volume:1, reset: true },
+						// 	objects: [
+						// 		{
+						// 			key: 'shakestomp', position: 'css'
+						// 		}
+						// 	],
+						// 	atk: {
+						// 		yRange: 15,
+						// 		rate: 2,
+						// 		aoe: 200,
+						// 		type: 'common',
+						// 		hurt: {
+						// 			key: 'hurtair',
+						// 			type: 'air'
+						// 		}
+						// 	}
+						// },
+						// {
+						// 	spriteLeft: 3655,
+						// 	spriteTop: 170,
+						// 	spriteWidth: 4095 - 3655,
+						// 	spriteHeight: 430,
+						// 	spriteOrigin: 195,
+						// 	spell: {
+						// 		key: 'stomp',
+						// 		xGap: 220,
+						// 		zoomRate: .85,
+						// 		bottomGap: 35,
+						// 	},
+						// 	speed: 6
+						// },
+						// {
+						// 	spriteLeft: 155,
+						// 	spriteTop: 72,
+						// 	spriteWidth: 415,
+						// 	spriteHeight: 528,
+						// 	spriteOrigin: 195,
+						// 	speed: 14,
+						// 	directionChangeEnabled: true
+						// },
+						// {
+						// 	spriteLeft: 855,
+						// 	spriteTop: 180,
+						// 	spriteWidth: 1325 - 855,
+						// 	spriteHeight: 420,
+						// 	spriteOrigin: 195,
+						// 	speed: 6,
+						// 	sound: { key: 'stomp', volume:1, reset: true },
+						// 	objects: [
+						// 		{
+						// 			key: 'shakestomp', position: 'css'
+						// 		}
+						// 	],
+						// 	push: 10,
+						// 	atk: {
+						// 		yRange: 15,
+						// 		rate: 2,
+						// 		aoe: 200,
+						// 		type: 'common',
+						// 		hurt: {
+						// 			key: 'hurtair',
+						// 			type: 'air'
+						// 		}
+						// 	}
+						// },
+						// {
+						// 	spriteLeft: 1555,
+						// 	spriteTop: 180,
+						// 	spriteWidth: 2025 - 1555,
+						// 	spriteHeight: 420,
+						// 	spriteOrigin: 195,
+						// 	spell: {
+						// 		bottomGap:-45,
+						// 		xGap: -20,
+						// 		key: 'stomp'
+						// 	},
+						// 	speed: 6
+						// },
+						// {
+						// 	spriteLeft: 2255,
+						// 	spriteTop: 85,
+						// 	spriteWidth: 2725 - 2255,
+						// 	spriteHeight: 515,
+						// 	spriteOrigin: 195,
+						// 	speed: 14,
+						// 	directionChangeEnabled: true
+						// },
+						// {
+						// 	spriteLeft: 2955,
+						// 	spriteTop: 170,
+						// 	spriteWidth: 3558 - 2955,
+						// 	spriteHeight: 430,
+						// 	spriteOrigin: 195,
+						// 	speed: 6,
+						// 	push: 10,
+						// 	sound: { key: 'stomp', volume:1, reset: true },
+						// 	objects: [
+						// 		{
+						// 			key: 'shakestomp', position: 'css'
+						// 		}
+						// 	],
+						// 	atk: {
+						// 		yRange: 15,
+						// 		rate: 2,
+						// 		aoe: 200,
+						// 		type: 'common',
+						// 		hurt: {
+						// 			key: 'hurtair',
+						// 			type: 'air'
+						// 		}
+						// 	}
+						// },
+						// {
+						// 	spriteLeft: 3655,
+						// 	spriteTop: 170,
+						// 	spriteWidth: 4095 - 3655,
+						// 	spriteHeight: 430,
+						// 	spriteOrigin: 195,
+						// 	spell: {
+						// 		key: 'stomp',
+						// 		xGap: 220,
+						// 		zoomRate: .85,
+						// 		bottomGap: 35,
+						// 	},
+						// 	speed: 6
+						// },
+						// {
+						// 	spriteLeft: 155,
+						// 	spriteTop: 72,
+						// 	spriteWidth: 415,
+						// 	spriteHeight: 528,
+						// 	spriteOrigin: 195,
+						// 	speed: 14,
+						// 	directionChangeEnabled: true
+						// },
+						// {
+						// 	spriteLeft: 855,
+						// 	spriteTop: 180,
+						// 	spriteWidth: 1325 - 855,
+						// 	spriteHeight: 420,
+						// 	spriteOrigin: 195,
+						// 	speed: 6,
+						// 	sound: { key: 'stomp', volume:1, reset: true },
+						// 	objects: [
+						// 		{
+						// 			key: 'shakestomp', position: 'css'
+						// 		}
+						// 	],
+						// 	push: 10,
+						// 	atk: {
+						// 		yRange: 15,
+						// 		rate: 2,
+						// 		aoe: 200,
+						// 		type: 'common',
+						// 		hurt: {
+						// 			key: 'hurtair',
+						// 			type: 'air'
+						// 		}
+						// 	}
+						// },
+						// {
+						// 	spriteLeft: 1555,
+						// 	spriteTop: 180,
+						// 	spriteWidth: 2025 - 1555,
+						// 	spriteHeight: 420,
+						// 	spriteOrigin: 195,
+						// 	spell: {
+						// 		bottomGap:-45,
+						// 		xGap: -20,
+						// 		key: 'stomp'
+						// 	},
+						// 	speed: 6
+						// },
+						// {
+						// 	spriteLeft: 2255,
+						// 	spriteTop: 85,
+						// 	spriteWidth: 2725 - 2255,
+						// 	spriteHeight: 515,
+						// 	spriteOrigin: 195,
+						// 	speed: 14,
+						// 	directionChangeEnabled: true
+						// },
+						// {
+						// 	spriteLeft: 2955,
+						// 	spriteTop: 170,
+						// 	spriteWidth: 3558 - 2955,
+						// 	spriteHeight: 430,
+						// 	spriteOrigin: 195,
+						// 	speed: 6,
+						// 	push: 10,
+						// 	sound: { key: 'stomp', volume:1, reset: true },
+						// 	objects: [
+						// 		{
+						// 			key: 'shakestomp', position: 'css'
+						// 		}
+						// 	],
+						// 	atk: {
+						// 		yRange: 15,
+						// 		rate: 2,
+						// 		aoe: 200,
+						// 		type: 'common',
+						// 		hurt: {
+						// 			key: 'hurtair',
+						// 			type: 'air'
+						// 		}
+						// 	}
+						// },
+						// {
+						// 	spriteLeft: 3655,
+						// 	spriteTop: 170,
+						// 	spriteWidth: 4095 - 3655,
+						// 	spriteHeight: 430,
+						// 	spriteOrigin: 195,
+						// 	spell: {
+						// 		key: 'stomp',
+						// 		xGap: 220,
+						// 		zoomRate: .85,
+						// 		bottomGap: 35,
+						// 	},
+						// 	speed: 6
+						// }
 					]
 				},
 				attack: {
@@ -38128,22 +38749,30 @@ const _allEnemies = {
 					_hurt.key = 'hurtground2';
 					return _hurt;
 				}(),
-				hurtair: createHurtAir(
-					{
-						spriteLeft: 2183,
-						spriteTop: 3168,
-						spriteWidth: 550,
-						spriteHeight: 435,
-						spriteOrigin: 267
-					}, {
-						spriteLeft: 2880,
-						spriteTop: 3380,
-						spriteWidth: 563,
-						spriteHeight: 258,
-						bottomGap: 38,
-						spriteOrigin: 270
-					}, { key: 'goblinkinghurt1,goblinkinghurt2,goblinkinghurt3,goblinkinghurt4', volume: .7, reset: true }
-				),
+				hurtair: function() {
+					const _ha = createHurtAir(
+						{
+							spriteLeft: 2183,
+							spriteTop: 3168,
+							spriteWidth: 550,
+							spriteHeight: 435,
+							spriteOrigin: 267
+						}, {
+							spriteLeft: 2880,
+							spriteTop: 3380,
+							spriteWidth: 563,
+							spriteHeight: 258,
+							bottomGap: 38,
+							spriteOrigin: 270
+						}, { key: 'goblinkinghurt1,goblinkinghurt2,goblinkinghurt3,goblinkinghurt4', volume: .7, reset: true }
+					);
+					_ha.frames.forEach(x => {
+						x.chain = [
+							{ key: 'counterair', num: 4 },
+						];
+					});
+					return _ha;
+				}(),
 				// hurtair2: function() {
 				// 	const _ha = createHurtAir(
 				// 		{
@@ -54678,12 +55307,61 @@ const _allEnemies = {
 						// }	
 					]
 				},
+				attack: {
+					key: 'attack',
+					order: 1,
+					type: 'skill',
+					attack: true,
+					totalRange: 30,
+					priority: 2,
+					src: './images/sprites/ep37/summon.png',
+					frames: [
+						{
+							spriteLeft: 50,
+							spriteTop: 50,
+							spriteWidth: 176,
+							spriteHeight: 350,
+							spriteOrigin: 100,
+							speed: 8,
+							sound: { key:'shamanhand', volume:1	},
+							directionChangeEnabled: true
+						},
+						{
+							spriteLeft: 680,
+							spriteTop: 50,
+							spriteWidth: 180,
+							spriteHeight: 350,
+							spriteOrigin: 70,
+							speed: 16,
+							spell: { 
+								key: 'lava'
+							}
+						},
+						{
+							spriteLeft: 350,
+							spriteTop: 50,
+							spriteWidth: 204,
+							spriteHeight: 350,
+							spriteOrigin: 100,
+							speed: 8
+						},
+						{
+							spriteLeft: 50,
+							spriteTop: 50,
+							spriteWidth: 176,
+							spriteHeight: 350,
+							spriteOrigin: 100,
+							speed: 8
+						}
+					]
+				},
 				ground1: {
 					key: 'ground1',
 					order: 3,
 					type: 'skill',
 					attack: true,
 					move: true,
+					cooldown: 5000,
 					priority: 2,
 					frames: [
 						{
@@ -54750,7 +55428,7 @@ const _allEnemies = {
 					order: 4,
 					type: 'skill',
 					attack: true,
-					cooldown: 5000,
+					cooldown: 10000,
 					priority: 2,
 					skipHealthBar: true,
 					frames: [
@@ -55571,6 +56249,7 @@ const _allEnemies = {
 								yGap: 70,
 								xGap: 0
 							}],
+							directionChangeEnabled: true,
 							def: {
 								iframe: true
 							}
@@ -55583,6 +56262,7 @@ const _allEnemies = {
 							spriteOrigin: 85,
 							sound: { key: 'shamanair2' , volume: .4 },
 							speed: 6,
+							spell: { key: 'hand' },
 							def: {
 								iframe: true
 							}
@@ -55738,6 +56418,7 @@ const _allEnemies = {
 							spriteHeight: 343,
 							spriteOrigin: 83,
 							speed: 6,
+							directionChangeEnabled: true,
 							buffs: [{ key: 'rage', level: 5 }],
 							def: {
 								iframe: true
@@ -56009,13 +56690,20 @@ const _allEnemies = {
 						spriteOrigin: 160
 					}
 				),
-				dodge: {
-					key: 'dodge',
+				roll: {
+					key: 'roll',
 					type: 'skill',
-					priority: 2,
-					rate: 60,
+					maxCharge: 2,
+					useExtraStepXRate: true,
+					order: 7,
 					reversed: true,
 					cooldown: 5000,
+					// key: 'dodge',
+					// type: 'skill',
+					// priority: 2,
+					// rate: 60,
+					// reversed: true,
+					// cooldown: 5000,
 					frames: [
 						{
 							spriteLeft: 1660,
@@ -56750,12 +57438,18 @@ const _allEnemies = {
 						spriteOrigin: 160
 					}
 				),
-				dodge: {
-					key: 'dodge',
+				roll: {
+					key: 'roll',
 					type: 'skill',
-					priority: 2,
-					rate: 50,
+					maxCharge: 2,
+					useExtraStepXRate: true,
+					order: 7,
 					cooldown: 5000,
+					// key: 'dodge',
+					// type: 'skill',
+					// priority: 2,
+					// rate: 50,
+					// cooldown: 5000,
 					frames: [
 						{
 							spriteLeft: 61,
@@ -83145,18 +83839,9 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				extraStepXRate: .4,
-				bottomGap: -40,
+				bottomGap: -38,
 				speed: 1,
 				objects: [
-				// 	{
-				// 	key: 'bloodfx8',
-				// 	position: 'front-head',
-				// 	reversed: true,
-				// 	pushObject: true,
-				// 	xGap: _sprite1.xGap ?? _sprite1.spriteWidth * 3,
-				// 	yGap:  MathRound(_sprite1.spriteHeight * .2),
-				// 	still: true
-				// },
 				{
 					key: 'ouch',
 					position: 'middle-feet',
@@ -83181,7 +83866,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -70,
+				bottomGap: -72,
 				extraStepXRate: .4,
 				speed: 2
 			},
@@ -83192,7 +83877,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -85,
+				bottomGap: -88,
 				extraStepXRate: .4,
 				speed: 2
 			},
@@ -83203,7 +83888,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -100,
+				bottomGap: -102,
 				extraStepXRate: .4,
 				speed: 2
 			},
@@ -83214,7 +83899,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -115,
+				bottomGap: -114,
 				extraStepXRate: .4,
 				speed: 2
 			},
@@ -83225,7 +83910,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -125,
+				bottomGap: -123,
 				extraStepXRate: .5,
 				speed: 2
 			},
@@ -83236,7 +83921,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -125,
+				bottomGap: -126,
 				extraStepXRate: .6,
 				speed: 2
 			},
@@ -83247,7 +83932,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -115,
+				bottomGap: -122,
 				extraStepXRate: .3,
 				speed: 2
 			},
@@ -83258,7 +83943,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -100,
+				bottomGap: -112,
 				extraStepXRate: .3,
 				speed: 2
 			},
@@ -83269,7 +83954,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -85,
+				bottomGap: -96,
 				extraStepXRate: .3,
 				speed: 2
 			},
@@ -83280,7 +83965,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -70,
+				bottomGap: -76,
 				extraStepXRate: .3,
 				speed: 2
 			},
@@ -83291,7 +83976,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -55,
+				bottomGap: -58,
 				extraStepXRate: .3,
 				speed: 2
 			},
@@ -83302,7 +83987,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -40,
+				bottomGap: -38,
 				extraStepXRate: .3,
 				speed: 2
 			},
@@ -83313,7 +83998,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -20,
+				bottomGap: -18,
 				extraStepXRate: .3,
 				speed: 2
 			},
@@ -83343,7 +84028,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -20,
+				bottomGap: -18,
 				extraStepXRate: .3,
 				speed: 3
 			},
@@ -83365,7 +84050,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -40,
+				bottomGap: -38,
 				extraStepXRate: .3,
 				speed: 6
 			},
@@ -83376,7 +84061,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -30,
+				bottomGap: -28,
 				extraStepXRate: .3,
 				speed: 4
 			},
@@ -83387,7 +84072,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -20,
+				bottomGap: -16,
 				extraStepXRate: .3,
 				speed: 3
 			},
@@ -85144,6 +85829,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: _arr[0],
+				sound: _sound,
 				objects: [{
 					position: 'under-feet',
 					key: 'throw',
@@ -85159,7 +85845,6 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: _arr[1],
-				sound: _sound,
 				speed: 3
 			},
 			{

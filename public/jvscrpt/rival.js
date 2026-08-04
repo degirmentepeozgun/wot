@@ -2296,7 +2296,7 @@ function createCharacter(_settings) {
 								spriteOrigin: 35,
 								speed: 17,
 								spell: {
-									key: 'earthspikes2',
+									key: 'earthspikes4',
 									pierce: true
 								},
 								atk: {

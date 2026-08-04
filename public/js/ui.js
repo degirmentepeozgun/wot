@@ -742,8 +742,8 @@ function resetSkill(_key, _char, _num) {
 	resetSkills(_c?.ultimate, 1, _char, _key);
 	return true;
 }
-function forceResetSkills(_char) {
-	resetSkills(null,null,_char,null,null,1);
+function forceResetSkills(_char, _endOfRage) {
+	resetSkills(null,null,_char,null,_endOfRage,1);
 }
 function resetSkills(_ultimate, _keepCD, _char, _k, _endOfRage, _force) {
 	const _c = _char ?? mainCharacter;

@@ -2567,7 +2567,7 @@ function enemy(_e) {
 			//this.finishAnimation();
 			this.increaseHealth(MathAbs(this.health) + this.MAXHP);
 			this.ultimateUsed = false;
-			forceResetSkills();
+			forceResetSkills(this, 1);
 			this.dying = this.dead = this.remove = false;
 			this.attackerCount = 0;
 			this.addBuff({ key: 'release', level: 3, ms: 3000 });
@@ -2583,6 +2583,14 @@ function enemy(_e) {
 			});
 			this.immobilize = this.oldProps.immobilize;
 			delete this.deadDramaStart;
+			if(this.main) {
+				clearChainSkills();
+				delete this.chainStatus;
+				let _div = document.querySelector('.game-status-screen');
+				if(_div) 
+					_div.remove();
+				blurKeyboard();
+			}
 		}
 	}
 	// this.setSound = async function(_sf,_anima) {
@@ -3076,8 +3084,11 @@ function enemy(_e) {
 		if (_sf && this.soundPlaying != (this.frame + 1) && (!this.animationFinished || _sf.force)) {
 			if(!_sf.range || (!this.main && _sf.range))
 			{
-				this.soundPlaying = this.frame + 1;
-				this.setSound(_sf, _anima);
+				if((_gameTick - (this.lastSoundPlayedTime ?? 0)) > 500) {
+					this.soundPlaying = this.frame + 1;
+					this.lastSoundPlayedTime = _gameTick;
+					this.setSound(_sf, _anima);
+				}
 			}
 		}
 		else if(_anima.sound)
@@ -4533,9 +4544,12 @@ function enemy(_e) {
 		if(zoom !== this.ZOOM)
 			this.ZOOM = zoom;
 		let spriteOrigin = _frame.spriteOrigin ?? 0;
+		if(this.extraOriginX) {
+			delete this.extraOriginX;
+		}
 		const bottomGap = _frame.bottomGap ?? 0;
 		const rightGap = _frame.rightGap ?? 0;
-		const leftGap = _frame.leftGap ?? 0;
+		let leftGap = _frame.leftGap ?? 0;
 		if(this.shadow) {
 			if(bottomGap < 0)
 				this.SHADOWWIDTHRATE =  1 - (-bottomGap / (this.HURTHEIGHT * 2));
@@ -4955,9 +4969,6 @@ function enemy(_e) {
 	// 	// this.CLOSEENEMIES = _ce;
 	// 	return _ce;
 	// }
-	this.getOriginX = function (_frame) {
-		return (this.main ? 0 : platformX) + this.left + (_frame.spriteOrigin * this.ZOOM);
-	}
 	this.getClone = function (_aoe) {
 		return {
 			left: this.LEFT - (_aoe ?? 0),
@@ -6031,7 +6042,7 @@ function enemy(_e) {
 						x.attackerCount = x.hitTakenCount = 0;
 						x.setHealth(x.maxHP);
 						x.commonItem = x.moveDirection = undefined;
-						resetSkills(null, null,x);
+						forceResetSkills(x, 1);
 						if(x.main) {
 							clearChainSkills();
 							delete x.chainStatus;
@@ -6208,13 +6219,14 @@ this.getRotateVerticalRate = function(attacker, victim) {
 				_e.direction = _e.direction === __left ? __right : __left;
 			else if (!_e.alp && _f.atk.hurt.catch === 'front' && _e.direction === _t.direction)
 				_e.direction = _e.direction === __left ? __right : __left;
-			if (_f.atk.hurt.sound)
+			if (_f.atk.hurt.sound) {
 				requestAnimationFrame(() => {
 					if(_f.atk.hurt.sound.key)
 						PlaySound(_f.atk.hurt.sound);
 					else
 						PlaySound({ key: _e.class + _f.atk.hurt.sound, owner: _e }, [_f.atk.hurt.sound]);
 				});
+			}
 			else if(_e.bleed)
 				PlaySound({key:'fleshhurt' + getRandomValue2(1,6), volume:.7, owner: _e});
 			if (_f.atk.hurt.props) {
@@ -6555,6 +6567,8 @@ this.getRotateVerticalRate = function(attacker, victim) {
 								}
 								_e.increaseRage(_f.atk.hitTaken * (_t.criticalHit ? 2 : 1), null, 1);
 								let _canStop = false;
+								if(_f.atk.originX && !_t.extraOriginX)
+									_t.extraOriginX =_f.atk.originX;
 								if(_t.class !== __spell && !_t.hitStop && (_anima.hitStop || _f.atk.hitStop)) {
 									let _stopAdd = -1;
 									if(!_t.criticalHit) {
@@ -8012,7 +8026,8 @@ this.getRotateVerticalRate = function(attacker, victim) {
 			else if ((this.enemy || this.dropType === 'quest-item') && (this.left > (episode.width - (yy * maxLeft))))
 				this.left = (episode.width - MathCeil(yy * maxLeft));
 		}
-		let _xDiff = ((_reversed ? -1 : 1) * (this.ZOOM * (_frame.leftGap ?? 0))) + ((_reversed ? 1 : -1) * (_frame.spriteOrigin * this.ZOOM));
+		let _xDiff = ((_reversed ? -1 : 1) * (this.ZOOM * (_frame.leftGap ?? 0))) + ((_reversed ? 1 : -1) * 
+			((_frame.spriteOrigin + (this.extraOriginX ?? 0)) * this.ZOOM));
 		let _sw = _frame.spriteWidth * this.ZOOM;
 		if(this.iFrameJitter)
 		{

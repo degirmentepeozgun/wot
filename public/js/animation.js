@@ -20,6 +20,7 @@ function animation(_a) {
 	this.particleColor = _a.particleColor;
 	this.oldSpeed = this.speed;
 	this.frames = _a.frames;
+	this.do = _a.do;
 	if(this.frames?.[0])
 		this.frames.forEach(x => x.frameKey = 'l' + x.spriteLeft + 't' + x.spriteTop + 'w' + x.spriteWidth + 'h' + x.spriteHeight);
 	if(_a.alternateFrames)

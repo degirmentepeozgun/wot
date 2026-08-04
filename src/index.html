@@ -39,7 +39,7 @@
 			return (msNow % ((max - min) + 1)) + min;
 		}
 		function getRandomValue2(min, max) {
-			return MathFloor(Math.random() * (max - min + 1) + min);
+			return MathFloor(Math.random() * ((max - min) + 1) + min);
 		}
 		function getParameterByName(name, url = window.location.href) {
 			name = name.replace(/[\[\]]/g, '\\$&');
