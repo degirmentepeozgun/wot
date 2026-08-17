@@ -8,6 +8,7 @@ function enemy(_e) {
 	this.alp = _e.alp;
 	this.frame = 0;
 	this.start = 0;
+	this.shadowWidthRate = _e.shadowWidthRate ?? 1;
 	this.npc = _e.npc;
 	this.class = _e.class;
 	this.mustDraw = _e.mustDraw;
@@ -4552,7 +4553,7 @@ function enemy(_e) {
 		let leftGap = _frame.leftGap ?? 0;
 		if(this.shadow) {
 			if(bottomGap < 0)
-				this.SHADOWWIDTHRATE =  1 - (-bottomGap / (this.HURTHEIGHT * 2));
+				this.SHADOWWIDTHRATE =  1 - ((-bottomGap / (this.HURTHEIGHT * 2)) / this.shadowWidthRate);
 			else
 				this.SHADOWWIDTHRATE = 1;
 		}
@@ -5946,10 +5947,10 @@ function enemy(_e) {
 						+ _icon +
 					`</div>
 					<div class="status-item-action-container talk-avatar-text flex">
-						<div class="item-title-wrapper flex w-100 flex-jc-start">
+						<div class="item-title-wrapper dialogue-speaker flex w-100 flex-jc-start">
 							${_title}
 						</div>
-						<div class="item-action-wrapper flex flex-jc-start w-100">
+						<div class="item-action-wrapper dialogue-text flex flex-jc-start w-100">
 							${_text}
 						</div>
 					</div>
@@ -8212,7 +8213,6 @@ this.getRotateVerticalRate = function(attacker, victim) {
 			}
 		}
 		if(this.rotateAngle) {
-			console.log('rotate');
 			this.rotateAngle *= getRandomValue2(58, 68) / 100;
 			if(this.rotateAngle < 2 && this.rotateAngle > -2)
 				delete this.rotateAngle;

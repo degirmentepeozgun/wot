@@ -45,7 +45,7 @@ function animateStart(_failed) {
 									<img src="./images/ui/menu-icons/${_rs.icon}.png" style="height: 70%;margin-right: 2.5%;">
 								</div>
 								<div class="flex flex-jc-end stage-achievement-item-right">
-									<div class="flex flex-jc-end stage-achievement-item-right-top">
+									<div class="flex flex-jc-end stage-achievement-item-right-top" lang="${getLang()}">
 										${_rs.title[getLang()]}
 									</div>
 									<div class="flex flex-jc-end stage-achievement-item-right-bottom">
@@ -62,7 +62,7 @@ function animateStart(_failed) {
 				const _leadersList = document.querySelector('.leaderboards-list');
 				if(!_leadersList)
 					return;
-				_leaderboardsHTML = `<div class="w-100 fade-me flex flex-ai-end victory-header">${getLangData('Leaderboard')}</div>
+				_leaderboardsHTML = `<div class="w-100 fade-me flex flex-ai-end victory-header d-none">${getLangData('Leaderboard')}</div>
 					<div class="quickplay-leaderboards flex fade-me flex-ai-start"><div class="full char slide-right">`;
 				let _order = 1, player_order, player_score;
 				for(let _player of _leadersData) {
@@ -98,13 +98,13 @@ function animateStart(_failed) {
 		btnId = 'next-stage-btn';
 		action = 1;
 		_orderHTML = `<div class="stage-finish-informer flex w-100">
-						 <div class="flex w-100">${getLangData('After the countdown, you will be ported to next stage')}</div><span id="next-stage-counter">8</span>
+						 <div class="flex w-100">${getLangData('Next stage in')}</div><span id="next-stage-counter">8</span>
 					</div>`;
 	}
 	else {
 		btnId = 'quit-stage-btn';
 		_orderHTML = `<div class="stage-finish-informer flex w-100">
-						 <div class="flex w-100">${getLangData('After the countdown, action will be active')}</div><span id="next-stage-counter">8</span>
+						 <div class="flex w-100">${getLangData('Action will be active in')}</div><span id="next-stage-counter">8</span>
 					</div>`;
 	}
 	let _nextStageTimer, _nextStageCounter = 0, _playTicks;
@@ -141,16 +141,17 @@ function animateStart(_failed) {
 		<div class="w-50 side-left flex flex-jc-start flex-ai-start leaderboards-list op-none ms250" style="height:100% !important;width:55%;flex-direction:column">`
 			+ _leaderboardsHTML +
 		`</div>
-		<div class="w-50 container side-right flex flex-ai-start" style="height:90%;width:45%${_hasNext ? ';padding:.5% 0 3.5% 0!important' : ''}">
+		<div class="w-50 container side-right flex flex-ai-start${_hasNext ? ' has-next' : ''}">
 			<div class="full stage-results-screen-middle${_hasNext ? ' final-screen-before-next' : ''}" style="position:relative;z-index:2;margin: 0 13.5% 0 1.5%;width:85%">
-				<div class="stars flex w-100" style="height: 20%;position:relative;background: url(./images/ui/header.png);background-size: contain;background-repeat: no-repeat;background-position: center;">
-					<div class="w-50 flex one-line" style="position: absolute;left: 25%;height: 30%;font-size: 4vh !important;color: #f3f4f580;z-index: 0;text-shadow: 2px 2px 1px #000;padding-top: 1%;">` + _missionTitle + `</div>
+				<div class="stars flex w-100 flex-ai-end" style="height: 20%;position:relative;background: url(./images/ui/header.png);background-size: contain;background-repeat: no-repeat;background-position: center;">
+					<div class="w-50 flex one-line stars-title">` + _missionTitle + `</div>
 				</div>
-				<div class="flex flex-ai-start w-100" style="padding:0 27%;height:58%">
+				<div class="flex flex-ai-start w-100 stage-finish-body">
 					<div class="header-content w-100 flex flex-jc-start" style="height: 60%">`
 					 + _achievementsHtml +
 					`</div>
-					<div class="w-100 flex header flex-jc-start ms1500 op-none" style="height:20%;border-top:1px solid #f3f4f520">
+					<div class="stage-finish-splitter ms1500 op-none"></div>
+					<div class="w-100 stage-finish-total-score flex header flex-jc-start ms1500 op-none" style="height:20%">
 						<div class="w-100 flex flex-jc-start stage-achievement-item" style="height:50%">
 							<div class="w-50 flex flex-jc-start stage-achievement-item-left" style="height:100%">
 								${getLangData('Total Score')}
@@ -160,7 +161,7 @@ function animateStart(_failed) {
 							</div>
 						</div>
 						<div class="w-100 flex flex-jc-start stage-achievement-item${!_hasNext ? '' : ' d-none'}" style="height:50%">
-							<div class="w-50 flex flex-jc-start stage-achievement-item-left" style="height:100%">
+							<div class="w-50 flex flex-jc-start stage-achievement-item-left" style="height:100%" lang="${getLang()}">
 								${getLangData('Final Score')}
 							</div>
 							<div id="final-quickplay-score" class="w-50 flex flex-jc-end stage-achievement-item-right" style="height:100%">

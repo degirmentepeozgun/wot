@@ -55,29 +55,29 @@ const avatarTemplate = function (char, _name) {
 	if (_oldAvatar)
 		_oldAvatar.remove();
 	const _class = char.main ? '' : (episode?.pvp ? ' war-player-profile' : ' friendly-profile');
-	let _html = `<div style="margin-top:0 !important;cursor:pointer;position:relative;width:20.2vw;aspect-ratio:101/59;height:auto!important" ${char.main ? 'onexactclick="if(episode.id > 99 || __story) { return; } showMyModalPopUp(\'game-menu\');switchBookPage(1)" ' : 'onexactclick="switchCharacter(null,null,null,1)"'}class="profile${_class}" id="char-${char.key}">
-			<img src='./images/icons/hp-frame.png' class='full' style='left: 0; top: 0; position: absolute; z-index: 2; filter:drop-shadow(0 0 .8vh #000) drop-shadow(0 0 .8vh #000)' />
-			<div class="full flex">
-				<div style="color:white;width:34%;height:100%">
-					<div style="height:55%;padding:6.5% 5%;overflow:hidden;position:relative">
-						<div class="full flex" style="margin:14% 22% 15% 8%;transform:rotate(45deg);-webkit-transform:rotate(45deg);background:radial-gradient(circle at center, ${char.color}, black);border-radius:100%">
+	let _html = `<div ${char.main ? 'onexactclick="if(episode.id > 99 || __story) { return; } showMyModalPopUp(\'game-menu\');switchBookPage(1)" ' : 'onexactclick="switchCharacter(null,null,null,1)"'}class="hb-frame-wrapper profile${_class}" id="char-${char.key}">
+			<img src='./images/ui/game/hb2.png' class='full hb-frame' />
+			<div class="full flex hb-frame-inner">
+				<div class="hb-frame-inner-left">
+					<div class="hb-frame-inner-left-inner">
+						<div class="full flex hb-frame-inner-left-inner-top" style="background:radial-gradient(circle at center, ${char.color}, black)">
 							<span id="level-${char.key}" class="character-level-text">${char.level ?? 1}</span>
 						</div>
-						<div class="${!char.main && char.switchTime ? 'switch-character-cooldown' : 'd-none'}" style="opacity:0;margin-top:14%;position:absolute;width:100%;height:100%;top:0;left:0;background:#000000cc"></div>
+						<div class="hb-frame-inner-left-inner-bottom ${!char.main && char.switchTime ? 'switch-character-cooldown' : 'd-none'}"></div>
 					</div>
 				</div>
-				<div style="width:66%;height:100%">
-					<div class="flex flex-ai-start flex-jc-start" style="width:100%;height:24%">
-						<span class="character-name-text" style="color:#E2DFD2;font-weight:600;font-size:1.4vw !important;text-shadow:.25vh .25vh .5vh #000">${char?.main ? (__account.name === '' ? getLangData('Player') + ' ' + __account.id.substring(0,4).toUpperCase() : __account.name) ?? char.name : char?.displayName ?? char?.name}</span>
+				<div class="hb-frame-inner-right">
+					<div class="flex flex-ai-start flex-jc-start hb-frame-inner-right-top">
+						<span class="character-name-text hb-frame-inner-right-top-inner font-player-name">${char?.main ? (__account.name === '' ? getLangData('Player') + ' ' + __account.id.substring(0,4).toUpperCase() : __account.name) ?? char.name : char?.displayName ?? char?.name}</span>
 					</div>
-					<div style="position:relative;margin-top:2%;height:16%;background:#FFFFFF99;clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 0% 100%); width:95%;overflow:hidden">
-						<div class="full healthvalue" style="position:absolute;background:#880808;clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 0% 100%); width:${100 * (char.health / char.MAXHP)}%">
+					<div class="hb-frame-inner-right-middle">
+						<div class="full healthvalue hb-frame-inner-right-middle-top" style="width:${100 * (char.health / char.MAXHP)}%">
 						</div>
-						<div class="full healthvalue" style="position:absolute;background:#0818A8;clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 0% 100%); width:${100 * (char.health / char.MAXHP)}%">
+						<div class="full healthvalue hb-frame-inner-right-middle-bottom" style="width:${100 * (char.health / char.MAXHP)}%">
 						</div>
 					</div>
-					<div style="width:68%;height:10%;background:#FFFFFF99;clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 0% 100%);overflow:hidden">
-						<div class="full defbar-value" style="background:#BF40BF;clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 0% 100%)"></div>
+					<div class="hb-frame-inner-right-bottom">
+						<div class="full defbar-value hb-frame-inner-right-bottom-inner"></div>
 					</div>
 					<div class="buffs flex flex-jc-start" style="padding:.4vw .8vw"></div>
 				</div>
@@ -85,9 +85,9 @@ const avatarTemplate = function (char, _name) {
 			<img class="move-up d-none" src="./images/icons/upgrade.png" style="-webkit-filter:drop-shadow(0 0 .3vh #fff);filter:drop-shadow(0 0 .3vh #fff);z-index:2;position:absolute;width:1.8vw;left:.8vw" />
 			<img class="aid${episode?.pvp || char.main || char.isDead() || char.health >= char.MAXHP ? ' v-none' : ''}" id="aid-${char.key}" onexactclick="drinkPot(episode.enemies.find(x => x.key === '${char.key}'), mainCharacter, event)" src="./images/icons/aid.png" />`
 			if(char.main && char.heartCount > 1) {
-				_html += `<img src='./images/icons/heart.png' id='heartcount1' />
-					<img${char.heartCount > 1 ? '' : ' class="gray"'} src='./images/icons/heart.png' id='heartcount2' />
-					<img${char.heartCount > 2 ? '' : ' class="gray"'} src='./images/icons/heart.png' id='heartcount3' />`;
+				_html += `<img src='./images/icons/heart.png' id='heartcount1' style="display:none" />
+					<img${char.heartCount > 1 ? '' : ' class="gray"'} style="display:none" src='./images/icons/heart.png' id='heartcount2' />
+					<img${char.heartCount > 2 ? '' : ' class="gray"'} style="display:none" src='./images/icons/heart.png' id='heartcount3' />`;
 			}
 		return _html + '</div>';
 }

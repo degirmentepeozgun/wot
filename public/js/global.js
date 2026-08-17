@@ -2462,6 +2462,11 @@ const relatedObjects = [
 		id: 'mud', key: 'mud',
 		width: 274, height: 215, col:7, zoom: 1, multiUse: true,
 		totalFrames: 14, speed: 2, singleton: true, still: true
+	},
+	{
+		id: 'whitedzzt', key: 'whitedzzt', baseTop: 450,
+		width: 300, height: 225, col:8, zoom: 1,
+		totalFrames: 32, speed: 3, singleton: true, still: true
 	}
 ];
 function setRelatedObjectSpeed() {
@@ -2996,6 +3001,9 @@ const relatedObjectImages = {
 	dzzt: function () {
 		return getImage('./images/related/dzzt-2.png')
 	},
+	whitedzzt: function () {
+		return getImage('./images/sprites/ep37/electric-blue.png')
+	},
 	jump: function () {
 		return getImage('./images/related/air-jump.png')
 	},
@@ -3189,6 +3197,10 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	groundslide: './images/sounds/groundslide.mp3',
+	voodooelectrix: './images/sounds/voodoo-electrix.mp3',
+	voodooland: './images/sounds/voodooland.mp3',
+	shamancounter: './images/sounds/shaman-counter.mp3',
 	shamanhandhit: './images/sounds/shaman-hand-hit.mp3',
 	shamanhand: './images/sounds/shaman-hand.mp3',
 	firepuff: './images/sounds/fire-puff.mp3',
@@ -4660,6 +4672,24 @@ const mapSprites = [
 			{ minYRate: 0, maxYRate: 15, min_X: MathRound(1950 * 1.065), max_X: MathRound(2650 * 1.065), foreground: true },
 			{ minYRate: 0, maxYRate: 15, min_X: MathRound(3500 * 1.065), max_X: MathRound(4200 * 1.065), foreground: true }
 		],
+		groundLayerLighting: [
+			{
+				id: "purple_torch_right",
+				xBase: 1700,
+				yBase: 500,
+				color: "#A86CFF",
+				intensity: 0.32,
+				radiusBase: 700
+			},
+			{
+				id: "purple_torch_right",
+				xBase: 6144 - 1700,
+				yBase: 500,
+				color: "#A86CFF",
+				intensity: 0.32,
+				radiusBase: 700
+			}
+		],
 		objectMobs: [
 			{
 				id: 626,
@@ -5250,6 +5280,63 @@ const mapSprites = [
 		id: 11, ambianceVolume: .03, coords: { left: '16%', top: '32%', title: 'Swamp' }, 
 		theme: 'lush', hasMobile: true, distance: 1, width: MathFloor(6144 * 1.065),
 		minLevel: 1, 
+		groundLayerLighting: [
+			{
+				id: "ground_glow_left",
+				xBase: 500,
+				yBase: 820,
+				"color": "#D6E85A",
+				"intensity": 0.2,
+				"radiusBase": 500
+				// color: "#FF0000",
+				// intensity: 1,
+				// radiusBase: 500
+			},
+			{
+				id: "ground_glow_center",
+				xBase: 2100,
+				yBase: 780,
+				// color: "#FF0000",
+				// intensity: 1,
+				// radiusBase: 500
+				color: "#C9E96A",
+				intensity: 0.23,
+				radiusBase: 600
+			},
+			{
+				id: "ground_glow_right",
+				xBase: 3750,
+				yBase: 820,
+				// color: "#FF0000",
+				// intensity: 1,
+				// radiusBase: 500
+				color: "#A9D94F",
+				intensity: 0.18,
+				radiusBase: 500
+			},
+			{
+				id: "ground_glow_far_right",
+				xBase: 5600,
+				yBase: 820,
+				// color: "#FF0000",
+				// intensity: 1,
+				// radiusBase: 500
+				color: "#A9D94F",
+				intensity: 0.18,
+				radiusBase: 500
+			},
+			// {
+			// 	id: "waterfall_glow",
+			// 	xBase: 2350,
+			// 	yBase: 650,
+			// 	color: "#FF0000",
+			// 	intensity: 1,
+			// 	radiusBase: 500
+			// 	// color: "#8FE8A5",
+			// 	// intensity: 0.28,
+			// 	// radiusBase: 850
+			// }
+		],
 		// itemGrade: 3,
 		// equipmentDropRates: [
 		// 	{ key:'necklace', rate: 8 },
@@ -5901,6 +5988,97 @@ const mapSprites = [
 		id: 36, coords: { left: '5%', top: '40%', title: 'Arena', icon: 'battleground' }, 
 		theme: 'cave', hasMobile: true, distance: 1, width: MathFloor(6144 * 1.065), ambiancePath: './images/sounds/cave2.mp3',
 		ambianceVolume: .5,
+		groundLayerLighting: [
+			{
+				id: "cave_dark_left",
+				type: "darkness",
+				xBase: 0,
+				yBase: 500,
+				color: "#000000",
+				intensity: 0.35,
+				radiusBase: 1000
+			},
+			// =====================================================
+			// SOL KARANLIK BÖLGE — SOĞUK DOLGU
+			// =====================================================
+			// {
+			// 	id: "cave_cold_left",
+			// 	xBase: 300,
+			// 	yBase: 800,
+			// 	color: "#29476A",
+			// 	intensity: 0.28,
+			// 	radiusBase: 1550
+			// },
+
+			// =====================================================
+			// SOL-ORTA GEÇİŞ
+			// =====================================================
+			{
+				id: "cave_cold_left_center",
+				xBase: 1350,
+				yBase: 580,
+				color: "#102641",
+				intensity: 0.18,
+				radiusBase: 300
+			},
+
+			// =====================================================
+			// SICAK MERKEZ
+			// =====================================================
+			{
+				id: "cave_warm_center",
+				xBase: 2800,
+				yBase: 720,
+				color: "#D87943",
+				intensity: 0.2,
+				radiusBase: 400
+			},
+
+			// =====================================================
+			// MERKEZDEN SAĞA GEÇİŞ
+			// =====================================================
+			{
+				id: "cave_warm_right_center",
+				xBase: 4400,
+				yBase: 720,
+				color: "#C9683D",
+				intensity: 0.2,
+				radiusBase: 400
+			},
+
+			// =====================================================
+			// SAĞ KARANLIK BÖLGE
+			// =====================================================
+			{
+				id: "cave_cold_right",
+				xBase: 3900,
+				yBase: 550,
+				color: "#304D75",
+				intensity: 0.28,
+				radiusBase: 500
+			},
+
+			// =====================================================
+			// EN SAĞ
+			// =====================================================
+			{
+				id: "cave_cold_far_right",
+				xBase: 4900,
+				yBase: 550,
+				color: "#294568",
+				intensity: 0.25,
+				radiusBase: 500
+			},
+			{
+				id: "cave_dark_right",
+				type: "darkness",
+				xBase: 6200,
+				yBase: 500,
+				color: "#000000",
+				intensity: 0.35,
+				radiusBase: 500
+			}
+		],
 		mobs: [
 		],
 		objects: [
@@ -9972,6 +10150,209 @@ const spells = {
 							yRange: 10,
 							rate: 2,
 							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'toxic'
+						}
+					}
+				]
+			}
+		}
+	},
+	beespit: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		src: './images/sprites/ep07/spit.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		class: __spell,
+		name: 'Bee Spit',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 427,
+						spriteTop: 237,
+						spriteWidth: 34,
+						spriteHeight: 42,
+						spriteOrigin: 17,
+						bottomGap: -172,
+						sound: { key: 'emegenspitdead', volume: .8 },
+						speed: 4
+					},
+					{
+						spriteLeft: 463,
+						spriteTop: 222,
+						spriteWidth: 42,
+						spriteHeight: 68,
+						spriteOrigin: 21,
+						bottomGap: -159,
+						speed: 4
+					},
+					{
+						spriteLeft: 507,
+						spriteTop: 199,
+						spriteWidth: 60,
+						spriteHeight: 105,
+						spriteOrigin: 30,
+						bottomGap: -140,
+						speed: 4
+					},
+					{
+						spriteLeft: 571,
+						spriteTop: 181,
+						spriteWidth: 85,
+						spriteHeight: 140,
+						spriteOrigin: 43,
+						bottomGap: -122,
+						speed: 4
+					},
+					{
+						spriteLeft: 656,
+						spriteTop: 166,
+						spriteWidth: 112,
+						spriteHeight: 176,
+						spriteOrigin: 56,
+						bottomGap: -104,
+						speed: 4
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				attack: true,
+				move: true,
+				frames: [
+					{
+						spriteLeft: 1,
+						spriteTop: 237,
+						spriteWidth: 30,
+						spriteHeight: 39,
+						spriteOrigin: 15,
+						bottomGap: -132 - 50,
+						extraStepXRate: .7,
+						speed: 6,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'toxic'
+						}
+					},
+					{
+						spriteLeft: 31,
+						spriteTop: 237,
+						spriteWidth: 72,
+						spriteHeight: 39,
+						spriteOrigin: 36,
+						bottomGap: -132 - 50,
+						extraStepXRate: .7,
+						speed: 6,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'toxic'
+						}
+					},
+					{
+						spriteLeft: 105,
+						spriteTop: 237,
+						spriteWidth: 104,
+						spriteHeight: 39,
+						spriteOrigin: 52,
+						bottomGap: -130 - 50,
+						extraStepXRate: .7,
+						speed: 6,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'toxic'
+						}
+					},
+					{
+						spriteLeft: 211,
+						spriteTop: 237,
+						spriteWidth: 86,
+						spriteHeight: 39,
+						spriteOrigin: 43,
+						bottomGap: -125 - 50,
+						extraStepXRate: .7,
+						speed: 6,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'toxic'
+						}
+					},
+					{
+						spriteLeft: 300,
+						spriteTop: 237,
+						spriteWidth: 77,
+						spriteHeight: 39,
+						spriteOrigin: 39,
+						bottomGap: -123 - 50,
+						extraStepXRate: .72,
+						speed: 6,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'toxic'
+						}
+					},
+					{
+						spriteLeft: 380,
+						spriteTop: 237,
+						spriteWidth: 44,
+						spriteHeight: 39,
+						spriteOrigin: 22,
+						bottomGap: -123 - 50,
+						extraStepXRate: .75,
+						speed: 6,
+						atk: {
+							yRange: 15,
+							reset: 1,
+							rate: 2,
 							hurt: {
 								key: 'hurtground1',
 								type: 'ground'
@@ -14289,62 +14670,65 @@ const spells = {
 					{
 						spriteLeft: 0,
 						spriteTop: 355,
-						spriteWidth: 600,
+						spriteWidth: 28,
 						spriteHeight: 245,
-						spriteOrigin: 300,
+						spriteOrigin: 14,
 						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
 						speed: 6
 					},
 					{
-						spriteLeft: 600,
+						spriteLeft: 662,
 						spriteTop: 355,
-						spriteWidth: 600,
+						spriteWidth: 40,
 						spriteHeight: 245,
-						spriteOrigin: 300,
+						spriteOrigin: 20,
 						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
 						speed: 6
 					},
 					{
-						spriteLeft: 1200,
+						spriteLeft: 1333,
 						spriteTop: 355,
-						spriteWidth: 600,
+						spriteWidth: 44,
 						spriteHeight: 245,
-						spriteOrigin: 300,
+						spriteOrigin: 22,
 						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
 						speed: 6
 					},
 					{
-						spriteLeft: 1800,
+						spriteLeft: 2015,
 						spriteTop: 355,
-						spriteWidth: 600,
+						spriteWidth: 33,
 						spriteHeight: 245,
-						spriteOrigin: 300,
+						spriteOrigin: 16,
 						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
 						speed: 6
 					},
 					{
-						spriteLeft: 2400,
+						spriteLeft: 2647,
 						spriteTop: 355,
-						spriteWidth: 600,
+						spriteWidth: 26,
 						spriteHeight: 245,
-						spriteOrigin: 300,
+						spriteOrigin: 13,
 						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
 						speed: 5
 					},
 					{
-						spriteLeft: 2400,
+						spriteLeft: 2647,
 						spriteTop: 355,
-						spriteWidth: 600,
+						spriteWidth: 26,
 						spriteHeight: 245,
-						spriteOrigin: 300,
+						spriteOrigin: 13,
 						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
 						speed: 1,
+						do: function(_e) {
+							delete _e.shadow;
+						},
 						atk: {
 							yRange: 15,
 							rate: 1,
@@ -18776,6 +19160,113 @@ const spells = {
 							},
 							type: 'common'
 						}
+					}
+				]
+			},
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			}
+		}
+	},
+	voodoodoll: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		invulnerable: true,
+		pierce: true,
+		width: 200,
+		height: 200,
+		class: __spell,
+		src: './images/sprites/ep37/air-voodoo.png',
+		name: 'Voodoo Doll',
+		animations: {
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				attack: true,
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						extraStepXRate: .5,
+						extraStepYRate: -.085,
+						bottomGap: -200,
+						speed: 6
+					},
+					{
+						spriteLeft: 200,
+						spriteTop: 0,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						extraStepXRate: .45,
+						extraStepYRate: -.09,
+						bottomGap: -100,
+						speed: 6
+					},
+					{
+						spriteLeft: 200,
+						spriteTop: 0,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						extraStepXRate: .4,
+						extraStepYRate: -.095,
+						bottomGap: -50,
+						sound: { key: 'voodooland' , volume: 1 },
+						speed: 6
+					},
+					{
+						spriteLeft: 200,
+						spriteTop: 0,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						bottomGap: 10,
+						do : function(_char) {
+							const _old = episode.enemies?.find?.(x => x.id === 114);
+							if(_old)
+								_old.remove = true;
+							const _left = MathRound((_char.HURTLEFT + _char._HURTBOX_half + platformX) / __zoom);
+							const _mobs = [
+								{
+									id: 114,
+									minX: _left,
+									maxX: _left,
+									difficulty: _char.difficulty,
+									sight: 99,
+									count: 1,
+									yPosition: _char.yPosition,
+									minLevel: _char.level,
+									maxLevel: _char.level
+								}
+							];
+							episode.installMobs(_mobs, function (_e) {
+								_e.direction = _char.direction;
+								_e.autoTarget = _char.autoTarget;
+								_e.experience = 0;
+								_e.atk = (_char.owner ?? _char.related).atk;
+							});
+						},
+						speed: 6
 					}
 				]
 			},
@@ -35797,7 +36288,7 @@ const cssAnimations = {
 			_curt.className += ' focus-transparent';
 		if(_text) {
 			if(!_doneBtn)
-				_curt.innerHTML = '<div class="flex overlay-black-text">' + _text + '</div>';
+				_curt.innerHTML = '<div lang="'+ getLang()+'" class="flex overlay-black-text">' + _text + '</div>';
 			else {
 				const _wrapper = document.createElement('div');
 				_wrapper.className = 'flex w-100 show-ui';
@@ -35807,8 +36298,8 @@ const cssAnimations = {
 				const _btnWrapper = document.createElement('div');
 				_btnWrapper.className = 'flex black-screen-ok-btn w-100';
 				const _btn = document.createElement('div');
-				_btn.style = 'color:#f7f7f7cc !important;font-size:3vh !important';
-				_btn.className = "game-btn2 flex one-line";
+				_btn.style = 'color:#f7f7f7cc !important;height:6vh !important;font-size:3vh !important';
+				_btn.className = "orange-action-btn flex one-line";
 				_btn.innerText = getLangData('Done');
 				if(__isPC)
 					_btn.onexactclick = function() {

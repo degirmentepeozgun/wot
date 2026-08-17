@@ -556,10 +556,10 @@ function createTipsUI(_tipOrder, _showCurrent) {
 	`</div></div>`;
 	setTimeout(() => {
 		document.getElementById('loading-tip').innerHTML = `<div class="tip-wrapper flex flex-ai-start">
-			<div style="padding:0 3vh;text-align:right"> 
+			<div class="tip-label flex flex-jc-end" lang="${getLang()}"> 
 				${getLangData('Tip')}<span id="tip-current">${_showCurrent ? ' ' + _current.toString() + '/' + _count.toString() : ': '}</span>
 			</div>
-			<div class="flex flex-jc-start" style="flex:1;padding:0 3vh 0 0">
+			<div class="flex flex-jc-start tip-text" style="flex:1;padding:0 3vh 0 0" lang="${getLang()}">
 				${_tips[_tipOrder][getLang()]}
 			</div>
 		</div>`;

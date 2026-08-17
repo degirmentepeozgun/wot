@@ -5,7 +5,7 @@
 
 #story-finish.finish {
 	aspect-ratio: 770 / 413;
-	background: url(./../images/ui/full-border.png), radial-gradient(#232323, #000);
+	background: url(./../images/ui/game/fullbg2.png), radial-gradient(#232323, #000);
 	background-size: 100% 100%, 50% 100% !important;
 	position: absolute;
 	opacity: 1;
@@ -78,7 +78,12 @@ body.mobile-device #story-finish.finish {
 #story-finish .side-right {
 	position: relative;
 	height: 80%;
-	overflow:hidden
+	overflow:hidden;
+	height:98%;
+	width:45%
+}
+#story-finish .side-right.has-next {
+	padding:1% 0 6% 0!important
 }
 #story-finish .side-right {
 	padding:2% 0
@@ -88,7 +93,9 @@ body.mobile-device #story-finish.finish {
     background-size: 100% 100%;
     width: auto !important;
     font-weight: 400 !important;
-	font-size: 3vh !important;
+	font-size: 2.2vh !important;
+	line-height: 2.2vh !important;
+	font-family:cinzelbold !important;
     height: 80% !important;
     color: #cfcfcf !important;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
@@ -116,8 +123,8 @@ body.mobile-device #story-finish.finish {
 	text-shadow: .4vh .4vh 0 #9d987f
 }
 .quickplay-leaderboards {
-	padding: 4% 12.5% 8% 12.5%;
-	height:88%;
+	padding: 14% 12.5% 8% 12.5%;
+	height:100%;
 	width:100%;
 	position: relative;
 }
@@ -127,24 +134,52 @@ body.mobile-device #story-finish.finish {
 	width:100%
 }
 .leaderboard-item-left {
-	color:#f3f4f5cc !important;
-	font-size: 2.6vh !important;
-	padding-left:2vh
+	padding-left:2vh;
+    font-family: cinzelsemibold, serif !important;
+    font-size: 1.55vh !important;
+    font-weight: 600!important;
+    letter-spacing: 0.025em;
+    color: #ddd6c9!important;
+    text-shadow:
+        0 2px 2px rgba(0, 0, 0, 0.95);
+    text-transform: none;
 }
 .leaderboard-item-right {
-	color:#967969 !important;
-	font-size: 2.6vh !important;
-	padding-right:2vh
+	padding-right:2vh;
+	font-family: cinzelsemibold, serif !important;;
+    font-size: 1.45vh !important;;
+    font-weight: 600 !important;;
+    letter-spacing: 0.035em;
+    color: #b9a28a !important;
+    text-shadow:
+        0 2px 2px rgba(0, 0, 0, 0.95);
+    text-transform: none;
 }
 .leaderboard-item:nth-child(2n-1) {
 	background-color: #f3f4f510;
 }
 .leaderboard-item.selected {
-	background-color: #F4BB44cc;
-	border:1px solid #f3f4f5ab
+	background:
+        linear-gradient(
+            90deg,
+            rgba(120, 86, 28, 0.82),
+            rgba(171, 124, 42, 0.92),
+            rgba(120, 86, 28, 0.82)
+        );
+
+    border: 0.1vh solid rgba(220, 174, 73, 0.65);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 220, 130, 0.18),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+        0 1px 3px rgba(0, 0, 0, 0.7);
 }
 .leaderboard-item.selected * {
-	color:#262626 !important;
+	color: #fff0c7 !important;
+
+    text-shadow:
+        0 2px 2px rgba(0, 0, 0, 0.95),
+        0 0 3px rgba(0, 0, 0, 0.55);
 }
 #story-finish .victory-header {
 	height: 12% !important;
@@ -169,34 +204,43 @@ body.mobile-device #story-finish.finish {
 	height: 33%;
 }
 #story-finish .stage-achievement-item-left {
-	color:#f3f4f5ab !important;
+	color:#e8e5de !important;
+	font-family: cinzelsemibold, sans-serif !important;
+	font-weight: 400 !important;
+	line-height: 2vh !important;
+	font-size:2vh !important;
 	height:100%;
-	line-height: 3vh !important;
-	font-size:2.6vh !important
+
 }
 #story-finish .stage-achievement-item-left img{
 	height:4vh !important
 }
 #story-finish .stage-achievement-item-right {
 	height:100%;
-	color:#967969 !important;
-	font-size: 2.6vh !important;
-	line-height: 3vh !important;
+	color:#e0b84a !important;
+	font-family: "Open Sans", sans-serif !important;
+	font-weight: 400 !important;
+	line-height: 2vh !important;
+	font-size: 2vh !important;
 	flex:1
 }
 #story-finish .stage-achievement-item-right-top {
-	color:#f3f4f5ab !important;
+	color:#e8e5de !important;
+	font-family: cinzelsemibold, sans-serif !important;
+	font-weight: 400 !important;
 	height:50%;
 	width:100%;
-	line-height: 3vh !important;
-	font-size: 2.6vh !important;
+	font-size: 2vh !important;
+	line-height: 2vh !important;
 }
 #story-finish .stage-achievement-item-right-bottom {
 	color:#967969 !important;
+	font-family: "Open Sans", sans-serif !important;
+	font-weight: 400 !important;
+	line-height: 2vh !important;
+	font-size: 2vh !important;
 	width:100%;
-	line-height: 3vh !important;
 	height:50%;
-	font-size: 2.6vh !important;
 }
 #story-finish .w-33 {
 	width: 33.33%
@@ -209,14 +253,16 @@ body.mobile-device #story-finish.finish {
 }
 #story-finish .stage-finish-informer * {
 	line-height: 3vh !important;
-	color:#f3f4f560 !important;
-	font-size: 2.4vh !important;
+	color:#bebab0 !important;
+	font-family: "Open Sans", sans-serif !important;
+	font-size: 1.9vh !important;
 	text-align: center;
 }
 #story-finish #next-stage-counter {
+	font-family: cinzelbold, sans-serif !important;
 	font-size: 2.6vh !important;
-	font-weight: 600;
-	color: #F4BB44 !important;
+	font-weight: 700 !important;
+	color: #d4af37 !important;
 }
 #story-finish .btn.inactivated {
 	pointer-events: none !important;
@@ -232,13 +278,19 @@ body.mobile-device #story-finish.finish {
 	 #story-finish .side-right {
 		transform: scale(1.2) !important;
 		-webkit-transform: scale(1.2) !important;
-		margin-top: 7%
+		margin-top: 7%;
+		height:89% !important
 	 }
-	 #story-finish .stage-achievement-item-right-top {
-		font-size: 3.4vh !important;
+	 #story-finish .side-right.has-next {
+		padding-top:0 !important;
 	 }
-	 #story-finish .stage-achievement-item-right-bottom {
-		font-size: 3.6vh !important;
+	 #story-finish .stage-achievement-item-right-top,
+	 #story-finish .stage-achievement-item-left {
+		font-size: 3vh !important;
+	 }
+	 #story-finish .stage-achievement-item-right-bottom,
+	 #story-finish .stage-achievement-item-right {
+		font-size: 2.9vh !important;
 	 }
 	 #story-finish .stage-achievement-item-left img {
 		height: 5vh !important;
@@ -246,5 +298,16 @@ body.mobile-device #story-finish.finish {
 	#story-finish.finish {
 		max-height:100% !important;
 		min-height:100% !important;
+	}
+}
+@media
+    (hover: none),
+    (pointer: coarse),
+    (max-width: 1024px) {
+	 #story-finish .side-right.has-next {
+		padding-top:0 !important;
+	 }
+	#story-finish .stage-finish-body {
+		padding:4% 26% 0 26%
 	}
 }

@@ -6920,6 +6920,10 @@ const __stories = [
 				owner: 'system',
 				minLevel: 1,
 				maps: [201],
+				props: {
+					current: 1,
+					limit: 12
+				},
 				timer: {
 					ms: 200000,
 					after: function() {
@@ -6943,6 +6947,10 @@ const __stories = [
 				owner: 'system',
 				minLevel: 1,
 				maps: [11],
+				props: {
+					current: 0,
+					limit: 12
+				},
 				timer: {
 					ms: 200000,
 					after: function() {
@@ -7176,14 +7184,15 @@ const __stories = [
 						_div.innerHTML = `<img class="tutorial-avatar flip" src="./images/main/blacksmith/concept.png" />
 						<div class="tutorial-box-inner full">
 						<b class="tutorial-title">${__storyScene.lang[0].title[getLang()]}:</b>
-							<div class="w-100 tutorial-description-text">
+							<div class="w-100 tutorial-description-text" lang="${getLang()}">
 								${__storyScene.lang[0][getLang()]}
 							</div>	
 						</div>`;
 						_gameUI.appendChild(_div);
 						const _skip = document.createElement('div');
-						_skip.className = 'flex show-ui tutorial-skip fade-me';
-						_skip.innerHTML = 'Skip Tutorial';
+						_skip.className = 'flex show-ui tutorial-skip fade-me red-action-btn';
+						_skip.innerHTML = getLangData('Skip Tutorial');
+						_skip.lang = getLang();
 						_skip.onexactclick = function() {
 							episode.tutorialEnded = true;
 						}
@@ -7268,7 +7277,7 @@ const __stories = [
 							_game.suspended = 1;
 							const _inner = document.querySelector('.tutorial-box-inner');
 							_inner.innerHTML = `<b class="tutorial-title fade-me">${__storyScene.lang[2].title[getLang()]}:</b>
-							<div class="w-100 fade-me tutorial-description-text"">
+							<div class="w-100 fade-me tutorial-description-text" lang="${getLang()}">
 								${__storyScene.lang[2][getLang()]}</div>`;
 							focusMe('#' + _id, function() {
 								removeFocus();
@@ -7461,7 +7470,7 @@ const __stories = [
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
 							_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[9].title[getLang()]}:</b>
-							<div class="w-100 fade-me tutorial-description-text">
+							<div class="w-100 fade-me tutorial-description-text" lang="${getLang()}">
 								${__storyScene.lang[9][getLang()]}
 							</div>`;
 							_game.suspended = 1;
@@ -7498,7 +7507,7 @@ const __stories = [
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
 								_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[10].title[getLang()]}:</b>
-									<div class="w-100 fade-me tutorial-description-text">
+									<div class="w-100 fade-me tutorial-description-text" lang="${getLang()}">
 										${__storyScene.lang[10][getLang()]}
 								</div>`;
 							mainCharacter.immobilize = true;
@@ -7558,7 +7567,7 @@ const __stories = [
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
 								_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[11].title[getLang()]}:</b>
-								<div class="w-100 fade-me tutorial-description-text">
+								<div class="w-100 fade-me tutorial-description-text" lang="${getLang()}">
 									${__storyScene.lang[11][getLang()]}
 								</div>`;
 							episode.tutorialOrder = 13;
@@ -7612,7 +7621,7 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[12].title[getLang()]}:</b><div class="w-100 fade-me tutorial-description-text">
+								_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[12].title[getLang()]}:</b><div class="w-100 fade-me tutorial-description-text" lang="${getLang()}">
 										${__storyScene.lang[12][getLang()]}
 								</div>`;
 							mainCharacter.direction = __right;
@@ -7874,7 +7883,7 @@ const __stories = [
 						</div>`;
 						}
 						_desc.innerHTML = _html +
-						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2vh" class="w-50 h-100 flex flex-jc-start" onclick="doNotShowAgain(this,event)"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2vh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(0, 1, null, null, 1);skipQuickPlayTutorial(1)">&lt;&nbsp;${getLangData('UNDERSTOOD')}&nbsp;&gt;</div></div>`;
+						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2vh" class="w-50 h-100 flex flex-jc-start" onclick="doNotShowAgain(this,event)"  lang="${getLang()}"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2vh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(0, 1, null, null, 1);skipQuickPlayTutorial(1)"><div class="orange-action-btn flex">${getLangData('UNDERSTOOD')}</div></div></div>`;
 						_gameUI.appendChild(_desc);
 						episode.hasSkippableScreen = 1;
 						addClass(_gameUI, 'disable-ui');
@@ -7902,6 +7911,11 @@ const __stories = [
 					// 		});
 					// 	}
 					// });
+					// setTimeout(() => {
+						
+					// 		const _portal = summonMob(113, 3000, MathRound(groundheight * .5), 1);
+					// 		activatePortal(_portal);
+					// }, 3000);
 				},
 				actions: [
 					{
@@ -8128,6 +8142,10 @@ const __stories = [
 								y.maxHP = y.MAXHP = mainCharacter.level * 60;
 								y.name = y.displayName = '';
 								y.setHealth(y.maxHP);
+							}
+							if(__account?.questStatus?.quest?.props) {
+								__account.questStatus.quest.props.current++;
+								updateQuestArea();
 							}
 							// updateQuestArea(null, {
 							// 	id: 1000 + mainCharacter.level,
@@ -8493,7 +8511,7 @@ const __stories = [
 									</div>`;
 						}
 						_desc.innerHTML = _html +
-						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2vh" class="w-50 h-100 flex flex-jc-start" onclick="doNotShowAgain(this,event)"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2vh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(1, 1, null, null, 1);skipQuickPlayTutorial(2)">&lt;&nbsp;${getLangData('UNDERSTOOD')}&nbsp;&gt;</div></div>`;
+						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2vh" class="w-50 h-100 flex flex-jc-start" onclick="doNotShowAgain(this,event)" lang="${getLang()}"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2vh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(1, 1, null, null, 1);skipQuickPlayTutorial(2)"><div class="orange-action-btn flex">${getLangData('UNDERSTOOD')}</div></div></div>`;
 						addClass(_gameUI, 'disable-ui');
 						requestAnimationFrame(() => {
 							_game.suspended = true;
@@ -8523,7 +8541,6 @@ const __stories = [
 							let _div = document.querySelector('.game-status-screen');
 							if(_div)
 								_div.remove();
-							
 							_div = document.createElement('div');
 							_div.className = 'flex game-status-screen';
 							_gameUI.appendChild(_div);
@@ -8541,7 +8558,7 @@ const __stories = [
 										${_title}
 									</div>
 									<div class="item-action-wrapper flex flex-jc-start w-100">
-										<div id="strongbox-unlock-btn" class="game-menu-button animate-me flex" onexactclick="renderChestOpeningScreen()">
+										<div id="strongbox-unlock-btn" class="red-action-btn animate-me flex" onexactclick="renderChestOpeningScreen()">
 											<div class="flex">${getLangData('UNLOCK')}</div>
 										</div>
 									</div>
@@ -8610,6 +8627,13 @@ const __stories = [
 								wearStatusItem(_id, null, 1);
 							});
 							episode.allLooted = 1;
+							if(__account?.questStatus?.quest?.props) {
+								if(__account.questStatus.quest.props.limit >
+									__account.questStatus.quest.props.current) {
+									__account.questStatus.quest.props.current++;
+									updateQuestArea();
+								}
+							}
 							clearStatusBoard();
 							//addClass(document.querySelector('.game-status-screen'), 'v-none');
 						}
@@ -8655,8 +8679,8 @@ const __stories = [
 												<img style="height:80%;max-height:2.6vh" src="./images/icons/power-up.png" />${_powerDiff}
 											</div>
 										</div>
-										<div class="item-action-wrapper flex flex-jc-start w-100">
-											<div class="game-menu-button animate-me flex"${!__isPC ? '' : ' onexactclick="wearStatusItem(' + _item.id + ', ' + _powerDiff + ')"'}>
+										<div class="item-action-wrapper flex w-100">
+											<div class="red-action-btn animate-me flex"${!__isPC ? '' : ' onexactclick="wearStatusItem(' + _item.id + ', ' + _powerDiff + ')"'}>
 												<div class="flex">${getLangData('WEAR')}<span class="flex${__isPC ? '' : ' d-none'}">(${getNewKeyboardKey('U').baseKey})</span></div>
 											</div>
 										</div>
@@ -8699,6 +8723,10 @@ const __stories = [
 									}
 								}
 								episode.phase--;
+								if(__account?.questStatus?.quest?.props) {
+									__account.questStatus.quest.props.current++;
+									updateQuestArea();
+								}
 							}
 						}
 					},
@@ -9541,8 +9569,8 @@ const __stories = [
 											
 										</div>
 									</div>
-									<div class="item-action-wrapper flex flex-jc-start w-100">
-										<div class="game-menu-button animate-me flex"${__isPC ? ' onexactclick="mainCharacter.useCommonSkill(1)"' : ''}>
+									<div class="item-action-wrapper flex w-100">
+										<div class="red-action-btn animate-me flex"${__isPC ? ' onexactclick="mainCharacter.useCommonSkill(1)"' : ''}>
 											<div class="flex">${getLangData('USE')}<span class="flex${__isPC ? '' : ' d-none'}">(${getNewKeyboardKey('1').baseKey})</span></div>
 										</div>
 									</div>
@@ -10136,9 +10164,9 @@ function renderChestOpeningScreen(_gift) {
 				id="chest-open-gift"
 				draggable="false"
 			>
-			<div class="chest-open-tap-text" id="tap-text">${getLangData('TAP TO UNLOCK')}</div>
+			<div class="chest-open-tap-text" lang="${getLang()}" id="tap-text">${getLangData('TAP TO UNLOCK')}</div>
 			<div class="chest-open-reward-text" id="reward-text">
-				<div class="reward-unlocked">
+				<div class="reward-unlocked" lang="${getLang()}">
 					${getLangData('SUPPORT CHARACTER UNLOCKED')}
 				</div>
 
@@ -10147,7 +10175,7 @@ function renderChestOpeningScreen(_gift) {
 				</div>
 			</div>
 		</div>
-		<div onclick="closeChestOpeningScreen()" id="chest-open-ok-button" class="flex game-btn2 d-none">${getLangData('Get Reward')}</div>
+		<div onclick="closeChestOpeningScreen()" id="chest-open-ok-button" class="flex orange-action-btn d-none">${getLangData('Get Reward')}</div>
 
 		<div class="chest-open-flash" id="chest-open-flash"></div>
 

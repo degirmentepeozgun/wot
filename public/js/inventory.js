@@ -1458,7 +1458,7 @@ function wearStatusItem(_id, _power, _force) {
     if(!_force && mainCharacter.lastItemEquipTime > (_gameTick - 500))
         return;
     if(!_id) { 
-        const _child = document.querySelector('.status-item-container .game-menu-button');
+        const _child = document.querySelector('.status-item-container .red-action-btn');
         if(_child?.onexactclick)
             _child.onexactclick();
         return;

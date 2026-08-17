@@ -23,6 +23,18 @@ function map(_m) {
 	}
 	this.season = _m.season;
 	const _mapSprite = mapSprites.find(x => x.id == this.season);
+	this.backgroundLayerLighting = _mapSprite.backgroundLayerLighting ?? [];
+	this.backgroundLayerLighting.forEach(x => {
+		x.x = Number(x.xBase) * __zoom;
+		x.y = Number(x.yBase) * __zoom;
+		x.radius = Number(x.radiusBase) * __zoom;
+	});
+	this.groundLayerLighting = _mapSprite.groundLayerLighting ?? [];
+	this.groundLayerLighting.forEach(x => {
+		x.x = Number(x.xBase) * __zoom;
+		x.y = Number(x.yBase) * __zoom;
+		x.radius = Number(x.radiusBase) * __zoom;
+	});
 	this.still = _mapSprite.still;
 	// this.width = MathRound((_mapSprite.width ?? _m.width) * __zoom);
 	// if(this.width < _canvas.width)
@@ -849,8 +861,8 @@ function map(_m) {
 	this.updateStoryPoint = function(_add) {
 		if(_add)
 			__story.point += _add;
-		pvpCounter.innerHTML = '<div class="flex" style="color:#F4BB44">' + 
-				getLangData('Stage') + ' ' + __storySceneOrder + '</div><div class="flex w-100">' + 
+		pvpCounter.innerHTML = '<div class="flex stage-name-text">' + 
+				getLangData('Stage') + ' ' + __storySceneOrder + '</div><div class="story-point-text flex w-100">' + 
 				getLangData('Score') + ': ' + (__story.point ?? 0).formatWithDots() + '</div>'; 
 	}
 	this.checkGoldResult = function(_timeIsUp, _diff) {
@@ -2836,147 +2848,102 @@ function map(_m) {
 	// 	return null;
 	// };
 	this.colorizeSprite4 = function (_item, _col, _force) {
-
-	// =====================
-	// COLOR CACHE
-	// =====================
-	if (!this._colorCache)
-		this._colorCache = Object.create(null);
-
-	let _opc = 1;
-	let _color, _isHurtFlash;
-
-	// =====================
-	// HIT FLASH (AYNI)
-	// =====================
-	if (_item?.char?.hurting?.hit) {
-		const h = _item.char.hurting.hit;
-		if (h >= 3)
-			_color = 'rgba(255,255,255,1)';
-		else if (h === 2)
-			_color = 'rgba(255,230,150,0.85)';
-		else
-			_color = 'rgba(255,110,40,0.55)';
-
-		_item.char.hurting.hit--;
-		_isHurtFlash = 1;
-	}
-	else {
-		const base = _col ?? _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
-		_color = this._colorCache[base];
-		if (!_color) {
-			if (base.startsWith('#') && base.length >= 7) {
-				const r = parseInt(base.slice(1, 3), 16);
-				const g = parseInt(base.slice(3, 5), 16);
-				const b = parseInt(base.slice(5, 7), 16);
-				if (base.length === 9)
-					_opc = parseInt(base.slice(7, 9), 16) / 255;
-
-				_color = `rgba(${r},${g},${b},${_force ? Math.round(_opc * 10) / 10 : 1})`;
+		if (!this._colorCache)
+			this._colorCache = Object.create(null);
+		let _opc = 1;
+		let _color, _isHurtFlash;
+		if (_item?.char?.hurting?.hit) {
+			const h = _item.char.hurting.hit;
+			if (h >= 3)
+				_color = 'rgba(255,255,255,1)';
+			else if (h === 2)
+				_color = 'rgba(255,230,150,0.85)';
+			else
+				_color = 'rgba(255,110,40,0.55)';
+			_item.char.hurting.hit--;
+			_isHurtFlash = 1;
+		}
+		else {
+			const base = _col ?? _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
+			_color = this._colorCache[base];
+			if (!_color) {
+				if (base.startsWith('#') && base.length >= 7) {
+					const r = parseInt(base.slice(1, 3), 16);
+					const g = parseInt(base.slice(3, 5), 16);
+					const b = parseInt(base.slice(5, 7), 16);
+					if (base.length === 9)
+						_opc = parseInt(base.slice(7, 9), 16) / 255;
+					_color = `rgba(${r},${g},${b},${_force ? Math.round(_opc * 10) / 10 : 1})`;
+				}
+				else
+					_color = base;
+				this._colorCache[base] = _color;
 			}
-			else {
-				_color = base;
+		}
+		const _key1 = 'i' + _item.char.id;
+		const _key2 = 'a' + _item.animation;
+		const _key3 =
+			'c' + _color +
+			'l' + _item.spriteX +
+			't' + _item.spriteY +
+			'w' + _item.spriteWidth +
+			'h' + _item.spriteHeight;
+		const _key = _key1 + _key2 + _key3;
+		if (_key === _item.char.lastHurtSpriteKey)
+			return _item.char.lastHurtSprite;
+		const _arr = _isHurtFlash ? this.hurtFlashSprites : this.hurtSprites;
+		let _hs = _arr[_key1]?.[_key2]?.[_key3];
+		if (!_hs) {
+			if (!this._colorizeCanvas) {
+				this._colorizeCanvas = document.createElement('canvas');
+				this._colorizeCtx = this._colorizeCanvas.getContext('2d');
+				this._colorizeCtx.imageSmoothingEnabled = false;
 			}
-			this._colorCache[base] = _color;
+			const _osc = this._colorizeCanvas;
+			let ctx = this._colorizeCtx;
+			if(!ctx) {
+				this._colorizeCtx = this._colorizeCanvas.getContext('2d');
+				this._colorizeCtx.imageSmoothingEnabled = false;
+				ctx = this._colorizeCtx;
+			}
+			_osc.width = _item.spriteWidth;
+			_osc.height = _item.spriteHeight;
+			ctx.clearRect(0, 0, _osc.width, _osc.height);
+			const _cropped = this.getCroppedSprite(_item.spriteX, _item.spriteY, _item.spriteWidth, _item.spriteHeight, 
+				_item.char, _item.sprite.relativeSrc, _item.frameKey);
+			if(_cropped)
+				ctx.drawImage(_cropped, 0, 0, _osc.width, _osc.height);
+			else
+				ctx.drawImage(
+					_item.sprite,
+					_item.spriteX,
+					_item.spriteY,
+					_item.spriteWidth,
+					_item.spriteHeight,
+					0, 0,
+					_osc.width,
+					_osc.height
+				);
+			ctx.globalCompositeOperation = 'source-atop';
+			ctx.fillStyle = _color;
+			ctx.fillRect(0, 0, _osc.width, _osc.height);
+			ctx.globalCompositeOperation = 'source-over';
+			const out = document.createElement('canvas');
+			out.width = _osc.width;
+			out.height = _osc.height;
+			if(_osc.width > 0)
+				out.getContext('2d').drawImage(_osc, 0, 0);
+			if (!_arr[_key1]) 
+				_arr[_key1] = Object.create(null);
+			if (!_arr[_key1][_key2]) _arr[_key1][_key2] = Object.create(null);
+			_arr[_key1][_key2][_key3] = _hs = out;
 		}
-	}
-
-	// =====================
-	// KEY (AYNI MANTIK)
-	// =====================
-	const _key1 = 'i' + _item.char.id;
-	const _key2 = 'a' + _item.animation;
-	const _key3 =
-		'c' + _color +
-		'l' + _item.spriteX +
-		't' + _item.spriteY +
-		'w' + _item.spriteWidth +
-		'h' + _item.spriteHeight;
-
-	const _key = _key1 + _key2 + _key3;
-	if (_key === _item.char.lastHurtSpriteKey)
-		return _item.char.lastHurtSprite;
-	const _arr = _isHurtFlash ? this.hurtFlashSprites : this.hurtSprites;
-	let _hs = _arr[_key1]?.[_key2]?.[_key3];
-
-	if (!_hs) {
-
-		// =====================
-		// SHARED WORK CANVAS
-		// =====================
-
-		if (!this._colorizeCanvas) {
-			this._colorizeCanvas = document.createElement('canvas');
-			this._colorizeCtx = this._colorizeCanvas.getContext('2d');
-			this._colorizeCtx.imageSmoothingEnabled = false;
-		}
-		const _osc = this._colorizeCanvas;
-		let ctx = this._colorizeCtx;
-		if(!ctx) {
-			this._colorizeCtx = this._colorizeCanvas.getContext('2d');
-			this._colorizeCtx.imageSmoothingEnabled = false;
-			ctx = this._colorizeCtx;
-		}
-		_osc.width = _item.spriteWidth;
-		_osc.height = _item.spriteHeight;
-		ctx.clearRect(0, 0, _osc.width, _osc.height);
-		// if (!this._colorizeCanvas)
-		// 	this._colorizeCanvas = document.createElement('canvas');
-
-		// const _osc = this._colorizeCanvas;
-		//_osc.width = _item.spriteWidth;
-		//_osc.height = _item.spriteHeight;
-
-		//const ctx = _osc.getContext('2d');
-		//if (ctx.imageSmoothingEnabled)
-			//ctx.imageSmoothingEnabled = false;
-
-		//ctx.clearRect(0, 0, _osc.width, _osc.height);
-		const _cropped = this.getCroppedSprite(_item.spriteX, _item.spriteY, _item.spriteWidth, _item.spriteHeight, 
-								_item.char, _item.sprite.relativeSrc, _item.frameKey);
-		if(_cropped)
-			ctx.drawImage(_cropped, 0, 0, _osc.width, _osc.height);
-		else
-			ctx.drawImage(
-				_item.sprite,
-				_item.spriteX,
-				_item.spriteY,
-				_item.spriteWidth,
-				_item.spriteHeight,
-				0, 0,
-				_osc.width,
-				_osc.height
-			);
-
-		ctx.globalCompositeOperation = 'source-atop';
-		ctx.fillStyle = _color;
-		ctx.fillRect(0, 0, _osc.width, _osc.height);
-		ctx.globalCompositeOperation = 'source-over';
-
-		// =====================
-		// CLONE (CACHE SAFE)
-		// =====================
-		const out = document.createElement('canvas');
-		out.width = _osc.width;
-		out.height = _osc.height;
-		if(_osc.width > 0)
-			out.getContext('2d').drawImage(_osc, 0, 0);
-
-		if (!_arr[_key1]) 
-			_arr[_key1] = Object.create(null);
-		if (!_arr[_key1][_key2]) _arr[_key1][_key2] = Object.create(null);
-		//_hs = _osc;
-		_arr[_key1][_key2][_key3] = _hs = out;
-	}
-
-	_item.char.lastHurtSprite = _hs;
-	_item.char.lastHurtSpriteKey = _key;
-
-	if (_item.char?.hurting?.count <= 0)
-		delete _item.char.hurtColor;
-
-	return _hs;
-};
+		_item.char.lastHurtSprite = _hs;
+		_item.char.lastHurtSpriteKey = _key;
+		if (_item.char?.hurting?.count <= 0)
+			delete _item.char.hurtColor;
+		return _hs;
+	};
 
 	// this.colorizeRelSprite4 = function (_item, _col, _animationKey) {
 	// 	let _opc = .01;
@@ -4092,6 +4059,146 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 	if (arr.length === 0)
 		delete _char.ripples;
 };
+// this.getShadowOffset = function(_char) {
+
+//     const lights = this.backgroundLayerLighting;
+
+//     if (!lights || lights.length === 0) {
+//         return { x: 0, y: 0 };
+//     }
+
+//     const light = lights[0];
+
+//     const charX = _char.HURTLEFT + _char._HURTBOX_half + platformX;
+//     const charY = _char.TOP + (_char.HURTHEIGHT / 2);
+
+//     const dx = charX - light.x;
+//     const dy = charY - light.y;
+
+//     const angle = Math.atan2(dy, dx);
+
+//     // TEST DEĞERİ
+//     const offset = 50;
+
+//     return {
+//         x: Math.cos(angle) * offset,
+//         y: Math.sin(angle) * offset
+//     };
+// }
+this.getShadowOffset = function(_char) {
+
+    const charX = _char.HURTLEFT + _char._HURTBOX_half + platformX;
+    const charY = _char.TOP + (_char.HURTHEIGHT / 2);
+
+    let light = null;
+
+    // --------------------------------------------------
+    // 1. ÖNCE GROUND LIGHT'LARI KONTROL ET
+    // --------------------------------------------------
+
+    const groundLights = this.groundLayerLighting;
+
+    if (groundLights && groundLights.length > 0) {
+
+        let bestWeight = 0;
+
+        for (let i = 0; i < groundLights.length; i++) {
+
+            const candidate = groundLights[i];
+
+            const dx = charX - candidate.x;
+            const dy = charY - candidate.y;
+
+            const distance = Math.sqrt(
+                dx * dx +
+                dy * dy
+            );
+
+            // Işığın radius'u dışındaysa etkisiz
+            if (distance >= candidate.radius)
+                continue;
+
+            // Merkeze yakınsa daha güçlü
+            const distanceFactor = 1 - (distance / candidate.radius);
+
+            // Intensity de seçimde etkili olsun
+            const weight = distanceFactor * candidate.intensity;
+
+            if (weight > bestWeight) {
+                bestWeight = weight;
+                light = candidate;
+            }
+        }
+    }
+
+    // --------------------------------------------------
+    // 2. GROUND LIGHT YOKSA BACKGROUND LIGHT'A BAK
+    // --------------------------------------------------
+
+    if (!light) {
+
+        const backgroundLights = this.backgroundLayerLighting;
+
+        if (backgroundLights && backgroundLights.length > 0) {
+
+            let bestWeight = 0;
+
+            for (let i = 0; i < backgroundLights.length; i++) {
+
+                const candidate = backgroundLights[i];
+
+                const dx = charX - candidate.x;
+                const dy = charY - candidate.y;
+
+                const distance = Math.sqrt(
+                    dx * dx +
+                    dy * dy
+                );
+
+                if (distance >= candidate.radius)
+                    continue;
+
+                const distanceFactor =
+                    1 - (distance / candidate.radius);
+
+                const weight =
+                    distanceFactor * candidate.intensity;
+
+                if (weight > bestWeight) {
+                    bestWeight = weight;
+                    light = candidate;
+                }
+            }
+        }
+    }
+
+    // --------------------------------------------------
+    // 3. HİÇ IŞIK YOKSA GÖLGE KAYMASIN
+    // --------------------------------------------------
+
+    if (!light) {
+        return {
+            x: 0,
+            y: 0
+        };
+    }
+
+    // --------------------------------------------------
+    // 4. IŞIK -> KARAKTER YÖNÜ
+    // --------------------------------------------------
+
+    const dx = charX - light.x;
+    const dy = charY - light.y;
+
+    const angle = Math.atan2(dy, dx);
+
+    const offset = this.cWidth * 0.026;
+
+    return {
+        x: Math.cos(angle) * offset,
+        y: Math.sin(angle) * offset
+    };
+};
 	this.drawCharacterQueue = function (_queue) {
 		if (this.disposing || !_queue?.[0]){
 			this.checkSceneActions();
@@ -4141,10 +4248,19 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 						_shadowZoomRate = _item.char.SHADOWWIDTHRATE;
 					const _shadowWidth = MathFloor(_rel.width * _relZoom);
 					const _shadowZoomedWidth = MathFloor(_shadowWidth * _shadowZoomRate);
-					offCtx.drawImage(this.FootShadow, _rel.left ?? 0, _rel.top ?? 0, _rel.width, _rel.height,
-						_item.char.LEFT + MathRound((_shadowWidth - _shadowZoomedWidth) / 2),
-						MathRound(this.cHeight - _item.char.yPosition - (_item.char.yGap < 5 ? _shadowHeight / 2 : ((_shadowHeight * 3) / 4))),
-						_shadowZoomedWidth, MathFloor(_shadowHeight));
+					const shadowOffset = this.getShadowOffset(_item.char);
+					offCtx.drawImage(
+						this.FootShadow, 
+						_rel.left ?? 0,
+						_rel.top ?? 0,
+						_rel.width,
+						_rel.height,
+						_item.char.LEFT + MathRound((_shadowWidth - _shadowZoomedWidth) / 2) + shadowOffset.x,
+						MathRound(this.cHeight - _item.char.yPosition - (_item.char.yGap < 5 ? 
+							_shadowHeight / 2 : ((_shadowHeight * 3) / 4))),// + shadowOffset.y,
+						_shadowZoomedWidth, 
+						MathFloor(_shadowHeight)
+					);
 				}
 			}
 		}
@@ -4365,17 +4481,44 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 									cFGA.drawHappened = true;
 							}
 							_x = MathRound(_charCan.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff)) - rotateX;
-							if(!_cropped)
+							if(!_cropped) {
 								_charCan.drawImage(_item.sprite, _item.spriteX, _item.spriteY,
 									_item.spriteWidth, _item.spriteHeight,
 									_x,
 									_y, 
 									_w,
 									_h);
+								// this.applyLightOnCharacter(
+								// 	_item.char,
+								// 	_charCan,
+								// 	_item.sprite,
+    							// 	_item.spriteX,
+								// 	_item.spriteY,
+								// 	_item.spriteWidth,
+								// 	_item.spriteHeight,
+								// 	_x,
+								// 	_y,
+								// 	_w,
+								// 	_h
+								// );
+							}
 							else if(_cropped.width > 0) {
 								_coordsSet = 1;
 								this.drawCharacterGhost(_item,_cropped,_x,_y,_w,_h);
 								_charCan.drawImage(_cropped,_x,_y,_w,_h);
+								// this.applyLightOnCharacter(
+								// 	_item.char,
+								// 	_charCan,
+								// 	_cropped,
+								// 	0,
+								// 	0,
+								// 	_cropped.width,
+								// 	_cropped.height,
+								// 	_x,
+								// 	_y,
+								// 	_w,
+								// 	_h
+								// );
 								if(_item.char.chargeProperties) {
 									if(!_item.char.ghostData)
 										_item.char.ghostData = [];
@@ -4540,6 +4683,7 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 			cFGA.restore();
 			cFGA.reversed = false;
 		}
+		this.applySceneLighting(offCtx);
 		c10.drawImage(this.offCanvas, 0, 0);
 		if (__account.options.gore){
 			if(offGoreCtx.reversed)
@@ -4549,7 +4693,1261 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 		this.checkUnseenEnemyPointer();
 		this.checkSceneActions();
 	}
-	this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 3) {
+this.applySceneLighting = function(_ctx) {
+    // =========================================================
+    // LIGHT SOURCES
+    // =========================================================
+    const _lights = [];
+    if (this.backgroundLayerLighting?.length)
+        _lights.push(...this.backgroundLayerLighting);
+    if (this.groundLayerLighting?.length)
+        _lights.push(...this.groundLayerLighting);
+    if (!_lights.length)
+        return;
+    // =========================================================
+    // SCREEN
+    // =========================================================
+
+    const _width = episode.cWidth;
+    const _height = episode.cHeight;
+    const _screenX = platformX;
+    if (
+        !_ctx ||
+        !Number.isFinite(_width) ||
+        !Number.isFinite(_height) ||
+        !Number.isFinite(_screenX) ||
+        _width <= 0 ||
+        _height <= 0
+    )
+        return;
+    // =========================================================
+    // LIGHT CANVAS
+    //
+    // BU CANVAS TAMAMEN SCREEN SPACE'TİR.
+    //
+    // Burada:
+    //
+    // x = ekran X
+    // y = ekran Y
+    //
+    // hiçbir camera / character transform'u yok.
+    // =========================================================
+    if (
+        !this._sceneLightingCanvas ||
+        this._sceneLightingCanvas.width !== _width ||
+        this._sceneLightingCanvas.height !== _height
+    ) {
+
+        this._sceneLightingCanvas =
+            document.createElement("canvas");
+
+        this._sceneLightingCanvas.width =
+            _width;
+
+        this._sceneLightingCanvas.height =
+            _height;
+
+        this._sceneLightingCtx =
+            this._sceneLightingCanvas.getContext("2d");
+
+        this._sceneLightingCtx.imageSmoothingEnabled =
+            false;
+    }
+
+
+    const _lightCtx =
+        this._sceneLightingCtx;
+
+
+    if (!_lightCtx)
+        return;
+
+
+    // =========================================================
+    // CLEAR
+    // =========================================================
+
+    _lightCtx.setTransform(
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+    );
+
+    _lightCtx.globalAlpha =
+        1;
+
+    _lightCtx.globalCompositeOperation =
+        "source-over";
+
+    _lightCtx.clearRect(
+        0,
+        0,
+        _width,
+        _height
+    );
+
+
+    // =========================================================
+    // HEX -> RGB
+    // =========================================================
+
+    const _hexToRgb = function(_hex) {
+
+        if (
+            typeof _hex !== "string"
+        ) {
+
+            return {
+                r: 255,
+                g: 255,
+                b: 255
+            };
+        }
+
+
+        let _value =
+            _hex
+                .trim()
+                .replace("#", "");
+
+
+        if (_value.length === 3) {
+
+            _value =
+                _value[0] + _value[0] +
+                _value[1] + _value[1] +
+                _value[2] + _value[2];
+        }
+
+
+        if (
+            _value.length !== 6 ||
+            !/^[0-9a-fA-F]+$/.test(_value)
+        ) {
+
+            return {
+                r: 255,
+                g: 255,
+                b: 255
+            };
+        }
+
+
+        return {
+
+            r: parseInt(
+                _value.substring(0, 2),
+                16
+            ),
+
+            g: parseInt(
+                _value.substring(2, 4),
+                16
+            ),
+
+            b: parseInt(
+                _value.substring(4, 6),
+                16
+            )
+        };
+    };
+    // =========================================================
+    // LIGHTS
+    // =========================================================
+    for (const _light of _lights) {
+        const _lightX = _light.x;
+        const _lightY = _light.y;
+        const _radius = _light.radius;
+        const _intensity = _light.intensity ?? 0;
+        if (
+            !Number.isFinite(_lightX) ||
+            !Number.isFinite(_lightY) ||
+            !Number.isFinite(_radius) ||
+            !Number.isFinite(_intensity)
+        )
+            continue;
+
+
+        if (
+            _radius <= 0 ||
+            _intensity <= 0
+        )
+            continue;
+        // =====================================================
+        // INTENSITY
+        // =====================================================
+
+        const _power =
+            Math.max(
+                0,
+                Math.min(
+                    1,
+                    _intensity
+                )
+            );
+        // =====================================================
+        // LIGHT SCREEN POSITION
+        // =====================================================
+        //
+        // SENİN SİSTEMİNDE KESİN OLARAK:
+        //
+        // light.x zaten zoom uygulanmış.
+        //
+        // platformX de zoom uygulanmış camera offset.
+        //
+        // O yüzden:
+        //
+        //       SCREEN X
+        //           =
+        //       light.x - platformX
+        //
+        // =====================================================
+        const _gx =
+            _lightX -
+            _screenX;
+        const _gy =
+            _lightY;
+
+
+        // =====================================================
+        // SCREEN CULL
+        // =====================================================
+
+        if (
+            _gx + _radius < 0 ||
+            _gx - _radius > _width ||
+            _gy + _radius < 0 ||
+            _gy - _radius > _height
+        )
+            continue;
+
+
+        // =====================================================
+        // COLOR
+        // =====================================================
+
+        const _rgb =
+            _hexToRgb(
+                _light.color || "#FFFFFF"
+            );
+
+
+        const _color =
+            `rgb(${_rgb.r},${_rgb.g},${_rgb.b})`;
+
+
+        // =====================================================
+        // RADIAL GRADIENT
+        // =====================================================
+        //
+        // Burada özellikle:
+        //
+        // 0.7 -> color
+        //
+        // YOK.
+        //
+        // Işık merkezden itibaren düşmeye başlıyor.
+        //
+        // =====================================================
+
+        let _gradient;
+
+        try {
+
+            _gradient =
+                _lightCtx.createRadialGradient(
+                    _gx,
+                    _gy,
+                    0,
+                    _gx,
+                    _gy,
+                    _radius
+                );
+
+        }
+        catch (_e) {
+
+            continue;
+        }
+
+
+        // =====================================================
+        // FALL OFF
+        // =====================================================
+        //
+        // Merkez = 1
+        // Radius = 0
+        //
+        // Bu, eski:
+        //
+        // intensity *
+        // (1 - distance / radius)
+        //
+        // davranışının spatial karşılığıdır.
+        //
+        // =====================================================
+
+        _gradient.addColorStop(
+            0,
+            _color
+        );
+
+        _gradient.addColorStop(
+            0.25,
+            _color
+        );
+
+        _gradient.addColorStop(
+            0.50,
+            _color
+        );
+
+        _gradient.addColorStop(
+            0.75,
+            _color
+        );
+
+        _gradient.addColorStop(
+            1,
+            "rgba(0,0,0,0)"
+        );
+
+
+        // =====================================================
+        // APPLY THIS LIGHT
+        // =====================================================
+
+        _lightCtx.save();
+
+
+        _lightCtx.globalCompositeOperation =
+            "lighter";
+
+
+        _lightCtx.globalAlpha =
+            _power;
+
+
+        _lightCtx.fillStyle =
+            _gradient;
+
+
+        _lightCtx.fillRect(
+            0,
+            0,
+            _width,
+            _height
+        );
+
+
+        _lightCtx.restore();
+    }
+
+
+    // =========================================================
+    // APPLY LIGHT CANVAS
+    // =========================================================
+    //
+    // ÇOK ÖNEMLİ:
+    //
+    // _ctx'nin mevcut transform'u ne olursa olsun
+    // light canvas SCREEN SPACE olarak basılacak.
+    //
+    // Böylece:
+    //
+    // translate
+    // scale
+    // flip
+    //
+    // ışığın koordinatını değiştiremeyecek.
+    //
+    // =========================================================
+
+    _ctx.save();
+
+
+    _ctx.setTransform(
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+    );
+
+
+    _ctx.globalCompositeOperation =
+        "source-atop";
+
+
+    _ctx.globalAlpha =
+        1;
+
+
+    _ctx.drawImage(
+        this._sceneLightingCanvas,
+        0,
+        0,
+        _width,
+        _height,
+        0,
+        0,
+        _width,
+        _height
+    );
+
+
+    _ctx.restore();
+};
+// this.applyLightOnCharacter = function(
+//     _char,
+//     _ctx,
+//     _source,
+//     _sx,
+//     _sy,
+//     _sw,
+//     _sh,
+//     _x,
+//     _y,
+//     _w,
+//     _h
+// ) {
+// 	return;
+//     if (
+// 		_char.class === 'object' ||
+//         !_source ||
+//         isNaN(_char.HURTLEFT) ||
+//         !Number.isFinite(_w) ||
+//         !Number.isFinite(_h) ||
+//         _w <= 0 ||
+//         _h <= 0
+//     )
+//         return;
+//     const _charX =
+//         _char.HURTLEFT +
+//         _char._HURTBOX_half +
+//         platformX;
+
+//     const _charY =
+//         _char.TOP +
+//         (_char.HURTHEIGHT / 2);
+
+//     // ==========================================
+//     // LIGHT SOURCES
+//     // ==========================================
+
+//     const _backgroundLights =
+//         this.backgroundLayerLighting;
+
+//     const _groundLights =
+//         this.groundLayerLighting;
+
+//     if (
+//         (!_backgroundLights || !_backgroundLights.length) &&
+//         (!_groundLights || !_groundLights.length)
+//     )
+//         return;
+
+
+//     // ==========================================
+//     // COMBINE ALL LIGHTS
+//     // ==========================================
+
+//     let _totalWeight = 0;
+
+//     let _lightX = 0;
+//     let _lightY = 0;
+
+//     let _red = 0;
+//     let _green = 0;
+//     let _blue = 0;
+
+//     let _combinedIntensity = 0;
+
+//     let _dirX = 0;
+//     let _dirY = 0;
+
+
+//     const _processLights = (_lights) => {
+
+//         if (!_lights || !_lights.length)
+//             return;
+
+//         for (const _light of _lights) {
+
+//             const _radius =
+//                 Number(_light.radius);
+
+//             if (
+//                 !Number.isFinite(_radius) ||
+//                 _radius <= 0
+//             )
+//                 continue;
+
+
+//             const _dx =
+//                 Number(_light.x) -
+//                 Number(_charX);
+
+//             const _dy =
+//                 Number(_light.y) -
+//                 Number(_charY);
+
+//             if (
+//                 !Number.isFinite(_dx) ||
+//                 !Number.isFinite(_dy)
+//             )
+//                 continue;
+
+
+//             const _distanceSq =
+//                 (_dx * _dx) +
+//                 (_dy * _dy);
+
+//             const _radiusSq =
+//                 _radius * _radius;
+
+
+//             // Karakter ışığın dışında
+//             if (_distanceSq >= _radiusSq)
+//                 continue;
+
+
+//             const _distance =
+//                 Math.sqrt(_distanceSq);
+
+
+//             // ==================================
+//             // FALLOFF
+//             // ==================================
+
+//             const _falloff =
+//                 1 -
+//                 (_distance / _radius);
+
+
+//             const _intensity =
+//                 Number(_light.intensity ?? 0) *
+//                 _falloff;
+
+
+//             if (
+//                 !Number.isFinite(_intensity) ||
+//                 _intensity <= 0
+//             )
+//                 continue;
+
+
+//             // ==================================
+//             // WEIGHT
+//             // ==================================
+
+//             /*
+//              * Işığın karakter üzerindeki gerçek
+//              * etkisini ağırlık olarak kullanıyoruz.
+//              */
+
+//             const _weight =
+//                 _intensity;
+
+
+//             _totalWeight += _weight;
+
+
+//             // ==================================
+//             // VIRTUAL LIGHT POSITION
+//             // ==================================
+
+//             _lightX +=
+//                 Number(_light.x) *
+//                 _weight;
+
+//             _lightY +=
+//                 Number(_light.y) *
+//                 _weight;
+
+
+//             // ==================================
+//             // COLOR
+//             // ==================================
+
+//             let _color =
+//                 _light.color || "#FFFFFF";
+
+//             let _r = 255;
+//             let _g = 255;
+//             let _b = 255;
+
+
+//             if (
+//                 typeof _color === "string" &&
+//                 _color[0] === "#" &&
+//                 (
+//                     _color.length === 7 ||
+//                     _color.length === 9
+//                 )
+//             ) {
+//                 _r =
+//                     parseInt(
+//                         _color.slice(1, 3),
+//                         16
+//                     );
+
+//                 _g =
+//                     parseInt(
+//                         _color.slice(3, 5),
+//                         16
+//                     );
+
+//                 _b =
+//                     parseInt(
+//                         _color.slice(5, 7),
+//                         16
+//                     );
+//             }
+
+
+//             _red +=
+//                 _r * _weight;
+
+//             _green +=
+//                 _g * _weight;
+
+//             _blue +=
+//                 _b * _weight;
+
+
+//             // ==================================
+//             // LIGHT DIRECTION
+//             // ==================================
+
+//             if (_distance > 0) {
+
+//                 _dirX +=
+//                     (_dx / _distance) *
+//                     _weight;
+
+//                 _dirY +=
+//                     (_dy / _distance) *
+//                     _weight;
+//             }
+
+
+//             _combinedIntensity +=
+//                 _intensity;
+//         }
+//     };
+
+
+//     _processLights(_backgroundLights);
+//     _processLights(_groundLights);
+
+
+//     // ==========================================
+//     // NO ACTIVE LIGHT
+//     // ==========================================
+
+//     if (
+//         _totalWeight <= 0 ||
+//         _combinedIntensity <= 0
+//     )
+//         return;
+
+
+//     // ==========================================
+//     // NORMALIZE VIRTUAL LIGHT
+//     // ==========================================
+
+//     const _virtualLightX =
+//         _lightX / _totalWeight;
+
+//     const _virtualLightY =
+//         _lightY / _totalWeight;
+
+
+//     let _finalR =
+//         Math.round(
+//             _red / _totalWeight
+//         );
+
+//     let _finalG =
+//         Math.round(
+//             _green / _totalWeight
+//         );
+
+//     let _finalB =
+//         Math.round(
+//             _blue / _totalWeight
+//         );
+
+
+//     _finalR =
+//         Math.max(
+//             0,
+//             Math.min(255, _finalR)
+//         );
+
+//     _finalG =
+//         Math.max(
+//             0,
+//             Math.min(255, _finalG)
+//         );
+
+//     _finalB =
+//         Math.max(
+//             0,
+//             Math.min(255, _finalB)
+//         );
+
+
+//     /*
+//      * Birden fazla ışığın toplamını sınırsız
+//      * şekilde büyütmeyelim.
+//      */
+
+//     const _finalIntensity =
+//         Math.min(
+//             1,
+//             _combinedIntensity
+//         );
+
+
+//     // ==========================================
+//     // LIGHT POSITION ON CHARACTER CANVAS
+//     // ==========================================
+
+//     const _gx =
+//         (_w / 2) +
+//         (
+//             _virtualLightX -
+//             _charX
+//         );
+
+//     const _gy =
+//         (_h / 2) +
+//         (
+//             _virtualLightY -
+//             _charY
+//         );
+
+
+//     if (
+//         !Number.isFinite(_gx) ||
+//         !Number.isFinite(_gy)
+//     )
+//         return;
+
+
+//     // ==========================================
+//     // CHARACTER LIGHT CANVAS
+//     // ==========================================
+
+//     if (
+//         !this._characterLightCanvas ||
+//         this._characterLightCanvas.width !== _w ||
+//         this._characterLightCanvas.height !== _h
+//     ) {
+
+//         this._characterLightCanvas =
+//             document.createElement("canvas");
+
+//         this._characterLightCanvas.width =
+//             _w;
+
+//         this._characterLightCanvas.height =
+//             _h;
+
+//         this._characterLightCtx =
+//             this._characterLightCanvas.getContext("2d");
+
+//         this._characterLightCtx.imageSmoothingEnabled =
+//             false;
+//     }
+
+
+//     const _lightCtx =
+//         this._characterLightCtx;
+
+
+//     if (!_lightCtx)
+//         return;
+
+
+//     _lightCtx.clearRect(
+//         0,
+//         0,
+//         _w,
+//         _h
+//     );
+
+
+//     // ==========================================
+//     // DRAW CHARACTER ONTO LIGHT CANVAS
+//     // ==========================================
+
+//     _lightCtx.globalCompositeOperation =
+//         "source-over";
+
+//     _lightCtx.globalAlpha = 1;
+
+//     _lightCtx.drawImage(
+//         _source,
+//         _sx,
+//         _sy,
+//         _sw,
+//         _sh,
+//         0,
+//         0,
+//         _w,
+//         _h
+//     );
+
+
+//     // ==========================================
+//     // ONE RADIAL LIGHT
+//     // ==========================================
+
+//     /*
+//      * Birden fazla ışığın radius'larını da
+//      * ağırlıklı olarak birleştiriyoruz.
+//      */
+
+//     let _radiusSum = 0;
+
+//     const _processRadius = (_lights) => {
+
+//         if (!_lights || !_lights.length)
+//             return;
+
+//         for (const _light of _lights) {
+
+//             const _radius =
+//                 Number(_light.radius);
+
+//             if (
+//                 !Number.isFinite(_radius) ||
+//                 _radius <= 0
+//             )
+//                 continue;
+
+//             const _dx =
+//                 Number(_light.x) -
+//                 _charX;
+
+//             const _dy =
+//                 Number(_light.y) -
+//                 _charY;
+
+//             const _distanceSq =
+//                 (_dx * _dx) +
+//                 (_dy * _dy);
+
+//             if (
+//                 _distanceSq >=
+//                 _radius * _radius
+//             )
+//                 continue;
+
+//             const _distance =
+//                 Math.sqrt(_distanceSq);
+
+//             const _falloff =
+//                 1 -
+//                 (_distance / _radius);
+
+//             const _weight =
+//                 Number(_light.intensity ?? 0) *
+//                 _falloff;
+
+//             if (_weight > 0)
+//                 _radiusSum +=
+//                     _radius * _weight;
+//         }
+//     };
+
+
+//     _processRadius(_backgroundLights);
+//     _processRadius(_groundLights);
+
+
+//     let _virtualRadius =
+//         _radiusSum /
+//         Math.max(_totalWeight, 0.0001);
+
+
+//     if (
+//         !Number.isFinite(_virtualRadius) ||
+//         _virtualRadius <= 0
+//     )
+//         return;
+
+
+//     /*
+//      * Karakter canvasına göre gereksiz dev
+//      * gradient oluşturmamak için biraz sınırla.
+//      */
+
+//     const _maxRadius =
+//         Math.max(
+//             _w,
+//             _h
+//         ) * 2;
+
+
+//     _virtualRadius =
+//         Math.min(
+//             _virtualRadius,
+//             _maxRadius
+//         );
+
+
+//     const _radial =
+//         _lightCtx.createRadialGradient(
+//             _gx,
+//             _gy,
+//             0,
+//             _gx,
+//             _gy,
+//             _virtualRadius
+//         );
+
+
+//     const _lightColor =
+//         `rgb(${_finalR},${_finalG},${_finalB})`;
+
+
+//     _radial.addColorStop(
+//         0,
+//         _lightColor
+//     );
+
+//     _radial.addColorStop(
+//         0.7,
+//         _lightColor
+//     );
+
+//     _radial.addColorStop(
+//         1,
+//         "rgba(0,0,0,0)"
+//     );
+
+
+//     // ==========================================
+//     // APPLY ONE LIGHT
+//     // ==========================================
+
+//     _lightCtx.save();
+
+//     _lightCtx.globalCompositeOperation =
+//         "source-atop";
+
+//     _lightCtx.globalAlpha =
+//         _finalIntensity;
+
+//     _lightCtx.fillStyle =
+//         _radial;
+
+//     _lightCtx.fillRect(
+//         0,
+//         0,
+//         _w,
+//         _h
+//     );
+
+//     _lightCtx.restore();
+
+
+//     // ==========================================
+//     // COMBINED LIGHT DIRECTION
+//     // ==========================================
+
+//     const _dirLength =
+//         Math.sqrt(
+//             (_dirX * _dirX) +
+//             (_dirY * _dirY)
+//         );
+
+
+//     if (_dirLength > 0) {
+
+//         _dirX /=
+//             _dirLength;
+
+//         _dirY /=
+//             _dirLength;
+
+
+//         // Işığın tersi = gölge yönü
+
+//         const _shadowDirX =
+//             -_dirX;
+
+//         const _shadowDirY =
+//             -_dirY;
+
+
+//         const _shadowDistance =
+//             Math.sqrt(
+//                 (_w * _w) +
+//                 (_h * _h)
+//             );
+
+
+//         const _centerX =
+//             _w / 2;
+
+//         const _centerY =
+//             _h / 2;
+
+
+//         const _shadowStartX =
+//             _centerX -
+//             (
+//                 _shadowDirX *
+//                 _shadowDistance
+//             );
+
+//         const _shadowStartY =
+//             _centerY -
+//             (
+//                 _shadowDirY *
+//                 _shadowDistance
+//             );
+
+
+//         const _shadowEndX =
+//             _centerX +
+//             (
+//                 _shadowDirX *
+//                 _shadowDistance
+//             );
+
+//         const _shadowEndY =
+//             _centerY +
+//             (
+//                 _shadowDirY *
+//                 _shadowDistance
+//             );
+
+
+//         // ======================================
+//         // ONE DIRECTIONAL SHADOW
+//         // ======================================
+
+//         const _shadowGradient =
+//             _lightCtx.createLinearGradient(
+//                 _shadowStartX,
+//                 _shadowStartY,
+//                 _shadowEndX,
+//                 _shadowEndY
+//             );
+
+
+//         _shadowGradient.addColorStop(
+//             0,
+//             "rgba(0,0,0,0)"
+//         );
+
+
+//         _shadowGradient.addColorStop(
+//             0.5,
+//             "rgba(0,0,20,0.025)"
+//         );
+
+
+//         const _shadowAlpha =
+//             Math.min(
+//                 0.18,
+//                 _finalIntensity * 0.45
+//             );
+
+
+//         _shadowGradient.addColorStop(
+//             1,
+//             `rgba(0,0,20,${_shadowAlpha})`
+//         );
+
+
+//         _lightCtx.save();
+
+//         _lightCtx.globalCompositeOperation =
+//             "source-atop";
+
+//         _lightCtx.globalAlpha =
+//             1;
+
+//         _lightCtx.fillStyle =
+//             _shadowGradient;
+
+//         _lightCtx.fillRect(
+//             0,
+//             0,
+//             _w,
+//             _h
+//         );
+
+//         _lightCtx.restore();
+//     }
+
+
+//     // ==========================================
+//     // FINAL CHARACTER
+//     // ==========================================
+
+//     _ctx.drawImage(
+//         this._characterLightCanvas,
+//         0,
+//         0,
+//         _w,
+//         _h,
+//         _x,
+//         _y,
+//         _w,
+//         _h
+//     );
+// };
+// 	this.applyLightOnCharacter = function(
+//     _char,
+//     _ctx,
+//     _source,
+//     _sx,
+//     _sy,
+//     _sw,
+//     _sh,
+//     _x,
+//     _y,
+//     _w,
+//     _h
+// ) {
+//     if (
+// 		_char.class === 'object' ||
+// 		!_source ||
+// 		!Number.isFinite(_w) ||
+// 		!Number.isFinite(_h) ||
+// 		_w <= 0 ||
+// 		_h <= 0 ||
+// 		isNaN(_char.HURTLEFT)
+// 	)
+//     return;
+//     const _charX =
+//         _char.HURTLEFT +
+//         _char._HURTBOX_half +
+//         platformX;
+
+//     const _charY =
+//         _char.TOP +
+//         (_char.HURTHEIGHT / 2);
+
+//     //const _backgroundLights = this.backgroundLayerLighting;
+// 	const _lights = this.groundLayerLighting;
+
+// 	if (
+// 		//(!_backgroundLights || !_backgroundLights.length) &&
+// 		(!_lights || !_lights.length)
+// 	)
+// 		return;
+
+//     if (
+//         !this._characterLightCanvas ||
+//         this._characterLightCanvas.width !== _w ||
+//         this._characterLightCanvas.height !== _h
+//     ) {
+//         this._characterLightCanvas = document.createElement("canvas");
+//         this._characterLightCanvas.width = _w;
+//         this._characterLightCanvas.height = _h;
+
+//         this._characterLightCtx =
+//             this._characterLightCanvas.getContext("2d");
+
+//         this._characterLightCtx.imageSmoothingEnabled = false;
+//     }
+
+//     const c = this._characterLightCtx;
+
+//     c.clearRect(0, 0, _w, _h);
+
+//     // sadece karakter sprite'ı
+//     c.drawImage(
+//         _source,
+//         _sx,
+//         _sy,
+//         _sw,
+//         _sh,
+//         0,
+//         0,
+//         _w,
+//         _h
+//     );
+
+//     for (const light of _lights) {
+//         const dx = (light.x) - (_charX);
+// 		const dy = (light.y) - (_charY);
+
+// 		if (!Number.isFinite(dx) || !Number.isFinite(dy))
+// 			continue;
+
+//         const d2 = dx * dx + dy * dy;
+
+//         if (d2 >= light.radius * light.radius)
+//             continue;
+
+//         const d = Math.sqrt(d2);
+
+//         const intensity =
+//             (light.intensity ?? 0) *
+//             (1 - d / light.radius);
+
+//         if (intensity <= 0)
+//             continue;
+
+//         const gx = _w / 2 + dx;
+//         const gy = _h / 2 + dy;
+// 		if (
+// 			!Number.isFinite(gx) ||
+// 			!Number.isFinite(gy) ||
+// 			!Number.isFinite(light.radius) ||
+// 			light.radius <= 0
+// 		)
+//     		continue;
+// 		const g = c.createRadialGradient(
+// 				gx,
+// 				gy,
+// 				0,
+// 				gx,
+// 				gy,
+// 				light.radius
+// 			);
+//         g.addColorStop(0, light.color);
+//         g.addColorStop(0.7, light.color);
+//         g.addColorStop(1, "rgba(0,0,0,0)");
+
+//         c.save();
+
+//         c.globalCompositeOperation = "source-atop";
+//         c.globalAlpha = intensity;
+//         c.fillStyle = g;
+//         c.fillRect(0, 0, _w, _h);
+
+//         c.restore();
+//     }
+
+//     _ctx.drawImage(
+//         this._characterLightCanvas,
+//         0,
+//         0,
+//         _w,
+//         _h,
+//         _x,
+//         _y,
+//         _w,
+//         _h
+//     );
+// 	};
+	
+this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 3) {
 		const w = image.width;
 		const h = image.height;
 

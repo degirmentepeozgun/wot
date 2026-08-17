@@ -134,7 +134,7 @@
 				<div id="world-mini-map" class="top-ui-item">
 					<div id="world-mini-map-area" class="full">
 						<div class="world-mini-map-img"></div>
-						<img src="./images/ui/skill.png" />
+						<img src="./images/ui/game/map3.png" />
 					</div>
 				</div>
 				<div id="chat-board" class="expanded d-none">
