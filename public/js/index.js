@@ -556,10 +556,10 @@ function createTipsUI(_tipOrder, _showCurrent) {
 	`</div></div>`;
 	setTimeout(() => {
 		document.getElementById('loading-tip').innerHTML = `<div class="tip-wrapper flex flex-ai-start">
-			<div class="tip-label flex flex-jc-end" lang="${getLang()}"> 
+			<div class="tip-label flex flex-jc-end wot-subtitle" lang="${getLang()}"> 
 				${getLangData('Tip')}<span id="tip-current">${_showCurrent ? ' ' + _current.toString() + '/' + _count.toString() : ': '}</span>
 			</div>
-			<div class="flex flex-jc-start tip-text" style="flex:1;padding:0 3vh 0 0" lang="${getLang()}">
+			<div class="flex flex-jc-start tip-text wot-subtitle" style="flex:1;padding:0 3vh 0 0" lang="${getLang()}">
 				${_tips[_tipOrder][getLang()]}
 			</div>
 		</div>`;
@@ -2450,7 +2450,7 @@ function activateGameStart(_quickPlay, _force) {
 	addClass(document.getElementById('connect-btn'), 'disabled2'); 
 	addClass(document.getElementById('qp-btn'), 'disabled2'); 
 	addClass(document.getElementById('pak-btn'), 'disabled2'); 
-	document.getElementById('mini-menu').innerHTML = '<div onexactclick="askExitApp()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/pause.png);background-size: cover"></div>'; // '<div onexactclick="activatePowerSaveMode()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/power-save.png);background-size: cover"></div>';
+	document.getElementById('mini-menu').innerHTML = '<div onexactclick="askExitApp()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/pause2.png);background-size: cover"></div>'; // '<div onexactclick="activatePowerSaveMode()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/power-save.png);background-size: cover"></div>';
 	openGame();
 }
 const __difficulties = [
@@ -2528,11 +2528,11 @@ function getOpeningLanguages(_selected) {
 	_selected = _selected ?? getLang();
 	return `<div class="full flex fade-me"><div data-lang="en" onexactclick="selectOpeningLanguage('en')" class="opening-lang-item w-100 flex flex-jc-start${_selected === 'en' ? ' selected' : ''}" style="padding:2vh 0 1vh 0">
 		<img style="height:4.5vh" src="./images/ui/circle-${_selected === 'en' ? 'on' : 'off'}.png" />
-		<div style="margin-left:2vh;font-size:3vh;color:#f3f4f5${_selected === 'en' ? '' : 'cc'}">${getLangData("English")}</div>
+		<div class="question-modal-item wot-subtitle" style="margin-left:2vh;color:#f3f4f5${_selected === 'en' ? '' : 'cc'}">${getLangData("English")}</div>
 	</div>
 	<div data-lang="tr" onexactclick="selectOpeningLanguage('tr')" class="opening-lang-item w-100 flex flex-jc-start${_selected === 'tr' ? ' selected' : ''}" style="padding:1vh 0 2vh 0">
 		<img style="height:4.5vh" src="./images/ui/circle-${_selected === 'tr' ? 'on' : 'off'}.png" />
-		<div style="margin-left:2vh;font-size:3vh;color:#f3f4f5${_selected === 'tr' ? '' : 'cc'}">${getLangData("Turkish")}</div>
+		<div class="question-modal-item wot-subtitle" style="margin-left:2vh;color:#f3f4f5${_selected === 'tr' ? '' : 'cc'}">${getLangData("Turkish")}</div>
 	</div></div>`;
 }
 function selectOpeningLanguage(_key) {
@@ -2541,18 +2541,18 @@ function selectOpeningLanguage(_key) {
 }
 function askChangeLanguage() {
 	playClick();
-	let _modal = `<div class="full fade-me show-ui flex inventory-question settings-before-play">
+	let _modal = `<div class="full fade-me show-ui language-change-modal flex inventory-question settings-before-play">
 		<div class="inventory-modal flex" style="width:50vh;aspect-ratio:1/1;flex-direction:column">`
 			+
 			`<div style="padding:6vh 4vh 2vh 4vh" class="flex w-100">
-				<span style="color:#F4BB44 !important;font-size:3.2vh !important">${getLangData('CHOOSE LANGUAGE')}</span>
+				<span class="question-modal-title wot-title">${getLangData('CHOOSE LANGUAGE')}</span>
 			</div>
 			<div id="opening-languages" class="flex w-50" style="padding:0 4%;flex:1">`
 				+ getOpeningLanguages() +
 			`</div>
 			<div style="padding:2vh 2vh 6vh 2vh" class="flex w-100">
-				<div class="game-menu-button flex animate-me" style="font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('IGNORE')}</div>
-				<div id="item-selection-approve-btn" class="game-menu-button flex animate-me" style="font-size:3vh !important" onexactclick="approveSelectedLanguage()">${getLangData('APPROVE')}</div>
+				<div class="orange-action-btn flex animate-me wot-button"  onexactclick="closeInventoryQuestionModal()">${getLangData('BACK')}</div>
+				<div id="item-selection-approve-btn" class="orange-action-btn flex animate-me wot-button" onexactclick="approveSelectedLanguage()">${getLangData('OK')}</div>
 			</div>
 		</div>
 	</div>`;
@@ -2684,7 +2684,7 @@ function getKeyboardPromo(_force) {
 	for(let i = 11; i < 21; i++) {
 		const _item = { title: _keyCombinations[i].title, baseKey: __account.keyboard?.[i] ?? _keyCombinations[i].baseKey };
 		_html += `<div class="w-100 flex" style="height:9%">
-			<div class="w-50 flex flex-jc-end" style="height:100%">` 
+			<div class="w-50 flex flex-jc-end wot-title" style="height:100%">` 
 			+ (_keyCombinations[i].desc ?? '') +
 			`<input onkeydown="setBindKey(this, event)" data-key="${_item.baseKey}" onfocus="readyToBindKey(this)" onblur="tryResetBindKey(this)" class="key-combination-item" type="text" style="height:100%;aspect-ratio:5/1" value="${_item.baseKey === ' ' ? 'SPACE' : _item.baseKey}" /></div>
 			<div class="w-50 flex flex-jc-start" style="height:100%">${_item.title[getLang()]}</div>
@@ -2692,13 +2692,13 @@ function getKeyboardPromo(_force) {
 	}
 	_desc.innerHTML = _html + '</div></div>' +
 			`<div class="quick-play-desc-skip flex" style="padding:0 10vh">
-				<div onexactclick="cancelKeyboardConfig()" class="flex flex-jc-end" style="height:100%">
+				<div onexactclick="cancelKeyboardConfig()" class="orange-action-btn flex wot-button">
 					${getLangData('CANCEL')}
 				</div>
-				<div onexactclick="askResetKeyboardConfig()" class="flex flex-jc-end" style="height:100%">
+				<div onexactclick="askResetKeyboardConfig()" class="orange-action-btn flex wot-button">
 					${getLangData('RESET')}
 				</div>
-				<div onexactclick="approveKeyboardConfig()" class="flex flex-jc-end" style="height:100%">
+				<div onexactclick="approveKeyboardConfig()" class="orange-action-btn flex wot-button">
 					${getLangData('APPROVE')}
 				</div>
 			</div>`;
@@ -3043,12 +3043,12 @@ function openCredits(_fromMenu) {
 			</div>
 			<div class="share-moment-info-buttons">
 				<div class="share-moment-card-title">
-					<div class="share-button" onexactclick="takePhotoOfScreen(${_fromMenu ? 1 : 0})">
+					<div class="red-action-btn flex" onexactclick="takePhotoOfScreen(${_fromMenu ? 1 : 0})">
 						${getLangData('Capture Moment')}
 					</div>
 				</div>
 				<div class="share-moment-card-value">
-					<div class="share-button" onexactclick="createPromoScreen(${_fromMenu ? 1 : 0})">
+					<div class="orange-action-btn flex" onexactclick="createPromoScreen(${_fromMenu ? 1 : 0})">
 						${getLangData('Learn More')}
 					</div>
 				</div>
@@ -3492,13 +3492,13 @@ function installOpeningScreen(_instant, _lateOpening) {
 				<img src="./images/icons/text.png" />
 			</div>
 			<div class="game-opening-screen-menu">
-				<div class="game-opening-screen-menu-item" onexactclick="tryOpenGame()">
+				<div class="game-opening-screen-menu-item wot-title" onexactclick="tryOpenGame()">
 					${getLangData('NEW GAME', __openingScreenLangData)}
 				</div>
-				<div class="game-opening-screen-menu-item" onexactclick="openCredits(1)">
+				<div class="game-opening-screen-menu-item wot-title" onexactclick="openCredits(1)">
 					${getLangData('CREDITS', __openingScreenLangData)}
 				</div>
-				<div class="game-opening-screen-menu-item" onexactclick="quitGame()">
+				<div class="game-opening-screen-menu-item wot-title" onexactclick="quitGame()">
 					${getLangData('QUIT', __openingScreenLangData)}
 				</div>
 			</div>
@@ -3543,8 +3543,8 @@ function installOpeningScreen(_instant, _lateOpening) {
 						<div onexactclick="setGameVolume(this)" class="bar" data-level="9"></div>
 						<div onexactclick="setGameVolume(this)" class="bar" data-level="10"></div>
 					</div>
-					<div class="volume-text">
-						${getLangData('Level')} <span class="level" id="volumeValue">${__volume * 10}</span>/10
+					<div class="volume-text wot-title">
+						${getLangData('Level')} <span class="level wot-title" id="volumeValue">${__volume * 10}</span>/10
 					</div>
 				</div>
 			</div>`;

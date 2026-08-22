@@ -5947,10 +5947,10 @@ function enemy(_e) {
 						+ _icon +
 					`</div>
 					<div class="status-item-action-container talk-avatar-text flex">
-						<div class="item-title-wrapper dialogue-speaker flex w-100 flex-jc-start">
+						<div class="item-title-wrapper dialogue-speaker flex w-100 flex-jc-start wot-subtitle">
 							${_title}
 						</div>
-						<div class="item-action-wrapper dialogue-text flex flex-jc-start w-100">
+						<div class="item-action-wrapper dialogue-text flex flex-jc-start w-100 wot-description">
 							${_text}
 						</div>
 					</div>

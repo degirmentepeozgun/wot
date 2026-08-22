@@ -812,7 +812,7 @@ function openItemInfoModal(_id) {
         <div class="full flex item-info-container-inner">`
         + getItemInfoModalHtml(_id) +
 		`</div>
-    <div onexactclick="closeItemInfoModal()" class="item-info-modal-close">&times;</div>
+    <div onexactclick="closeItemInfoModal()" class="item-info-modal-close"></div>
     </div> 
     <div class="shine-area"></div>
     </div>`;
@@ -866,7 +866,7 @@ function openMiscItemInfoModal(_type, _grade) {
             <div class="flex action-button-container ${_item.do ? ' d-none' : ''}" style="width:86%;margin:0 7%;height:14%;justify-content:space-evenly">
                 <div class="game-menu-button animate-me flex" style="width:90%;height:65%;color:#F4BB44 !important;font-size:3vh !important" onexactclick="sellMiscItem('${_item.type}', ${_grade})">${getLangData('SELL')}</div>
             </div>
-		    <div onexactclick="closeItemInfoModal()" class="item-info-modal-close">&times;</div>
+		    <div onexactclick="closeItemInfoModal()" class="item-info-modal-close"></div>
         </div>
     </div>`;
     var _currentItemModal = document.querySelector('.item-info-container-parent');
@@ -911,7 +911,7 @@ function openGemItemInfoModal(_type, _grade) {
                 <div class="game-menu-button animate-me flex d-none" style="width:45%;height:65%;color:#F4BB44 !important;font-size:3vh !important" onexactclick="sellGemItem('${_type}', ${_grade})">${getLangData('SELL')}</div>
                 <div class="game-menu-button animate-me flex" style="width:90%;height:65%;color:#F4BB44 !important;font-size:3vh !important" onexactclick="openGemMeltModal('${_type}', ${_grade})">${getLangData('MELT')}</div>
             </div>
-		    <div onexactclick="closeItemInfoModal()" class="item-info-modal-close">&times;</div>
+		    <div onexactclick="closeItemInfoModal()" class="item-info-modal-close"></div>
         </div>
     </div>`;
     var _currentItemModal = document.querySelector('.item-info-container-parent');
@@ -1179,7 +1179,7 @@ function openCharacterInfoModal() {
     //    _props += `<div${_o.color ? ' style="color:' + _o.color + '80!important"' : ''} class="stats-group-item">${_o.title}: ${_o.key.endsWith('-rate') ? '%' + _o.value.toFixed(2) : _o.value.formatWithDots()}</div>`;
     let _html = `<div class="full character-info-container-parent menu-modal-left"><div class="full flex character-info-container">
     <div class="flex" style="width:100%;height:12%"><div style="padding:0 4%" class="full flex flex-jc-start"><div class="one-line" style="font-size:3.2vh !important;line-height:200%;color:#F4BB44 !important">Lvl ${_level} - ${_class}</div></div>
-    <div class="flex flex-jc-end item-info-modal-close" onexactclick="closeCharacterInfoModal()">&times;</div>
+    <div class="flex flex-jc-end item-info-modal-close" onexactclick="closeCharacterInfoModal()"></div>
     </div>
     <div style="width:100%;height:88%;overflow-y:auto">
         <div class="flex flex-jc-start flex-ai-start" style="padding-bottom:2vh">`
@@ -1204,7 +1204,7 @@ function openGemMeltModal(_type, _grade) {
     //playClick();
     let _html = `<div class="full gem-info-container-parent character-info-container-parent menu-modal-left"><div class="full flex character-info-container">
     <div class="flex" style="width:100%;height:12%">
-    <div class="flex flex-jc-end item-info-modal-close" onexactclick="closeGemInfoModal()">&times;</div>
+    <div class="flex flex-jc-end item-info-modal-close" onexactclick="closeGemInfoModal()"></div>
     </div>
     <div style="width:100%;height:88%;padding:0 6% 6% 6%">
         <div class="flex full" style="position:relative">

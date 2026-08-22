@@ -861,8 +861,8 @@ function map(_m) {
 	this.updateStoryPoint = function(_add) {
 		if(_add)
 			__story.point += _add;
-		pvpCounter.innerHTML = '<div class="flex stage-name-text">' + 
-				getLangData('Stage') + ' ' + __storySceneOrder + '</div><div class="story-point-text flex w-100">' + 
+		pvpCounter.innerHTML = '<div class="flex stage-name-text wot-subtitle">' + 
+				getLangData('Stage') + ' ' + __storySceneOrder + '</div><div class="story-point-text flex w-100 wot-subtitle">' + 
 				getLangData('Score') + ': ' + (__story.point ?? 0).formatWithDots() + '</div>'; 
 	}
 	this.checkGoldResult = function(_timeIsUp, _diff) {
@@ -6414,7 +6414,7 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 
 	this.drawBossName = function(cofftx, _char, x, y, w, padX, h) {
 
-		const name = _char.displayName ?? _char.name ?? "BOSS";
+		const name = getLangData(_char.displayName ?? _char.name ?? "BOSS");
 		if(name === '')
 			return;
 

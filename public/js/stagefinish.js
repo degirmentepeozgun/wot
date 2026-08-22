@@ -45,10 +45,10 @@ function animateStart(_failed) {
 									<img src="./images/ui/menu-icons/${_rs.icon}.png" style="height: 70%;margin-right: 2.5%;">
 								</div>
 								<div class="flex flex-jc-end stage-achievement-item-right">
-									<div class="flex flex-jc-end stage-achievement-item-right-top" lang="${getLang()}">
+									<div class="flex flex-jc-end stage-achievement-item-right-top wot-subtitle" lang="${getLang()}">
 										${_rs.title[getLang()]}
 									</div>
-									<div class="flex flex-jc-end stage-achievement-item-right-bottom">
+									<div class="flex flex-jc-end stage-achievement-item-right-bottom wot-subtitle">
 										${_rs.value.formatWithDots()}
 									</div>
 								</div>
@@ -62,15 +62,15 @@ function animateStart(_failed) {
 				const _leadersList = document.querySelector('.leaderboards-list');
 				if(!_leadersList)
 					return;
-				_leaderboardsHTML = `<div class="w-100 fade-me flex flex-ai-end victory-header d-none">${getLangData('Leaderboard')}</div>
+				_leaderboardsHTML = `<div class="w-100 fade-me flex flex-ai-end victory-header d-none"></div>
 					<div class="quickplay-leaderboards flex fade-me flex-ai-start"><div class="full char slide-right">`;
 				let _order = 1, player_order, player_score;
 				for(let _player of _leadersData) {
 					_leaderboardsHTML += `<div class="flex leaderboard-item${_player.me ? ' selected' : ''}">
-						<div class="flex flex-jc-start w-50 leaderboard-item-left">
+						<div class="flex flex-jc-start w-50 leaderboard-item-left wot-subtitle">
 							${_player.me ? 'You' : _player.name}
 						</div>
-						<div class="flex flex-jc-end w-50 leaderboard-item-right">
+						<div class="flex flex-jc-end w-50 leaderboard-item-right wot-subtitle">
 							${_player.point.formatWithDots()}
 						</div>
 					</div>`;
@@ -89,7 +89,7 @@ function animateStart(_failed) {
 				_leadersList.innerHTML = _leaderboardsHTML;
 			});
 			if(!_stageResult) 
-				_leaderboardsHTML = `<div class="w-100 flex op-none defeat-header ms250">${getLangData(_failed ? 'DEFEAT' : 'VICTORY')}</div>
+				_leaderboardsHTML = `<div class="w-100 flex op-none defeat-header ms250 wot-subtitle">${getLangData(_failed ? 'DEFEAT' : 'VICTORY')}</div>
 			<img src="./images/main/${(episode.realClass ?? mainCharacter.class) + '/' + (_failed ? 'loose' : 'finish') + '-concept.png'}" class="char slide-right"/>`;
 		});
 	}
@@ -97,14 +97,14 @@ function animateStart(_failed) {
 	if(_hasNext) {
 		btnId = 'next-stage-btn';
 		action = 1;
-		_orderHTML = `<div class="stage-finish-informer flex w-100">
-						 <div class="flex w-100">${getLangData('Next stage in')}</div><span id="next-stage-counter">8</span>
+		_orderHTML = `<div class="stage-finish-informer flex w-100" style="padding-top:3%">
+						 <div class="flex w-100 wot-description">${getLangData('Next stage in')}</div><span id="next-stage-counter" class="wot-title">8</span>
 					</div>`;
 	}
 	else {
 		btnId = 'quit-stage-btn';
-		_orderHTML = `<div class="stage-finish-informer flex w-100">
-						 <div class="flex w-100">${getLangData('Action will be active in')}</div><span id="next-stage-counter">8</span>
+		_orderHTML = `<div class="stage-finish-informer flex w-100" style="padding-top:3%">
+						 <div class="flex w-100 wot-description">${getLangData('Action will be active in')}</div><span id="next-stage-counter" class="wot-title">8</span>
 					</div>`;
 	}
 	let _nextStageTimer, _nextStageCounter = 0, _playTicks;
@@ -144,44 +144,44 @@ function animateStart(_failed) {
 		<div class="w-50 container side-right flex flex-ai-start${_hasNext ? ' has-next' : ''}">
 			<div class="full stage-results-screen-middle${_hasNext ? ' final-screen-before-next' : ''}" style="position:relative;z-index:2;margin: 0 13.5% 0 1.5%;width:85%">
 				<div class="stars flex w-100 flex-ai-end" style="height: 20%;position:relative;background: url(./images/ui/header.png);background-size: contain;background-repeat: no-repeat;background-position: center;">
-					<div class="w-50 flex one-line stars-title">` + _missionTitle + `</div>
+					<div class="w-50 flex one-line stars-title wot-header">` + _missionTitle + `</div>
 				</div>
 				<div class="flex flex-ai-start w-100 stage-finish-body">
-					<div class="header-content w-100 flex flex-jc-start" style="height: 60%">`
+					<div class="header-content w-100 flex flex-jc-start" style="height: 55%">`
 					 + _achievementsHtml +
 					`</div>
 					<div class="stage-finish-splitter ms1500 op-none"></div>
-					<div class="w-100 stage-finish-total-score flex header flex-jc-start ms1500 op-none" style="height:20%">
+					<div class="w-100 stage-finish-total-score flex header flex-jc-start ms1500 op-none" style="height:24%">
 						<div class="w-100 flex flex-jc-start stage-achievement-item" style="height:50%">
-							<div class="w-50 flex flex-jc-start stage-achievement-item-left" style="height:100%">
+							<div class="w-50 flex flex-jc-start one-line stage-achievement-item-left wot-description" style="height:100%">
 								${getLangData('Total Score')}
 							</div>
-							<div class="w-50 flex flex-jc-end stage-achievement-item-right" style="height:100%">
+							<div class="w-50 flex flex-jc-end stage-achievement-item-right wot-subtitle" style="height:100%;color:#bebab0 !important">
 								${_totalAchScore.formatWithDots()}
 							</div>
 						</div>
 						<div class="w-100 flex flex-jc-start stage-achievement-item${!_hasNext ? '' : ' d-none'}" style="height:50%">
-							<div class="w-50 flex flex-jc-start stage-achievement-item-left" style="height:100%" lang="${getLang()}">
+							<div class="w-50 flex flex-jc-start one-line stage-achievement-item-left wot-description" style="height:100%" lang="${getLang()}">
 								${getLangData('Final Score')}
 							</div>
-							<div id="final-quickplay-score" class="w-50 flex flex-jc-end stage-achievement-item-right" style="height:100%">
+							<div id="final-quickplay-score" class="w-50 flex flex-jc-end stage-achievement-item-right wot-subtitle" style="height:100%">
 								${_hasNext ? __story.point.formatWithDots() : ''}
 							</div>
 						</div>
 					</div>
-					<div id="stage-result-order" class="header-content w-100 flex ms${_hasNext ? '2000' : '4000'} op-none" style="height:20%">`
+					<div id="stage-result-order" class="header-content w-100 flex ms${_hasNext ? '2000' : '4000'} op-none" style="height:15%">`
 						+ _orderHTML +
 					'</div>'
 					+ //_firstFinishRewardsHtml +
 				`</div>
 				<div class="flex w-100 ms2000 op-none" style="height: 10%">`
 					+ (_hasNext ? '' :
-					`<div class="w-33 flex" style="padding: 1%;height: 100%">
-						<div onexactclick="openCredits()" id="quit-stage-btn" style="height:74%!important" class="btn quick-space-btn inactivated gray animate-me-500 flex">${getLangData('CONTINUE')}</div>
+					`<div class="w-50 flex" style="padding: 1%;height: 100%">
+						<div onexactclick="openCredits()" id="quit-stage-btn" style="height:74%!important" class="orange-action-btn wot-button quick-space-btn inactivated gray animate-me-500 flex ">${getLangData('CONTINUE')}</div>
 					</div>`)
 					+ (_hasNext ?
-					`<div id="next-stage-btn" class="quick-space-btn w-33 flex" style="padding: 1%;height: 100%" onexactclick="playClick();hideMyModalPopUp(1);checkStoryFinish(1, ${__stories.find(x => !x.passive && x.order > __story.order)?.id}, null, null, null, 1)">
-						<div style="height:74%!important" class="btn animate-me-500 flex">${getLangData('NEXT')}</div>
+					`<div id="next-stage-btn" class="quick-space-btn w-50 flex" style="padding: 1%;height: 100%" onexactclick="playClick();hideMyModalPopUp(1);checkStoryFinish(1, ${__stories.find(x => !x.passive && x.order > __story.order)?.id}, null, null, null, 1)">
+						<div style="height:74%!important" class="orange-action-btn wot-button animate-me-500 flex">${getLangData('NEXT')}</div>
 					</div>` : '')
 					+
 				`</div>

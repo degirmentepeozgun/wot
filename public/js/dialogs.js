@@ -78,8 +78,8 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 			const _f = (_item.count ?? 0) >= _item.limit;
 			if(!_f)
 				_finish = undefined;
-			_steps += '<div class="flex flex-jc-start"><div class="d-none flex"><img style="height:.9rem;margin:0 .2rem;background:none" src="./images/icons/quest-progress.png"' + (!_finish ? 'class="gray"' : '') + ' /></div><div class="flex" style="justify-content:flex-start;height:100%;flex:1;color:' + (!_finish ? '#ffffff80' : '#fff') + ' !important">' + (_item.descriptions ?? _q.descriptions)[getLang()] + '</div></div>';
-			_steps += `<div class="w-100 flex flex-jc-start timedquest-object-progress"><div class='timedquest-progress-wrapper'><div class='timedquest-progress' style="width:${((_item.count ?? 0) / _item.limit) * 100}% !important"></div></div><div class="flex flex-jc-end timedquest-object-info">` + (_item.count ?? 0) + ' / ' + _item.limit + `</div></div>`;
+			_steps += '<div class="flex flex-jc-start"><div class="d-none flex"><img style="height:.9rem;margin:0 .2rem;background:none" src="./images/icons/quest-progress.png"' + (!_finish ? 'class="gray"' : '') + ' /></div><div class="flex wot-description" style="justify-content:flex-start;height:100%;flex:1;color:' + (!_finish ? '#e2d4b599' : '#e2d4b5') + ' !important">' + (_item.descriptions ?? _q.descriptions)[getLang()] + '</div></div>';
+			_steps += `<div class="w-100 flex flex-jc-start timedquest-object-progress"><div class='timedquest-progress-wrapper'><div class='timedquest-progress' style="width:${((_item.count ?? 0) / _item.limit) * 100}% !important"></div></div><div class="flex flex-jc-end timedquest-object-info wot-description">` + (_item.count ?? 0) + ' / ' + _item.limit + `</div></div>`;
 			_stepsAdded = 1;
 		}
 		if (_finish) {
@@ -102,7 +102,7 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 				}
 			}
 		}
-		_html += '<div class="one-line quest-title font-quest-title" style="padding-bottom:3%;color:#DAA520' + (_state == 'end' ? '' : 'bb') + ' !important"><img class="quest-title-icon" src="./images/ui/game/baklavagold.png"/>' + _q.names[getLang()] + '</div><div class="quest-line"></div>' + _steps;
+		_html += '<div class="one-line quest-title font-quest-title wot-subtitle" style="padding-bottom:3%;color:#DAA520' + (_state == 'end' ? '' : 'bb') + ' !important"><img class="quest-title-icon" src="./images/ui/game/baklavagold.png"/>' + _q.names[getLang()] + '</div><div class="quest-line"></div>' + _steps;
 		
 	}
 	else if (_q?.kills) {
@@ -113,8 +113,8 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 			const _f = (_item.count ?? 0) >= _item.limit;
 			if(!_f)
 				_finish = undefined;
-			_steps += '<div class="one-line flex flex-jc-start quest-desc-one-line font-normal-text"><div class="d-none flex" style="width:15%"><img style="width:3vh;background:none" src="./images/icons/quest-progress.png"' + (!_finish ? ' class="gray"' : '') + ' /></div><div style="width:85%;color:' + (!_finish ? '#ffffff80' : '#fff') + ' !important">' + (_item.descriptions ?? _q.descriptions)[getLang()]  + '</div></div>';
-			_steps += `<div class="w-100 flex flex-jc-start timedquest-object-progress"><div class='timedquest-progress-wrapper'><div class='timedquest-progress' style="width:${((_item.count ?? 0) / _item.limit) * 100}% !important"></div></div><div class="flex flex-jc-end timedquest-object-info">` + (_item.count ?? 0) + ' / ' + _item.limit + `</div></div>`;
+			_steps += '<div class="one-line flex flex-jc-start quest-desc-one-line font-normal-text"><div class="d-none flex" style="width:15%"><img style="width:3vh;background:none" src="./images/icons/quest-progress.png"' + (!_finish ? ' class="gray"' : '') + ' /></div><div class="wot-description" style="width:85%;color:' + (!_finish ? '#ffffff80' : '#fff') + ' !important">' + (_item.descriptions ?? _q.descriptions)[getLang()]  + '</div></div>';
+			_steps += `<div class="w-100 flex flex-jc-start timedquest-object-progress"><div class='timedquest-progress-wrapper'><div class='timedquest-progress' style="width:${((_item.count ?? 0) / _item.limit) * 100}% !important"></div></div><div class="flex flex-jc-end timedquest-object-info wot-description">` + (_item.count ?? 0) + ' / ' + _item.limit + `</div></div>`;
 			_stepsAdded = 1;
 		}
 		if (_finish) {
@@ -130,7 +130,7 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 				}
 			}
 		}
-		_html += '<div class="one-line font-quest-title quest-title" style="padding-bottom:3%;color:#DAA520' + (_state == 'end' ? '' : 'bb') + ' !important"><img class="quest-title-icon" src="./images/ui/game/baklavagold.png"/>' + _q.names[getLang()] + '</div><div class="quest-line"></div>' + _steps;
+		_html += '<div class="one-line font-quest-title quest-title wot-subtitle" style="padding-bottom:3%;color:#DAA520' + (_state == 'end' ? '' : 'bb') + ' !important"><img class="quest-title-icon" src="./images/ui/game/baklavagold.png"/>' + _q.names[getLang()] + '</div><div class="quest-line"></div>' + _steps;
 	}
 	if(_q?.timer) {
 		if(!_q.timer.startTime)
@@ -142,9 +142,9 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 				_icon = '<img src="' + _q.timer.iconPath + '" class="timedquest-icon" />';
 			_steps += `<div class="timedquest-timer one-line flex flex-jc-start quest-desc-one-line font-normal-text">`
 					+ _icon;
-			_steps += '<div class="one-line flex flex-jc-start quest-desc-one-line font-normal-text"><div style="width:100%;padding:0 2vh;color:' + (!_finish ? '#ffffff80' : '#fff') + ' !important">' + (_q.descriptions?.[getLang()] ?? '') + '</div></div>';
+			_steps += '<div class="one-line flex flex-jc-start quest-desc-one-line font-normal-text"><div class="wot-description" style="width:100%;padding:0 2vh;color:' + (!_finish ? '#ffffff80' : '#fff') + ' !important">' + (_q.descriptions?.[getLang()] ?? '') + '</div></div>';
 			if(_q.props)
-				_steps += `<div class="w-100 flex flex-jc-start timedquest-object-progress"><div class='timedquest-progress-wrapper'><div class='timedquest-progress' style="width:${(_q.props.current / _q.props.limit) * 100}% !important"></div></div><div class="flex flex-jc-end timedquest-object-info">` + _q.props.current + ' / ' + _q.props.limit + `</div></div>`;
+				_steps += `<div class="w-100 flex flex-jc-start timedquest-object-progress"><div class='timedquest-progress-wrapper'><div class='timedquest-progress' style="width:${(_q.props.current / _q.props.limit) * 100}% !important"></div></div><div class="flex flex-jc-end timedquest-object-info wot-description">` + _q.props.current + ' / ' + _q.props.limit + `</div></div>`;
 			_steps += `</div>`;
 		} 
 		else {
@@ -167,8 +167,8 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 		tQCounter = (_m > 9 ? _m : '0' + _m.toString()) + ':' 
 		+ (_s > 9 ? _s : '0' + _s.toString());
 		if(!_stepsAdded)
-			_html += '<div class="flex" style="width:100%"><div class="one-line quest-title font-quest-title" style="flex:1;padding-bottom:3%;color:#DAA520' + (_state == 'end' ? '' : 'bb') + ' !important"><img src="./images/ui/game/baklavagold.png" class="quest-title-icon" />' + _q.names[getLang()] + '</div>'
-		_html += '<div class="timedquest-counter">' + tQCounter + '</div>';
+			_html += '<div class="flex" style="width:100%"><div class="one-line quest-title font-quest-title wot-subtitle" style="flex:1;padding-bottom:3%;color:#DAA520' + (_state == 'end' ? '' : 'bb') + ' !important"><img src="./images/ui/game/baklavagold.png" class="quest-title-icon" />' + _q.names[getLang()] + '</div>'
+		_html += '<div class="timedquest-counter wot-subtitle">' + tQCounter + '</div>';
 		if(!_stepsAdded)
 			_html += '</div><div class="quest-line"></div>';
 		_html += _steps;
@@ -177,7 +177,7 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 	if(!_stepsAdded) {
 		if (_qq) {
 			let _steps = '<div class="one-line flex flex-jc-start quest-desc-one-line font-normal-text"><div class="d-none flex" style="width:15%"><img style="width:3vh;background:none" src="./images/icons/quest-progress.png" class="gray" /></div><div style="width:85%;color:#ffffff80 !important">' + _q.descriptions[getLang()] + '</div></div>';
-			_html += '<div  class="one-line quest-title font-quest-title" style="padding-bottom:3%;color:#DAA520' + (_state == 'end' ? '' : 'bb') + ' !important"><img class="quest-title-icon" src="./images/ui/game/baklavagold.png"/>' + _q.names[getLang()] + '</div><div class="quest-line"></div>' + _steps;
+			_html += '<div  class="one-line quest-title font-quest-title wot-subtitle" style="padding-bottom:3%;color:#DAA520' + (_state == 'end' ? '' : 'bb') + ' !important"><img class="quest-title-icon" src="./images/ui/game/baklavagold.png"/>' + _q.names[getLang()] + '</div><div class="quest-line"></div>' + _steps;
 		}
 		else {
 			addClass(_elm, 'd-none');
@@ -681,7 +681,7 @@ function createBubbleText(_dialog) {
 		_d.dialogText = getLangData(_dialog.text);
 		if(!_dialog.asap)
 			_d.letterOrder = 0;
-		_d.innerHTML = '<div class="talk-bubble-inner"' + (_dialog.color ? ' style="color:' + _dialog.color + ' !important"' : '') + '>' + (_dialog.asap ? _d.dialogText : '') + '</div>';
+		_d.innerHTML = '<div class="talk-bubble-inner wot-description"' + (_dialog.color ? ' style="color:' + _dialog.color + ' !important"' : '') + '>' + (_dialog.asap ? _d.dialogText : '') + '</div>';
 		_gameUI.appendChild(_d);
 		if(!episode.bubbles)
 			episode.bubbles = [];

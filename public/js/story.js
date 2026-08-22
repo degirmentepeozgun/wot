@@ -6997,7 +6997,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		//startScene: 2,
+		startScene: 2,
 		scenes: [
 			{
 				when: function() {
@@ -7183,14 +7183,14 @@ const __stories = [
 						_div.className = 'flex show-ui flex-ai-start tutorial-box fade-me';
 						_div.innerHTML = `<img class="tutorial-avatar flip" src="./images/main/blacksmith/concept.png" />
 						<div class="tutorial-box-inner full">
-						<b class="tutorial-title">${__storyScene.lang[0].title[getLang()]}:</b>
-							<div class="w-100 tutorial-description-text" lang="${getLang()}">
+						<b class="tutorial-title wot-title">${__storyScene.lang[0].title[getLang()]}:</b>
+							<div class="w-100 tutorial-description-text wot-description" lang="${getLang()}">
 								${__storyScene.lang[0][getLang()]}
 							</div>	
 						</div>`;
 						_gameUI.appendChild(_div);
 						const _skip = document.createElement('div');
-						_skip.className = 'flex show-ui tutorial-skip fade-me red-action-btn';
+						_skip.className = 'wot-button flex show-ui tutorial-skip fade-me red-action-btn';
 						_skip.innerHTML = getLangData('Skip Tutorial');
 						_skip.lang = getLang();
 						_skip.onexactclick = function() {
@@ -7245,7 +7245,7 @@ const __stories = [
 								if(_current)
 									_current.remove();
 								const _div = document.createElement('div');
-								_div.className = "w-100 pt-3 toxic fade-me flex w-100 flex-jc-start";
+								_div.className = "w-100 pt-3 toxic wot-subtitle fade-me flex w-100 flex-jc-start";
 								_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[1][getLang()]}!`;
 								_inner.appendChild(_div);
 								disposeFocus();
@@ -7276,8 +7276,8 @@ const __stories = [
 								_id = 'chain-skill-4';
 							_game.suspended = 1;
 							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerHTML = `<b class="tutorial-title fade-me">${__storyScene.lang[2].title[getLang()]}:</b>
-							<div class="w-100 fade-me tutorial-description-text" lang="${getLang()}">
+							_inner.innerHTML = `<b class="tutorial-title fade-me wot-title">${__storyScene.lang[2].title[getLang()]}:</b>
+							<div class="w-100 fade-me tutorial-description-text wot-description" lang="${getLang()}">
 								${__storyScene.lang[2][getLang()]}</div>`;
 							focusMe('#' + _id, function() {
 								removeFocus();
@@ -7292,7 +7292,7 @@ const __stories = [
 								if(_current)
 									_current.remove();
 								const _div = document.createElement('div');
-								_div.className = "w-100 pt-3 toxic fade-me flex w-100 flex-jc-start";
+								_div.className = "w-100 pt-3 toxic wot-subtitle fade-me flex w-100 flex-jc-start";
 								_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[3][getLang()]}!`;
 								_inner.appendChild(_div);
 								disposeFocus();
@@ -7313,8 +7313,8 @@ const __stories = [
 							_game.suspended = 1;
 							removeFocus();
 							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[4].title[getLang()]}:</b>
-							<div class="w-100 fade-me">${__storyScene.lang[4][getLang()]}</div>`;
+							_inner.innerHTML = `<b class="tutorial-title wot-title">${__storyScene.lang[4].title[getLang()]}:</b>
+							<div class="w-100 fade-me tutorial-description-text wot-description">${__storyScene.lang[4][getLang()]}</div>`;
 							delete mainCharacter.disableKeyboard;
 							focusMe('#skill1', function(_elem, _shield) {
 								delete _game.suspended;
@@ -7355,7 +7355,7 @@ const __stories = [
 							const _current = _inner.querySelector('.fire,.toxic');
 							if(_current)
 								_current.remove();
-							_div.className = "w-100 pt-3 fire fade-me flex w-100 flex-jc-start";
+							_div.className = "w-100 pt-3 fire wot-subtitle fade-me flex w-100 flex-jc-start";
 							_div.innerHTML = `<img src="./images/icons/cross.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[5][getLang()]}!`;
 							_inner.appendChild(_div);
 							mainCharacter.immobilize = true;
@@ -7378,7 +7378,7 @@ const __stories = [
 							if(_current)
 								_current.remove();
 							const _div = document.createElement('div');
-							_div.className = "w-100 pt-3 toxic fade-me flex w-100 flex-jc-start";
+							_div.className = "w-100 pt-3 toxic wot-substitle fade-me flex w-100 flex-jc-start";
 							_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[6][getLang()]}!`;
 							_inner.appendChild(_div);
 							mainCharacter.immobilize = true;
@@ -7398,8 +7398,8 @@ const __stories = [
 						do: function() {
 							_game.suspended = 1;
 							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[7].title[getLang()]}:</b>
-							<div class="w-100 fade-me">${__storyScene.lang[7][getLang()]}</div>`;
+							_inner.innerHTML = `<b class="tutorial-title wot-title">${__storyScene.lang[7].title[getLang()]}:</b>
+							<div class="w-100 fade-me tutorial-description-text wot-description">${__storyScene.lang[7][getLang()]}</div>`;
 							delete mainCharacter.disableKeyboard;
 							focusMe('#skill1', function() {
 								removeFocus();
@@ -7434,7 +7434,7 @@ const __stories = [
 							if(_current)
 								_current.remove();
 							const _div = document.createElement('div');
-							_div.className = "w-100 pt-3 toxic fade-me flex w-100 flex-jc-start";
+							_div.className = "w-100 pt-3 toxic wot-subtitle fade-me flex w-100 flex-jc-start";
 							_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[8][getLang()]}!`;
 							_inner.appendChild(_div);
 							mainCharacter.immobilize = mainCharacter.still = true;
@@ -7469,8 +7469,8 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
-							_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[9].title[getLang()]}:</b>
-							<div class="w-100 fade-me tutorial-description-text" lang="${getLang()}">
+							_inner.innerHTML = `<b class="tutorial-title wot-title">${__storyScene.lang[9].title[getLang()]}:</b>
+							<div class="w-100 fade-me tutorial-description-text wot-description" lang="${getLang()}">
 								${__storyScene.lang[9][getLang()]}
 							</div>`;
 							_game.suspended = 1;
@@ -7506,8 +7506,8 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[10].title[getLang()]}:</b>
-									<div class="w-100 fade-me tutorial-description-text" lang="${getLang()}">
+								_inner.innerHTML = `<b class="tutorial-title wot-title">${__storyScene.lang[10].title[getLang()]}:</b>
+									<div class="w-100 fade-me tutorial-description-text wot-description" lang="${getLang()}">
 										${__storyScene.lang[10][getLang()]}
 								</div>`;
 							mainCharacter.immobilize = true;
@@ -7566,8 +7566,8 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[11].title[getLang()]}:</b>
-								<div class="w-100 fade-me tutorial-description-text" lang="${getLang()}">
+								_inner.innerHTML = `<b class="tutorial-title wot-title">${__storyScene.lang[11].title[getLang()]}:</b>
+								<div class="w-100 fade-me tutorial-description-text wot-description" lang="${getLang()}">
 									${__storyScene.lang[11][getLang()]}
 								</div>`;
 							episode.tutorialOrder = 13;
@@ -7621,7 +7621,7 @@ const __stories = [
 						},
 						do: function() {
 							const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<b class="tutorial-title">${__storyScene.lang[12].title[getLang()]}:</b><div class="w-100 fade-me tutorial-description-text" lang="${getLang()}">
+								_inner.innerHTML = `<b class="tutorial-title wot-title">${__storyScene.lang[12].title[getLang()]}:</b><div class="w-100 fade-me tutorial-description-text wot-description" lang="${getLang()}">
 										${__storyScene.lang[12][getLang()]}
 								</div>`;
 							mainCharacter.direction = __right;
@@ -7671,7 +7671,7 @@ const __stories = [
 							const _current = _inner.querySelector('.fire,.toxic');
 							if(_current)
 								_current.remove();
-								_inner.innerHTML = `<div class="w-100 pt-3 toxic fade-me flex w-100 flex-jc-start flex-ai-start">
+								_inner.innerHTML = `<div class="w-100 pt-3 toxic wot-subtitle fade-me flex w-100 flex-jc-start flex-ai-start">
 										<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[13][getLang()]}!
 								</div>`;
 							mainCharacter.immobilize = true;
@@ -7705,6 +7705,8 @@ const __stories = [
 							_game.suspended = true;
 							episode.pauseAmbianceMusic();
 							episode.enemies.forEach(x => x.stopStepSound());
+							removeFocus();
+							disposeFocus();
 							cssAnimations.blackui(null, 6000, __storyScene.lang[14][getLang()], function() {
 								switchStoryScene();
 							});
@@ -7879,17 +7881,21 @@ const __stories = [
 							_html += `<div class="quick-play-desc-item" style="background:url(./images/ui/full-border-vert.png) !important;background-size: 100% auto !important;background-repeat: no-repeat !important;overflow:visible;position:relative">
 									<div class="flex" style="overflow:hidden;z-index:-1;top:0;left:0;position:absolute;inset:0"><img class="w-100" src="./images/${!isPhone() ? '_' : ''}quicktips/${_tip.id}.png" /></div>`
 								+ _skillHtml +
-								`<div class="quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
+								`<div class="wot-subtitle quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
 						</div>`;
 						}
 						_desc.innerHTML = _html +
-						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2vh" class="w-50 h-100 flex flex-jc-start" onclick="doNotShowAgain(this,event)"  lang="${getLang()}"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2vh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(0, 1, null, null, 1);skipQuickPlayTutorial(1)"><div class="orange-action-btn flex">${getLangData('UNDERSTOOD')}</div></div></div>`;
+						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2vh" class="w-50 h-100 flex flex-jc-start wot-title" onclick="doNotShowAgain(this,event)"  lang="${getLang()}"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2vh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(0, 1, null, null, 1);skipQuickPlayTutorial(1)"><div class="orange-action-btn wot-button flex">${getLangData('OK')}</div></div></div>`;
 						_gameUI.appendChild(_desc);
 						episode.hasSkippableScreen = 1;
 						addClass(_gameUI, 'disable-ui');
 						requestAnimationFrame(() => {
 							_game.suspended = true;
 						});
+					}
+					else{
+						takeQuest(0, 1, null, null, 1);
+						skipQuickPlayTutorial();
 					}
 					document.querySelectorAll('.top-ui-item').forEach(x => 
 						removeClass(x, 'd-none'));
@@ -7911,11 +7917,12 @@ const __stories = [
 					// 		});
 					// 	}
 					// });
-					// setTimeout(() => {
+					setTimeout(() => {
 						
-					// 		const _portal = summonMob(113, 3000, MathRound(groundheight * .5), 1);
-					// 		activatePortal(_portal);
-					// }, 3000);
+							const _portal = summonMob(113, 3000, MathRound(groundheight * .5), 1);
+							activatePortal(_portal);
+							mainCharacter.talk();
+					}, 3000);
 				},
 				actions: [
 					{
@@ -8452,6 +8459,9 @@ const __stories = [
 				save: true,
 				lazyLoadingCharacterIds: [72,73, 37, 38, 1003],
 				loadingCharacterIds: [1, 111, 33, 35, 2, 7],
+				after: function() {
+					removeClass(document.getElementById('quest-status'), 'd-none');
+				},
 				start: function() {
 					clearAudioCache(loadedSounds);
 					episode.itemDropOrder = [ 
@@ -8502,16 +8512,16 @@ const __stories = [
 					const _skipped = _json.indexOf(2) !== -1;
 					if(_skipped) {
 						const _desc = document.createElement('div');
-						_desc.className = 'flex show-ui full quick-play-desc-container';
+						_desc.className = 'flex show-ui full quick-play-desc-container quick-play-desc-container2';
 						let _html = '';
 						for(let i = 6; i < 12; i++) {
 							const _tip = __quickTips[i];
-							_html += `<div style="background-image:url(./images/ui/full-border-vert.png), url(./images/${__isPC ? '_' : ''}quicktips/${_tip.id}.png) !important;background-size: 100% auto !important;background-repeat: no-repeat !important" class="quick-play-desc-item quick-play-desc-item${_tip.id}">
-										<div class="quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
+							_html += `<div class="quick-play-desc-item quick-play-desc-item${_tip.id}">
+										<div class="wot-description flex quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
 									</div>`;
 						}
 						_desc.innerHTML = _html +
-						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2vh" class="w-50 h-100 flex flex-jc-start" onclick="doNotShowAgain(this,event)" lang="${getLang()}"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2vh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(1, 1, null, null, 1);skipQuickPlayTutorial(2)"><div class="orange-action-btn flex">${getLangData('UNDERSTOOD')}</div></div></div>`;
+						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2vh" class="w-50 h-100 flex flex-jc-start wot-title" onclick="doNotShowAgain(this,event)" lang="${getLang()}"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2vh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(1, 1, null, null, 1);skipQuickPlayTutorial(2)"><div class="orange-action-btn wot-button flex">${getLangData('OK')}</div></div></div>`;
 						addClass(_gameUI, 'disable-ui');
 						requestAnimationFrame(() => {
 							_game.suspended = true;
@@ -8519,13 +8529,17 @@ const __stories = [
 						_gameUI.appendChild(_desc);
 						episode.hasSkippableScreen = 1;
 					}
+					else{
+						takeQuest(1, 1, null, null, 1);
+						skipQuickPlayTutorial();
+					}
 					mainCharacter.disableSkill('tag');
 					mainCharacter.maxHP = mainCharacter.MAXHP = mainCharacter.health = mainCharacter.level * 120;
 					mainCharacter.setHealth(mainCharacter.health);
 					// setTimeout(function() {
 					// 	__storyPlaying = false;
 					// 	installStoryFinish();
-					// }, 5000);
+					// }, 4000);
 				},
 				actions: [
 					{
@@ -8554,18 +8568,18 @@ const __stories = [
 									+ _icon +
 								`</div>
 								<div class="status-item-action-container flex">
-									<div class="item-title-wrapper flex flex-jc-start w-100">
+									<div class="item-title-wrapper flex flex-jc-start w-100 wot-subtitle">
 										${_title}
 									</div>
 									<div class="item-action-wrapper flex flex-jc-start w-100">
 										<div id="strongbox-unlock-btn" class="red-action-btn animate-me flex" onexactclick="renderChestOpeningScreen()">
-											<div class="flex">${getLangData('UNLOCK')}</div>
+											<div class="flex wot-button">${getLangData('UNLOCK')}</div>
 										</div>
 									</div>
 								</div>
 							</div>`;
 							PlaySound({key:'questaccepted', volume: .8});
-							warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/present.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Strongbox Found') + '</span></div>', null, null, 1);
+							warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/present.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1" class="wot-title">' + getLangData('Strongbox Found') + '</span></div>', null, null, 1);
 							
 							frag.appendChild(_subDiv.firstElementChild);
 							_div.prepend(frag);
@@ -8672,16 +8686,16 @@ const __stories = [
 									`</div>
 									<div class="status-item-action-container flex">
 										<div class="item-title-container w-100 flex">
-											<div class="item-title-wrapper flex w-50">
+											<div class="item-title-wrapper flex w-50 wot-subtitle">
 												${_title}
 											</div>
-											<div class="item-title-wrapper flex w-50">
+											<div class="item-title-wrapper flex w-50 wot-subtitle">
 												<img style="height:80%;max-height:2.6vh" src="./images/icons/power-up.png" />${_powerDiff}
 											</div>
 										</div>
 										<div class="item-action-wrapper flex w-100">
 											<div class="red-action-btn animate-me flex"${!__isPC ? '' : ' onexactclick="wearStatusItem(' + _item.id + ', ' + _powerDiff + ')"'}>
-												<div class="flex">${getLangData('WEAR')}<span class="flex${__isPC ? '' : ' d-none'}">(${getNewKeyboardKey('U').baseKey})</span></div>
+												<div class="flex wot-button">${getLangData('WEAR')}<span class="flex${__isPC ? '' : ' d-none'}">(${getNewKeyboardKey('U').baseKey})</span></div>
 											</div>
 										</div>
 									</div>
@@ -9128,7 +9142,7 @@ const __stories = [
 							requestAnimationFrame(() => {
 								mainCharacter.still = mainCharacter.immobilize = mainCharacter.disableKeyboard = true;
 								blurKeyboard();
-								focusMe('#skill12', null, null, "<div class='full flex' style='flex-direction: column;'><div class='flex' style='padding-bottom:.5vh'>" + getLangData('You\'ve activated a support skill') + '</div><div class="flex">' + getLangData('It can be used even in danger') + "</div></div>", null, null, __isPC ? null : true, 1);
+								focusMe('#skill12', null, null, "<div class='full flex' style='flex-direction: column;'><div class='flex wot-subtitle' style='padding-bottom:.5vh'>" + getLangData('You\'ve activated a support skill') + '</div><div class="flex wot-subtitle">' + getLangData('It can be used even in danger') + "</div></div>", null, null, __isPC ? null : true, 1);
 								requestAnimationFrame(() => {
 									const _curt = document.getElementById('focus-ui');
 									_curt.appendChild(clone);
@@ -9199,8 +9213,8 @@ const __stories = [
 												const _btnWrapper = document.createElement('div');
 												_btnWrapper.className = 'flex black-screen-ok-btn w-100 focus-ui-done-btn-custom';
 												const _btn = document.createElement('div');
-												_btn.style = 'color:#f7f7f7cc !important;font-size:3vh !important';
-												_btn.className = "game-btn2 flex one-line fade-me";
+												_btn.style = 'color:#f7f7f7cc !important;height:5vh !important';
+												_btn.className = "wot-button orange-action-btn flex one-line fade-me";
 												_btn.innerText = getLangData('Done');
 												_btn.onexactclick = function() {					
 													playClick();
@@ -9419,7 +9433,7 @@ const __stories = [
 						count: 1,
 						sight: 1000,
 						grade: 12,
-						hp:1650,
+						hp:165,//0,
 						zoom: .33,
 						experience: 0,
 						do: function(_e) {
@@ -9446,248 +9460,248 @@ const __stories = [
 							return MathRound(groundheight * .5);
 						}
 					},
-					{
-						id: 35,
-						minX: 1580,
-						maxX: 4800,
-						count: 1,
-						sight: 1000,
-						spawn: 10,
-						hp:300,
-						experience: 0
-					},
-					{
-						id: 7,
-						minX: 2000,
-						maxX: 3200,
-						count: 2,
-						sight: 1000,
-						spawn: 10,
-						hp:300,
-						experience: 0
-					},
-					{
-						id: 2,
-						minX: 1580,
-						maxX: 4800,
-						count: 2,
-						sight: 1000,
-						spawn: 10,
-						hp:300,
-						experience: 0
-					},
-					{
-						id: 33,
-						minX: 1580,
-						maxX: 4800,
-						count: 1,
-						sight: 1000,
-						spawn: 10,
-						hp:300,
-						experience: 0
-					}
+					// {
+					// 	id: 35,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 1,
+					// 	sight: 1000,
+					// 	spawn: 10,
+					// 	hp:300,
+					// 	experience: 0
+					// },
+					// {
+					// 	id: 7,
+					// 	minX: 2000,
+					// 	maxX: 3200,
+					// 	count: 2,
+					// 	sight: 1000,
+					// 	spawn: 10,
+					// 	hp:300,
+					// 	experience: 0
+					// },
+					// {
+					// 	id: 2,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 2,
+					// 	sight: 1000,
+					// 	spawn: 10,
+					// 	hp:300,
+					// 	experience: 0
+					// },
+					// {
+					// 	id: 33,
+					// 	minX: 1580,
+					// 	maxX: 4800,
+					// 	count: 1,
+					// 	sight: 1000,
+					// 	spawn: 10,
+					// 	hp:300,
+					// 	experience: 0
+					// }
 				]
 			},
-			{
-				map: 42,
-				noArtifact: true,
-				leaderBoards: {
-					calculate: function() {
-						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
-						//Kalan kalp (3 adet te) + 1000 * 3
-						//Yediği Damage ın toplam sağlığına oranı negatif bonusu (50 * 10) dmgTaken
+			// {
+			// 	map: 42,
+			// 	noArtifact: true,
+			// 	leaderBoards: {
+			// 		calculate: function() {
+			// 			//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
+			// 			//Kalan kalp (3 adet te) + 1000 * 3
+			// 			//Yediği Damage ın toplam sağlığına oranı negatif bonusu (50 * 10) dmgTaken
 						
-						const _result = {
-							description: [
-								{
-									title: {
-										en: 'Package Bonus',
-										tr: 'Paket Bonusu'
-									},
-									icon: 'pack',
-									value: (mainCharacter.packageCount ?? 0) * 1000
-								},
-								{
-									title: {
-										en: 'Kill Bonus',
-										tr: 'Öldürme Bonusu'
-									},
-									icon: 'strong',
-									value: (mainCharacter.killCount ?? 0) * 1500
-								},
-								{
-									title: {
-										en: 'Team Bonus',
-										tr: 'Takım Bonusu'
-									},
-									icon: 'war',
-									value: (episode['team' + mainCharacter.groupId + 'score'] ?? 0) * 500
-								}
-							]
-						};
-						_result.score = _result.description.reduce(
-							(sum, item) => sum + (item.value ?? 0),
-							0
-						);
-						return _result;
-					}
-				},
-				enableCommonSkills: true,
-				loadingCharacterIds: [],
-				actions: [	
-					{
-						when: function() {
-							return mainCharacter?.commonItem && !mainCharacter.commonItemRendered;
-						},
-						do: function() {
-							let _div = document.querySelector('.game-status-screen');
-							if(_div) 
-								_div.remove();
-							_div = document.createElement('div');
-							_div.className = 'flex game-status-screen';
-							_gameUI.appendChild(_div);
-							mainCharacter.commonItemRendered = 1;
-							const _item = mainCharacter.commonItem;
-							const _ci = commonSkills.find(x => x.key === _item.key);
-							const _title = _ci.title[getLang()];
-							const _icon = `<span class="item-in-slot full grade3-item" 
-								style="display:inline-block;position:relative">
-								<img style="background:#010101" class="item-img" src="./images/common/icons/${_ci.key}.png"/></span>`;
+			// 			const _result = {
+			// 				description: [
+			// 					{
+			// 						title: {
+			// 							en: 'Package Bonus',
+			// 							tr: 'Paket Bonusu'
+			// 						},
+			// 						icon: 'pack',
+			// 						value: (mainCharacter.packageCount ?? 0) * 1000
+			// 					},
+			// 					{
+			// 						title: {
+			// 							en: 'Kill Bonus',
+			// 							tr: 'Öldürme Bonusu'
+			// 						},
+			// 						icon: 'strong',
+			// 						value: (mainCharacter.killCount ?? 0) * 1500
+			// 					},
+			// 					{
+			// 						title: {
+			// 							en: 'Team Bonus',
+			// 							tr: 'Takım Bonusu'
+			// 						},
+			// 						icon: 'war',
+			// 						value: (episode['team' + mainCharacter.groupId + 'score'] ?? 0) * 500
+			// 					}
+			// 				]
+			// 			};
+			// 			_result.score = _result.description.reduce(
+			// 				(sum, item) => sum + (item.value ?? 0),
+			// 				0
+			// 			);
+			// 			return _result;
+			// 		}
+			// 	},
+			// 	enableCommonSkills: true,
+			// 	loadingCharacterIds: [],
+			// 	actions: [	
+			// 		{
+			// 			when: function() {
+			// 				return mainCharacter?.commonItem && !mainCharacter.commonItemRendered;
+			// 			},
+			// 			do: function() {
+			// 				let _div = document.querySelector('.game-status-screen');
+			// 				if(_div) 
+			// 					_div.remove();
+			// 				_div = document.createElement('div');
+			// 				_div.className = 'flex game-status-screen';
+			// 				_gameUI.appendChild(_div);
+			// 				mainCharacter.commonItemRendered = 1;
+			// 				const _item = mainCharacter.commonItem;
+			// 				const _ci = commonSkills.find(x => x.key === _item.key);
+			// 				const _title = _ci.title[getLang()];
+			// 				const _icon = `<span class="item-in-slot full grade3-item" 
+			// 					style="display:inline-block;position:relative">
+			// 					<img style="background:#010101" class="item-img" src="./images/common/icons/${_ci.key}.png"/></span>`;
     
-							const frag = document.createDocumentFragment();
-							const _subDiv = document.createElement('div');
-							_subDiv.innerHTML = `<div${!__isPC ? ' ontouchstart="mainCharacter.useCommonSkill(1)"' : ''} data-status-item-id="${_item.id ?? _item.key}" class="flex status-item-container w-50 flex flex-ai-start">
-								<div class="status-item-icon-container">`
-									+ _icon +
-								`</div>
-								<div class="status-item-action-container flex">
-									<div class="item-title-container w-100 flex">
-										<div class="item-title-wrapper flex w-50">
-											${_title}
-										</div>
-										<div class="item-title-wrapper flex w-50">
+			// 				const frag = document.createDocumentFragment();
+			// 				const _subDiv = document.createElement('div');
+			// 				_subDiv.innerHTML = `<div${!__isPC ? ' ontouchstart="mainCharacter.useCommonSkill(1)"' : ''} data-status-item-id="${_item.id ?? _item.key}" class="flex status-item-container w-50 flex flex-ai-start">
+			// 					<div class="status-item-icon-container">`
+			// 						+ _icon +
+			// 					`</div>
+			// 					<div class="status-item-action-container flex">
+			// 						<div class="item-title-container w-100 flex">
+			// 							<div class="item-title-wrapper flex w-50 wot-subtitle">
+			// 								${_title}
+			// 							</div>
+			// 							<div class="item-title-wrapper flex w-50">
 											
-										</div>
-									</div>
-									<div class="item-action-wrapper flex w-100">
-										<div class="red-action-btn animate-me flex"${__isPC ? ' onexactclick="mainCharacter.useCommonSkill(1)"' : ''}>
-											<div class="flex">${getLangData('USE')}<span class="flex${__isPC ? '' : ' d-none'}">(${getNewKeyboardKey('1').baseKey})</span></div>
-										</div>
-									</div>
-								</div>
-							</div>`;
+			// 							</div>
+			// 						</div>
+			// 						<div class="item-action-wrapper flex w-100">
+			// 							<div class="red-action-btn animate-me flex"${__isPC ? ' onexactclick="mainCharacter.useCommonSkill(1)"' : ''}>
+			// 								<div class="flex wot-button">${getLangData('USE')}<span class="flex${__isPC ? '' : ' d-none'}">(${getNewKeyboardKey('1').baseKey})</span></div>
+			// 							</div>
+			// 						</div>
+			// 					</div>
+			// 				</div>`;
 
-							frag.appendChild(_subDiv.firstElementChild);
-							_div.prepend(frag);
-						}
-					},
-					{
-						when: function() {
-							return episode.pvpCounterValue > 10 && episode.mobPhaseTick && (_gameTick - episode.mobPhaseTick) > 60000;
-						},
-						do: function() {
-							episode.mobPhaseTick = _gameTick;
-							const _maxW = MathRound(episode.width / __zoom);
-							const _minX = MathRound(_maxW * (1 / 6));
-							const _maxX = MathRound(_maxW * (5 / 6));
-							const _minY = MathRound(groundheight * (1 / 10));
-							const _maxY = MathRound(groundheight * (9 / 10));
-							const _parachute = summonMobWithJson({
-								id: 631,
-								level: 1,
-								minX: _minX,
-								maxX: _maxX,
-								yPosition: function() {
-									return getRandomValue2(_minY, _maxY);
-								},
-								sight:1000,
-								count:1,
-								experience: 0
-							}, 0, 1, 1);
-							_parachute.package = true;
-							_parachute.animate('start', 1);
-						}
-					},
-					// {
-					// 	when: function() {
-					// 		return episode.phase === 2 && 
-					// 		(episode.deads.filter(x => !x.remove)?.length ?? 0) === 0;
-					// 	},
-					// 	do: function() {
-					// 		__storyPlaying = false;
-					// 		episode.pvp = episode.war = false;
-					// 		mainCharacter.class = episode.mainClass;
-					// 		delete episode.mainClass;
-					// 		installStoryFinish();
-					// 		episode.phase = 3;
-					// 	}
-					// },
-					{
-						when: function() {
-							return episode.phase < 2 && episode.pvpEnded;
-						},
-						do: function() {
-							__storyPlaying = false;
-							episode.pvp = episode.war = false;
-							if(episode.mainClass) {
-								mainCharacter.class = episode.mainClass;
-								delete episode.mainClass;
-							}
-							installStoryFinish();
-							episode.phase = 2;
-						}
-					}
-				],
-				do: function() {
-					__account.inventory = [];
-					applyCharacterStats();
-					const _place = 0;
-					const opponents = [];
-					const _mobs = [null, '02', 47, 1000];
-					const _pvpNames = ['Berserker', 'Ranger', 'Cyclops', 'Al Karısı'];
-					// const _mobs = [null, 1000];
-					// const _pvpNames = ['Berserker','Al Karısı'];
-					for(var i = 0; i < _mobs.length; i++) {
-						if(i === _place){
-							mainCharacter.totalPower = getTotalPower().total;
-							mainCharacter.pvpName = mainCharacter.displayName = _pvpNames[i];
-							opponents.push(mainCharacter);
-							continue;
-						}
-						const _e = setCharacterFunctions(_allEnemies['enemy' + _mobs[i]](), 1);
-						_e.level = mainCharacter.level;
-						_e.inventory = [];
-						applyCharacterStats(null, _e);
-						_e.totalPower = getTotalPower(_e).total;
-						_e.pvpName = _pvpNames[i];
-						opponents.push(_e);
-					}
-					requestAnimationFrame(() => {
-						episode.loadCharacterSprites(function() {}, [10, 48], null, 1);
-					});
-					createWar(opponents, 42, 1, 1, 180, function() {
-						clearAudioCache(loadedSounds);
-						mainCharacter.startPlatformX = platformX;
-						episode.skipPvPFinalScreen = 1;
-						episode.phase = 1;
-						episode.canPause = false;
-						episode.deathMatch = true;
-						episode.mainClass = mainCharacter.class;
-						mainCharacter.disableSkill('tag');
-						episode.beforePVPStart = function() {
-							episode.mobPhaseTick = _gameTick;
-							episode.enemies.forEach(x => {
-								x.pvpRespawn = true;
-								x.maxHP = x.MAXHP = x.health = mainCharacter.maxHP = 1000;
-								x.setHealth(x.health);
-								x.immunities = [];
-							});
-						}
-						const _objects = mapSprites.find(x => x.id === __storyScene.map).objectMobs;
-						episode.installMobs(_objects);
-					});
-				}
-			}
+			// 				frag.appendChild(_subDiv.firstElementChild);
+			// 				_div.prepend(frag);
+			// 			}
+			// 		},
+			// 		{
+			// 			when: function() {
+			// 				return episode.pvpCounterValue > 10 && episode.mobPhaseTick && (_gameTick - episode.mobPhaseTick) > 60000;
+			// 			},
+			// 			do: function() {
+			// 				episode.mobPhaseTick = _gameTick;
+			// 				const _maxW = MathRound(episode.width / __zoom);
+			// 				const _minX = MathRound(_maxW * (1 / 6));
+			// 				const _maxX = MathRound(_maxW * (5 / 6));
+			// 				const _minY = MathRound(groundheight * (1 / 10));
+			// 				const _maxY = MathRound(groundheight * (9 / 10));
+			// 				const _parachute = summonMobWithJson({
+			// 					id: 631,
+			// 					level: 1,
+			// 					minX: _minX,
+			// 					maxX: _maxX,
+			// 					yPosition: function() {
+			// 						return getRandomValue2(_minY, _maxY);
+			// 					},
+			// 					sight:1000,
+			// 					count:1,
+			// 					experience: 0
+			// 				}, 0, 1, 1);
+			// 				_parachute.package = true;
+			// 				_parachute.animate('start', 1);
+			// 			}
+			// 		},
+			// 		// {
+			// 		// 	when: function() {
+			// 		// 		return episode.phase === 2 && 
+			// 		// 		(episode.deads.filter(x => !x.remove)?.length ?? 0) === 0;
+			// 		// 	},
+			// 		// 	do: function() {
+			// 		// 		__storyPlaying = false;
+			// 		// 		episode.pvp = episode.war = false;
+			// 		// 		mainCharacter.class = episode.mainClass;
+			// 		// 		delete episode.mainClass;
+			// 		// 		installStoryFinish();
+			// 		// 		episode.phase = 3;
+			// 		// 	}
+			// 		// },
+			// 		{
+			// 			when: function() {
+			// 				return episode.phase < 2 && episode.pvpEnded;
+			// 			},
+			// 			do: function() {
+			// 				__storyPlaying = false;
+			// 				episode.pvp = episode.war = false;
+			// 				if(episode.mainClass) {
+			// 					mainCharacter.class = episode.mainClass;
+			// 					delete episode.mainClass;
+			// 				}
+			// 				installStoryFinish();
+			// 				episode.phase = 2;
+			// 			}
+			// 		}
+			// 	],
+			// 	do: function() {
+			// 		__account.inventory = [];
+			// 		applyCharacterStats();
+			// 		const _place = 0;
+			// 		const opponents = [];
+			// 		const _mobs = [null, '02', 47, 1000];
+			// 		const _pvpNames = ['Berserker', 'Ranger', 'Cyclops', 'Al Karısı'];
+			// 		// const _mobs = [null, 1000];
+			// 		// const _pvpNames = ['Berserker','Al Karısı'];
+			// 		for(var i = 0; i < _mobs.length; i++) {
+			// 			if(i === _place){
+			// 				mainCharacter.totalPower = getTotalPower().total;
+			// 				mainCharacter.pvpName = mainCharacter.displayName = _pvpNames[i];
+			// 				opponents.push(mainCharacter);
+			// 				continue;
+			// 			}
+			// 			const _e = setCharacterFunctions(_allEnemies['enemy' + _mobs[i]](), 1);
+			// 			_e.level = mainCharacter.level;
+			// 			_e.inventory = [];
+			// 			applyCharacterStats(null, _e);
+			// 			_e.totalPower = getTotalPower(_e).total;
+			// 			_e.pvpName = _pvpNames[i];
+			// 			opponents.push(_e);
+			// 		}
+			// 		requestAnimationFrame(() => {
+			// 			episode.loadCharacterSprites(function() {}, [10, 48], null, 1);
+			// 		});
+			// 		createWar(opponents, 42, 1, 1, 180, function() {
+			// 			clearAudioCache(loadedSounds);
+			// 			mainCharacter.startPlatformX = platformX;
+			// 			episode.skipPvPFinalScreen = 1;
+			// 			episode.phase = 1;
+			// 			episode.canPause = false;
+			// 			episode.deathMatch = true;
+			// 			episode.mainClass = mainCharacter.class;
+			// 			mainCharacter.disableSkill('tag');
+			// 			episode.beforePVPStart = function() {
+			// 				episode.mobPhaseTick = _gameTick;
+			// 				episode.enemies.forEach(x => {
+			// 					x.pvpRespawn = true;
+			// 					x.maxHP = x.MAXHP = x.health = mainCharacter.maxHP = 1000;
+			// 					x.setHealth(x.health);
+			// 					x.immunities = [];
+			// 				});
+			// 			}
+			// 			const _objects = mapSprites.find(x => x.id === __storyScene.map).objectMobs;
+			// 			episode.installMobs(_objects);
+			// 		});
+			// 	}
+			// }
 		]
 	},
 	// {
@@ -10164,18 +10178,18 @@ function renderChestOpeningScreen(_gift) {
 				id="chest-open-gift"
 				draggable="false"
 			>
-			<div class="chest-open-tap-text" lang="${getLang()}" id="tap-text">${getLangData('TAP TO UNLOCK')}</div>
+			<div class="chest-open-tap-text wot-title" lang="${getLang()}" id="tap-text">${getLangData('TAP TO UNLOCK')}</div>
 			<div class="chest-open-reward-text" id="reward-text">
-				<div class="reward-unlocked" lang="${getLang()}">
+				<div class="reward-unlocked wot-subtitle" lang="${getLang()}">
 					${getLangData('SUPPORT CHARACTER UNLOCKED')}
 				</div>
 
-				<div class="reward-name">
+				<div class="reward-name wot-header">
 					DELİ DUMRUL
 				</div>
 			</div>
 		</div>
-		<div onclick="closeChestOpeningScreen()" id="chest-open-ok-button" class="flex orange-action-btn d-none">${getLangData('Get Reward')}</div>
+		<div onclick="closeChestOpeningScreen()" id="chest-open-ok-button" class="flex wot-button orange-action-btn d-none">${getLangData('Get Reward')}</div>
 
 		<div class="chest-open-flash" id="chest-open-flash"></div>
 
@@ -10882,12 +10896,12 @@ function skipQuickPlayTutorial(_order) {
 		}
 		playClick();
 		_cont.remove();
-		requestAnimationFrame(() => {
-			removeClass(_gameUI, 'disable-ui');
-			_game.suspended = false;
-			blurKeyboard();
-		});
 	}
+	requestAnimationFrame(() => {
+		removeClass(_gameUI, 'disable-ui');
+		_game.suspended = false;
+		blurKeyboard();
+	});
 	removeFocus();
 }
 

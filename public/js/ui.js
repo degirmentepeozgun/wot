@@ -10,7 +10,7 @@ const pvpAvatarTemplate = function (char, _name) {
 				</div>
 				<div class='war-player-card-right flex flex-jc-start'>
 					<div class="hp-war-player-name">
-						<div class="one-line">
+						<div class="one-line wot-title">
 							${char?.main ? __account.name ?? char.name : char?.displayName ?? char?.name}
 						</div>
 					</div>
@@ -61,14 +61,14 @@ const avatarTemplate = function (char, _name) {
 				<div class="hb-frame-inner-left">
 					<div class="hb-frame-inner-left-inner">
 						<div class="full flex hb-frame-inner-left-inner-top" style="background:radial-gradient(circle at center, ${char.color}, black)">
-							<span id="level-${char.key}" class="character-level-text">${char.level ?? 1}</span>
+							<span id="level-${char.key}" class="wot-title character-level-text">${char.level ?? 1}</span>
 						</div>
 						<div class="hb-frame-inner-left-inner-bottom ${!char.main && char.switchTime ? 'switch-character-cooldown' : 'd-none'}"></div>
 					</div>
 				</div>
 				<div class="hb-frame-inner-right">
 					<div class="flex flex-ai-start flex-jc-start hb-frame-inner-right-top">
-						<span class="character-name-text hb-frame-inner-right-top-inner font-player-name">${char?.main ? (__account.name === '' ? getLangData('Player') + ' ' + __account.id.substring(0,4).toUpperCase() : __account.name) ?? char.name : char?.displayName ?? char?.name}</span>
+						<span class="character-name-text hb-frame-inner-right-top-inner font-player-name wot-title">${char?.main ? (__account.name === '' ? getLangData('Player') + ' ' + __account.id.substring(0,4).toUpperCase() : __account.name) ?? char.name : char?.displayName ?? char?.name}</span>
 					</div>
 					<div class="hb-frame-inner-right-middle">
 						<div class="full healthvalue hb-frame-inner-right-middle-top" style="width:${100 * (char.health / char.MAXHP)}%">
@@ -1587,11 +1587,11 @@ function askSomething(_question, _okFuncString, _singletonAttr, _container) {
 		let _modal = `<div${_singletonAttr ? " data-singleton-key='" + _singletonAttr + "'" : ""} class="full fade-me show-ui flex inventory-question">
 			<div class="inventory-modal">
 				<div style="padding:4vh 2vh" class="flex">
-					<span class="flex" style="color:#f7f7f7dd !important;font-size:3vh !important">` + getLangData(_question) + `${_addQuestionMark ? '?' : ''}</span>
+					<span class="flex ask-something-modal-text wot-subtitle">` + getLangData(_question) + `${_addQuestionMark ? '?' : ''}</span>
 				</div>
 				<div style="padding:4vh 2vh" class="flex">
-					<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
-					<div class="quick-space-btn game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="${_okFuncString}">${getLangData('YES')}</div>
+					<div class="orange-action-btn flex animate-me wot-button" style="cursor:pointer;min-width:80px" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
+					<div class="quick-space-btn orange-action-btn flex animate-me wot-button" style="cursor:pointer;min-width:80px;" onexactclick="${_okFuncString}">${getLangData('YES')}</div>
 				</div>
 			</div>
 		</div>`;

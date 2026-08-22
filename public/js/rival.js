@@ -36317,7 +36317,7 @@ const _allEnemies = {
 					type: 'skill',
 					attack: true,
 					cooldown: 5000,
-					priority: 3,
+					priority: 2,
 					frames: [
 						{
 							spriteLeft: 1245,
@@ -36495,7 +36495,7 @@ const _allEnemies = {
 					type: 'skill',
 					attack: true,
 					cooldown: 5000,
-					priority: 2,
+					priority: 1,
 					frames: [
 						{
 							spriteLeft: 85,
@@ -36933,7 +36933,7 @@ const _allEnemies = {
 			bleed: true,
 			stepX: 8,
 			weight: 1000,
-			stepXRate: .4,
+			stepXRate: .45,
 			bloodColor: 'green',
 			src: './images/sprites/ep621/',
 			buffs: []
@@ -78459,7 +78459,7 @@ const _allEnemies = {
 							spriteHeight: 377,
 							spriteOrigin: 200 - 33,
 							bottomGap: -240,
-							sound: { key: 'swing', volume: .3 },
+							sound: { key: 'swing', volume: 1 },
 							speed: 7
 						},
 						{

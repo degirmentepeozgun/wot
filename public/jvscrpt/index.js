@@ -878,10 +878,10 @@ function switchMap(_x, _force, _func, _effect, _charId, _onEnd) {
 				// 	window.Keyboard.disableScrollingInShrinkView(false);
 				// if(!__account.cs && !_startWith)
 				//  	requestVideo(1);
-				mainCharacter.addCommonSkill({key:'poisonpuff'});
-				mainCharacter.addCommonSkill({key:'poisonpuff'});
-				mainCharacter.addCommonSkill({key:'poisonpuff'});
-				mainCharacter.addCommonSkill({key:'poisonpuff'});
+				// mainCharacter.addCommonSkill({key:'poisonpuff'});
+				// mainCharacter.addCommonSkill({key:'poisonpuff'});
+				// mainCharacter.addCommonSkill({key:'poisonpuff'});
+				// mainCharacter.addCommonSkill({key:'poisonpuff'});
 			// }
 			// catch(_ex) {
 			// 	alert('index 937' + _ex.message);

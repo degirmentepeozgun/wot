@@ -32763,7 +32763,7 @@ const cssAnimations = {
 			_curt.className += ' focus-transparent';
 		if(_text) {
 			if(!_doneBtn)
-				_curt.innerHTML = '<div class="flex overlay-black-text">' + _text + '</div>';
+				_curt.innerHTML = '<div class="flex overlay-black-text wot-subtitle">' + _text + '</div>';
 			else {
 				const _wrapper = document.createElement('div');
 				_wrapper.className = 'flex w-100 show-ui';
@@ -32788,7 +32788,7 @@ const cssAnimations = {
 					_curt.appendChild(_wrapper);
 				else {
 					const _wrapperOuter = document.createElement('div');
-					_wrapperOuter.className = "flex overlay-black-text";
+					_wrapperOuter.className = "flex overlay-black-text wot-title";
 					_wrapperOuter.appendChild(_wrapper);
 					_curt.appendChild(_wrapperOuter);
 				}

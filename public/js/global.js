@@ -36288,7 +36288,7 @@ const cssAnimations = {
 			_curt.className += ' focus-transparent';
 		if(_text) {
 			if(!_doneBtn)
-				_curt.innerHTML = '<div lang="'+ getLang()+'" class="flex overlay-black-text">' + _text + '</div>';
+				_curt.innerHTML = '<div lang="'+ getLang()+'" class="flex overlay-black-text wot-subtitle">' + _text + '</div>';
 			else {
 				const _wrapper = document.createElement('div');
 				_wrapper.className = 'flex w-100 show-ui';
@@ -36514,7 +36514,7 @@ const cssAnimations = {
 			}
 			const _b = document.createElement('div');
 			_b.className = 'full show-ui flex fade-me intro-screen';
-			_b.innerHTML = '<div class="intro-text">' + (_text ?? '') + '</div>';
+			_b.innerHTML = '<div class="intro-text wot-description">' + (_text ?? '') + '</div>';
 			_gameUI.appendChild(_b);
 			if(!__isPC)
 				addClass(_gameUI, 'disable-ui');
@@ -38260,16 +38260,16 @@ function askExitApp(){
 		}
 		let _buttons = '';
 		for(let _op of _options)
-			_buttons += `<div class="game-menu-button flex animate-me" style="padding:0 2vh;height:5.4vh!important;font-size:3vh!important;min-width:80%;margin:1.25vh 0" onexactclick="${_op.action}">${_op.title[getLang()]}</div>`;
+			_buttons += `<div class="orange-action-btn flex animate-me wot-button" onexactclick="${_op.action}">${_op.title[getLang()]}</div>`;
 		let _modal = `<div class="full fade-me show-ui flex inventory-question show-info">
 			<div class="inventory-modal flex quit-modal" style="width:25%;flex-direction:column;position:relative;aspect-ratio:auto">
-				<div style="padding:6vh 4vh 2vh 4vh" class="flex w-100">
-					<span style="color:#F4BB44 !important;font-size:3.2vh !important">${getLangData('Go back')}?</span>
+				<div class="flex w-100 question-modal-title-container">
+					<span class="question-modal-title wot-ttile">${getLangData('Go back')}?</span>
 				</div>
 				<div class="flex w-100" style="padding:2vh 2vh 4vh 2vh">`
 					+ _buttons +
 				`</div>
-				<div onexactclick="closeInventoryQuestionModal()" style="font-size:4.2vh !important;color:#9d987f !important;padding:1.6vh 3.2vh" class="item-info-modal-close">&times;</div>
+				<div onexactclick="closeInventoryQuestionModal()" style="font-size:4.2vh !important;color:#9d987f !important;padding:1.6vh 3.2vh" class="item-info-modal-close"></div>
 			</div>
 		</div>`;
 		const _div = document.createElement('div');

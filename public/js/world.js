@@ -161,7 +161,7 @@ function world() {
 					</div>
 				</div>
 			</div>
-			<div onexactclick="getRef(\'world\')?.closeMapInfoModal()" class="item-info-modal-close">&times;</div>
+			<div onexactclick="getRef(\'world\')?.closeMapInfoModal()" class="item-info-modal-close"></div>
         	<div id="shine"></div>
 		</div>`;
 		document.querySelector('.world-map-container .book-page-bg').appendChild(_container);

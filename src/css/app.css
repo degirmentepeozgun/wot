@@ -62,6 +62,74 @@
 	font-family: 'ff';
     src: url('./../fonts/e1.ttf');
 }
+/* =========================================================
+   Grenze
+   ========================================================= */
+
+@font-face {
+    font-family: 'Grenze';
+    src: url('./../images/fonts/Grenze-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Grenze';
+    src: url('./../images/fonts/Grenze-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Grenze';
+    src: url('./../images/fonts/Grenze-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Grenze';
+    src: url('./../images/fonts/Grenze-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Alegreya';
+    src: url('./../images/fonts/Alegreya-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Alegreya';
+    src: url('./../images/fonts/Alegreya-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Alegreya';
+    src: url('./../images/fonts/Alegreya-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Alegreya';
+    src: url('./../images/fonts/Alegreya-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+
 html, body, .page, #wrapper,#app, #game-pad {
   margin: 0;
   padding: 0;
@@ -188,7 +256,8 @@ body.pc-mission .common img {
 	--ui-light: #48443F;
 	--ix:0;
 	--iy:0;
-	--impact-time:0
+	--impact-time:0;
+	--wot-font-base: clamp(14px, 1.1vw, 18px);
 }
 
 .heading {
@@ -999,9 +1068,7 @@ svg#use-progress.use-in-progress circle {
     top: 17.4%;
     right: 1.75%;
 	opacity: .65;
-	z-index: 3;
-	-webkit-ffilter: brightness(0) invert(.8);
-	filter: brightness(0) invert(.8)
+	z-index: 3
 }
 #mini-menu .mini-menu-icon {
 	height: 100%;
@@ -1534,9 +1601,8 @@ svg#use-progress.use-in-progress circle {
 		left: -10% !important
 	}
 .character-level-text {
-	color:#E2DFD2cc;
-	font-weight:600;
-	font-size:3.2vh !important;
+	color:#e2d4b5 !important;
+	font-family: cinzelsemibold !important;
 	text-shadow:.25vh .25vh .5vh #000;
 	will-change: transform;
 	transform: translateZ(0);
@@ -2068,7 +2134,7 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 .talk-bubble {
 	max-width: 75vw;
 	border-radius: .8vh;
-	padding: 2.2vh 2vh;
+	padding: 1.2vh 2vh !important;
 	border: .2vh solid #191213;
     box-shadow: .5vh .5vh 1vh #191213;
 	background: #dcc5b2;
@@ -2088,14 +2154,6 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 }
 	.talk-bubble * {
 		background: #dcc5b2;
-		line-height: 1vh !important;
-		 font-family: 'Trebuchet MS', Arial, sans-serif !important;
-
-		font-size: 2vh !important;
-		font-weight: 700 !important;
-
-		letter-spacing: 0.015em;
-		line-height: 1.3;
 
 		text-align: center;
 
@@ -3464,16 +3522,14 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	filter:drop-shadow(0px 0px .5vh #000)
 }
 #pot-btn span {
-	color:#E2DFD2 !important;
-	font-size:2.2vh !important;
-	line-height: 2vh !important;
-	font-family: "Open Sans", sans-serif;
-    font-weight: 700;
+	font-size:calc(var(--wot-font-base) * 1.1) !important;
 	position: absolute;
-	bottom:-.5vh;
+	bottom:-1.1vh;
 	right:-.75vh;
 	text-shadow:0 0 .5vh #000;
-	z-index: 1
+	z-index: 1;
+	font-family: cinzelsemibold !important;
+	color:#e2d4b5 !important 
 }
 #pot-btn.not-allowed {
 	pointer-events: none
@@ -5361,14 +5417,13 @@ body:has(#quest-dialog:not(.d-none)) #skill10 {
 }
 .item-info-modal-close {
 	position:absolute;
-	top:0;
-	right:0;
-	padding: 6% 7%;
-	font-size:5vh!important;
-	line-height:3.5vh !important;
-	color:#f3f4f580 !important;
-	transition: all .3s ease;
-	-webkit-transition: all .3s ease
+	top:.4vh;
+	right:-2.5vh;
+	background-image: url(./../images/ui/game/close.png);
+	width: 6vh !important;
+	aspect-ratio: 151 / 156 !important;
+	background-size: 100% !important;
+	padding:0 !important
 }
 .item-info-modal-close:active {
 	color:#f3f4f5cc !important;
@@ -5541,7 +5596,6 @@ body:has(#quest-dialog:not(.d-none)) #skill10 {
 }
 
 .tip-wrapper * {
-	font-size: 4vh !important;
 	color: #F4BB44dd !important
 }
 .tip-wrapper img {
@@ -5614,9 +5668,6 @@ body:has(#quest-dialog:not(.d-none)) #skill10 {
 	box-shadow: none !important;
 	font-weight: 600
 }
-#all-tips .tip-wrapper * {
-	line-height: 4.5vh !important
-}
 #all-tips .tip-wrapper img {
 	height: 8vh !important
 }
@@ -5652,7 +5703,6 @@ body:has(#quest-dialog:not(.d-none)) #skill10 {
 }
 #tip-screen .tip-wrapper > div:last-child {
 	color:#f7f7f7cc !important;
-	font-weight: 400 !important;
 }
 #splash  #tip-screen > .flex:first-child {
 	height: 80% !important;
@@ -5664,9 +5714,6 @@ body:has(#quest-dialog:not(.d-none)) #skill10 {
 #splash  #tip-screen .tip-wrapper {
 	box-shadow: none !important;
 	max-width: 130vh;
-}
-#splash  #tip-screen .tip-wrapper * {
-	line-height: 5vh !important
 }
 #splash  #tip-screen img {
 	display: none
@@ -7110,11 +7157,6 @@ img.dmmg.toxic-dmmg {
 	margin-top:.5vh;
   }
   #game-ui #quest-status .timedquest-counter {
-	color: #E8E5DE !important;
-    font-family: cinzelbold;
-    font-size: 2.3vh !important;
-    letter-spacing: 0.03em;
-	font-weight: 600;
     text-shadow:
         1px 1px 2px #000,
         0 0 3px #000;
@@ -7191,9 +7233,11 @@ img.dmmg.toxic-dmmg {
 	line-height: 5vh !important;
   }
   .black-screen-ok-btn {
-	padding-bottom: 14vh
+	z-index: 99999 !important
   }
-
+  .black-screen-ok-btn,   .black-screen-ok-btn * {
+	pointer-events: all !important;
+  }
 #game-ui .skill.atk-sf:after {
 	background-image: url('./../images/ui/skill.png') !important;
 	background-size: cover;
@@ -8345,9 +8389,7 @@ body:not(.pc-mission) .tag-sf.bgless {
 	border: none !important;
 	aspect-ratio: 288 / 90;
 }
-.toast-wrapper .achievement.important * {
-	font-size: 3vh !important;
-}
+
 .my-badge::before {
 	content:'';
 	position: absolute;
@@ -8593,12 +8635,6 @@ box-shadow:
     box-shadow: 0 0 2vh #000;
 
     margin-bottom: 10.5%;
-
-    font-family: Georgia, 'Times New Roman', serif !important;
-    font-size: 2.15vh !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.035em;
-    line-height: 1.55 !important;
     text-align: center;
 
     color: #e8e1d3 !important;
@@ -9676,7 +9712,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 }
 .enemy-profile .hp-war-player-name *,
 #top-nav .hp-war-player-name * {
-    font-family: "Trajan Pro", "Cinzel", "Times New Roman", serif;
+    font-family: "Trajan Pro", Marcellus, cinzel, "Times New Roman", serif;
     font-size: 2vh;
     font-weight: 600;
     color: #E1E1E1 !important;
@@ -10193,60 +10229,38 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	background-color:#000;    
 	position: relative;
     z-index: 1;
+	padding-top:1%;
 }
 .quick-play-desc-item {
-	width:30.5%;
-	height:42%;
-	margin-top:1.6%;
-	background:#212121 !important;
-	border-radius: 1vh;
+	width:30%;
+	height:41.5%;
+	margin:1% 0;
 	position: relative;
 }
-.quick-play-desc-item1 {
+.quick-play-desc-item:nth-child(3n + 3) {
+	margin-right: 1%;
+}
+.quick-play-desc-item:nth-child(3n + 1) {
+	margin-left: 1%;
+}
+.quick-play-desc-item .wot-description {
+	width: 100%;
+	padding:0 12%;
+    text-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.95),
+        0 2px 5px rgba(0, 0, 0, 0.75) !important;
+}
+.quick-play-desc-item .wot-subtitle {
+	background-color:#00000099 !important
+}
+
+.quick-play-desc-container2 {
+	background-image: url(./../images/ui/game/info2.png);
 	background-size: 100% auto !important;
 	background-repeat: no-repeat !important;
 }
-.quick-play-desc-item2 {
-	background-size: 100% auto !important;
-	background-repeat: no-repeat !important;
-}
-.quick-play-desc-item3 {
-	background-size: 100% auto !important;
-	background-repeat: no-repeat !important;
-}
-.quick-play-desc-item4 {
-	background-size: 100% auto !important;
-	background-repeat: no-repeat !important;
-}
-.quick-play-desc-item5 {
-	background-size: 100% auto !important;
-	background-repeat: no-repeat !important;
-}
-.quick-play-desc-item7 {
-	background-size: 100% auto !important;
-	background-repeat: no-repeat !important;
-}
-.quick-play-desc-item1-pc {
-	background-size: 100% auto !important;
-	background-repeat: no-repeat !important;
-}
-.quick-play-desc-item2-pc {
-	background-size: 100% auto !important;
-	background-repeat: no-repeat !important;
-}
-.quick-play-desc-item3-pc {
-	background-size: 100% auto !important;
-	background-repeat: no-repeat !important;
-}
-.quick-play-desc-item4-pc {
-	background-size: 100% auto !important;
-	background-repeat: no-repeat !important;
-}
-.quick-play-desc-item5-pc {
-	background-size: 100% auto !important;
-	background-repeat: no-repeat !important;
-}
-.quick-play-desc-item7-pc {
+.quick-play-desc-container1 {
+	background-image: url(./../images/ui/game/info1.png);
 	background-size: 100% auto !important;
 	background-repeat: no-repeat !important;
 }
@@ -10254,8 +10268,7 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	width:100%;
 	text-align: center;
 	padding:0 2vh;
-	color:#f3f4f5cc !important;
-	font-size: 3.8vh !important;
+	color:#eee7d8 !important;
 	height:9%
 }
 .quick-play-desc-bottom, .quick-play-desc-top {
@@ -10263,17 +10276,11 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	left:0;
 	width:100%;
 	padding: 1vh;
-	line-height: 3vh !important;
-	background-color:#00000099;
-	color:#F4BB44 !important;
-	font-size: 3vh !important;
+	color:#eee7d8  !important;
 	text-align: center;
 }
 .quick-play-desc-item-title {
-	background-color:#000;
-	line-height: 3vh !important;
-	color:#F4BB44 !important;
-	font-size: 3vh !important;
+	color:#eee7d8 !important;
 	text-align: center
 }
 .quick-play-desc-skill-icons {
@@ -10296,15 +10303,11 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	height:8vh;
 	width:8vh;
 	border-radius: 100%;
-	background:crimson;
 	position: relative;
 }
 .quick-play-desc-skill-icon::after {
 	width: 10vh;
 	content: "";
-	background-image: url('./../images/ui/skill.png?v=3');
-	background-repeat: no-repeat;
-	background-size: cover;
 	position: absolute;
 	left: -1vh;
 	top: -1vh;
@@ -10573,7 +10576,6 @@ body:not(.pc-mission) #game-ui .game-status-screen {
 	height:100% !important;
 	flex:1;
 	color:#F4BB44cc !important;
-	font-size:2.6vh !important
 }
 #game-ui .game-status-screen .status-item-action-container .game-menu-button{
 	height:80% !important;
@@ -10581,7 +10583,6 @@ body:not(.pc-mission) #game-ui .game-status-screen {
 	margin:0 !important;
 	padding:0 !important;
 	background: linear-gradient(#8b2b24, #5f1815);
-	line-height: 1px !important;
 	color:#F4BB44 !important;
 	 background:
         linear-gradient(
@@ -10590,8 +10591,6 @@ body:not(.pc-mission) #game-ui .game-status-screen {
             #75221d 50%,
             #4f1513 100%
         );
-
-    border:.35vh solid #d0a14f;
     color:#f7eed3;
     text-shadow:0 1px 3px rgba(0,0,0,.7);
 
@@ -10602,13 +10601,9 @@ body:not(.pc-mission) #game-ui .game-status-screen {
 #game-ui .game-status-screen .status-item-action-container .game-menu-button span{
 	color:#f3f4f5 !important;
 	margin-left:.5vh;
-	font-size:2.6vh !important;
-	line-height: 2.6vh !important;
 }
 #game-ui .game-status-screen .status-item-action-container .game-menu-button *{
 	height:100% !important;
-	font-size:2.6vh !important;
-	line-height: 2.6vh !important;
 	color: #f5e6c8 !important;
 }
 #game-ui .game-status-screen .status-item-action-container .item-title-container{
@@ -10617,11 +10612,6 @@ body:not(.pc-mission) #game-ui .game-status-screen {
 #game-ui .game-status-screen .status-item-action-container .item-title-wrapper{
 	height:50% !important;
 	padding:0 1vh;
-    font-family: Georgia, 'Times New Roman', serif !important;
-    font-size: 2.1vh !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.04em;
-    line-height: 1 !important;
     color: #d4af37 !important;
     text-transform: none !important;
     text-shadow:
@@ -10631,6 +10621,10 @@ body:not(.pc-mission) #game-ui .game-status-screen {
 #game-ui .game-status-screen .status-item-action-container .item-action-wrapper{
 	height:50% !important;
 	padding:0 1vh
+}
+#game-ui .game-status-screen .status-item-action-container .item-action-wrapper .red-action-btn{
+	height:95% !important;
+	margin-bottom:5% !important
 }
 #game-ui .game-status-screen .status-item-icon-container {
 	height:100% !important;
@@ -10760,20 +10754,19 @@ body.pc-mission #game-ui .common::before {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: -25%;
+    bottom: -40%;
 	font-family: "Open Sans", sans-serif;
     font-weight: 700;
-    color: #f3f4f5cf;
+    color: #e2d4b5 !important;
     text-shadow: 0 0 1vh black;
     pointer-events: none;
     text-transform: uppercase;
     z-index: 5;
 	font-family: cinzelsemibold, serif !important;
-    font-size: 2vh !important;
+    font-size: calc(var(--wot-font-base)) !important;
     font-weight: 600 !important;
     letter-spacing: 0.06em !important;
     line-height: 1 !important;
-    color: #e2d4b5 !important;
     text-align: center;
     white-space: nowrap;
     text-shadow:
@@ -10781,13 +10774,13 @@ body.pc-mission #game-ui .common::before {
         0 0 4px rgba(0, 0, 0, 0.9),
         0 0 1px rgba(0, 0, 0, 1);
 }
+
+body.pc-mission #game-ui .skill.placed-skill::before {
+    bottom: -25%;
+}
 body.pc-mission #game-ui .common::before {
-    bottom: -7.5%;
-    font-size: 16px;
-    font-size: 16cqw;
-	font-family: "Open Sans", sans-serif !important;
-    font-weight: 700;
-    color: #F0ECE3 !important;
+    bottom: 0%;
+	font-size: calc(var(--wot-font-base) * .8) !important;
 	text-shadow:
 		1px 1px 2px #000,
 		0 0 3px #000;	
@@ -10902,7 +10895,7 @@ body.pc-mission-without-skillui .skill:not(.action.talk-btn) * {
 	width:2.8vh;
 	height:2.8vh;
 	margin:0 2vh;
-	border: .35vh solid #f3f4f599;
+	border: .35vh solid #eee7d8;
 	position:relative
 }
 .cb-square.checked::after {
@@ -11703,7 +11696,7 @@ pointer-events: "auto";
 }
 .tutorial-box .tutorial-title {
 	font-family: cinzelsemibold, serif !important;
-    font-size: 1.9vh !important;
+    font-size: 2.4vh !important;
     font-weight: 600 !important;
     letter-spacing: 0.045em;
     line-height: 1.25 !important;
@@ -11738,10 +11731,10 @@ pointer-events: "auto";
 }
 .tutorial-box .tutorial-description-text {
     font-family: 'Rajdhani', sans-serif !important;
-    font-size: 2vh !important;
+    font-size: 2.2vh !important;
     font-weight: 600  !important;
     letter-spacing: 0.025em;
-    line-height: 1.65 !important;
+    line-height: 1.55 !important;
     color: #d8d4ca !important;
     text-shadow:
         0 1px 1px rgba(0, 0, 0, 0.95),
@@ -11750,7 +11743,7 @@ pointer-events: "auto";
 .tutorial-box-inner .toxic,
 .tutorial-box-inner .fire {
     font-family: 'Rajdhani', sans-serif !important;
-    font-size: 2.1vh !important;
+    font-size: 2.3vh !important;
 	margin-top:.65vh;
     font-weight: 600  !important;
     letter-spacing: 0.025em;
@@ -11793,11 +11786,12 @@ body.pc-mission .move-to-place::after{
 .focus-ui-done-btn-custom {
 	bottom:5% !important;
 	position: absolute;
-	z-index: 999999 !important
+	z-index: 999999 !important;
+	padding-bottom: 10vh
 }
 /* Version yazısı */
 .opening-cover::after {
-    content: "Version 1.0009";
+    content: "Version 2";
     position: absolute;
     bottom: 2vh;
     left: 3vh;
@@ -11858,11 +11852,6 @@ body.pc-mission .move-to-place::after{
 	max-width:80%;
 	text-align:center !important;
 	color:#f3e7c1 !important;
-	font-family: 'Rajdhani', sans-serif !important;
-    font-size: 3vh !important;;
-    font-weight: 600 !important;;
-    letter-spacing: 0.055em;
-    line-height: 1.8 !important;
 	text-shadow:
 		0 0 0.5rem rgba(255,220,120,0.15),
 		0 0 1.4rem rgba(255,180,60,0.08),
@@ -12605,11 +12594,6 @@ body:not(.pc-mission) .chest-open-gift {
         scale(1);
 }
 .reward-name{
-    font-family: cinzelbolder, serif;
-    font-size: 3.4vh !important;
-    font-weight: 800 !important;
-    letter-spacing: 0.085em;
-    line-height: 1.15 !important;
     color: #e5c46a !important;
     text-align: center;
     text-shadow:
@@ -12649,11 +12633,6 @@ body:not(.pc-mission) .chest-open-gift {
 
 }
 .chest-open-tap-text, .reward-unlocked{
-	font-family: cinzelsemibold, serif !important;
-    font-size: 2.35vh  !important;
-    font-weight: 600  !important;
-    letter-spacing: 0.14em;
-    line-height: 1.2  !important;
     color: #c9a64a  !important;
     text-align: center;
     text-transform: none;
@@ -13579,14 +13558,6 @@ body:not(.pc-mission) #game-ui .game-status-screen .talk-avatar-render {
 }
 
 .volume-panel{
-    /* background:
-        linear-gradient(to bottom,#241c16,#17120e);
-    border:2px solid #5f4a2f;
-    box-shadow:
-        inset 0 0 20px rgba(255,220,150,.05),
-        0 0 30px rgba(0,0,0,.8);
-    padding:20px;
-    width:360px; */
 	position:absolute;
 	right:2vh;
 	bottom:1vh;
@@ -13611,9 +13582,7 @@ body:not(.pc-mission) #game-ui .game-status-screen .talk-avatar-render {
     height:2vh;
     background:
         linear-gradient(to bottom,#2f2821,#1a1511);
-
     border:1px solid #564229;
-
     transition:.15s;
 }
 
@@ -13624,9 +13593,7 @@ body:not(.pc-mission) #game-ui .game-status-screen .talk-avatar-render {
 .volume-panel .bar.active{
     background:
         linear-gradient(to bottom,#d8bb80,#8a6330);
-
     border-color:#e7cf9f;
-
     box-shadow:
         0 0 1vh rgba(255,190,90,.4);
 }
@@ -13635,58 +13602,57 @@ body:not(.pc-mission) #game-ui .game-status-screen .talk-avatar-render {
     margin-top:1.5vh;
     text-align:center;
     color:#d8d0be;
-    font-size:2.8vh !important;
-    letter-spacing:1px;
 }
 
 .volume-panel .level{
     color:#f3d495;
-    font-size:3vh !important;
 }
 @media
     (hover: none),
     (pointer: coarse),
     (max-width: 1024px) {
     /* Telefonlar */
+	:root {
+        --wot-font-base: clamp(8px, 1vw, 10px);
+    }
 	#assets-progress {
 		font-size:4.5vh!important
 	}
 	#game-ui .game-status-screen {
 		transform: scale(1.35) !important;
 		-webkit-transform: scale(1.35) !important;
-		transform-origin: bottom center !important
+		transform-origin: bottom center !important;
+		width:80% !important;
+		background: #00000060 !important;
+		border-radius: 0 !important;
+	}
+	#game-ui .game-status-screen:empty {
+		background: none !important
 	}
 	#focus-ui .overlay-black-text *{
-		font-size: 4.5vh !important;
-		line-height: 5vh !important;
-		font-weight: 400 !important
+		color: #e6e6e6 !important;
+		text-align: center;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 	}
 	.chest-open-scene #chest-open-ok-button{
-		font-size: 4vh !important;
-		height: 6vh !important;
+		height: 8vh !important;
 		top: 85% !important
 	}
 	#focus-ui .black-screen-ok-btn {
 		top: 85% !important
 	}
 	#focus-ui .black-screen-ok-btn * {
-		font-size: 4.5vh !important;
-		line-height: 5vh !important;
 		transform: scale(1.5) !important;
 		-webkit-transform: scale(1.5) !important
 	}
 	#story-finish .side-right {
 		transform: scale(1.3) !important;
 		-webkit-transform: scale(1.3) !important;
-		margin-top: 7%;
 		height:89% !important
 	}
 	 #story-finish .side-right.has-next {
 		padding-top:0 !important;
 	 }
-	#story-finish .stage-achievement-item-right-top {
-		font-size: 3vh !important
-	}
 }
 body.pc-mission  #game-ui .intro-screen {
 	z-index: 9 !important
@@ -13700,12 +13666,6 @@ body.pc-mission  #game-ui .intro-screen {
 .font-player-name {
     font-family: cinzelbold, serif;
     font-weight: 700; /* Bold */
-}
-
-/* Quest Başlığı / Önemli Metin */
-.font-quest-title {
-    font-family: cinzelsemibold, serif;
-    font-weight: 600; /* SemiBold */
 }
 
 /* Normal metin / Açıklamalar */
@@ -13758,14 +13718,16 @@ body.pc-mission  #game-ui .intro-screen {
 }
 .hb-frame-inner-right-top {
 	width:100%;
-	height:21%;
-	margin-top:12%;
+	height:17.9%;
+	margin-top:14.1%;
 	position: relative;
 	z-index: 2;
 	padding-left:5%
 }
 .hb-frame-inner-right-top span {
-	font-size: 2.2vh !important
+	color:#e2d4b5 !important;
+	font-family: cinzelsemibold !important;
+	font-size: calc(var(--wot-font-base)) !important;
 }
 .hb-frame-inner-right-middle {
 	position:relative;
@@ -13828,11 +13790,14 @@ body.pc-mission  #game-ui .intro-screen {
 .hb-frame-inner-left-inner-top {
 	margin:14% 22% 15% 8%;
 	border-radius:100%;
-	box-shadow: inset 0 0 10vh 4vh rgba(0, 0, 0, 0.25);
+	box-shadow: inset 0 0 12vh 4vh rgba(0, 0, 0, 0.35);
 }
 .hb-frame-inner-left-inner-top span {
-	font-size: 3vh !important;
 	font-family: cinzelbolder, serif !important;
+	text-shadow:
+		0 0 0.14em rgba(255, 240, 210, 0.65),
+		0 0 0.32em rgba(255, 225, 180, 0.30),
+		0 0.12em 0.18em rgba(0, 0, 0, 0.9);
 }
 .hb-frame-inner-left-inner-bottom {
 	opacity:0;
@@ -13962,7 +13927,8 @@ body.pc-mission  #game-ui .intro-screen {
 	width:75% !important
 }
 #game-ui #quest-status .timedquest-object-info {
-	width:25% !important
+	width:25% !important;
+	color:#e2d4b5 !important
 }
 .quest-log-header {
 	height: 23%;
@@ -13971,12 +13937,11 @@ body.pc-mission  #game-ui .intro-screen {
 	pointer-events: visible !important;
 }
 #game-ui #quest-status .quest-log-header .quest-log-header-text {
-	font-family: cinzelbold !important;
-    font-size: 2vh !important;
-    font-weight: normal;
-    line-height: 2vh !important;
-    color: #E8D8B8 !important;
-	padding:4% 0 2% 19.8%;
+	font-family: cinzelsemibold !important;
+    font-size: calc(var(--wot-font-base) * .85) !important;
+    line-height: calc(var(--wot-font-base) * .85) !important;
+    color: #e2d4b5 !important;
+	padding:4% 0 2% 20%;
     text-shadow:
         2px 2px 2px rgba(0, 0, 0, 0.95),
         0 0 4px rgba(0, 0, 0, 0.8);
@@ -13984,11 +13949,6 @@ body.pc-mission  #game-ui .intro-screen {
 
 .stage-name-text,
 .story-point-text {
-    font-family: "Open Sans", sans-serif;
-    font-size: 2vh !important;
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: 0.04em;
     text-shadow:
         0.15vh 0.15vh 0 #000,
         0.25vh 0.25vh 0 rgba(0, 0, 0, 0.8);
@@ -14000,6 +13960,7 @@ body.pc-mission  #game-ui .intro-screen {
 
 .story-point-text {
     color: #E8E8E5 !important;
+	padding-top:2%
 }
 #game-ui #quest-status.collapsed {
 	clip-path: polygon(
@@ -14116,32 +14077,21 @@ body.pc-mission  #game-ui .intro-screen {
 	height: 20%;
 	position:relative;
 	background: none !important;
-	padding-bottom: 3%;
 }
 #story-finish .stage-results-screen-middle .stars .stars-title {
-	font-size: 4vh !important;
-	letter-spacing: 0.05em;
-	font-weight: 400 !important;
-	font-family: cinzelbold !important;
 	color:#E0B84A !important;
 	position: absolute;
 	left: 25%;
-	height: 30%;
 	z-index: 0;
 	text-shadow: 2px 2px 1px #000;
-	padding-top: 1%
 }
 #story-finish .btn, .orange-action-btn {
    	background: url(./../images/ui/game/btn.png) !important;
     background-size: 100% 100% !important;
     width: auto !important;
-    font-weight: 400 !important;
-	font-size: 2.2vh !important;
-	line-height: 2.2vh !important;
     height: 90% !important;
 	color:#E8E5DE !important;
     aspect-ratio: 538 / 120 !important;
-	font-family: cinzelbold !important;
 	cursor:default
 }
 .red-action-btn {
@@ -14151,11 +14101,6 @@ body.pc-mission  #game-ui .intro-screen {
     height: 90% !important;
     aspect-ratio: 177 / 34 !important;
 	cursor:default;
-	font-family: "Open Sans", sans-serif !important;
-    font-size: 1.8vh;
-    font-weight: 700 !important;
-    letter-spacing: 0.06em;
-    line-height: 1 !important;
     color: #f1e5d0 !important;
     text-shadow:
         1px 1px 2px #000,
@@ -14171,22 +14116,12 @@ body.pc-mission  #game-ui .intro-screen {
 	height:58%
 }
 .quick-play-desc-bottom, .quick-play-desc-top {
-	font-family: 'Open Sans', sans-serif;
-    font-size: 2vh !important;
-    font-weight: 600;
-    line-height: 1.4;
-    letter-spacing: 0.04em;
     color: #E8E3D8 !important;
     text-shadow:
         1px 1px 2px rgba(0, 0, 0, 0.95),
         0 0 2px rgba(0, 0, 0, 0.8);
 }
 .quick-play-desc-skip .w-50.flex-jc-start{
-	font-family: cinzel, serif  !important;
-    font-size: 2.2vh !important;
-    font-weight: 700  !important;
-    line-height: 1;
-    letter-spacing: 0.06em;
     color: #D8D2C5  !important;
     text-shadow:
         1px 1px 2px #000,
@@ -14194,11 +14129,6 @@ body.pc-mission  #game-ui .intro-screen {
 }
 .quick-play-desc-skip .w-50.flex-jc-end .orange-action-btn{
 	height:70% !important;
-	font-family: cinzel, serif !important;
-    font-size: 2vh !important;
-    font-weight: 700 !important;
-    line-height: 1;
-    letter-spacing: 0.09em;
     color: #E8E0CE !important;
     text-shadow:
         1px 1px 2px #000,
@@ -14222,11 +14152,6 @@ body.pc-mission  #game-ui .intro-screen {
    ========================= */
 
 .tip-text {
-    font-family: cinzelsemibold, cinzel, serif;
-    font-size: 2.1vh !important;
-    font-weight: 600 !important;
-    line-height: 1.45 !important;
-    letter-spacing: 0.035em;
     color: #f0eee8 !important;
     text-shadow:
         0 2px 3px rgba(0, 0, 0, 0.95),
@@ -14237,11 +14162,6 @@ body.pc-mission  #game-ui .intro-screen {
 /* "Tip:" kısmı */
 
 .tip-label {
-    font-family: cinzelbold, cinzel, serif !important;
-    font-size: 2.2vh  !important;
-    font-weight: 900 !important;
-    line-height: 1.45 !important;
-    letter-spacing: 0.04em;
     color: #e0b84a !important;
 	height: 100%;
     text-transform: uppercase;
@@ -14251,11 +14171,6 @@ body.pc-mission  #game-ui .intro-screen {
         0 0 1px rgba(0, 0, 0, 0.9);
 }
 .tip-label * {
-    font-family: cinzelbold, cinzel, serif !important;
-    font-size: 2.2vh  !important;
-    font-weight: 900 !important;
-    line-height: 1.45 !important;
-    letter-spacing: 0.04em;
     text-transform: uppercase;
     color: #e0b84a !important;
     text-shadow:
@@ -14289,7 +14204,215 @@ body.pc-mission  #game-ui .intro-screen {
 }
 #game-ui .tutorial-skip.red-action-btn {
 	height:6vh !important;
-	font-family: cinzelbold !important;
-	font-size: 2.4vh !important;
 	box-shadow: none !important;
+}
+.inventory-question[data-singleton-key="exit-app-question"] .inventory-modal {
+	background:url(./../images/ui/game/modal_2x1.png) !important;
+	background-size:100% 100% !important;
+	border:none !important;
+	border-radius: 0 !important;
+	aspect-ratio: 2 / 1 !important;
+	padding-top:6.5%;
+	box-shadow: none !important;
+}
+.language-change-modal.inventory-question .inventory-modal, .quit-modal {
+	background:url(./../images/ui/game/modal_1x1.png) !important;
+	background-size:100% 100% !important;
+	border:none !important;
+	border-radius: 0 !important;
+	aspect-ratio: 1 / 1 !important;
+	width:40% !important;
+	padding:6.5% 3% 3.5% 3%;
+	box-shadow: none !important;
+}
+.ask-something-modal-text {
+    text-align: center;
+    color: #e6dfd2 !important;
+    text-transform: none;
+    text-shadow:
+        0 2px 2px rgba(0, 0, 0, 0.95),
+        0 0 3px rgba(0, 0, 0, 0.75);
+}
+.inventory-question[data-singleton-key="exit-app-question"] .inventory-modal .orange-action-btn {
+	height:4.5vh !important
+}
+.language-change-modal.inventory-question .inventory-modal .orange-action-btn {
+	height:4.5vh !important
+}
+.language-change-modal.inventory-question .inventory-modal .question-modal-title,
+.quit-modal .question-modal-title {
+    color: #d9a63a !important;
+    text-align: center;
+    text-shadow:
+        0 2px 2px rgba(0, 0, 0, 0.95),
+        0 0 4px rgba(0, 0, 0, 0.7);
+}
+.language-change-modal.inventory-question .inventory-modal .question-modal-item {
+    color: #e4dfd4 !important;
+    text-transform: none;
+    text-shadow:
+        0 2px 2px rgba(0, 0, 0, 0.95),
+        0 0 3px rgba(0, 0, 0, 0.65);
+}
+.language-change-modal.inventory-question .inventory-modal .opening-lang-item.selected:hover .question-modal-item,
+.language-change-modal.inventory-question .inventory-modal .opening-lang-item.selected .question-modal-item {
+    color: #e0b24a !important;
+    text-shadow:
+        0 2px 2px rgba(0, 0, 0, 0.95),
+        0 0 4px rgba(180, 125, 35, 0.35);
+}
+#opening-languages {
+	padding: 6% 0 10% 11.2% !important;
+}
+.quick-play-desc-skip .orange-action-btn {
+	height:5vh !important;
+}
+.quick-play-desc-skip .w-50.flex-jc-end .orange-action-btn {
+	height:5vh !important;
+}
+.quit-modal .orange-action-btn {
+	width: 80% !important;
+	height: auto !important;
+	max-height: 30% !important;
+	margin-top:3.33%
+}
+.quit-modal .question-modal-title-container {
+	flex:1;
+	padding-top:6%
+}
+.share-moment-stats-panel {
+	background:url(./../images/ui/game/credits-footer2.png), linear-gradient(0deg, black, transparent, transparent) !important;
+	border-radius: none !important;
+	box-shadow: none !important;
+	border:0 !important;
+	background-size: cover !important;
+	aspect-ratio: 1504 / 209 !important;
+	width: 80% !important;
+	margin-left:10%;
+	height: auto !important;
+	bottom:0 !important
+}
+.share-moment-level-value {
+	font-family: cinzelbold, serif !important;
+    font-size: 8vh !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.01em;
+    line-height: 1 !important;
+}
+.share-moment-info-card {
+	height:67% !important;
+	margin-top:2%;
+	border-radius: 0 !important
+}
+.share-moment-card-title {
+	font-family:cinzelsemibold, serif !important;
+    font-size: 1.9vh  !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.09em;
+    line-height: 1.2 !important;
+    color: #a99d88 !important;
+    text-transform: none;
+    text-shadow:
+        0 2px 2px rgba(0, 0, 0, 0.9);
+	padding-top:2.2%
+}
+.share-moment-card-value {
+	font-family: 'Spectral-SemiBold', serif !important;
+    font-size: 1.8vh !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.025em;
+    color: #e6dfd2 !important;
+    text-shadow:
+        0 2px 2px rgba(0, 0, 0, 0.95);
+}
+.share-moment-info-buttons .share-moment-card-title {
+	width: 90% !important;
+	max-height:50% !important;
+	height:auto !important
+}
+.share-moment-info-buttons .share-moment-card-value {
+	width: 90% !important;
+	max-height:50% !important;
+	height:auto !important
+}
+.share-moment-info-buttons .orange-action-btn,
+.share-moment-info-buttons .red-action-btn  {
+	width:100% !important;
+	margin-top:2%
+}
+
+/* =========================
+   Başlık
+   Almendra
+   ========================= */
+
+.wot-header {
+    font-family: "Grenze", serif !important;
+    font-weight: 700 !important;
+    font-size: calc(var(--wot-font-base) * 2.35) !important;
+    line-height: 1.08 !important;
+    letter-spacing: 0.025em !important;
+}
+
+
+/* =========================
+   Ana başlık
+   Almendra
+   ========================= */
+
+.wot-title,
+.toast-wrapper .achievement.important * {
+    font-family: "Grenze", serif !important;
+    font-weight: 700 !important;
+    font-size: calc(var(--wot-font-base) * 1.5) !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.02em !important;
+}
+
+
+/* =========================
+   Alt başlık
+   Almendra
+   ========================= */
+
+.wot-subtitle {
+    font-family: 'Almendra', serif !important;
+    font-weight: 600 !important;
+    font-size: calc(var(--wot-font-base) * 1.22) !important;
+    line-height: 1.15 !important;
+    letter-spacing: 0.015em !important;
+}
+
+
+/* =========================
+   Normal açıklama
+   Literata
+   ========================= */
+
+.wot-description {
+    font-family: 'Almendra', serif !important;
+    font-weight: 400 !important;
+    font-size: var(--wot-font-base) !important;
+    line-height: 1.45 !important;
+    letter-spacing: 0 !important;
+}
+
+
+
+.wot-button {
+    font-family: "Grenze", serif !important;
+    font-weight: 700 !important;
+    font-size: var(--wot-font-base) !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.025em !important;
+}
+
+@media
+    (hover: none),
+    (pointer: coarse),
+    (max-width: 1024px) {
+
+    .wot-header {
+        font-size: calc(var(--wot-font-base) * 2) !important;
+    }
 }
