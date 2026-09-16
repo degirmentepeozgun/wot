@@ -27,8 +27,8 @@ function talent() {
 						<div class="w-50 flex flex-jc-start">
 							<span style="color:#9d987f !important">${getLangData('Points Used')}:</span>&nbsp;&nbsp;<span id="talent-points-remaining">${_char.talents?.reduce((x, {count}) => x + count, 0) ?? 0}</span>&nbsp;/&nbsp;<span id="talent-points-all">${MathFloor(mainCharacter.level / 2)}</span>
 						</div>
-						<div class="w-50 flex flex-jc-end">
-							 <div onexactclick="getRef(\'talent\').askReset()" class="game-menu-button btn-reset flex animate-me" style="height:80% !important">${getLangData('RESET')}</div>
+						<div class="w-50 flex flex-jc-end" style="height:100%">
+							 <div onexactclick="getRef(\'talent\').askReset()" class="game-menu-button btn-reset flex animate-me page-detail-button" style="height:80% !important">${getLangData('RESET')}</div>
 						</div>
 					</div>
 					<div class="w-100 flex flex-ai-start talent-tree-middle">`
@@ -131,40 +131,41 @@ function talent() {
 					</div>
 				</div>
 				<div class="artifact-detail-header-info">
-					<div class="flex artifact-title artifact-detail-header-title" style="width:100%;padding:2vh">
+					<div class="page-detail-header flex artifact-title artifact-detail-header-title" style="width:100%;padding:2vh">
 						${_m.names[getLang()]}
 					</div>
 					<div class="flex talent-level flex-jc-start${_maxed ? ' maxed' : ''}">
 						${_level}&nbsp;/&nbsp;${_m.props.length}<span class="${_maxed ? '' : 'd-none '}already-maxed">&nbsp;(max)</span>
 					</div>
-					<div class="flex artifact-description" style="width:100%;padding:2vh;text-align:center">
+					<div class="page-detail-desc flex artifact-description" style="width:100%;padding:2vh;text-align:center">
 						${_m.descriptions[getLang()]}
 					</div>
 				</div>
 			</div>
+			<div class="w-100 flex page-detail-splitter"></div>
 			<div class="flex artifact-bonus" style="width:100%;padding:1vh">
                	<div class="w-100">
-			   		<div class="talent-props-header flex flex-jc-start w-100">
+			   		<div class="page-detail-title talent-props-header flex flex-jc-start w-100">
 						${getLangData('Current Level')}
 					</div>
 					<div class="talent-props-desc flex flex-jc-start w-100">
-						<div class="w-50 flex flex-jc-start">
+						<div class="w-50 flex flex-jc-start page-detail-item-label">
 							${getLangData(_current.type)}
 						</div>
-						<div class="w-50 flex flex-jc-end">
+						<div class="w-50 flex flex-jc-end page-detail-item-value">
 							&percnt;${_current.value}
 						</div>
 					</div>
 				</div>
 			   	<div class="w-100${(_level > 0 && _next) ? '' : ' d-none'} talent-props-next-level">
-			   		<div class="talent-props-header flex flex-jc-start w-100">
+			   		<div class="page-detail-title talent-props-header flex flex-jc-start w-100">
 						${getLangData('Next Level')}
 					</div>
 					<div class="talent-props-desc flex flex-jc-start w-100">
-						<div class="w-50 flex flex-jc-start">
+						<div class="w-50 flex flex-jc-start page-detail-item-label">
 							${getLangData(_next?.type ?? '')}
 						</div>
-						<div class="w-50 flex flex-jc-end">
+						<div class="w-50 flex flex-jc-end page-detail-item-value">
 							&percnt;${_next?.value ?? ''}
 						</div>
 					</div>
@@ -172,7 +173,8 @@ function talent() {
             </div>
 		</div>
 		<div class="talent-buttons flex w-100" style="height:14%">
-			<div class="game-menu-button animate-me flex${_maxed ? ' disabled' : ''}" onexactclick="getRef(\'talent\')?.upgrade(${_id})" style="height:65%">
+			<div class="w-100 flex page-detail-splitter"></div>
+			<div class="page-detail-button animate-me flex${_maxed ? ' disabled' : ''}" onexactclick="getRef(\'talent\')?.upgrade(${_id})" style="height:65%">
 				<div class="flex">${getLangData(_level > 0 ? 'UPGRADE' : 'ACTIVATE')}</div>
 			</div>
 		</div>`;
@@ -181,7 +183,7 @@ function talent() {
 			_container.innerHTML = _html + '</div><div class="shine-area"></div></div>';
 	}
 	this.askReset = function() {
-   		askSomething(`${getLangData('Reset talent build?')}`, `getRef(\'talent\')?.reset()`);
+   		askSomething(`${getLangData('Reset talent build?')}`, `getRef(\'talent\')?.reset()`, 'modal_2x1');
 	}
 	this.reset = function(){
    		PlaySound({ key: 'reset', volume:1 });

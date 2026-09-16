@@ -3948,11 +3948,13 @@ const __holoMenuItems = [
 	{ icon: 'settings', order:9, subOrder:1, titles: {
 		en: 'Settings',
 		tr: 'Ayarlar'
-	}},
+	}}
+	,
 	{ icon: 'tip', order:9, subOrder:2, titles: {
 		en: 'About Us',
 		tr: 'Bize Dair'
-	}}
+	}
+}
 ];
 const mapSprites = [
 	{
@@ -38050,14 +38052,12 @@ function showMenuTutorial(_arr, _key) {
 		return '';
 	const _data = _arr[getLang()];
 	return `<div class="full flex menu-tutorial-content" style="flex-direction:column">
-				<img style="position:absolute;top: 2.5%;left: 3%;width: 13%;" src="./images/ui/corner-small.png" />
-				<img style="position:absolute;top: 2.5%;right: 3%;width: 13%;transform: scaleX(-1);" src="./images/ui/corner-small.png" />
-				<img style="position:absolute;bottom: 2.8%;left: 3%;width: 13%;transform: scaleY(-1);" src="./images/ui/corner-small.png" />
-				<img style="position:absolute;bottom: 2.8%;right: 3%;width: 13%;transform: scale(-1,-1);" src="./images/ui/corner-small.png" />
-				<div class="menu-tutorial-header w-100 flex">${_data.title}</div>
-				<div class="menu-tutorial-desc w-100 flex flex-ai-start"><div class="w-100 flex">${_data.desc}</div></div>
-				<div class="menu-tutorial-skip w-100 flex"><div class="flex game-btn3 animate-me" onexactclick="skipMenuTutorial('${_key}')">${getLangData('UNDERSTOOD')}</div></div>
-	</div>`;
+				<div class="full flex menu-tutorial-content-inner">
+					<div class="menu-tutorial-header w-100 flex"><img src="./images/ui/game/big-title-badge.png" />${_data.title}<img src="./images/ui/game/big-title-badge-r.png" /></div>
+					<div class="menu-tutorial-desc w-100 flex flex-ai-start"><div class="w-100 flex">${_data.desc}</div></div>
+					<div class="menu-tutorial-skip w-100 flex"><div class="flex game-btn3 animate-me" onexactclick="skipMenuTutorial('${_key}')">${getLangData('UNDERSTOOD')}</div></div>
+				</div>
+			</div>`;
 }
 function skipMenuTutorial(_key) {
 	const _clicked = document.querySelector('.menu-tutorial-content');
@@ -38215,7 +38215,7 @@ function askExitApp(){
 		const _isActive = _fs && !hasClass(_fs, 'v-none');
 		playClick();
 		if(!__story){
-			askSomething(getLangData('Application will be closed'), "exitApplication()", "exit-app-question", _isActive ? _fs : undefined);
+			askSomething(getLangData('Application will be closed'), "exitApplication()", "modal_2x1", _isActive ? _fs : undefined);
 			return;
 		}
 		let _options = [
@@ -38261,15 +38261,15 @@ function askExitApp(){
 		let _buttons = '';
 		for(let _op of _options)
 			_buttons += `<div class="orange-action-btn flex animate-me wot-button" onexactclick="${_op.action}">${_op.title[getLang()]}</div>`;
-		let _modal = `<div class="full fade-me show-ui flex inventory-question show-info">
+		let _modal = `<div class="full fade-me show-ui flex inventory-question show-info" data-singleton-key="modal_1x1">
 			<div class="inventory-modal flex quit-modal" style="width:25%;flex-direction:column;position:relative;aspect-ratio:auto">
 				<div class="flex w-100 question-modal-title-container">
-					<span class="question-modal-title wot-ttile">${getLangData('Go back')}?</span>
+					<span class="question-modal-title wot-title">${getLangData('Go back')}?</span>
 				</div>
-				<div class="flex w-100" style="padding:2vh 2vh 4vh 2vh">`
+				<div class="flex w-100" style="padding:0 2vh 6vh 2vh">`
 					+ _buttons +
 				`</div>
-				<div onexactclick="closeInventoryQuestionModal()" style="font-size:4.2vh !important;color:#9d987f !important;padding:1.6vh 3.2vh" class="item-info-modal-close"></div>
+				<div onexactclick="closeInventoryQuestionModal()" class="item-info-modal-close"></div>
 			</div>
 		</div>`;
 		const _div = document.createElement('div');
@@ -38469,61 +38469,101 @@ function clearAudioCache(_sounds) {
   }
   _sounds.length = 0; // diziyi boşalt
 }
-
 (function () {
-  // cooldown süresi (ms)
   const EXACTCLICK_COOLDOWN = 250;
+  const MOVE_THRESHOLD = 8;
 
-  // Ortak helper -> gerçek listener
   function attachExactClick(el, handler) {
     if (!el._onexactclickAttached) {
-      let startX, startY, moved;
+      let startX = 0;
+      let startY = 0;
+      let pointerId = null;
+      let moved = false;
 
       const pointerDown = (e) => {
+        // Sol mouse / touch dışındaki pointerları ignore et
+        if (e.pointerType === "mouse" && e.button !== 0) {
+          return;
+        }
+
         startX = e.clientX;
         startY = e.clientY;
+        pointerId = e.pointerId;
         moved = false;
+
+        // Mobilde tarayıcının gesture davranışını azalt
+        if (e.pointerType === "touch") {
+          e.preventDefault();
+        }
 
         const moveListener = (moveEvent) => {
           if (
-            Math.abs(moveEvent.clientX - startX) > 5 ||
-            Math.abs(moveEvent.clientY - startY) > 5
+            moveEvent.pointerId !== pointerId
+          ) {
+            return;
+          }
+
+          if (
+            Math.abs(moveEvent.clientX - startX) > MOVE_THRESHOLD ||
+            Math.abs(moveEvent.clientY - startY) > MOVE_THRESHOLD
           ) {
             moved = true;
           }
         };
 
-        const upListener = (upEvent) => {
-          if (!moved && el._onexactclickHandler) {
-            const now = _gameTick;
-
-            // cooldown kontrolü
-            if (
-              !el._lastExactClick ||
-              now - el._lastExactClick > EXACTCLICK_COOLDOWN
-            ) {
-              el._lastExactClick = now;
-              el._onexactclickHandler.call(el, upEvent);
-            }
-          }
+        const cleanup = () => {
           document.removeEventListener("pointermove", moveListener);
           document.removeEventListener("pointerup", upListener);
+          document.removeEventListener("pointercancel", cancelListener);
+          pointerId = null;
+        };
+
+        const upListener = (upEvent) => {
+          if (upEvent.pointerId !== pointerId) {
+            return;
+          }
+
+          cleanup();
+        };
+
+        const cancelListener = (cancelEvent) => {
+          if (cancelEvent.pointerId !== pointerId) {
+            return;
+          }
+
+          cleanup();
         };
 
         document.addEventListener("pointermove", moveListener);
         document.addEventListener("pointerup", upListener);
+        document.addEventListener("pointercancel", cancelListener);
+
+        // HEMEN tetikle
+        if (!moved && el._onexactclickHandler) {
+          const now = performance.now();
+
+          if (
+            !el._lastExactClick ||
+            now - el._lastExactClick >= EXACTCLICK_COOLDOWN
+          ) {
+            el._lastExactClick = now;
+            el._onexactclickHandler.call(el, e);
+          }
+        }
       };
 
-      el.addEventListener("pointerdown", pointerDown);
+      el.addEventListener("pointerdown", pointerDown, {
+        passive: false,
+      });
+
       el._onexactclickAttached = true;
     }
 
-    // hangi handler atanmış onu sakla
     el._onexactclickHandler = handler;
   }
 
-  // setAttribute override -> <div onexactclick="...">
   const origSetAttribute = HTMLElement.prototype.setAttribute;
+
   HTMLElement.prototype.setAttribute = function (name, value) {
     if (name.toLowerCase() === "onexactclick") {
       const handler = new Function("event", value);
@@ -38533,47 +38573,162 @@ function clearAudioCache(_sounds) {
     }
   };
 
-  // property destekle -> div.onexactclick = function(){ }
   Object.defineProperty(HTMLElement.prototype, "onexactclick", {
     set: function (handler) {
       attachExactClick(this, handler);
     },
+
     get: function () {
       return this._onexactclickHandler || null;
     },
   });
 
-  // Mevcut DOM’u tara
   document.querySelectorAll("[onexactclick]").forEach((el) => {
     const code = el.getAttribute("onexactclick");
+
     if (code) {
       const handler = new Function("event", code);
       attachExactClick(el, handler);
     }
   });
 
-  // Sonradan eklenenler için
   const observer = new MutationObserver((mutations) => {
     for (const m of mutations) {
       m.addedNodes.forEach((node) => {
-        if (node.nodeType === 1) {
-          if (node.hasAttribute && node.hasAttribute("onexactclick")) {
-            const code = node.getAttribute("onexactclick");
+        if (node.nodeType !== 1) {
+          return;
+        }
+
+        if (node.hasAttribute?.("onexactclick")) {
+          const code = node.getAttribute("onexactclick");
+
+          if (code) {
             const handler = new Function("event", code);
             attachExactClick(node, handler);
           }
-          node.querySelectorAll &&
-            node.querySelectorAll("[onexactclick]").forEach((el) => {
-              const code = el.getAttribute("onexactclick");
-              const handler = new Function("event", code);
-              attachExactClick(el, handler);
-            });
         }
+
+        node.querySelectorAll?.("[onexactclick]").forEach((el) => {
+          const code = el.getAttribute("onexactclick");
+
+          if (code) {
+            const handler = new Function("event", code);
+            attachExactClick(el, handler);
+          }
+        });
       });
     }
   });
+
   observer.observe(document.documentElement, {
     childList: true,
     subtree: true,
   });
 })();
+// (function () {
+//   // cooldown süresi (ms)
+//   const EXACTCLICK_COOLDOWN = 250;
+
+//   // Ortak helper -> gerçek listener
+//   function attachExactClick(el, handler) {
+//     if (!el._onexactclickAttached) {
+//       let startX, startY, moved;
+
+//       const pointerDown = (e) => {
+//         startX = e.clientX;
+//         startY = e.clientY;
+//         moved = false;
+
+//         const moveListener = (moveEvent) => {
+//           if (
+//             Math.abs(moveEvent.clientX - startX) > 5 ||
+//             Math.abs(moveEvent.clientY - startY) > 5
+//           ) {
+//             moved = true;
+//           }
+//         };
+
+//         const upListener = (upEvent) => {
+//           if (!moved && el._onexactclickHandler) {
+//             const now = _gameTick;
+
+//             // cooldown kontrolü
+//             if (
+//               !el._lastExactClick ||
+//               now - el._lastExactClick > EXACTCLICK_COOLDOWN
+//             ) {
+//               el._lastExactClick = now;
+//               el._onexactclickHandler.call(el, upEvent);
+//             }
+//           }
+//           document.removeEventListener("pointermove", moveListener);
+//           document.removeEventListener("pointerup", upListener);
+//         };
+
+//         document.addEventListener("pointermove", moveListener);
+//         document.addEventListener("pointerup", upListener);
+//       };
+
+//       el.addEventListener("pointerdown", pointerDown);
+//       el._onexactclickAttached = true;
+//     }
+
+//     // hangi handler atanmış onu sakla
+//     el._onexactclickHandler = handler;
+//   }
+
+//   // setAttribute override -> <div onexactclick="...">
+//   const origSetAttribute = HTMLElement.prototype.setAttribute;
+//   HTMLElement.prototype.setAttribute = function (name, value) {
+//     if (name.toLowerCase() === "onexactclick") {
+//       const handler = new Function("event", value);
+//       attachExactClick(this, handler);
+//     } else {
+//       return origSetAttribute.apply(this, arguments);
+//     }
+//   };
+
+//   // property destekle -> div.onexactclick = function(){ }
+//   Object.defineProperty(HTMLElement.prototype, "onexactclick", {
+//     set: function (handler) {
+//       attachExactClick(this, handler);
+//     },
+//     get: function () {
+//       return this._onexactclickHandler || null;
+//     },
+//   });
+
+//   // Mevcut DOM’u tara
+//   document.querySelectorAll("[onexactclick]").forEach((el) => {
+//     const code = el.getAttribute("onexactclick");
+//     if (code) {
+//       const handler = new Function("event", code);
+//       attachExactClick(el, handler);
+//     }
+//   });
+
+//   // Sonradan eklenenler için
+//   const observer = new MutationObserver((mutations) => {
+//     for (const m of mutations) {
+//       m.addedNodes.forEach((node) => {
+//         if (node.nodeType === 1) {
+//           if (node.hasAttribute && node.hasAttribute("onexactclick")) {
+//             const code = node.getAttribute("onexactclick");
+//             const handler = new Function("event", code);
+//             attachExactClick(node, handler);
+//           }
+//           node.querySelectorAll &&
+//             node.querySelectorAll("[onexactclick]").forEach((el) => {
+//               const code = el.getAttribute("onexactclick");
+//               const handler = new Function("event", code);
+//               attachExactClick(el, handler);
+//             });
+//         }
+//       });
+//     }
+//   });
+//   observer.observe(document.documentElement, {
+//     childList: true,
+//     subtree: true,
+//   });
+// })();

@@ -9136,6 +9136,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 					if (_pressedKey) {
 						let _order = getBaseKeyboardKey(_pressedKey);
 						if(_order) {
+							_order = _order?.baseKey ?? _order;
 							_order = parseInt(_order);
 							if(_order === 1 && this.commonItem) {
 								this.useCommonSkill(1);

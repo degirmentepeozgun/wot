@@ -45,7 +45,7 @@ function animateStart(_failed) {
 									<img src="./images/ui/menu-icons/${_rs.icon}.png" style="height: 70%;margin-right: 2.5%;">
 								</div>
 								<div class="flex flex-jc-end stage-achievement-item-right">
-									<div class="flex flex-jc-end stage-achievement-item-right-top wot-subtitle" lang="${getLang()}">
+									<div class="flex flex-jc-end stage-achievement-item-right-top wot-minititle" lang="${getLang()}">
 										${_rs.title[getLang()]}
 									</div>
 									<div class="flex flex-jc-end stage-achievement-item-right-bottom wot-subtitle">
@@ -153,18 +153,18 @@ function animateStart(_failed) {
 					<div class="stage-finish-splitter ms1500 op-none"></div>
 					<div class="w-100 stage-finish-total-score flex header flex-jc-start ms1500 op-none" style="height:24%">
 						<div class="w-100 flex flex-jc-start stage-achievement-item" style="height:50%">
-							<div class="w-50 flex flex-jc-start one-line stage-achievement-item-left wot-description" style="height:100%">
+							<div class="w-50 flex flex-jc-start one-line stage-achievement-item-left wot-minititle" style="height:100%">
 								${getLangData('Total Score')}
 							</div>
-							<div class="w-50 flex flex-jc-end stage-achievement-item-right wot-subtitle" style="height:100%;color:#bebab0 !important">
+							<div class="w-50 flex flex-jc-end stage-achievement-item-right wot-minititle" style="height:100%;color:#bebab0 !important">
 								${_totalAchScore.formatWithDots()}
 							</div>
 						</div>
 						<div class="w-100 flex flex-jc-start stage-achievement-item${!_hasNext ? '' : ' d-none'}" style="height:50%">
-							<div class="w-50 flex flex-jc-start one-line stage-achievement-item-left wot-description" style="height:100%" lang="${getLang()}">
+							<div class="w-50 flex flex-jc-start one-line stage-achievement-item-left wot-minititle" style="height:100%" lang="${getLang()}">
 								${getLangData('Final Score')}
 							</div>
-							<div id="final-quickplay-score" class="w-50 flex flex-jc-end stage-achievement-item-right wot-subtitle" style="height:100%">
+							<div id="final-quickplay-score" class="w-50 flex flex-jc-end stage-achievement-item-right wot-minititle" style="height:100%">
 								${_hasNext ? __story.point.formatWithDots() : ''}
 							</div>
 						</div>

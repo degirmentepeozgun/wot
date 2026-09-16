@@ -1,7 +1,7 @@
 .daily-login-item {
 	padding:.5%;
-	width:13%;
-	margin:.5%;
+	width:13.5%;
+	margin:.25%;
 	height: 24%;
 	background-size: 100% 100% !important;
 	background-repeat: no-repeat !important;
@@ -15,14 +15,6 @@
 div[data-module=dailylogin] .book-page-bg {
 	padding-bottom: 1.5% !important;
 	overflow: hidden;
-}
-.daily-login-item-title {
-	color:#f3f4f5cc !important;
-	font-size: 2.8vh !important;
-}
-.daily-login-item-day  {
-	color:#9d987f !important;
-	font-size: 2.8vh !important;
 }
 .passed-splash {
 	display: none;
@@ -44,16 +36,4 @@ div[data-module=dailylogin] .book-page-bg {
 	background-size: 30%, 100% !important;
 	background-position: 75% 70%, 75% 70% !important;
 	background-repeat: no-repeat, no-repeat !important;
-}
-.daily-login-item.passed .daily-login-item-title{
-	color:#f3f4f599 !important;
-} 
-.daily-login-item.passed .daily-login-item-day  {
-	color:#9d987fda !important;
-}
-.daily-login-item.current .daily-login-item-title {
-	color:#f3f4f5 !important;
-}
-.daily-login-item.current .daily-login-item-day {
-	color:#F4BB44 !important;
 }

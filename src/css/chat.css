@@ -52,7 +52,10 @@
 }
 .chat-screen {
 	padding:1% !important;
-	background:radial-gradient(#36454F,#1B1212)
+	background:url(./../images/ui/game/chat-bg.png) !important;
+	background-size:100% 100% !important;
+	border-radius: 0 !important;
+	border:1px solid #413020 !important
 }
 .chat-screen .chat-message-inner {
 	font-size: 1.7vw !important;

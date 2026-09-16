@@ -1586,10 +1586,10 @@ function askSomething(_question, _okFuncString, _singletonAttr, _container) {
 		const _addQuestionMark = !(_question.endsWith('>') || _question.endsWith('?'));
 		let _modal = `<div${_singletonAttr ? " data-singleton-key='" + _singletonAttr + "'" : ""} class="full fade-me show-ui flex inventory-question">
 			<div class="inventory-modal">
-				<div style="padding:4vh 2vh" class="flex">
+				<div style="padding:4vh 2vh" class="flex question-modal-desc">
 					<span class="flex ask-something-modal-text wot-subtitle">` + getLangData(_question) + `${_addQuestionMark ? '?' : ''}</span>
 				</div>
-				<div style="padding:4vh 2vh" class="flex">
+				<div style="padding:4vh 2vh" class="flex question-modal-buttons">
 					<div class="orange-action-btn flex animate-me wot-button" style="cursor:pointer;min-width:80px" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
 					<div class="quick-space-btn orange-action-btn flex animate-me wot-button" style="cursor:pointer;min-width:80px;" onexactclick="${_okFuncString}">${getLangData('YES')}</div>
 				</div>
@@ -1620,18 +1620,20 @@ function showInfo(_json) {
 	catch(ex) {}
 	try {
 		const _title = _json.titles?.[getLang()] ?? '';
-		let _modal = `<div class="full flex inventory-question show-info">
-			<div class="inventory-modal">
-				<div style="padding:6vh 2vh 2vh 2vh" class="flex">
-					<span class="flex show-info-title">${_title}</span>
+		let _modal = `<div data-singleton-key="modal_vert" class="full flex inventory-question show-info show-ui">
+			<div class="inventory-modal flex">
+				<div class="flex show-info-title-wrapper">
+					<span class="flex show-info-title wot-title">${_title}</span>
 				</div>
+				<div class="line1-splitter"></div>
 				<div id="show-info-navigations" style="padding:4vh 2vh" class="flex w-100"></div>
-				<div class="show-info-close flex" onexactclick="closeInventoryQuestionModal()">&times;</div>
+				<div class="item-info-modal-close" onexactclick="closeInventoryQuestionModal()"></div>
 			</div>
 		</div>`;
 		const _div = document.createElement('div');
 		_div.innerHTML = _modal;
-		document.querySelector('#menu-ui').appendChild(_div.querySelector('.inventory-question'));
+		const _parentDiv = document.querySelector('#menu-ui');
+		(_parentDiv ?? _gameUI).appendChild(_div.querySelector('.inventory-question'));
 		playClick();
 		const _container = document.getElementById('show-info-navigations');
 		for(let _n of _json.navigations ?? []) {
@@ -1639,7 +1641,7 @@ function showInfo(_json) {
 			_div2.className = 'info-nav-container flex';
 			_div2.innerHTML = 
 			`<div class="flex" style="height:100%">
-				<img src="./images/ui/menu-icons/${_n.icon}.png" />
+				<img src="./images/ui/game/menu-icons/${_n.icon}.png" />
 			</div>
 			<div class="info-nav flex flex-jc-start" style='flex:1'>
 				${_n.titles[getLang()]}

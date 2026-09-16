@@ -33,8 +33,10 @@ function getLobbyScene() {
 					blurKeyboard();
 					mainCharacter.disableKeyboard = mainCharacter.immobilize = true;
 					mainCharacter.animate('idlelobby',1);
-					if(_presentationMode)
+					if(_presentationMode) {
 						setCharacterLevel(20, mainCharacter, 1);
+						updateExperience(10000);
+					}
 				}
 				//resetOnlineDetection();
 				//injectModule('lobby', function() {
@@ -7867,22 +7869,24 @@ const __stories = [
 					const _skipped = _json.indexOf(1) !== -1;
 					if(_skipped) {
 						const _desc = document.createElement('div');
-						_desc.className = 'flex show-ui full quick-play-desc-container';
+						_desc.className = 'flex show-ui full quick-play-desc-container quick-play-desc-container1';
 						let _html = '';
 						for(let i = 0; i < 6; i++) {
 							const _tip = __quickTips[i];
 							let _skillHtml = '';
-							for(let _sk of _tip.skills) {
-								if(_skillHtml !== '')
-									_skillHtml += '<img src="./images/icons/swap-right.png" class="quick-play-desc-skill-swap" />';
-								_skillHtml += '<div class="quick-play-desc-skill-icon" style="background-image:url(./images/main/skill-icons/warrior/' + _sk + '.png);background-size:cover"></div>';
-							}
-							_skillHtml = `<div class="quick-play-desc-skill-icons flex">` + _skillHtml + '</div>';
-							_html += `<div class="quick-play-desc-item" style="background:url(./images/ui/full-border-vert.png) !important;background-size: 100% auto !important;background-repeat: no-repeat !important;overflow:visible;position:relative">
-									<div class="flex" style="overflow:hidden;z-index:-1;top:0;left:0;position:absolute;inset:0"><img class="w-100" src="./images/${!isPhone() ? '_' : ''}quicktips/${_tip.id}.png" /></div>`
-								+ _skillHtml +
-								`<div class="wot-subtitle quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
-						</div>`;
+							// for(let _sk of _tip.skills) {
+							// 	if(_skillHtml !== '')
+							// 		_skillHtml += '<img src="./images/icons/swap-right.png" class="quick-play-desc-skill-swap" />';
+							// 	_skillHtml += '<div class="quick-play-desc-skill-icon" style="background-image:url(./images/main/skill-icons/warrior/' + _sk + '.png);background-size:cover"></div>';
+							// }
+							//_skillHtml = `<div class="quick-play-desc-skill-icons flex">` + _skillHtml + '</div>';
+							_html += 
+								// `<div class="quick-play-desc-item" style="background:url(./images/ui/full-border-vert.png) !important;background-size: 100% auto !important;background-repeat: no-repeat !important;overflow:visible;position:relative">
+								// 	<div class="flex" style="overflow:hidden;z-index:-1;top:0;left:0;position:absolute;inset:0"><img class="w-100" src="./images/${!isPhone() ? '_' : ''}quicktips/${_tip.id}.png" /></div>`
+								// + _skillHtml +
+								`<div class="quick-play-desc-item quick-play-desc-item${_tip.id}">
+									<div class="wot-description quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>
+								</div>`;
 						}
 						_desc.innerHTML = _html +
 						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2vh" class="w-50 h-100 flex flex-jc-start wot-title" onclick="doNotShowAgain(this,event)"  lang="${getLang()}"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2vh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(0, 1, null, null, 1);skipQuickPlayTutorial(1)"><div class="orange-action-btn wot-button flex">${getLangData('OK')}</div></div></div>`;
@@ -7917,12 +7921,11 @@ const __stories = [
 					// 		});
 					// 	}
 					// });
-					setTimeout(() => {
-						
-							const _portal = summonMob(113, 3000, MathRound(groundheight * .5), 1);
-							activatePortal(_portal);
-							mainCharacter.talk();
-					}, 3000);
+					// setTimeout(() => {
+					// 		const _portal = summonMob(113, 3000, MathRound(groundheight * .5), 1);
+					// 		activatePortal(_portal);
+					// 		mainCharacter.talk();
+					// }, 3000);
 				},
 				actions: [
 					{
@@ -9432,7 +9435,7 @@ const __stories = [
 						maxX: 2580,
 						count: 1,
 						sight: 1000,
-						grade: 12,
+						//grade: 12,
 						hp:165,//0,
 						zoom: .33,
 						experience: 0,
@@ -9502,206 +9505,206 @@ const __stories = [
 					// }
 				]
 			},
-			// {
-			// 	map: 42,
-			// 	noArtifact: true,
-			// 	leaderBoards: {
-			// 		calculate: function() {
-			// 			//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
-			// 			//Kalan kalp (3 adet te) + 1000 * 3
-			// 			//Yediği Damage ın toplam sağlığına oranı negatif bonusu (50 * 10) dmgTaken
+			{
+				map: 42,
+				noArtifact: true,
+				leaderBoards: {
+					calculate: function() {
+						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
+						//Kalan kalp (3 adet te) + 1000 * 3
+						//Yediği Damage ın toplam sağlığına oranı negatif bonusu (50 * 10) dmgTaken
 						
-			// 			const _result = {
-			// 				description: [
-			// 					{
-			// 						title: {
-			// 							en: 'Package Bonus',
-			// 							tr: 'Paket Bonusu'
-			// 						},
-			// 						icon: 'pack',
-			// 						value: (mainCharacter.packageCount ?? 0) * 1000
-			// 					},
-			// 					{
-			// 						title: {
-			// 							en: 'Kill Bonus',
-			// 							tr: 'Öldürme Bonusu'
-			// 						},
-			// 						icon: 'strong',
-			// 						value: (mainCharacter.killCount ?? 0) * 1500
-			// 					},
-			// 					{
-			// 						title: {
-			// 							en: 'Team Bonus',
-			// 							tr: 'Takım Bonusu'
-			// 						},
-			// 						icon: 'war',
-			// 						value: (episode['team' + mainCharacter.groupId + 'score'] ?? 0) * 500
-			// 					}
-			// 				]
-			// 			};
-			// 			_result.score = _result.description.reduce(
-			// 				(sum, item) => sum + (item.value ?? 0),
-			// 				0
-			// 			);
-			// 			return _result;
-			// 		}
-			// 	},
-			// 	enableCommonSkills: true,
-			// 	loadingCharacterIds: [],
-			// 	actions: [	
-			// 		{
-			// 			when: function() {
-			// 				return mainCharacter?.commonItem && !mainCharacter.commonItemRendered;
-			// 			},
-			// 			do: function() {
-			// 				let _div = document.querySelector('.game-status-screen');
-			// 				if(_div) 
-			// 					_div.remove();
-			// 				_div = document.createElement('div');
-			// 				_div.className = 'flex game-status-screen';
-			// 				_gameUI.appendChild(_div);
-			// 				mainCharacter.commonItemRendered = 1;
-			// 				const _item = mainCharacter.commonItem;
-			// 				const _ci = commonSkills.find(x => x.key === _item.key);
-			// 				const _title = _ci.title[getLang()];
-			// 				const _icon = `<span class="item-in-slot full grade3-item" 
-			// 					style="display:inline-block;position:relative">
-			// 					<img style="background:#010101" class="item-img" src="./images/common/icons/${_ci.key}.png"/></span>`;
+						const _result = {
+							description: [
+								{
+									title: {
+										en: 'Package Bonus',
+										tr: 'Paket Bonusu'
+									},
+									icon: 'pack',
+									value: (mainCharacter.packageCount ?? 0) * 1000
+								},
+								{
+									title: {
+										en: 'Kill Bonus',
+										tr: 'Öldürme Bonusu'
+									},
+									icon: 'strong',
+									value: (mainCharacter.killCount ?? 0) * 1500
+								},
+								{
+									title: {
+										en: 'Team Bonus',
+										tr: 'Takım Bonusu'
+									},
+									icon: 'war',
+									value: (episode['team' + mainCharacter.groupId + 'score'] ?? 0) * 500
+								}
+							]
+						};
+						_result.score = _result.description.reduce(
+							(sum, item) => sum + (item.value ?? 0),
+							0
+						);
+						return _result;
+					}
+				},
+				enableCommonSkills: true,
+				loadingCharacterIds: [],
+				actions: [	
+					{
+						when: function() {
+							return mainCharacter?.commonItem && !mainCharacter.commonItemRendered;
+						},
+						do: function() {
+							let _div = document.querySelector('.game-status-screen');
+							if(_div) 
+								_div.remove();
+							_div = document.createElement('div');
+							_div.className = 'flex game-status-screen';
+							_gameUI.appendChild(_div);
+							mainCharacter.commonItemRendered = 1;
+							const _item = mainCharacter.commonItem;
+							const _ci = commonSkills.find(x => x.key === _item.key);
+							const _title = _ci.title[getLang()];
+							const _icon = `<span class="item-in-slot full grade3-item" 
+								style="display:inline-block;position:relative">
+								<img style="background:#010101" class="item-img" src="./images/common/icons/${_ci.key}.png"/></span>`;
     
-			// 				const frag = document.createDocumentFragment();
-			// 				const _subDiv = document.createElement('div');
-			// 				_subDiv.innerHTML = `<div${!__isPC ? ' ontouchstart="mainCharacter.useCommonSkill(1)"' : ''} data-status-item-id="${_item.id ?? _item.key}" class="flex status-item-container w-50 flex flex-ai-start">
-			// 					<div class="status-item-icon-container">`
-			// 						+ _icon +
-			// 					`</div>
-			// 					<div class="status-item-action-container flex">
-			// 						<div class="item-title-container w-100 flex">
-			// 							<div class="item-title-wrapper flex w-50 wot-subtitle">
-			// 								${_title}
-			// 							</div>
-			// 							<div class="item-title-wrapper flex w-50">
+							const frag = document.createDocumentFragment();
+							const _subDiv = document.createElement('div');
+							_subDiv.innerHTML = `<div${!__isPC ? ' ontouchstart="mainCharacter.useCommonSkill(1)"' : ''} data-status-item-id="${_item.id ?? _item.key}" class="flex status-item-container w-50 flex flex-ai-start">
+								<div class="status-item-icon-container">`
+									+ _icon +
+								`</div>
+								<div class="status-item-action-container flex">
+									<div class="item-title-container w-100 flex">
+										<div class="item-title-wrapper flex w-50 wot-subtitle">
+											${_title}
+										</div>
+										<div class="item-title-wrapper flex w-50">
 											
-			// 							</div>
-			// 						</div>
-			// 						<div class="item-action-wrapper flex w-100">
-			// 							<div class="red-action-btn animate-me flex"${__isPC ? ' onexactclick="mainCharacter.useCommonSkill(1)"' : ''}>
-			// 								<div class="flex wot-button">${getLangData('USE')}<span class="flex${__isPC ? '' : ' d-none'}">(${getNewKeyboardKey('1').baseKey})</span></div>
-			// 							</div>
-			// 						</div>
-			// 					</div>
-			// 				</div>`;
+										</div>
+									</div>
+									<div class="item-action-wrapper flex w-100">
+										<div class="red-action-btn animate-me flex"${__isPC ? ' onexactclick="mainCharacter.useCommonSkill(1)"' : ''}>
+											<div class="flex wot-button">${getLangData('USE')}<span class="flex${__isPC ? '' : ' d-none'}">(${getNewKeyboardKey('1').baseKey})</span></div>
+										</div>
+									</div>
+								</div>
+							</div>`;
 
-			// 				frag.appendChild(_subDiv.firstElementChild);
-			// 				_div.prepend(frag);
-			// 			}
-			// 		},
-			// 		{
-			// 			when: function() {
-			// 				return episode.pvpCounterValue > 10 && episode.mobPhaseTick && (_gameTick - episode.mobPhaseTick) > 60000;
-			// 			},
-			// 			do: function() {
-			// 				episode.mobPhaseTick = _gameTick;
-			// 				const _maxW = MathRound(episode.width / __zoom);
-			// 				const _minX = MathRound(_maxW * (1 / 6));
-			// 				const _maxX = MathRound(_maxW * (5 / 6));
-			// 				const _minY = MathRound(groundheight * (1 / 10));
-			// 				const _maxY = MathRound(groundheight * (9 / 10));
-			// 				const _parachute = summonMobWithJson({
-			// 					id: 631,
-			// 					level: 1,
-			// 					minX: _minX,
-			// 					maxX: _maxX,
-			// 					yPosition: function() {
-			// 						return getRandomValue2(_minY, _maxY);
-			// 					},
-			// 					sight:1000,
-			// 					count:1,
-			// 					experience: 0
-			// 				}, 0, 1, 1);
-			// 				_parachute.package = true;
-			// 				_parachute.animate('start', 1);
-			// 			}
-			// 		},
-			// 		// {
-			// 		// 	when: function() {
-			// 		// 		return episode.phase === 2 && 
-			// 		// 		(episode.deads.filter(x => !x.remove)?.length ?? 0) === 0;
-			// 		// 	},
-			// 		// 	do: function() {
-			// 		// 		__storyPlaying = false;
-			// 		// 		episode.pvp = episode.war = false;
-			// 		// 		mainCharacter.class = episode.mainClass;
-			// 		// 		delete episode.mainClass;
-			// 		// 		installStoryFinish();
-			// 		// 		episode.phase = 3;
-			// 		// 	}
-			// 		// },
-			// 		{
-			// 			when: function() {
-			// 				return episode.phase < 2 && episode.pvpEnded;
-			// 			},
-			// 			do: function() {
-			// 				__storyPlaying = false;
-			// 				episode.pvp = episode.war = false;
-			// 				if(episode.mainClass) {
-			// 					mainCharacter.class = episode.mainClass;
-			// 					delete episode.mainClass;
-			// 				}
-			// 				installStoryFinish();
-			// 				episode.phase = 2;
-			// 			}
-			// 		}
-			// 	],
-			// 	do: function() {
-			// 		__account.inventory = [];
-			// 		applyCharacterStats();
-			// 		const _place = 0;
-			// 		const opponents = [];
-			// 		const _mobs = [null, '02', 47, 1000];
-			// 		const _pvpNames = ['Berserker', 'Ranger', 'Cyclops', 'Al Karısı'];
-			// 		// const _mobs = [null, 1000];
-			// 		// const _pvpNames = ['Berserker','Al Karısı'];
-			// 		for(var i = 0; i < _mobs.length; i++) {
-			// 			if(i === _place){
-			// 				mainCharacter.totalPower = getTotalPower().total;
-			// 				mainCharacter.pvpName = mainCharacter.displayName = _pvpNames[i];
-			// 				opponents.push(mainCharacter);
-			// 				continue;
-			// 			}
-			// 			const _e = setCharacterFunctions(_allEnemies['enemy' + _mobs[i]](), 1);
-			// 			_e.level = mainCharacter.level;
-			// 			_e.inventory = [];
-			// 			applyCharacterStats(null, _e);
-			// 			_e.totalPower = getTotalPower(_e).total;
-			// 			_e.pvpName = _pvpNames[i];
-			// 			opponents.push(_e);
-			// 		}
-			// 		requestAnimationFrame(() => {
-			// 			episode.loadCharacterSprites(function() {}, [10, 48], null, 1);
-			// 		});
-			// 		createWar(opponents, 42, 1, 1, 180, function() {
-			// 			clearAudioCache(loadedSounds);
-			// 			mainCharacter.startPlatformX = platformX;
-			// 			episode.skipPvPFinalScreen = 1;
-			// 			episode.phase = 1;
-			// 			episode.canPause = false;
-			// 			episode.deathMatch = true;
-			// 			episode.mainClass = mainCharacter.class;
-			// 			mainCharacter.disableSkill('tag');
-			// 			episode.beforePVPStart = function() {
-			// 				episode.mobPhaseTick = _gameTick;
-			// 				episode.enemies.forEach(x => {
-			// 					x.pvpRespawn = true;
-			// 					x.maxHP = x.MAXHP = x.health = mainCharacter.maxHP = 1000;
-			// 					x.setHealth(x.health);
-			// 					x.immunities = [];
-			// 				});
-			// 			}
-			// 			const _objects = mapSprites.find(x => x.id === __storyScene.map).objectMobs;
-			// 			episode.installMobs(_objects);
-			// 		});
-			// 	}
-			// }
+							frag.appendChild(_subDiv.firstElementChild);
+							_div.prepend(frag);
+						}
+					},
+					{
+						when: function() {
+							return episode.pvpCounterValue > 10 && episode.mobPhaseTick && (_gameTick - episode.mobPhaseTick) > 60000;
+						},
+						do: function() {
+							episode.mobPhaseTick = _gameTick;
+							const _maxW = MathRound(episode.width / __zoom);
+							const _minX = MathRound(_maxW * (1 / 6));
+							const _maxX = MathRound(_maxW * (5 / 6));
+							const _minY = MathRound(groundheight * (1 / 10));
+							const _maxY = MathRound(groundheight * (9 / 10));
+							const _parachute = summonMobWithJson({
+								id: 631,
+								level: 1,
+								minX: _minX,
+								maxX: _maxX,
+								yPosition: function() {
+									return getRandomValue2(_minY, _maxY);
+								},
+								sight:1000,
+								count:1,
+								experience: 0
+							}, 0, 1, 1);
+							_parachute.package = true;
+							_parachute.animate('start', 1);
+						}
+					},
+					// {
+					// 	when: function() {
+					// 		return episode.phase === 2 && 
+					// 		(episode.deads.filter(x => !x.remove)?.length ?? 0) === 0;
+					// 	},
+					// 	do: function() {
+					// 		__storyPlaying = false;
+					// 		episode.pvp = episode.war = false;
+					// 		mainCharacter.class = episode.mainClass;
+					// 		delete episode.mainClass;
+					// 		installStoryFinish();
+					// 		episode.phase = 3;
+					// 	}
+					// },
+					{
+						when: function() {
+							return episode.phase < 2 && episode.pvpEnded;
+						},
+						do: function() {
+							__storyPlaying = false;
+							episode.pvp = episode.war = false;
+							if(episode.mainClass) {
+								mainCharacter.class = episode.mainClass;
+								delete episode.mainClass;
+							}
+							installStoryFinish();
+							episode.phase = 2;
+						}
+					}
+				],
+				do: function() {
+					__account.inventory = [];
+					applyCharacterStats();
+					const _place = 0;
+					const opponents = [];
+					const _mobs = [null, '02', 47, 1000];
+					const _pvpNames = ['Berserker', 'Ranger', 'Cyclops', 'Al Karısı'];
+					// const _mobs = [null, 1000];
+					// const _pvpNames = ['Berserker','Al Karısı'];
+					for(var i = 0; i < _mobs.length; i++) {
+						if(i === _place){
+							mainCharacter.totalPower = getTotalPower().total;
+							mainCharacter.pvpName = mainCharacter.displayName = _pvpNames[i];
+							opponents.push(mainCharacter);
+							continue;
+						}
+						const _e = setCharacterFunctions(_allEnemies['enemy' + _mobs[i]](), 1);
+						_e.level = mainCharacter.level;
+						_e.inventory = [];
+						applyCharacterStats(null, _e);
+						_e.totalPower = getTotalPower(_e).total;
+						_e.pvpName = _pvpNames[i];
+						opponents.push(_e);
+					}
+					requestAnimationFrame(() => {
+						episode.loadCharacterSprites(function() {}, [10, 48], null, 1);
+					});
+					createWar(opponents, 42, 1, 1, 180, function() {
+						clearAudioCache(loadedSounds);
+						mainCharacter.startPlatformX = platformX;
+						episode.skipPvPFinalScreen = 1;
+						episode.phase = 1;
+						episode.canPause = false;
+						episode.deathMatch = true;
+						episode.mainClass = mainCharacter.class;
+						mainCharacter.disableSkill('tag');
+						episode.beforePVPStart = function() {
+							episode.mobPhaseTick = _gameTick;
+							episode.enemies.forEach(x => {
+								x.pvpRespawn = true;
+								x.maxHP = x.MAXHP = x.health = mainCharacter.maxHP = 1000;
+								x.setHealth(x.health);
+								x.immunities = [];
+							});
+						}
+						const _objects = mapSprites.find(x => x.id === __storyScene.map).objectMobs;
+						episode.installMobs(_objects);
+					});
+				}
+			}
 		]
 	},
 	// {
@@ -10141,6 +10144,9 @@ function closeChestOpeningScreen() {
 	}
 }
 function renderChestOpeningScreen(_gift) {
+	const _ex = document.getElementById('chest-open-wrapper');
+	if(_ex)
+		return;
 	playClick(1);
 	episode.pauseBgMusic(1);
 	episode.pauseAmbianceMusic();
@@ -11127,7 +11133,7 @@ function createStoryUI(_id) {
 					'<div class="menu-ui-left fade-me">' +
 						'<div class="menu-modal-left menu-modal-left-content">' +
 							'<div class="stories-content-left skills-content-left menu-modal-left-container">' +
-								'<div style="padding:1% 5%;overflow-y:auto" class="full">' +
+								'<div style="overflow-y:auto" class="full">' +
 									createStoriesUI(_id ?? 1) +
 								'</div>' +
 							'</div>' +
@@ -11171,7 +11177,7 @@ function createStoriesUI(_id) {
 			<div class="flex" style="flex:1;height:100%;padding:1vh 0">
 				<div class="flex flex-jc-start skill-card-title w-100" style="height:40%">${_s.title[getLang()]}</div>
 				<div class="story-level flex flex-jc-start w-100" style="height:30%">${getLangData('Lvl')}&nbsp;${_s.minLevel}&nbsp;${getLangData('required')}</div>
-				<div class="story-consume flex flex-jc-start w-50" style="height:30%">${_s.ticket}&nbsp;<img src="./images/icons/key.png" style="height:2.8vh" /></div>
+				<div class="story-consume flex flex-jc-start w-50" style="height:30%">${_s.ticket}&nbsp;<img src="./images/icons/key.png" style="height:100%" /></div>
 				<div class="story-stars flex flex-jc-end w-50" style="height:30%">
 					<img src="./images/ui/star-${(!_s.locked && _ss?.stars) ? 'on' : 'off'}.png"  />
 					<img src="./images/ui/star-${(!_s.locked && (_ss?.stars?.length >= 2)) ? 'on' : 'off'}.png" />
@@ -11221,9 +11227,9 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 			const _done = _ss?.stars?.indexOf(parseInt(Math.pow(2, _goali))) >= 0;
 			_goals += `<div class="w-100 story-goal-item flex">
 				<div class="flex story-goal-icon">
-					<img src="./images/ui/${_done ? '36' : 'lock'}.png" />
+					<img src="./images/ui/${_done ? 'quest-star' : 'lock'}.png" />
 				</div>
-				<div class="flex flex-jc-start story-goal-title"${_done ? ' style="color:#F3F4F5 !important"' : ''}>
+				<div class="flex wot-subtitle flex-jc-start story-goal-title"${_done ? ' style="color:#c3b9a4 !important"' : ''}>
 					${getLangData(_rs.title)}
 				</div>
 			</div>`;
@@ -11231,10 +11237,12 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 		}
 	//const _div = document.createElement('div');
 	//_div.className = 'flex show-ui story-detail fade-in';
-	let _html = `<div class="flex full show-ui story-detail${_noAnimation ? '' : ' fade-me'}"><div class="flex flex-jc-end story-detail-close"><div>${__account.act}-${_s.order}&nbsp;${_s.title[getLang()]}</div></div>
+	let _html = `<div class="flex full show-ui story-detail${_noAnimation ? '' : ' fade-me'}"><div class="flex flex-jc-end story-detail-close"><div class="page-detail-header">${__account.act}-${_s.order}&nbsp;${_s.title[getLang()]}</div></div><div class="page-detail-splitter-thin"></div>
 		<div class="story-detail-wrapper">`
 		+ _goals +
-		`<div class="flex flex-jc-start story-detail-heading" style="margin-top:2vh">${getLangData('Rewards')}</div>
+		`<div class="page-detail-splitter"></div>
+		<div class="flex flex-jc-start page-detail-header story-detail-heading">${getLangData('Rewards')}</div>
+		<div class="page-detail-splitter-thin"></div>
 		<div class="story-rewards w-100 flex flex-jc-start">`;
 	for(const _r of _s.rewards) {
 		if(_r.key === 'fragment'){
@@ -11247,10 +11255,10 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 						+ _img +
 						`</div>
 						<div style="flex:1" class="flex">
-							<div class="w-100 flex flex-jc-start">
+							<div class="w-100 flex flex-jc-start page-detail-desc">
 								${(_r.count ? _r.count.formatWithDots() : ((_r.minCount && _r.maxCount) ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1))}
 							</div>
-							<div style="color:#ff6c00 !important" class="w-100 flex-jc-start flex${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
+							<div style="color:#ff6c00 !important" class="w-100 page-detail-desc flex-jc-start flex${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
 						</div>
 					</div>`;
 		}
@@ -11260,10 +11268,10 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 							<img class="item-img" src="./images/gems/${_r.type}${_r.grade ?? 1}.png" />
 						</span>
 						<div style="flex:1;padding-left:1vh" class="flex">
-							<div class="w-100 flex flex-jc-start">
+							<div class="w-100 flex flex-jc-start page-detail-desc">
 								${(_r.count ? _r.count.formatWithDots() : ((_r.minCount && _r.maxCount) ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1))}
 							</div>
-							<div style="color:#ff6c00 !important" class="flex flex-jc-start w-100${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
+							<div style="color:#ff6c00 !important" class="flex page-detail-desc flex-jc-start w-100${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
 						</div>
 					</div>`;
 		else if(_r.key === 'item')
@@ -11272,20 +11280,20 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 							<img class="item-img" src="./images/items/icons/${(_r.type ?? _r.key) === 'weapon' ? mainCharacter.class + '/' : ''}${_r.type ?? _r.key}${_r.grade ?? 1}.png" />
 						</span>
 						<div style="flex:1;padding-left:1vh" class="flex">
-							<div class="w-100 flex flex-jc-start">
+							<div class="w-100 flex flex-jc-start page-detail-desc">
 								${(_r.count ? _r.count.formatWithDots() : ((_r.minCount && _r.maxCount) ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1))}
 							</div>
-							<div style="color:#ff6c00 !important" class="flex flex-jc-start w-100${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
+							<div style="color:#ff6c00 !important" class="flex page-detail-desc flex-jc-start w-100${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
 						</div>
 					</div>`;
 		else
 			_html += `<div class="flex flex-jc-start w-50 story-reward">
 							<img src="./images/${_r.key === 'item' ? 'items/' : ''}icons/${_r.type ?? _r.key}${_r.grade ?? ''}.png" />
 							<div style="flex:1" class="flex">
-								<div class="w-100 flex flex-jc-start">
+								<div class="w-100 flex flex-jc-start page-detail-desc">
 									${(_r.count ? _r.count.formatWithDots() : ((_r.minCount && _r.maxCount) ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1))}
 								</div>
-								<div style="color:#ff6c00 !important" class="flex flex-jc-start w-100${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
+								<div style="color:#ff6c00 !important" class="flex page-detail-desc flex-jc-start w-100${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
 							</div>
 						</div>`;
 	}
@@ -11303,20 +11311,20 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 				</div>
 				<div class="flex flex-jc-start story-bonus-achievement-title">
 					<div class="w-100 flex flex-jc-start ba-requirement">
-						<div class="flex flex-jc-start">
+						<div class="flex flex-jc-start page-detail-desc">
 							${getLangData('Story Finish Count')}
 						</div>
 						<div class="flex flex-jc-end">
-							<span class="ba-current-count">${_rs?.count > _ba.minCount ? _ba.minCount : _rs?.count ?? 0}</span>/<span class="ba-min-count">${_ba.minCount}</span>
+							<span class="page-detail-desc ba-current-count">${_rs?.count > _ba.minCount ? _ba.minCount : _rs?.count ?? 0}</span>/<span class="ba-min-count page-detail-desc">${_ba.minCount}</span>
 						</div>
 					</div>
-					<div class="w-100 flex flex-jc-start">
+					<div class="w-100 flex story-bonus-achievement-desc flex-jc-start page-detail-desc">
 						${_ba.title[getLang()]}
 					</div>
 				</div>
 				<div class="flex story-bonus-achievement-icon story-bonus-achievement-reward">
 					<img src="${_reward.src}" />
-					<div class="w-100 flex story-bonus-achievement-reward-count">
+					<div class="w-100 flex story-bonus-achievement-reward-count page-detail-desc">
 						${(_ba.reward.count ?? 1).formatWithDots()}
 					</div>
 					<div class="full flex story-bonus-achievement-reward-taken">
@@ -11328,13 +11336,18 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 	const _hasBonusAch = _bonusAchHTML !== '';
 	_html +=
 		`</div>
-		<div class="flex flex-jc-start story-detail-heading" style="margin-top:2vh">${getLangData('Description')}</div>
-		<div class="story-description">${_s.description[getLang()]}</div>
-		<div class="flex flex-jc-start story-detail-heading${_hasBonusAch ? '' : ' d-none'}" style="margin-top:2vh">${getLangData('Bonus Achievements')}</div>
+		<div class="page-detail-splitter"></div>
+		<div class="flex flex-jc-start story-detail-heading page-detail-header">${getLangData('Description')}</div>
+		<div class="page-detail-splitter-thin"></div>
+		<div class="story-description page-detail-desc">${_s.description[getLang()]}</div>
+		<div class="page-detail-splitter"></div>
+		<div class="flex flex-jc-start story-detail-heading page-detail-header${_hasBonusAch ? '' : ' d-none'}">${getLangData('Bonus Achievements')}</div>
+		<div class="page-detail-splitter-thin"></div>
 		<div class="story-description${_hasBonusAch ? '' : ' d-none'}">` + _bonusAchHTML + `</div>
 		</div>
-		<div class="w-100 flex action-button-container" style="height:14%">
-			<div id="new-story-start-btn" onexactclick="tryStartStoryMission(${_id})" class="flex game-menu-button">
+		<div class="w-100 flex action-button-container">
+			<div class="page-detail-splitter w-100"></div>
+			<div id="new-story-start-btn" onexactclick="tryStartStoryMission(${_id})" class="flex page-detail-button">
 				<div class="flex">${getLangData('START')}</div>
 			</div>
 		</div>

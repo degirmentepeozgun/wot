@@ -49,7 +49,7 @@ function sortItems() {
     refreshInventory();
 }
 function askAutoWearItems() {
-    askSomething('Auto wear best items', "autoWearItems()");
+    askSomething('Auto wear best items', "autoWearItems()", 'modal_2x1');
 }
 function autoWearItems() {
     const _gears = getItems();
@@ -90,8 +90,8 @@ function autoWearItems() {
 }
 function getAvarageStatsScreenUI(_power) {
     return `
-        <div class="flex" style="opacity:.75;justify-content:center;width:33.3%;padding:0 .5vh"><img src="./images/icons/sword.png" style="height:4vh" />&nbsp;<span style="font-weight:600;color:#f7f7f7!important;font-size:3vh!important">${_power.atk.formatWithDots()}</span></div>
-        <div class="flex" style="opacity:.75;justify-content:center;width:33.3%;padding:0 .5vh"><img src="./images/icons/shield.png" style="height:4vh" />&nbsp;<span style="font-weight:600;color:#f7f7f7!important;font-size:3vh!important">${_power.def.formatWithDots()}</span></div>
+        <div class="flex char-avg-stats"><img src="./images/ui/game/sword.png" /><span class="char-avg-stats-value">${_power.atk.formatWithDots()}</span></div>
+        <div class="flex char-avg-stats"><img src="./images/ui/game/shield.png" /><span class="char-avg-stats-value">${_power.def.formatWithDots()}</span></div>
     `;
 }
 function renderInventory(_noAnimation, _activeTab) {
@@ -115,11 +115,11 @@ function renderInventory(_noAnimation, _activeTab) {
     let _html = `
         <div class="menu-ui-left${_noAnimation ? '' : ' fade-me'}" id="character-screen">
             <div class="full flex menu-ui-left-content">
-                <div id="avarage-stats-screen" class="flex" style="border-top:.4vh solid #ffffff40;position:absolute;bottom:0;left:0;width:100%;height:10%;background:var(--ui-light)">`
+                <div id="avarage-stats-screen" class="flex inventory-character-screen-bottom">`
                  + getAvarageStatsScreenUI(_power) +  
                `</div>
-                <div class="main-level-count-wrapper flex flex-jc-start">${getLangData('Lvl')}&nbsp;<span id="main-level-count">${mainCharacter.level}</span><div id="main-class" class="w-100 flex flex-jc-start">${getLangData(mainCharacter.class)}</div></div>
-                <div class="game-menu-button btn-info flex animate-me" onexactclick="openCharacterInfoModal()">${getLangData('INFO')}</div>
+                <div class="main-level-count-wrapper flex flex-jc-start wot-title">${getLangData('Lvl')}&nbsp;<span class="wot-title" id="main-level-count">${mainCharacter.level}</span><div lang="${getLang()}" id="main-class" class="w-100 flex flex-jc-start"><img class="title-badge" src="./images/ui/game/title-badge.png" />${getLangData(mainCharacter.class)}<img class="title-badge-r" src="./images/ui/game/title-badge-r.png" /></div></div>
+                <div class="game-menu-button btn-info flex animate-me" onexactclick="openCharacterInfoModal()"><img class="info-icon" src="./images/ui/game/info.png" /></div>
                 <div style="cursor:pointer" class="item item-helmet">${getItemIcon(_wearedItems.find(x => x.type === 'helmet'))}</div>
                 <div style="cursor:pointer" class="item item-necklace"> ${getItemIcon(_wearedItems.find(x => x.type === 'necklace'))}</div>
                 <div style="cursor:pointer" class="item item-belt"> ${getItemIcon(_wearedItems.find(x => x.type === 'belt'))}</div>
@@ -130,22 +130,22 @@ function renderInventory(_noAnimation, _activeTab) {
                 <div style="cursor:pointer" class="item item-boots"> ${getItemIcon(_wearedItems.find(x => x.type === 'boots'))}</div>
                 <div style="cursor:pointer" class="item item-gloves"> ${getItemIcon(_wearedItems.find(x => x.type === 'gloves'))}</div>
                 <div style="cursor:pointer" class="item item-weapon"> ${getItemIcon(_wearedItems.find(x => x.type === 'weapon'))}</div>
-                <div onexactclick="howToGetStronger()" style="position:absolute;aspect-ratio:520 / 145;height:8%;margin-bottom:3%;background:url(./images/ui/toast2.png);
-background-size:contain;background-position:center;background-repeat:no-repeat;bottom:10%" class="flex">
+                <div onexactclick="howToGetStronger()" class="flex power-bg">
 <div style="text-shadow:0 0 .5vh #000;font-weight:600;height:100%;position:relative" class="flex">
-<span class="character-total-power animate-me" style="color:#f7f7f7!important;font-size:3vh!important;margin-top:1%;font-weight:600">${_power.total.formatWithDots()}</span></div></div>
-</div></div><div class="menu-ui-right${_noAnimation ? '' : ' fade-me'}" id="inventory-list">
-    <div style="width:100%;height:6vh;background:var(--ui-light);padding:0 1vh;border-top-right-radius:1.6vh" class="flex">
-    <div onexactclick="switchInventoryTab(this, 1)" class="flex animate-me inventory-tab${_activeTab === 1 ? ' selected' : ''}" style="width:33%;height:100%;border-left: .55vh solid var(--ui-light)">${getLangData('Item')}</div>
-    <div onexactclick="switchInventoryTab(this, 2)" class="flex animate-me inventory-tab${_activeTab === 2 ? ' selected' : ''}" style="width:33%;height:100%;border-left: .55vh solid #00000080">${getLangData('Gem')}</div>
-    <div onexactclick="switchInventoryTab(this, 3);" class="flex animate-me inventory-tab${_activeTab === 3 ? ' selected' : ''}" style="width:34%;height:100%;border-left: .55vh solid #00000080">${getLangData('Misc')}</div>
-</div><div style="box-shadow:.2vh -.2vh .2vh var(--ui-light);width:100%;height:calc(90% - 6vh);padding:.4vh 0 0 0;background:var(--ui-light)"><div id="inventory-slots" class="full flex" style="overflow-y:auto">`;
-    _html += _content + `</div></div><div class="flex flex-jc-end" style="width:100%;height:10%;background:var(--ui-light);border-top:.4vh solid #ffffff40;box-shadow: 0 -.8vh 2.4vh #000;border-left:1px solid #000;position:relative">
-    <div style="height:100%;flex:1;position:absolute;z-index:10" class="w-100 flex flex-jc-start inventory-action-btns">
-        <div class="game-menu-button flex animate-me${__account.slots >= 200 ? ' disabled' : ''}" style="padding:0;aspect-ratio:13/10;cursor:pointer;color:#f3f4f5ab !important;font-size:3vh !important;margin:0 .5vh" onexactclick="askAddSlot()">+</div>
-        <div class="game-menu-button flex animate-me" style="padding:0;aspect-ratio:13/10;cursor:pointer;color:#F4BB44 !important;font-size:2.6vh !important;margin:0 .5vh" onexactclick="sortItems()"><img class="gray" style="height:2vh" src="./images/icons/sort.png" /></div>
-        <div class="game-menu-button flex animate-me" style="padding:0;aspect-ratio:13/10;cursor:pointer;color:#F4BB44 !important;font-size:2.6vh !important;margin:0 .5vh" onexactclick="askFilterSellItems()"><img class="gray" style="height:3vh" src="./images/icons/sell.png" /></div>
-        <div class="game-menu-button flex animate-me" style="padding:0;aspect-ratio:13/10;cursor:pointer;color:#F4BB44 !important;font-size:2.6vh !important;margin:0 .5vh" onexactclick="askAutoWearItems()"><img class="gray" style="height:3vh" src="./images/icons/wear.png" /></div>
+<img class="power-icon" src="./images/ui/game/power-icon.png" />
+<span class="character-total-power wot-title animate-me">${_power.total.formatWithDots()}</span></div></div>
+</div></div><div class="flex menu-ui-right${_noAnimation ? '' : ' fade-me'}" id="inventory-list">
+    <div class="flex inventory-tabs-container">
+    <div lang="${getLang()}" onexactclick="switchInventoryTab(this, 1)" class="flex wot-title inventory-tab${_activeTab === 1 ? ' selected' : ''}">${getLangData('Item')}</div>
+    <div lang="${getLang()}" onexactclick="switchInventoryTab(this, 2)" class="flex wot-title inventory-tab${_activeTab === 2 ? ' selected' : ''}">${getLangData('Gem')}</div>
+    <div lang="${getLang()}" onexactclick="switchInventoryTab(this, 3)" class="flex wot-title inventory-tab${_activeTab === 3 ? ' selected' : ''}">${getLangData('Misc')}</div>
+</div><div class="inventory-inner"><div id="inventory-slots" class="full flex">`;
+    _html += _content + `</div></div><div class="flex flex-jc-end inventory-footer">
+    <div class="w-100 flex flex-jc-start inventory-action-btns">
+        <div class="game-menu-button flex animate-me${__account.slots >= 200 ? ' disabled' : ''}" onexactclick="askAddSlot()"><img src="./images/ui/game/add.png" /></div>
+        <div class="game-menu-button flex animate-me" onexactclick="sortItems()"><img src="./images/ui/game/sort.png" /></div>
+        <div class="game-menu-button flex animate-me" onexactclick="askFilterSellItems()"><img src="./images/ui/game/sell.png" /></div>
+        <div class="game-menu-button flex animate-me" onexactclick="askAutoWearItems()"><img src="./images/ui/game/wear.png" /></div>
     </div>
     <div style="position:relative;height:80%" class="flex d-none"><img style="height:60%" src="./images/icons/coin.png" /><div style="font-size:2.6vh !important;font-weight:600;padding:0 1.6vh 0 .8vh;text-shadow:0 0 #000;color:#F7f7f7cc !important" class="d-none account-gold-value">${__account.gold.formatWithDots()}</div></div>
     </div>
@@ -229,20 +229,20 @@ function askFilterSellItems() {
         _grades.push(_i);
     let _html = '';
     for(let _grade of _grades)
-        _html += `<div onexactclick="selectFilterGrade(this)" class="flex sell-choice flex-jc-start animate-me" data-key="${_grade}"><div class="sell-choice-left flex animate-me"></div><div class="sell-choice-right flex grade${_grade}">${getLangData(_grade > 0 ? 'Grade' : 'All') + (_grade > 0 ? ' ' + _grade : '')}</div></div>`;
+        _html += `<div onexactclick="selectFilterGrade(this)" class="flex sell-choice flex-jc-start animate-me" data-key="${_grade}"><div class="sell-choice-left flex animate-me"></div><div class="sell-choice-right wot-subtitle flex grade${_grade}">${getLangData(_grade > 0 ? 'Grade' : 'All') + (_grade > 0 ? ' ' + _grade : '')}</div></div>`;
     playClick();
-    let _modal = `<div class="full fade-me flex inventory-question inventory-question-sell-items">
+    let _modal = `<div data-singleton-key="modal_square" class="full fade-me flex inventory-question inventory-question-sell-items">
         <div class="inventory-modal flex" style="flex-direction:column">
-            <div style="padding:6vh 4vh 4vh 4vh" class="flex">
-                <div class="flex w-100" style="color:#f3f4f5cc !important;font-size:3vh !important">${getLangData('Group sell items')}</div>
-                <div class="flex w-100" style="padding:1vh"><span class="flex" style="font-size:2.8vh !important;color:#f3f4f5cc !important">${getLangData('Total')}: <span style="color:#f3f4f5 !important;margin:0 10px" id="total-group-sell-cost">0</span> <img style="height:2.6vh" src="./images/icons/coin.png" /></span></div>
+            <div class="flex question-modal-title-wrapper">
+                <div class="flex w-100 wot-title">${getLangData('Group sell items')}</div>
+                <div class="flex w-100 wot-subtitle">${getLangData('Total')}: <span id="total-group-sell-cost">0</span> <img style="height:2.6vh" src="./images/icons/coin.png" /></div>
             </div>
-            <div style="padding:6vh 4vh 4vh 4vh" class="flex">`
+            <div class="flex w-100 question-modal-middle" style="flex:1">`
                 + _html +
             `</div>
-            <div style="padding:4vh 2vh 6vh 2vh;flex:1" class="w-100 flex flex-ai-end">
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('SKIP')}</div>
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="sellItems()">${getLangData('SELL')}</div>
+            <div class="w-100 flex flex-ai-end new-game-menu-buttons">
+                <div class="new-game-menu-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('SKIP')}</div>
+                <div class="new-game-menu-button flex animate-me" onexactclick="sellItems()">${getLangData('SELL')}</div>
             </div>
         </div>
     </div>`;
@@ -284,14 +284,16 @@ function getItemIcon(_item, _noBadge) {
     if(!_item.weared && !_noBadge) {
         const _diff = getPowerDiffAgainstWearedOne(_item.id);
         if(_diff < 0)
-            _diffIconHtml = '<img class="d-s" src="./images/icons/power-down.png" style="z-index:2;top:-.25vh;left:-.25vh;position:absolute;height:2.5vh" />';
+            _diffIconHtml = '<img class="d-s power-diff-icon" src="./images/icons/power-down.png" />';
         else if(_diff > 0)
-            _diffIconHtml = '<img class="d-s" src="./images/icons/power-up.png" style="z-index:2;top:-.25vh;left:-.25vh;position:absolute;height:2.5vh" />';
+            _diffIconHtml = '<img class="d-s power-diff-icon" src="./images/icons/power-up.png" />';
     }
     // if(!_item.level || _item.level <= 1)
     //     _item.level = getRandomValue(1, 20);
-    if(_item.level > 1)
-        _level = '<span class="item-level-badge" style="color:#f7f7f7cc !important">' + _item.level + '</span>';
+    if(_item.level > 1){
+        var _itemProps = _equips[_item.type]['grade' + _item.grade];
+        _level = '<span class="item-level-badge item-stat-value-max' + (_item.level >= _itemProps.maxLevel ? '1' : '2') + '">' + _item.level + '</span>';
+    }
     return _diffIconHtml + '<span class="item-in-slot full grade' + _item.grade + '-item" style="display:inline-block;position:relative" onexactclick="openItemInfoModal(' + _item.id + ')"><img style="background:#010101" class="item-img" src="./images/items/icons/' + (_item.for ? (_item.for + '/') : '') + _item.type + _item.grade + '.png"/>' + _level +
     (_item.new ? '<div class="inventory-item-new-badge"></div>' : '') + '</span>';
 }
@@ -738,59 +740,154 @@ function getItemInfoModalHtml(_id) {
     else if(_powerDiff < 0)
         _powerDiffHtml += ' (<img style="height:2.5vh" src="./images/icons/power-down.png" /> ' + MathAbs(parseInt(_powerDiff)).formatWithDots() + ')';
    
-    var _props = '<div class="flex" style="width:100%"><div class="flex" style="padding:1vh 7%;width:100%;font-size:3vh!important"><div class="flex flex-jc-start" style="width:50%;color:#9d987f !important">' + getLangData('Gear Score') + ':</div><div class="flex flex-jc-end" style="width:50%;color:#f3f4f5cc !important">' + parseInt(_power).formatWithDots() + _powerDiffHtml + '</div></div></div>';
+    var _props = ''; // '<div class="flex w-100 item-prop"><div class="flex w-100"><div class="flex flex-jc-start wot-subtitle w-50">' + getLangData('Gear Score') + ':</div><div class="flex flex-jc-end w-50 wot-subtitle">' + parseInt(_power).formatWithDots() + _powerDiffHtml + '</div></div></div>';
     let _socketsHtml = '', _socketProps = '';
+    if(!_item.sockets) 
+        _item.sockets = [{},{},{},{}];
     if(_item.sockets){
+        
+        // let _si = 0;
+        // for(let _socket of _item.sockets.sort((a, b) => (b.grade ?? 0) - (a.grade ?? 0)))
+        // {
+        //     if(!_socket.grade)
+        //         _socketsHtml += `<div onexactclick="tryAddSocket(${_id})" class="flex item-socket"><img class="empty-socket-icon" src="./images/ui/game/socket-empty.png" /></div>`;
+        //     else {
+        //         _socketsHtml += `<div onexactclick="tryRemoveSocket(${_id}, ${_si})" class="flex item-socket"><img src="./images/gems/${_socket.key}${_socket.grade}.png" /></div>`;
+        //         var _gem = __gems.find(x => x.key === _socket.key);
+        //         const _g = _gem.grades.find(x => x.grade === _socket.grade);
+        //         const _gemProps = _g.props;
+        //         const _pr = _gemProps.find(x => x.for.indexOf(_item.type) !== -1);
+        //         const _p = __properties.find(x => x.key === _pr.key);
+        //         _socketProps += '<div class="item-prop socket-prop flex w-100"><div class="flex flex-jc-start w-50">' + _p.titles[getLang()] + 
+        // '</div><div class="flex flex-jc-end w-50 wot-subtitle">' + (_pr.value ? ((_p.key.endsWith('-rate')) ? '%' + parseFloat(_pr.value).toFixed(2) : _pr.value) + ' ' : '') + '</div></div>';
+        //     }
+        //     _si++;
+        // }
+        const _socketStats = _item.sockets.reduce((a, s) => {
+            if (!s.key || !s.grade) return a;
+
+            const p = __gems.find(x => x.key === s.key)?.grades?.find(x => x.grade === s.grade)?.props?.find(x => x.for.includes(_item.type));
+            if (!p) return a;
+
+            return (
+                (a[p.key] ??= { key: p.key, maxGrade: 0, totalValue: 0 }),
+                a[p.key].maxGrade = Math.max(a[p.key].maxGrade, s.grade),
+                a[p.key].totalValue += +p.value,
+                a
+            );
+        }, {});
+
+        const _socketStatsSorted = Object.values(_socketStats)
+            .sort((a, b) => b.maxGrade - a.maxGrade);
+
+        // SOCKETLARI ÇİZ
         let _si = 0;
-        for(let _socket of _item.sockets.sort((a, b) => (b.grade ?? 0) - (a.grade ?? 0)))
-        {
-            if(!_socket.grade)
-                _socketsHtml += `<div onexactclick="tryAddSocket(${_id})" class="flex item-socket">+</div>`;
-            else {
-                _socketsHtml += `<div onexactclick="tryRemoveSocket(${_id}, ${_si})" class="flex glow-yellow item-socket"><img src="./images/gems/${_socket.key}${_socket.grade}.png" /></div>`;
-                var _gem = __gems.find(x => x.key === _socket.key);
-                const _g = _gem.grades.find(x => x.grade === _socket.grade);
-                const _gemProps = _g.props;
-                const _pr = _gemProps.find(x => x.for.indexOf(_item.type) !== -1);
-                const _p = __properties.find(x => x.key === _pr.key);
-                _socketProps += '<div class="item-prop socket-prop flex w-100"><div class="flex flex-jc-start w-50">' + _p.titles[getLang()] + 
-        '</div><div class="flex flex-jc-end w-50">' + (_pr.value ? ((_p.key.endsWith('-rate')) ? '%' + parseFloat(_pr.value).toFixed(2) : _pr.value) + ' ' : '') + '</div></div>';
+
+        for (const _socket of _item.sockets) {
+
+            if (!_socket.grade) {
+                _socketsHtml += `<div onexactclick="tryAddSocket(${_id})" class="flex item-socket">
+                    <img class="empty-socket-icon" src="./images/ui/game/socket-empty.png" />
+                </div>`;
             }
+            else {
+                _socketsHtml += `<div onexactclick="tryRemoveSocket(${_id}, ${_si})" class="flex item-socket">
+                    <img src="./images/gems/${_socket.key}${_socket.grade}.png" />
+                </div>`;
+            }
+
             _si++;
+        }
+
+        // STATLARI ÇİZ
+        for (const _stat of _socketStatsSorted) {
+            const _p = __properties.find(x => x.key === _stat.key);
+
+            _socketProps += `<div class="item-prop socket-prop flex w-100">
+                <div class="flex flex-jc-start w-50">
+                    ${_p.titles[getLang()]}:
+                </div>
+                <div class="flex flex-jc-end w-50 wot-subtitle">
+                    ${_p.key.endsWith('-rate') ? '%' + _stat.totalValue.toFixed(2) : _stat.totalValue}
+                </div>
+            </div>`;
         }
     }
     if(_item.for && (_item.for !== mainCharacter.class))
         _props += '<div class="item-prop flex" style="font-size:3vh!important;width:100%;padding:1vh 7%;color:#9d987f !important">' + getLangData(_item.for).toProperCase() + ' item</div>';
-    _props += renderItemProps(_item);
+    
+    _equips[_item.type]['grade' + _item.grade].grade = 3;
+    _item.grade = 3;
+    _item.name = 'AynZaur';
+     const __CLONE = structuredClone(_item); 
+     for(let ci = 0; ci < 2; ci++) {
+        var cprops = getRandomProps(__CLONE.type, __CLONE.grade, __CLONE.level);
+        __CLONE.props.push(cprops[0]);
+     }
+    
+    
+    _props += renderItemProps(__CLONE);
     _props += _socketProps;
-    _props += '<div class="item-prop flex" style="padding:1vh 7%;font-size:3vh!important;width:100%"><div class="flex flex-jc-start" style="width:50%;color:#9d987f !important">' + getLangData('Cost') + ':</div><div style="color:#f3f4f5cc !important;width:50%" class="flex flex-jc-end">' + sellCost.formatWithDots() + '<img style="height:2vh;margin-left:.5vh" src="./images/icons/coin.png" /></div></div>';
-    let _html = `<div style="height:30%;width:100%;padding:0 7%" class="flex flex-jc-start">
-            <div class="item-modal-icon-container">
-                <img src="./images/items/icons/${(_item.for ? (_item.for + '/') : '')}${_item.type}${_item.grade}.png" class="full grade${_item.grade}-item${_item.grade > 5 ? ' glow' : ''}" />
-                <div class="grade-letter" style="position:absolute;font-size:7vh !important;bottom:-5%;left:-5%">${getItemGradeLetter(_item.grade)}</div>
-            </div>
-            <div style="color:#9d987f !important;flex:1;height: 60%;color: #f3f4f599;font-size: 3vh !important;padding: 0 4%">
-                <div style="height:50%">
-                    ${getLangData('Lvl')}&nbsp;${_item.level ?? 1} - ${getLangData(_item.type).toLocaleUpperCase(getLang())}
+    _props += '<div class="item-prop flex w-100"><div class="flex flex-jc-start w-50 wot-subtitle">' + getLangData('Cost') + ':</div><div class="flex flex-jc-end w-50 wot-subtitle item-detail-cost">' + sellCost.formatWithDots() + '<img style="height:2vh;margin-left:.5vh" src="./images/icons/coin.png" /></div></div>';
+    let _html = 
+        `<div class="flex w-100 item-detail-container">
+            <div class="flex flex-jc-start flex-ai-start item-detail-container-inner">
+                <div class="item-modal-icon-container">
+                    <div class="item-back-frame full">
+                        <img src="./images/ui/game/weapon-bg1.gif" />
+                    </div>
+                    <img style="padding:14%" class="item-current-frame" src="./images/ui/game/items/AynZaur.png" />
+                    <div class="item-front-frame full"></div>` +
+                    //${(_item.for ? (_item.for + '/') : '')}${_item.type}${_item.grade}.png" class="full grade${_item.grade}-item${_item.grade > 5 ? ' glow' : ''}" />
+                    `<div class="grade-letter d-none" style="position:absolute;font-size:7vh !important;bottom:-5%;left:-5%">${getItemGradeLetter(_item.grade)}</div>
                 </div>
-                <div style="height:50%" class="flex flex-jc-start w-100 item-socket-container">`
-                    + _socketsHtml +
+                <div class="item-detail-title-container">
+                    <div class="item-detail-title wot-title">
+                        ${getLangData('Lvl')}&nbsp;${_item.level ?? 1} - ${_item.name ?? getLangData(_item.type).toLocaleUpperCase(getLang())}
+                    </div>
+                    <div class="item-detail-desc wot-title">
+                        UNCOMMON ITEM
+                    </div>
+                    <div class="flex flex-jc-start w-100 item-detail-power">
+                         <div class="wot-subtitle item-detail-power-title"> 
+                            ${getLangData('Gear Score')}:
+                        </div>
+                        <div class="flex flex-jc-start wot-subtitle item-detail-power-value">
+                            ${parseInt(_power).formatWithDots() + _powerDiffHtml}
+                        </div>
+                    </div>
+                    <div class="flex w-100 item-detail-top-splitter">
+                        <img src="./images/ui/game/item-detail-top-splitter.png" />
+                    </div>
+                    <div style="height:50%" class="flex flex-jc-start w-100 item-socket-container">`
+                        + _socketsHtml +
+                    `</div>
+                </div>
+            </div>
+            <div class="item-props-scroll-area">
+                <div class="flex flex-jc-start flex-ai-start">`
+                    + _props +
                 `</div>
             </div>
         </div>
-        <div style="width:100%;height:40%;overflow-y:auto">
-            <div class="flex flex-jc-start flex-ai-start">`
-                + _props +
-            `</div>
+        <div class="flex w-100 item-detail-bottom-splitter">
+            <img src="./images/ui/game/item-detail-bottom-splitter.png" />
         </div>
-        <div class="flex" style="width:100%;height:20%">
-            <div class="game-menu-button animate-me flex${hasMaterial('ticket-random') ? '' : ' disabled'}" style="width:90%;height:40%" onexactclick="askRandomizeItem(${_id})"><div class="flex" style="height:80%;font-size:3vh !important"><div class="flex">${getLangData('RANDOMIZE')} (<img style="height:3vh" src="./images/icons/ticket-random.png" />)</div></div></div>
-            <div class="game-menu-button animate-me flex${_itemProps.maxLevel > _item.level ? '' : ' disabled'}" style="width:90%;height:40%" onexactclick="upgradeItem(${_id})"><div class="flex" style="height:80%;font-size:3vh !important">${getLangData('UPDATE')}` + (updateCost > 0 ? ` (${updateCost.formatWithDots()} <img style="height:2vh;margin:0 0 0 1vh" src="./images/icons/coin.png" />)` : '') + `</div></div>
+        <div class="flex w-100 game-menu-icon-buttons">
+            <div class="game-menu-icon-button w-25${hasMaterial('ticket-random') ? '' : ' disabled'}" onexactclick="askRandomizeItem(${_id})"><img src="./images/ui/game/item-detail-btn1.png" /></div>
+            <div class="game-menu-icon-button w-25${_itemProps.maxLevel > _item.level ? '' : ' disabled'}" onexactclick="upgradeItem(${_id})"><img src="./images/ui/game/item-detail-btn4.png" /></div>
+            <div class="game-menu-icon-button w-25${(_item.weared === mainCharacter.class) ? ' disabled' : ''}" onexactclick="sellItem(${_id})"><img src="./images/ui/game/item-detail-btn3.png" /></div>
+            <div class="equipment-wear-button game-menu-icon-button w-25${(_item.weared === mainCharacter.class) ? ' d-none' : ''}${(_item.for && (_item.for !== mainCharacter.class)) ? ' disabled' : ''}" onexactclick="wearItem(${_id})"><img src="./images/ui/game/item-detail-btn2.png" /></div>
+            <div class="game-menu-icon-button w-25${(_item.weared === mainCharacter.class) ? '' : ' d-none'}" onexactclick="unWearItem(${_id})"><img src="./images/ui/game/item-detail-btn2.png" /></div>
         </div>
-        <div class="flex" style="width:100%;height:10%;justify-content:space-evenly">
-            <div class="game-menu-button animate-me flex${(_item.weared === mainCharacter.class) ? ' disabled' : ''}" style="width:42.5%;height:80%;font-size:3vh !important" onexactclick="sellItem(${_id})">${getLangData('SELL')}</div>
-            <div class="game-menu-button equipment-wear-button animate-me flex${(_item.weared === mainCharacter.class) ? ' d-none' : ''}${(_item.for && (_item.for !== mainCharacter.class)) ? ' disabled' : ''}" style="width:42.5%;height:80%;font-size:3vh !important" onexactclick="wearItem(${_id})">${getLangData('WEAR')}</div>
-            <div class="game-menu-button animate-me flex${(_item.weared === mainCharacter.class) ? '' : ' d-none'}" style="width:42.5%;height:80%;font-size:3vh !important" onexactclick="unWearItem(${_id})">${getLangData('UNWEAR')}</div>
+        <div class="flex game-menu-buttons-big d-none">
+            <div lang="${getLang()}" class="game-menu-button animate-me flex${hasMaterial('ticket-random') ? '' : ' disabled'}" onexactclick="askRandomizeItem(${_id})"><div class="flex game-menu-button-inner"><div class="flex wot-title">${getLangData('RANDOMIZE')} (<img style="height:3vh" src="./images/icons/ticket-random.png" />)</div></div></div>
+            <div lang="${getLang()}" class="game-menu-button animate-me flex${_itemProps.maxLevel > _item.level ? '' : ' disabled'}" onexactclick="upgradeItem(${_id})"><div class="flex game-menu-button-inner wot-title">${getLangData('UPDATE')}` + (updateCost > 0 ? ` (${updateCost.formatWithDots()} <img style="height:2vh;margin:0 0 0 1vh" src="./images/icons/coin.png" />)` : '') + `</div></div>
+        </div>
+        <div class="flex game-menu-buttons-small d-none">
+            <div lang="${getLang()}" class="wot-title game-menu-button-half animate-me flex${(_item.weared === mainCharacter.class) ? ' disabled' : ''}" onexactclick="sellItem(${_id})">${getLangData('SELL')}</div>
+            <div lang="${getLang()}" class="wot-title game-menu-button-half equipment-wear-button animate-me flex${(_item.weared === mainCharacter.class) ? ' d-none' : ''}${(_item.for && (_item.for !== mainCharacter.class)) ? ' disabled' : ''}" onexactclick="wearItem(${_id})">${getLangData('WEAR')}</div>
+            <div lang="${getLang()}" class="wot-title game-menu-button-half animate-me flex${(_item.weared === mainCharacter.class) ? '' : ' d-none'}" onexactclick="unWearItem(${_id})">${getLangData('UNWEAR')}</div>
         </div>`
     return _html;
 }
@@ -829,8 +926,20 @@ function renderItemProps(_item, _defaultColor) {
     let _props = '';
     for(let _prop of (_item.props ?? []).sort((a,b) => __properties.find(x => x.key === a.key).order - __properties.find(x => x.key === b.key).order)) {
         const _p = __properties.find(x => x.key === _prop.key);
-        _props += '<div class="item-prop flex w-100"><div class="flex flex-jc-start w-50">' + _p.titles[getLang()] + 
-        '</div><div class="flex flex-jc-end w-50">' + (_prop.value ? ((_p.key.endsWith('-rate')) ? '%' + parseFloat(_prop.value).toFixed(2) : _prop.value) + ' ' : '') + (_item.level > 1 ? '</div>' :  '&nbsp;<span class="item-prop-gap">(' + getMinPropValue(_prop.key, _item) + ' - ' + getMaxPropValue(_prop.key, _item) + ')</span></div>') + '</div>';
+        const _min = getMinPropValue(_prop.key, _item);
+        const _max = getMaxPropValue(_prop.key, _item);
+        let _quality;
+        if(_prop.value === _max)
+            _quality = 1;
+        else {
+            const _half = _min + (_max - _min) / 2;
+            if(_prop.value >= _half)
+                _quality = 2;
+            else
+                _quality = 3;
+        }
+        _props += '<div class="item-prop flex w-100"><div class="flex flex-jc-start w-50 page-detail-item-label"><img src="./images/ui/game/prop-badge.png" />' + _p.titles[getLang()] + 
+        ':</div><div class="page-detail-item-value flex flex-jc-end w-50 item-stat-value-max' + _quality + '">' + (_prop.value ? ((_p.key.endsWith('-rate')) ? '%' + parseFloat(_prop.value).toFixed(2) : _prop.value) + ' ' : '') + (_item.level > 1 ? '</div>' :  '&nbsp;<span class="item-prop-gap wot-subtitle">(' + getMinPropValue(_prop.key, _item) + ' - ' + getMaxPropValue(_prop.key, _item) + ')</span></div>') + '</div>';
     }
     return _props;
 }
@@ -838,33 +947,31 @@ function openMiscItemInfoModal(_type, _grade) {
     playClick();
     var _item = misc.find(x => x.type === _type);
     var _html = `<div class="full flex item-info-container-parent menu-modal-right">
-        <div class="full flex item-info-container">
-            <div class="flex" style="width:100%;height:10%;padding-top:6%">
-                <div style="width:10%;height:100%"></div>
-                <div style="height:100%;width:80%" class="flex">
-                    <div class="one-line" style="font-size:3vh !important;font-weight:600;color:#F4BB44 !important">${_grade > 0 ? getLangData('Grade').toLocaleUpperCase(getLang()) + ' ' + _grade + ' ' : ''}${_item.titles[getLang()].toLocaleUpperCase(getLang())}</div>
-                </div>
-                <div style="width:10%;height:100%" class="flex"></div>
+        <div class="full flex item-info-container item-misc-info-container">
+            <div class="flex w-100 page-detail-header-wrapper">
+                <div lang="${getLang()}" class="one-line page-detail-header">${_grade > 0 ? getLangData('Grade').toLocaleUpperCase(getLang()) + ' ' + _grade + ' ' : ''}${_item.titles[getLang()].toLocaleUpperCase(getLang())}</div>
             </div>
-            <div style="height:30%;width:100%" class="flex">
-                <div style="height:80%;aspect-ratio:1/1;position:relative">
-                    <img src="./images/icons/${_item.type}.png" class="full" />
-                </div>
+            <div class="page-detail-splitter-thin"></div>
+            <div class="flex w-100 page-detail-icon-wrapper">
+                <img src="./images/icons/${_item.type}.png" />
             </div>
-            <div class="flex flex-ai-start" style="width:100%;height:46%;overflow-y:auto">
-                <div class="flex" style="color:#f7f7f780 !important; font-size:3vh !important; width:80%">
+            <div class="flex w-100 flex-ai-start page-detail-desc-wrapper">
+                <div class="flex page-detail-desc" style="width:80%">
                     ${_item.descriptions[getLang()]}
                 </div>
-                <div style="width:100%;text-align:center;color:#f7f7f7 !important; font-size:2.6vh !important; padding:3vh">
+                <div class="page-detail-splitter"></div>
+                <div class="flex wot-subtitle" style="width:80%">
                     ${getLangData('Cost')}:&nbsp;${(_item.cost * (_grade ?? 1)).formatWithDots()}&nbsp;<img src="./images/icons/coin.png" style="height:2vh" />
                 </div>
             </div>
-            <div class="flex action-button-container ${_item.do ? '' : ' d-none'}" style="width:86%;margin:0 7%;height:14%;justify-content:space-around">
-                <div class="game-menu-button animate-me flex" style="width:45%;height:65%;color:#F4BB44 !important;font-size:3vh !important" onexactclick="sellMiscItem('${_item.type}', ${_grade})">${getLangData('SELL')}</div>
-                <div class="game-menu-button animate-me flex" style="width:45%;height:65%;color:#F4BB44 !important;font-size:3vh !important" onexactclick="useMiscItem('${_item.type}', ${_grade})">${getLangData('USE')}</div>
+            <div class="flex w-100 action-button-container ${_item.do ? '' : ' d-none'}">
+                <div class="page-detail-splitter"></div>
+                <div class="page-detail-button-half animate-me flex" onexactclick="sellMiscItem('${_item.type}', ${_grade})">${getLangData('SELL')}</div>
+                <div class="page-detail-button-half animate-me flex" onexactclick="useMiscItem('${_item.type}', ${_grade})">${getLangData('USE')}</div>
             </div>
-            <div class="flex action-button-container ${_item.do ? ' d-none' : ''}" style="width:86%;margin:0 7%;height:14%;justify-content:space-evenly">
-                <div class="game-menu-button animate-me flex" style="width:90%;height:65%;color:#F4BB44 !important;font-size:3vh !important" onexactclick="sellMiscItem('${_item.type}', ${_grade})">${getLangData('SELL')}</div>
+            <div class="flex w-100 action-button-container ${_item.do ? ' d-none' : ''}">
+                <div class="page-detail-splitter"></div>
+                <div class="page-detail-button animate-me flex" onexactclick="sellMiscItem('${_item.type}', ${_grade})">${getLangData('SELL')}</div>
             </div>
 		    <div onexactclick="closeItemInfoModal()" class="item-info-modal-close"></div>
         </div>
@@ -889,27 +996,29 @@ function openGemItemInfoModal(_type, _grade) {
     {
         const _pr = __properties.find(x => x.key === _p.key);
         for(let _f of _p.for)
-            _desc += '<div class="gem-item-prop flex w-100"><div class="flex flex-jc-start w-50">' + getLangData(_f).toTitleCase() + 
-            '</div><div class="flex flex-jc-end w-50">' + ((_p.key.endsWith('-rate') ? '%' + parseFloat(_p.value).toFixed(2) : '+'+_p.value))+ '&nbsp;' +_pr.titles[getLang()]+ '</div></div>';
+            _desc += '<div class="gem-item-prop flex w-100"><div class="flex flex-jc-start w-50 page-detail-item-label"><img src="./images/ui/game/'+ _f +'.png" />' + getLangData(_f).toTitleCase() + 
+            '</div><div class="flex flex-jc-end w-50 page-detail-item-value">' + ((_p.key.endsWith('-rate') ? '%' + parseFloat(_p.value).toFixed(2) : '+'+_p.value))+ '&nbsp;' +_pr.titles[getLang()]+ '</div></div>';
     }
     var _html = `<div class="full flex item-info-container-parent menu-modal-right">
-        <div class="full flex item-info-container">
-            <div style="height:22%;width:100%;padding:6% 10% 2% 10%" class="flex">
-                <div style="height:90%;aspect-ratio:1/1;position:relative">
-                    <img src="./images/gems/${_type}${_grade}.png" class="full glow-${_type}" />
+        <div class="full flex gem-item-info-container item-info-container">
+            <div class="flex w-100 page-detail-header-container">
+                <div class="page-detail-gem-icon-wrapper flex">
+                    <img src="./images/gems/${_type}${_grade}.png" class="page-detail-gem-icon" />
                 </div>
-                <div style="height:80%;flex:1" class="flex flex-jc-start">
-                    <div class="one-line" style="padding-left:6%;font-size:3vh !important;font-weight:600;color:#F4BB44 !important">${_grade > 0 ? getLangData('Grade').toLocaleUpperCase(getLang()) + ' ' + _grade + ' ' : ''}${_item.titles[getLang()].toLocaleUpperCase(getLang())}</div>
+                <div class="flex flex-jc-start page-detail-header-wrapper">
+                    <div class="one-line page-detail-header" lang="${getLang()}">${_grade > 0 ? getLangData('Grade').toLocaleUpperCase(getLang()) + ' ' + _grade + ' ' : ''}${_item.titles[getLang()].toLocaleUpperCase(getLang())}</div>
                 </div>
+                <div class="page-detail-splitter"></div>
             </div>
-            <div class="flex flex-ai-start" style="width:100%;height:64%;overflow-y:auto">
-                <div class="flex" style="color:#f7f7f780 !important; font-size:3vh !important; width:80%">`
-                + _desc +
+            <div class="flex flex-ai-start w-100 page-detail-desc-wrapper">
+                <div class="flex w-100 page-detail-desc-wrapper-inner">`
+                    + _desc +
                 `</div>
             </div>
-            <div class="flex action-button-container" style="width:86%;height:14%;margin:0 7%;justify-content:space-around">
-                <div class="game-menu-button animate-me flex d-none" style="width:45%;height:65%;color:#F4BB44 !important;font-size:3vh !important" onexactclick="sellGemItem('${_type}', ${_grade})">${getLangData('SELL')}</div>
-                <div class="game-menu-button animate-me flex" style="width:90%;height:65%;color:#F4BB44 !important;font-size:3vh !important" onexactclick="openGemMeltModal('${_type}', ${_grade})">${getLangData('MELT')}</div>
+            <div class="flex w-100 action-button-container">
+                <div class="page-detail-splitter"></div>
+                <div class="page-detail-button-half animate-me flex d-none" onexactclick="sellGemItem('${_type}', ${_grade})">${getLangData('SELL')}</div>
+                <div class="page-detail-button animate-me flex" onexactclick="openGemMeltModal('${_type}', ${_grade})">${getLangData('MELT')}</div>
             </div>
 		    <div onexactclick="closeItemInfoModal()" class="item-info-modal-close"></div>
         </div>
@@ -1163,35 +1272,47 @@ function openCharacterInfoModal() {
         mp: []
     };
     var _offensiveProps = _stats.op, _defensiveProps = _stats.dp, _miscProps = _stats.mp;
-    let _props = '<div style="color:#f3f4f599 !important; position:relative" class="stats-group-title">' + getLangData('Offensive Stats') + '<img src="./images/icons/sword.png" style="opacity:.65;position:absolute;height:70%;top:15%;right:3vh" /></div>';
+    let _props = '<div class="stats-group-stats-line"><img src="./images/ui/game/stats-line.png" /></div>';
+    _props += '<div class="stats-group-title flex flex-jc-start">' + getLangData('Offensive Stats') + '<img src="./images/ui/game/stats-badge.png" /></div>';
+    _props += '<div class="stats-group-stats-line"><img src="./images/ui/game/stats-line.png" /></div>';
     //var _atk = _offensiveProps.find(x => x.key === 'atk')?.value ?? 1;
     //var _dps = getTotalPower().atk;
     //_props += `<div style="color:#F7F7F780!important" class="stats-group-item">${getLangData('Base Damage')}: ${_stats.minDmg.formatWithDots()} - ${_stats.maxDmg.formatWithDots()}</div>`;
     for(let _o of _offensiveProps)
-        _props += `<div style="padding:0 6%" class="w-100 flex"><div style="color:#9d987f !important" class="w-50 flex flex-jc-start">${_o.title}:</div><div class="flex w-50 flex-jc-end" style="color:#f3f4f5cc !important">${_o.key.endsWith('-rate') ? '% ' + _o.value.toFixed(2) : _o.value.formatWithDots()}</div></div>`;
-    _props += '<div style="text-align:right;color:#f3f4f599 !important;position:relative;margin-top:1vh" class="stats-group-title"><img src="./images/icons/shield.png" style="opacity:.65;position:absolute;height:70%;top:15%;left:3vh" />' + getLangData('Defensive Stats')  + '</div>';
+        _props += `<div style="padding:0 6%" class="w-100 flex"><div class="w-50 flex flex-jc-start">${_o.title}:</div><div class="flex w-50 flex-jc-end" style="color:#f3f4f5cc !important">${_o.key.endsWith('-rate') ? '% ' + _o.value.toFixed(2) : _o.value.formatWithDots()}</div></div>`;
+    _props += '<div class="stats-group-stats-line"><img src="./images/ui/game/stats-line.png" /></div>';
+    _props += '<div class="stats-group-title flex flex-jc-start">' + getLangData('Defensive Stats')  + '<img src="./images/ui/game/stats-badge.png" /></div>';
+    _props += '<div class="stats-group-stats-line"><img src="./images/ui/game/stats-line.png" /></div>';
     //_props += `<div style="text-align:right;color:#F7F7F780!important" class="stats-group-item">${getLangData('Base Armor')}: ${_stats.armor.formatWithDots()}</div>`;
     for(let _o of _defensiveProps)
-        _props += `<div style="padding:0 6%" class="w-100 flex"><div style="color:#9d987f !important" class="w-50 flex flex-jc-start">${_o.title}:</div><div class="flex w-50 flex-jc-end" style="color:#f3f4f5cc !important">${_o.key.endsWith('-rate') ? '% ' + _o.value.toFixed(2) : _o.value.formatWithDots()}</div></div>`;
+        _props += `<div style="padding:0 6%" class="w-100 flex"><div class="w-50 flex flex-jc-start">${_o.title}:</div><div class="flex w-50 flex-jc-end" style="color:#f3f4f5cc !important">${_o.key.endsWith('-rate') ? '% ' + _o.value.toFixed(2) : _o.value.formatWithDots()}</div></div>`;
     //_props += '<div style="margin-top:1vh;color:#f7f7f799 !important; position:relative" class="stats-group-title">' + getLangData('Other Stats') + '<img src="./images/icons/hp.png" style="opacity:.65;position:absolute;height:70%;top:15%;right:3vh" /></div>';
     //_props += `<div style="color:#F7F7F780!important" class="stats-group-item">${getLangData('Base Health')}: ${_stats.maxHP.formatWithDots()}</div>`;
     //for(let _o of _hpProps)
     //    _props += `<div${_o.color ? ' style="color:' + _o.color + '80!important"' : ''} class="stats-group-item">${_o.title}: ${_o.key.endsWith('-rate') ? '%' + _o.value.toFixed(2) : _o.value.formatWithDots()}</div>`;
-    let _html = `<div class="full character-info-container-parent menu-modal-left"><div class="full flex character-info-container">
-    <div class="flex" style="width:100%;height:12%"><div style="padding:0 4%" class="full flex flex-jc-start"><div class="one-line" style="font-size:3.2vh !important;line-height:200%;color:#F4BB44 !important">Lvl ${_level} - ${_class}</div></div>
-    <div class="flex flex-jc-end item-info-modal-close" onexactclick="closeCharacterInfoModal()"></div>
-    </div>
-    <div style="width:100%;height:88%;overflow-y:auto">
-        <div class="flex flex-jc-start flex-ai-start" style="padding-bottom:2vh">`
-            + _props +
-            `<div style="margin-top:1vh;color:#f3f4f599 !important" class="stats-group-title">${getLangData('General')}</div>
-            <div class="stats-group-item w-100 flex"><div class="w-50 flex flex-jc-start" style="color:#9d987f !important">${getLangData('Title:')}</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${getLangData(mainCharacter.title)}</div></div>
-            <div class="stats-group-item w-100 flex"><div class="w-50 flex flex-jc-start" style="color:#9d987f !important">${getLangData('Experience')}:</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${mainCharacter.experience.formatWithDots()} / ${mainCharacter.maxExperience.formatWithDots()}</div></div>
-            <div class="stats-group-item w-100 flex"><div class="w-50 flex flex-jc-start" style="color:#9d987f !important">${getLangData('Fatique')}:</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${mainCharacter.maxFatique.formatWithDots()}</div></div>
-            <div class="stats-group-item w-100 flex"><div class="w-50 flex flex-jc-start" style="color:#9d987f !important">${getLangData('Total Power')}:</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${getTotalPower().total.formatWithDots()}</div></div>
-            <div class="stats-group-item w-100 flex d-none"><div class="w-50 flex flex-jc-start" style="color:#9d987f !important">${getLangData('Progress')}:</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${__account.questStatus.order} / ${_npcQuests.length}</div></div>
+    let _html = `<div class="full character-info-container-parent menu-modal-left">
+    <div class="full flex character-info-container">
+        <div class="flex character-info-header">
+            <div class="full flex flex-jc-start">
+                <div class="one-line flex flex-jc-start character-info-header-text">
+                    <img src="./images/ui/game/stats-badge.png" />Lvl ${_level} - ${_class}
+                </div>
+            </div>
+            <div class="flex flex-jc-end item-info-modal-close character-info-close" onexactclick="closeCharacterInfoModal()"></div>
         </div>
-    </div>
+        <div class="character-info-scroll-area">
+            <div class="flex flex-jc-start flex-ai-start" style="padding-bottom:2vh">`
+                + _props +
+                `<div class="stats-group-stats-line"><img src="./images/ui/game/stats-line.png" /></div>
+                <div class="stats-group-title flex flex-jc-start">${getLangData('General')}<img src="./images/ui/game/stats-badge.png" /></div>
+                <div class="stats-group-stats-line"><img src="./images/ui/game/stats-line.png" /></div>
+                <div class="stats-group-item w-100 flex"><div class="w-50 flex flex-jc-start">${getLangData('Title:')}</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${getLangData(mainCharacter.title)}</div></div>
+                <div class="stats-group-item w-100 flex"><div class="w-50 flex flex-jc-start">${getLangData('Experience')}:</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${mainCharacter.experience.formatWithDots()} / ${mainCharacter.maxExperience.formatWithDots()}</div></div>
+                <div class="stats-group-item w-100 flex"><div class="w-50 flex flex-jc-start">${getLangData('Fatique')}:</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${mainCharacter.maxFatique.formatWithDots()}</div></div>
+                <div class="stats-group-item w-100 flex"><div class="w-50 flex flex-jc-start">${getLangData('Total Power')}:</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${getTotalPower().total.formatWithDots()}</div></div>
+                <div class="stats-group-item w-100 flex d-none"><div class="w-50 flex flex-jc-start">${getLangData('Progress')}:</div><div style="color:#f3f4f5cc !important" class="w-50 flex flex-jc-end">${__account.questStatus.order} / ${_npcQuests.length}</div></div>
+            </div>
+        </div>
     </div>
     </div>`;
     document.getElementById('character-screen').innerHTML += _html;
@@ -1728,28 +1849,84 @@ function askAddSlot() {
     const _cost = 10000;
     let _modal = `<div class="full fade-me flex inventory-question inventory-question-add-slot">
         <div class="inventory-modal">
-            <div style="padding:6vh 4vh 4vh 4vh" class="flex">
-                <span style="color:#f3f4f5cc !important;font-size:3vh !important">${getLangData('Enlarge inventory capacity')}</span>
+            <div class="flex inventory-modal-title">
+                ${getLangData('Enlarge inventory capacity')}
             </div>
-            <div class="flex" style="padding:2vh">
-                <span class="flex">
-                    <div id="decrease-slot-btn" class="game-menu-button flex animate-me disabled" style="margin:0 1vh;cursor:pointer;color:#F4BB44;font-size:3vh !important" onexactclick="decreaseSlotAmount()">-</div>
-                    &nbsp;<span id="slot-amount" style="font-size:3vh !important;color:#f3f4f5 !important">10</span>&nbsp;
-                    <div id="increase-slot-btn" class="game-menu-button flex animate-me" style="margin:0 1vh;cursor:pointer;color:#F4BB44;font-size:3vh !important" onexactclick="increaseSlotAmount()">+</div>          
-                </span>
+            <div class="inventory-question-add-slot-inner flex w-100">
+                <div class="inventory-question-add-slot-inner-left flex">
+                    <img src="./images/ui/game/bag.png" />
+                </div>
+                <div class="inventory-question-add-slot-inner-right flex">
+                    <div class="flex inventory-question-add-slot-count">
+                        <span class="flex flex-jc-start w-100">
+                            <div class="flex slot-amount-border">
+                                <div id="decrease-slot-btn" class="flex animate-me disabled" onexactclick="decreaseSlotAmount()"><img src="./images/ui/game/arrow-left.png" /></div>
+                                <div id="slot-amount">10</div>
+                                <div id="increase-slot-btn" class="flex animate-me" onexactclick="increaseSlotAmount()"><img src="./images/ui/game/arrow-right.png" /></div>          
+                            </div>
+                        </span>
+                    </div>
+                    <div class="flex inventory-question-add-slot-cost flex-jc-start w-100">
+                        <span class="flex">${getLangData('Cost')}:<span id="slot-cost">${_cost.formatWithDots()}</span><img src="./images/icons/coin.png" style="height:3vh" /></span>
+                    </div>
+                </div>
             </div>
-            <div style="padding:2vh" class="flex">
-                <span style="color:#f3f4f5cc !important;font-size:3vh !important" class="flex">${getLangData('Cost')}:&nbsp;<span id="slot-cost" style="margin:0 10px;font-size:3vh !important;color:#f3f4f5 !important">${_cost.formatWithDots()}</span>&nbsp;<img src="./images/icons/coin.png" style="height:3vh" /></span>
-            </div>
-            <div style="padding:4vh" class="flex">
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="acceptInventorySlot()">${getLangData('YES')}</div>
+            <div class="flex new-game-menu-buttons">
+                <div class="new-game-menu-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
+                <div class="new-game-menu-button flex animate-me" onexactclick="acceptInventorySlot()">${getLangData('YES')}</div>
             </div>
         </div>
     </div>`;
     const _div = document.createElement('div');
     _div.innerHTML = _modal;
-    document.querySelector('#menu-ui').appendChild(_div.firstChild);
+    const parentEl = document.querySelector('#menu-ui');
+    (parentEl ?? _gameUI).appendChild(_div.firstChild);
+}
+function selectAvatarImage(_order) {
+    const _item = document.querySelector('.avatar-image' + _order);
+    if(_item) {
+        playClick();
+        const _items = document.querySelectorAll('.avatar-item');
+        if(_items)
+            _items.forEach(x => removeClass(x, 'selected'));
+        addClass(_item, 'selected');
+        const _selectionWrapper = document.querySelector('.avatar-selection-inner');
+        _selectionWrapper.setAttribute('data-selected', _order.toString());
+    }
+}
+function chooseAvatar() {
+    const _selectionWrapper = document.querySelector('.avatar-selection-inner');
+    const _order = _selectionWrapper.getAttribute('data-selected');
+    const _tba = document.querySelector('.top-bar-avatar');
+    if(_tba)
+        _tba.src = './images/ui/game/avatars/avatar' + _order + '.png';
+    closeInventoryQuestionModal();
+    __account.avatarOrder = _order;
+    _client.saveState();
+}
+function askAvatar() {
+    playClick();
+    let _avatarHTML = '';
+    for(let i = 1; i < 22; i++) 
+        _avatarHTML += `<div onexactclick="selectAvatarImage(${i})" class="avatar-image${i} flex avatar-item"><img src="./images/ui/game/avatars/avatar${i}.png" /></div>`;
+    let _modal = `<div data-singleton-key="modal_7x4" class="full fade-me flex inventory-question show-ui avatars-container">
+        <div class="inventory-modal">
+            <div class="flex inventory-modal-title">
+                ${getLangData('Choose Your Avatar')}
+            </div>
+            <div class="avatar-selection-inner flex w-100">`
+               + _avatarHTML + 
+            `</div>
+            <div class="flex new-game-menu-buttons">
+                <div class="new-game-menu-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('IGNORE')}</div>
+                <div class="new-game-menu-button flex animate-me" onexactclick="chooseAvatar()">${getLangData('ACCEPT')}</div>
+            </div>
+        </div>
+    </div>`;
+    const _div = document.createElement('div');
+    _div.innerHTML = _modal;
+    const parentEl = document.querySelector('#menu-ui');
+    (parentEl ?? _gameUI).appendChild(_div.firstChild);
 }
 const _selectionItems = [];
 function useItemSelectionTicket(_level) {

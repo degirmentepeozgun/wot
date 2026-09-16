@@ -1,6 +1,6 @@
 
 .chat-container .book-page-bg{
-	padding:.25vw 1.5vw 1vw 1.5vw !important
+	padding:.25vw 1.25vw 1vw 1.25vw !important
 }
 .chat-screen {
 	margin:0;
@@ -14,8 +14,7 @@
 	border-radius: .3vw;
 	height: 3.2vw;
 	border:1px solid #f3f4f540;
-	width:97%;
-	margin:0 1.5%;
+	width:100%;
 	position: relative;
 	z-index:10
 }
@@ -33,10 +32,7 @@
 }
 .chat-send-text input {
 	width:100%;
-	font-size: 1.7vw !important;
-	line-height: 1.7vw !important;
 	padding: .65vw 1.2vw;
-	color:#f3f4f5ab !important;
 	background:#000;
 	height: calc(3vw - 2px);
 	outline:none !important;
@@ -55,14 +51,15 @@
 	background:radial-gradient(#36454F,#1B1212)
 }
 .chat-screen .chat-message-inner {
-	font-size: 1.7vw !important;
-	line-height: 1.7vw !important;
+    font-size: calc(var(--wot-font-base) * 1.35) !important;
+	line-height: calc(var(--wot-font-base) * 1.25) !important;;
+	font-family: 'Alegreya' !important;
 	color:#f3f4f5cc;
 	justify-content: flex-end !important;
 	margin:.35vw 1vw;
 	max-width:90%;
 	width:auto !important;
-	padding:.75vw 1.25vw;
+	padding:1% 2%;
 	border-radius: .3vw;
 	background-color:#f3f4f520;
 	box-shadow: .25vw .25vw .125vw .07vw #00000080;
@@ -84,7 +81,9 @@
 	justify-content: flex-end !important;
 }
 .chat-screen .chat-message.your-chat-message .chat-message-inner {
-	font-size: 1.7vw !important;
+    font-size: calc(var(--wot-font-base) * 1.35) !important;
+	line-height: calc(var(--wot-font-base) * 1.25) !important;;
+	font-family: 'Alegreya' !important;
 	justify-content: flex-end !important;
 	background: linear-gradient(45deg, #00000040, transparent,#00000040), linear-gradient(45deg, #353935, #353935)
 }
@@ -117,7 +116,4 @@
 .chat-screen .chat-message.whisper-chat-message .chat-message-inner {
 	max-width:100% !important;
 	justify-content: center !important;
-}
-.chat-screen .chat-message * {
-	line-height: 1.7vw !important;
 }

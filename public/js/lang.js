@@ -244,6 +244,7 @@ const __langData = [
 	{ key: 'Friend limit reached', tr: 'Arkadaşlık limitine ulaşıldı'},
 	{ key: 'You', tr: 'Siz'},
 	{ key: 'Lvl', tr: 'Svy'},
+	{ key: 'Lv', tr: 'Sv'},
 	{ key: 'Match', tr: 'Eşleşme'},
 	{ key: 'START', tr: 'BAŞLAT'},
 	{ key: 'OK', tr: 'TAMAM'},
@@ -360,6 +361,7 @@ const __langData = [
 	{ key: 'Type your message', tr: 'Mesajınızı yazın' },
 	{ key: 'No conversation', tr: 'Konuşma yok' },
 	{ key: 'Quest Needs', tr: 'Görev İhtiyaçları' },
+	{ key: 'Choose Your Avatar', tr: 'Avatarını Seç' },
 	{ key: 'Forge Time', tr: 'Dövülme Süresi' },
 	{ key: 'Next Spin', tr: 'Sonraki Çevirme' },
 	{ key: 'Remove talk', tr: 'Konuşmayı kaldır' },
@@ -622,6 +624,10 @@ const __openingScreenLangData = [
 	{
 		key: 'CREDITS',
 		tr: 'JENERİK'
+	},
+	{
+		key: 'CONTROLS',
+		tr: 'KONTROLLER'
 	},
 	{
 		key: 'QUIT',

@@ -732,6 +732,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 			if(_startWith && (mainCharacter?.id % 10000) !== _startWith)
 				startWithThisCharacter(_startWith, null, null, 1);
 			setTimeout(function() {
+				addClass(document.getElementById('game-opening-screen-menu'), 'd-none');
 				if(_onEnd)
 					_onEnd();
 				else if(!episode.pvp && !episode.war){
@@ -1447,7 +1448,7 @@ function checkIfFragmentUpdate() {
 }
 function getBottomMenuTemplate(_index) {
 	return `<div class="menu-bottom">
-        <div class="flex" style="padding: 3.7% 11.5% 3% 11.5%;height: 100%;">
+        <div class="flex menu-bottom-inner">
             <div class="flex animate-me main-menu-btn${_index === 0 ? ' selected' : ''}">
                 <img class="animate-me" src="./images/ui/menu/item3.png" onexactclick="switchBookPage(1, 1)" />
             </div>
@@ -1531,10 +1532,10 @@ function getRightMenuTemplate(_index) {
 	const _ic = __account.misc?.find(x => x.type === 'ticket-item')?.count ?? 0;
 	const _pc = __account.misc?.find(x => x.type === 'ticket-pass')?.count ?? 0;
 	return `<div class="menu-right flex-ai-end flex">
-		<div onexactclick="tryUseStoryTicket(3,1,2,'exp')" class="w-100 menu-sub-button${_ec > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="2"><img src="./images/ui/12.png"><img class="story-ticket-img" src="./images/icons/ticket-exp.png" /><div class="story-ticket-count story-exp-ticket-count${_ec > 0 ? '' : ' no-ticket'}">${_ec > 999 ? '999+' : _ec}</div></div>
-		<div onexactclick="tryUseStoryTicket(3,1,3,'gold')" class="w-100 menu-sub-button${_gc > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="3"><img src="./images/ui/12.png"><img class="story-ticket-img" src="./images/icons/ticket-gold.png" /><div class="story-ticket-count story-gold-ticket-count${_gc > 0 ? '' : ' no-ticket'}">${_gc > 999 ? '999+' : _gc}</div></div>
-		<div onexactclick="tryUseStoryTicket(3,1,4,'item')" class="w-100 menu-sub-button${_ic > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="4"><img src="./images/ui/12.png"><img class="story-ticket-img" src="./images/icons/ticket-item.png" /><div class="story-ticket-count story-item-ticket-count${_ic > 0 ? '' : ' no-ticket'}">${_ic > 999 ? '999+' : _ic}</div></div>
-		<div onexactclick="tryUseStoryTicket(3,1,5,'pass')" class="w-100 menu-sub-button${_pc > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="5"><img src="./images/ui/12.png"><img class="story-ticket-img" src="./images/icons/ticket-pass.png" /><div class="story-ticket-count story-pass-ticket-count${_pc > 0 ? '' : ' no-ticket'}">${_pc > 999 ? '999+' : _pc}</div></div>
+		<div onexactclick="tryUseStoryTicket(3,1,2,'exp')" class="w-100 menu-sub-button${_ec > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="2"><img src="./images/ui/game/story-ticket-btn.png"><img class="story-ticket-img" src="./images/icons/ticket-exp.png" /><div class="story-ticket-count story-exp-ticket-count${_ec > 0 ? '' : ' no-ticket'}">${_ec > 999 ? '999+' : _ec}</div></div>
+		<div onexactclick="tryUseStoryTicket(3,1,3,'gold')" class="w-100 menu-sub-button${_gc > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="3"><img src="./images/ui/game/story-ticket-btn.png"><img class="story-ticket-img" src="./images/icons/ticket-gold.png" /><div class="story-ticket-count story-gold-ticket-count${_gc > 0 ? '' : ' no-ticket'}">${_gc > 999 ? '999+' : _gc}</div></div>
+		<div onexactclick="tryUseStoryTicket(3,1,4,'item')" class="w-100 menu-sub-button${_ic > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="4"><img src="./images/ui/game/story-ticket-btn.png"><img class="story-ticket-img" src="./images/icons/ticket-item.png" /><div class="story-ticket-count story-item-ticket-count${_ic > 0 ? '' : ' no-ticket'}">${_ic > 999 ? '999+' : _ic}</div></div>
+		<div onexactclick="tryUseStoryTicket(3,1,5,'pass')" class="w-100 menu-sub-button${_pc > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="5"><img src="./images/ui/game/story-ticket-btn.png"><img class="story-ticket-img" src="./images/icons/ticket-pass.png" /><div class="story-ticket-count story-pass-ticket-count${_pc > 0 ? '' : ' no-ticket'}">${_pc > 999 ? '999+' : _pc}</div></div>
 		<div onexactclick="zoomInWorldMap()" class="w-100 zoom-in menu-sub-button animate-me menu-sub-button-3-3${__storyPlaying ? ' disabled gray' : ''}" data-index="4"><img src="./images/ui/menu/plus.png"></div>
 		<div onexactclick="zoomOutWorldMap()" class="w-100 zoom-out menu-sub-button animate-me menu-sub-button-3-3${__storyPlaying ? '' : ' disabled gray'}" data-index="5"><img src="./images/ui/menu/minus.png"></div>
 	</div>`;	
@@ -1810,21 +1811,21 @@ function howToGetStronger() {
 function getTopMenuTemplate(_index) {
 	return `<div class="menu-top flex w-100">
 		<div class="menu-top-item flex">
-			<span onexactclick="howToGainGold()">+</span>
+			<span class="wot-plus" onexactclick="howToGainGold()"></span>
 			<img src="./images/icons/coin.png" />
 		</div>
 		<div class="menu-top-item flex flex-jc-start" id="main-gold-count">
 			${__account.gold.formatWithDots()}
 		</div>
 		<div class="menu-top-item flex">
-			<span onexactclick="howToGainHonor()">+</span>
+			<span class="wot-plus" onexactclick="howToGainHonor()"></span>
 			<img src="./images/icons/honor.png" />
 		</div>
 		<div class="menu-top-item flex flex-jc-start" id="main-honor-count">
 			${__account.pvp.honor.formatWithDots()}
 		</div>
 		<div class="menu-top-item flex">
-			<span onexactclick="howToGainTickets()">+</span>
+			<span class="wot-plus" onexactclick="howToGainTickets()"></span>
 			<img src="./images/icons/key.png" />
 		</div>
 		<div class="menu-top-item flex" style="width:14.6% !important">
@@ -1832,14 +1833,14 @@ function getTopMenuTemplate(_index) {
 			<div class="w-50 flex flex-jc-start" id="portal-timer"></div>
 		</div>
 		<div class="menu-top-item flex" style="width:6.6% !important">
-			<img src="./images/icons/pot.png" style="max-width:100% !important" />
+			<img src="./images/ui/game/potion.png" style="max-width:100% !important" />
 		</div>
 		<div class="menu-top-item flex flex-jc-start" id="main-pot-count-menu">
 			${(__account.pots?.find(x => x.key === 'pot')?.value ?? 0).formatWithDots()}
 		</div>
 		<div class="menu-top-item flex">
 		</div>
-		<img onexactclick="hideMyMenu()" src="./images/icons/close.png" class="gray top-menu-close animate-me" />
+		<img onexactclick="hideMyMenu()" src="./images/ui/game/kapat.png" class="top-menu-close animate-me" />
 	</div>`;	
 }
 function updateMenuBottom(_order) {
@@ -2541,8 +2542,8 @@ function selectOpeningLanguage(_key) {
 }
 function askChangeLanguage() {
 	playClick();
-	let _modal = `<div class="full fade-me show-ui language-change-modal flex inventory-question settings-before-play">
-		<div class="inventory-modal flex" style="width:50vh;aspect-ratio:1/1;flex-direction:column">`
+	let _modal = `<div data-singleton-key="modal_1x1" class="full fade-me show-ui language-change-modal flex inventory-question settings-before-play">
+		<div class="inventory-modal flex">`
 			+
 			`<div style="padding:6vh 4vh 2vh 4vh" class="flex w-100">
 				<span class="question-modal-title wot-title">${getLangData('CHOOSE LANGUAGE')}</span>
@@ -2550,7 +2551,7 @@ function askChangeLanguage() {
 			<div id="opening-languages" class="flex w-50" style="padding:0 4%;flex:1">`
 				+ getOpeningLanguages() +
 			`</div>
-			<div style="padding:2vh 2vh 6vh 2vh" class="flex w-100">
+			<div class="flex w-100 language-change-action-buttons">
 				<div class="orange-action-btn flex animate-me wot-button"  onexactclick="closeInventoryQuestionModal()">${getLangData('BACK')}</div>
 				<div id="item-selection-approve-btn" class="orange-action-btn flex animate-me wot-button" onexactclick="approveSelectedLanguage()">${getLangData('OK')}</div>
 			</div>
@@ -2561,16 +2562,20 @@ function askChangeLanguage() {
 	document.getElementById('first-splash').appendChild(_div.firstChild);
 }
 function askResetKeyboardConfig() {
+	const _fs = document.getElementById('first-splash');
+	const _isActive = _fs && !hasClass(_fs, 'v-none');
 	playClick();
-	let _modal = `<div class="full fade-me show-ui flex inventory-question">
+	askSomething(getLangData('Reset to default settings'), "resetKeyboardConfig()", "modal_2x1", _isActive ? _fs : undefined);
+	return;
+	let _modal = `<div class="full fade-me show-ui flex inventory-question modal_2x1">
 		<div class="inventory-modal flex">`
 			+
 			`<div style="padding:6vh 4vh 2vh 4vh" class="flex w-100">
-				<span style="color:#F4BB44 !important;font-size:3.2vh !important">${getLangData('Reset to default settings')}?</span>
+				<span style="color:#F4BB44 !important" class="wot-title">${getLangData('Reset to default settings')}?</span>
 			</div>
 			<div style="padding:2vh 2vh 6vh 2vh" class="flex w-100">
-				<div class="game-menu-button flex animate-me" style="font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('IGNORE')}</div>
-				<div id="item-selection-approve-btn" class="game-menu-button flex animate-me" style="font-size:3vh !important" onexactclick="resetKeyboardConfig()">${getLangData('APPROVE')}</div>
+				<div class="orange-action-btn wot-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('IGNORE')}</div>
+				<div id="item-selection-approve-btn" class="orange-action-btn wot-button flex animate-me" onexactclick="resetKeyboardConfig()">${getLangData('APPROVE')}</div>
 			</div>
 		</div>
 	</div>`;
@@ -2649,6 +2654,8 @@ function getBaseKeyboardKey(_newKey) {
 		return{ title: _keyCombinations[i].title, baseKey: _keyCombinations[i].baseKey };
 }
 function getKeyboardPromo(_force) {
+	if(__switchingMap || gameopening)
+		return;
 	const _seenBefore = localStorage.getItem('keyboard-promo-skip');
 	if(_seenBefore && !_force)
 		return;
@@ -2674,8 +2681,8 @@ function getKeyboardPromo(_force) {
 	for(let i = 0; i < 11; i++) {
 		const _item = { title: _keyCombinations[i].title, baseKey: __account.keyboard?.[i] ?? _keyCombinations[i].baseKey };
 		_html += `<div class="w-100 flex" style="height:9%">
-			<div class="w-50 flex flex-jc-end" style="height:100%">${_item.title[getLang()]}</div>
-			<div class="w-50 flex flex-jc-start" style="height:100%"><input onkeydown="setBindKey(this, event)" data-key="${_item.baseKey}" onfocus="readyToBindKey(this)" onblur="tryResetBindKey(this)" class="key-combination-item" type="text" style="height:100%;aspect-ratio:5/1" value="${_item.baseKey === ' ' ? 'SPACE' : _item.baseKey}" />` 
+			<div class="w-50 flex flex-jc-end wot-subtitle" style="height:100%">${_item.title[getLang()]}</div>
+			<div class="w-50 flex flex-jc-start wot-description" style="height:100%"><input onkeydown="setBindKey(this, event)" data-key="${_item.baseKey}" onfocus="readyToBindKey(this)" onblur="tryResetBindKey(this)" class="key-combination-item" type="text" style="height:100%;aspect-ratio:5/1" value="${_item.baseKey === ' ' ? 'SPACE' : _item.baseKey}" />` 
 			+ (_keyCombinations[i].desc ?? '') +
 			`</div>
 		</div>`;
@@ -2684,10 +2691,10 @@ function getKeyboardPromo(_force) {
 	for(let i = 11; i < 21; i++) {
 		const _item = { title: _keyCombinations[i].title, baseKey: __account.keyboard?.[i] ?? _keyCombinations[i].baseKey };
 		_html += `<div class="w-100 flex" style="height:9%">
-			<div class="w-50 flex flex-jc-end wot-title" style="height:100%">` 
+			<div class="w-50 flex flex-jc-end wot-description" style="height:100%">` 
 			+ (_keyCombinations[i].desc ?? '') +
 			`<input onkeydown="setBindKey(this, event)" data-key="${_item.baseKey}" onfocus="readyToBindKey(this)" onblur="tryResetBindKey(this)" class="key-combination-item" type="text" style="height:100%;aspect-ratio:5/1" value="${_item.baseKey === ' ' ? 'SPACE' : _item.baseKey}" /></div>
-			<div class="w-50 flex flex-jc-start" style="height:100%">${_item.title[getLang()]}</div>
+			<div class="w-50 flex flex-jc-start wot-subtitle" style="height:100%">${_item.title[getLang()]}</div>
 		</div>`;
 	}
 	_desc.innerHTML = _html + '</div></div>' +
@@ -3041,16 +3048,15 @@ function openCredits(_fromMenu) {
 					${(mainCharacter?.storyScore ?? 1942881).formatWithDots()}
 				</div>
 			</div>
-			<div class="share-moment-info-buttons">
-				<div class="share-moment-card-title">
-					<div class="red-action-btn flex" onexactclick="takePhotoOfScreen(${_fromMenu ? 1 : 0})">
+			<div class="share-moment-info-buttons flex" style="padding-left:0 !important">
+				<div class="share-moment-card-title" style="width:100% !important">
+					<div class="orange-action-btn flex" onexactclick="takePhotoOfScreen(${_fromMenu ? 1 : 0})">
 						${getLangData('Capture Moment')}
 					</div>
 				</div>
-				<div class="share-moment-card-value">
+				<div class="share-moment-card-value d-none">
 					<div class="orange-action-btn flex" onexactclick="createPromoScreen(${_fromMenu ? 1 : 0})">
-						${getLangData('Learn More')}
-					</div>
+						${getLangData('Başa Döb')}
 				</div>
 			</div>
 		</div>`;
@@ -3078,7 +3084,7 @@ function openCredits(_fromMenu) {
 					${getLangData('CREDITS', __creditsLangData)}
 				</div>
 				<div class="credits-section">
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('CREATIVE DIRECTOR', __creditsLangData)}
 					</div>
 
@@ -3086,19 +3092,19 @@ function openCredits(_fromMenu) {
 						Özgün Değirmentepe
 					</div>
 					<div class="credits-role-list">
-						<div class="credits-role">
+						<div class="credits-role" lang="${getLang()}">
 							${getLangData('GAME DESIGN', __creditsLangData)}
 						</div>
-						<div class="credits-role">
+						<div class="credits-role" lang="${getLang()}">
 							${getLangData('PROGRAMMING', __creditsLangData)}
 						</div>
-						<div class="credits-role">
+						<div class="credits-role" lang="${getLang()}">
 							${getLangData('TECHNICAL DIRECTION', __creditsLangData)}
 						</div>
-						<div class="credits-role">
+						<div class="credits-role" lang="${getLang()}">
 							${getLangData('LEVEL DESIGN', __creditsLangData)}
 						</div>
-						<div class="credits-role">
+						<div class="credits-role" lang="${getLang()}">
 							${getLangData('CUSTOM ENGINE DEVELOPMENT', __creditsLangData)}
 						</div>
 					</div>
@@ -3109,7 +3115,7 @@ function openCredits(_fromMenu) {
 
 				<div class="credits-section">
 
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('ART DIRECTION & ANIMATION', __creditsLangData)}
 					</div>
 
@@ -3117,19 +3123,19 @@ function openCredits(_fromMenu) {
 						Mehmet Canpolat
 					</div>
 					<div class="credits-role-list">
-						<div class="credits-role">
+						<div class="credits-role" lang="${getLang()}">
 							${getLangData('CHARACTER DESIGN', __creditsLangData)}
 						</div>					
-						<div class="credits-role">
+						<div class="credits-role" lang="${getLang()}">
 							${getLangData('SPRITE ART', __creditsLangData)}
 						</div>				
-						<div class="credits-role">
+						<div class="credits-role" lang="${getLang()}">
 							${getLangData('CONCEPT ART', __creditsLangData)}
 						</div>
-						<div class="credits-role">
+						<div class="credits-role" lang="${getLang()}">
 							${getLangData('UI DESIGN', __creditsLangData)}
 						</div>
-						<div class="credits-role">
+						<div class="credits-role" lang="${getLang()}">
 							${getLangData('WORLDBUILDING & LORE', __creditsLangData)}
 						</div>
 					</div>
@@ -3140,13 +3146,13 @@ function openCredits(_fromMenu) {
 
 				<div class="credits-section">
 
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('INSPIRED BY', __creditsLangData)}
 					</div>
 
 					<div class="credits-name">
 						NORAD
-						<span class="credits-role">
+						<span class="credits-role" lang="${getLang()}">
 							${getLangData('WRITTEN BY', __creditsLangData)} Mehmet Canpolat
 						</span>
 					</div>
@@ -3157,7 +3163,7 @@ function openCredits(_fromMenu) {
 				
 				<div class="credits-section">
 
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('CULTUREL INSPIRATION', __creditsLangData)}
 					</div>
 
@@ -3171,7 +3177,7 @@ function openCredits(_fromMenu) {
 
 				<div class="credits-section">
 
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('STRATEGY & PUBLISHING ADVISOR', __creditsLangData)}
 					</div>
 
@@ -3179,13 +3185,13 @@ function openCredits(_fromMenu) {
 						Egemen Kağan Duman
 					</div>
 					<div class="credits-role-list">
-						<div class="credits-role">
+						<div class="credits-role" lang="${getLang()}">
 							${getLangData('MARKETING STRATEGY', __creditsLangData)}
 						</div>
-						<div class="credits-role">
+						<div class="credits-role" lang="${getLang()}">
 							${getLangData('COMMUNITY GUIDANCE', __creditsLangData)}
 						</div>
-						<div class="credits-role">
+						<div class="credits-role" lang="${getLang()}">
 							${getLangData('INVESTOR RELATIONS', __creditsLangData)}
 						</div>
 					</div>
@@ -3196,7 +3202,7 @@ function openCredits(_fromMenu) {
 
 				<div class="credits-section">
 
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('CREATIVE CONSULTING', __creditsLangData)}
 					</div>
 
@@ -3210,7 +3216,7 @@ function openCredits(_fromMenu) {
 
 				<div class="credits-section">
 
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('TRAILER PRODUCTION', __creditsLangData)}
 					</div>
 
@@ -3224,7 +3230,7 @@ function openCredits(_fromMenu) {
 
 				<div class="credits-section">
 
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('TRAILER VISUAL DESIGN', __creditsLangData)}
 					</div>
 
@@ -3237,7 +3243,7 @@ function openCredits(_fromMenu) {
 				<div class="credits-divider"></div>
 				<div class="credits-section">
 
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('SOCIAL MEDIA', __creditsLangData)}
 					</div>
 
@@ -3255,7 +3261,7 @@ function openCredits(_fromMenu) {
 
 				<div class="credits-section">
 
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('WEBSITE DEVELOPMENT', __creditsLangData)}
 					</div>
 
@@ -3269,7 +3275,7 @@ function openCredits(_fromMenu) {
 
 				<div class="credits-section">
 
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('WEBSITE VISUAL DESIGN', __creditsLangData)}
 					</div>
 
@@ -3283,7 +3289,7 @@ function openCredits(_fromMenu) {
 
 				<div class="credits-section">
 
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('MAP ASSETS', __creditsLangData)}
 					</div>
 
@@ -3297,13 +3303,13 @@ function openCredits(_fromMenu) {
 
 				<div class="credits-section">
 
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('UI ELEMENTS', __creditsLangData)}
 					</div>
 
 					<div class="credits-name">
 						Rexard
-						<span class="credits-role">
+						<span class="credits-role" lang="${getLang()}">
 							${getLangData('Assets from GameDevMarket', __creditsLangData)}
 						</span>
 					</div>
@@ -3314,7 +3320,7 @@ function openCredits(_fromMenu) {
 
 				<div class="credits-section">
 
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('AI VOICE TECHNOLOGY', __creditsLangData)}
 					</div>
 
@@ -3327,7 +3333,7 @@ function openCredits(_fromMenu) {
 				<div class="credits-divider"></div>
 
 				<div class="credits-section">
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('AI MUSIC GENERATION', __creditsLangData)}
 					</div>
 					<div class="credits-name">
@@ -3338,7 +3344,7 @@ function openCredits(_fromMenu) {
 				<div class="credits-divider"></div>
 
 				<div class="credits-section">
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('SOUND EFFECTS', __creditsLangData)}
 					</div>
 					<div class="credits-name">
@@ -3353,7 +3359,7 @@ function openCredits(_fromMenu) {
 
 				<div class="credits-section">
 
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('QA TESTERS', __creditsLangData)}
 					</div>
 
@@ -3403,7 +3409,7 @@ function openCredits(_fromMenu) {
 				<!-- SPECIAL THANKS -->
 
 				<div class="credits-section">
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('SPECIAL THANKS', __creditsLangData)}
 					</div>
 					<div class="credits-name">
@@ -3420,7 +3426,7 @@ function openCredits(_fromMenu) {
 					</div>
 				</div>
 				<div class="credits-section">
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('FOR FOLLOW & SUPPORT', __creditsLangData)}
 					</div>
 					<div class="credits-name">
@@ -3441,7 +3447,7 @@ function openCredits(_fromMenu) {
 
 				<div class="credits-section${_fromMenu ? ' d-none' : ''}">
 
-					<div class="credits-subtitle">
+					<div class="credits-subtitle" lang="${getLang()}">
 						${getLangData('Thanks for playing', __creditsLangData)}...
 					</div>
 				</div>
@@ -3462,7 +3468,7 @@ function openCredits(_fromMenu) {
 			else
 				closeCredits(_fromMenu);
 		}
-		_back.innerHTML = '<img class="right-to-left" src="./images/icons/nav.png" />';
+		_back.innerHTML = '<img src="./images/ui/game/back.png" />';
 		_scr.appendChild(_wrapper);
 		// if(!_fromMenu)
 		// 	_scr.appendChild(_share);
@@ -3482,23 +3488,26 @@ function installOpeningScreen(_instant, _lateOpening) {
 	var _opening = document.getElementById('first-splash');
 	if(_opening)
 		_opening.innerHTML = `<canvas id="particles"></canvas>
-				<div onexactclick="getKeyboardPromo(1)" class="opening-controls-icon flex flex-jc-start${__isPC ? '' : ' d-none'}">
+				<div onexactclick="getKeyboardPromo(1)" class="d-none opening-controls-icon flex${__isPC ? '' : ' d-none'}">
 				<img src="./images/icons/controls.png" />
 			</div>
-			<div onexactclick="askChangeLanguage()" class="opening-lang-icon flex flex-jc-end">
+			<div onexactclick="askChangeLanguage()" lang="${getLang()}" class="opening-lang-icon flex flex-jc-end">
 				<img src="./images/icons/lang.png" /><span>${getLang().toUpperCase()}</span>
 			</div>
 			<div class="game-title-text">
-				<img src="./images/icons/text.png" />
+				<img src="./images/ui/game/logo3.png" />
 			</div>
-			<div class="game-opening-screen-menu">
-				<div class="game-opening-screen-menu-item wot-title" onexactclick="tryOpenGame()">
+			<div id="game-opening-screen-menu" class="game-opening-screen-menu">
+				<div lang="${getLang()}" class="game-opening-screen-menu-item wot-menu-btn flex" onexactclick="tryOpenGame()">
 					${getLangData('NEW GAME', __openingScreenLangData)}
 				</div>
-				<div class="game-opening-screen-menu-item wot-title" onexactclick="openCredits(1)">
+				<div lang="${getLang()}" class="game-opening-screen-menu-item wot-menu-btn flex" onexactclick="openCredits(1)">
 					${getLangData('CREDITS', __openingScreenLangData)}
 				</div>
-				<div class="game-opening-screen-menu-item wot-title" onexactclick="quitGame()">
+				<div lang="${getLang()}" class="game-opening-screen-menu-item wot-menu-btn flex" onexactclick="getKeyboardPromo(1)">
+					${getLangData('CONTROLS', __openingScreenLangData)}
+				</div>
+				<div lang="${getLang()}" class="game-opening-screen-menu-item wot-menu-btn flex" onexactclick="quitGame()">
 					${getLangData('QUIT', __openingScreenLangData)}
 				</div>
 			</div>
@@ -3526,7 +3535,7 @@ function installOpeningScreen(_instant, _lateOpening) {
 					<div class="flex" id="assets-progressbar-inner">
 					</div>
 				</div>
-				<div class="flex" id="assets-progress"></div>
+				<div class="flex wot-title" id="assets-progress"></div>
 				<div class="volume-panel">
 					<div class="volume-title">
 						<img src="./images/icons/volume.png" />
@@ -3584,7 +3593,7 @@ function installOpeningScreen(_instant, _lateOpening) {
 			// _opening.style.backgroundPosition = 'center, center';
 			const _cover = document.createElement('div');
 			_cover.className = 'opening-cover';
-			_cover.innerHTML = '<img src="./images/loading/001.gif" />';
+			_cover.innerHTML = '<img src="./images/ui/game/intro.gif" />';
 			_opening.appendChild(_cover)
 			addClass(_opening, 'fade-start');
 			if(!_instant)
@@ -3607,7 +3616,7 @@ function installOpeningScreen(_instant, _lateOpening) {
 		else
 			renderOpeningUI();
 	}
-	_img.src = './images/loading/001.gif';
+	_img.src = './images/ui/game/intro.gif';
 	// if(__isPC && !_lateOpening && !_instant)
 	// 	setTimeout(() => {
 	// 		getKeyboardPromo();

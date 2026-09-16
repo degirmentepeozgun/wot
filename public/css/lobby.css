@@ -197,21 +197,6 @@
     font-size: 5vh !important;
     color: #f3f4f5cc !important
 }
-.menu-icon-wrapper {
-    height:80%;
-    cursor: pointer;
-}
-.menu-icon-wrapper img {
-    opacity: .85;
-}
-.menu-icon {
-    height: 80%;
-    aspect-ratio: 1/1;
-}
-.menu-icon img {
-   height: 100% !important
-}
-
 .menu-left-opener {
 	width:40%;
 	left:0;

@@ -38152,7 +38152,7 @@ const _allEnemies = {
 							spriteWidth: 568,
 							spriteHeight: 391,
 							spriteOrigin: 219,
-							speed: 10,
+							speed: 6,
 							def: {
 								iframe: true
 							}

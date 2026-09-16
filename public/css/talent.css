@@ -40,15 +40,18 @@
 	padding: 0 3%;
 	margin: 0 1.5%;
 	width:97%;
-	border-bottom: 1px solid #f3f4f540;
+	border-bottom: 1px solid #412817;
 }
 .talent-tree-top span,
 .talent-tree-top .flex-jc-start {
 	color:#f3f4f5ab !important;
-	font-size: 2.8vh !important;
 }
-.talent-tree-top .btn-reset {
-	font-size: 2.8vh !important;
+.talent-tree-top, .talent-tree-top * {
+	font-family: "Grenze", serif !important;
+    font-size: calc(var(--wot-font-base) * 1.35) !important;
+}
+.talent-tree-top .page-detail-button {
+	color:#b68d49 !important
 }
 .talent-tree-middle {
 	height: 92%;
@@ -112,12 +115,17 @@
 }
 .talent-level{
 	padding:2% 7% 0 7%;
+    font-family: "Grenze", serif !important;
+    font-size: calc(var(--wot-font-base) * 1.5) !important;
 	color:#f3f4f5cc !important
+}
+.talent-desc .page-detail-splitter {
+	margin-top:1%
 }
 .talent-props-header {
 	color:#F4BB44cc !important;
 	opacity: .9;
-	padding-top:2.5%
+	padding:1% 2% 0 2% !important
 }
 .talent-props-next-level .talent-props-header {
 	opacity: 1;
@@ -141,8 +149,7 @@
 	color:#f3f4f599 !important
 }
 .talent-info .artifact-detail-header {
-	padding: 0 !important;
-	padding-top:2.5% !important
+	padding: 2.5% 2% 0 2% !important;
 }
 .talent-props-next-level {
 	padding-top:2.5%
@@ -153,13 +160,7 @@
 .talent-level:has(.already-maxed:not(.d-none)) {
 	color:#f3f4f5 !important
 }
-.talent-info .artifact-detail-header-icon {
-	overflow: hidden;
-	background:url(./../images/ui/square7.png) !important;
-	background-size:contain !important;
-	background-repeat: no-repeat !important;
-	padding:1.5% !important
-}
+
 .talent-info .artifact-detail-header-icon .full {
 	position: relative;
 }
@@ -171,8 +172,4 @@
 	top: 0;
 	width: 100%;
  	content: '';
-}
-.talent-buttons {
-	border-top: 1px solid #9d987f20;
-    box-shadow: 0 -1vh 2vh #00000040
 }

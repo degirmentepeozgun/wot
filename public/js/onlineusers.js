@@ -20,13 +20,13 @@ function onlineusers() {
 		let _content = showMenuTutorial(this.tutorial, this.key);
 		if(_content === '')
 			_content = `<div class="flex full">
-							<div class="flex game-btn2 animate-me" onexactclick="getRef('onlineusers')?.refresh()">${getLangData('REFRESH')}</div>
+							<div class="flex online-players-refresh orange-action-btn animate-me" onexactclick="getRef('onlineusers')?.refresh()">${getLangData('REFRESH')}</div>
 						</div>`
 		_container.innerHTML = 
 					'<div data-module="onlineusers" class="menu-ui-left fade-me">' +
 						'<div class="menu-modal-left menu-modal-left-content w-100">' +
 							'<div class="skills-content-left fragments-content-left menu-modal-left-container">' +
-								'<div id="online-users-list" style="padding:1% 5%;overflow-y:auto" class="full">' +
+								'<div id="online-users-list" style="overflow-y:auto" class="full">' +
 									this.getOnlineUsers() +
 								'</div>' +
 							'</div>' +
@@ -90,7 +90,7 @@ function onlineusers() {
 					break;
 			}
 			if(_html === '')
-				_html = `<div class="full flex" style="color:#f3f4f580 !important;font-size:3vh !important">${getLangData('No players online')}</div>`;
+				_html = `<div class="full flex wot-subtitle" style="color:#f3f4f580 !important">${getLangData('No players online')}</div>`;
 			const _cont = document.getElementById('online-users-list');
 			if(_cont)
 				_cont.innerHTML = _html;

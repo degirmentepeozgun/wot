@@ -15,12 +15,19 @@
     padding-top:4%
 }
 .mailbox-desc {
-    padding:6% 8%;
+    padding:10% 4% 6% 4%;
     max-height: 100%;
     overflow-y: auto;
 }
+.mailbox-desc * {
+	font-family: 'Grenze', serif !important;
+    font-size: calc(var(--wot-font-base) * 1.25) !important;
+}
+.mailbox-desc .mailbox-owner {
+	font-family: 'Grenze', serif !important;
+    font-size: calc(var(--wot-font-base) * 1.15) !important;
+}
 .mailbox-desc-text {
-    font-size: 3vh !important;
     text-indent: 7.5%;
 }
 .mailbox-owner {
