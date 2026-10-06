@@ -666,6 +666,7 @@ const __stories = [
 		},
 		boss: "king",
 		minLevel: 1,
+		//startScene: 1,
 		scenes: [
 			{
 				map: 105,
@@ -1036,7 +1037,7 @@ const __stories = [
 											owner: mainCharacter.key,
 											text: "Damn! Machine in my head!",
 											onend: function() {
-												__storyTell = new story(6, null, null, 'Meanwhile, the quakes created by the monster caused a prisoner in dungeon to be freed from his chains', function() {
+												__storyTell = new storyTell(6, null, null, 'Meanwhile, the quakes created by the monster caused a prisoner in dungeon to be freed from his chains', function() {
 													//installStoryFinish();
 													switchStoryScene();
 												});
@@ -1551,7 +1552,7 @@ const __stories = [
 								x.remove = true;
 							});
 							setTimeout(() => {
-								__storyTell = new story(1, null, null, 'Two prisoners waiting for death in the dungeon managed to escape among these ruins', function() {
+								__storyTell = new storyTell(1, null, null, 'Two prisoners waiting for death in the dungeon managed to escape among these ruins', function() {
 									//installStoryFinish();
 									switchStoryScene();
 								});
@@ -1838,7 +1839,7 @@ const __stories = [
 						do: function() {
 							delete episode.phase;
 							episode.removeLocationHand();
-							__storyTell = new story(2, null, null, 
+							__storyTell = new storyTell(2, null, null, 
 							'Our heroes take shelter in a camp, unaware that they are being followed',
 							function() {
 								switchStoryScene();
@@ -2571,7 +2572,7 @@ const __stories = [
 	// 					do: function() {
 	// 						delete episode.phase;
 	// 						episode.removeLocationHand();
-	// 						__storyTell = new story(2, function() {
+	// 						__storyTell = new storyTell(2, function() {
 	// 							switchStoryScene();
 	// 						}, null, 'Our heroes take shelter in a camp, unaware that they are being followed');
 	// 					}
@@ -3867,7 +3868,7 @@ const __stories = [
 				maps: [36],
 				complete: function() {
 					setTimeout(() => {
-						__storyTell = new story(4, null, null, 'Everything needed for the potion recipe was ready. Our heroes hoped it would work', function() {
+						__storyTell = new storyTell(4, null, null, 'Everything needed for the potion recipe was ready. Our heroes hoped it would work', function() {
 							installStoryFinish();
 						});
 					}, 100);
@@ -4242,7 +4243,7 @@ const __stories = [
 								_finishes++;
 								if(_finishes === _l) {
 									stopWeather();
-									__storyTell = new story(7, null, null, 'As the enemy approached, villagers fled with their carts, leaving behind a silent hero carrying only a small handmade toy', function() {
+									__storyTell = new storyTell(7, null, null, 'As the enemy approached, villagers fled with their carts, leaving behind a silent hero carrying only a small handmade toy', function() {
 										installStoryFinish();
 									});
 									// cssAnimations.black(null, 3000, getLangData('Village people move to a safe place'), function() {
@@ -5813,7 +5814,7 @@ const __stories = [
 							ms: 10200
 						}
 					], 11500, function() {
-						__storyTell = new story(5, function() {
+						__storyTell = new storyTell(5, function() {
 							const _var = structuredClone2({
 								level: mainCharacter.level,
 								experience: mainCharacter.experience,
@@ -6999,7 +7000,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		startScene: 2,
+		//startScene: 2,
 		scenes: [
 			{
 				when: function() {
@@ -7192,7 +7193,7 @@ const __stories = [
 						</div>`;
 						_gameUI.appendChild(_div);
 						const _skip = document.createElement('div');
-						_skip.className = 'wot-button flex show-ui tutorial-skip fade-me red-action-btn';
+						_skip.className = 'wot-button flex show-ui tutorial-skip fade-me orange-action-btn';
 						_skip.innerHTML = getLangData('Skip Tutorial');
 						_skip.lang = getLang();
 						_skip.onexactclick = function() {
@@ -7328,7 +7329,7 @@ const __stories = [
 								_kb.frames.forEach(f => {
 									if(f.extraStepXRate) {
 										f.oldExtraStepXRate = f.extraStepXRate;
-										f.extraStepXRate *= 1.33;
+										f.extraStepXRate *= 1.1;
 									}
 								});
 								episode.boss.animations.ground1.disabled = true;
@@ -7649,6 +7650,7 @@ const __stories = [
 								delete _game.suspended;
 								delete mainCharacter.disableKeyboard;
 								mainCharacter.still = mainCharacter.immobilize = false;
+								mainCharacter.speedRate *= 1.5;
 								mainCharacter.animate('air1', 1);
 								mainCharacter.disableKeyboard = true;
 								blurKeyboard();
@@ -8541,7 +8543,10 @@ const __stories = [
 					mainCharacter.setHealth(mainCharacter.health);
 					// setTimeout(function() {
 					// 	__storyPlaying = false;
-					// 	installStoryFinish();
+					// 	__storyTell = new storyTell(7, null, null, 'Meanwhile, the quakes created by the monster caused a prisoner in dungeon to be freed from his chains', function() {
+					// 		//installStoryFinish();
+					// 		//switchStoryScene();
+					// 	});
 					// }, 4000);
 				},
 				actions: [
@@ -9435,8 +9440,8 @@ const __stories = [
 						maxX: 2580,
 						count: 1,
 						sight: 1000,
-						//grade: 12,
-						hp:165,//0,
+						grade: 12,
+						hp:1650,
 						zoom: .33,
 						experience: 0,
 						do: function(_e) {
@@ -9463,46 +9468,46 @@ const __stories = [
 							return MathRound(groundheight * .5);
 						}
 					},
-					// {
-					// 	id: 35,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 1,
-					// 	sight: 1000,
-					// 	spawn: 10,
-					// 	hp:300,
-					// 	experience: 0
-					// },
-					// {
-					// 	id: 7,
-					// 	minX: 2000,
-					// 	maxX: 3200,
-					// 	count: 2,
-					// 	sight: 1000,
-					// 	spawn: 10,
-					// 	hp:300,
-					// 	experience: 0
-					// },
-					// {
-					// 	id: 2,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 2,
-					// 	sight: 1000,
-					// 	spawn: 10,
-					// 	hp:300,
-					// 	experience: 0
-					// },
-					// {
-					// 	id: 33,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 1,
-					// 	sight: 1000,
-					// 	spawn: 10,
-					// 	hp:300,
-					// 	experience: 0
-					// }
+					{
+						id: 35,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						sight: 1000,
+						spawn: 10,
+						hp:300,
+						experience: 0
+					},
+					{
+						id: 7,
+						minX: 2000,
+						maxX: 3200,
+						count: 2,
+						sight: 1000,
+						spawn: 10,
+						hp:300,
+						experience: 0
+					},
+					{
+						id: 2,
+						minX: 1580,
+						maxX: 4800,
+						count: 2,
+						sight: 1000,
+						spawn: 10,
+						hp:300,
+						experience: 0
+					},
+					{
+						id: 33,
+						minX: 1580,
+						maxX: 4800,
+						count: 1,
+						sight: 1000,
+						spawn: 10,
+						hp:300,
+						experience: 0
+					}
 				]
 			},
 			{
@@ -10298,7 +10303,7 @@ function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 			func:_func,
 			first:_isFirstStart
 		};
-    	askSomething(`<div class="w-100 flex" style="padding-top:2vh;color:#f3f4f5cc"><span>${getLangData('Minium adviced level is')}:&nbsp;<b>${_s.minLevel}</b></span></div><div class="w-100 flex p-2" style="color:#ff6c00">${'It might be hard for you'}</div><div style="color:#f3f4f5cc" class="w-100 flex">${getLangData('Continue Anyway')}?</div>`, `continueStoryAnyway()`, 1);
+    	askSomething(`<div class="w-100 flex" style="padding-top:2vh;color:#f3f4f5cc"><span>${getLangData('Minium adviced level is')}:&nbsp;<b>${_s.minLevel}</b></span></div><div class="w-100 flex p-2" style="color:#ff6c00">${'It might be hard for you'}</div><div style="color:#f3f4f5cc" class="w-100 flex">${getLangData('Continue Anyway')}?</div>`, `continueStoryAnyway()`, 'modal_2x1');
 		return;
 	}
 	hideMyMenu();
@@ -10607,7 +10612,7 @@ function story(_id, _func, _noBlack, _desc, _after) {
 			if(__account.storyTell.indexOf(this.id) === -1) {
 				__account.storyTell.push(this.id);
 				this.firstSeen = 1;
-				_skp.innerHTML = `<div onexactclick="__storyTell.skip()" class="flex flex-jc-end w-50" style="height:100%"><div class="story-skip-inner flex">${getLangData('SKIP')}&gt;</div></div>`;
+				_skp.innerHTML = `<div onexactclick="__storyTell.skip()" class="flex flex-jc-end w-50" style="height:100%"><div class="story-skip-inner flex wot-title">${getLangData('SKIP')}</div></div>`;
 			}
 		}
 		_wrapper.appendChild(_skp);
@@ -10687,10 +10692,151 @@ function story(_id, _func, _noBlack, _desc, _after) {
 	this.start = _gameTick;
 	this.init();
 }
-
-function storyBonus(_func, _instant) {
+function storyTell(_id, _func, _noBlack, _desc, _after) {
+	this.data = {
+		st1: [
+			{ text: '', ms: 0, w: '37%' },
+			{ text: 'SPLASH!', ms: 600, marginLeft:'2%', class: 'talk', order: 3, w: '34.5%', position: 'top center' },
+			{ text: '', ms: 1200, imgSize: '117%', order: 4, marginLeft:'2%', w: '31%', position: 'top center' },
+			{ finish: 1, ms: 5000 }
+		],
+		st2: [
+			{ text: '', ms: 0, w: '40%', position: 'center left' },
+			{ text: {
+				en:'Over there!',
+				tr: 'İşte orada!'
+			}, ms: 600, marginLeft:'2%', class: 'talk', order: 3, w: '34.5%', position: 'top center' },
+			{ text: '', ms: 1200, imgSize: '125%', order: 4, marginLeft:'2%', w: '28%', position: 'top center' },
+			{ finish: 1, ms: 5000 }
+		],
+		st3: [
+			{ text: 'MEANWHILE...', ms: 0, class: 'desc', w: '26%' },
+			{ text: 'CLUNK!', ms: 350, class: 'desc-vert',  w: '19.5%' },
+			{ text: 'WHAT?', ms: 700, class: 'talk', w: '39%' },
+			{ finish: 1, ms: 4000 }
+		],
+		st4: [
+			{ text: '', ms: 0, w: '36%', position: 'bottom center' },
+			{ text: '', ms: 600, order: 3, w: '40%', position: 'top right' },
+			{ text: '', ms: 1200, imgSize: '117%', order: 4, w: '30.5%' },
+			{ finish: 1, ms: 5000 }
+		],
+		st5: [
+			{ text: '', ms: 0, w: '44%', position: 'top center' },
+			{ text: '', ms: 600, order: 35, w: '34.5%', position: 'center left' },
+			{ text: '', ms: 1200, order: 4, w: '28%', position: 'top center' },
+			{ finish: 1, ms: 5000 }
+		],
+		st6: [
+			{ text: '', ms: 0, w: '44%', position: 'top center' },
+			{ text: '', ms: 600, order: 35, w: '34.5%', position: 'top center' },
+			{ text: '', ms: 1200, imgSize: '125%', order: 4, marginLeft:'2%', w: '28%', position: 'center center' },
+			{ finish: 1, ms: 5000 }
+		],
+		st7: [
+			{ text: '', ms: 0, w: '41%', position: 'bottom center' },
+			{ text: '', ms: 600, order: 35, w: '34.5%', position: 'center center' },
+			{ text: '', ms: 1200, imgSize: '120%', order: 4, w: '31%', position: 'bottom right' },
+			{ finish: 1, ms: 5000 }
+		]
+	}
+	this.id = _id;
+	this.order = 1;
 	const _s = this;
-	if(!_instant && episode.cardFlipped) {
+	this.skip = function() {
+		playClick();
+		delete this.firstSeen;
+		this.skipped = 1;
+		this.order = this.data['st' + this.id].length;
+		this.render(this.order);
+		// if(_after)
+		// 	_after();
+	}
+	this.init = function() {
+		if(mainCharacter)
+			mainCharacter.animate('idle', 1);
+		blurKeyboard();
+		const _wrapper = document.createElement('div');
+		_wrapper.className = 'story-wrapper fade-in' + (_desc ? ' story-with-description' : '');
+		const _skp = document.createElement('div');
+		_skp.className = 'story-skip w-100 flex flex-jc-end';
+		if(!_noBlack){
+			if(!__account.storyTell)
+				__account.storyTell = [];
+			if(__account.storyTell.indexOf(this.id) === -1) {
+				__account.storyTell.push(this.id);
+				this.firstSeen = 1;
+				_skp.innerHTML = `<div onexactclick="__storyTell.skip()" class="flex flex-jc-end w-50" style="height:100%"><div class="story-skip-inner flex wot-title">${getLangData('SKIP')}</div></div>`;
+			}
+		}
+		_wrapper.appendChild(_skp);
+		const _sin = document.createElement('div');
+		_sin.className = 'full story-inner flex story-inner' + this.id;
+		const _inner = document.createElement('div');
+		_inner.style.width = 'calc(36vh * ' + (this.data['st' + this.id].filter(x => !x.finish).length) + ')';
+		_inner.className = 'inner-wrapper flex flex-jc-start';
+		_wrapper.appendChild(_sin);
+		if(_desc)
+		{
+			const _descDiv = document.createElement('div');
+			_descDiv.className = 'story-inner-description flex';
+			_descDiv.innerHTML = getLangData(_desc);
+			_wrapper.appendChild(_descDiv);
+		}
+		_sin.appendChild(_inner);
+		const _wp = document.getElementById('wrapper');
+		(_wp ?? document.body).appendChild(_wrapper);
+		this.container = _inner;
+		this.wrapper = _wrapper;
+		if(!_noBlack)
+			cssAnimations.black(null, (this.data['st' + this.id].find(x => x.finish).ms - 400) , '', _func);
+	}
+	this.render = function(_realOrder) {
+		const i = _realOrder ?? this.order;
+		if(i > _s.data.length)
+			return;
+		const item = _s.data['st' + this.id][i - 1];
+		if(!item)
+			return;
+		if(this.skipped || ((_gameTick - this.start) > item?.ms))
+		{
+			if(this.order === 1) {
+				PlaySound({key:'story', volume: .5});
+			}
+			if(!item.finish) {
+				const _box = document.createElement('div');
+				if(item.marginLeft)
+					_box.style.left = item.marginLeft;
+				_box.className = 'story-box story-box' + i;
+				_box.innerHTML = `<img src="./images/story/s${this.id}-${i}.png" />`;
+				this.container.appendChild(_box);
+			}
+			else {
+				if(this.firstSeen)
+					return;
+				removeClass(this.wrapper, 'fade-in');
+				addClass(this.wrapper, 'fade-out');
+				this.closing = 1;
+				if(_after)
+					_after();
+				this.wrapper.onanimationend = function(event) {
+					if(event.animationName === 'fade-out-me'){
+						this.remove();
+						__storyTell = undefined;
+						if(_noBlack && _func)
+							_func();
+					}
+				}
+			}
+			this.order++;
+		}
+	}
+	this.start = _gameTick;
+	this.init();
+}
+function storyBonus(_func, _instant, _container) {
+	const _s = this;
+	if(!_instant && !_container && episode.cardFlipped) {
 		if(_func)
 			_func();
 		return;
@@ -10721,12 +10867,13 @@ function storyBonus(_func, _instant) {
 			if(_func)
 				_func();
 		};
-		_btnW.appendChild(_btn);
+		if(!_container)
+			_btnW.appendChild(_btn);
 		_wrapper.appendChild(_title);
 		_wrapper.appendChild(_sin);
 		_wrapper.appendChild(_btnW);
 		_sin.appendChild(_inner);
-		document.body.appendChild(_wrapper);
+		(_container ?? document.body).appendChild(_wrapper);
 		this.container = _inner;
 		this.wrapper = _wrapper;
 		this.btn = _btn;
@@ -10749,7 +10896,8 @@ function storyBonus(_func, _instant) {
 		for (var i = 0; i < 4; i++) {
 			let _iconPath;
 			if(_possibilities[i] === 'item'){
-				const _item = __story.rewards.find(x => x.key === 'item');
+				const _item = __story?.rewards ? __story.rewards.find(x => x.key === 'item') : 
+					getRandomItem(1, null, mainCharacter.class);
 				_iconPath = './images/items/icons/' +
 				(_item.type === 'weapon' ? mainCharacter.class + '/' : '')
 				+ _item.type + (_item.grade ?? 1) + '.png';
@@ -10773,7 +10921,7 @@ function storyBonus(_func, _instant) {
 			_front.className = 'card-front flex match-item';
 			_back.className = 'card-back flex match-item';
 			_wrapper.className = 'match-card flex glow-jump';
-			_img.src = './images/icons/story-gift-card.png';
+			_img.src = './images/ui/game/card-back-light.png';
 			_title.className = 'bonus-title full flex';
 			_title.innerHTML = '&nbsp;';
 			_s.container.appendChild(_item);
@@ -10784,8 +10932,8 @@ function storyBonus(_func, _instant) {
 				const _dk = this.getAttribute('data-key');
 				let _cardTitle;
 				if(_dk === 'item'){
-					const r = __story.rewards.find(x => x.key === 'item');
-					_cardTitle = '';
+					const r = __story?.rewards ? __story.rewards.find(x => x.key === 'item') : getRandomItem(1,null,mainCharacter.class);
+					_cardTitle = 'x1';
 					warnChestReward(getChestReward(r.grade ?? 1, 'item', { key: r.type }));
 				}
 				else{
@@ -11058,7 +11206,7 @@ function killStory() {
 	quitFromStory();
 }
 function askQuitFromStory() {
-	askSomething(getLangData('Proceed To Lobby'), "quitFromStory()");
+	askSomething(getLangData('Proceed To Lobby'), "quitFromStory()", 'modal_2x1');
 }
 function quitFromStory() {
 	if(!episode?.menu && __account.storyResults.find(x => x.id === 1)?.stars?.[0]) {
@@ -11340,9 +11488,9 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 		<div class="flex flex-jc-start story-detail-heading page-detail-header">${getLangData('Description')}</div>
 		<div class="page-detail-splitter-thin"></div>
 		<div class="story-description page-detail-desc">${_s.description[getLang()]}</div>
-		<div class="page-detail-splitter"></div>
+		<div class="page-detail-splitter${_hasBonusAch ? '' : ' d-none'}"></div>
 		<div class="flex flex-jc-start story-detail-heading page-detail-header${_hasBonusAch ? '' : ' d-none'}">${getLangData('Bonus Achievements')}</div>
-		<div class="page-detail-splitter-thin"></div>
+		<div class="page-detail-splitter-thin${_hasBonusAch ? '' : ' d-none'}"></div>
 		<div class="story-description${_hasBonusAch ? '' : ' d-none'}">` + _bonusAchHTML + `</div>
 		</div>
 		<div class="w-100 flex action-button-container">
@@ -11432,7 +11580,7 @@ function getStoryRewardsResultHtml(_story, _bonus, _pass, _looseGain, _isRealPla
 				getChestReward(r.grade, 'item', { key: r.type });
 			updateGlobalQuest('loot-item', _count);
 			_rewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 50%${episode.itemSelected ? ';color:#F4BB44 !important' : ''}">
-				<span class="story-reward-item grade${r.grade}-item" style="display:inline-block;position:relative">
+				<span class="auto-pass-result-item-icon-wrapper story-reward-item grade${r.grade}-item" style="display:inline-block;position:relative">
 					<img class="item-img" src="./images/items/icons/${r.type === 'weapon' ? mainCharacter.class + '/' : ''}${r.type}${r.grade}.png" />
 				</span> x ${_count}
 			</div>`;
@@ -11442,14 +11590,18 @@ function getStoryRewardsResultHtml(_story, _bonus, _pass, _looseGain, _isRealPla
 			const _name = episode.chosenFragment ?? _names[getRandomValue2(0, _names.length - 1)];
 			updateFragment(_name, _count);
 			_rewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 50%">
-				<img style="filter:drop-shadow(0 0 1px #f3f4f5);height: 70%;margin-right: 5%;" src="./images/fragments/${_name}.png"> x ${_count}
+				<span class="auto-pass-result-item-icon-wrapper">
+				<img style="filter:drop-shadow(0 0 1px #f3f4f5);height: 70%;margin-right: 5%;" src="./images/fragments/${_name}.png">
+				</span> x ${_count}
 			</div>`;
 		}
 		else if(r.key === 'gem'){
 			const _gem = updateGem(r.type, r.grade, _count);
 			_rewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 50%">
-				<img style="filter:drop-shadow(0 0 1px #f3f4f5);height: 70%;margin-right: 5%;" src="./images/gems/${_gem.type}${_gem.grade}.png"> x ${_count}
-			</div>`;
+				<span class="auto-pass-result-item-icon-wrapper">
+				<img style="filter:drop-shadow(0 0 1px #f3f4f5);height: 70%;margin-right: 5%;" src="./images/gems/${_gem.type}${_gem.grade}.png">
+				</span> x ${_count}
+				</div>`;
 		}
 		else if(r.key === 'misc'){
 			const _misc = misc.find(x => x.type === r.type);
@@ -11459,16 +11611,20 @@ function getStoryRewardsResultHtml(_story, _bonus, _pass, _looseGain, _isRealPla
 			else
 				updateMisc({ type: _misc.type, count: _val });
 			_rewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 50%">
-				<img style="filter:drop-shadow(0 0 1px #f3f4f5);height: 70%;margin-right: 5%;" src="./images/icons/${r.type}.png"> x ${_count}
-			</div>`;
+				<span class="auto-pass-result-item-icon-wrapper">
+				<img style="filter:drop-shadow(0 0 1px #f3f4f5);height: 70%;margin-right: 5%;" src="./images/icons/${r.type}.png">
+				</span> x ${_count}
+				</div>`;
 		}
 		else if(r.key === 'gold'){
 			updateGold(_count);
 			if(_bonus?.type === 'gold')
 				_count += _bonus.count;
 			_rewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 50%${episode.goldSelected ? ';color:#F4BB44 !important' : ''}">
-				<img style="height: 70%;margin-right: 5%;" src="./images/icons/coin.png"> x ${_count.formatWithDots()}
-			</div>`;
+				<span class="auto-pass-result-item-icon-wrapper">
+				<img style="height: 70%;margin-right: 5%;" src="./images/icons/coin.png">
+				</span> x ${_count.formatWithDots()}
+				</div>`;
 		}
 		else if(r.key === 'exp'){
 			const _oldLevel = mainCharacter.level;
@@ -11480,14 +11636,18 @@ function getStoryRewardsResultHtml(_story, _bonus, _pass, _looseGain, _isRealPla
 			if(_bonus?.type === 'exp')
 				_count += _bonus.count;
 			_rewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 50%${episode.expSelected ? ';color:#F4BB44 !important' : ''}">
-				<img style="height: 70%;margin-right: 5%;" src="./images/icons/exp.png"><div><div class="w-100">&nbsp;x&nbsp;${_count.formatWithDots()}</div>` + _lastLevelStatus + `</div>
-			</div>`;
+				<span class="auto-pass-result-item-icon-wrapper">
+				<img style="height: 70%;margin-right: 5%;" src="./images/icons/exp.png">
+				</span><div><div class="w-100">&nbsp;x&nbsp;${_count.formatWithDots()}</div>` + _lastLevelStatus + `</div>
+				</div>`;
 		}
 		else if(r.key === 'honor'){
 			__account.pvp.honor += _count;
 			_rewardsHtml += `<div class="w-100 flex flex-jc-start" style="padding: 1%; height: 50%">
-				<img style="height: 80%;margin-right: 5%;" src="./images/icons/honor.png"><div><div class="w-100">&nbsp;x&nbsp;${_count.formatWithDots()}&nbsp;${r.title ?? ''}</div></div>
-			</div>`;
+				<span class="auto-pass-result-item-icon-wrapper">
+				<img style="height: 80%;margin-right: 5%;" src="./images/icons/honor.png">
+				</span><div><div class="w-100">&nbsp;x&nbsp;${_count.formatWithDots()}&nbsp;${r.title ?? ''}</div></div>
+				</div>`;
 		}
 	}
 	return _rewardsHtml;
@@ -11573,22 +11733,31 @@ function tryConsumeTickets(_goldSelected, _expSelected, _itemSelected, _portal) 
 function askPassStory(_itemSelected, _goldSelected, _expSelected) {
     playClick();
     const _limit = __account.misc.find(x => x.type === 'ticket-pass')?.count ?? 0;
-    let _modal = `<div class="full fade-me flex inventory-question inventory-question-add-slot">
+    let _modal = `<div class="full fade-me flex inventory-question inventory-question-redeem-pass-ticket inventory-question-add-slot">
         <div class="inventory-modal">
-            <div style="padding:6vh 4vh 4vh 4vh" class="flex">
-                <span style="color:#f3f4f5cc !important;font-size:3vh !important">${getLangData('Auto-Pass Story Mission')}</span>
+            <div class="flex inventory-modal-title">
+                ${getLangData('Auto-Pass Story Mission')}
             </div>
-            <div class="flex" style="padding:2vh">
-                <span class="flex story-pass-info-container">
-                    <div id="decrease-pass-btn" class="game-menu-button flex animate-me disabled" style="margin:0 1vh;cursor:pointer;color:#F4BB44;font-size:3vh !important" onexactclick="decreasePassAmount()">-</div>
-                    &nbsp;<span id="pass-amount" style="font-size:3vh !important;color:#f3f4f5 !important">1</span>&nbsp;/&nbsp;${_limit}&nbsp;
-                    <div id="increase-pass-btn" class="game-menu-button flex animate-me${_limit < 2 ? ' disabled' : ''}" style="margin:0 1vh;cursor:pointer;color:#F4BB44;font-size:3vh !important" onexactclick="increasePassAmount()">+</div>
-                    <div id="use-max-pass-btn" class="game-menu-button flex animate-me${_limit < 2 ? ' disabled' : ''}" style="margin:0 1vh;cursor:pointer;color:#F4BB44;font-size:3vh !important" onexactclick="useMaxPassAmount()">max</div>
-                </span>
+            <div class="flex w-100 inventory-question-add-slot-inner">
+				<div class="inventory-question-add-slot-inner-left flex">
+                    <img src="./images/icons/ticket-pass.png" />
+                </div>
+                <div class="inventory-question-add-slot-inner-right flex">
+                    <div class="flex w-100 inventory-question-add-slot-count">
+                        <span class="flex flex-jc-start w-100">
+                            <div class="flex slot-amount-border">
+                                <div id="decrease-pass-btn" class="flex animate-me disabled" onexactclick="decreasePassAmount()"><img src="./images/ui/game/arrow-left.png" /></div>
+                                <span><span id="pass-amount">1</span>/${_limit}</span>
+                                <div id="increase-pass-btn" class="flex animate-me" onexactclick="increasePassAmount()"><img src="./images/ui/game/arrow-right.png" /></div>          
+                            </div>
+                        </span>
+                    </div>
+                </div>
+                <div id="use-max-pass-btn" class="game-menu-button-max flex animate-me${_limit < 2 ? ' disabled' : ''}" onexactclick="useMaxPassAmount()">max</div>
             </div>
-            <div style="padding:4vh" class="flex">
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="acceptStoryPass(${_itemSelected ? 1 : 0}, ${_goldSelected ? 1 : 0}, ${_expSelected ? 1 : 0})">${getLangData('YES')}</div>
+            <div class="flex new-game-menu-buttons">
+                <div class="new-game-menu-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
+                <div class="new-game-menu-button flex animate-me" onexactclick="acceptStoryPass(${_itemSelected ? 1 : 0}, ${_goldSelected ? 1 : 0}, ${_expSelected ? 1 : 0})">${getLangData('YES')}</div>
             </div>
         </div>
     </div>`;
@@ -11706,15 +11875,16 @@ async function createStoryPassScreen(_amount) {
 	_client.saveState();
 
 	// modal HTML'ini kur
-	let _modal = `<div class="full fade-me flex inventory-question inventory-question-add-slot">
+	let _modal = `<div data-singleton-key="modal_middle" class="full fade-me flex inventory-question inventory-question-add-slot inventory-question-auto-pass-results">
 		<div class="inventory-modal">
-			<div style="padding:6vh 4vh 4vh 4vh" class="flex">
-				<span style="color:#f3f4f5cc !important;font-size:3vh !important">${getLangData('Auto-Pass Results')}</span>
+			<div class="flex w-100 flex-ai-end question-modal-title">
+				<div class="flex w-100">${getLangData('Auto-Pass Results')}</div>
+				<img src="./images/ui/game/line4.png" />
 			</div>
-			<div class="flex flex-ai-start auto-pass-results" style="padding:2vh;overflow-y:auto"></div>
-			<div style="padding:4vh" class="flex">
-				<div id="auto-pass-skip" class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="skipStoryPass()">${getLangData('SKIP')}</div>
-				<div id="auto-pass-close" class="game-menu-button flex animate-me disabled" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('CLOSE')}</div>
+			<div class="flex flex-ai-start auto-pass-results" style="overflow-y:auto"></div>
+			<div class="flex new-game-menu-buttons">
+				<div id="auto-pass-skip" class="new-game-menu-button flex animate-me" onexactclick="skipStoryPass()">${getLangData('SKIP')}</div>
+				<div id="auto-pass-close" class="new-game-menu-button flex animate-me disabled" onexactclick="closeInventoryQuestionModal()">${getLangData('CLOSE')}</div>
 			</div>
 		</div>
 	</div>`;
@@ -11735,6 +11905,10 @@ async function createStoryPassScreen(_amount) {
 		row.className = 'w-100 flex flex-jc-start auto-pass-result-item fade-me';
 		row.innerHTML = _results[i];
 		_container.appendChild(row);
+		const _splitter = document.createElement('div');
+		_splitter.className = "page-detail-splitter";
+		_container.appendChild(row);
+		_container.appendChild(_splitter);
 		_container.scrollTo({
 			top: _container.scrollHeight,
 			behavior: 'smooth'

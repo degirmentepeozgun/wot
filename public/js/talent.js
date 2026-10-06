@@ -1,6 +1,7 @@
 ﻿'use strict';
-console.log('talent')
+(function () {
 function talent() {
+	console.log('talent');
 	this.key = 'talent';
 	this.tutorial = {
 		tr: {
@@ -260,3 +261,6 @@ function talent() {
 	}
 	return this;
 }
+    
+    window.talent = talent;
+})();

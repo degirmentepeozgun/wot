@@ -22,19 +22,13 @@
 .char-selection-center-inner {
 	max-height: 100% !important;
 	height:100% !important;
-	padding:5vh 4vh 6vh 4vh !important;
 	position: relative;
 	margin:0 !important;
 	flex-direction: column;
 	max-width: 100% !important;
-	aspect-ratio: 376 / 741;
-	background-image:url(./../images/ui/modal2.png) !important;
-	background-size: 100% 100% !important;
-	background-repeat: no-repeat !important;
-	background-position: center center
 }
-.c-i.c-i-race {
-	padding-top:2vh !important
+.c-i:not(.c-i-stats,.c-i-name) {
+	padding-top:4% !important
 }
 .c-i .w-50.flex-jc-end {
 	color:#9d987f !important;
@@ -57,7 +51,6 @@
 	-webkit-animation: fade-out-me 1s
 }
 .c-i-choose {
-	font-size:3vh !important;
 	color:#f7f7f7cc !important;
 	height:20vh;
 	position: relative;
@@ -119,7 +112,6 @@
 .char-selection-center {
 	width:40%;
 	height:100%;
-	padding:5vh 0;
 	overflow-y: auto;
 	display: flex;
 	align-items: center;
@@ -131,9 +123,6 @@
 .char-selection-center-inner:has(.c-i-choose) {
 	background:radial-gradient(#000, transparent, transparent);
 	border:none
-}
-.char-selection-center-inner .c-i-btn {
-	padding:2.5vh 0
 }
 .char-selection-center-inner table {
 	width:100% !important
@@ -149,23 +138,59 @@
 .char-selection-center-inner table tr td:last-child {
 	padding-right: 12%;
 }
-.c-i {
-	font-size:2.6vh !important;
-	color:#f7f7f7ab !important;
-	padding: .75vh;
-}
-.c-i-name {
-	font-size: 3vh !important;
-	color:#cfc180 !important;
-	font-weight: 600;
-}
 .char-selection-ui:has(.c-i-choose) {
 	background:none !important
 }
-
-
 .c-i.c-i-stats {
-	flex:1;
-	justify-content: flex-start !important;
     flex-direction: inherit;
+}
+.char-selection-center-inner {
+	background: url(./../images/ui/game/char-select-bg.png) !important;
+	background-size: 100% 100% !important;
+	background-repeat: no-repeat !important;
+	aspect-ratio: 765 / 1229 !important;
+	padding:12% 9% 7.5% 9% !important;
+}
+.c-i-name {
+	font-family: "Grenze" !important;
+	font-size: calc(var(--wot-font-base) * 2) !important;
+	color:#e3c18a !important;
+	height:8.5% !important;
+	margin-bottom: 3.5% !important;
+	padding-top:2.5% !important;
+}
+.c-i .flex-jc-start {
+	font-family: "Grenze" !important;
+	font-size: calc(var(--wot-font-base) * 1.5) !important;
+	line-height: calc(var(--wot-font-base) * 1.85) !important;
+	color:#d9c1a3 !important;
+}
+.c-i .flex-jc-end {
+	font-family: "Grenze" !important;
+	font-size: calc(var(--wot-font-base) * 1.5) !important;
+	line-height: calc(var(--wot-font-base) * 1.85) !important;
+	color:#b19e7d !important;
+}
+.char-selection-center {
+	padding:1% 0 5% 0 !important;
+}
+.char-select-splitter {
+	aspect-ratio: 376 / 9 !important;
+	background:url(./../images/ui/game/char-select-splitter.png) !important;
+	background-size: 100% 100% !important;
+	width:80%;
+    position: relative;
+    bottom: 0;
+	background-repeat: no-repeat !important;
+	background-position: center !important;
+}
+.c-i-choose {
+	font-family: "Alegreya" !important;
+	font-size: calc(var(--wot-font-base) * 1.8) !important;
+}
+.c-i-props {
+	flex:1 !important;
+	overflow-y:auto !important;
+	flex-direction: column !important;
+	justify-content: flex-start !important;
 }

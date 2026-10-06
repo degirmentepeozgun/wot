@@ -164,7 +164,7 @@ function getHonorItemDetailUI(_type, _noSound, _noAnimation) {
 		'<div class="page-detail-splitter"></div>' +
 		'<div class="w-100 flex flex-jc-end honor-items-content-value">' + renderItemProps(_item, '#ffffffcc') + '</div></div>' +
 		'</div></div>' +
-		'<div class="flex action-button-container">' +
+		'<div class="flex action-button-container w-100">' +
 			'<div class="page-detail-splitter"></div>' +
 			'<div class="page-detail-button animate-me flex' + (_perc < 0 ? '' : ' d-none') + '" onexactclick="askStartForge(\'' + _type + '\')"><div class="flex">' + getLangData('CREATE') + '</div></div>' + 
 			'<div class="page-detail-button animate-me flex' + (_perc >= 100 ? ' glow' : (_perc < 0 ? ' d-none' : ' gray disabled')) + '" onexactclick="takeForgedItem(\'' + _type + '\')"><div class="flex">' + getLangData('READY') + '</div></div>' + 
@@ -198,7 +198,7 @@ function askStartForge(_type) {
 		warn('<span>' + getLangData('Not enough honor points') + '</span>', 'warn');
 		return;
 	}
-	askSomething(`${getLangData('Redeem honor points')} <b style="margin:0 1vh;color:#F4BB44 !important">${_item.cost.formatWithDots()}</b> <img style="height:4vh" src="./images/icons/honor.png" />`, "startForge('" + _type + "')");
+	askSomething(`${getLangData('Redeem honor points')} <b style="margin:0 1vh;color:#F4BB44 !important">${_item.cost.formatWithDots()}</b> <img style="height:4vh" src="./images/icons/honor.png" />`, "startForge('" + _type + "')", "modal_2x1");
 }
 function startForge(_type) {
 	if(!__account.forges)

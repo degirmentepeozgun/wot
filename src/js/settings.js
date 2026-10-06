@@ -4,10 +4,10 @@ function getOptionsUI() {
 	`<div class="menu-ui-left fade-me">
 		<div class="menu-modal-left menu-modal-left-content">
 			<div class="skills-content-left settings-content-left menu-modal-left-container">
-				<div style="padding:1% 5%;overflow-y:auto" class="full">
-		<div style="width:100%;height:10%;padding:4vh 2vh 5vh 2vh" class="flex flex-jc-start">${getLangData('Language Choice')}</div>
-		<div onexactclick="langSelect('en')" class="flex flex-jc-start" style="width:100%;padding:1vh;height:10vh">
-			<div style="aspect-ratio:1/1;padding:1vh">
+				<div style="overflow-y:auto" class="full">
+		<div class="settings-row flex flex-jc-start">${getLangData('Language Choice')}</div>
+		<div onexactclick="langSelect('en')" class="settings-row settings-row-radio flex flex-jc-start" style="width:100%;padding:1vh;height:10vh">
+			<div class="my-radio-wrapper">
 				<div class="my-radio${(getLang()) === 'en' ? ' selected' : ''} flex">
 					<div></div>
 				</div>
@@ -16,8 +16,8 @@ function getOptionsUI() {
 				${getLangData('English')}
 			</div>
 		</div>
-		<div onexactclick="langSelect('tr')" class="flex flex-jc-start" style="width:100%;padding:1vh;height:10vh">
-			<div style="aspect-ratio:1/1;padding:1vh">
+		<div onexactclick="langSelect('tr')" class="settings-row settings-row-radio flex flex-jc-start" style="width:100%;padding:1vh;height:10vh">
+			<div class="my-radio-wrapper">
 				<div class="my-radio${(getLang()) === 'tr' ? ' selected' : ''} flex">
 					<div></div>
 				</div>
@@ -27,8 +27,8 @@ function getOptionsUI() {
 			</div>
 		</div>
 		<div style="flex:1"></div>
-		<div onexactclick="getKeyboardPromo(1)" style="cursor:pointer;width:100%;height:10%;padding:4vh 2vh 7.5vh 2vh" class="flex flex-jc-start${__isPC ? '' : ' d-none'}">${getLangData('Controls')}</div>
-		<div onexactclick="askExitApp()" style="cursor:pointer;width:100%;height:10%;padding:4vh 2vh 7.5vh 2vh" class="flex flex-jc-start">${getLangData('Quit Game')}</div>
+		<div onexactclick="getKeyboardPromo(1)" class="settings-row flex flex-jc-start${__isPC ? '' : ' d-none'}">${getLangData('Controls')}</div>
+		<div onexactclick="askExitApp()" class="settings-row flex flex-jc-start">${getLangData('Quit Game')}</div>
 		</div>
 			</div>
 				</div>

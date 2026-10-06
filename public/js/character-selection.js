@@ -1,5 +1,6 @@
 ﻿'use strict';
-function characterSelection(){
+(function(){
+	function characterSelection(){
 	const __characterInfos = [
 		{
 			class: 'werewolf',
@@ -67,11 +68,19 @@ function characterSelection(){
 			const _root = document.querySelector(':root');
 			_root.style.setProperty('--main-char-bg', 'url(./../images/main/' + _class + '/bg.png)');
 			let _html = `<div class="char-selection-center-inner flex"><div class="flex w-100 c-i c-i-name">${_conceptArts[_class]?.title ?? episode.enemies.find(x => x.class === _class)?.name ?? ''}</div>
+			<div class="w-100 flex c-i-props">
 			<div class="flex w-100 c-i c-i-race"><div class="flex flex-jc-start w-50">${getLangData("Race")}</div><div class="flex flex-jc-end w-50">${_info.race}</div></div>
+			<div class="char-select-splitter"></div>
+			<div class="flex w-100 c-i c-i-type"><div class="flex flex-jc-start w-50">${getLangData("Type")}</div><div class="flex flex-jc-end w-50">${_info.type}</div></div>	
+			<div class="char-select-splitter"></div>	
 			<div class="flex w-100 c-i c-i-class"><div class="flex flex-jc-start w-50">${getLangData("Class")}</div><div class="flex flex-jc-end w-50">${_info.classText}</div></div>
+			<div class="char-select-splitter"></div>
 			<div class="flex w-100 c-i c-i-weapon"><div class="flex flex-jc-start w-50">${getLangData("Weapon")}</div><div class="flex flex-jc-end w-50">${_info.weapon}</div></div>
+			<div class="char-select-splitter"></div>
 			<div class="flex w-100 c-i c-i-elemental"><div class="flex flex-jc-start w-50">${getLangData("Elemental")}</div><div class="flex flex-jc-end w-50">${_info.elemental}</div></div>
+			<div class="char-select-splitter"></div>
 			<div class="flex w-100 c-i c-i-cc"><div class="flex flex-jc-start w-50">${getLangData("Control")}</div><div class="flex flex-jc-end w-50">${_info.cc}</div></div>
+			<div class="char-select-splitter"></div>
 			<div class="flex w-100 c-i c-i-stats" style="padding:0">`;
 			const _bonus = __storyScene.bonusRewards;
 			if(!_bonus){
@@ -79,18 +88,22 @@ function characterSelection(){
 					<div class="flex flex-jc-start w-50">${getLangData("Attack")}</div>
 					<div class="flex flex-jc-end w-50">${_info.atk}&nbsp;/&nbsp;10</div>
 				</div>
+				<div class="char-select-splitter"></div>
 				<div class="flex w-100 c-i c-i-stat">
 					<div class="flex flex-jc-start w-50">${getLangData("Defense")}</div>
 					<div class="flex flex-jc-end w-50">${_info.def}&nbsp;/&nbsp;10</div>
 				</div>
+				<div class="char-select-splitter"></div>
 				<div class="flex w-100 c-i c-i-stat">
 					<div class="flex flex-jc-start w-50">${getLangData("Health")}</div>
 					<div class="flex flex-jc-end w-50">${_info.hp}&nbsp;/&nbsp;10</div>
 				</div>
+				<div class="char-select-splitter"></div>
 				<div class="flex w-100 c-i c-i-stat">
 					<div class="flex flex-jc-start w-50">${getLangData("Crit")}</div>
 					<div class="flex flex-jc-end w-50">${_info.crit}&nbsp;/&nbsp;10</div>
-				</div>`;
+				</div>
+				<div class="char-select-splitter"></div>`;
 			}
 			// else 
 			// {
@@ -109,7 +122,7 @@ function characterSelection(){
 				}
 			}
 			_html +=
-			`</div>
+			`</div></div>
 			<div class="flex w-100 c-i c-i-btn"><div class="game-btn2 flex" onexactclick="getRef('character-selection')?.selectHero('${_info.class}', '${_dir}', '${_another}')"><div class="flex">SELECT</div></div></div></div>`;
 		
 			document.querySelector('.char-selection-center').innerHTML = _html;
@@ -252,3 +265,6 @@ function characterSelection(){
 	// window.installedModules.push({name:'character-selection', ref: this});
 	return this;
 }
+window.characterSelection =characterSelection;
+
+})();

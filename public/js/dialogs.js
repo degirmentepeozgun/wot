@@ -317,12 +317,12 @@ function skipDialog() {
 						_gain += '&nbsp;<img src="./images/icons/' + _item.key + '.png" style="width:4vh" /> &nbsp;x &nbsp;' + _item.value;
 					}
 				if (__account.questStatus.state === 'begin') {
-					_skip.innerHTML = '<span style="color:#16F529 !important">' + getLangData('ACCEPT') + '</span>';
+					_skip.innerHTML = getLangData('ACCEPT');
 					if(_gain.length > 0)
 						_add = '<div class="flex" style="margin-top:2%;padding:1%;width:100%;border-top:1px solid #F4BB44;border-bottom:1px solid #F4BB44"><div class="flex" style="color:#fff !important">' + getLangData('Complete Rewards') + ': &nbsp;' + _gain + '</div></div>';
 				}
 				else if (__account.questStatus.state === 'end') {
-					_skip.innerHTML = '<span style="color:#16F529 !important">' + getLangData('COMPLETE') + '</span>';
+					_skip.innerHTML = '<span class="new-green">' + getLangData('COMPLETE') + '</span>';
 					if(_gain.length > 0)
 						_add = '<div class="flex" style="margin-top:2%;padding:1%;width:100%;border-top:1px solid #F4BB44;border-bottom:1px solid #F4BB44"><div class="flex" style="color:#fff !important">' + getLangData('Rewards') + ': &nbsp;' + _gain + '</div></div>';
 				}
@@ -341,7 +341,7 @@ function skipDialog() {
 				const _cImg = document.getElementById('concept-' + _class);
 				_cImg.src = './images/main/' + _class + '/' + (__account.questStatus.dialogArr[__account.questStatus.dialogOrder]?.faceExpression ??  'concept') + '.png';
 		}
-		document.getElementById('dialog-owner').innerHTML = '<span style="color:#f7f7f7cc !important;font-size:3vh !important">[' + (_conceptArts[_class]?.title ?? _class) + ']</span>' +
+		document.getElementById('dialog-owner').innerHTML = '<span>[' + (_conceptArts[_class]?.title ?? _class) + ']</span>' +
 			(__account.questStatus.dialogArr[__account.questStatus.dialogOrder].expression ?
 				''//'&nbsp;&nbsp;<span style="font-size:2.8vh!important" class="dialog-owner-expression">(' + __account.questStatus.dialogArr[__account.questStatus.dialogOrder].expression + ')</span>'
 				 : '');
@@ -810,9 +810,9 @@ function createDialogScreen(_arr, _quest) {
 			+ "</div>";
 		_order++;
 	}
-	_html += '</div><div class="dialog-scr-left"></div><div onexactclick="skipDialog()" id="game-dialogs" style="border-top-left-radius:3vh;border-top-right-radius:3vh;overflow:hidden;width:70%;left:15%;top:65%;height:35%;background:#121212;position:absolute;z-index:99999 !important"><div style="height:20%;background:#00000080;border-bottom:2px solid #856b2c;color:#856b2c;padding-left:5%" id="dialog-owner" class="flex flex-jc-start"><span style="color:#f7f7f7cc!important;font-size:3vh !important">[' + _conceptArts[_people[0]].title + ']</span>' + (__account.questStatus.dialogArr[0].expression ? 
+	_html += '</div><div class="dialog-scr-left"></div><div onexactclick="skipDialog()" id="game-dialogs"><div id="dialog-owner" class="flex flex-jc-start"><span>[' + _conceptArts[_people[0]].title + ']</span>' + (__account.questStatus.dialogArr[0].expression ? 
 		'' //'&nbsp;&nbsp;<span style="font-size:2.8vh!important" class="dialog-owner-expression">(' + __account.questStatus.dialogArr[0].expression + ')</span>' 
-		: '') + '</div><div style="height:60%;padding:2% 5% 1% 5%"><div class="full" style="overflow-y:auto;color:#F4BB44 !important" id="dialog-text">' + replaceDialogText(__account.questStatus.dialogArr[0].texts?.[getLang()] ?? __account.questStatus.dialogArr[0].text) + '</div></div><div style="height:20%;padding:1% 5%"><span id="quest-skip" style="font-size:2.8vh!important;cursor:pointer;color:#fff !important">' + getLangData('NEXT') + ' &gt;&gt;</span></div></div><div class="dialog-scr-right"></div>';
+		: '') + '</div><div style="height:60%;padding:2% 5% 1% 5%"><div class="full" style="overflow-y:auto" id="dialog-text">' + replaceDialogText(__account.questStatus.dialogArr[0].texts?.[getLang()] ?? __account.questStatus.dialogArr[0].text) + '</div></div><div class="flex w-100 flex-jc-end flex-ai-start" style="height:20%"><div class="orange-action-btn" id="quest-skip">' + getLangData('NEXT') + ' &gt;&gt;</div></div></div><div class="dialog-scr-right"></div>';
 	_dialogScreen.innerHTML = _html;
 	setTimeout(function () {
 		removeClass(document.querySelectorAll('.concept-image')[0], 'gray-concept');

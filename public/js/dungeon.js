@@ -1,5 +1,6 @@
 ﻿'use strict';
-function dungeon() {
+(function() {
+	function dungeon() {
 	this.key = 'dungeon';
 	this.tutorial = {
 		tr: {
@@ -165,7 +166,7 @@ function dungeon() {
 			<div class="page-detail-splitter"></div>
 			<div class="flex flex-jc-start story-detail-heading page-detail-header">${getLangData('Description')}</div>
 			<div class="page-detail-splitter-thin"></div>
-			<div class="story-description wot-description">${_s.description[getLang()]}</div>
+			<div class="story-description page-detail-desc">${_s.description[getLang()]}</div>
 			</div>
 			<div class="w-100 flex action-button-container">
 				<div class="page-detail-splitter w-100"></div>
@@ -224,3 +225,6 @@ function dungeon() {
 	}
 	return this;
 }
+window.dungeon =dungeon;
+
+})();

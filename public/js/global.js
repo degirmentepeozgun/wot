@@ -844,18 +844,18 @@ const _missions = [
 					_choices += `<div data-class="${_item.class}" class="selection-item selection-char flex" onexactclick="selectCTFCharacter('${_item.class}')" style="width:21% !important;aspect-ratio:1/1;position:relative;cursor:pointer">
 						<img src="./images/main/avatars/${_item.class}.png" style="padding:2%;height:84%" class="grade${_item.grade}-item" />
 					</div>`;
-			let _modal = `<div class="full fade-me show-ui flex inventory-question">
+			let _modal = `<div data-singleton-key="modal_middle" class="full fade-me show-ui flex inventory-question">
 							<div class="inventory-modal">`
 								+
-								`<div style="padding:6vh 4vh 4vh 4vh" class="flex">
-									<span style="color:#f7f7f7dd !important;font-size:3.2vh !important">${getLangData('CHOOSE YOUR SUPPORTER')}</span>
+								`<div class="flex question-modal-title-wrapper">
+									<div class="wot-title">${getLangData('CHOOSE YOUR SUPPORTER')}</div>
 								</div>
-								<div class="flex ctf-supporters" style="padding:2vh 4%">`
+								<div class="flex ctf-supporters question-modal-desc">`
 								+ _choices +
 								`</div>
-								<div style="padding:4vh 2vh 6vh 2vh" class="flex">
-									<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('BACK')}</div>
-									<div id="item-selection-approve-btn" class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="approveCTFSelection(${_id})">${getLangData('APPROVE')}</div>
+								<div class="flex new-game-menu-buttons">
+									<div class="new-game-menu-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('BACK')}</div>
+									<div id="item-selection-approve-btn" class="new-game-menu-button flex animate-me" onexactclick="approveCTFSelection(${_id})">${getLangData('APPROVE')}</div>
 								</div>
 							</div>
 						</div>`;
@@ -883,12 +883,12 @@ const _missions = [
 			return true;
 		},
 		html: function() { 
-			return `<div class="w-100 flex" style="padding:4vh 0 2vh 0">
-				<div class="w-50 flex flex-jc-start" style="padding-left:1vh">${getLangData('Dummy Count')}</div>
-				<div class="w-50 flex flex-jc-end" style="padding-right:1vh">
-					<div style="aspect-ratio:1/1;font-size:3vh !important" onexactclick="decreaseDummyCount()" class="game-menu-button flex">-</div>
-					<div style="width:6vh" class="flex" id='dummy-count'>10</div>
-					<div style="aspect-ratio:1/1;font-size:3vh !important" onexactclick="increaseDummyCount()" class="game-menu-button flex">+</div>
+			return `<div class="w-100 flex add-remove-count-wrapper">
+				<div class="w-50 flex flex-jc-start add-remove-count-title">${getLangData('Dummy Count')}</div>
+				<div class="w-50 flex flex-jc-end">
+					<div style="aspect-ratio:1/1" onexactclick="decreaseDummyCount()" class="add-remove-count-btn flex"><img class="remove-count-btn" src="./images/ui/game/remove-count.png" /></div>
+					<div class="flex" id='dummy-count'>10</div>
+					<div style="aspect-ratio:1/1" onexactclick="increaseDummyCount()" class="add-remove-count-btn flex"><img class="add-count-btn" src="./images/ui/game/add-count.png" /></div>
 				</div>
 			</div>`;
 		},
@@ -3197,6 +3197,8 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	headhit: './images/sounds/head-hit.mp3',
+	kongrun: './images/sounds/kong-goblin-run.mp3',
 	groundslide: './images/sounds/groundslide.mp3',
 	voodooelectrix: './images/sounds/voodoo-electrix.mp3',
 	voodooland: './images/sounds/voodooland.mp3',
@@ -3951,8 +3953,8 @@ const __holoMenuItems = [
 	}}
 	,
 	{ icon: 'tip', order:9, subOrder:2, titles: {
-		en: 'About Us',
-		tr: 'Bize Dair'
+		en: 'Draw',
+		tr: 'Çekiliş'
 	}
 }
 ];
@@ -4660,6 +4662,7 @@ const mapSprites = [
 	},
 	{
 		id: 42, minLevel : 1,
+		mobs:[],
 		coords: { 
 			title: 'Arena Ground',
 		 }, theme: 'arena', hasMobile: true,
@@ -4680,15 +4683,15 @@ const mapSprites = [
 				xBase: 1700,
 				yBase: 500,
 				color: "#A86CFF",
-				intensity: 0.32,
+				intensity: 0.24,
 				radiusBase: 700
 			},
 			{
 				id: "purple_torch_right",
-				xBase: 6144 - 1700,
+				xBase: 6144 - 1300,
 				yBase: 500,
 				color: "#A86CFF",
-				intensity: 0.32,
+				intensity: 0.24,
 				radiusBase: 700
 			}
 		],
@@ -5288,7 +5291,7 @@ const mapSprites = [
 				xBase: 500,
 				yBase: 820,
 				"color": "#D6E85A",
-				"intensity": 0.2,
+				"intensity": 0.19,
 				"radiusBase": 500
 				// color: "#FF0000",
 				// intensity: 1,
@@ -5302,7 +5305,7 @@ const mapSprites = [
 				// intensity: 1,
 				// radiusBase: 500
 				color: "#C9E96A",
-				intensity: 0.23,
+				intensity: 0.22,
 				radiusBase: 600
 			},
 			{
@@ -5313,7 +5316,7 @@ const mapSprites = [
 				// intensity: 1,
 				// radiusBase: 500
 				color: "#A9D94F",
-				intensity: 0.18,
+				intensity: 0.2,
 				radiusBase: 500
 			},
 			{
@@ -5324,7 +5327,7 @@ const mapSprites = [
 				// intensity: 1,
 				// radiusBase: 500
 				color: "#A9D94F",
-				intensity: 0.18,
+				intensity: 0.22,
 				radiusBase: 500
 			},
 			// {
@@ -6020,7 +6023,7 @@ const mapSprites = [
 				xBase: 1350,
 				yBase: 580,
 				color: "#102641",
-				intensity: 0.18,
+				intensity: 0.3,
 				radiusBase: 300
 			},
 
@@ -6035,7 +6038,14 @@ const mapSprites = [
 				intensity: 0.2,
 				radiusBase: 400
 			},
-
+			{
+				id: "cave_cold_right_center2",
+				xBase: 3200,
+				yBase: 720,
+				color: "#102641",
+				intensity: 0.22,
+				radiusBase: 300
+			},
 			// =====================================================
 			// MERKEZDEN SAĞA GEÇİŞ
 			// =====================================================
@@ -6056,7 +6066,7 @@ const mapSprites = [
 				xBase: 3900,
 				yBase: 550,
 				color: "#304D75",
-				intensity: 0.28,
+				intensity: 0.3,
 				radiusBase: 500
 			},
 
@@ -6068,7 +6078,7 @@ const mapSprites = [
 				xBase: 4900,
 				yBase: 550,
 				color: "#294568",
-				intensity: 0.25,
+				intensity: 0.28,
 				radiusBase: 500
 			},
 			{
@@ -38163,7 +38173,7 @@ function dancingInTheRain(_container) {
 	createRain2(_container);
 }
 
-function shuffle(array) {
+function shuffle(array, _primaryKey) {
 	let currentIndex = array.length;
 
 	// While there remain elements to shuffle...
@@ -38176,6 +38186,15 @@ function shuffle(array) {
 		// And swap it with the current element.
 		[array[currentIndex], array[randomIndex]] = [
 		array[randomIndex], array[currentIndex]];
+	}
+	if (_primaryKey) {
+		const primaryIndex = array.findIndex(x => x.id == _primaryKey);
+
+		if (primaryIndex > 0) {
+			[array[0], array[primaryIndex]] = [
+				array[primaryIndex], array[0]
+			];
+		}
 	}
 }
 function copyText(_elem) {

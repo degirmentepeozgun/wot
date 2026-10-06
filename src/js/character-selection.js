@@ -1,5 +1,6 @@
 ﻿'use strict';
-function characterSelection(){
+(function(){
+	function characterSelection(){
 	const __characterInfos = [
 		{
 			class: 'werewolf',
@@ -252,3 +253,6 @@ function characterSelection(){
 	// window.installedModules.push({name:'character-selection', ref: this});
 	return this;
 }
+window.characterSelection =characterSelection;
+
+})();

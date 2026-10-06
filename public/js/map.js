@@ -4693,113 +4693,57 @@ this.getShadowOffset = function(_char) {
 		this.checkUnseenEnemyPointer();
 		this.checkSceneActions();
 	}
-this.applySceneLighting = function(_ctx) {
-    // =========================================================
-    // LIGHT SOURCES
-    // =========================================================
-    const _lights = [];
-    if (this.backgroundLayerLighting?.length)
-        _lights.push(...this.backgroundLayerLighting);
-    if (this.groundLayerLighting?.length)
-        _lights.push(...this.groundLayerLighting);
-    if (!_lights.length)
+this.applySceneLighting = function (_ctx) {
+
+    if (
+        !_ctx ||
+        (
+            !Array.isArray(this.backgroundLayerLighting) &&
+            !Array.isArray(this.groundLayerLighting)
+        )
+    ) {
         return;
-    // =========================================================
-    // SCREEN
-    // =========================================================
+    }
+
+    const _lights = [];
+
+    if (Array.isArray(this.backgroundLayerLighting)) {
+        _lights.push(...this.backgroundLayerLighting);
+    }
+
+    if (Array.isArray(this.groundLayerLighting)) {
+        _lights.push(...this.groundLayerLighting);
+    }
+
+    if (!_lights.length) {
+        return;
+    }
 
     const _width = episode.cWidth;
     const _height = episode.cHeight;
     const _screenX = platformX;
+
     if (
-        !_ctx ||
         !Number.isFinite(_width) ||
         !Number.isFinite(_height) ||
         !Number.isFinite(_screenX) ||
         _width <= 0 ||
         _height <= 0
-    )
-        return;
-    // =========================================================
-    // LIGHT CANVAS
-    //
-    // BU CANVAS TAMAMEN SCREEN SPACE'TİR.
-    //
-    // Burada:
-    //
-    // x = ekran X
-    // y = ekran Y
-    //
-    // hiçbir camera / character transform'u yok.
-    // =========================================================
-    if (
-        !this._sceneLightingCanvas ||
-        this._sceneLightingCanvas.width !== _width ||
-        this._sceneLightingCanvas.height !== _height
     ) {
-
-        this._sceneLightingCanvas =
-            document.createElement("canvas");
-
-        this._sceneLightingCanvas.width =
-            _width;
-
-        this._sceneLightingCanvas.height =
-            _height;
-
-        this._sceneLightingCtx =
-            this._sceneLightingCanvas.getContext("2d");
-
-        this._sceneLightingCtx.imageSmoothingEnabled =
-            false;
+        return;
     }
 
+    /*
+     * HEX -> RGB
+     *
+     * RGB değerini light üzerinde cache'liyoruz.
+     *
+     * Bu fonksiyon 60 FPS çalışıyorsa aynı rengi
+     * her frame tekrar parse etmemek önemli.
+     */
+    const _hexToRgb = function (_hex) {
 
-    const _lightCtx =
-        this._sceneLightingCtx;
-
-
-    if (!_lightCtx)
-        return;
-
-
-    // =========================================================
-    // CLEAR
-    // =========================================================
-
-    _lightCtx.setTransform(
-        1,
-        0,
-        0,
-        1,
-        0,
-        0
-    );
-
-    _lightCtx.globalAlpha =
-        1;
-
-    _lightCtx.globalCompositeOperation =
-        "source-over";
-
-    _lightCtx.clearRect(
-        0,
-        0,
-        _width,
-        _height
-    );
-
-
-    // =========================================================
-    // HEX -> RGB
-    // =========================================================
-
-    const _hexToRgb = function(_hex) {
-
-        if (
-            typeof _hex !== "string"
-        ) {
-
+        if (typeof _hex !== "string") {
             return {
                 r: 255,
                 g: 255,
@@ -4807,27 +4751,21 @@ this.applySceneLighting = function(_ctx) {
             };
         }
 
-
-        let _value =
-            _hex
-                .trim()
-                .replace("#", "");
-
+        let _value = _hex
+            .trim()
+            .replace("#", "");
 
         if (_value.length === 3) {
-
             _value =
                 _value[0] + _value[0] +
                 _value[1] + _value[1] +
                 _value[2] + _value[2];
         }
 
-
         if (
             _value.length !== 6 ||
             !/^[0-9a-fA-F]+$/.test(_value)
         ) {
-
             return {
                 r: 255,
                 g: 255,
@@ -4835,240 +4773,26 @@ this.applySceneLighting = function(_ctx) {
             };
         }
 
-
         return {
-
-            r: parseInt(
-                _value.substring(0, 2),
-                16
-            ),
-
-            g: parseInt(
-                _value.substring(2, 4),
-                16
-            ),
-
-            b: parseInt(
-                _value.substring(4, 6),
-                16
-            )
+            r: parseInt(_value.substring(0, 2), 16),
+            g: parseInt(_value.substring(2, 4), 16),
+            b: parseInt(_value.substring(4, 6), 16)
         };
     };
-    // =========================================================
-    // LIGHTS
-    // =========================================================
-    for (const _light of _lights) {
-        const _lightX = _light.x;
-        const _lightY = _light.y;
-        const _radius = _light.radius;
-        const _intensity = _light.intensity ?? 0;
-        if (
-            !Number.isFinite(_lightX) ||
-            !Number.isFinite(_lightY) ||
-            !Number.isFinite(_radius) ||
-            !Number.isFinite(_intensity)
-        )
-            continue;
 
 
-        if (
-            _radius <= 0 ||
-            _intensity <= 0
-        )
-            continue;
-        // =====================================================
-        // INTENSITY
-        // =====================================================
-
-        const _power =
-            Math.max(
-                0,
-                Math.min(
-                    1,
-                    _intensity
-                )
-            );
-        // =====================================================
-        // LIGHT SCREEN POSITION
-        // =====================================================
-        //
-        // SENİN SİSTEMİNDE KESİN OLARAK:
-        //
-        // light.x zaten zoom uygulanmış.
-        //
-        // platformX de zoom uygulanmış camera offset.
-        //
-        // O yüzden:
-        //
-        //       SCREEN X
-        //           =
-        //       light.x - platformX
-        //
-        // =====================================================
-        const _gx =
-            _lightX -
-            _screenX;
-        const _gy =
-            _lightY;
-
-
-        // =====================================================
-        // SCREEN CULL
-        // =====================================================
-
-        if (
-            _gx + _radius < 0 ||
-            _gx - _radius > _width ||
-            _gy + _radius < 0 ||
-            _gy - _radius > _height
-        )
-            continue;
-
-
-        // =====================================================
-        // COLOR
-        // =====================================================
-
-        const _rgb =
-            _hexToRgb(
-                _light.color || "#FFFFFF"
-            );
-
-
-        const _color =
-            `rgb(${_rgb.r},${_rgb.g},${_rgb.b})`;
-
-
-        // =====================================================
-        // RADIAL GRADIENT
-        // =====================================================
-        //
-        // Burada özellikle:
-        //
-        // 0.7 -> color
-        //
-        // YOK.
-        //
-        // Işık merkezden itibaren düşmeye başlıyor.
-        //
-        // =====================================================
-
-        let _gradient;
-
-        try {
-
-            _gradient =
-                _lightCtx.createRadialGradient(
-                    _gx,
-                    _gy,
-                    0,
-                    _gx,
-                    _gy,
-                    _radius
-                );
-
-        }
-        catch (_e) {
-
-            continue;
-        }
-
-
-        // =====================================================
-        // FALL OFF
-        // =====================================================
-        //
-        // Merkez = 1
-        // Radius = 0
-        //
-        // Bu, eski:
-        //
-        // intensity *
-        // (1 - distance / radius)
-        //
-        // davranışının spatial karşılığıdır.
-        //
-        // =====================================================
-
-        _gradient.addColorStop(
-            0,
-            _color
-        );
-
-        _gradient.addColorStop(
-            0.25,
-            _color
-        );
-
-        _gradient.addColorStop(
-            0.50,
-            _color
-        );
-
-        _gradient.addColorStop(
-            0.75,
-            _color
-        );
-
-        _gradient.addColorStop(
-            1,
-            "rgba(0,0,0,0)"
-        );
-
-
-        // =====================================================
-        // APPLY THIS LIGHT
-        // =====================================================
-
-        _lightCtx.save();
-
-
-        _lightCtx.globalCompositeOperation =
-            "lighter";
-
-
-        _lightCtx.globalAlpha =
-            _power;
-
-
-        _lightCtx.fillStyle =
-            _gradient;
-
-
-        _lightCtx.fillRect(
-            0,
-            0,
-            _width,
-            _height
-        );
-
-
-        _lightCtx.restore();
-    }
-
-
-    // =========================================================
-    // APPLY LIGHT CANVAS
-    // =========================================================
-    //
-    // ÇOK ÖNEMLİ:
-    //
-    // _ctx'nin mevcut transform'u ne olursa olsun
-    // light canvas SCREEN SPACE olarak basılacak.
-    //
-    // Böylece:
-    //
-    // translate
-    // scale
-    // flip
-    //
-    // ışığın koordinatını değiştiremeyecek.
-    //
-    // =========================================================
+    /*
+     * SAHNEYİ TEK SEFER SAVE EDİYORUZ.
+     *
+     * Her ışık için save/restore yapmak yerine
+     * sadece fonksiyon başında yapıyoruz.
+     */
 
     _ctx.save();
 
-
+    /*
+     * Ekran koordinatında çalışıyoruz.
+     */
     _ctx.setTransform(
         1,
         0,
@@ -5078,30 +4802,658 @@ this.applySceneLighting = function(_ctx) {
         0
     );
 
+    /*
+     * Sadece mevcut sahnenin alpha'sı olan bölgeleri
+     * boyamak için source-atop.
+     */
+    _ctx.globalCompositeOperation = "source-atop";
 
-    _ctx.globalCompositeOperation =
-        "source-atop";
+    /*
+     * Alpha'yı gradient içerisinde kontrol edeceğiz.
+     * Bu nedenle burada 1 bırakıyoruz.
+     */
+    _ctx.globalAlpha = 1;
 
 
-    _ctx.globalAlpha =
-        1;
+    for (let _i = 0; _i < _lights.length; _i++) {
+
+        const _light = _lights[_i];
+
+        if (!_light) {
+            continue;
+        }
+
+        const _lightX = Number(_light.x);
+        const _lightY = Number(_light.y);
+        const _radius = Number(_light.radius);
+        const _intensity = Number(
+            _light.intensity ?? 0
+        );
+
+        /*
+         * Geçersiz ışıkları direkt atla.
+         */
+        if (
+            !Number.isFinite(_lightX) ||
+            !Number.isFinite(_lightY) ||
+            !Number.isFinite(_radius) ||
+            !Number.isFinite(_intensity)
+        ) {
+            continue;
+        }
+
+        if (
+            _radius <= 0 ||
+            _intensity <= 0
+        ) {
+            continue;
+        }
 
 
-    _ctx.drawImage(
-        this._sceneLightingCanvas,
-        0,
-        0,
-        _width,
-        _height,
-        0,
-        0,
-        _width,
-        _height
-    );
+        /*
+         * Intensity 0 - 1 arasında tutuluyor.
+         *
+         * 0.5 = merkezde %50
+         * 0.6 = merkezde %60
+         * 1.0 = merkezde %100
+         */
+        const _power =
+            _intensity <= 0
+                ? 0
+                : _intensity >= 1
+                    ? 1
+                    : _intensity;
+
+
+        /*
+         * Dünya koordinatını ekran koordinatına çevir.
+         *
+         * x zaten zoom uygulanmış.
+         */
+        const _screenLightX =
+            _lightX - _screenX;
+
+        const _screenLightY =
+            _lightY;
+
+
+        /*
+         * Işık ekranın tamamen dışındaysa
+         * gradient oluşturma.
+         *
+         * Bu önemli bir optimizasyon.
+         */
+        if (
+            _screenLightX + _radius < 0 ||
+            _screenLightX - _radius > _width ||
+            _screenLightY + _radius < 0 ||
+            _screenLightY - _radius > _height
+        ) {
+            continue;
+        }
+
+
+        /*
+         * RGB CACHE
+         *
+         * Aynı light'ın rengi değişmediyse
+         * tekrar HEX parse etmiyoruz.
+         */
+        const _color =
+            _light._lightingColorCache;
+
+        let _rgb;
+
+        if (
+            _color &&
+            _color.hex === _light.color
+        ) {
+
+            _rgb = _color.rgb;
+
+        } else {
+
+            _rgb = _hexToRgb(
+                _light.color || "#FFFFFF"
+            );
+
+            _light._lightingColorCache = {
+                hex: _light.color,
+                rgb: _rgb
+            };
+        }
+
+
+        /*
+         * RADIAL GRADIENT
+         *
+         * Merkez:
+         *     _power
+         *
+         * Kenara:
+         *     0
+         *
+         * Buradaki değerler LINEAR değil,
+         * smooth easing davranışı oluşturuyor.
+         *
+         * Böylece ışığın sınırında sert geçiş olmaz.
+         */
+        let _gradient;
+
+        try {
+
+            _gradient = _ctx.createRadialGradient(
+                _screenLightX,
+                _screenLightY,
+                0,
+
+                _screenLightX,
+                _screenLightY,
+                _radius
+            );
+
+        } catch (_error) {
+            continue;
+        }
+
+
+        /*
+         * SMOOTH FALLOFF
+         *
+         * 0.00 -> %100
+         * 0.20 -> %90
+         * 0.40 -> %65
+         * 0.60 -> %35
+         * 0.80 -> %10
+         * 1.00 -> %0
+         *
+         * Böylece renk merkezden itibaren
+         * yavaşça kayboluyor.
+         */
+
+
+        /*
+         * MERKEZ
+         */
+        _gradient.addColorStop(
+            0.00,
+            `rgba(${_rgb.r}, ${_rgb.g}, ${_rgb.b}, ${_power})`
+        );
+
+
+        /*
+         * Merkezin hemen çevresi.
+         *
+         * Burada hala güçlü ama artık
+         * yumuşak şekilde azalmaya başlıyor.
+         */
+        _gradient.addColorStop(
+            0.20,
+            `rgba(${_rgb.r}, ${_rgb.g}, ${_rgb.b}, ${_power * 0.90})`
+        );
+
+
+        /*
+         * Radius'ın ortası.
+         */
+        _gradient.addColorStop(
+            0.40,
+            `rgba(${_rgb.r}, ${_rgb.g}, ${_rgb.b}, ${_power * 0.65})`
+        );
+
+
+        /*
+         * Dış bölge.
+         */
+        _gradient.addColorStop(
+            0.60,
+            `rgba(${_rgb.r}, ${_rgb.g}, ${_rgb.b}, ${_power * 0.35})`
+        );
+
+
+        /*
+         * Kenara yaklaşırken çok hafif renk.
+         */
+        _gradient.addColorStop(
+            0.80,
+            `rgba(${_rgb.r}, ${_rgb.g}, ${_rgb.b}, ${_power * 0.10})`
+        );
+
+
+        /*
+         * Radius sonunda tamamen normale dön.
+         */
+        _gradient.addColorStop(
+            1.00,
+            "rgba(0, 0, 0, 0)"
+        );
+
+
+        /*
+         * Gradient'i sahneye tek seferde uygula.
+         */
+        _ctx.fillStyle = _gradient;
+
+        _ctx.fillRect(
+            0,
+            0,
+            _width,
+            _height
+        );
+    }
 
 
     _ctx.restore();
 };
+// this.applySceneLighting = function(_ctx) {
+//     // =========================================================
+//     // LIGHT SOURCES
+//     // =========================================================
+//     const _lights = [];
+//     if (this.backgroundLayerLighting?.length)
+//         _lights.push(...this.backgroundLayerLighting);
+//     if (this.groundLayerLighting?.length)
+//         _lights.push(...this.groundLayerLighting);
+//     if (!_lights.length)
+//         return;
+//     // =========================================================
+//     // SCREEN
+//     // =========================================================
+
+//     const _width = episode.cWidth;
+//     const _height = episode.cHeight;
+//     const _screenX = platformX;
+//     if (
+//         !_ctx ||
+//         !Number.isFinite(_width) ||
+//         !Number.isFinite(_height) ||
+//         !Number.isFinite(_screenX) ||
+//         _width <= 0 ||
+//         _height <= 0
+//     )
+//         return;
+//     // =========================================================
+//     // LIGHT CANVAS
+//     //
+//     // BU CANVAS TAMAMEN SCREEN SPACE'TİR.
+//     //
+//     // Burada:
+//     //
+//     // x = ekran X
+//     // y = ekran Y
+//     //
+//     // hiçbir camera / character transform'u yok.
+//     // =========================================================
+//     if (
+//         !this._sceneLightingCanvas ||
+//         this._sceneLightingCanvas.width !== _width ||
+//         this._sceneLightingCanvas.height !== _height
+//     ) {
+
+//         this._sceneLightingCanvas =
+//             document.createElement("canvas");
+
+//         this._sceneLightingCanvas.width =
+//             _width;
+
+//         this._sceneLightingCanvas.height =
+//             _height;
+
+//         this._sceneLightingCtx =
+//             this._sceneLightingCanvas.getContext("2d");
+
+//         this._sceneLightingCtx.imageSmoothingEnabled =
+//             false;
+//     }
+
+
+//     const _lightCtx =
+//         this._sceneLightingCtx;
+
+
+//     if (!_lightCtx)
+//         return;
+
+
+//     // =========================================================
+//     // CLEAR
+//     // =========================================================
+
+//     _lightCtx.setTransform(
+//         1,
+//         0,
+//         0,
+//         1,
+//         0,
+//         0
+//     );
+
+//     _lightCtx.globalAlpha =
+//         1;
+
+//     _lightCtx.globalCompositeOperation =
+//         "source-over";
+
+//     _lightCtx.clearRect(
+//         0,
+//         0,
+//         _width,
+//         _height
+//     );
+
+
+//     // =========================================================
+//     // HEX -> RGB
+//     // =========================================================
+
+//     const _hexToRgb = function(_hex) {
+
+//         if (
+//             typeof _hex !== "string"
+//         ) {
+
+//             return {
+//                 r: 255,
+//                 g: 255,
+//                 b: 255
+//             };
+//         }
+
+
+//         let _value =
+//             _hex
+//                 .trim()
+//                 .replace("#", "");
+
+
+//         if (_value.length === 3) {
+
+//             _value =
+//                 _value[0] + _value[0] +
+//                 _value[1] + _value[1] +
+//                 _value[2] + _value[2];
+//         }
+
+
+//         if (
+//             _value.length !== 6 ||
+//             !/^[0-9a-fA-F]+$/.test(_value)
+//         ) {
+
+//             return {
+//                 r: 255,
+//                 g: 255,
+//                 b: 255
+//             };
+//         }
+
+
+//         return {
+
+//             r: parseInt(
+//                 _value.substring(0, 2),
+//                 16
+//             ),
+
+//             g: parseInt(
+//                 _value.substring(2, 4),
+//                 16
+//             ),
+
+//             b: parseInt(
+//                 _value.substring(4, 6),
+//                 16
+//             )
+//         };
+//     };
+//     // =========================================================
+//     // LIGHTS
+//     // =========================================================
+//     for (const _light of _lights) {
+//         const _lightX = _light.x;
+//         const _lightY = _light.y;
+//         const _radius = _light.radius;
+//         const _intensity = _light.intensity ?? 0;
+//         if (
+//             !Number.isFinite(_lightX) ||
+//             !Number.isFinite(_lightY) ||
+//             !Number.isFinite(_radius) ||
+//             !Number.isFinite(_intensity)
+//         )
+//             continue;
+
+
+//         if (
+//             _radius <= 0 ||
+//             _intensity <= 0
+//         )
+//             continue;
+//         // =====================================================
+//         // INTENSITY
+//         // =====================================================
+
+//         const _power =
+//             Math.max(
+//                 0,
+//                 Math.min(
+//                     1,
+//                     _intensity
+//                 )
+//             );
+//         // =====================================================
+//         // LIGHT SCREEN POSITION
+//         // =====================================================
+//         //
+//         // SENİN SİSTEMİNDE KESİN OLARAK:
+//         //
+//         // light.x zaten zoom uygulanmış.
+//         //
+//         // platformX de zoom uygulanmış camera offset.
+//         //
+//         // O yüzden:
+//         //
+//         //       SCREEN X
+//         //           =
+//         //       light.x - platformX
+//         //
+//         // =====================================================
+//         const _gx =
+//             _lightX -
+//             _screenX;
+//         const _gy =
+//             _lightY;
+
+
+//         // =====================================================
+//         // SCREEN CULL
+//         // =====================================================
+
+//         if (
+//             _gx + _radius < 0 ||
+//             _gx - _radius > _width ||
+//             _gy + _radius < 0 ||
+//             _gy - _radius > _height
+//         )
+//             continue;
+
+
+//         // =====================================================
+//         // COLOR
+//         // =====================================================
+
+//         const _rgb =
+//             _hexToRgb(
+//                 _light.color || "#FFFFFF"
+//             );
+
+
+//         const _color =
+//             `rgb(${_rgb.r},${_rgb.g},${_rgb.b})`;
+
+
+//         // =====================================================
+//         // RADIAL GRADIENT
+//         // =====================================================
+//         //
+//         // Burada özellikle:
+//         //
+//         // 0.7 -> color
+//         //
+//         // YOK.
+//         //
+//         // Işık merkezden itibaren düşmeye başlıyor.
+//         //
+//         // =====================================================
+
+//         let _gradient;
+
+//         try {
+
+//             _gradient =
+//                 _lightCtx.createRadialGradient(
+//                     _gx,
+//                     _gy,
+//                     0,
+//                     _gx,
+//                     _gy,
+//                     _radius
+//                 );
+
+//         }
+//         catch (_e) {
+
+//             continue;
+//         }
+
+
+//         // =====================================================
+//         // FALL OFF
+//         // =====================================================
+//         //
+//         // Merkez = 1
+//         // Radius = 0
+//         //
+//         // Bu, eski:
+//         //
+//         // intensity *
+//         // (1 - distance / radius)
+//         //
+//         // davranışının spatial karşılığıdır.
+//         //
+//         // =====================================================
+
+//         _gradient.addColorStop(
+//             0,
+//             _color
+//         );
+
+//         _gradient.addColorStop(
+//             0.25,
+//             _color
+//         );
+
+//         _gradient.addColorStop(
+//             0.50,
+//             _color
+//         );
+
+//         _gradient.addColorStop(
+//             0.75,
+//             _color
+//         );
+
+//         _gradient.addColorStop(
+//             1,
+//             "rgba(0,0,0,0)"
+//         );
+
+
+//         // =====================================================
+//         // APPLY THIS LIGHT
+//         // =====================================================
+
+//         _lightCtx.save();
+
+
+//         _lightCtx.globalCompositeOperation =
+//             "lighter";
+
+
+//         _lightCtx.globalAlpha =
+//             _power;
+
+
+//         _lightCtx.fillStyle =
+//             _gradient;
+
+
+//         _lightCtx.fillRect(
+//             0,
+//             0,
+//             _width,
+//             _height
+//         );
+
+
+//         _lightCtx.restore();
+//     }
+
+
+//     // =========================================================
+//     // APPLY LIGHT CANVAS
+//     // =========================================================
+//     //
+//     // ÇOK ÖNEMLİ:
+//     //
+//     // _ctx'nin mevcut transform'u ne olursa olsun
+//     // light canvas SCREEN SPACE olarak basılacak.
+//     //
+//     // Böylece:
+//     //
+//     // translate
+//     // scale
+//     // flip
+//     //
+//     // ışığın koordinatını değiştiremeyecek.
+//     //
+//     // =========================================================
+
+//     _ctx.save();
+
+
+//     _ctx.setTransform(
+//         1,
+//         0,
+//         0,
+//         1,
+//         0,
+//         0
+//     );
+
+
+//     _ctx.globalCompositeOperation =
+//         "source-atop";
+
+
+//     _ctx.globalAlpha =
+//         1;
+
+
+//     _ctx.drawImage(
+//         this._sceneLightingCanvas,
+//         0,
+//         0,
+//         _width,
+//         _height,
+//         0,
+//         0,
+//         _width,
+//         _height
+//     );
+
+
+//     _ctx.restore();
+// };
 // this.applyLightOnCharacter = function(
 //     _char,
 //     _ctx,

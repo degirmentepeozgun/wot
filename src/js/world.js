@@ -1,5 +1,6 @@
 ﻿'use strict';
-function world() {
+(function() {
+	function world() {
 	this.render = function(_noAnimation, _zoomed) {
 		let _mapName = 'world-map';
 		if(_zoomed)
@@ -161,10 +162,13 @@ function world() {
 					</div>
 				</div>
 			</div>
-			<div onexactclick="getRef(\'world\')?.closeMapInfoModal()" class="item-info-modal-close">&times;</div>
+			<div onexactclick="getRef(\'world\')?.closeMapInfoModal()" class="item-info-modal-close"></div>
         	<div id="shine"></div>
 		</div>`;
 		document.querySelector('.world-map-container .book-page-bg').appendChild(_container);
 	}
 	return this;
-}
+} 
+window.world = world;
+
+})();

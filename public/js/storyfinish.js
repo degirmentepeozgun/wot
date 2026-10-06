@@ -1,6 +1,7 @@
 ﻿'use strict';
-console.log('story-finish');
-function animateStart(_failed, _extraGain, _content) {
+(function() {
+	console.log('story-finish');
+	function animateStart(_failed, _extraGain, _content) {
 	_game.suspended = true;
 	clearChainSkills();
 	if(episode.mainClass && mainCharacter.id !== episode.mainClass) {
@@ -80,7 +81,7 @@ function animateStart(_failed, _extraGain, _content) {
 		for(let _rs of _story.resultStars){
 			const _ok = _failed ? false : _rs.when(_rs);
 			_achievementsHtml += `<div class="w-100 flex flex-jc-start" style="color:${_ok ? '#F4BB44' : '#ff6c00cc'}; padding: 1%; height: 33%">
-								<img src="./images/ui/star-${_ok ? 'on' : 'off'}.png" style="height: 70%;margin-right: 2.5%;">${getLangData(_rs.title)}
+								<img src="./images/ui/game/${_ok ? 'yellow' : 'event'}-badge.png" style="height:80%;margin-right: 2.5%;">${getLangData(_rs.title)}
 							</div>`;
 		}
 	let _rewardsHtml = (_failed && !_extraGain) ? '' : getStoryRewardsResultHtml(_story, null, null, _extraGain, 1, _totalStar >= 1);
@@ -141,16 +142,18 @@ function animateStart(_failed, _extraGain, _content) {
 		_hasNext = _story.missin ? false : __stories.find(x => x.order > __story.order && !x.passive && x.list);
 	const _template = `<div data-module='storyfinish' id="story-finish" class="finish flex d-none">
 		<div class="w-50 side-left flex flex-jc-start" style="height:100% !important;width:55%;flex-direction:column">
-			<div class="${_draw ? 'gray ' : ''}w-100 flex op-none ${_failed ? 'defeat' : 'victory'}-header ms250">${getLangData(_failed ? (_draw ? 'DRAW' : 'DEFEAT') : 'VICTORY')}</div>
+			<div class="${_draw ? 'gray ' : ''}w-100 flex op-none ${_failed ? 'defeat' : 'victory'}-header ms250" lang="${getLang()}">${getLangData(_failed ? (_draw ? 'DRAW' : 'DEFEAT') : 'VICTORY')}
+				<div class="page-detail-splitter-thin"></div>
+			</div>
 			<img src="./images/${_draw ? 'icons/war.png' : 'main/' + (episode.realClass ?? mainCharacter.class) + '/' + (_failed ? 'loose' : 'finish') + '-concept.png'}" class="char slide-right">
 		</div>
 		<div class="w-50 container side-right flex flex-ai-start" style="height:90%;width:45%">
 			<div class="full" style="position:relative;z-index:2;margin: 0 15% 0 0;width:85%">
-				<div class="stars flex w-100" style="height: 20%;position:relative;background: url(./images/ui/header.png);background-size: contain;background-repeat: no-repeat;background-position: center;">
-					<img class="ms250 op-none${_isPvp ? ' d-none':''}" src="./images/ui/star-${_totalAchDone > 0 ? 'on' : 'off'}.png">
-					<img class="ms500 op-none${_isPvp ? ' d-none':''}" src="./images/ui/star-${_totalAchDone > 1 ? 'on' : 'off'}.png" style="margin-bottom: -4%;margin-top: -6%;">
-					<img class="ms750 op-none${_isPvp ? ' d-none':''}" src="./images/ui/star-${_totalAchDone > 2 ? 'on' : 'off'}.png">
-					<div class="w-50 flex one-line" style="position: absolute;left: 25%;height: 30%;font-size: 4vh !important;color: #f3f4f580;z-index: 0;text-shadow: 2px 2px 1px #000;padding-top: 1%;">` + _missionTitle + `</div>
+				<div class="stars flex w-100" style="height: 20%;position:relative;background: url(./images/ui/game/story-finish-header.png);background-size: contain;background-repeat: no-repeat;background-position: center;">
+					<img class="ms250 op-none${_isPvp ? ' d-none':''}" src="./images/ui/game/star-${_totalAchDone > 0 ? 'on' : 'off'}.png">
+					<img class="ms500 op-none${_isPvp ? ' d-none':''}" src="./images/ui/game/star-${_totalAchDone > 1 ? 'on' : 'off'}.png" style="margin-bottom: -4%;margin-top: -6%;">
+					<img class="ms750 op-none${_isPvp ? ' d-none':''}" src="./images/ui/game/star-${_totalAchDone > 2 ? 'on' : 'off'}.png">
+					<div class="w-50 flex one-line" style="position: absolute;left: 25%;height: 30%;font-size: calc(var(--wot-font-base) * 2.85)!important;color: #f3f4f580;z-index: 0;text-shadow: 2px 2px 1px #000;padding-top: 1%;padding-left:0 !important;justify-content:center !important">` + _missionTitle + `</div>
 				</div>
 				<div class="flex w-100 ms1000 op-none${_isPvp ? ' d-none' : ''}" style="padding: 1.5% 12.5% 0 12.5%;height: 8%;">
 					<div id="level" class="flex" style="padding:0 3%">${getLangData('Lvl')}&nbsp;${_currentLevel}</div>
@@ -180,6 +183,7 @@ function animateStart(_failed, _extraGain, _content) {
 						<div class="flex flex-jc-end" style="opacity:.8">
 							${_totalAchDone}&nbsp;/&nbsp;3
 						</div>
+						<div class="page-detail-splitter-thin"></div>
 					</div>
 					<div class="header-content w-100 ms1500 op-none flex flex-jc-start" style="height: 24%;">`
 					 + _achievementsHtml +
@@ -188,6 +192,7 @@ function animateStart(_failed, _extraGain, _content) {
 						<div class="header-inner${_rewardsHtml === '' ? ' v-none' : ''}">
 							${episode.war ? '' : getLangData('Rewards')}
 						</div>
+						<div class="page-detail-splitter-thin"></div>
 					</div>
 					<div class="header-content w-100 flex flex-jc-start flex-ai-start ms${_isPvp ? 1000 : 2000} op-none" style="height:${episode.war ? '20%;margin:2% 0 3.5% 0' : '30%'}">`
 						+ _rewardsHtml +
@@ -298,4 +303,9 @@ function animateStart(_failed, _extraGain, _content) {
 		fade('#story-finish .ms2000', 2500);
 		fade('#story-finish .ms2500', 3000);
 	}, 100);
-}
+	}
+
+	window.storyfinish = window.storyfinish || {};
+	window.storyfinish.animateStart = animateStart;
+
+})();

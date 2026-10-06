@@ -1,146 +1,273 @@
-﻿const __voices = {}; // talkId -> VoiceData
+﻿/****************************************************
+ * AAA GIBBERISH VOICE ENGINE - STABLE VERSION
+ * - no pitch abuse
+ * - no segment crash
+ * - role-based spectral selection (warrior fix)
+ * - smooth timeline playback
+ ****************************************************/
 
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-const EMOTION_PRESETS = {
-  normal: {
-    rate: 1.0,
-    pitch: 1.0,
-    variance: 0.05,
-    filter: null
+/**********************
+ * STATE
+ **********************/
+const __voices = {};
+
+/**********************
+ * CONFIG (PURE DATA)
+ **********************/
+const __characterVoiceSettings = {
+  wizard: {
+    base: { gender: "male", rate: 0.95, pause: 0.05 },
+    emotions: {
+      normal: { energy: 0.9 },
+      angry: { energy: 1.3 },
+      sleepy: { energy: 0.6 },
+      energetic: { energy: 1.2 }
+    }
   },
-  energetic: {
-    rate: 1.25,
-    pitch: 1.2,
-    variance: 0.12,
-    filter: { type: "highpass", freq: 1200 }
+
+  warrior: {
+    base: { gender: "male", rate: 1.0, pause: 0.04 },
+    emotions: {
+      normal: { energy: 1.0 },
+      angry: { energy: 1.6 },
+      sleepy: { energy: 0.7 },
+      energetic: { energy: 1.3 }
+    },
+    voiceProfile: {
+      segmentRange: [4, 16] // 🔥 MID RANGE FIX (warrior tone)
+    }
   },
-  angry: {
-    rate: 1.35,
-    pitch: 0.9,
-    variance: 0.18,
-    filter: { type: "distortion", amount: 20 }
+
+  tank: {
+    base: { gender: "male", rate: 0.9, pause: 0.07 },
+    emotions: {
+      normal: { energy: 1.0 },
+      angry: { energy: 1.6 },
+      sleepy: { energy: 0.6 },
+      energetic: { energy: 1.2 }
+    },
+    voiceProfile: {
+      segmentRange: [0, 10] // darker range
+    }
   },
-  sad: {
-    rate: 0.85,
-    pitch: 0.85,
-    variance: 0.08,
-    filter: { type: "lowpass", freq: 800 }
-  },
-  sleepy: {
-    rate: 0.65,
-    pitch: 0.75,
-    variance: 0.03,
-    filter: { type: "lowpass", freq: 600 }
-  },
-  happy: {
-    rate: 1.15,
-    pitch: 1.25,
-    variance: 0.15,
-    filter: { type: "bandpass", freq: 1800 }
+
+  archer: {
+    base: { gender: "female", rate: 1.03, pause: 0.04 },
+    emotions: {
+      normal: { energy: 1.0 },
+      angry: { energy: 1.25 },
+      sleepy: { energy: 0.7 },
+      energetic: { energy: 1.35 }
+    },
+    voiceProfile: {
+      segmentRange: [6, 16] // avoid goblin highs
+    }
   }
 };
 
-async function loadAudioBuffer(url) {
-  const res = await fetch(url);
-  const arrayBuffer = await res.arrayBuffer();
-  return await audioCtx.decodeAudioData(arrayBuffer);
-}
+/**********************
+ * AUDIO CORE
+ **********************/
+const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioContextClass();
 
-async function createVoice(id, text, languageCode, gender, age, emotion = "normal") {
-  const basePath = gender === "female"
-    ? "./images/voices/female"
-    : "./images/voices/male";
+const AudioEngine = {
+  cache: new Map(),
 
-  const segmentCount = gender === "female" ? 24 : 29;
+  async decode(url) {
+    if (this.cache.has(url)) return this.cache.get(url);
 
-  const promises = [];
+    const r = await fetch(url);
 
-  for (let i = 1; i <= segmentCount; i++) {
-    const url = `${basePath}/segment_${i}.wav`;
-    promises.push(loadAudioBuffer(url));
-  }
-
-  const buffers = await Promise.all(promises);
-
-  __voices["talk" + id] = {
-    id,
-    text,
-    languageCode,
-    gender,
-    age,
-    emotion,
-    buffers,
-    ready: true
-  };
-}
-
-function playVoice(id) {
-  const voice = __voices["talk" + id];
-  if (!voice || !voice.ready) return;
-
-  const preset = EMOTION_PRESETS[voice.emotion] || EMOTION_PRESETS.normal;
-
-  const sourceNodes = [];
-
-  let time = audioCtx.currentTime;
-
-  // Sims-like: 4–12 segment arası konuşma
-  const count = 4 + Math.floor(Math.random() * 8);
-
-  for (let i = 0; i < count; i++) {
-    const buffer =
-      voice.buffers[Math.floor(Math.random() * voice.buffers.length)];
-
-    const source = audioCtx.createBufferSource();
-    source.buffer = buffer;
-
-    // emotion-based pitch variation
-    const rand = (Math.random() * 2 - 1) * (preset.variance || 0.1);
-
-    source.playbackRate.value =
-      preset.rate * (1 + rand);
-
-    // basic filter chain
-    let node = source;
-
-    if (preset.filter) {
-      const filter = audioCtx.createBiquadFilter();
-
-      if (preset.filter.type === "lowpass") {
-        filter.type = "lowpass";
-        filter.frequency.value = preset.filter.freq;
-      }
-
-      if (preset.filter.type === "highpass") {
-        filter.type = "highpass";
-        filter.frequency.value = preset.filter.freq;
-      }
-
-      if (preset.filter.type === "bandpass") {
-        filter.type = "bandpass";
-        filter.frequency.value = preset.filter.freq;
-      }
-
-      node.connect(filter);
-      filter.connect(audioCtx.destination);
-    } else {
-      node.connect(audioCtx.destination);
+    // ❗ crash guard
+    if (!r.ok) {
+      console.warn("Missing audio:", url);
+      return null;
     }
 
-    // random timing spacing (natural speech jitter)
-    const offset = i * (0.12 + Math.random() * 0.08);
+    const buf = await r.arrayBuffer();
 
-    source.start(time + offset);
-
-    sourceNodes.push(source);
+    try {
+      const audioBuffer = await audioCtx.decodeAudioData(buf);
+      this.cache.set(url, audioBuffer);
+      return audioBuffer;
+    } catch (e) {
+      console.warn("Decode fail:", url);
+      return null;
+    }
   }
+};
 
-  return sourceNodes;
+/**********************
+ * UTILS
+ **********************/
+function clamp(v, min, max) {
+  return Math.max(min, Math.min(max, v));
 }
 
+function countSyllables(w) {
+  const vowels = "aeiouy";
+  let c = 0, prev = false;
 
-async function playNow() {
-	await createVoice(1, "What can you do? Sometimes and in the tabela we lost", "en", 
-	"male", 25, "happy");
-	playVoice(1);
+  for (let ch of w.toLowerCase()) {
+    const v = vowels.includes(ch);
+    if (v && !prev) c++;
+    prev = v;
+  }
+
+  return Math.max(1, c);
+}
+
+function parseSentence(text) {
+  return text
+    .replace(/[^a-zA-Z\s]/g, "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(w => ({ word: w, syllables: countSyllables(w) }));
+}
+
+/**********************
+ * SEGMENT SELECTOR
+ **********************/
+function getSegmentPath(i, gender, profile) {
+  const max = gender === "male" ? 22 : 17;
+
+  // default full range
+  let start = 0;
+  let end = max - 1;
+
+  // role-based spectral gating
+  if (profile?.segmentRange) {
+    start = profile.segmentRange[0];
+    end = profile.segmentRange[1];
+  }
+
+  const range = Math.max(1, end - start);
+
+  const idx = start + (i % range);
+
+  return `./images/voices/${gender}/segment_${idx}.wav`;
+}
+
+/**********************
+ * SILENCE
+ **********************/
+function silence(sec) {
+  return audioCtx.createBuffer(
+    1,
+    audioCtx.sampleRate * sec,
+    audioCtx.sampleRate
+  );
+}
+
+/**********************
+ * TONE ENGINE (STABLE)
+ **********************/
+function computeTone(cfg, emotion) {
+  const mod = cfg.emotions[emotion] || cfg.emotions.normal;
+
+  let rate = cfg.base.rate;
+
+  // energy influence (very mild)
+  rate += (mod.energy - 1) * 0.04;
+
+  // stability clamp (IMPORTANT)
+  rate = clamp(rate, 0.9, 1.08);
+
+  const gain = clamp(mod.energy, 0.75, 1.35);
+
+  return { rate, gain };
+}
+
+/**********************
+ * PLAYBACK (SMOOTH TIMELINE)
+ **********************/
+function play(track) {
+  let t = audioCtx.currentTime;
+
+  const master = audioCtx.createGain();
+  master.connect(audioCtx.destination);
+
+  for (const x of track) {
+    if (!x.buffer) continue;
+
+    const src = audioCtx.createBufferSource();
+    src.buffer = x.buffer;
+    src.playbackRate.value = x.rate;
+
+    const g = audioCtx.createGain();
+    g.gain.value = x.gain;
+
+    src.connect(g);
+    g.connect(master);
+
+    src.start(t);
+
+    t += x.buffer.length / audioCtx.sampleRate;
+  }
+}
+
+/**********************
+ * BUILD VOICE
+ **********************/
+async function BuildVoice(id, char, text, emotion = "normal") {
+
+  const cfg = __characterVoiceSettings[char];
+  if (!cfg) throw new Error("Unknown character: " + char);
+
+  const words = parseSentence(text);
+  const tone = computeTone(cfg, emotion);
+
+  const track = [];
+  let idx = 0;
+
+  for (const w of words) {
+
+    for (let i = 0; i < w.syllables; i++) {
+
+      const path = getSegmentPath(
+        idx,
+        cfg.base.gender,
+        cfg.voiceProfile
+      );
+
+      const buf = await AudioEngine.decode(path);
+
+      if (buf) {
+        track.push({
+          buffer: buf,
+          rate: tone.rate,
+          gain: tone.gain
+        });
+      }
+
+      idx++;
+    }
+
+    // natural micro pause
+    track.push({
+      buffer: silence(cfg.base.pause),
+      rate: 1,
+      gain: 0
+    });
+  }
+
+  __voices["talk" + id] = {
+    char,
+    text,
+    emotion,
+    track
+  };
+
+  return __voices["talk" + id];
+}
+
+/**********************
+ * PLAY API
+ **********************/
+function PlayVoice(id) {
+  const v = __voices["talk" + id];
+  if (!v) return console.warn("Missing voice:", id);
+
+  play(v.track);
 }

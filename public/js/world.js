@@ -1,5 +1,6 @@
 ﻿'use strict';
-function world() {
+(function() {
+	function world() {
 	this.render = function(_noAnimation, _zoomed) {
 		let _mapName = 'world-map';
 		if(_zoomed)
@@ -27,10 +28,18 @@ function world() {
 			mapArea.innerHTML = '<img loading="lazy" src="./images/icons/compass.png" class="map-compass" />';
 		else
 			mapArea.innerHTML = `<div class="full flex act-map-whole">
-				<div class="flex active act-map-part">${getLangData('Act')}&nbsp;I</div>
-				<div class="flex act-map-part">${getLangData('Act')}&nbsp;II</div>
-				<div class="flex act-map-part">${getLangData('Act')}&nbsp;III</div>
-				<div class="flex act-map-part">${getLangData('Act')}&nbsp;IV</div>
+				<div class="flex active act-map-part">
+					<div>${getLangData('Act')}&nbsp;I</div>
+				</div>
+				<div class="flex act-map-part">
+					<div>${getLangData('Act')}&nbsp;II</div>
+				</div>
+				<div class="flex act-map-part">
+					<div>${getLangData('Act')}&nbsp;III</div>
+				</div>
+				<div class="flex act-map-part">
+					<div>${getLangData('Act')}&nbsp;IV</div>
+				</div>
 				<img loading="lazy" src="./images/icons/world-title.png" />
 			</div>
 			<div class="full world-map-frame"></div>
@@ -140,24 +149,26 @@ function world() {
 			_container.remove();
 		_container = document.createElement('div');
 		_container.id = 'map-detail-modal';
-		_container.className = 'flex animate-me fade-me';
-		_container.style = "background:url(./images/ui/square.png)";
-		_container.innerHTML = `<div class="full map-detail-modal-inner">
-			<div class="w-100 flex flex-jc-start map-detail-modal-title">${_mission?.titles?.[getLang()]?.toLocaleUpperCase(getLang())}</div>
+		_container.className = 'flex animate-me fade-me full inventory-question';
+		_container.setAttribute('data-singleton-key', 'modal_1x1');
+		_container.innerHTML = `<div class="full map-detail-modal-inner inventory-modal">
+			<div class="w-100 map-detail-modal-title question-modal-title-container">
+				<div class="w-100 flex flex-jc-start question-modal-title wot-title">
+					${_mission?.titles?.[getLang()]?.toLocaleUpperCase(getLang())}
+				</div>
+			</div>
+			<div class="page-detail-splitter"></div>
 			<div class="full flex flex-ai-start flex-jc-start map-detail-modal-content">
-				<div class="w-100 flex flex-jc-start map-detail-modal-desc">${_mission?.descriptions?.[getLang()] ?? ''}`
+				<div class="w-100 flex flex-jc-start map-detail-modal-desc question-modal-desc">${_mission?.descriptions?.[getLang()] ?? ''}
+				<div class="page-detail-splitter-thin"></div>`
 				+ (_mission.html?.() ?? '') +
 			`</div>
 			</div>
-			<div class="flex map-detail-modal-btn">
-				<div class="w-50 flex d-none">
-					<div class="game-menu-button animate-me flex" onexactclick="" style="height:65%">
-						<div class="flex">${getLangData('UPGRADE')}</div>
-					</div>
-				</div>
+			<div class="flex map-detail-modal-btn action-button-container">
+				<div class="page-detail-splitter-thin"></div>
 				<div class="w-100 flex" style="height:100%">
-					<div class="game-menu-button animate-me flex" onexactclick="getRef(\'world\')?.startPort(${_id})" style="height:65%">
-						<div class="flex" style="height:100%;color:#ff6c00 !important">${getLangData('START')}</div>
+					<div class="page-detail-button animate-me flex" onexactclick="getRef(\'world\')?.startPort(${_id})" style="height:65%">
+						<div class="flex" style="height:100%">${getLangData('START')}</div>
 					</div>
 				</div>
 			</div>
@@ -167,4 +178,7 @@ function world() {
 		document.querySelector('.world-map-container .book-page-bg').appendChild(_container);
 	}
 	return this;
-}
+} 
+window.world = world;
+
+})();

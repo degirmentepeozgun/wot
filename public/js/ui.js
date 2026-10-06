@@ -1569,7 +1569,7 @@ function renderLockedContent(_requirement) {
 	 	<span style="text-align:center;color:#f7f7f7cc!important;font-size:3vh!important"><span style="color:#ff6c00 !important">[${getLangData('Content Is Locked')}]</span><br/>${getLangData(_requirement)}</span>
 	 </div>`;
 }
-function askSomething(_question, _okFuncString, _singletonAttr, _container) {
+function askSomething(_question, _okFuncString, _singletonAttr, _container, className) {
 	try	{
 		event.preventDefault();
 		event.stopPropagation();
@@ -1584,14 +1584,14 @@ function askSomething(_question, _okFuncString, _singletonAttr, _container) {
 				return;
 		}
 		const _addQuestionMark = !(_question.endsWith('>') || _question.endsWith('?'));
-		let _modal = `<div${_singletonAttr ? " data-singleton-key='" + _singletonAttr + "'" : ""} class="full fade-me show-ui flex inventory-question">
-			<div class="inventory-modal">
-				<div style="padding:4vh 2vh" class="flex question-modal-desc">
+		let _modal = `<div${_singletonAttr ? " data-singleton-key='" + _singletonAttr + "'" : ""} class="full fade-me show-ui flex inventory-question${className ? ' ' + className : ''}">
+			<div class="inventory-modal flex w-100" style="padding-top:0;flex-direction:column !important">
+				<div style="flex:1" class="flex question-modal-desc">
 					<span class="flex ask-something-modal-text wot-subtitle">` + getLangData(_question) + `${_addQuestionMark ? '?' : ''}</span>
 				</div>
-				<div style="padding:4vh 2vh" class="flex question-modal-buttons">
-					<div class="orange-action-btn flex animate-me wot-button" style="cursor:pointer;min-width:80px" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
-					<div class="quick-space-btn orange-action-btn flex animate-me wot-button" style="cursor:pointer;min-width:80px;" onexactclick="${_okFuncString}">${getLangData('YES')}</div>
+				<div class="flex w-100 new-game-menu-buttons">
+					<div class="new-game-menu-button flex animate-me" style="cursor:pointer;min-width:80px" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
+					<div class="quick-space-btn new-game-menu-button flex animate-me" style="cursor:pointer;min-width:80px;" onexactclick="${_okFuncString}">${getLangData('YES')}</div>
 				</div>
 			</div>
 		</div>`;
@@ -1626,7 +1626,11 @@ function showInfo(_json) {
 					<span class="flex show-info-title wot-title">${_title}</span>
 				</div>
 				<div class="line1-splitter"></div>
-				<div id="show-info-navigations" style="padding:4vh 2vh" class="flex w-100"></div>
+				<div id="show-info-navigations" style="padding:4vh 2vh" class="flex w-100">
+					<div id="show-info-navigations-inner" class="flex w-100">
+				
+					</div>
+				</div>
 				<div class="item-info-modal-close" onexactclick="closeInventoryQuestionModal()"></div>
 			</div>
 		</div>`;
@@ -1635,7 +1639,7 @@ function showInfo(_json) {
 		const _parentDiv = document.querySelector('#menu-ui');
 		(_parentDiv ?? _gameUI).appendChild(_div.querySelector('.inventory-question'));
 		playClick();
-		const _container = document.getElementById('show-info-navigations');
+		const _container = document.getElementById('show-info-navigations-inner');
 		for(let _n of _json.navigations ?? []) {
 			const _div2 = document.createElement('div');
 			_div2.className = 'info-nav-container flex';
@@ -1643,7 +1647,7 @@ function showInfo(_json) {
 			`<div class="flex" style="height:100%">
 				<img src="./images/ui/game/menu-icons/${_n.icon}.png" />
 			</div>
-			<div class="info-nav flex flex-jc-start" style='flex:1'>
+			<div class="info-nav flex flex-jc-start one-line" style='flex:1'>
 				${_n.titles[getLang()]}
 			</div>`;
 			if(_n.func)
@@ -1766,6 +1770,7 @@ function detachModule() {
 						_arr[i].remove();
 				removeModule(_k);
 				delete __latestUIModule[_k];
+				delete window[_k];
 			}
 		}
 		catch(_lumex) { }

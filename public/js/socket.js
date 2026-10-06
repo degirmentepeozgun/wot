@@ -212,7 +212,7 @@ function selectPersonFromBigChat(_id, _name) {
 	openPersonelMessages(_id);
 }
 function askRemovePersonFromMessages(_id) {
-	askSomething('Remove talk', "removePersonFromMessages('" + _id + "')");
+	askSomething('Remove talk', "removePersonFromMessages('" + _id + "')", 'modal_2x1');
 }
 function removePersonFromMessages(_id) {
 	try {
@@ -223,7 +223,7 @@ function removePersonFromMessages(_id) {
 	catch(rex) { }
 }
 function askClearBigChatArea() {
-	askSomething('Clear chat', "clearBigChatArea()");
+	askSomething('Clear chat', "clearBigChatArea()", 'modal_2x1');
 }
 function clearBigChatArea() {
 	closeInventoryQuestionModal();
@@ -266,7 +266,7 @@ function openPersonelMessages(_id) {
 	}
 }
 function askClearPersonalChatArea() {
-	askSomething('Clear this talk', "clearBigChatArea()");
+	askSomething('Clear this talk', "clearBigChatArea()", 'modal_2x1');
 }
 function getPersonelChatMessageTemplate(_m) {
 	return `<div class="personal-chat-message w-100 flex ${_m.y ? 'flex-jc-end' : 'flex-jc-start'}"><div style="color:${_m.y ? '#F4BB44' : '#f7f7f7'}cc !important" class="chat-message flex">

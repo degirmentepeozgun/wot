@@ -20,7 +20,7 @@ function createArtifactsUI(_id) {
 	let _html = '<div class="menu-ui-left fade-me">' +
 						'<div class="menu-modal-left menu-modal-left-content">' +
 							'<div class="skills-content-left menu-modal-left-container">' +
-								'<div style="padding:1% 5%;overflow-y:auto" class="full">';
+								'<div style="overflow-y:auto" class="full">';
 	for(let _i of __artifacts) {
 		if(!_id)
 			_id = _i.id;
@@ -56,11 +56,14 @@ function openArtifactDetailModal(_id, _containerId, _noAnimation) {
 	var _ids = __artifacts.filter(x => x.group === _item.group).map(x => x.id);
 	var _bonusTitle = __properties.find(x => x.key === _item.bonus.key).titles[getLang()];
 	var _pieces = '';
-	for(let _i of __artifacts.filter(x => x.group === _item.group)) {
+	let _pCounter = 1;
+	const _filteredArray = __artifacts.filter(x => x.group === _item.group);
+	for(let _i of _filteredArray) {
 		var _owned = __account.artifacts.find(x => x.id === _i.id);
-		_pieces += `<div class="flex artifact-bonus-item${_owned ? ' owned' : ''}" style="width:100%;padding:1vh">
+		_pieces += `<div class="flex w-100 artifact-bonus-item${_owned ? ' owned' : ''}"><div class="flex flex-jc-start w-50 page-detail-item-label">
                ${_i.titles[getLang()]}
-        	</div>`;
+        	</div><div class="flex flex-jc-end w-50 page-detail-item-value">${_pCounter}/${_filteredArray.length}</div></div>`;
+		_pCounter++;
 	}
 	const _isActive = __account.artifacts.filter(x => _ids.indexOf(x.id) !== -1)?.length >= 4;
     var _html = `<div class="full flex item-info-container-parent artifact-item-info-container-parent${_noAnimation ? '' : ' fade-me'}" style="padding:4.5% 8% 4.5% 0;top:0;left:0;margin:4% 6% 4% 0;width:94%;height:92%">
@@ -70,19 +73,24 @@ function openArtifactDetailModal(_id, _containerId, _noAnimation) {
 					<img style="background:radial-gradient(${_item.group === 1 ? '#008000' : '#000080'}40, transparent)" src="./images/artifacts/${_id}.png" />
 				</div>
 				<div class="artifact-detail-header-info">
-					<div class="flex artifact-title artifact-detail-header-title" style="width:100%;padding:2vh">
+					<div class="flex artifact-title artifact-detail-header-title page-detail-header" style="width:100%;padding:2vh">
 						${_item.titles[getLang()]}
 					</div>
-					<div class="flex artifact-description" style="width:100%;padding:2vh;text-align:center">
+					<div class="page-detail-splitter-thin"></div>
+					<div class="flex artifact-description page-detail-desc" style="width:100%;padding:2vh;text-align:center">
 						${getItemGradeLetter(_item.group)} ${getLangData('grade talisman, collect all pieces for set bonus')}
 					</div>
 				</div>
 			</div>
+			<div class="page-detail-splitter"></div>
 			<div class="flex artifact-bonus" style="width:100%;padding:1vh">`
                + _pieces +
             `</div>
-			<div class="flex artifact-heading" style="width:100%;padding:2vh">
-               <span style="color:#f3f4f5cc!important">Set Bonus: <span style="font-weight:600;color:${_item.group < 2 ? '#FF3131': '#6495ED'}!important">%${_item.bonus.rate} ${_bonusTitle}</span><span${_isActive ? ' style="color:green!important;font-weight:600"' : ' class="d-none"'}">&nbsp;(${getLangData('Active')})</span></span>
+			<div class="flex artifact-heading flex-ai-start w-100">
+               	<div class="flex flex-jc-start w-100 artifact-heading-title">
+					Set Bonus:<span${_isActive ? ' style="color:green!important;font-weight:600"' : ' class="d-none"'}">&nbsp;(${getLangData('Active')})</span>
+				</div>
+				<div class="artifact-heading-bonus-value w-100 flex flex-jc-start" style="color:${_item.group < 2 ? '#FF3131': '#6495ED'}!important">%${_item.bonus.rate} ${_bonusTitle}</div>
             </div>
 			<div class="d-none" onexactclick="closeItemInfoModal()" style="position:absolute;top:0;right:0;padding:2vh;font-weight:600;font-size:5vh!important;line-height:3vh !important;color:darkgoldenrod !important">&times;</div>
         </div>

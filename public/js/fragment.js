@@ -228,21 +228,27 @@ function askSwapFragmentCharacter(_id) {
 	if(_myfr.grade > 0)
 		_count -= _item.limits.find(x => x.grade === _myfr.grade).limit;
 	if(_count > 2) {
-    	let _modal = `<div class="full flex inventory-question fragment-swap-question">
+    	let _modal = `<div data-singleton-key="modal_middle" class="full flex inventory-question fragment-swap-question">
 			<div class="inventory-modal">
-				<div style="padding:4vh 2vh 2vh 2vh;position:relative" class="flex w-100">
+				<div class="flex w-100 fragment-swap-question-header">
 					<div class="w-50 flex">
-						<div class="main-portrait flex w-100" style="padding:1vh">
+						<div class="main-portrait flex w-100">
 							<img src="./images/fragments/${_item.key}.png" style="height:6vh" />
 						</div>
-						<div class="flex w-100" style="justify-content:center!important;font-size:3vh !important;color:#f3f4f5cc !important">
-							<div id="decrease-count-btn" class="game-menu-button flex animate-me disabled" style="margin:0 1vh;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="decreaseSwapCount('${_item.key}')">-</div>
-							&nbsp;&nbsp;x&nbsp;<span id="swap-count" style="font-size:3vh !important;color:#f3f4f5cc !important">3</span>&nbsp;&nbsp;
-							<div id="increase-count-btn" class="game-menu-button flex animate-me${_count > 5 ? '' : ' disabled'}" style="margin:0 1vh;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="increaseSwapCount('${_item.key}')">+</div>          
+						<div class="flex w-100 swap-count-container">
+							<div id="decrease-count-btn" class="flex animate-me disabled" onexactclick="decreaseSwapCount('${_item.key}')">
+								
+							</div>
+							<div class="swap-count-wrapper flex">
+								x <span id="swap-count">3</span>
+							</div>
+							<div id="increase-count-btn" class="flex animate-me${_count > 5 ? '' : ' disabled'}" onexactclick="increaseSwapCount('${_item.key}')">
+								
+							</div>          
 						</div>
 					</div>
 					<div class="w-50 flex">
-						<div class="taken-fragment-portrait flex w-100" style="padding:1vh">
+						<div class="taken-fragment-portrait flex w-100">
 							<img src="./images/fragments/${_others[0].key}.png" style="height:6vh" />
 						</div>
 						<div class="taken-fragment-count flex">
@@ -250,15 +256,16 @@ function askSwapFragmentCharacter(_id) {
 						</div>
 					</div>
 					<div class="swap-right">
-						<img src="./images/icons/swap-right.png" />
+						<img src="./images/ui/game/double-arrow.png" />
 					</div>
 				</div>
-				<div class="fragment-swap-list flex flex-jc-start">`
+				<div class="fragment-swap-list flex flex-jc-start question-modal-desc">
+					<div class="page-detail-splitter"></div>`
 					+ _html +
 				`</div>
-				<div style="padding:3vh 2vh 5vh 2vh" class="flex">
-					<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('IGNORE')}</div>
-					<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="swapCharacterFragment(${_id})">${getLangData('ACCEPT')}</div>
+				<div class="flex new-game-menu-buttons">
+					<div class="new-game-menu-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('IGNORE')}</div>
+					<div class="new-game-menu-button flex animate-me" onexactclick="swapCharacterFragment(${_id})">${getLangData('ACCEPT')}</div>
 				</div>
 			</div>
 		</div>`;

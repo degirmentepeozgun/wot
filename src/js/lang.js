@@ -47,6 +47,7 @@ const __langData = [
 	{ key: 'belt', tr: 'Kemer' },
 	{ key: 'weapon', tr: 'Silah' },
 	{ key: 'minutes', tr: 'dakika' },
+	{ key: 'Strongbox', tr: 'Kilitli Sandık' },
 	{ key: 'Stay online for', tr: 'Çevrimiçi kal' },
 	{ key: 'Group sell items', tr: 'Ekipman toplu satışı' },
 	{ key: 'Sell this equipment for', tr: 'Bu ekipmanı sat' },
@@ -58,6 +59,8 @@ const __langData = [
 	{ key: 'Score', tr: 'Puan' },
 	{ key: 'Final Score', tr: 'Genel Toplam' },
 	{ key: 'Total Score', tr: 'Toplam Puan' },
+	{ key: 'World Ranking', tr: 'Dünya Sıralaması' },
+	{ key: 'Character Level', tr: 'Karakter Seviyesi' },
 	{ key: 'Leaderboard', tr: 'Lider Tablosu' },
 	{ key: 'New Record', tr: 'Yeni Rekor' },
 	{ key: 'Supply Incoming', tr: 'Tedarik Geliyor' },
@@ -69,7 +72,7 @@ const __langData = [
 	{ key: 'Attribute Possibilities', tr: 'Özellik Olasılıkları' },
 	{ key: 'Coming Soon', tr: 'Yakında Gelecek' },
 	{ key: 'After the countdown, you will be ported to next stage', tr: 'Geri sayımdan sonra, sonraki bölüme geçilecektir' },
-	{ key: 'After the countdown, action will be active', tr: 'Geri sayımdan sonra, çıkış aktif olacaktır' },
+	{ key: 'Action will be active in', tr: 'Menüye dönmek için bekleyin' },
 	{ key: 'Bonus Achievements', tr: 'Bonus Başarılar' },
 	{ key: 'Content Is Locked', tr: 'İçerik Kilitli' },
 	{ key: 'Current Grade', tr: 'Mevcut Seviye' },
@@ -138,7 +141,9 @@ const __langData = [
 	{ key: 'Daily', tr: 'Günlük' },
 	{ key: 'Attack', tr: 'Saldırı' },
 	{ key: 'Health Per Second', tr: 'Saniye Başı Sağlık' },
-	{ key: 'Unlock', tr: 'Kilitli' },
+	{ key: 'Unlocked', tr: 'Kilitli' },
+	{ key: 'Strongbox Found', tr: 'Sandık Bulundu' },
+	{ key: 'UNLOCK', tr: 'KİLİDİ AÇ' },
 	{ key: 'Fire', tr: 'Alev' },
 	{ key: 'Ice', tr: 'Buz' },
 	{ key: 'Lightning', tr: 'Işık' },
@@ -214,6 +219,8 @@ const __langData = [
 	{ key: 'Kobold', tr: 'Ejder'},
 	{ key: 'Gold Waggon', tr: 'Altın Vagon'},
 	{ key: 'BOSS', tr: 'Patron'},
+	{ key: 'Pinata Hive', tr: 'Arı Kovanı'},
+	{ key: 'Goblin King', tr: 'Goblin Kral'},
 	{ key: 'TRAVEL', tr: 'SEYAHAT'},
 	{ key: 'All', tr: 'Tümü'},
 	{ key: 'Atk', tr: 'Sdr'},
@@ -231,13 +238,16 @@ const __langData = [
 	{ key: 'Honor Point', tr: 'Onur Puanı'},
 	{ key: 'Active Duel', tr: 'Aktif Düello'},
 	{ key: 'PVP Order', tr: 'PVP Sırası'},
+	{ key: 'TAP TO UNLOCK', tr: 'BAS VE KİLİDİ AÇ'},
 	{ key: 'Watch Video', tr: 'Videoyu İzle'},
 	{ key: 'Duel limit reached', tr: 'Düello limitine ulaşıldı'},
 	{ key: 'Friend limit reached', tr: 'Arkadaşlık limitine ulaşıldı'},
 	{ key: 'You', tr: 'Siz'},
 	{ key: 'Lvl', tr: 'Svy'},
+	{ key: 'Lv', tr: 'Sv'},
 	{ key: 'Match', tr: 'Eşleşme'},
 	{ key: 'START', tr: 'BAŞLAT'},
+	{ key: 'OK', tr: 'TAMAM'},
 	{ key: 'FIGHT', tr: 'BAŞLA'},
 	{ key: 'LEVEL UP!', tr: 'ÜST SEVİYE!'},
 	{ key: 'Victory', tr: 'Zafer'},
@@ -251,6 +261,7 @@ const __langData = [
 	{ key: 'Quest Progress', tr: 'Görev Durumu'},
 	{ key: 'Quest Status', tr: 'Görev Durumu'},
 	{ key: 'Quest Owner', tr: 'Görev Sahibi'},
+	{ key: 'Get Reward', tr: 'Ödülü Al'},
 	{ key: 'Item Drop Rates', tr: 'Ekipman Düşme Oranları'},
 	{ key: 'Day', tr: 'Gün'},
 	{ key: 'Active', tr: 'Aktif'},
@@ -263,6 +274,13 @@ const __langData = [
 	{ key: 'Zone Level', tr: 'Alan Seviyesi'},
 	{ key: 'Played Today', tr: 'Bugün Oynanan'},
 	{ key: 'Rewards', tr: 'Ödüller'},
+	{ key: 'We put them down', tr: 'İblislerin üstesinden geldik'},
+	{ key: 'There can be more', tr: 'Daha fazlası olabilir'},
+	{ key: 'More? What exactly?', tr: 'Daha fazlası derken?'},
+	{ key: 'There! The gate of demons', tr: 'İşte! İblisler geçidi'},
+	{ key: 'Won\'t be easy this time', tr: 'Bu sefer kolay olmayacak'},
+	{ key: 'Take Alkin with you', tr: 'Alkini de yanına al'},
+	{ key: 'SUPPORT CHARACTER UNLOCKED', tr: 'DESTEKÇİ KİLİDİ AÇILDI'},
 	{ key: 'Complete Rewards', tr: 'Tamamlama Ödülü'},
 	{ key: 'Mission Cleared', tr: 'Görev Başarılı'},
 	{ key: 'Mission Failed', tr: 'Görev Başarısız'},
@@ -336,12 +354,14 @@ const __langData = [
 	{ key: 'Power', tr: 'Güç' },
 	{ key: 'Portal', tr: 'Geçit' },
 	{ key: 'Player', tr: 'Oyuncu' },
+	{ key: 'PRESS ANY KEY', tr: 'BİR TUŞA BASIN' },
 	{ key: 'Your mailbox is empty', tr: 'Posta kutun boş' },
 	{ key: 'No players online', tr: 'Çevrimiçi oyuncu yok' },
 	{ key: 'You text too often', tr: 'Çok sık mesaj yazamazsınız' },
 	{ key: 'Type your message', tr: 'Mesajınızı yazın' },
 	{ key: 'No conversation', tr: 'Konuşma yok' },
 	{ key: 'Quest Needs', tr: 'Görev İhtiyaçları' },
+	{ key: 'Choose Your Avatar', tr: 'Avatarını Seç' },
 	{ key: 'Forge Time', tr: 'Dövülme Süresi' },
 	{ key: 'Next Spin', tr: 'Sonraki Çevirme' },
 	{ key: 'Remove talk', tr: 'Konuşmayı kaldır' },
@@ -358,6 +378,7 @@ const __langData = [
 	{ key: 'last', tr: 'son' },
 	{ key: 'hours', tr: 'saat' },
 	{ key: 'Skip Story', tr: 'Hikayeyi Geç' },
+	{ key: 'Skip Tutorial', tr: 'Tanıtımı Geç' },
 	{ key: 'Your level is too low', tr: 'Seviyeniz çok düşük' },
 	{ key: 'Confirm purchase', tr: 'Alımı onayla' },
 	{ key: 'Start duel battle', tr: 'Düello savaşını başlat' },
@@ -392,14 +413,20 @@ const __langData = [
 	{ key: 'Item Is Ready', tr: 'Ekipman Hazır'},
 	{ key: 'KEEP OLD STATS', tr: 'ESKİ HALİNİ KORU'},
 	{ key: 'READY', tr: 'HAZIR'},
+	{ key: 'SHARE', tr: 'PAYLAŞ'},
 	{ key: 'It might be hard for you', tr: 'Senin için zor olabilir'},
 	{ key: 'Minium adviced level is', tr: 'Tavsiye edilen en düşük seviye'},
 	{ key: 'New gem possibilities', tr: 'Yeni taş olasılıkları'},
 	{ key: 'Melt places are full', tr: 'Eritme yuvaları dolu'},
 	{ key: 'All gems must be in same grade', tr: 'Tüm taşlar aynı seviye olmalıdır' },
 	{ key: 'Not started', tr: 'Başlamadı' },
+	{ key: 'My legendary moment', tr: 'Efsanevi anım' },
+	{ key: 'Capture Moment', tr: 'Anı Yakala' },
+	{ key: 'Share Your Legend', tr: 'Efsanevi Anımı Paylaş' },
 	{ key: 'Pick a gem for socket', tr: 'Yuva için bir taş seçin' },
 	{ key: 'USE NEW STATS', tr: 'YENİ HALİNİ KULLAN'},
+	{ key: 'TAP TO COPY', tr: 'BAS VE KOPYALA'},
+	{ key: 'TAP TO SHARE', tr: 'BAS VE PAYLAŞ'},
 	{ key: 'Coop Content', tr: 'Coop İçeriği'},
 	{ key: 'Old Version', tr: 'Eski Versiyon'},
 	{ key: 'New Version', tr: 'Yeni Versiyon'},
@@ -422,13 +449,17 @@ const __langData = [
 	{ key: 'Auto-Pass Results', tr: 'Oto-Oynatma Sonucu' },
 	{ key: 'CLOSE', tr: 'KAPAT' },
 	{ key: 'SIDE QUEST', tr: 'YAN GÖREV' },
+	{ key: 'QUEST', tr: 'GÖREV' },
 	{ key: 'Don\'t show again', tr: 'Tekrar gösterme' },
 	{ key: 'Win Streak', tr: 'Galibiyet Serisi' },
 	{ key: 'Min Level', tr: 'En Düşük Seviye' },
 	{ key: 'Progress', tr: 'Durum' },
 	{ key: 'RESET', tr: 'SIFIRLA' },
 	{ key: 'Rage', tr: 'Öfke' },
+	{ key: 'Next stage in', tr: 'Sonraki bölüm' },
+	{ key: 'Presentation', tr: 'Tanıtım' },
 	{ key: 'Controls', tr: 'Kontroller' },
+	{ key: 'Photo copied to clipboard', tr: 'Fotoğraf panoya kopyalandı' },
 	{ key: 'Reset to default settings', tr: 'Varsayılan ayarlara geri dön' },
 	{ key: 'Affected Target', tr: 'Etkilenen Hedef' },
 	{ key: 'Reset talent build?', tr: 'Beceri ağacını sıfırla?' },
@@ -441,6 +472,7 @@ const __langData = [
 	{ key: 'Crit Damage Resist Rate', tr: 'Kritik Hasar Direnç Oranı' },
 	{ key: 'ACTIVATE', tr: 'AKTİF ET' },
 	{ key: 'Act', tr: 'Perde' },
+	{ key: 'Learn More', tr: 'Daha Fazla Bilgi' },
 	{ key: 'Attack Speed', tr: 'Saldırı Hızı' },
 	{ key: 'Health Point', tr: 'Sağlık Puanı' },
 	{ key: 'Crit Rate', tr: 'Kritik Oranı' },
@@ -583,16 +615,196 @@ const __langData = [
 		tr: 'Harika! Görevi bitirdin. Şimdi istikametimiz Köy'
 	},
 	{ key: 'grade talisman, adds bonus attributes when you combine with other set pieces', tr: 'seviye tılsım, diğer set parçaları ile kombinlendiğinde size ekstra güç verir' }
+];
+const __openingScreenLangData = [
+	{ 
+		key: 'DEMO',
+		tr: 'DEMO'
+	},
+	{ 
+		key: 'PROTOTYPE',
+		tr: 'PROTOTİP'
+	},
+	{ 
+		key: 'NEW GAME',
+		tr: 'YENİ OYUN'
+	},
+	{
+		key: 'CREDITS',
+		tr: 'JENERİK'
+	},
+	{
+		key: 'CONTROLS',
+		tr: 'KONTROLLER'
+	},
+	{
+		key: 'QUIT',
+		tr: 'ÇIKIŞ'
+	}
+]
+const __creditsLangData = [
+	{
+		key: 'CREDITS',
+		tr: 'JENERİK'
+	},
+	{
+		key: 'CREATIVE DIRECTOR',
+		tr: 'YARATICI DİREKTÖR'
+	},
+	{
+		key: 'GAME DESIGN',
+		tr: 'OYUN TASARIMI'
+	},
+	{
+		key: 'PROGRAMMING',
+		tr: 'PROGRAMLAMA'
+	},
+	{
+		key: 'TECHNICAL DIRECTION',
+		tr: 'TEKNİK DİREKTÖRLÜK'
+	},
+	{
+		key: 'LEVEL DESIGN',
+		tr: 'SEVİYE TASARIMI'
+	},
+	{
+		key: 'CUSTOM ENGINE DEVELOPMENT',
+		tr: 'ÖZEL OYUN MOTORU GELİŞTİRME'
+	},
+	{
+		key: 'ART DIRECTION & ANIMATION',
+		tr: 'SANAT DİREKTÖRLÜĞÜ ve ANİMASYON'
+	},
+	{
+		key: 'CHARACTER DESIGN',
+		tr: 'KARAKTER TASARIMI'
+	},
+	{
+		key: 'SPRITE ART',
+		tr: 'SPRITE SANATI'
+	},
+	{
+		key: 'CONCEPT ART',
+		tr: 'KONSEPT SANATI'
+	},
+	{
+		key: 'UI DESIGN',
+		tr: 'KULLANICI ARAYÜZÜ TASARIMI'
+	},
+	{
+		key: 'WORLDBUILDING & LORE',
+		tr: 'EVREN TASARIMI ve HİKAYE'
+	},
+	{
+		key: 'INSPIRED BY',
+		tr: 'ESİN KAYNAĞI'
+	},
+	{
+		key: 'WRITTEN BY',
+		tr: 'YAZAN'
+	},
+	{
+		key: 'STRATEGY & PUBLISHING ADVISOR',
+		tr: 'STRATEJİ ve YAYIN DANIŞMANI'
+	},
+	{
+		key: 'MARKETING STRATEGY',
+		tr: 'PAZARLAMA STRATEJİSİ'
+	},
+	{
+		key: 'COMMUNITY GUIDANCE',
+		tr: 'TOPLULUK YÖNETİMİ'
+	},
+	{
+		key: 'INVESTOR RELATIONS',
+		tr: 'YATIRIMCI İLİŞKİLERİ'
+	},
+	{
+		key: 'CREATIVE CONSULTING',
+		tr: 'YARATICI DANIŞMANLIK'
+	},
+	{
+		key: 'FOR FOLLOW & SUPPORT',
+		tr: 'TAKİP ve DESTEK İÇİN'
+	},
+	{
+		key: 'Everyone who supported the project',
+		tr: 'Projeye destek veren herkes'
+	},
+	{
+		key: 'SPECIAL THANKS',
+		tr: 'ÖZEL TEŞEKKÜRLER'
+	},
+	{
+		key: 'QA TESTERS',
+		tr: 'TEST EKİBİ'
+	},
+	{
+		key: 'SOUND EFFECTS',
+		tr: 'SES EFEKTLERİ'
+	},
+	{
+		key: 'AI MUSIC GENERATION',
+		tr: 'YAPAY ZEKA MÜZİK OLUŞTURMA'
+	},
+	{
+		key: 'AI VOICE TECHNOLOGY',
+		tr: 'YAPAY ZEKA SES TEKNOLOJİSİ'
+	},
+	{
+		key: 'Assets from GameDevMarket',
+		tr: 'GameDevMarket\'ten Alınan Varlıklar'
+	},
+	{
+		key: 'UI ELEMENTS',
+		tr: 'KULLANICI ARAYÜZÜ ÖGELERİ'
+	},
+	{
+		key: 'MAP ASSETS',
+		tr: 'HARİTA VARLIKLARI'
+	},
+	{
+		key: 'WEBSITE VISUAL DESIGN',
+		tr: 'WEB SİTESİ GÖRSEL TASARIMI'
+	},
+	{
+		key: 'WEBSITE DEVELOPMENT',
+		tr: 'WEB SİTESİ GELİŞTİRME'
+	},
+	{
+		key: 'SOCIAL MEDIA',
+		tr: 'SOSYAL MEDYA'
+	},
+	{
+		key: 'TRAILER VISUAL DESIGN',
+		tr: 'FRAGMAN GÖRSEL TASARIMI'
+	},
+	{
+		key: 'TRAILER PRODUCTION',
+		tr: 'FRAGMAN PRODÜKSİYONU'
+	},
+	{
+		key: 'CULTUREL INSPIRATION',
+		tr: 'KÜLTÜREL ESİN KAYNAĞI'
+	},
+	{
+		key: 'Inspired by Turkic mythology, Anatolian folklore and ancient legends',
+		tr: 'Türk mitolojisi, Anadolu folkloru ve eski efsanelerden esinlenilmiştir'
+	},
+	{
+		key: 'Thanks for playing',
+		tr: 'Oyunu oynadığınız için teşekkürler'
+	}
 ]
 function getLang() {
 	return __account.lang ?? __defaultLang;
 }
-function getLangData(_key) {
+function getLangData(_key, _array) {
 	if(getLang() === __defaultLang)
 		return _key;
 	const _k = _key.replace(/[?]/g, '[?]');
 	var _rex = new RegExp('^' + _k + '$', "i");
-	return __langData.find(x => _rex.test(x.key))?.[__account.lang] ?? _key;
+	return (_array ?? __langData).find(x => _rex.test(x.key))?.[__account.lang] ?? _key;
 }
 function getLangDataFromArray(_arr, _lang) {
 	return _arr?.[_lang] ?? _arr['en'];

@@ -21,6 +21,7 @@ function animation(_a) {
 	this.oldSpeed = this.speed;
 	this.frames = _a.frames;
 	this.do = _a.do;
+	this.primary = _a.primary;
 	if(this.frames?.[0])
 		this.frames.forEach(x => x.frameKey = 'l' + x.spriteLeft + 't' + x.spriteTop + 'w' + x.spriteWidth + 'h' + x.spriteHeight);
 	if(_a.alternateFrames)

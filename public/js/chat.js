@@ -1,6 +1,7 @@
 ﻿'use strict';
-console.log('chat');
-function chat() {
+(function(){
+	console.log('chat');
+	function chat() {
 	this.render = function(_noAnimation) {
 		let _html = 
 		`<div data-module="chat" class="book-page-wrapper chat-container shop-container${_noAnimation ? '' : ' fade-me'}">
@@ -146,3 +147,6 @@ function chat() {
 	}
 	return this;
 }
+window.chat =chat;
+
+})();

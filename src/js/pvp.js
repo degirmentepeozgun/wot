@@ -36,12 +36,12 @@ function pvp() {
 				addClass(_o, 'selected');
 			else
 				removeClass(_o, 'selected');
-		askSomething('Start duel battle', "__pvp.match('" + _key + "')");
+		askSomething('Start duel battle', "__pvp.match('" + _key + "')", 'modal_2x1');
 	}
 	this.findOpponents = function () {
 		const _container = document.querySelector('.pvp-content-left-content');
 		if(mainCharacter.level < this.unlockLevel) {
-			_container.innerHTML = `<div class="skills-content-left menu-modal-left-container full"><div style="padding:1% 5%;overflow-y:auto" class="full">` +
+			_container.innerHTML = `<div class="skills-content-left menu-modal-left-container full"><div style="overflow-y:auto" class="full">` +
 				renderLockedContent(getLangData('Lvl') + ' ' + this.unlockLevel + ' ' + getLangData('required')) + `</div></div>`;
 			return;
 		}
@@ -62,11 +62,11 @@ function pvp() {
 			_e.pvpOrder = __account.pvp.order - i;
 			this.opponents.push(_e);
 		}
-		let _html = '<div class="skills-content-left menu-modal-left-container full"><div style="padding:1% 5%;overflow-y:auto" class="full">';
+		let _html = '<div class="skills-content-left menu-modal-left-container full"><div style="overflow-y:auto" class="full">';
 		for(let _opponent of this.opponents)
 			_html += `<div onexactclick="__pvp.selectOpponent(this,'${_opponent.key}')" class="skill-card animate-me flex">
 						<div class="skill-icon-wrapper flex" style="padding-right:.5vh">
-							<img src="./images/main/avatars/${_opponent.class}.png" style="width:9vh" />
+							<img src="./images/main/avatars/${_opponent.class}.png" />
 						</div>
 						<div style="flex:1;height:100%" class="flex flex-jc-start">
 							<div class="flex flex-jc-start skill-card-title w-100" style="height:50%">${getLangData('Lvl')}&nbsp;${_opponent.level}&nbsp;${getLangData(_opponent.class)}</div>
@@ -110,31 +110,26 @@ function pvp() {
 			<div class="honor-content-detail-wrapper menu-modal-right-container">`
 			+ (_content !== '' ? _content :
 			`<div style="justify-content:center" class="me-container flex">
-				<div style="height:100%;aspect-ratio:110/365;position:relative;z-index:10">
-					<img loading="lazy" src="./images/ui/border-left.png" style="max-width:120%;max-height:120%;position:relative;right:-20%;top:-10%;z-index:10" />
-				</div>
-				<div class="me-frame">
+				<div class="me-frame artifact-detail-header-icon">
 					<div class="me-concept flex full">
 						<img loading="lazy" src="./images/main/${mainCharacter.class}/finish-concept-s.png" />
 					</div>
 				</div>
-				<div style="height:100%;aspect-ratio:110/365">
-					<img style="max-width:120%;max-height:120%;position:relative;left:-40%;top:-10%" loading="lazy" src="./images/ui/border-right.png" />
-				</div>
 			</div>
+			<div class="w-100 flex pvp-top-splitter"><img src="./images/ui/game/item-detail-top-splitter.png" /></div>
 			<div class="flex me-info">
 				<div class="flex pvp-info-0 w-100">
-				<div class="flex flex-jc-start w-50">${getLangData('League')}</div>
-				<div class="flex flex-jc-end w-50">${getLangData(_league)}</div>
+				<div class="flex flex-jc-start w-50 page-detail-item-label">${getLangData('League')}</div>
+				<div class="flex flex-jc-end w-50 page-detail-item-value">${getLangData(_league)}</div>
 			</div>
 			<div class="flex pvp-info-1 w-100">
-				<div class="flex flex-jc-start w-50">${getLangData('PVP Order')}</div>
-				<div class="flex flex-jc-end w-50">${mainCharacter.level < this.unlockLevel ? '-' : __account.pvp.order.formatWithDots()}</div>
+				<div class="flex flex-jc-start w-50 page-detail-item-label">${getLangData('PVP Order')}</div>
+				<div class="flex flex-jc-end w-50 page-detail-item-value">${mainCharacter.level < this.unlockLevel ? '-' : __account.pvp.order.formatWithDots()}</div>
 			</div>
 			<div class="flex w-100 pvp-info-2"></div>
 			<div class="flex pvp-info-3 w-100">
-				<div class="w-50 flex flex-jc-start">${getLangData('Total Power')}</div>
-				<div class="flex w-50 flex-jc-end">${getTotalPower()?.total?.formatWithDots()}</div>
+				<div class="w-50 flex flex-jc-start page-detail-item-label">${getLangData('Total Power')}</div>
+				<div class="flex w-50 flex-jc-end page-detail-item-value">${getTotalPower()?.total?.formatWithDots()}</div>
 			</div>
 			<div class="flex pvp-info-4 w-100"></div>`)
 			+
@@ -169,8 +164,8 @@ function pvp() {
 				_client.saveState();
 			}
 		}
-		_container4.innerHTML = `<div class="flex w-50 flex-jc-start">${getLangData('Win Streak')}</div><div class="flex w-50 flex-jc-end">${__account.pvp.maxWinCount.formatWithDots()}</div>`;
-		_container.innerHTML = '<div class="flex w-50 flex-jc-start">' + getLangData('Active Duel') + '</div><div class="flex w-50 flex-jc-end">' + (__account.pvp.duelCount < 1 ? '0' : __account.pvp.duelCount.toString()) + ' / 10<span id="pvp-play-time-left"></span></div>';
+		_container4.innerHTML = `<div class="flex w-50 flex-jc-start page-detail-item-label">${getLangData('Win Streak')}</div><div class="flex w-50 flex-jc-end page-detail-item-value">${__account.pvp.maxWinCount.formatWithDots()}</div>`;
+		_container.innerHTML = '<div class="flex w-50 flex-jc-start page-detail-item-label">' + getLangData('Active Duel') + '</div><div class="flex w-50 flex-jc-end page-detail-item-value"><span id="pvp-play-time-left"></span>' + (__account.pvp.duelCount < 1 ? '0' : __account.pvp.duelCount.toString()) + ' / 10</div>';
 		this.updatePlayStatus();
 	}
 	this.updatePlayStatus = function() {

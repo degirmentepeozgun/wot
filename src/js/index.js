@@ -41,7 +41,7 @@ function animate(_tick) {
 	}
 	if(_closeOpeningMusic && _openingSound?.volume > 0)
 	{
-		const _vol = _openingSound.volume - .025;
+		const _vol = _openingSound.volume - (.025 * __volume);
 		if(_vol <=0) {
 			_openingSound.volume = 0;
 			if(!_openingSound.paused) {
@@ -57,12 +57,14 @@ function animate(_tick) {
 	episode.check = true;
 	__queue.length = 0;
 	_cNPC.clearRect(0, 0, _canvasS.width, _canvasS.height);
-	if(mainCharacter)
+	if(mainCharacter){
+		episode.tryMoveMainCamera();
 		mainCharacter.draw(__queue);
+	}
 	const _sameCoords = (platformX === prevPlatformX);
 	episode.checkWeatherEffect();
 	episode.checkForgeDone();
-	if (!_sameCoords && !episode?.effect) {
+	if (!_sameCoords || episode?.effect) {
 		episode.drawLayers();
 		episode.drawObjects();
 		episode.drawSpriteObjects();
@@ -82,7 +84,7 @@ function animate(_tick) {
 	if(__storyTell)
 		__storyTell.render();
 	
-	const _moved = episode.tinyMoveCamera();
+	const _moved =  episode.tinyMoveCamera();
 	if(_moved)
 		prevPlatformX = undefined;
 	requestAnimationFrame(animate);
@@ -198,6 +200,7 @@ function loadAsset(src, _checkObj, _callback, _global, _zoom) {
 		if(_checkObj) {
 			_checkObj.order++;
 			_assetsProgress.innerText = _checkObj.order + ' / ' + _checkObj.limit;
+			document.getElementById('assets-progressbar-inner').style.width = (_checkObj.order / _checkObj.limit * 100) + '%';
 			if (_checkObj.order === _checkObj.limit)
 				_callback();
 		}
@@ -206,6 +209,7 @@ function loadAsset(src, _checkObj, _callback, _global, _zoom) {
 	getImage(src, function () {
 		if(_checkObj) {
 			_checkObj.order++;
+			document.getElementById('assets-progressbar-inner').style.width = (_checkObj.order / _checkObj.limit * 100) + '%';
 			_assetsProgress.innerText = _checkObj.order + ' / ' + _checkObj.limit;
 			if (_checkObj.order === _checkObj.limit)
 				_callback();
@@ -552,16 +556,17 @@ function createTipsUI(_tipOrder, _showCurrent) {
 	`</div></div>`;
 	setTimeout(() => {
 		document.getElementById('loading-tip').innerHTML = `<div class="tip-wrapper flex flex-ai-start">
-			<div style="padding:0 3vh;text-align:right"> 
-				${getLangData('Tip')}<span id="tip-current">${_showCurrent ? ' ' + _current.toString() + '/' + _count.toString() : ': '}</span>
+			<div class="tip-label flex flex-ai-start flex-jc-end wot-subtitle" lang="${getLang()}"> 
+				${getLangData('Tip')}
 			</div>
-			<div class="flex flex-jc-start" style="flex:1;padding:0 3vh 0 0">
+			<div class="flex flex-jc-start tip-text wot-subtitle" style="flex:1;padding:0 3vh 0 0" lang="${getLang()}">
 				${_tips[_tipOrder][getLang()]}
 			</div>
 		</div>`;
 	}, 20);
 	return _html;
 }
+setTimeout(function(){ createTipsUI(5)}, 6000);
 function initMainCharacter() {
 	const _mh = mainCharacter?.health;
 	const _me = mainCharacter?.experience;
@@ -599,7 +604,7 @@ function setTip() {
 	}
 	return _splash;
 }
-function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
+function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 	if(__switchingMap)
 		return;
 	_game.suspended = 1;
@@ -705,7 +710,6 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 			mainCharacter.animate('idle', 1);
 			mainCharacter.lastActivity = _gameTick;
 			mainCharacter.enableSkillUI();
-			episode.playAmbianceMusic();
 			let _mapDiscovered;
 			if (!_isBattleGround && !episode.dungeon && !_isMission && __account.visitedMaps.indexOf(episode.subMap ?? episode.id) === -1) {
 				_client.upgradeVisitedMaps(episode.id);
@@ -729,9 +733,10 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 			if(_startWith && (mainCharacter?.id % 10000) !== _startWith)
 				startWithThisCharacter(_startWith, null, null, 1);
 			setTimeout(function() {
+				addClass(document.getElementById('game-opening-screen-menu'), 'd-none');
 				if(_onEnd)
 					_onEnd();
-				else {
+				else if(!episode.pvp && !episode.war){
 					addClass(_splash, 'd-none');
 					const _ts = document.getElementById('tip-screen');
 					if(_ts)
@@ -777,7 +782,9 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 					mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
 				else if(_startWith === 0)
 					mainCharacter = undefined;
-				if(__storyScene?.afterInit)
+				if(_afterInit)
+					_afterInit();
+				else if(__storyScene?.afterInit)
 					__storyScene.afterInit();
 				if(!_storySceneSwitching)
 					_game.suspended = false;
@@ -794,12 +801,18 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 				}
 				removeClass(_gameUI, 'ghost');
 				disposeFocus();
-				if(__particles)
-					__particles.cancel();
-				if(episode.war)
-					_gameUI.setAttribute('data-mapid', 'war');
-				else if(_gameUI.hasAttribute('data-mapid'))
-					_gameUI.removeAttribute('data-mapid');
+				// if(__particles)
+				// 	__particles.cancel();
+				if(episode.war || episode.pvp){
+					addClass(_gameUI, 'war-map');
+					//document.querySelector('.enemy-profile').style.setProperty('width', '40vw', 'important');
+					//document.getElementById('top-nav').style.setProperty('width', '40vw', 'important');
+				}
+				else {
+					removeClass(_gameUI, 'war-map');
+				//	document.querySelector('.enemy-profile').style.removeProperty('width');
+				//	document.getElementById('top-nav').style.removeProperty('width');
+				}
 				for(let i = 1; i < 5; i++) {
 					const cfc = chainSkills['skill' + i].firstChild;
 					cfc.removeAttribute("src");
@@ -808,6 +821,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd) {
 				resetTouchPad();
 				checkPC();
 				clearStatusBoard();
+				episode.playAmbianceMusic();
 			}, 2000);
 		});
 	});
@@ -916,16 +930,22 @@ function getGroundHeight() {
 	}
 	return groundheight;
 }
-
-var _closeOpeningMusic, gameopening;
+function isPhone() {
+    return (
+        navigator.maxTouchPoints > 0 &&
+        Math.min(window.innerWidth, window.innerHeight) < 600
+    );
+}
+var _closeOpeningMusic, gameopening, __isHEDevice, gameIsReady = false;
 function openGame() {
-	if(gameopening)
+	if(gameopening || !gameIsReady)
 		return;
 	gameopening = 1;
+	removeClass(document.getElementById('assets-progressbar'), 'd-none');
 	//launchIntoFullscreen(document.documentElement);
 	setTimeout(async function () {
-		const _isHEDevice = await isHighEndDevice();
-		if(!_isHEDevice)
+		__isHEDevice = await isHighEndDevice();
+		if(!__isHEDevice)
 			__scale = 2;
 		if(_openingSound)
 			_closeOpeningMusic = 1;
@@ -947,7 +967,7 @@ function openGame() {
 		_client.loadGold();
 		_client.loadPots();
 		__account.onlineStart = Date.now();
-		if(__account.name)
+		if(__account.name !== '')
 			connectSocket();
 		_client.saveState();
 		updateQuestArea();
@@ -1041,6 +1061,8 @@ function setKeyBoard(_c) {
 }
 function addEvent(_id, _char) {
 	const _skillbtn = document.getElementById(_id);
+	if(!_skillbtn)
+		return;
 	_skillbtn.addEventListener("mousedown", function() {
 		mainCharacter.keyboard.mouseDown(_char);
 	});
@@ -1427,7 +1449,7 @@ function checkIfFragmentUpdate() {
 }
 function getBottomMenuTemplate(_index) {
 	return `<div class="menu-bottom">
-        <div class="flex" style="padding: 3.7% 11.5% 3% 11.5%;height: 100%;">
+        <div class="flex menu-bottom-inner">
             <div class="flex animate-me main-menu-btn${_index === 0 ? ' selected' : ''}">
                 <img class="animate-me" src="./images/ui/menu/item3.png" onexactclick="switchBookPage(1, 1)" />
             </div>
@@ -1511,10 +1533,10 @@ function getRightMenuTemplate(_index) {
 	const _ic = __account.misc?.find(x => x.type === 'ticket-item')?.count ?? 0;
 	const _pc = __account.misc?.find(x => x.type === 'ticket-pass')?.count ?? 0;
 	return `<div class="menu-right flex-ai-end flex">
-		<div onexactclick="tryUseStoryTicket(3,1,2,'exp')" class="w-100 menu-sub-button${_ec > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="2"><img src="./images/ui/12.png"><img class="story-ticket-img" src="./images/icons/ticket-exp.png" /><div class="story-ticket-count story-exp-ticket-count${_ec > 0 ? '' : ' no-ticket'}">${_ec > 999 ? '999+' : _ec}</div></div>
-		<div onexactclick="tryUseStoryTicket(3,1,3,'gold')" class="w-100 menu-sub-button${_gc > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="3"><img src="./images/ui/12.png"><img class="story-ticket-img" src="./images/icons/ticket-gold.png" /><div class="story-ticket-count story-gold-ticket-count${_gc > 0 ? '' : ' no-ticket'}">${_gc > 999 ? '999+' : _gc}</div></div>
-		<div onexactclick="tryUseStoryTicket(3,1,4,'item')" class="w-100 menu-sub-button${_ic > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="4"><img src="./images/ui/12.png"><img class="story-ticket-img" src="./images/icons/ticket-item.png" /><div class="story-ticket-count story-item-ticket-count${_ic > 0 ? '' : ' no-ticket'}">${_ic > 999 ? '999+' : _ic}</div></div>
-		<div onexactclick="tryUseStoryTicket(3,1,5,'pass')" class="w-100 menu-sub-button${_pc > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="5"><img src="./images/ui/12.png"><img class="story-ticket-img" src="./images/icons/ticket-pass.png" /><div class="story-ticket-count story-pass-ticket-count${_pc > 0 ? '' : ' no-ticket'}">${_pc > 999 ? '999+' : _pc}</div></div>
+		<div onexactclick="tryUseStoryTicket(3,1,2,'exp')" class="w-100 menu-sub-button${_ec > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="2"><img src="./images/ui/game/story-ticket-btn.png"><img class="story-ticket-img" src="./images/icons/ticket-exp.png" /><div class="story-ticket-count story-exp-ticket-count${_ec > 0 ? '' : ' no-ticket'}">${_ec > 999 ? '999+' : _ec}</div></div>
+		<div onexactclick="tryUseStoryTicket(3,1,3,'gold')" class="w-100 menu-sub-button${_gc > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="3"><img src="./images/ui/game/story-ticket-btn.png"><img class="story-ticket-img" src="./images/icons/ticket-gold.png" /><div class="story-ticket-count story-gold-ticket-count${_gc > 0 ? '' : ' no-ticket'}">${_gc > 999 ? '999+' : _gc}</div></div>
+		<div onexactclick="tryUseStoryTicket(3,1,4,'item')" class="w-100 menu-sub-button${_ic > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="4"><img src="./images/ui/game/story-ticket-btn.png"><img class="story-ticket-img" src="./images/icons/ticket-item.png" /><div class="story-ticket-count story-item-ticket-count${_ic > 0 ? '' : ' no-ticket'}">${_ic > 999 ? '999+' : _ic}</div></div>
+		<div onexactclick="tryUseStoryTicket(3,1,5,'pass')" class="w-100 menu-sub-button${_pc > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="5"><img src="./images/ui/game/story-ticket-btn.png"><img class="story-ticket-img" src="./images/icons/ticket-pass.png" /><div class="story-ticket-count story-pass-ticket-count${_pc > 0 ? '' : ' no-ticket'}">${_pc > 999 ? '999+' : _pc}</div></div>
 		<div onexactclick="zoomInWorldMap()" class="w-100 zoom-in menu-sub-button animate-me menu-sub-button-3-3${__storyPlaying ? ' disabled gray' : ''}" data-index="4"><img src="./images/ui/menu/plus.png"></div>
 		<div onexactclick="zoomOutWorldMap()" class="w-100 zoom-out menu-sub-button animate-me menu-sub-button-3-3${__storyPlaying ? '' : ' disabled gray'}" data-index="5"><img src="./images/ui/menu/minus.png"></div>
 	</div>`;	
@@ -1790,21 +1812,21 @@ function howToGetStronger() {
 function getTopMenuTemplate(_index) {
 	return `<div class="menu-top flex w-100">
 		<div class="menu-top-item flex">
-			<span onexactclick="howToGainGold()">+</span>
+			<span class="wot-plus" onexactclick="howToGainGold()"></span>
 			<img src="./images/icons/coin.png" />
 		</div>
 		<div class="menu-top-item flex flex-jc-start" id="main-gold-count">
 			${__account.gold.formatWithDots()}
 		</div>
 		<div class="menu-top-item flex">
-			<span onexactclick="howToGainHonor()">+</span>
+			<span class="wot-plus" onexactclick="howToGainHonor()"></span>
 			<img src="./images/icons/honor.png" />
 		</div>
 		<div class="menu-top-item flex flex-jc-start" id="main-honor-count">
 			${__account.pvp.honor.formatWithDots()}
 		</div>
 		<div class="menu-top-item flex">
-			<span onexactclick="howToGainTickets()">+</span>
+			<span class="wot-plus" onexactclick="howToGainTickets()"></span>
 			<img src="./images/icons/key.png" />
 		</div>
 		<div class="menu-top-item flex" style="width:14.6% !important">
@@ -1812,14 +1834,14 @@ function getTopMenuTemplate(_index) {
 			<div class="w-50 flex flex-jc-start" id="portal-timer"></div>
 		</div>
 		<div class="menu-top-item flex" style="width:6.6% !important">
-			<img src="./images/icons/pot.png" style="max-width:100% !important" />
+			<img src="./images/ui/game/potion.png" style="max-width:100% !important" />
 		</div>
 		<div class="menu-top-item flex flex-jc-start" id="main-pot-count-menu">
 			${(__account.pots?.find(x => x.key === 'pot')?.value ?? 0).formatWithDots()}
 		</div>
 		<div class="menu-top-item flex">
 		</div>
-		<img onexactclick="hideMyMenu()" src="./images/icons/close.png" class="gray top-menu-close animate-me" />
+		<img onexactclick="hideMyMenu()" src="./images/ui/game/kapat.png" class="top-menu-close animate-me" />
 	</div>`;	
 }
 function updateMenuBottom(_order) {
@@ -2187,6 +2209,15 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 		}
 		//if(episode?.id !== _mapId)
 			switchMap(_mapId, 1, function() {
+				const _ids = _opponents.map(x => x.id);
+				const _firstIds = [];
+				const _lastIds = [];
+				for(let i = 0; i < _ids.length; i++) {
+					if(i < (_ids.length / 2))
+						_firstIds.push(_ids[i]);
+					else
+						_lastIds.push(_ids[i]);
+				}
 				episode.loadCharacterSprites(function() {
 					_setMapVariables();
 					// const _splash = document.getElementById('splash');
@@ -2215,13 +2246,18 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 					}
 					if(_after)
 						_after();
-				}, _opponents.map(x => x.id));
+					requestIdleCallback(() => {
+						episode.loadCharacterSprites(function() {
+						}, _lastIds);
+					});
+				}, _firstIds);
 			});
 		//else
 		//	_setMapVariables();
 	}
 }
 document.addEventListener("deviceready", onDeviceReady, false);
+let _socialSharing = null;
 function getDeviceId() {
     // mobile
     if (window.device?.uuid) {
@@ -2239,20 +2275,34 @@ function getDeviceId() {
     return id;
 }
 function onDeviceReady() {
+
     try {
 
-        const isElectron = navigator.userAgent.includes("Electron");
+        _socialSharing = window.plugins?.socialsharing ?? null;
 
-        if (!isElectron && window.StatusBar) {
-            StatusBar.hide();
-        }
+        const isElectron = navigator.userAgent.includes("Electron");
 
         if (!isElectron && window.plugins?.insomnia) {
             window.plugins.insomnia.keepAwake();
         }
 
-        if (!isElectron && window.NavigationBar) {
-            window.NavigationBar.backgroundColorByHexString("#000000");
+        if (!isElectron && window.StatusBar) {
+
+            try {
+                StatusBar.overlaysWebView(false);
+            } catch (e) {}
+
+            try {
+                StatusBar.backgroundColorByHexString("#000000");
+            } catch (e) {}
+
+            try {
+                StatusBar.hide();
+            } catch (e) {}
+        }
+
+        if (screen?.orientation?.lock) {
+            screen.orientation.lock("landscape").catch(() => {});
         }
 
         __deviceId = getDeviceId();
@@ -2261,15 +2311,58 @@ function onDeviceReady() {
         _client.loadState();
 
     } catch (ex) {
+
         console.error(ex);
 
-        // fallback (kritik)
         __deviceId = getDeviceId();
 
         _client = new dataOperations();
         _client.loadState();
     }
+
+    if (window.cordova) {
+        const s = document.createElement('script');
+        s.src = './js/html2canvas.js';
+        document.head.appendChild(s);
+    }
 }
+// function onDeviceReady() {
+//     try {
+// 		 _socialSharing = window.plugins?.socialsharing ?? null;
+//         const isElectron = navigator.userAgent.includes("Electron");
+
+//         // if (!isElectron && window.StatusBar) {
+//         //     StatusBar.hide();
+//         // }
+
+//         if (!isElectron && window.plugins?.insomnia) {
+//             window.plugins.insomnia.keepAwake();
+//         }
+
+//         if (!isElectron && window.NavigationBar) {
+//             window.NavigationBar.backgroundColorByHexString("#000000");
+// 			NavigationBar.backgroundColorByHexString("#000000");
+// 			NavigationBar.navigationBarVisibility("hide");
+//         }
+// 		if(screen?.orientation?.lock)
+// 			screen.orientation.lock("landscape").catch(() => {});
+//         __deviceId = getDeviceId();
+
+//         _client = new dataOperations();
+//         _client.loadState();
+//     } catch (ex) {
+//         console.error(ex);
+//         __deviceId = getDeviceId();
+
+//         _client = new dataOperations();
+//         _client.loadState();
+//     }
+// 	if (window.cordova) {
+// 		const s = document.createElement('script');
+// 		s.src = './js/html2canvas.js';
+// 		document.head.appendChild(s);
+// 	}
+// }
 function floatDusts() {
 	return;
 	var speed = 400;
@@ -2302,7 +2395,7 @@ function floatDusts() {
 		twinkleLoop(i);
 }
 var _openingSound;
-function playOpeningMusic() {
+function playOpeningMusic(_path, _volume) {
 	if(episodeVisibilityHidden || document.hidden)
 		return;
 	_openingSound = document.createElement("audio");
@@ -2311,21 +2404,32 @@ function playOpeningMusic() {
 		_openingSound.autoPlay = false;
 	else
 		_openingSound.preload = 'auto';
-	_openingSound.volume = .5;
+	_openingSound.oldVolume = _volume ?? .5;
+	_openingSound.volume = _openingSound.oldVolume * __volume;
+	_openingSound.loop = true;
 	_openingSound.currentTime = 0;
-	_openingSound.src = "./images/sounds/opening3.mp3";
+	_openingSound.src = _path ?? "./images/sounds/wind-menu.mp3"; // "./images/sounds/opening3.mp3";
 	_openingSound.play();
 	_openingSound.onended = function() {
 		_openingSound = _closeOpeningMusic = null;
 	}
 }
-
+function switchOpeningMusic(_path, _volume) {
+	if(_openingSound || _path) {
+		if(_openingSound) {
+			_openingSound.pause();
+			_openingSound.currentTime = 0;
+		}
+		_closeOpeningMusic = null;
+		playOpeningMusic(_path, _volume);
+	}
+}
 function activateGameStart(_quickPlay, _force) {
 	__story = undefined;
 	if(_quickPlay){
 		if(!_force) {
 			askSomething(`<div class="question-area">${getLangData('This section is designed solely to provide a quick overview of our game mechanics and gameplay. It doesn\'t award any rewards or impact your demo progress. Still want to play?')}</div>`, 
-				'activateGameStart(1, 1)', null, document.getElementById('first-splash'));
+				'activateGameStart(1, 1)', 'modal_2x1', document.getElementById('first-splash'));
 			return;
 		}
 		closeInventoryQuestionModal(1);
@@ -2339,6 +2443,7 @@ function activateGameStart(_quickPlay, _force) {
 	}
 	PlaySound({key:'enter', volume:.5});
 	addClass(document.querySelector('.opening-controls-icon'), 'd-none');
+	addClass(document.querySelector('.volume-panel'), 'd-none');
 	addClass(document.querySelector('.opening-lang-icon'), 'd-none');
 	addClass(document.getElementById('game-difficulty-down'), 'disabled');
 	addClass(document.getElementById('game-difficulty-up'), 'disabled');
@@ -2346,7 +2451,8 @@ function activateGameStart(_quickPlay, _force) {
 	__account.difficulty = 6 - __account.difficulty;
 	addClass(document.getElementById('connect-btn'), 'disabled2'); 
 	addClass(document.getElementById('qp-btn'), 'disabled2'); 
-	document.getElementById('mini-menu').innerHTML = '<div onexactclick="askExitApp()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/pause.png);background-size: cover"></div>'; // '<div onexactclick="activatePowerSaveMode()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/power-save.png);background-size: cover"></div>';
+	addClass(document.getElementById('pak-btn'), 'disabled2'); 
+	document.getElementById('mini-menu').innerHTML = '<div onexactclick="askExitApp()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/pause2.png);background-size: cover"></div>'; // '<div onexactclick="activatePowerSaveMode()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/power-save.png);background-size: cover"></div>';
 	openGame();
 }
 const __difficulties = [
@@ -2387,6 +2493,10 @@ function changeDifficulty(_step){
 	_val.innerText = __difficulties[__account.difficulty - 1].text[getLang()];
 }
 function resetOpeningScreen() {
+	if(_openingSound){
+		_openingSound.pause();
+		_openingSound.currentTime= 0;
+	}
 	_game.suspended = 1;
 	removeClass(_gamePad, 'ghost-mode');
 	__queue.length = 0;
@@ -2399,6 +2509,7 @@ function resetOpeningScreen() {
 	detachModule();
 	episode?.dispose?.();
 	gameopening = false;
+	gameIsReady = false;
 	setTip();
 	installOpeningScreen(null, 1);
 	episode = __story = mainCharacter = null;
@@ -2419,11 +2530,11 @@ function getOpeningLanguages(_selected) {
 	_selected = _selected ?? getLang();
 	return `<div class="full flex fade-me"><div data-lang="en" onexactclick="selectOpeningLanguage('en')" class="opening-lang-item w-100 flex flex-jc-start${_selected === 'en' ? ' selected' : ''}" style="padding:2vh 0 1vh 0">
 		<img style="height:4.5vh" src="./images/ui/circle-${_selected === 'en' ? 'on' : 'off'}.png" />
-		<div style="margin-left:2vh;font-size:3vh;color:#f3f4f5${_selected === 'en' ? '' : 'cc'}">${getLangData("English")}</div>
+		<div class="question-modal-item wot-subtitle" style="margin-left:2vh;color:#f3f4f5${_selected === 'en' ? '' : 'cc'}">${getLangData("English")}</div>
 	</div>
 	<div data-lang="tr" onexactclick="selectOpeningLanguage('tr')" class="opening-lang-item w-100 flex flex-jc-start${_selected === 'tr' ? ' selected' : ''}" style="padding:1vh 0 2vh 0">
 		<img style="height:4.5vh" src="./images/ui/circle-${_selected === 'tr' ? 'on' : 'off'}.png" />
-		<div style="margin-left:2vh;font-size:3vh;color:#f3f4f5${_selected === 'tr' ? '' : 'cc'}">${getLangData("Turkish")}</div>
+		<div class="question-modal-item wot-subtitle" style="margin-left:2vh;color:#f3f4f5${_selected === 'tr' ? '' : 'cc'}">${getLangData("Turkish")}</div>
 	</div></div>`;
 }
 function selectOpeningLanguage(_key) {
@@ -2432,18 +2543,18 @@ function selectOpeningLanguage(_key) {
 }
 function askChangeLanguage() {
 	playClick();
-	let _modal = `<div class="full fade-me show-ui flex inventory-question">
-		<div class="inventory-modal flex" style="width:50vh;aspect-ratio:1/1;flex-direction:column">`
+	let _modal = `<div data-singleton-key="modal_1x1" class="full fade-me show-ui language-change-modal flex inventory-question settings-before-play">
+		<div class="inventory-modal flex">`
 			+
 			`<div style="padding:6vh 4vh 2vh 4vh" class="flex w-100">
-				<span style="color:#F4BB44 !important;font-size:3.2vh !important">${getLangData('CHOOSE LANGUAGE')}</span>
+				<span class="question-modal-title wot-title">${getLangData('CHOOSE LANGUAGE')}</span>
 			</div>
 			<div id="opening-languages" class="flex w-50" style="padding:0 4%;flex:1">`
 				+ getOpeningLanguages() +
 			`</div>
-			<div style="padding:2vh 2vh 6vh 2vh" class="flex w-100">
-				<div class="game-menu-button flex animate-me" style="font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('IGNORE')}</div>
-				<div id="item-selection-approve-btn" class="game-menu-button flex animate-me" style="font-size:3vh !important" onexactclick="approveSelectedLanguage()">${getLangData('APPROVE')}</div>
+			<div class="flex w-100 language-change-action-buttons">
+				<div class="orange-action-btn flex animate-me wot-button"  onexactclick="closeInventoryQuestionModal()">${getLangData('BACK')}</div>
+				<div id="item-selection-approve-btn" class="orange-action-btn flex animate-me wot-button" onexactclick="approveSelectedLanguage()">${getLangData('OK')}</div>
 			</div>
 		</div>
 	</div>`;
@@ -2452,16 +2563,20 @@ function askChangeLanguage() {
 	document.getElementById('first-splash').appendChild(_div.firstChild);
 }
 function askResetKeyboardConfig() {
+	const _fs = document.getElementById('first-splash');
+	const _isActive = _fs && !hasClass(_fs, 'v-none');
 	playClick();
-	let _modal = `<div class="full fade-me show-ui flex inventory-question">
+	askSomething(getLangData('Reset to default settings'), "resetKeyboardConfig()", "modal_2x1", _isActive ? _fs : undefined);
+	return;
+	let _modal = `<div class="full fade-me show-ui flex inventory-question modal_2x1">
 		<div class="inventory-modal flex">`
 			+
 			`<div style="padding:6vh 4vh 2vh 4vh" class="flex w-100">
-				<span style="color:#F4BB44 !important;font-size:3.2vh !important">${getLangData('Reset to default settings')}?</span>
+				<span style="color:#F4BB44 !important" class="wot-title">${getLangData('Reset to default settings')}?</span>
 			</div>
 			<div style="padding:2vh 2vh 6vh 2vh" class="flex w-100">
-				<div class="game-menu-button flex animate-me" style="font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('IGNORE')}</div>
-				<div id="item-selection-approve-btn" class="game-menu-button flex animate-me" style="font-size:3vh !important" onexactclick="resetKeyboardConfig()">${getLangData('APPROVE')}</div>
+				<div class="orange-action-btn wot-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('IGNORE')}</div>
+				<div id="item-selection-approve-btn" class="orange-action-btn wot-button flex animate-me" onexactclick="resetKeyboardConfig()">${getLangData('APPROVE')}</div>
 			</div>
 		</div>
 	</div>`;
@@ -2540,13 +2655,15 @@ function getBaseKeyboardKey(_newKey) {
 		return{ title: _keyCombinations[i].title, baseKey: _keyCombinations[i].baseKey };
 }
 function getKeyboardPromo(_force) {
+	if(__switchingMap || gameopening)
+		return;
 	const _seenBefore = localStorage.getItem('keyboard-promo-skip');
 	if(_seenBefore && !_force)
 		return;
 	if(_force)
 		playClick();
 	const _desc = document.createElement('div');
-	_desc.className = 'flex show-ui full keyboard-promo-container quick-play-desc-container fade-me-99 animate-me';
+	_desc.className = 'flex show-ui full keyboard-promo-container quick-play-desc-container fade-me-99 animate-me settings-before-play';
 	_desc.style = 'position:absolute;top:0;left:0;overflow:hidden;z-index:1499';
 	//let _html = '<div style="height:calc(100% - 9vh);position:relative" class="w-100 flex"><img src="./images/icons/keys.png" style="border:.2vh solid #F3F4F599;border-top:0;position:absolute;object-fit:cover;max-width:100%;max-height:100%" /></div>';
 	// _desc.innerHTML = _html +
@@ -2565,8 +2682,8 @@ function getKeyboardPromo(_force) {
 	for(let i = 0; i < 11; i++) {
 		const _item = { title: _keyCombinations[i].title, baseKey: __account.keyboard?.[i] ?? _keyCombinations[i].baseKey };
 		_html += `<div class="w-100 flex" style="height:9%">
-			<div class="w-50 flex flex-jc-end" style="height:100%">${_item.title[getLang()]}</div>
-			<div class="w-50 flex flex-jc-start" style="height:100%"><input onkeydown="setBindKey(this, event)" data-key="${_item.baseKey}" onfocus="readyToBindKey(this)" onblur="tryResetBindKey(this)" class="key-combination-item" type="text" style="height:100%;aspect-ratio:5/1" value="${_item.baseKey === ' ' ? 'SPACE' : _item.baseKey}" />` 
+			<div class="w-50 flex flex-jc-end wot-subtitle" style="height:100%">${_item.title[getLang()]}</div>
+			<div class="w-50 flex flex-jc-start wot-description" style="height:100%"><input onkeydown="setBindKey(this, event)" data-key="${_item.baseKey}" onfocus="readyToBindKey(this)" onblur="tryResetBindKey(this)" class="key-combination-item" type="text" style="height:100%;aspect-ratio:5/1" value="${_item.baseKey === ' ' ? 'SPACE' : _item.baseKey}" />` 
 			+ (_keyCombinations[i].desc ?? '') +
 			`</div>
 		</div>`;
@@ -2575,21 +2692,21 @@ function getKeyboardPromo(_force) {
 	for(let i = 11; i < 21; i++) {
 		const _item = { title: _keyCombinations[i].title, baseKey: __account.keyboard?.[i] ?? _keyCombinations[i].baseKey };
 		_html += `<div class="w-100 flex" style="height:9%">
-			<div class="w-50 flex flex-jc-end" style="height:100%">` 
+			<div class="w-50 flex flex-jc-end wot-description" style="height:100%">` 
 			+ (_keyCombinations[i].desc ?? '') +
 			`<input onkeydown="setBindKey(this, event)" data-key="${_item.baseKey}" onfocus="readyToBindKey(this)" onblur="tryResetBindKey(this)" class="key-combination-item" type="text" style="height:100%;aspect-ratio:5/1" value="${_item.baseKey === ' ' ? 'SPACE' : _item.baseKey}" /></div>
-			<div class="w-50 flex flex-jc-start" style="height:100%">${_item.title[getLang()]}</div>
+			<div class="w-50 flex flex-jc-start wot-subtitle" style="height:100%">${_item.title[getLang()]}</div>
 		</div>`;
 	}
 	_desc.innerHTML = _html + '</div></div>' +
 			`<div class="quick-play-desc-skip flex" style="padding:0 10vh">
-				<div onexactclick="cancelKeyboardConfig()" class="flex flex-jc-end" style="height:100%">
+				<div onexactclick="cancelKeyboardConfig()" class="orange-action-btn flex wot-button">
 					${getLangData('CANCEL')}
 				</div>
-				<div onexactclick="askResetKeyboardConfig()" class="flex flex-jc-end" style="height:100%">
+				<div onexactclick="askResetKeyboardConfig()" class="orange-action-btn flex wot-button">
 					${getLangData('RESET')}
 				</div>
-				<div onexactclick="approveKeyboardConfig()" class="flex flex-jc-end" style="height:100%">
+				<div onexactclick="approveKeyboardConfig()" class="orange-action-btn flex wot-button">
 					${getLangData('APPROVE')}
 				</div>
 			</div>`;
@@ -2598,23 +2715,807 @@ function getKeyboardPromo(_force) {
 		_parent = document.querySelector('#menu-ui') ?? _gameUI;
 	_parent.appendChild(_desc);
 }
-let __particles;
+function isElectron(){
+    return !!window._cdvElectronIpc;
+}
+let generatedImage = null;
+async function takePhotoOfScreen(_fromMenu){
+ 	const _wrapper = document.body;
+	if(hasClass(_wrapper, 'share-capture-mode'))
+		return;
+	addClass(_wrapper, 'share-capture-mode');
+    try{
+        await new Promise(resolve=>{
+            requestAnimationFrame(()=>{
+                requestAnimationFrame(resolve);
+            });
+        });
+		// if(__isPC)
+		// 	generatedImage = await window._cdvElectronIpc.capturePage();
+		// else
+		// 	generatedImage = 
+		await takePhotoOfScreenForMobile();
+        //document.getElementById('sharePreviewImage').src = generatedImage;
+    }
+	catch(err){
+        console.log(err.message ?? err);
+    }
+    addClass(document.getElementById('shareOverlay'), 'show');
+	removeClass(_wrapper, 'share-capture-mode');
+}
+let isSharing = false;
+async function shareGeneratedImage(base64, _fromMenu) {
+    if (isSharing) return;
+    isSharing = true;
+
+    try {
+
+        if (__isPC) {
+			if(window._cdvElectronIpc) {
+				window._cdvElectronIpc.copyImage(base64);
+				warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/film.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Photo copied to clipboard') + '!</span></div>', null, null, 1, null, null, _fromMenu ? document.getElementById('shareOverlay') : null);
+			}
+        } else {
+
+            const _base64 = base64.replace(
+                /^data:image\/png;base64,/,
+                ''
+            );
+
+            AndroidBridge.share(
+                "Warriors Of Tengri",
+                _base64
+            );
+        }
+
+    } catch (e) {
+        alert(e?.message ?? e);
+    } finally {
+        setTimeout(() => {
+            isSharing = false;
+        }, 1500);
+    }
+}
+async function takePhotoOfScreenForMobile(){
+	PlaySound({key:'photo', volume:1});
+	const _img = document.getElementById(
+		'sharePreviewImage'
+	);
+	const _st = document.querySelector('.share-text');
+	_img.imageLoaded = false;
+	addClass(_img, 'v-none');
+	addClass(_st, 'v-none');
+	removeClass(_img, 'fade-me');
+	getCreditsScreenLightBase64().then(async base64 => {
+		if(_img){
+			removeClass(_img, 'v-none');
+			_img.src = base64;
+			addClass(_img, 'fade-me');
+			_img.imageLoaded = true;
+			removeClass(_st, 'v-none');
+		}
+	});
+}
+// function shareToWithPlugin() {
+// 	try{
+// 		window.plugins.socialsharing.share(
+// 			getLangData('My legendary moment'),
+// 			'Warriors of Tengri',
+// 			generatedImage,
+// 			null
+// 		);
+// 	} 
+// 	catch(_){
+// 		alert(_?.message ?? _);
+// 	}
+// }
+function shareToWithPlugin(_fromMenu) {
+	shareGeneratedImage(generatedImage, _fromMenu);
+}
+// async function shareToWithPlugin() {
+//     try {
+//         const result =
+//             await _cdvElectronIpc.share({
+
+//                 text:
+//                     getLangData(
+//                         'My legendary moment'
+//                     ),
+
+//                 title:
+//                     'Warriors of Tengri',
+
+//                 image:
+//                     generatedImage,
+
+//                 url:
+//                     null
+//             });
+//     }
+//     catch(e){
+//         console.log('HATA: '+ (e.message ?? e));
+//     }
+// }
+function closeShareUI(){
+    removeClass(document.getElementById('shareOverlay'), 'show');
+}
+function closeCredits(_fromMenu){
+	const _wrapper = document.querySelector('.credits-bg-wrapper');
+	if(_wrapper)
+		_wrapper.remove();
+	if(_fromMenu)
+		switchOpeningMusic();
+	generatedImage = null;
+}
+function getCreditsScreenLightHtml() {
+	let _w, _h;
+	if(_gameUI.clientWidth > 800) {
+		const _rate = 800 / _gameUI.clientWidth;
+		_w = 800;
+		_h = MathRound(_gameUI.clientHeight * _rate);
+	}
+	else
+	{
+		_w = _gameUI.clientWidth;
+		_h = _gameUI.clientHeight;
+	}
+	let _scr = document.createElement('div');
+	_scr.style = 'z-index:999999;position:absolute;overflow:hidden;width:' + _w
+	+ 'px;height:' + _h + 'px;background-color:#000';
+	_scr.innerHTML = 
+	`<img style='width:100%;left:0;top:0;position:absolute' 
+	crossorigin="anonymous" src="./images/texture/lobbymobile-ground.png" />
+	<img style='width:8.5%;
+	right:30.5%;
+	bottom:28%;
+	position:absolute;
+	z-index:3' crossorigin="anonymous" src="./images/gifs/source2.png" />
+	<img style='width:7.5%;
+	right:39%;
+	bottom:23%;
+	position:absolute;
+	z-index:3' crossorigin="anonymous" src="./images/sprites/ep87/sprite.png" />
+	<img style='width:7%;
+	right:20%;
+	bottom:25.5%;
+	position:absolute;
+	z-index:1' crossorigin="anonymous" src="./images/sprites/ep87/dark.png" />
+	<img style='width:14%;
+	right:10%;
+	bottom:20%;
+	position:absolute;
+	z-index:2' crossorigin="anonymous" src="./images/gifs/warrior2.png" />
+	<img style='width:13%;
+	right:28%;
+	bottom:33%;
+	position:absolute;
+	transform:scale(-1,1);
+	-webkit-transform:scale(-1,1)' crossorigin="anonymous" src="./images/gifs/archer2.png" />
+	<img style='width:14%;
+	right:16%;
+	bottom:31%;
+	position:absolute' crossorigin="anonymous" src="./images/gifs/tank2.png" />
+	<img style='width:11%;
+	right:39%;
+	bottom:31%;
+	position:absolute' crossorigin="anonymous" src="./images/gifs/wizard2.png" />
+	<img style='width:17%;
+	right:10.6%;
+	bottom:31%;
+	position:absolute;
+	z-index:5' crossorigin="anonymous" src="./images/gifs/zzz2.png" />
+	<img style='width:14%;
+	left:2%;
+	bottom:2%;
+	position:absolute;
+	z-index:1' crossorigin="anonymous" src="./images/icons/watermark.png" />
+	<div style="
+	position:absolute;
+	left:50%;
+	bottom:0;
+	transform:translateX(-50%);
+	width:50%;
+	height:14%;
+	background:rgba(0,0,0,0.75);
+	display:flex;
+	flex-direction:column;
+	justify-content:center;
+	align-items:center;
+	box-sizing:border-box;
+	z-index:999">
+		<div style="
+		font-size:1.4rem;
+		font-weight:900;
+		color:#FFD86B;
+		text-shadow:
+			0 2px 0 #000,
+			0 0 10px rgba(0,0,0,.8);
+		line-height:1;">
+		#${(mainCharacter?.storyOrder ?? 214).formatWithDots()} - ${(mainCharacter?.storyScore ?? 1942881).formatWithDots()}
+		</div>
+		<div style="
+		margin-top:.25rem;
+		font-size:1.25rem;
+		font-weight:700;
+		color:#FFFFFF;
+		text-shadow:
+			0 2px 0 #000,
+			0 0 8px rgba(0,0,0,.8);
+		line-height:1">
+		${getLangData('Lvl') + ' ' + (mainCharacter?.level ?? 1) + ' - ' + (mainCharacter ? getLangData(mainCharacter.class).toProperCase() : getLangData('warrior').toProperCase())}
+		</div>
+	</div>`;
+	return _scr;
+}
+async function getCreditsScreenLightBase64() {
+
+    const el = getCreditsScreenLightHtml();
+
+    document.body.appendChild(el);
+
+    try {
+
+        // bütün img'lerin yüklenmesini bekle
+        await Promise.all(
+            [...el.querySelectorAll('img')].map(img => {
+
+                if (img.complete) {
+                    return Promise.resolve();
+                }
+
+                return new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = reject;
+                });
+
+            })
+        );
+
+        const canvas = await html2canvas(el, {
+            backgroundColor: '#000000',
+            useCORS: true,
+            scale: 1
+        });
+
+        generatedImage = canvas.toDataURL('image/png');
+		return generatedImage;
+
+    }
+    finally {
+
+        el.remove();
+
+    }
+
+}
+function openCredits(_fromMenu) {
+	if(__switchingMap || (_fromMenu && gameopening))
+		return;
+	playClick();
+	switchOpeningMusic('./images/music/lobby.mp3', .3);
+	//switchMap(-1, 1, null, null, null, function() {
+		// if(mainCharacter){
+		// 	mainCharacter.left = MathRound(1735 * __zoom);
+		// 	mainCharacter.direction = __right;
+		// 	mainCharacter.skipHealthBar = true;
+		// 	mainCharacter.noDirection = true;
+		// 	blurKeyboard();
+		// 	mainCharacter.disableKeyboard = mainCharacter.immobilize = true;
+		// 	mainCharacter.animate('idlelobby',1);
+		// }
+		// const _fire = episode.enemies.find(x => x.id === 5);
+		// _fire.animations.idle.frames.forEach(x => delete x.sound);
+		// _fire.animations.idle.frames[0].sound = { key: 'bonefire', volume:.1, bind: true, loop: true };
+		let _scr = document.createElement('div');
+		_scr.className = 'full flex show-ui fade-me credits-bg-wrapper';
+		let _parent = document.getElementById('first-splash');
+		if(hasClass(_parent, 'v-none'))
+			_parent = document.querySelector('#menu-ui') ?? _gameUI;
+		const _wrapper = document.createElement('div');
+		_wrapper.className = 'full flex credits-bg';
+		_wrapper.id = "shareMomentWrapper";
+		_wrapper.innerHTML = `<img crossorigin="anonymous" id="credits-fire-gif" src="./images/gifs/source.gif" />
+		<div class="credits-fire-glow"></div>
+		<img crossorigin="anonymous" id="credits-seat1" src="./images/sprites/ep87/sprite.png" />
+		<img crossorigin="anonymous" id="credits-seat2" src="./images/sprites/ep87/dark.png" />
+		<img crossorigin="anonymous" id="credits-warrior-gif" src="./images/gifs/warrior.gif" />
+		<img crossorigin="anonymous" id="credits-archer-gif" src="./images/gifs/archer.gif" />
+		<img crossorigin="anonymous" id="credits-tank-gif"  src="./images/gifs/tank.gif" />
+		<img crossorigin="anonymous" id="credits-wizard-gif" src="./images/gifs/wizard.gif" />
+		<img crossorigin="anonymous" id="credits-zzz-gif" src="./images/gifs/zzz.gif" />
+		<div class="share-moment-stats-panel${_fromMenu ? ' d-none' : ''}">
+			<div class="share-moment-level-block">
+				<div class="share-moment-label d-none">
+					${getLangData('World Ranking')}
+				</div>
+				<div class="share-moment-level-value">
+					#${(mainCharacter?.storyOrder ?? 214).formatWithDots()}
+				</div>
+			</div>
+			<div class="share-moment-info-card">
+				<div class="share-moment-card-title">
+					${getLangData('Character Level')}
+				</div>
+				<div class="share-moment-card-value">
+					${getLangData('Lvl') + ' ' + (mainCharacter?.level ?? 1) + ' - ' + (mainCharacter ? getLangData(mainCharacter.class).toProperCase() : getLangData('warrior').toProperCase())}
+				</div>
+			</div>
+			<div class="share-moment-info-card">
+				<div class="share-moment-card-title">
+					${getLangData('Total Score')}
+				</div>
+				<div class="share-moment-card-value">
+					${(mainCharacter?.storyScore ?? 1942881).formatWithDots()}
+				</div>
+			</div>
+			<div class="share-moment-info-buttons flex" style="padding-left:0 !important">
+				<div class="share-moment-card-title" style="width:100% !important">
+					<div class="orange-action-btn flex" onexactclick="takePhotoOfScreen(${_fromMenu ? 1 : 0})">
+						${getLangData('Capture Moment')}
+					</div>
+				</div>
+				<div class="share-moment-card-value d-none">
+					<div class="orange-action-btn flex" onexactclick="createPromoScreen(${_fromMenu ? 1 : 0})">
+						${getLangData('Başa Döb')}
+				</div>
+			</div>
+		</div>`;
+		const _splash = document.getElementById('splash');
+		addClass(_splash, 'd-none');
+		addClass(_gameUI, 'disable-ui');
+		const _btn = document.createElement('div');
+		_btn.className = 'flex share-moment-overlay';
+		_btn.id = 'shareOverlay';
+		_btn.innerHTML = `<div>
+			<div class="share-moment-photo-card" onclick="shareToWithPlugin(${_fromMenu ? 1 : 0})">
+				<div id="sharePreviewImage-parent">
+					<img class="share-moment-photo-image" id="sharePreviewImage">
+				</div>
+				<div class="share-text">${getLangData(__isPC ? 'TAP TO COPY' : 'TAP TO SHARE')}</div>
+				<div class="share-moment-actions" onclick="event.stopPropagation(); closeShareUI()">
+					<img src="./images/icons/close.png" />
+				</div>
+			</div>
+		</div>`;
+		const _div = document.createElement('div');
+		_div.className = 'flex credits-screen';
+		_div.innerHTML = `<div class="credits-scroll${__isPC ? '': ' credits-scroll-mobile'}">
+				<div class="credits-title">
+					${getLangData('CREDITS', __creditsLangData)}
+				</div>
+				<div class="credits-section">
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('CREATIVE DIRECTOR', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Özgün Değirmentepe
+					</div>
+					<div class="credits-role-list">
+						<div class="credits-role" lang="${getLang()}">
+							${getLangData('GAME DESIGN', __creditsLangData)}
+						</div>
+						<div class="credits-role" lang="${getLang()}">
+							${getLangData('PROGRAMMING', __creditsLangData)}
+						</div>
+						<div class="credits-role" lang="${getLang()}">
+							${getLangData('TECHNICAL DIRECTION', __creditsLangData)}
+						</div>
+						<div class="credits-role" lang="${getLang()}">
+							${getLangData('LEVEL DESIGN', __creditsLangData)}
+						</div>
+						<div class="credits-role" lang="${getLang()}">
+							${getLangData('CUSTOM ENGINE DEVELOPMENT', __creditsLangData)}
+						</div>
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('ART DIRECTION & ANIMATION', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Mehmet Canpolat
+					</div>
+					<div class="credits-role-list">
+						<div class="credits-role" lang="${getLang()}">
+							${getLangData('CHARACTER DESIGN', __creditsLangData)}
+						</div>					
+						<div class="credits-role" lang="${getLang()}">
+							${getLangData('SPRITE ART', __creditsLangData)}
+						</div>				
+						<div class="credits-role" lang="${getLang()}">
+							${getLangData('CONCEPT ART', __creditsLangData)}
+						</div>
+						<div class="credits-role" lang="${getLang()}">
+							${getLangData('UI DESIGN', __creditsLangData)}
+						</div>
+						<div class="credits-role" lang="${getLang()}">
+							${getLangData('WORLDBUILDING & LORE', __creditsLangData)}
+						</div>
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('INSPIRED BY', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						NORAD
+						<span class="credits-role" lang="${getLang()}">
+							${getLangData('WRITTEN BY', __creditsLangData)} Mehmet Canpolat
+						</span>
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+				
+				<div class="credits-section">
+
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('CULTUREL INSPIRATION', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						${getLangData('Inspired by Turkic mythology, Anatolian folklore and ancient legends', __creditsLangData)}
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('STRATEGY & PUBLISHING ADVISOR', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Egemen Kağan Duman
+					</div>
+					<div class="credits-role-list">
+						<div class="credits-role" lang="${getLang()}">
+							${getLangData('MARKETING STRATEGY', __creditsLangData)}
+						</div>
+						<div class="credits-role" lang="${getLang()}">
+							${getLangData('COMMUNITY GUIDANCE', __creditsLangData)}
+						</div>
+						<div class="credits-role" lang="${getLang()}">
+							${getLangData('INVESTOR RELATIONS', __creditsLangData)}
+						</div>
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('CREATIVE CONSULTING', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Buğra Güven Günbatı
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('TRAILER PRODUCTION', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Özgün Değirmentepe
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('TRAILER VISUAL DESIGN', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Mehmet Canpolat
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+				<div class="credits-section">
+
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('SOCIAL MEDIA', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Özgün Değirmentepe
+					</div>
+
+					<div class="credits-name">
+						Mehmet Canpolat
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('WEBSITE DEVELOPMENT', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Özgün Değirmentepe
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('WEBSITE VISUAL DESIGN', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Mehmet Canpolat
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('MAP ASSETS', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Theon James
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('UI ELEMENTS', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Rexard
+						<span class="credits-role" lang="${getLang()}">
+							${getLangData('Assets from GameDevMarket', __creditsLangData)}
+						</span>
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('AI VOICE TECHNOLOGY', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						ElevenLabs
+					</div>
+
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('AI MUSIC GENERATION', __creditsLangData)}
+					</div>
+					<div class="credits-name">
+						Suno
+					</div>
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('SOUND EFFECTS', __creditsLangData)}
+					</div>
+					<div class="credits-name">
+						Pixabay
+					</div>
+					<div class="credits-name">
+						Mixit
+					</div>
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<div class="credits-section">
+
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('QA TESTERS', __creditsLangData)}
+					</div>
+
+					<div class="credits-name">
+						Murat Ergün
+					</div>
+
+					<div class="credits-name">
+						Tolga Canpolat
+					</div>
+
+					<div class="credits-name">
+						Yiğit Kuyucu
+					</div>
+
+					<div class="credits-name">
+						Hasan Yanılmaz
+					</div>
+
+					<div class="credits-name">
+						Eren Deniz Çerkeş
+					</div>
+
+					<div class="credits-name">
+						Amil Salonke
+					</div>
+
+					<div class="credits-name">
+						Volkan Kocataşkın
+					</div>
+					
+					<div class="credits-name">
+						Özüm Değirmentepe
+					</div>
+					
+					<div class="credits-name">
+						Barış Alagöz
+					</div>
+					
+					<div class="credits-name">
+						Yiğit Gürsoy
+					</div>
+				</div>
+
+				<div class="credits-divider"></div>
+
+				<!-- SPECIAL THANKS -->
+
+				<div class="credits-section">
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('SPECIAL THANKS', __creditsLangData)}
+					</div>
+					<div class="credits-name">
+						Facebook/Indie Game Devs
+					</div>
+					<div class="credits-name">
+						Linkedin/Yeni Oyun Gazetesi
+					</div>
+					<div class="credits-name">
+						Facebook/Indie Game Devs
+					</div>
+					<div class="credits-name">
+						${getLangData('Everyone who supported the project', __creditsLangData)}
+					</div>
+				</div>
+				<div class="credits-section">
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('FOR FOLLOW & SUPPORT', __creditsLangData)}
+					</div>
+					<div class="credits-name">
+						www.warriorsoftengri.com
+					</div>
+					<div class="credits-name">
+						youtube#warriorsoftengri
+					</div>
+					<div class="credits-name">
+						instagram#warriors_of_tengri
+					</div>
+					<div class="credits-name">
+						x.com/warriorsoftengri
+					</div>
+				</div>
+
+				<div class="credits-divider${_fromMenu ? ' d-none' : ''}"></div>
+
+				<div class="credits-section${_fromMenu ? ' d-none' : ''}">
+
+					<div class="credits-subtitle" lang="${getLang()}">
+						${getLangData('Thanks for playing', __creditsLangData)}...
+					</div>
+				</div>
+				
+			</div>`;
+		// const _share = document.createElement('div');
+		// _share.className = 'take-photo-button share-button';
+		// _share.onexactclick = function() {
+		// 	takePhotoOfScreen(_fromMenu);
+		// }
+		// _share.innerText = getLangData('Capture Moment');
+		const _back = document.createElement('div');
+		_back.className = 'share-back-button share-button secondary';
+		_back.onexactclick = function() {
+			playClick();
+			if(!_fromMenu)
+				resetOpeningScreen();
+			else
+				closeCredits(_fromMenu);
+		}
+		_back.innerHTML = '<img src="./images/ui/game/back.png" />';
+		_scr.appendChild(_wrapper);
+		// if(!_fromMenu)
+		// 	_scr.appendChild(_share);
+		_scr.appendChild(_back);
+		_scr.appendChild(_btn);
+		_scr.appendChild(_div);
+		_parent.appendChild(_scr);
+	//});
+}
+//let __particles;
 function installOpeningScreen(_instant, _lateOpening) {
 	const _current = parseInt(localStorage.getItem(__difficultyKey) ?? 3);
 	__account.difficulty = _current;
+	__account.gameOpening = true;
 	var _img = new Image();
 	var _bg = document.getElementById('splash');
 	var _opening = document.getElementById('first-splash');
 	if(_opening)
 		_opening.innerHTML = `<canvas id="particles"></canvas>
-				<div onexactclick="getKeyboardPromo(1)" class="opening-controls-icon flex flex-jc-start${__isPC ? '' : ' d-none'}">
+				<div onexactclick="getKeyboardPromo(1)" class="d-none opening-controls-icon flex${__isPC ? '' : ' d-none'}">
 				<img src="./images/icons/controls.png" />
 			</div>
-			<div onexactclick="askChangeLanguage()" class="opening-lang-icon flex flex-jc-end">
+			<div onexactclick="askChangeLanguage()" lang="${getLang()}" class="opening-lang-icon flex flex-jc-end">
 				<img src="./images/icons/lang.png" /><span>${getLang().toUpperCase()}</span>
 			</div>
+			<div class="game-title-text">
+				<img src="./images/ui/game/logo3.png" />
+			</div>
+			<div id="game-opening-screen-menu" class="game-opening-screen-menu">
+				<div lang="${getLang()}" class="game-opening-screen-menu-item wot-menu-btn flex" onexactclick="if(gameopening){return;}_presentationMode = false;_client = new dataOperations(1);_client.loadState();__account.gameOpening = true; tryOpenGame()">
+					${getLangData('PROTOTYPE', __openingScreenLangData)}
+				</div>
+				<div lang="${getLang()}" class="game-opening-screen-menu-item wot-menu-btn flex" onexactclick="if(gameopening){return;} _presentationMode = 1;_client = new dataOperations();_client.loadState();__account.gameOpening = true; tryOpenGame()">
+					${getLangData('DEMO', __openingScreenLangData)}
+				</div>
+				<div lang="${getLang()}" class="game-opening-screen-menu-item wot-menu-btn flex" onexactclick="openCredits(1)">
+					${getLangData('CREDITS', __openingScreenLangData)}
+				</div>
+				<div lang="${getLang()}" class="game-opening-screen-menu-item wot-menu-btn flex" onexactclick="getKeyboardPromo(1)">
+					${getLangData('CONTROLS', __openingScreenLangData)}
+				</div>
+				<div lang="${getLang()}" class="game-opening-screen-menu-item wot-menu-btn flex" onexactclick="quitGame()">
+					${getLangData('QUIT', __openingScreenLangData)}
+				</div>
+			</div>
 			<div style="height:20%;width:100%;padding-bottom:30vh;z-index:2" class="flex">
-				<div class="game-difficulty-wrapper flex w-100">
+				<div class="game-difficulty-wrapper flex w-100 d-none">
 					<div class="game-difficulty-content flex">
 						<div class="flex">
 							<div class="game-difficulty-title">${getLangData('Difficulty')}:</div>
@@ -2624,11 +3525,40 @@ function installOpeningScreen(_instant, _lateOpening) {
 						</div>
 					</div>
 				</div>
-				<div class="flex">
+				<div class="flex d-none">
 					<div id="qp-btn" class="framed-btn flex" onexactclick="activateGameStart(1)">${getLangData('QUICK PLAY')}</div>
 					<div id="connect-btn" class="framed-btn flex" onexactclick="activateGameStart()">${getLangData('DEMO PLAY')}</div>
 				</div>
-				<div style="padding-top:1vh;width:100%;color:#f8f8f880 !important;font-size:2.8vh!important" class="flex" id="assets-progress"></div>
+				<div class="press-any-key-wrapper d-none">
+					<div id="pak-btn" class="press-any-key-text" onexactclick="activateGameStart(1,1)">
+						${getLangData('PRESS ANY KEY')}
+					</div>
+				</div>
+				<div class="flex flex-jc-start d-none" id="assets-progressbar">
+					<div class="flex" id="assets-progressbar-inner">
+					</div>
+				</div>
+				<div class="flex wot-title" id="assets-progress"></div>
+				<div class="volume-panel">
+					<div class="volume-title">
+						<img src="./images/icons/volume.png" />
+					</div>
+					<div class="volume-bars" id="bars">
+						<div onexactclick="setGameVolume(this)" class="bar active" data-level="1"></div>
+						<div onexactclick="setGameVolume(this)" class="bar active" data-level="2"></div>
+						<div onexactclick="setGameVolume(this)" class="bar active" data-level="3"></div>
+						<div onexactclick="setGameVolume(this)" class="bar active" data-level="4"></div>
+						<div onexactclick="setGameVolume(this)" class="bar active" data-level="5"></div>
+						<div onexactclick="setGameVolume(this)" class="bar" data-level="6"></div>
+						<div onexactclick="setGameVolume(this)" class="bar" data-level="7"></div>
+						<div onexactclick="setGameVolume(this)" class="bar" data-level="8"></div>
+						<div onexactclick="setGameVolume(this)" class="bar" data-level="9"></div>
+						<div onexactclick="setGameVolume(this)" class="bar" data-level="10"></div>
+					</div>
+					<div class="volume-text wot-title">
+						${getLangData('Level')} <span class="level wot-title" id="volumeValue">${__volume * 10}</span>/10
+					</div>
+				</div>
 			</div>`;
 	if(!_opening) {
 		setTimeout(() => {
@@ -2651,12 +3581,13 @@ function installOpeningScreen(_instant, _lateOpening) {
 	}
 	_img.onload = function() {
 		const renderOpeningUI = function() {
-			if(__particles)
-				__particles.cancel();
-			__particles = new dustParticles();
+			// if(__particles)
+			// 	__particles.cancel();
+			// __particles = new dustParticles();
 			_opening.style.opacity = 0;
 			document.getElementById('connect-btn').innerText = getLangData('DEMO PLAY');
 			document.getElementById('qp-btn').innerText = getLangData('QUICK PLAY');
+			document.getElementById('pak-btn').innerText = getLangData('PRESS ANY KEY');
 			removeClass(_opening, 'd-none');
 			removeClass(_opening, 'v-none');
 			// _opening.style.background = 'url(./images/loading/00.png), linear-gradient(0deg, #000, #000)'
@@ -2665,7 +3596,7 @@ function installOpeningScreen(_instant, _lateOpening) {
 			// _opening.style.backgroundPosition = 'center, center';
 			const _cover = document.createElement('div');
 			_cover.className = 'opening-cover';
-			_cover.innerHTML = '<img src="./images/loading/00.gif" />';
+			_cover.innerHTML = '<img src="./images/ui/game/intro.gif" />';
 			_opening.appendChild(_cover)
 			addClass(_opening, 'fade-start');
 			if(!_instant)
@@ -2673,10 +3604,12 @@ function installOpeningScreen(_instant, _lateOpening) {
 					_opening.style.opacity = 1;
 					_bg.style.background = '#000';
 					document.getElementById('play-os').click();
+					gameIsReady = true;
 				}, 1000);
 			else {
 				_opening.style.opacity = 1;
 				document.getElementById('play-os').click();
+				gameIsReady = true;
 			}
 		}
 		if(!_instant)
@@ -2686,7 +3619,7 @@ function installOpeningScreen(_instant, _lateOpening) {
 		else
 			renderOpeningUI();
 	}
-	_img.src = './images/loading/00.gif';
+	_img.src = './images/ui/game/intro.gif';
 	// if(__isPC && !_lateOpening && !_instant)
 	// 	setTimeout(() => {
 	// 		getKeyboardPromo();
@@ -2717,7 +3650,22 @@ setTimeout(function() {
 			askExitApp();
 	}, false);
 }, 2000);
-
+function setGameVolume(elm) {
+	playClick();
+	const bars = document.querySelectorAll(".volume-panel .bar");
+	const volumeValue = document.getElementById("volumeValue");
+	const level = Number(elm.dataset.level);
+	bars.forEach((b,index)=>{
+		if(index < level)
+			b.classList.add("active");
+		else
+			b.classList.remove("active");
+	});
+	volumeValue.textContent = level;
+	__volume = level / 10;
+	if(_openingSound)
+		_openingSound.volume = _openingSound.oldVolume *__volume;
+}
 function dustParticles() {
 	const c = document.getElementById("particles");
     const ctx = c.getContext("2d");
@@ -2994,7 +3942,7 @@ function installCharacterSelection(_func) {
 }
 function installWorldMap() {
 	injectModule('world', function(_arr, _name) {
-		var x = new world();
+		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(3, 3);
 		checkUpdateAvailable2(3);
@@ -3003,7 +3951,7 @@ function installWorldMap() {
 }
 function installWarUI() {
 	injectModule('war', function(_arr, _name) {
-		var x = new war();
+		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(5, 3);
 		checkUpdateAvailable2(5);
@@ -3012,7 +3960,7 @@ function installWarUI() {
 }
 function installDungeonUI() {
 	injectModule('dungeon', function(_arr, _name) {
-		var x = new dungeon();
+		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(6, 1);
 		checkUpdateAvailable2(6);
@@ -3020,6 +3968,7 @@ function installDungeonUI() {
 	});
 }
 function installStoryFinish(_failed, _extraGain, _content) {
+	window.SoundManager.clearLoops();
 	if(__storyScene?.leaderBoards)
 	{
 		installQuickPlayStageFinish(_failed);
@@ -3053,7 +4002,7 @@ function installQuickPlayStageFinish(_failed) {
 }
 function installTalents() {
 	injectModule('talent', function(_arr, _name) {
-		var x = new talent();
+		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(2, 2);
 		checkUpdateAvailable2(2);
@@ -3062,7 +4011,7 @@ function installTalents() {
 }
 function installDailyLogin() {
 	injectModule('dailylogin', function(_arr, _name) {
-		var x = new dailylogin();
+		var x =new window[_name]();
 		x.render();
 		switchBookPageTabs(8, 3);
 		checkUpdateAvailable2(8);
@@ -3071,7 +4020,7 @@ function installDailyLogin() {
 }
 function installMailbox() {
 	injectModule('mailbox', function(_arr, _name) {
-		var x = new mailbox();
+		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(4, 2);
 		checkUpdateAvailable2(4);
@@ -3080,7 +4029,7 @@ function installMailbox() {
 }
 function installOnlineUsers() {
 	injectModule('onlineusers', function(_arr, _name) {
-		var x = new onlineusers();
+		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(4, 3);
 		checkUpdateAvailable2(4);
@@ -3089,7 +4038,7 @@ function installOnlineUsers() {
 }
 function installTips() {
 	injectModule('tips', function(_arr, _name) {
-		var x = new tips();
+		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(9);
 		checkUpdateAvailable2(9);
@@ -3098,7 +4047,7 @@ function installTips() {
 }
 function installChat() {
 	injectModule('chat', function(_arr, _name) {
-		var x = new chat();
+		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(4);
 		checkUpdateAvailable2(4);
@@ -3141,3 +4090,12 @@ async function isHighEndDevice() {
     fps >= 50
   );
 }
+
+// setTimeout(() => {
+//     if (window.AndroidBridge) {
+//         AndroidBridge.test();
+//     }
+//     else {
+//         alert("bridge yok");
+//     }
+// }, 3000);

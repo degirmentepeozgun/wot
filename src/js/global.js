@@ -655,6 +655,9 @@ const __fragments = [
 	] },
 	{ id:6, key: 'king', sound: {key:'knighttag', volume:.5}, name: 'King', charId:59, color:'#dc76bb', limits: [
 		{grade:1, limit:100, cost:10000, skill: 'attack', atk: 200}
+	] },
+	{ id:7, key: 'tank', sound: {key:'tanktag', volume:1}, name: 'Deli Dumrul', charId:73, color:'#80461B', limits: [
+		{grade:1, limit:100, cost:10000, skill: 'attack', atk: 200}
 	] }
 ];
 const _tips = [
@@ -841,18 +844,18 @@ const _missions = [
 					_choices += `<div data-class="${_item.class}" class="selection-item selection-char flex" onexactclick="selectCTFCharacter('${_item.class}')" style="width:21% !important;aspect-ratio:1/1;position:relative;cursor:pointer">
 						<img src="./images/main/avatars/${_item.class}.png" style="padding:2%;height:84%" class="grade${_item.grade}-item" />
 					</div>`;
-			let _modal = `<div class="full fade-me show-ui flex inventory-question">
+			let _modal = `<div data-singleton-key="modal_middle" class="full fade-me show-ui flex inventory-question">
 							<div class="inventory-modal">`
 								+
-								`<div style="padding:6vh 4vh 4vh 4vh" class="flex">
-									<span style="color:#f7f7f7dd !important;font-size:3.2vh !important">${getLangData('CHOOSE YOUR SUPPORTER')}</span>
+								`<div class="flex question-modal-title-wrapper">
+									<div class="wot-title">${getLangData('CHOOSE YOUR SUPPORTER')}</div>
 								</div>
-								<div class="flex ctf-supporters" style="padding:2vh 4%">`
+								<div class="flex ctf-supporters question-modal-desc">`
 								+ _choices +
 								`</div>
-								<div style="padding:4vh 2vh 6vh 2vh" class="flex">
-									<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('BACK')}</div>
-									<div id="item-selection-approve-btn" class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="approveCTFSelection(${_id})">${getLangData('APPROVE')}</div>
+								<div class="flex new-game-menu-buttons">
+									<div class="new-game-menu-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('BACK')}</div>
+									<div id="item-selection-approve-btn" class="new-game-menu-button flex animate-me" onexactclick="approveCTFSelection(${_id})">${getLangData('APPROVE')}</div>
 								</div>
 							</div>
 						</div>`;
@@ -1843,8 +1846,8 @@ const relatedObjects = [
 		totalFrames: 8, speed: 2, still: true, col: 1
 	},
 	{
-		id: 'explode', key: 'explode', width: 300, height: 85, baseTop: 172, zoom: 2.4,
-		totalFrames: 10, speed: 2, still: true, singleton: true
+		id: 'explode2', key: 'explode2', width: 325, height: 166, baseTop: 68, zoom: 2,
+		totalFrames: 8, speed: 3, still: true, singleton: true
 	},
 	{
 		id: 'blood', key: 'blood', type: 'hurt', width: 512, height: 512, zoom: .25,
@@ -2135,8 +2138,8 @@ const relatedObjects = [
 		zoom: 1.45, totalFrames: 1, speed: 6, singleton: true
 	},
 	{
-		id: 'web', key: 'web', width: 225, height: 82, color: '#f7f7f7ec',
-		zoom: 1, totalFrames: 1, speed: 120, singleton: true, still: true
+		id: 'web', key: 'web', width: 230, height: 80, reversable: false,
+		zoom: 1, totalFrames: 1, speed: 100, singleton: true, still: true
 	},
 	{
 		id: 'witch', key: 'witch', width: 2560, height: 1024,
@@ -2240,6 +2243,10 @@ const relatedObjects = [
 	{
 		id: 'aura2', key: 'aura2', width: 192, height: 192,
 		zoom: 1, totalFrames: 16, speed: 5, col: 5, singleton: true, still:true, stillOnChar: true
+	},
+	{
+		id: 'aurared', key: 'aurared', width: 960 / 5, height: 576 / 3,
+		zoom: 1, totalFrames: 15, speed: 4, col: 5, singleton: true, still:true, stillOnChar: true
 	},
 	{
 		id: 'atkbuff', key: 'atkbuff', width: 150, height: 150,
@@ -2440,6 +2447,26 @@ const relatedObjects = [
 		id: 'groundbackdust', key: 'groundbackdust',
 		width: 202, height: 411/3, col:3, zoom: 1,
 		totalFrames: 8, speed: 3, singleton: true, still: true
+	},
+	{
+		id: 'debris', key: 'debris',
+		width: 384, height: 300, col:5, zoom: 1,
+		totalFrames: 13, speed: 4, singleton: true, still: true
+	},
+	{
+		id: 'debris2', key: 'debris2', reversed: true,
+		width: 384, height: 300, col:5, zoom: 1,
+		totalFrames: 13, speed: 4, singleton: true, still: true
+	},
+	{
+		id: 'mud', key: 'mud',
+		width: 274, height: 215, col:7, zoom: 1, multiUse: true,
+		totalFrames: 14, speed: 2, singleton: true, still: true
+	},
+	{
+		id: 'whitedzzt', key: 'whitedzzt', baseTop: 450,
+		width: 300, height: 225, col:8, zoom: 1,
+		totalFrames: 32, speed: 3, singleton: true, still: true
 	}
 ];
 function setRelatedObjectSpeed() {
@@ -2449,6 +2476,9 @@ function setRelatedObjectSpeed() {
 }
 setRelatedObjectSpeed();
 const relatedObjectImages = {
+	mud: function () {
+		return getImage('./images/related/mud.png')
+	},
 	groundbackdust: function () {
 		return getImage('./images/related/ground-back-dust.png')
 	},
@@ -2463,6 +2493,12 @@ const relatedObjectImages = {
 	},
 	throw: function () {
 		return getImage('./images/related/throwdarker.png')
+	},
+	debris: function () {
+		return getImage('./images/related/debris.png')
+	},
+	debris2: function () {
+		return getImage('./images/related/debris.png')
 	},
 	sparks: function () {
 		return getImage('./images/related/sparks.png')
@@ -2607,6 +2643,9 @@ const relatedObjectImages = {
 	},
 	aura3: function () {
 		return getImage('./images/related/aura3.png')
+	},
+	aurared: function () {
+		return getImage('./images/related/aurared.png')
 	},
 	dust: function () {
 		return getImage('./images/related/dust.png')
@@ -2797,6 +2836,9 @@ const relatedObjectImages = {
 	explode: function () {
 		return getImage('./images/related/explode.png')
 	},
+	explode2: function () {
+		return getImage('./images/related/explode2.png')
+	},
 	blooddrop1: function () {
 		return getImage('./images/related/blood-drop.png')
 	},
@@ -2918,7 +2960,7 @@ const relatedObjectImages = {
 		return getImage('./images/related/stun-animated.png')
 	},
 	shadow: function () {
-		return getImage('./images/related/shadow3.png')
+		return getImage('./images/related/shadow-dark.png')
 	},
 	ouch: function () {
 		return getImage('./images/related/ouch-animated.png')
@@ -2958,6 +3000,9 @@ const relatedObjectImages = {
 	},
 	dzzt: function () {
 		return getImage('./images/related/dzzt-2.png')
+	},
+	whitedzzt: function () {
+		return getImage('./images/sprites/ep37/electric-blue.png')
 	},
 	jump: function () {
 		return getImage('./images/related/air-jump.png')
@@ -3152,6 +3197,40 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	headhit: './images/sounds/head-hit.mp3',
+	kongrun: './images/sounds/kong-goblin-run.mp3',
+	groundslide: './images/sounds/groundslide.mp3',
+	voodooelectrix: './images/sounds/voodoo-electrix.mp3',
+	voodooland: './images/sounds/voodooland.mp3',
+	shamancounter: './images/sounds/shaman-counter.mp3',
+	shamanhandhit: './images/sounds/shaman-hand-hit.mp3',
+	shamanhand: './images/sounds/shaman-hand.mp3',
+	firepuff: './images/sounds/fire-puff.mp3',
+	sharprockhit1: './images/sounds/sharprockhit1.mp3',
+	sharprockhit2: './images/sounds/sharprockhit2.mp3',
+	sharprockhit3: './images/sounds/sharprockhit3.mp3',
+	sharprockhit4: './images/sounds/sharprockhit4.mp3',
+	sharprockhit5: './images/sounds/sharprockhit5.mp3',
+	sharprockhit6: './images/sounds/sharprockhit6.mp3',
+	rockwave: './images/sounds/rockwavefast.mp3',
+	stomp: './images/sounds/stomp.mp3',
+	earthrock4: './images/sounds/earthrock4.mp3',
+	photo: './images/sounds/photo.mp3',
+	bonefire: './images/sounds/bonefire.mp3',
+	goblincackle: './images/sounds/goblin-cackle.mp3?x=2',
+	pickheavy: './images/sounds/pick-heavy.mp3',
+	tankfriction: './images/sounds/tank-friction.mp3',
+	ding: './images/sounds/ding.mp3',
+	heavyflesh: './images/sounds/heavy-flesh.mp3',
+	axehit: './images/sounds/axehit.mp3',
+	axewoosh: './images/sounds/axewoosh.mp3',
+	rockslam: './images/sounds/rock-slam.mp3',
+	movespin: './images/sounds/move-spin.mp3',
+	tankslashes: './images/sounds/tank-slashes.mp3',
+	chestbg: './images/sounds/chest-bgmusic.mp3',
+	chime: './images/sounds/chime.mp3',
+	shapeshift: './images/sounds/shapeshift.mp3',
+	tankhaha: './images/sounds/tank-haha.wav',
 	packagegain: './images/sounds/package-gain.wav',
 	woodland: './images/sounds/wood-land2.mp3',
 	comebackwin: './images/sounds/comeback-win.mp3',
@@ -3163,7 +3242,17 @@ const soundFiles = {
 	skillmove: './images/sounds/skill-move.mp3',
 	scoreup: './images/sounds/score-up.mp3',
 	eggfall: './images/sounds/egg-fall.mp3',
+	iframe: './images/sounds/iframe.mp3',
 	cliff: './images/sounds/cliff.mp3',
+	reaperhithurt: './images/sounds/reaper-hit-hurt.mp3',
+	reaperhit: './images/sounds/reaper-hit.mp3',
+	musclegoblinattack1: './images/sounds/muscle-goblin-attack1.mp3',
+	musclegoblinattack2: './images/sounds/muscle-goblin-attack2.mp3',
+	musclegoblinslam: './images/sounds/muscle-goblin-slam.mp3',
+	musclegoblinslash: './images/sounds/muscle-goblin-slash.mp3',
+	musclegoblinhurt1: './images/sounds/muscle-goblin-hurt1.mp3',
+	musclegoblinhurt3: './images/sounds/muscle-goblin-hurt3.mp3',
+	musclegoblinhurt4: './images/sounds/muscle-goblin-hurt4.mp3',
 	goblinkingtongue: './images/sounds/goblin-king-tongue.mp3',
 	goblinkingrelease: './images/sounds/goblin-king-release.mp3',
 	goblinkingenter: './images/sounds/goblin-king-enter.mp3',
@@ -3252,6 +3341,7 @@ const soundFiles = {
 	werewolfspin: './images/sounds/werewolf-spin.mp3?x=2',
 	bombertag: './images/sounds/bomber-tag.mp3',
 	knighttag: './images/sounds/knight-tag.mp3',
+	tanktag: './images/sounds/tanktag.wav',
 	altag: './images/sounds/al-tag.mp3',
 	tagimpact: './images/sounds/tag-impact.mp3',
 	geminsert: './images/sounds/gem-insert.mp3',
@@ -3426,6 +3516,8 @@ const soundFiles = {
 	cavalierground1: './images/sounds/cavalier-ground1.mp3',
 	cavalierattack: './images/sounds/cavalier-attack.mp3',
 	tughurt: './images/sounds/tughurt.mp3',
+	tughurt1: './images/sounds/tughurt1.mp3',
+	tughurt2: './images/sounds/tughurt2.mp3',
 	tugarrow: './images/sounds/tugarrow.mp3',
 	fireball: './images/sounds/fireball.mp3',
 	impact: './images/sounds/impact.mp3',
@@ -3571,6 +3663,8 @@ const soundFiles = {
 	eat: './images/sounds/eat.mp3',
 	curse: './images/sounds/curse.mp3',
 	alhand: './images/sounds/al-hand.mp3',
+	alslash: './images/sounds/al-slash.mp3',
+	alslashhit: './images/sounds/al-slash-hit.mp3',
 	alhit: './images/sounds/al-hit.mp3',
 	alhurt1: './images/sounds/alhurt1.mp3',
 	alhurt2: './images/sounds/alhurt2.mp3',
@@ -3856,11 +3950,13 @@ const __holoMenuItems = [
 	{ icon: 'settings', order:9, subOrder:1, titles: {
 		en: 'Settings',
 		tr: 'Ayarlar'
-	}},
+	}}
+	,
 	{ icon: 'tip', order:9, subOrder:2, titles: {
 		en: 'About Us',
 		tr: 'Bize Dair'
-	}}
+	}
+}
 ];
 const mapSprites = [
 	{
@@ -4568,7 +4664,7 @@ const mapSprites = [
 		id: 42, minLevel : 1,
 		coords: { 
 			title: 'Arena Ground',
-		 }, theme: 'arena', 
+		 }, theme: 'arena', hasMobile: true,
 		distance: 1, width: MathRound(6144 * 1.065),
 		playGrounds: [
 			{ min_X: 0, max_X:1700, bottom_Gap: 20, round: { rate: .44, dir: __right} },
@@ -4579,6 +4675,24 @@ const mapSprites = [
 			{ minYRate: 85, maxYRate: 100, min_X: MathRound(3400 * 1.065), max_X: MathRound(4250 * 1.065), background: true },
 			{ minYRate: 0, maxYRate: 15, min_X: MathRound(1950 * 1.065), max_X: MathRound(2650 * 1.065), foreground: true },
 			{ minYRate: 0, maxYRate: 15, min_X: MathRound(3500 * 1.065), max_X: MathRound(4200 * 1.065), foreground: true }
+		],
+		groundLayerLighting: [
+			{
+				id: "purple_torch_right",
+				xBase: 1700,
+				yBase: 500,
+				color: "#A86CFF",
+				intensity: 0.32,
+				radiusBase: 700
+			},
+			{
+				id: "purple_torch_right",
+				xBase: 6144 - 1700,
+				yBase: 500,
+				color: "#A86CFF",
+				intensity: 0.32,
+				radiusBase: 700
+			}
 		],
 		objectMobs: [
 			{
@@ -4882,6 +4996,99 @@ const mapSprites = [
 		],
 		ground: { width: 2048, height: 1152, zoom: 1.06, yRate: .9 }
 	},
+	{
+		id: -1, still: true, coords: { left: '20%', top: '60%', title: 'Credits' },
+		theme: __scale >= 2 ? 'lobbymobile' : 'lobby', distance: 1, width: MathFloor(4096 * .48 * __scale), 
+		ambiancePath: './images/music/lobby.mp3',
+		ambianceVolume: .5,
+		mobs: [
+			{
+				id: 72,
+				minX: 1175,
+				maxX: 1175,
+				count: 1,
+				do: function(_e) {
+					episode.msNow = 1;
+					_e.direction = 'right';
+					_e.noDirection = true;
+					_e.swapAnimation('idle');
+					_e.positionable = true;
+				},
+				yPosition: function() {
+					return MathRound(groundheight * 1.7);
+				}
+			},
+			{
+				id: 2002,
+				minX: 1400,
+				maxX: 1400,
+				count: 1,
+				do: function(_e) {
+					_e.npc = true;
+					_e.reversed = true;
+					_e.direction = 'left';
+					_e.noDirection = true;
+					_e.positionable = true;
+				},
+				yPosition: function() {
+					return MathRound(groundheight * 1.85);
+				}
+			},
+			{
+				id: 5,
+				minX: 1380,
+				maxX: 1380,
+				count: 1,
+				do: function(_e) {
+					_e.positionable = true;
+				},
+				yPosition: function() {
+					return MathRound(groundheight * 1.6);
+				}
+			},
+			{
+				id: 87,
+				minX: 1620,
+				maxX: 1620,
+				count: 1,
+				zoom: .9,
+				do: function(_e) {
+					_e.positionable = true;
+				},
+				yPosition: function() {
+					return MathRound(groundheight * .82);
+				}
+			},
+			{
+				id: 87,
+				minX: 1250,
+				maxX: 1250,
+				count: 1,
+				zoom: .85,
+				do: function(_e) {
+					_e.positionable = true;
+				},
+				yPosition: function() {
+					return MathRound(groundheight * 1.2);
+				}
+			}
+		],
+		objects : [
+			{ id: 'ff1', src:'./images/texture/farm-fireflies.gif', totalFrames: 2, key: 'fireflies', width: 400, height: 300, zoom: 1.2, locate: { left: 1100 , bottom: 200} },
+		],
+		tiles: [
+			{ 
+				name: 'ground',
+				count: 1, 
+				height: 2296, 
+				zoom: .48 * __scale, 
+				rate: 1, 
+				width: 4096, 
+				bottom: -350 
+			}
+		],
+		ground: { width: 4096, height: 2296, zoom: .48 * __scale }
+	},
 	// {
 	// 	id: 800, disabled: true, battleGround: true, coords: { left: '4%', top: '22%', title: 'Battleground', icon: 'battleground' }, theme: 'cave', distance: 1, width: 6144,
 	// 	mobs: [
@@ -5041,7 +5248,7 @@ const mapSprites = [
 	// },
 	{
 		id: 499, disabled: true, pvp: true, coords: { left: '5%', top: '40%', title: 'Arena', icon: 'battleground' }, 
-		theme: __scale >= 2 ? 'cavemobile' : 'cave', distance: 1, width: MathFloor(6144 * 1.06),
+		theme: 'cave', hasMobile: true, distance: 1, width: MathFloor(6144 * 1.06),
 		mobs: [
 			
 		],
@@ -5051,13 +5258,13 @@ const mapSprites = [
 		],
 		tiles: [
 			{ name: 'bg', count:1, width: 6144, height: 1080, zoom: 1.06 * __scale, rate: .5, count:1, bottom: -440 },
-			{ name: 'ground', width: 6144, height: 1080, zoom: 1.06 * __scale, rate: 1, bottom: -400, count:1 },
+			{ name: 'darkground', width: 6144, height: 1080, zoom: 1.06 * __scale, rate: 1, bottom: -400, count:1 },
 			{ name: 'foreground', count:1, width: 6144, height: 1080, bottom:-416, foreground: true, zoom: 1 * __scale, rate: 1 },
 		],
 		ground: { width: 6144, height: 1080, zoom: 1.06 * __scale, yRate: 2.2 }
 	},
 	{
-		id: 500, disabled: true, pvp: true, coords: { left: '5%', top: '40%', title: 'Arena', icon: 'battleground' }, theme: 'cave', distance: 1, 
+		id: 500, hasMobile: true, disabled: true, pvp: true, coords: { left: '5%', top: '40%', title: 'Arena', icon: 'battleground' }, theme: 'cave', distance: 1, 
 			width: 6144 * 1.06,
 		mobs: [
 			
@@ -5068,15 +5275,72 @@ const mapSprites = [
 		],
 		tiles: [
 			{ name: 'bg', count:1, width: 6144, height: 1080, zoom: 1.06 * __scale, rate: .5, count:1, bottom: -440 },
-			{ name: 'ground', width: 6144, height: 1080, zoom: 1.06 * __scale, rate: 1, bottom: -400, count:1 },
+			{ name: 'darkground', width: 6144, height: 1080, zoom: 1.06 * __scale, rate: 1, bottom: -400, count:1 },
 			{ name: 'foreground', count:1, width: 6144, height: 1080, bottom:-416, foreground: true, zoom: 1, rate: 1 },
 		],
 		ground: { width: 6144, height: 1080, zoom: 1.06 * __scale, yRate: 2.2 }
 	},
 	{
-		id: 11, ambianceVolume: .3, coords: { left: '16%', top: '32%', title: 'Swamp' }, 
-		theme: 'lush', distance: 1, width: MathFloor(6144 * 1.065),
+		id: 11, ambianceVolume: .03, coords: { left: '16%', top: '32%', title: 'Swamp' }, 
+		theme: 'lush', hasMobile: true, distance: 1, width: MathFloor(6144 * 1.065),
 		minLevel: 1, 
+		groundLayerLighting: [
+			{
+				id: "ground_glow_left",
+				xBase: 500,
+				yBase: 820,
+				"color": "#D6E85A",
+				"intensity": 0.2,
+				"radiusBase": 500
+				// color: "#FF0000",
+				// intensity: 1,
+				// radiusBase: 500
+			},
+			{
+				id: "ground_glow_center",
+				xBase: 2100,
+				yBase: 780,
+				// color: "#FF0000",
+				// intensity: 1,
+				// radiusBase: 500
+				color: "#C9E96A",
+				intensity: 0.23,
+				radiusBase: 600
+			},
+			{
+				id: "ground_glow_right",
+				xBase: 3750,
+				yBase: 820,
+				// color: "#FF0000",
+				// intensity: 1,
+				// radiusBase: 500
+				color: "#A9D94F",
+				intensity: 0.18,
+				radiusBase: 500
+			},
+			{
+				id: "ground_glow_far_right",
+				xBase: 5600,
+				yBase: 820,
+				// color: "#FF0000",
+				// intensity: 1,
+				// radiusBase: 500
+				color: "#A9D94F",
+				intensity: 0.18,
+				radiusBase: 500
+			},
+			// {
+			// 	id: "waterfall_glow",
+			// 	xBase: 2350,
+			// 	yBase: 650,
+			// 	color: "#FF0000",
+			// 	intensity: 1,
+			// 	radiusBase: 500
+			// 	// color: "#8FE8A5",
+			// 	// intensity: 0.28,
+			// 	// radiusBase: 850
+			// }
+		],
 		// itemGrade: 3,
 		// equipmentDropRates: [
 		// 	{ key:'necklace', rate: 8 },
@@ -5182,7 +5446,7 @@ const mapSprites = [
 	{
 		id: 13, ambianceVolume: .3, 
 		coords: {  left: '21%', top: '21%', title: 'Swamp', dir: 'North' }, 
-		theme: __scale >= 2 ? 'lushmobile' : 'lush', distance: 1, width: MathFloor(6144 * 1.06),
+		theme:'lush', hasMobile:true, distance: 1, width: MathFloor(6144 * 1.06),
 		minLevel: 8, itemGrade: 3,
 		equipmentDropRates: [
 			{ key:'weapon', rate: 8 },
@@ -5726,8 +5990,99 @@ const mapSprites = [
 	},
 	{
 		id: 36, coords: { left: '5%', top: '40%', title: 'Arena', icon: 'battleground' }, 
-		theme: 'cave', distance: 1, width: MathFloor(6144 * 1.065), ambiancePath: './images/sounds/cave2.mp3',
+		theme: 'cave', hasMobile: true, distance: 1, width: MathFloor(6144 * 1.065), ambiancePath: './images/sounds/cave2.mp3',
 		ambianceVolume: .5,
+		groundLayerLighting: [
+			{
+				id: "cave_dark_left",
+				type: "darkness",
+				xBase: 0,
+				yBase: 500,
+				color: "#000000",
+				intensity: 0.35,
+				radiusBase: 1000
+			},
+			// =====================================================
+			// SOL KARANLIK BÖLGE — SOĞUK DOLGU
+			// =====================================================
+			// {
+			// 	id: "cave_cold_left",
+			// 	xBase: 300,
+			// 	yBase: 800,
+			// 	color: "#29476A",
+			// 	intensity: 0.28,
+			// 	radiusBase: 1550
+			// },
+
+			// =====================================================
+			// SOL-ORTA GEÇİŞ
+			// =====================================================
+			{
+				id: "cave_cold_left_center",
+				xBase: 1350,
+				yBase: 580,
+				color: "#102641",
+				intensity: 0.18,
+				radiusBase: 300
+			},
+
+			// =====================================================
+			// SICAK MERKEZ
+			// =====================================================
+			{
+				id: "cave_warm_center",
+				xBase: 2800,
+				yBase: 720,
+				color: "#D87943",
+				intensity: 0.2,
+				radiusBase: 400
+			},
+
+			// =====================================================
+			// MERKEZDEN SAĞA GEÇİŞ
+			// =====================================================
+			{
+				id: "cave_warm_right_center",
+				xBase: 4400,
+				yBase: 720,
+				color: "#C9683D",
+				intensity: 0.2,
+				radiusBase: 400
+			},
+
+			// =====================================================
+			// SAĞ KARANLIK BÖLGE
+			// =====================================================
+			{
+				id: "cave_cold_right",
+				xBase: 3900,
+				yBase: 550,
+				color: "#304D75",
+				intensity: 0.28,
+				radiusBase: 500
+			},
+
+			// =====================================================
+			// EN SAĞ
+			// =====================================================
+			{
+				id: "cave_cold_far_right",
+				xBase: 4900,
+				yBase: 550,
+				color: "#294568",
+				intensity: 0.25,
+				radiusBase: 500
+			},
+			{
+				id: "cave_dark_right",
+				type: "darkness",
+				xBase: 6200,
+				yBase: 500,
+				color: "#000000",
+				intensity: 0.35,
+				radiusBase: 500
+			}
+		],
 		mobs: [
 		],
 		objects: [
@@ -5735,7 +6090,7 @@ const mapSprites = [
 		tiles: [
 			{ name: 'bg', count:1, width: 6144, height: 1080, zoom: 1.065, rate: .5, count:1, bottom: -440 },
 			{ name: 'parts2', width: 1920, height: 1080, count: 3, bottom: 500, zoom: 1, rate: .75 },
-			{ name: 'ground', width: 6144, height: 1080, zoom: 1.065, rate: 1, bottom: -400, count:1 }
+			{ name: 'darkground', width: 6144, height: 1080, zoom: 1.065, rate: 1, bottom: -400, count:1 }
 			//{ name: 'foreground', count:1, width: 6144, height: 1080, bottom:-416, foreground: true, zoom: 1, rate: 1 },
 		],
 		ground: { width: 6144, height: 1080, zoom: 1.065, yRate: 2.2 }
@@ -6189,8 +6544,9 @@ const grades = [
 	{ key: 8,  color: 'cyan',     hex: '#1FA6A0' }, // parlak turkuaz
 	{ key: 9,  color: 'lime',     hex: '#7CB342' }, // canlı ama kirli yeşil
 	{ key: 10, color: 'crimson',  hex: '#C13A4A' }, // açık elite red
-	{ key: 11, color: 'platinum', hex: '#C7CCD6' }, // açık metalik gri
-	{ key: 11, color: 'obsidian', hex: '#3d354b' } // açık metalik gri
+	{ key: 11, color: 'pink', hex: '#d706d7' }, // açık metalik gri
+	{ key: 12, color: 'teal', hex: '#178778' }, // açık metalik gri
+	{ key: 13, color: 'magenta', hex: '#450431' } // açık metalik gri
 ];
 function getGradeColor(_grade) {
 	return grades.find(x => x.key === _grade)?.color;
@@ -6294,7 +6650,7 @@ function createFrames(_speed, _count, _width, _height, _col, _atkFrame, _sound) 
 const spells = {
 	lasershow: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: .85,
 		width: 76,
 		invulnerable: true,
@@ -6325,6 +6681,7 @@ const spells = {
 				type: 'skill',
 				attack: true,
 				priority: 1,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -6766,7 +7123,7 @@ const spells = {
 	warriorhead: {
 		src: './images/main/warrior/Death.png',
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		noRelation: true,
@@ -7054,7 +7411,7 @@ const spells = {
 	teberhead: {
 		src: './images/sprites/ep02/sprite.png',
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.35,
 		invulnerable: true,
 		noRelation: true,
@@ -7335,7 +7692,7 @@ const spells = {
 	dynamite: {
 		src: './images/sprites/ep92/tnt.png',
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.5,
 		invulnerable: true,
 		class: __spell,
@@ -7363,6 +7720,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				useExtraStepXRate: true,
 				frames: [
 					{
@@ -7468,7 +7826,7 @@ const spells = {
 	dynamiteshort: {
 		src: './images/sprites/ep92/tnt.png',
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.5,
 		invulnerable: true,
 		class: __spell,
@@ -7496,6 +7854,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				useExtraStepXRate: true,
 				frames: [
 					{
@@ -7601,7 +7960,7 @@ const spells = {
 	earthspikes: {
 		src: './images/main/warrior/wave2.png',
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: .65,
 		invulnerable: true,
 		still: true,
@@ -7629,6 +7988,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -7783,7 +8143,7 @@ const spells = {
 	earthspikes2: {
 		src: './images/main/warrior/spikes.png',
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		class: __spell,
@@ -7810,6 +8170,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 1377,
@@ -8058,7 +8419,7 @@ const spells = {
 	earthspikes3: {
 		src: './images/main/warrior/spikes2.png',
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		still: true,
@@ -8088,6 +8449,7 @@ const spells = {
 				type: 'skill',
 				move: true,
 				priority: 1,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 206,
@@ -8290,9 +8652,518 @@ const spells = {
 			}
 		}
 	},
+	earthspikes4: {
+		src: './images/main/warrior/spikes3.png',
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		invulnerable: true,
+		class: __spell,
+		name: 'Spikes',
+		hasShadow: false,
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				attack: true,
+				frames: [
+					{
+						spriteLeft: 500,
+						spriteTop: 870,
+						spriteWidth: 360,
+						spriteHeight: 69,
+						spriteOrigin: 180,
+						speed: 4,
+						extraStepXRate: 1.3,
+						bottomGap: 18,
+						sound: 'crack'
+					},
+					{
+						spriteLeft: 480,
+						spriteTop: 625,
+						spriteWidth: 400,
+						spriteHeight: 67,
+						spriteOrigin: 200,
+						extraStepXRate: 1.2,
+						bottomGap: 18,
+						speed: 4,
+						bleed: true,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							rate: .2,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 20,
+						spriteTop: 612,
+						spriteWidth: 360,
+						spriteHeight: 83,
+						spriteOrigin: 180,
+						extraStepXRate: 1.1,
+						bottomGap: 18,
+						speed: 4,
+						bleed: true,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							rate: .2,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 480,
+						spriteTop: 625,
+						spriteWidth: 400,
+						spriteHeight: 67,
+						spriteOrigin: 200,
+						extraStepXRate: 1,
+						speed: 4,
+						bleed: true,
+						bottomGap: 18,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							reset: 1,
+							rate: .2,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 500,
+						spriteTop: 870,
+						spriteWidth: 360,
+						spriteHeight: 69,
+						spriteOrigin: 180,
+						extraStepXRate: .9,
+						speed: 4,
+						bleed: true,
+						bottomGap: 18,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							rate: .2,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 480,
+						spriteTop: 625,
+						spriteWidth: 400,
+						spriteHeight: 67,
+						spriteOrigin: 200,
+						extraStepXRate: .8,
+						speed: 4,
+						bleed: true,
+						bottomGap: 18,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							rate: .2,
+							reset: 1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 20,
+						spriteTop: 612,
+						spriteWidth: 360,
+						spriteHeight: 83,
+						spriteOrigin: 180,
+						extraStepXRate: .6,
+						speed: 4,
+						sound: { key: 'rock', reset: true, volume: .8 },
+						bleed: true,
+						bottomGap: 18,
+						zoom: 1.1,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							reset: 1,
+							rate: .2,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 480,
+						spriteTop: 322,
+						spriteWidth: 360,
+						spriteHeight: 159,
+						spriteOrigin: 180,
+						speed: 4,
+						bottomGap: 18,
+						zoom: 1.2,
+						sound: { key: 'earthrock4', volume: 1, reset: true},
+						objects: [
+							{
+								position:'canvas', 
+								key: 'debris',
+								p1: { color: '#b57064', strength: 2, xVelocity: .12, yVelocity:.001 } 
+							},
+							{
+								key: 'aurared',
+								position: 'middle-feet',
+								yGap: -28,
+								scale: 2.5,
+								still: true
+							}
+						],
+						bleed: true,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							reset: 1,
+							rate: .2,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 20,
+						spriteTop: 337,
+						spriteWidth: 360,
+						spriteHeight: 144,
+						spriteOrigin: 180,
+						speed: 4,
+						bottomGap: 18,
+						bleed: true,
+						zoom: 1.2,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							reset: 1,
+							rate: .2,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 480,
+						spriteTop: 29,
+						spriteWidth: 360,
+						spriteHeight: 207,
+						spriteOrigin: 180,
+						speed: 4,
+						bottomGap: 18,
+						bleed: true,
+						zoom: 1.2,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							reset: 1,
+							rate: .2,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 480 + 10,
+						spriteTop: 29,
+						spriteWidth: 360,
+						spriteHeight: 207,
+						spriteOrigin: 180,
+						speed: 2,
+						bottomGap: 18,
+						bleed: true,
+						zoom: 1.2,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							rate: .2,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 480 - 10,
+						spriteTop: 29,
+						spriteWidth: 360,
+						spriteHeight: 207,
+						spriteOrigin: 180,
+						speed: 2,
+						bottomGap: 18,
+						bleed: true,
+						zoom: 1.2,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							rate: .2,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 480 + 10,
+						spriteTop: 29,
+						spriteWidth: 360,
+						spriteHeight: 207,
+						spriteOrigin: 180,
+						speed: 2,
+						bottomGap: 18,
+						bleed: true,
+						zoom: 1.2,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							rate: .2,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 480 - 10,
+						spriteTop: 29,
+						spriteWidth: 360,
+						spriteHeight: 207,
+						spriteOrigin: 180,
+						speed: 2,
+						bottomGap: 18,
+						bleed: true,
+						zoom: 1.2,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							rate: .2,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 480 + 10,
+						spriteTop: 29,
+						spriteWidth: 360,
+						spriteHeight: 207,
+						spriteOrigin: 180,
+						speed: 2,
+						bleed: true,
+						zoom: 1.2,
+						bottomGap: 18,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							rate: .2,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 480 - 10,
+						spriteTop: 29,
+						spriteWidth: 360,
+						spriteHeight: 207,
+						spriteOrigin: 180,
+						speed: 2,
+						zoom: 1.2,
+						bottomGap: 18,
+						bleed: true,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							rate: .2,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 480 + 10,
+						spriteTop: 29,
+						spriteWidth: 360,
+						spriteHeight: 207,
+						spriteOrigin: 180,
+						speed: 2,
+						zoom: 1.2,
+						bottomGap: 18,
+						bleed: true,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							rate: .2,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 480 - 10,
+						spriteTop: 29,
+						spriteWidth: 360,
+						spriteHeight: 207,
+						spriteOrigin: 180,
+						speed: 2,
+						zoom: 1.2,
+						bottomGap: 18,
+						bleed: true,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							rate: .2,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 480,
+						spriteTop: 29,
+						spriteWidth: 360,
+						spriteHeight: 207,
+						spriteOrigin: 180,
+						speed: 4,
+						zoom: 1.2,
+						bleed: true,
+						bottomGap: 18,
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							reset: 1,
+							rate: .2,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 20,
+						spriteTop: 49,
+						spriteWidth: 360,
+						spriteHeight: 187,
+						spriteOrigin: 180,
+						speed: 4,
+						zoom: 1.1,
+						bottomGap: 18,
+						bleed: true,
+						objects: [{
+							position: 'under-feet',
+							key: 'throw',
+							scale: 2,
+							yGap:10
+						}],
+						atk: {
+							yRange: 15,
+							hitTaken: .2,
+							reset: 1,
+							rate: .2,
+							hurt: {
+								key: 'hurtair',
+								type: 'air'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 480,
+						spriteTop: 322,
+						spriteWidth: 360,
+						spriteHeight: 159,
+						spriteOrigin: 180,
+						bottomGap: 18,
+						speed: 4
+					},
+					{
+						spriteLeft: 500,
+						spriteTop: 870,
+						spriteWidth: 360,
+						spriteHeight: 69,
+						spriteOrigin: 180,
+						bottomGap: 18,
+						speed: 4
+					},
+					{
+						spriteLeft: 500,
+						spriteTop: 870,
+						spriteWidth: 360,
+						spriteHeight: 69,
+						spriteOrigin: 180,
+						bottomGap: 18,
+						zoom: .5,
+						speed: 4
+					}
+				]
+			}
+		}
+	},
 	tnt: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		src: './images/sprites/ep29/tnt.png',
 		invulnerable: true,
@@ -8502,7 +9373,7 @@ const spells = {
 	},
 	fireclaw: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		src: './images/sprites/ep29/fire-claw.png?v=2',
 		invulnerable: true,
@@ -8533,6 +9404,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -8732,7 +9604,7 @@ const spells = {
 	},
 	emegenspit: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		src: './images/sprites/ep03/spit.png',
 		invulnerable: true,
@@ -8769,6 +9641,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -8884,12 +9757,13 @@ const spells = {
 	},
 	suicide: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2.5,
 		noRemove: true,
 		src: './images/sprites/ep623/eplosion.png',
 		invulnerable: true,
 		pierce: true,
+		hasShadow: false,
 		class: __spell,
 		name: 'Suicide',
 		animations: {
@@ -8914,6 +9788,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				priority: 1,
+				attack: true,
 				frames: [
 						{
 							spriteLeft: 137,
@@ -9089,7 +9964,7 @@ const spells = {
 	},
 	emegenspit2: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: .6,
 		src: './images/sprites/ep03/spit2.png',
 		invulnerable: true,
@@ -9163,6 +10038,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -9289,9 +10165,1798 @@ const spells = {
 			}
 		}
 	},
+	beespit: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		src: './images/sprites/ep07/spit.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		class: __spell,
+		name: 'Bee Spit',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 427,
+						spriteTop: 237,
+						spriteWidth: 34,
+						spriteHeight: 42,
+						spriteOrigin: 17,
+						bottomGap: -172,
+						sound: { key: 'emegenspitdead', volume: .8 },
+						speed: 4
+					},
+					{
+						spriteLeft: 463,
+						spriteTop: 222,
+						spriteWidth: 42,
+						spriteHeight: 68,
+						spriteOrigin: 21,
+						bottomGap: -159,
+						speed: 4
+					},
+					{
+						spriteLeft: 507,
+						spriteTop: 199,
+						spriteWidth: 60,
+						spriteHeight: 105,
+						spriteOrigin: 30,
+						bottomGap: -140,
+						speed: 4
+					},
+					{
+						spriteLeft: 571,
+						spriteTop: 181,
+						spriteWidth: 85,
+						spriteHeight: 140,
+						spriteOrigin: 43,
+						bottomGap: -122,
+						speed: 4
+					},
+					{
+						spriteLeft: 656,
+						spriteTop: 166,
+						spriteWidth: 112,
+						spriteHeight: 176,
+						spriteOrigin: 56,
+						bottomGap: -104,
+						speed: 4
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				attack: true,
+				move: true,
+				frames: [
+					{
+						spriteLeft: 1,
+						spriteTop: 237,
+						spriteWidth: 30,
+						spriteHeight: 39,
+						spriteOrigin: 15,
+						bottomGap: -132 - 50,
+						extraStepXRate: .7,
+						speed: 6,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'toxic'
+						}
+					},
+					{
+						spriteLeft: 31,
+						spriteTop: 237,
+						spriteWidth: 72,
+						spriteHeight: 39,
+						spriteOrigin: 36,
+						bottomGap: -132 - 50,
+						extraStepXRate: .7,
+						speed: 6,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'toxic'
+						}
+					},
+					{
+						spriteLeft: 105,
+						spriteTop: 237,
+						spriteWidth: 104,
+						spriteHeight: 39,
+						spriteOrigin: 52,
+						bottomGap: -130 - 50,
+						extraStepXRate: .7,
+						speed: 6,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'toxic'
+						}
+					},
+					{
+						spriteLeft: 211,
+						spriteTop: 237,
+						spriteWidth: 86,
+						spriteHeight: 39,
+						spriteOrigin: 43,
+						bottomGap: -125 - 50,
+						extraStepXRate: .7,
+						speed: 6,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'toxic'
+						}
+					},
+					{
+						spriteLeft: 300,
+						spriteTop: 237,
+						spriteWidth: 77,
+						spriteHeight: 39,
+						spriteOrigin: 39,
+						bottomGap: -123 - 50,
+						extraStepXRate: .72,
+						speed: 6,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'toxic'
+						}
+					},
+					{
+						spriteLeft: 380,
+						spriteTop: 237,
+						spriteWidth: 44,
+						spriteHeight: 39,
+						spriteOrigin: 22,
+						bottomGap: -123 - 50,
+						extraStepXRate: .75,
+						speed: 6,
+						atk: {
+							yRange: 15,
+							reset: 1,
+							rate: 2,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'toxic'
+						}
+					}
+				]
+			}
+		}
+	},
+	tank1faster: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 2,
+		src: './images/sprites/ep73/sprite-blue.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		pierce: true,
+		class: __spell,
+		name: 'Tank Slash 1 Fast',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				attack: true,
+				move: true,
+				frames: [
+					{
+						spriteLeft: 257,
+						spriteTop: 2693,
+						spriteWidth: 107,
+						spriteHeight: 207,
+						spriteOrigin: 43,
+						shadow: 'red',
+						sound: { key: 'axewoosh', reset: true, volume: 1 },
+						extraStepXRate: 3,
+						extraStepYRate: .5,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							aoe: 100,
+							rate: .1,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 851,
+						spriteTop: 2689,
+						spriteWidth: 99,
+						spriteHeight: 211 + 10,
+						spriteOrigin: 49,
+						shadow: 'red',
+						extraStepXRate: 3,
+						extraStepYRate: .35,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							aoe: 100,
+							rate: .1,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 1427,
+						spriteTop: 2693,
+						spriteWidth: 107,
+						spriteHeight: 207 + 10,
+						spriteOrigin: 73,
+						shadow: 'red',
+						extraStepXRate: 3,
+						extraStepYRate: -.35,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 2051,
+						spriteTop: 2693,
+						spriteWidth: 99,
+						spriteHeight: 207,
+						spriteOrigin: 49,
+						shadow: 'red',
+						extraStepXRate: 3,
+						extraStepYRate: -.5,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 257,
+						spriteTop: 2693,
+						spriteWidth: 107,
+						spriteHeight: 207 - 10,
+						spriteOrigin: 43,
+						shadow: 'red',
+						speed: 6,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					}
+				]
+			}
+		}
+	},
+	tank2faster: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		src: './images/sprites/ep73/sprite-blue.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		pierce: true,
+		class: __spell,
+		name: 'Tank Slash 2 Fast',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				attack: true,
+				frames: [
+					{
+						spriteLeft: 596,
+						spriteTop: 1651,
+						spriteWidth: 514,
+						spriteHeight: 350,
+						spriteOrigin: 304,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .5,
+						sound: { key: 'axewoosh', reset: true, volume: 1 },
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 596,
+						spriteTop: 1651,
+						spriteWidth: 514,
+						spriteHeight: 350,
+						spriteOrigin: 304,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .35,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 596,
+						spriteTop: 1651,
+						spriteWidth: 514,
+						spriteHeight: 350,
+						spriteOrigin: 304,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.35,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 596,
+						spriteTop: 1651,
+						spriteWidth: 514,
+						spriteHeight: 350,
+						spriteOrigin: 304,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.5,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 1357,
+						spriteTop: 1652,
+						spriteWidth: 354,
+						spriteHeight: 350,
+						spriteOrigin: 143,
+						shadow: 'red',
+						speed: 6,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					}
+				]
+			}
+		}
+	},
+	tank3faster: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		src: './images/sprites/ep73/sprite-blue.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		pierce: true,
+		class: __spell,
+		name: 'Tank Slash 3 Fast',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				attack: true,
+				frames: [
+					{
+						spriteLeft: 642,
+						spriteTop: 1147,
+						spriteWidth: 555,
+						spriteHeight: 353,
+						spriteOrigin: 258,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .5,
+						sound: { key: 'axewoosh', reset: true, volume: 1 },
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 642,
+						spriteTop: 1147,
+						spriteWidth: 555,
+						spriteHeight: 353,
+						spriteOrigin: 258,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .35,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 642,
+						spriteTop: 1147,
+						spriteWidth: 555,
+						spriteHeight: 353,
+						spriteOrigin: 258,
+						extraStepXRate: 2,
+						extraStepYRate: -.35,
+						shadow: 'red',
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 642,
+						spriteTop: 1147,
+						spriteWidth: 555,
+						spriteHeight: 353,
+						spriteOrigin: 258,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.5,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 1240,
+						spriteTop: 1147,
+						spriteWidth: 480,
+						spriteHeight: 353,
+						spriteOrigin: 260,
+						shadow: 'red',
+						speed: 6,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					}
+				]
+			}
+		}
+	},
+	tank4faster: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		src: './images/sprites/ep73/sprite-blue.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		pierce: true,
+		class: __spell,
+		name: 'Tank Slash 4 Fast',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				attack: true,
+				frames: [
+					{
+						spriteLeft: 772,
+						spriteTop: 647,
+						spriteWidth: 287,
+						spriteHeight: 366,
+						spriteOrigin: 128,
+						bottomGap: 13,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .5,
+						sound: { key: 'axewoosh', reset: true, volume: 1 },
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 772,
+						spriteTop: 647,
+						spriteWidth: 287,
+						spriteHeight: 366,
+						spriteOrigin: 128,
+						bottomGap: 13,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .35,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 772,
+						spriteTop: 647,
+						spriteWidth: 287,
+						spriteHeight: 366,
+						spriteOrigin: 128,
+						bottomGap: 13,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.35,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 772,
+						spriteTop: 647,
+						spriteWidth: 287,
+						spriteHeight: 366,
+						spriteOrigin: 128,
+						bottomGap: 13,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.5,
+						speed: 3,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 1373,
+						spriteTop: 726,
+						spriteWidth: 273,
+						spriteHeight: 284,
+						bottomGap:10,
+						spriteOrigin: 127,
+						shadow: 'red',
+						speed: 6,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					}
+				]
+			}
+		}
+	},
+	tank1: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 2,
+		src: './images/sprites/ep73/sprite-blue.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		pierce: true,
+		class: __spell,
+		name: 'Tank Slash 1',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				attack: true,
+				frames: [
+					{
+						spriteLeft: 257,
+						spriteTop: 2693,
+						spriteWidth: 107,
+						spriteHeight: 307,
+						spriteOrigin: 43,
+						shadow: 'red',
+						sound: { key: 'axewoosh', reset: true, volume: 1 },
+						extraStepXRate: 2.25,
+						extraStepYRate: .5,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 851,
+						spriteTop: 2689,
+						spriteWidth: 99,
+						spriteHeight: 311 + 10,
+						spriteOrigin: 49,
+						shadow: 'red',
+						extraStepXRate: 2.25,
+						extraStepYRate: .35,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 1427,
+						spriteTop: 2693,
+						spriteWidth: 107,
+						spriteHeight: 307 + 10,
+						spriteOrigin: 73,
+						shadow: 'red',
+						extraStepXRate: 2.25,
+						extraStepYRate: -.35,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 2051,
+						spriteTop: 2693,
+						spriteWidth: 99,
+						spriteHeight: 307,
+						spriteOrigin: 49,
+						shadow: 'red',
+						extraStepXRate: 2.25,
+						extraStepYRate: -.5,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 257,
+						spriteTop: 2693,
+						spriteWidth: 107,
+						spriteHeight: 307 - 10,
+						spriteOrigin: 43,
+						shadow: 'red',
+						speed: 8,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					}
+				]
+			}
+		}
+	},
+	tank2: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		src: './images/sprites/ep73/sprite-blue.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		pierce: true,
+		class: __spell,
+		name: 'Tank Slash 2',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				attack: true,
+				frames: [
+					{
+						spriteLeft: 596,
+						spriteTop: 1651,
+						spriteWidth: 514,
+						spriteHeight: 350,
+						spriteOrigin: 304,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .5,
+						sound: { key: 'axewoosh', reset: true, volume: 1 },
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 596,
+						spriteTop: 1651,
+						spriteWidth: 514,
+						spriteHeight: 350,
+						spriteOrigin: 304,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .35,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 596,
+						spriteTop: 1651,
+						spriteWidth: 514,
+						spriteHeight: 350,
+						spriteOrigin: 304,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.35,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 596,
+						spriteTop: 1651,
+						spriteWidth: 514,
+						spriteHeight: 350,
+						spriteOrigin: 304,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.5,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 1357,
+						spriteTop: 1652,
+						spriteWidth: 354,
+						spriteHeight: 350,
+						spriteOrigin: 143,
+						shadow: 'red',
+						speed: 8,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					}
+				]
+			}
+		}
+	},
+	tank3: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		src: './images/sprites/ep73/sprite-blue.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		pierce: true,
+		class: __spell,
+		name: 'Tank Slash 3',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				attack: true,
+				move: true,
+				frames: [
+					{
+						spriteLeft: 642,
+						spriteTop: 1147,
+						spriteWidth: 555,
+						spriteHeight: 353,
+						spriteOrigin: 258,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .5,
+						sound: { key: 'axewoosh', reset: true, volume: 1 },
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 642,
+						spriteTop: 1147,
+						spriteWidth: 555,
+						spriteHeight: 353,
+						spriteOrigin: 258,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .35,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 642,
+						spriteTop: 1147,
+						spriteWidth: 555,
+						spriteHeight: 353,
+						spriteOrigin: 258,
+						extraStepXRate: 2,
+						extraStepYRate: -.35,
+						shadow: 'red',
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 642,
+						spriteTop: 1147,
+						spriteWidth: 555,
+						spriteHeight: 353,
+						spriteOrigin: 258,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.5,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 1240,
+						spriteTop: 1147,
+						spriteWidth: 480,
+						spriteHeight: 353,
+						spriteOrigin: 260,
+						shadow: 'red',
+						speed: 8,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					}
+				]
+			}
+		}
+	},
+	tank4: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		src: './images/sprites/ep73/sprite-blue.png',
+		invulnerable: true,
+		extraStepXRate: 1,
+		pierce: true,
+		class: __spell,
+		name: 'Tank Slash 4',
+		animations: {
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			},
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				attack: true,
+				frames: [
+					{
+						spriteLeft: 772,
+						spriteTop: 647,
+						spriteWidth: 287,
+						spriteHeight: 366,
+						spriteOrigin: 128,
+						bottomGap: 13,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .5,
+						sound: { key: 'axewoosh', reset: true, volume: 1 },
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 772,
+						spriteTop: 647,
+						spriteWidth: 287,
+						spriteHeight: 366,
+						spriteOrigin: 128,
+						bottomGap: 13,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: .35,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 772,
+						spriteTop: 647,
+						spriteWidth: 287,
+						spriteHeight: 366,
+						spriteOrigin: 128,
+						bottomGap: 13,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.35,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 772,
+						spriteTop: 647,
+						spriteWidth: 287,
+						spriteHeight: 366,
+						spriteOrigin: 128,
+						bottomGap: 13,
+						shadow: 'red',
+						extraStepXRate: 2,
+						extraStepYRate: -.5,
+						speed: 4,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 1373,
+						spriteTop: 726,
+						spriteWidth: 273,
+						spriteHeight: 284,
+						bottomGap:10,
+						spriteOrigin: 127,
+						shadow: 'red',
+						speed: 8,
+						atk: {
+							yRange: 10,
+							hitTaken: .1,
+							rate: .1,
+							aoe: 100,
+							reset:1,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+								sound: { key: 'axehit', reset: true, volume: 1 },
+								objects: [
+									{
+										key: 'claw',
+										position: 'css',
+										p2: 1000,
+										main: true
+									}
+								]
+							},
+							type: 'common'
+						}
+					}
+				]
+			}
+		}
+	},
 	itbu1: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.6,
 		src: './images/sprites/ep29/sprite2.png',
 		invulnerable: true,
@@ -9477,7 +12142,7 @@ const spells = {
 	},
 	itbu2: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.6,
 		src: './images/sprites/ep29/sprite2.png',
 		invulnerable: true,
@@ -9663,7 +12328,7 @@ const spells = {
 	},
 	itbu3: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.6,
 		src: './images/sprites/ep29/sprite2.png',
 		invulnerable: true,
@@ -9850,7 +12515,7 @@ const spells = {
 	},
 	itbu4: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.6,
 		src: './images/sprites/ep29/sprite2.png',
 		invulnerable: true,
@@ -10040,7 +12705,7 @@ const spells = {
 	},
 	itbu1faster: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.6,
 		src: './images/sprites/ep29/sprite2.png',
 		invulnerable: true,
@@ -10226,7 +12891,7 @@ const spells = {
 	},
 	itbu2faster: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.6,
 		src: './images/sprites/ep29/sprite2.png',
 		invulnerable: true,
@@ -10412,7 +13077,7 @@ const spells = {
 	},
 	itbu3faster: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.6,
 		src: './images/sprites/ep29/sprite2.png',
 		invulnerable: true,
@@ -10599,7 +13264,7 @@ const spells = {
 	},
 	itbu4faster: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.6,
 		src: './images/sprites/ep29/sprite2.png',
 		invulnerable: true,
@@ -10789,7 +13454,7 @@ const spells = {
 	},
 	poisoncloud: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		src: './images/sprites/ep07/poison.png',
 		invulnerable: true,
@@ -11181,6 +13846,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -11323,7 +13989,7 @@ const spells = {
 	},
 	rasengan: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2.3,
 		src: './images/sprites/ep83/rasengan.png',
 		invulnerable: true,
@@ -11354,6 +14020,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				priority: 1,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 12,
@@ -11664,7 +14331,7 @@ const spells = {
 	},
 	poisonbubbles: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		src: './images/sprites/ep07/bubbles.png',
 		invulnerable: true,
@@ -12002,66 +14669,70 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
 						spriteTop: 355,
-						spriteWidth: 600,
+						spriteWidth: 28,
 						spriteHeight: 245,
-						spriteOrigin: 300,
+						spriteOrigin: 14,
 						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
 						speed: 6
 					},
 					{
-						spriteLeft: 600,
+						spriteLeft: 662,
 						spriteTop: 355,
-						spriteWidth: 600,
+						spriteWidth: 40,
 						spriteHeight: 245,
-						spriteOrigin: 300,
+						spriteOrigin: 20,
 						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
 						speed: 6
 					},
 					{
-						spriteLeft: 1200,
+						spriteLeft: 1333,
 						spriteTop: 355,
-						spriteWidth: 600,
+						spriteWidth: 44,
 						spriteHeight: 245,
-						spriteOrigin: 300,
+						spriteOrigin: 22,
 						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
 						speed: 6
 					},
 					{
-						spriteLeft: 1800,
+						spriteLeft: 2015,
 						spriteTop: 355,
-						spriteWidth: 600,
+						spriteWidth: 33,
 						spriteHeight: 245,
-						spriteOrigin: 300,
+						spriteOrigin: 16,
 						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
 						speed: 6
 					},
 					{
-						spriteLeft: 2400,
+						spriteLeft: 2647,
 						spriteTop: 355,
-						spriteWidth: 600,
+						spriteWidth: 26,
 						spriteHeight: 245,
-						spriteOrigin: 300,
+						spriteOrigin: 13,
 						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
 						speed: 5
 					},
 					{
-						spriteLeft: 2400,
+						spriteLeft: 2647,
 						spriteTop: 355,
-						spriteWidth: 600,
+						spriteWidth: 26,
 						spriteHeight: 245,
-						spriteOrigin: 300,
+						spriteOrigin: 13,
 						extraStepXRate: .65,
 						src: './images/sprites/ep07/poison.png',
 						speed: 1,
+						do: function(_e) {
+							delete _e.shadow;
+						},
 						atk: {
 							yRange: 15,
 							rate: 1,
@@ -12078,7 +14749,7 @@ const spells = {
 	},
 	poisonball: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		src: './images/sprites/ep30/poison-bolt.png',
 		invulnerable: true,
@@ -12163,6 +14834,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 114,
@@ -12344,7 +15016,7 @@ const spells = {
 	},
 	web: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		src: './images/sprites/ep10/web.png',
 		invulnerable: true,
@@ -12385,6 +15057,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: 2,
+							reset: true,
 							hurt: {
 								buffs: [{
 									level: 1,
@@ -12410,6 +15083,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: 2,
+							reset: true,
 							hurt: {
 								buffs: [{
 									level: 1,
@@ -12435,6 +15109,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: 2,
+							reset: true,
 							hurt: {
 								buffs: [{
 									level: 1,
@@ -12460,6 +15135,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: 2,
+							reset: true,
 							hurt: {
 								buffs: [{
 									level: 1,
@@ -12485,6 +15161,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: 2,
+							reset: true,
 							hurt: {
 								buffs: [{
 									level: 1,
@@ -12505,7 +15182,7 @@ const spells = {
 	},
 	timestop: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.91,
 		width: 520,
 		invulnerable: true,
@@ -13073,7 +15750,7 @@ const spells = {
 	},
 	lestatthunder: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.5,
 		width: 450,
 		invulnerable: true,
@@ -13103,6 +15780,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 1,
 				frames: [
 					{
@@ -13287,7 +15965,7 @@ const spells = {
 	},
 	earthrock: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		width: 400,
 		invulnerable: true,
@@ -13318,6 +15996,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 2,
 				frames: createFrames(4, 45, 400, 400, 9,
 						{
@@ -13336,7 +16015,7 @@ const spells = {
 	},
 	corpseexplode: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 4,
 		width: 48,
 		invulnerable: true,
@@ -13368,6 +16047,7 @@ const spells = {
 				type: 'skill',
 				move: true,
 				priority: 1,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -13685,7 +16365,7 @@ const spells = {
 	},
 	icespike: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 2,
 		width: 256,
 		invulnerable: true,
@@ -13716,6 +16396,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 2,
 				frames: [
 					{
@@ -13968,7 +16649,7 @@ const spells = {
 	},
 	darkbolt: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 4,
 		width: 64,
 		invulnerable: true,
@@ -14000,6 +16681,7 @@ const spells = {
 				type: 'skill',
 				move: true,
 				priority: 2,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -14137,7 +16819,7 @@ const spells = {
 	},
 	mine: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		width: 160,
 		invulnerable: true,
@@ -14173,6 +16855,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 1,
 				frames: [
 					{
@@ -14562,7 +17245,7 @@ const spells = {
 	},
 	poisonpuff2: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		width: 71,
 		invulnerable: true,
@@ -14594,6 +17277,7 @@ const spells = {
 				type: 'skill',
 				move: true,
 				priority: 2,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 81,
@@ -14672,7 +17356,7 @@ const spells = {
 	},
 	poisonpuff: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		width: 200,
 		invulnerable: true,
@@ -14702,6 +17386,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				priority: 2,
 				frames: [
@@ -14910,7 +17595,7 @@ const spells = {
 	},
 	poisonpuff3: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2.2,
 		width: 71,
 		invulnerable: true,
@@ -14941,6 +17626,7 @@ const spells = {
 				type: 'skill',
 				move: true,
 				priority: 2,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -15019,7 +17705,7 @@ const spells = {
 	},
 	poisonpuff4: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.8,
 		width: 71,
 		invulnerable: true,
@@ -15049,6 +17735,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 2,
 				frames: [
 					{
@@ -15128,7 +17815,7 @@ const spells = {
 	},
 	fatalityrock1: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: .8,
 		width: 570,
 		invulnerable: true,
@@ -15191,6 +17878,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 1,
 				frames: [
 					{
@@ -15250,6 +17938,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: 3.1,
+							aoe: 100,
 							hurt: {
 								slam: true,
 								smashIfDead: true,
@@ -15304,6 +17993,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: 3.1,
+							aoe: 100,
 							hurt: {
 								slam: true,
 								knockback: 1,
@@ -15354,6 +18044,7 @@ const spells = {
 						atk: {
 							yRange: 10,
 							rate: 3.1,
+							aoe: 100,
 							hurt: {
 								slam: true,
 								smashIfDead: true,
@@ -15437,7 +18128,7 @@ const spells = {
 	},
 	fireexplosion: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 2.4,
 		width: 252,
 		invulnerable: true,
@@ -15468,6 +18159,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 2,
 				frames: [
 					{
@@ -15640,11 +18332,13 @@ const spells = {
 	},
 	rockfall: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		width: 96,
-		invulnerable: true,
+		height: 195,
+		yGap: 10,
 		pierce: true,
+		invulnerable: true,
 		class: __spell,
 		src: './images/sprites/ep15/rock.png',
 		name: 'Rockfall',
@@ -15653,6 +18347,37 @@ const spells = {
 				key: 'dead',
 				type: 'skill',
 				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 96,
+						spriteHeight: 145,
+						spriteOrigin: 48,
+						speed: 2,
+						objects: [
+							{
+								key: 'landing',
+								position: 'under-feet',
+								still: true
+							}
+						]
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 96,
+						spriteHeight: 95,
+						spriteOrigin: 48,
+						speed: 2
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 96,
+						spriteHeight: 45,
+						spriteOrigin: 48,
+						speed: 2
+					},
 					{
 						spriteLeft: 0,
 						spriteTop: 0,
@@ -15688,8 +18413,8 @@ const spells = {
 						spriteHeight: 0,
 						spriteOrigin: 0,
 						bottomGap: -700,
-						objects: [{ key: 'cast', position: 'css' }],
-						speed: 59,
+						//objects: [{ key: 'cast', position: 'css' }],
+						speed: 44,
 					},
 					{
 						spriteLeft: 0,
@@ -15701,11 +18426,13 @@ const spells = {
 						sound: { key: 'rockfall' },
 						speed: 2,
 						atk: {
-							yRange: 6,
+							yRange: 10,
 							rate: .2,
 							hitTaken: .1,
+							hitStop:4,
 							aoe: 50,
 							hurt: {
+								sound: { key: 'sharprockhit1,sharprockhit2,sharprockhit3,sharprockhit4,sharprockhit5,sharprockhit6', volume: .4, reset: true },
 								key: 'hurtground1',
 								type: 'ground'
 							},
@@ -15721,11 +18448,13 @@ const spells = {
 						bottomGap: -650,
 						speed: 2,
 						atk: {
-							yRange: 6,
+							yRange: 10,
 							rate: .2,
 							hitTaken: .1,
+							hitStop:4,
 							aoe: 50,
 							hurt: {
+								sound: { key: 'sharprockhit1,sharprockhit2,sharprockhit3,sharprockhit4,sharprockhit5,sharprockhit6', volume: .4, reset: true },
 								key: 'hurtground1',
 								type: 'ground'
 							},
@@ -15741,11 +18470,13 @@ const spells = {
 						bottomGap: -600,
 						speed: 2,
 						atk: {
-							yRange: 6,
+							yRange: 10,
 							rate: .2,
 							hitTaken: .1,
+							hitStop:4,
 							aoe: 50,
 							hurt: {
+								sound: { key: 'sharprockhit1,sharprockhit2,sharprockhit3,sharprockhit4,sharprockhit5,sharprockhit6', volume: .4, reset: true },
 								key: 'hurtground1',
 								type: 'ground'
 							},
@@ -15761,11 +18492,13 @@ const spells = {
 						bottomGap: -550,
 						speed: 2,
 						atk: {
-							yRange: 6,
+							yRange: 10,
 							rate: .2,
 							hitTaken: .1,
+							hitStop:4,
 							aoe: 50,
 							hurt: {
+								sound: { key: 'sharprockhit1,sharprockhit2,sharprockhit3,sharprockhit4,sharprockhit5,sharprockhit6', volume: .4, reset: true },
 								key: 'hurtground1',
 								type: 'ground'
 							},
@@ -15781,11 +18514,13 @@ const spells = {
 						bottomGap: -500,
 						speed: 2,
 						atk: {
-							yRange: 6,
+							yRange: 10,
 							rate: .2,
 							hitTaken: .1,
+							hitStop:4,
 							aoe: 50,
 							hurt: {
+								sound: { key: 'sharprockhit1,sharprockhit2,sharprockhit3,sharprockhit4,sharprockhit5,sharprockhit6', volume: .4, reset: true },
 								key: 'hurtground1',
 								type: 'ground'
 							},
@@ -15801,11 +18536,13 @@ const spells = {
 						bottomGap: -450,
 						speed: 2,
 						atk: {
-							yRange: 6,
+							yRange: 10,
 							rate: .2,
 							hitTaken: .1,
+							hitStop:4,
 							aoe: 50,
 							hurt: {
+								sound: { key: 'sharprockhit1,sharprockhit2,sharprockhit3,sharprockhit4,sharprockhit5,sharprockhit6', volume: .4, reset: true },
 								key: 'hurtground1',
 								type: 'ground'
 							},
@@ -15821,11 +18558,13 @@ const spells = {
 						bottomGap: -400,
 						speed: 2,
 						atk: {
-							yRange: 6,
+							yRange: 10,
 							rate: .2,
 							hitTaken: .1,
+							hitStop:4,
 							aoe: 50,
 							hurt: {
+								sound: { key: 'sharprockhit1,sharprockhit2,sharprockhit3,sharprockhit4,sharprockhit5,sharprockhit6', volume: .4, reset: true },
 								key: 'hurtground1',
 								type: 'ground'
 							},
@@ -15841,11 +18580,13 @@ const spells = {
 						bottomGap: -350,
 						speed: 2,
 						atk: {
-							yRange: 6,
+							yRange: 10,
 							rate: .2,
 							hitTaken: .1,
+							hitStop:4,
 							aoe: 50,
 							hurt: {
+								sound: { key: 'sharprockhit1,sharprockhit2,sharprockhit3,sharprockhit4,sharprockhit5,sharprockhit6', volume: .4, reset: true },
 								key: 'hurtground1',
 								type: 'ground'
 							},
@@ -15861,9 +18602,10 @@ const spells = {
 						bottomGap: -300,
 						speed: 2,
 						atk: {
-							yRange: 6,
+							yRange: 10,
 							rate: .2,
 							hitTaken: .1,
+							hitStop:4,
 							aoe: 50,
 							hurt: {
 								key: 'hurtground1',
@@ -15881,11 +18623,13 @@ const spells = {
 						bottomGap: -250,
 						speed: 2,
 						atk: {
-							yRange: 6,
+							yRange: 10,
 							rate: .2,
 							hitTaken: .1,
+							hitStop:4,
 							aoe: 50,
 							hurt: {
+								sound: { key: 'sharprockhit1,sharprockhit2,sharprockhit3,sharprockhit4,sharprockhit5,sharprockhit6', volume: .4, reset: true },
 								key: 'hurtground1',
 								type: 'ground'
 							},
@@ -15901,11 +18645,13 @@ const spells = {
 						bottomGap: -200,
 						speed: 2,
 						atk: {
-							yRange: 6,
+							yRange: 10,
 							rate: .2,
 							hitTaken: .1,
 							aoe: 50,
+							hitStop:4,
 							hurt: {
+								sound: { key: 'sharprockhit1,sharprockhit2,sharprockhit3,sharprockhit4,sharprockhit5,sharprockhit6', volume: .4, reset: true },
 								key: 'hurtground1',
 								type: 'ground'
 							},
@@ -15921,11 +18667,13 @@ const spells = {
 						bottomGap: -150,
 						speed: 2,
 						atk: {
-							yRange: 6,
+							yRange: 10,
 							rate: .2,
 							hitTaken: .1,
+							hitStop:4,
 							aoe: 50,
 							hurt: {
+								sound: { key: 'sharprockhit1,sharprockhit2,sharprockhit3,sharprockhit4,sharprockhit5,sharprockhit6', volume: .4, reset: true },
 								key: 'hurtground1',
 								type: 'ground'
 							},
@@ -15941,11 +18689,13 @@ const spells = {
 						bottomGap: -100,
 						speed: 2,
 						atk: {
-							yRange: 6,
+							yRange: 10,
 							rate: .2,
 							hitTaken: .1,
+							hitStop:4,
 							aoe: 50,
 							hurt: {
+								sound: { key: 'sharprockhit1,sharprockhit2,sharprockhit3,sharprockhit4,sharprockhit5,sharprockhit6', volume: .4, reset: true },
 								key: 'hurtground1',
 								type: 'ground'
 							},
@@ -15961,11 +18711,13 @@ const spells = {
 						bottomGap: -50,
 						speed: 2,
 						atk: {
-							yRange: 6,
+							yRange: 10,
 							rate: .2,
 							hitTaken: .1,
+							hitStop:4,
 							aoe: 50,
 							hurt: {
+								sound: { key: 'sharprockhit1,sharprockhit2,sharprockhit3,sharprockhit4,sharprockhit5,sharprockhit6', volume: .4, reset: true },
 								key: 'hurtground1',
 								type: 'ground'
 							},
@@ -15981,52 +18733,18 @@ const spells = {
 						speed: 2,
 						sound: { key: 'rocksmash', volume: .4 },
 						atk: {
-							yRange: 6,
+							yRange: 10,
 							rate: .2,
 							hitTaken: .1,
+							hitStop:4,
 							aoe: 50,
 							hurt: {
+								sound: { key: 'sharprockhit1,sharprockhit2,sharprockhit3,sharprockhit4,sharprockhit5,sharprockhit6', volume: .4, reset: true },
 								key: 'hurtground1',
 								type: 'ground'
 							},
 							type: 'common'
 						}
-					},
-					{
-						spriteLeft: 0,
-						spriteTop: 0,
-						spriteWidth: 96,
-						spriteHeight: 145,
-						spriteOrigin: 48,
-						speed: 2,
-						objects: [
-							{
-								key: 'ouch',
-								position: 'middle',
-								still: true
-							},
-							{
-								key: 'landing',
-								position: 'under-feet',
-								still: true
-							}
-						]
-					},
-					{
-						spriteLeft: 0,
-						spriteTop: 0,
-						spriteWidth: 96,
-						spriteHeight: 95,
-						spriteOrigin: 48,
-						speed: 2
-					},
-					{
-						spriteLeft: 0,
-						spriteTop: 0,
-						spriteWidth: 96,
-						spriteHeight: 45,
-						spriteOrigin: 48,
-						speed: 2
 					}
 				]
 			}
@@ -16034,7 +18752,7 @@ const spells = {
 	},
 	groundexplosion: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		pierce: true,
 		invulnerable: true,
@@ -16045,6 +18763,7 @@ const spells = {
 		animations: {
 			idle: {
 				key: "idle",
+				attack: true,
 				type: 'skill',
 				frames: [
 					{
@@ -16185,7 +18904,7 @@ const spells = {
 	},
 	groundexplosionsmash: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		pierce: true,
 		invulnerable: true,
@@ -16197,6 +18916,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 19,
@@ -16281,14 +19001,15 @@ const spells = {
 	},
 	sonicwave: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
-		zoom: 1.5,
+		defaultAnimationKey: 'idle',
+		zoom: 1.2,
+		pierce: true,
 		invulnerable: true,
 		knockback: true,
 		extraStepXRate: 1,
 		push: 'front',
 		class: __spell,
-		src: './images/sprites/ep1000/sonic-wave.png',
+		src: './images/sprites/ep1000/sonic-wave2.png',
 		name: 'Sonicwave',
 		animations: {
 			idle: {
@@ -16300,11 +19021,11 @@ const spells = {
 				priority: 1,
 				frames: [
 					{
-						spriteLeft: 0,
+						spriteLeft: 15,
 						spriteTop: 0,
-						spriteWidth: 230,
-						spriteHeight: 364,
-						spriteOrigin: 70,
+						spriteWidth: 228,
+						spriteHeight: 500,
+						spriteOrigin: 114,
 						extraStepXRate: 1.5,
 						speed: 8,
 						push: 15,
@@ -16329,11 +19050,11 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 230,
+						spriteLeft: 244,
 						spriteTop: 0,
-						spriteWidth: 230,
-						spriteHeight: 364,
-						spriteOrigin: 70,
+						spriteWidth: 178,
+						spriteHeight: 500,
+						spriteOrigin: 89,
 						extraStepXRate: 1.5,
 						speed: 8,
 						push: 15,
@@ -16358,11 +19079,11 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 230 * 2,
+						spriteLeft: 422,
 						spriteTop: 0,
-						spriteWidth: 230,
-						spriteHeight: 364,
-						spriteOrigin: 70,
+						spriteWidth: 210,
+						spriteHeight: 500,
+						spriteOrigin: 105,
 						extraStepXRate: 1.5,
 						speed: 8,
 						push: 15,
@@ -16387,11 +19108,11 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 230 * 3,
+						spriteLeft: 633,
 						spriteTop: 0,
-						spriteWidth: 230,
-						spriteHeight: 364,
-						spriteOrigin: 70,
+						spriteWidth: 200,
+						spriteHeight: 500,
+						spriteOrigin: 100,
 						extraStepXRate: 1.5,
 						speed: 8,
 						push: 15,
@@ -16416,11 +19137,11 @@ const spells = {
 						}
 					},
 					{
-						spriteLeft: 230 * 4,
+						spriteLeft: 842,
 						spriteTop: 0,
-						spriteWidth: 230,
-						spriteHeight: 364,
-						spriteOrigin: 70,
+						spriteWidth: 158,
+						spriteHeight: 500,
+						spriteOrigin: 79,
 						extraStepXRate: 1.5,
 						speed: 8,
 						push: 15,
@@ -16465,9 +19186,116 @@ const spells = {
 			}
 		}
 	},
+	voodoodoll: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		invulnerable: true,
+		pierce: true,
+		width: 200,
+		height: 200,
+		class: __spell,
+		src: './images/sprites/ep37/air-voodoo.png',
+		name: 'Voodoo Doll',
+		animations: {
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				attack: true,
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						extraStepXRate: .5,
+						extraStepYRate: -.085,
+						bottomGap: -200,
+						speed: 6
+					},
+					{
+						spriteLeft: 200,
+						spriteTop: 0,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						extraStepXRate: .45,
+						extraStepYRate: -.09,
+						bottomGap: -100,
+						speed: 6
+					},
+					{
+						spriteLeft: 200,
+						spriteTop: 0,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						extraStepXRate: .4,
+						extraStepYRate: -.095,
+						bottomGap: -50,
+						sound: { key: 'voodooland' , volume: 1 },
+						speed: 6
+					},
+					{
+						spriteLeft: 200,
+						spriteTop: 0,
+						spriteWidth: 200,
+						spriteHeight: 200,
+						spriteOrigin: 100,
+						bottomGap: 10,
+						do : function(_char) {
+							const _old = episode.enemies?.find?.(x => x.id === 114);
+							if(_old)
+								_old.remove = true;
+							const _left = MathRound((_char.HURTLEFT + _char._HURTBOX_half + platformX) / __zoom);
+							const _mobs = [
+								{
+									id: 114,
+									minX: _left,
+									maxX: _left,
+									difficulty: _char.difficulty,
+									sight: 99,
+									count: 1,
+									yPosition: _char.yPosition,
+									minLevel: _char.level,
+									maxLevel: _char.level
+								}
+							];
+							episode.installMobs(_mobs, function (_e) {
+								_e.direction = _char.direction;
+								_e.autoTarget = _char.autoTarget;
+								_e.experience = 0;
+								_e.atk = (_char.owner ?? _char.related).atk;
+							});
+						},
+						speed: 6
+					}
+				]
+			},
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			}
+		}
+	},
 	tugarrow: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -16479,6 +19307,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -16623,7 +19452,7 @@ const spells = {
 	},
 	tugflameeagle: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -16635,6 +19464,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -16795,7 +19625,7 @@ const spells = {
 	},
 	hurlingbomb: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.66,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -16806,6 +19636,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -17155,7 +19986,7 @@ const spells = {
 	},
 	shamanboomerang: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -17168,6 +19999,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				maxRepeat: 2,
 				next: 'ground1',
 				frames: [
@@ -17179,7 +20011,7 @@ const spells = {
 						spriteOrigin: 34,
 						extraStepXRate: 1.25,
 						bottomGap: -105,
-						sound: { key: 'boomerang', volume: .6 },
+						sound: { key: 'boomerang', volume: .7 },
 						shadow: 'red',
 						speed: 4,
 						atk: {
@@ -17202,7 +20034,7 @@ const spells = {
 						spriteOrigin: 40,
 						extraStepXRate: 1.25,
 						bottomGap: -105,
-						sound: { key: 'boomerang', volume: .6 },
+						sound: { key: 'boomerang', volume: .7 },
 						shadow: 'red',
 						speed: 4,
 						atk: {
@@ -17287,7 +20119,7 @@ const spells = {
 						spriteOrigin: 50,
 						extraStepXRate: 1.25,
 						bottomGap: -105,
-						sound: { key: 'boomerang', volume: .75 },
+						sound: { key: 'boomerang', volume: .85 },
 						speed: 4,
 						shadow: 'red',
 						atk: {
@@ -17372,7 +20204,7 @@ const spells = {
 						spriteOrigin: 28,
 						extraStepXRate: 1.25,
 						bottomGap: -105,
-						sound: { key: 'boomerang', volume: .6 },
+						sound: { key: 'boomerang', volume: .7 },
 						speed: 4,
 						shadow: 'red',
 						atk: {
@@ -17800,7 +20632,7 @@ const spells = {
 	},
 	greenarrowright: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.4,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -17812,6 +20644,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 26,
@@ -18017,7 +20850,7 @@ const spells = {
 	},
 	archerarrow: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -18028,6 +20861,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -18073,7 +20907,7 @@ const spells = {
 	},
 	lightningarrow: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 3,
 		invulnerable: true,
 		class: __spell,
@@ -18084,6 +20918,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -18331,7 +21166,7 @@ const spells = {
 	},
 	archerupperarrow: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -18343,6 +21178,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -18422,7 +21258,7 @@ const spells = {
 	},
 	archerdownrightarrow: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -18433,6 +21269,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -18480,7 +21317,7 @@ const spells = {
 	},
 	archerdownleftarrow: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -18491,6 +21328,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -18539,7 +21377,7 @@ const spells = {
 	},
 	archerdownarrow: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -18550,6 +21388,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -18597,7 +21436,7 @@ const spells = {
 	},
 	archerarrowtop: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		knockback: true,
@@ -18715,7 +21554,7 @@ const spells = {
 	},
 	archerarrowbottom: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		knockback: true,
@@ -18833,7 +21672,7 @@ const spells = {
 	},
 	archerarrowmiddle: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -18845,6 +21684,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -18890,7 +21730,7 @@ const spells = {
 	},
 	archerarrowfire: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -18903,6 +21743,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -18955,7 +21796,7 @@ const spells = {
 	},
 	warriorspell: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * .75,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -18968,6 +21809,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -19169,7 +22011,7 @@ const spells = {
 	},
 	teberweapon: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -19181,6 +22023,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 66,
@@ -19301,7 +22144,7 @@ const spells = {
 	},
 	electricbolt: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 2,
 		invulnerable: true,
 		pierce: true,
@@ -19314,6 +22157,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -19623,7 +22467,7 @@ const spells = {
 	},
 	electricboltsmall: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -19639,6 +22483,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -19759,7 +22604,7 @@ const spells = {
 	},
 	electricboltsmall2: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2.66,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -19774,6 +22619,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -19930,7 +22776,7 @@ const spells = {
 	},
 	firespray: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.5,
 		invulnerable: true,
 		pierce: true,
@@ -20170,9 +23016,206 @@ const spells = {
 			}
 		}
 	},
+	stomp: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		invulnerable: true,
+		pierce: true,
+		hasShadow: false,
+		knockback: 10,
+		class: __spell,
+		src: './images/sprites/ep622/stomp3.png',
+		name: 'Stomp',
+		animations: {
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				attack: true,
+				priority: 1,
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 152,
+						spriteHeight: 263,
+						bottomGap: 20,
+						spriteOrigin: 76,
+						extraStepXRate: .3,
+						sound: { key:'rockwave', volume:.85, reset: true },
+						speed: 4
+					},
+					{
+						spriteLeft: 152,
+						spriteTop: 0,
+						spriteWidth: 228,
+						spriteHeight: 263,
+						bottomGap: 20,
+						spriteOrigin: 114,
+						extraStepXRate: .4,
+						objects: [
+							{
+								key: 'charge',
+								position: 'behind-feet'
+							}
+						],
+						speed: 4
+					},
+					{
+						spriteLeft: 380,
+						spriteTop: 0,
+						spriteWidth: 296,
+						spriteHeight: 263,
+						bottomGap: 20,
+						spriteOrigin: 148,
+						extraStepXRate: .5,
+						speed: 4
+					},
+					{
+						spriteLeft: 677,
+						spriteTop: 0,
+						spriteWidth: 410,
+						spriteHeight: 263,
+						bottomGap: 20,
+						spriteOrigin: 205,
+						speed: 6,
+						extraStepXRate: .6,
+						zoom:.75,
+						push: 10,
+						atk: {
+							yRange: 10,
+							rate: 1,
+							reset: true,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 677,
+						spriteTop: 0,
+						spriteWidth: 410,
+						spriteHeight: 263,
+						bottomGap: 20,
+						spriteOrigin: 205,
+						speed: 12,
+						zoom:.85,
+						push: 10,
+						atk: {
+							yRange: 10,
+							rate: 1,
+							reset: true,
+							hurt: {
+								key: 'hurtair',
+								type: 'air',
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 677,
+						spriteTop: 0,
+						spriteWidth: 410,
+						spriteHeight: 263,
+						bottomGap: 20,
+						spriteOrigin: 210,
+						speed: 2,
+						zoom:.8
+					},
+					{
+						spriteLeft: 677,
+						spriteTop: 0,
+						spriteWidth: 410,
+						spriteHeight: 263,
+						bottomGap: 20,
+						spriteOrigin: 200,
+						speed: 2,
+						zoom:.8
+					},
+					{
+						spriteLeft: 677,
+						spriteTop: 0,
+						spriteWidth: 410,
+						spriteHeight: 263,
+						bottomGap: 20,
+						spriteOrigin: 210,
+						speed: 2,
+						zoom:.8
+					},
+					{
+						spriteLeft: 677,
+						spriteTop: 0,
+						spriteWidth: 410,
+						spriteHeight: 263,
+						bottomGap: 20,
+						spriteOrigin: 200,
+						speed: 2,
+						zoom:.8
+					},
+					{
+						spriteLeft: 677,
+						spriteTop: 0,
+						spriteWidth: 410,
+						spriteHeight: 263,
+						bottomGap: 20,
+						spriteOrigin: 205,
+						speed: 2,
+						zoom:.8
+					},
+					{
+						spriteLeft: 380,
+						spriteTop: 0,
+						spriteWidth: 296,
+						spriteHeight: 263,
+						bottomGap: 20,
+						spriteOrigin: 148,
+						speed: 6
+					},
+					{
+						spriteLeft: 152,
+						spriteTop: 0,
+						spriteWidth: 228,
+						spriteHeight: 263,
+						bottomGap: 20,
+						spriteOrigin: 114,
+						speed: 4
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 152,
+						spriteHeight: 263,
+						bottomGap: 20,
+						spriteOrigin: 76,
+						speed: 4
+					}
+				]
+			},
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						speed: 1,
+						props: {
+							remove: true
+						}
+					}
+				]
+			}
+		}
+	},
 	firewall: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		invulnerable: true,
 		pierce: true,
@@ -20513,7 +23556,7 @@ const spells = {
 	},
 	firewall2: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		invulnerable: true,
 		pierce: true,
@@ -20627,7 +23670,7 @@ const spells = {
 	},
 	firewall3: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		invulnerable: true,
 		pierce: true,
@@ -20743,7 +23786,7 @@ const spells = {
 	},
 	firewall4: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		invulnerable: true,
 		pierce: true,
@@ -21729,7 +24772,7 @@ const spells = {
 	},
 	toxicwall: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		invulnerable: true,
 		pierce: true,
@@ -22715,7 +25758,7 @@ const spells = {
 	},
 	fireball: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		class: __spell,
@@ -22861,7 +25904,7 @@ const spells = {
 	},
 	waterwave: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		invulnerable: true,
 		pierce: true,
@@ -22873,6 +25916,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -23076,7 +26120,7 @@ const spells = {
 	},
 	waterwavehit: {
 		defaultDirection: __left,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 1.5,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -23088,6 +26132,7 @@ const spells = {
 				key: "idle",
 				move: true,
 				type: 'skill',
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 195,
@@ -23243,7 +26288,7 @@ const spells = {
 	},
 	gear: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 1.5,
 		invulnerable: true,
 		knockback: 5,
@@ -23255,6 +26300,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -23546,7 +26592,7 @@ const spells = {
 	},
 	star: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * .65,
 		invulnerable: true,
 		height: 54 * .65,
@@ -23557,6 +26603,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -23693,7 +26740,7 @@ const spells = {
 	},
 	chain: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 3,
 		invulnerable: true,
 		push: true,
@@ -24166,7 +27213,7 @@ const spells = {
 	},
 	hurricane2: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.3,
 		invulnerable: true,
 		height: 250,
@@ -24180,6 +27227,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				maxRepeat: 2,
 				frames: [
 					{
@@ -24313,7 +27361,7 @@ const spells = {
 	},
 	hurricane: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 1.5,
 		invulnerable: true,
 		height: 182 * 1.5,
@@ -24327,6 +27375,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 0,
@@ -24513,7 +27562,7 @@ const spells = {
 	},
 	lightningball2: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.35,
 		invulnerable: true,
 		height: 600 * 1.35,
@@ -24526,6 +27575,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 257 * 4,
@@ -25120,7 +28170,7 @@ const spells = {
 	},
 	lightningball: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		height: 1365,
@@ -25131,6 +28181,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -25588,7 +28639,7 @@ const spells = {
 	},
 	beyblade: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * .75,
 		invulnerable: true,
 		class: __spell,
@@ -25599,6 +28650,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -25944,7 +28996,7 @@ const spells = {
 	},
 	horse: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.25,
 		invulnerable: true,
 		class: __spell,
@@ -25954,6 +29006,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -26317,7 +29370,7 @@ const spells = {
 	},
 	wolf: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.33,
 		invulnerable: true,
 		class: __spell,
@@ -26329,6 +29382,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				maxRepeat: 2,
 				frames: [
 					{
@@ -26633,7 +29687,7 @@ const spells = {
 	},
 	wolf2: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.33,
 		invulnerable: true,
 		class: __spell,
@@ -26645,6 +29699,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				maxRepeat: 2,
 				frames: [
 					{
@@ -26947,9 +30002,188 @@ const spells = {
 			}
 		}
 	},
+	hand: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		invulnerable: true,
+		class: __spell,
+		autoAim: 40,
+		zoom: .75,
+		width: 200,
+		height: 233,
+		pierce: true,
+		src: './images/sprites/ep37/hand.png',
+		name: 'Witch Hand',
+		animations: {
+				dead: {
+					key: 'idle',
+					type: 'skill',
+					src: './images/sprites/ep37/handidle.png',
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 0,
+							spriteHeight: 0,
+							spriteOrigin: 0,
+							speed: 1,
+							props: {
+								remove: true
+							}
+						}
+					]
+				},
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					attack: true,
+					priority: 2,
+					frames: [
+						{
+							spriteLeft: 8,
+							spriteTop: 433,
+							spriteWidth: 184,
+							spriteHeight: 233,
+							spriteOrigin: 92,
+							sound: { key: 'rocks', volume: .5 },
+							def: {
+								iframe: true
+							},
+							directionChangeEnabled: true,
+							speed: 6
+						},
+						{
+							spriteLeft: 213,
+							spriteTop: 433,
+							spriteWidth: 211,
+							spriteHeight: 233,
+							spriteOrigin: 106,
+							bottomGap: 8,
+							def: {
+								iframe: true
+							},
+							directionChangeEnabled: true,
+							speed: 6
+						},
+						{
+							spriteLeft: 471,
+							spriteTop: 433,
+							spriteWidth: 236,
+							spriteHeight: 233,
+							spriteOrigin: 113,
+							bottomGap: 8,
+							directionChangeEnabled: true,
+							def: {
+								iframe: true
+							},
+							speed: 6
+						},
+						{
+							spriteLeft: 765,
+							spriteTop: 433,
+							spriteWidth: 285,
+							spriteHeight: 233,
+							spriteOrigin: 118,
+							bottomGap: 8,
+							directionChangeEnabled: true,
+							def: {
+								iframe: true
+							},
+							speed: 6
+						},
+						{
+							spriteLeft: 1090,
+							spriteTop: 433,
+							spriteWidth: 238,
+							spriteHeight: 233,
+							spriteOrigin: 100,
+							bottomGap: 8,
+							directionChangeEnabled: true,
+							def: {
+								iframe: true
+							},
+							speed: 6
+						},
+						{
+							spriteLeft: 1378,
+							spriteTop: 433,
+							spriteWidth: 220,
+							spriteHeight: 233,
+							spriteOrigin: 93,
+							bottomGap: 8,
+							directionChangeEnabled: true,
+							def: {
+								iframe: true
+							},
+							speed: 6
+						},
+						{
+							spriteLeft: 1651,
+							spriteTop: 433,
+							spriteWidth: 279,
+							spriteHeight: 233,
+							spriteOrigin: 82,
+							bottomGap: 8,
+							directionChangeEnabled: true,
+							sound: { key: 'handwoosh', volume: 1 },
+							def: {
+								iframe: true
+							},
+							atk: {
+								yRange: 30,
+								rate: 2,
+								aoe: 200,
+								type: 'toxic',
+								hurt: {
+									key: 'hurtground1',
+									type: 'ground',
+									sound: { key:'shamanhandhit', volume: .5 }
+								}
+							},
+							directionChangeEnabled: true,
+							speed:6
+						},
+						{
+							spriteLeft: 213,
+							spriteTop: 433,
+							spriteWidth: 211,
+							spriteHeight: 233,
+							spriteOrigin: 106,
+							bottomGap: 8,
+							def: {
+								iframe: true
+							},
+							directionChangeEnabled: true,
+							speed: 6
+						},
+						{
+							spriteLeft: 8,
+							spriteTop: 433,
+							spriteWidth: 184,
+							spriteHeight: 233,
+							spriteOrigin: 92,
+							def: {
+								iframe: true
+							},
+							directionChangeEnabled: true,
+							speed: 6
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 200,
+							spriteHeight: 111,
+							spriteOrigin: 100,
+							src: './images/sprites/ep37/handidle.png',
+							speed: 6
+						}
+					]
+				}
+			},
+	},
 	bats: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 1.5,
 		invulnerable: true,
 		class: __spell,
@@ -26961,6 +30195,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				maxRepeat: 12,
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -27047,7 +30282,7 @@ const spells = {
 	},
 	bat: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		class: __spell,
@@ -27059,6 +30294,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				maxRepeat: 12,
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -27232,7 +30468,7 @@ const spells = {
 	},
 	medusabolt: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -27243,6 +30479,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -27413,7 +30650,7 @@ const spells = {
 	},
 	medusabubble: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 2,
 		invulnerable: true,
 		pierce: true,
@@ -27424,6 +30661,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -27630,7 +30868,7 @@ const spells = {
 	},
 	shamanravens: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -27642,6 +30880,7 @@ const spells = {
 			idle: {
 				key: "idle",
 				type: 'skill',
+				attack: true,
 				move: true,
 				frames: [
 					{
@@ -27989,7 +31228,7 @@ const spells = {
 	},
 	shamanbreath: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -28002,6 +31241,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 1330,
@@ -28265,7 +31505,7 @@ const spells = {
 	},
 	shamanbreathrage: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.1,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -28278,6 +31518,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 1330 - 1299,
@@ -28589,7 +31830,7 @@ const spells = {
 	},
 	shamanfire: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -28601,6 +31842,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 2639,
@@ -28610,7 +31852,7 @@ const spells = {
 						spriteOrigin: 108,
 						bottomGap: -120,
 						extraStepXRate: 1.25,
-						sound: { key: 'fireball', volume: .2 },
+						sound: { key: 'fireball', volume: .6 },
 						speed: 6,
 						atk: {
 							yRange: 10,
@@ -28703,12 +31945,6 @@ const spells = {
 							type: 'fire'
 						}
 					},
-				]
-			},
-			dead: {
-				key: "dead",
-				type: 'skill',
-				frames: [
 					{
 						spriteLeft: 2622,
 						spriteTop: 1446,
@@ -28716,7 +31952,18 @@ const spells = {
 						spriteHeight: 126,
 						spriteOrigin: 120,
 						bottomGap: -95,
-						speed: 6
+						extraStepXRate: 1,
+						speed: 6,
+						atk: {
+							yRange: 10,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'fire'
+						}
 					},
 					{
 						spriteLeft: 2887,
@@ -28725,7 +31972,18 @@ const spells = {
 						spriteHeight: 126,
 						spriteOrigin: 113,
 						bottomGap: -95,
-						speed: 6
+						extraStepXRate: .75,
+						speed: 6,
+						atk: {
+							yRange: 10,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'fire'
+						}
 					},
 					{
 						spriteLeft: 3171,
@@ -28733,8 +31991,19 @@ const spells = {
 						spriteWidth: 112,
 						spriteHeight: 126,
 						spriteOrigin: 98,
+						extraStepXRate: .5,
 						bottomGap: -95,
-						speed: 6
+						speed: 6,
+						atk: {
+							yRange: 10,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'fire'
+						}
 					},
 					{
 						spriteLeft: 3483,
@@ -28743,7 +32012,18 @@ const spells = {
 						spriteHeight: 126,
 						spriteOrigin: 28,
 						bottomGap: -95,
-						speed: 6
+						extraStepXRate: .25,
+						speed: 6,
+						atk: {
+							yRange: 10,
+							rate: 2,
+							reset: 1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'fire'
+						}
 					},
 					{
 						spriteLeft: 3733,
@@ -28754,6 +32034,12 @@ const spells = {
 						bottomGap: -95,
 						speed: 6
 					},
+				]
+			},
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
 					{
 						spriteLeft: 0,
 						spriteTop: 0,
@@ -28771,7 +32057,7 @@ const spells = {
 	},
 	shamanskull: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		extraStepXRate: 1,
@@ -28783,6 +32069,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				frames: [
 					{
 						spriteLeft: 3236,
@@ -29000,7 +32287,7 @@ const spells = {
 	},
 	roots: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1.35,
 		invulnerable: true,
 		class: __spell,
@@ -29017,6 +32304,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 1,
 				frames: [
 					{
@@ -29163,9 +32451,185 @@ const spells = {
 			}
 		}
 	},
+	lava: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1.5,
+		invulnerable: true,
+		class: __spell,
+		width: 250,
+		height: 200,
+		autoAim: 40,
+		drawPriority: .6,
+		pierce: true,
+		hasShadow: false,
+		still: true,
+		src: './images/sprites/ep37/lava2.png',
+		name: 'Lava',
+		animations: {
+			idle: {
+				key: "idle",
+				type: 'skill',
+				move: true,
+				attack: true,
+				priority: 1,
+				frames: [
+					{
+						spriteLeft: 118,
+						spriteTop: 0,
+						spriteWidth: 156,
+						spriteHeight: 210,
+						spriteOrigin: 86,
+						bottomGap: 2,
+						zoom: .55,
+						sound: { key: 'firepuff', volume: .7 },
+						speed: 6
+					},
+					{
+						spriteLeft: 947,
+						spriteTop: 0,
+						spriteWidth: 153,
+						spriteHeight: 210,
+						spriteOrigin: 83,
+						speed: 6,
+						bottomGap: 2,
+						atk: {
+							yRange: 10,
+							rate: 1,
+							reset:1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'fire'
+						}
+					},
+					{
+						spriteLeft: 1230,
+						spriteTop: 0,
+						spriteWidth: 167,
+						spriteHeight: 210,
+						spriteOrigin: 88,
+						bottomGap: 2,
+						speed: 6
+					},
+					{
+						spriteLeft: 399,
+						spriteTop: 216,
+						spriteWidth: 172,
+						spriteHeight: 190,
+						spriteOrigin: 80,
+						bottomGap: 2,
+						speed: 6,
+						atk: {
+							yRange: 10,
+							rate: 1,
+							reset:1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'fire'
+						}
+					},
+					{
+						spriteLeft: 1228,
+						spriteTop: 216,
+						spriteWidth: 180,
+						spriteHeight: 190,
+						spriteOrigin: 90,
+						bottomGap: 2,
+						speed: 6
+					},
+					{
+						spriteLeft: 666,
+						spriteTop: 410,
+						spriteWidth: 190,
+						spriteHeight: 188,
+						spriteOrigin: 96,
+						speed: 6,
+						bottomGap: 2,
+						atk: {
+							yRange: 10,
+							rate: 1,
+							reset:1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'fire'
+						}
+					},
+					{
+						spriteLeft: 1215,
+						spriteTop: 410,
+						spriteWidth: 215,
+						spriteHeight: 188,
+						spriteOrigin: 105,
+						bottomGap: 2,
+						speed: 6
+					},
+					{
+						spriteLeft: 920,
+						spriteTop: 620,
+						spriteWidth: 232,
+						spriteHeight: 155,
+						spriteOrigin: 116,
+						bottomGap: 2,
+						speed: 6,
+						atk: {
+							yRange: 10,
+							rate: .5,
+							reset:1,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'fire'
+						}
+					},
+					{
+						spriteLeft: 1200,
+						spriteTop: 620,
+						spriteWidth: 242,
+						spriteHeight: 155,
+						spriteOrigin: 122,
+						bottomGap: 2,
+						speed: 6
+					},
+					{
+						spriteLeft: 1216,
+						spriteTop: 830,
+						spriteWidth: 240,
+						spriteHeight: 118,
+						spriteOrigin: 118,
+						bottomGap: 2,
+						speed: 6
+					}
+				]
+			},
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						speed: 1,
+						props: {
+							remove: true
+						}
+					}
+				]
+			}
+		}
+	},
 	tentacles: {
 		defaultDirection: __right,
-		defaultAnimationKey: 'run',
+		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
 		class: __spell,
@@ -29182,6 +32646,7 @@ const spells = {
 				key: "idle",
 				type: 'skill',
 				move: true,
+				attack: true,
 				priority: 1,
 				frames: [
 					{
@@ -29431,11 +32896,13 @@ function addSlingStoneSpells() {
     for (let i = 1; i < 8; i++) {
         spells['slingstone' + i] = {
             defaultDirection: __right,
-            defaultAnimationKey: 'run',
+            defaultAnimationKey: 'idle',
             zoom: 1,
             src: './images/sprites/ep620/sapantas' + i + '.png',
             invulnerable: true,
             extraStepXRate: 1,
+			width: 60,
+			height: 60,
             class: __spell,
             lightColor: _colors[i - 1],
             name: 'SlingStone' + i,
@@ -29519,12 +32986,13 @@ function addSlingStoneSpells() {
 								_stoneReverse(_e);
 							},
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: { possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -29539,12 +33007,13 @@ function addSlingStoneSpells() {
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][0],
                             speed: 5,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -29569,12 +33038,13 @@ function addSlingStoneSpells() {
                             }] : null,
                             speed: 6,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -29599,12 +33069,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -29629,12 +33100,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -29659,12 +33131,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -29689,12 +33162,13 @@ function addSlingStoneSpells() {
                             }] : null,
                             speed: 6,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -29719,12 +33193,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -29749,12 +33224,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -29779,12 +33255,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -29809,12 +33286,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -29839,12 +33317,13 @@ function addSlingStoneSpells() {
                             }] : null,
                             speed: 6,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -29869,12 +33348,13 @@ function addSlingStoneSpells() {
                             }] : null,
                             speed: 6,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -29899,12 +33379,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -29929,12 +33410,13 @@ function addSlingStoneSpells() {
                                 yGap: 10
                             }] : null,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -29959,12 +33441,13 @@ function addSlingStoneSpells() {
                             }] : null,
                             speed: 6,
                             atk: {
-                                yRange: 10,
+                                yRange: 15,
                                 rate: 2,
                                 reset: true,
                                 hurt: {
                                     key: 'hurtground1',
-                                    type: 'ground'
+                                    type: 'ground',
+									sound: {  possibility:20, key:'goblincackle', volume: 1}
                                 },
                                 type: _spellEffects[i - 1]
                             }
@@ -30006,8 +33489,8 @@ function getSound(src, key, _load, _noCache) {
 			return load.sound;
 		if (!src)
 			src = soundFiles[key];
-		if (!src && !_load)
-			return;
+		if (!src)
+			return undefined;
 		const sound = document.createElement("audio");
 		sound.crossOrigin = 'anonymous';
 		if ("src" in sound)
@@ -30018,7 +33501,10 @@ function getSound(src, key, _load, _noCache) {
 		}
 		sound.volume = 0;
 		sound.src = src;
-		sound.play();
+		//console.log("AUDIO FILE =", src);
+		sound.play().catch(e => {
+			console.error("PLAY FAILED", e, sound.src);
+		});
 		if(key && !_noCache)
 			loadedSounds.push({ sound: sound, key: key });
 		//audioPreloader.appendChild(sound);
@@ -32054,6 +35540,8 @@ distortionhit: function(_char, _params, _canv) {
     if (elapsed >= _ms) {
         delete episode.distorting;
         delete _params.start;
+		delete _params.gradient;
+		delete _params.baseRadius;
         _char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit');
         return;
     }
@@ -32076,7 +35564,21 @@ distortionhit: function(_char, _params, _canv) {
     _ctx.scale(pulse, pulse);
     _ctx.translate(-cx, -cy);
     _ctx.globalAlpha = 0.25 * ease;
-    _ctx.drawImage(_ctx.canvas, 0, 0);
+    //_ctx.drawImage(_ctx.canvas, 0, 0);
+	const size = _char.HURTWIDTH;
+	_ctx.drawImage(
+		_ctx.canvas,
+		cx-size,
+		cy-size,
+		size*2,
+		size*2,
+
+		cx-size*pulse,
+		cy-size*pulse,
+
+		size*2*pulse,
+		size*2*pulse
+	);
     _ctx.restore();
 
     // === CHROMATIC GHOST ===
@@ -32092,17 +35594,44 @@ distortionhit: function(_char, _params, _canv) {
     // === FLASH RING ===
     const radius = (_params.rX ?? episode.cWidth / 10) * (1 + t * 1.2);
 
-    const g = _ctx.createRadialGradient(cx, cy, radius * 0.4, cx, cy, radius);
-    g.addColorStop(0, "rgba(255,255,255,0.4)");
-    g.addColorStop(1, "rgba(255,255,255,0)");
+    //const g = _ctx.createRadialGradient(cx, cy, radius * 0.4, cx, cy, radius);
+    //g.addColorStop(0, "rgba(255,255,255,0.4)");
+    //g.addColorStop(1, "rgba(255,255,255,0)");
+	if (!_params.gradient) {
 
-    _ctx.save();
-    _ctx.globalAlpha = 0.6 * ease;
-    _ctx.fillStyle = g;
-    _ctx.beginPath();
-    _ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-    _ctx.fill();
-    _ctx.restore();
+		const r = _params.rX ?? episode.cWidth / 10;
+
+		const g = _ctx.createRadialGradient(0,0,r*0.4,0,0,r);
+
+		g.addColorStop(0,"rgba(255,255,255,0.4)");
+		g.addColorStop(1,"rgba(255,255,255,0)");
+
+		_params.gradient = g;
+		_params.baseRadius = r;
+	}
+
+    // _ctx.save();
+    // _ctx.globalAlpha = 0.6 * ease;
+    // _ctx.fillStyle = _params.gradient;
+    // _ctx.beginPath();
+    // _ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    // _ctx.fill();
+    // _ctx.restore();
+	const scale = 1 + t * 1.2;
+
+	_ctx.save();
+
+	_ctx.translate(cx, cy);
+	_ctx.scale(scale, scale);
+
+	_ctx.globalAlpha = 0.6 * ease;
+	_ctx.fillStyle = _params.gradient;
+
+	_ctx.beginPath();
+	_ctx.arc(0, 0, _params.baseRadius, 0, Math.PI * 2);
+	_ctx.fill();
+
+	_ctx.restore();
 },
 
 distortionhit2: function(_char, _params, _canv) {
@@ -32692,7 +36221,7 @@ const cssAnimations = {
 		else {
 			_a = document.createElement('div');
 			_a.className = 'full flex animate-me-2000 screen-claw-final';
-			const _img = document.createElement('img');
+			const _img = document.createElemeNt('img');
 			_img.style.height = '70%';
 			_img.style.opacity = .6;
 			_img.src = './images/bloods/claw' + (_char.direction === __left ? 23 : 22) + '.png';
@@ -32754,7 +36283,7 @@ const cssAnimations = {
 			cssAnimationProps.crack = { start: _gameTick };
 		}
 	},
-	focusui: function (_selector, _func, _transparent, _text, _doneBtn, _blackBG, _fingerFade, _circle, _noFinger) {
+	focusui: function (_selector, _func, _transparent, _text, _doneBtn, _blackBG, _fingerFade, _circle, _noFinger, _fingerUp) {
 		_focusMode = 1;
 		let _curt = document.createElement('div');
 		_curt.id = 'focus-ui';
@@ -32763,7 +36292,7 @@ const cssAnimations = {
 			_curt.className += ' focus-transparent';
 		if(_text) {
 			if(!_doneBtn)
-				_curt.innerHTML = '<div class="flex overlay-black-text wot-subtitle">' + _text + '</div>';
+				_curt.innerHTML = '<div lang="'+ getLang()+'" class="flex overlay-black-text wot-subtitle">' + _text + '</div>';
 			else {
 				const _wrapper = document.createElement('div');
 				_wrapper.className = 'flex w-100 show-ui';
@@ -32773,14 +36302,23 @@ const cssAnimations = {
 				const _btnWrapper = document.createElement('div');
 				_btnWrapper.className = 'flex black-screen-ok-btn w-100';
 				const _btn = document.createElement('div');
-				_btn.style = 'color:#f7f7f7cc !important;font-size:3vh !important';
-				_btn.className = "game-btn2 flex one-line";
+				_btn.style = 'color:#f7f7f7cc !important;height:6vh !important;font-size:3vh !important';
+				_btn.className = "orange-action-btn flex one-line";
 				_btn.innerText = getLangData('Done');
-				_btn.onexactclick = function() {
-					if(_func)
-						_func();
-					removeFocus();
-				};
+				if(__isPC)
+					_btn.onexactclick = function() {
+						if(_btn.pointerDownTriggered)
+							return;
+						if(_func)
+							_func();
+						removeFocus();
+					};
+				// else
+					_btn.addEventListener('pointerdown', () => {
+						_btn.pointerDownTriggered = 1;
+						_func?.(_elem);
+						removeFocus();
+					});
 				_wrapper.appendChild(_txtWrapper);
 				_wrapper.appendChild(_btnWrapper);
 				_btnWrapper.appendChild(_btn);
@@ -32788,7 +36326,7 @@ const cssAnimations = {
 					_curt.appendChild(_wrapper);
 				else {
 					const _wrapperOuter = document.createElement('div');
-					_wrapperOuter.className = "flex overlay-black-text wot-title";
+					_wrapperOuter.className = "flex overlay-black-text";
 					_wrapperOuter.appendChild(_wrapper);
 					_curt.appendChild(_wrapperOuter);
 				}
@@ -32801,14 +36339,27 @@ const cssAnimations = {
 				const _shield = document.querySelectorAll('.focus-shield')?.[0];
 				if(_shield) {
 					const _s = _self;
-					_shield.onexactclick = function(event) {
-						event.stopPropagation();
-						event.preventDefault();
-						_func();
-						addClass(_elem, 'focus-clicked');
-						if(_s.keyboardHandler)
-							window.removeEventListener('keydown', _s.keyboardHandler);
-					}
+					if(__isPC)
+						_shield.onexactclick = function(event) {
+							event.stopPropagation();
+							event.preventDefault();
+							if(_shield.pointerDownTriggered)
+								return;
+							_func();
+							addClass(_elem, 'focus-clicked');
+							if(_s.keyboardHandler)
+								window.removeEventListener('keydown', _s.keyboardHandler);
+						}
+					// else
+						_shield.addEventListener('pointerdown', function(event) {
+							_shield.pointerDownTriggered = 1;
+							event.stopPropagation();
+							event.preventDefault();
+							_func(_elem, _shield);
+							addClass(_elem, 'focus-clicked');
+							if(_s.keyboardHandler)
+								window.removeEventListener('keydown', _s.keyboardHandler);
+						});
 					if(_elem && __isPC) {
 						let _kbKey = _elem.getAttribute('data-key');
 						if(_kbKey) {
@@ -32849,7 +36400,7 @@ const cssAnimations = {
 		if(!_noFinger) {
 			_finger = document.createElement('img');
 			_finger.className = 'push-me-finger';
-			if(__isPC && (hasClass(_elem, 'skill') || hasClass(_elem, 'main-menu-btn')) && !_elem.id.startsWith('chain-skill'))
+			if(_fingerUp || (__isPC && (hasClass(_elem, 'skill') || hasClass(_elem, 'main-menu-btn')) && !_elem.id.startsWith('chain-skill')))
 				_finger.className += ' finger-top';
 			if(_fingerFade)
 				_finger.className += ' fade-me';
@@ -32893,6 +36444,7 @@ const cssAnimations = {
 <div class='overlay-black show-ui fade-me' style="
   position:absolute;
   left:${R}px;
+  height:${T + H}px;
   right:0;
   top:0;
   bottom:0;
@@ -32910,7 +36462,7 @@ const cssAnimations = {
 "></div>
 
 <!-- FOCUS -->
-<div class='focus-shield${_circle ? ' circle' : ''} show-ui focus-shield-circle' style="
+<div class='focus-shield${(_circle && !_transparent) ? ' circle' : ''} show-ui focus-shield-circle' style="
   position:absolute;
   left:${L}px;
   top:${T}px;
@@ -32922,10 +36474,56 @@ const cssAnimations = {
 		if(!_noFinger) {
 			_finger.style.left = (_rect.left - _extraX) + 'px';
 			_finger.style.top = ((_rect.top - _extraY) + MathRound(.5 * _elem.offsetHeight)) + 'px';
+			_finger.onload = function() {
+				const gifWidth = _finger.offsetWidth;
+				if(W > gifWidth){
+					const offsetX = (W - gifWidth) / 2;
+					_finger.style.left = (_rect.left - _extraX + offsetX) + 'px';
+				}
+			}
 			_finger.src = './images/icons/push-me.gif';
 			_container.appendChild(_finger);
 		}
 		addClass(_gameUI, 'focus-ui-activated');
+	},
+	blackui: function (_c, _ms, _text, _func, _delay, _after) {
+		if(cssAnimationProps.blackui) {
+			if((_gameTick - cssAnimationProps.blackui.start) > ((cssAnimationProps.blackui.p2 ?? _ms ?? 4000) + (_delay ?? 0))) {
+				const _elem = _gameUI.querySelector('.intro-screen');
+				_gameUI.onanimationend = function(e) {
+					if(e.animationName === 'black-bg') {
+						removeClass(_gameUI, 'black-bg');
+						if(_after)
+							_after();
+						if(!__isPC)
+							removeClass(_gameUI, 'disable-ui');
+					}
+				}
+				if(_elem)
+					_elem.remove();
+				if(_func) 
+					_func();
+				delete cssAnimationProps.blackui;
+			}
+			else if(_delay && ((_gameTick - cssAnimationProps.blackui.start) > _delay)) {
+				delete cssAnimationProps.blackui.p5; 
+				addClass(_gameUI, 'black-bg');
+			}
+		}
+		else {
+			const __r = document.querySelector(':root');
+			__r.style.setProperty('--black-duration', ((_ms ?? 4000) + 1000).toString() + 'ms');
+			if(!_delay) {
+				addClass(_gameUI, 'black-bg');
+			}
+			const _b = document.createElement('div');
+			_b.className = 'full show-ui flex fade-me intro-screen';
+			_b.innerHTML = '<div class="intro-text wot-description">' + (_text ?? '') + '</div>';
+			_gameUI.appendChild(_b);
+			if(!__isPC)
+				addClass(_gameUI, 'disable-ui');
+			cssAnimationProps.blackui = { start: _gameTick, p1: _c, p2: (_ms ?? 4000) + (_delay ?? 0), p3: _text, p4: _func, p5: _delay, p6:_after };
+		}
 	},
 	black: function (_c, _ms, _text, _func, _delay, _after) {
 		if(cssAnimationProps.black) {
@@ -32940,7 +36538,7 @@ const cssAnimations = {
 							_after();
 					}
 				}
-				_elem.innerText = '';
+				_elem.innerHTML = '';
 				if(_func) 
 					_func();
 				delete cssAnimationProps.black;
@@ -32966,8 +36564,9 @@ const cssAnimations = {
 				addClass(_elem, 'black-bg');
 				addClass(_elem, 'flex');
 			}
-			_elem.innerText = _text ?? '';
-			addClass(_gameUI, 'd-none');
+			_elem.innerHTML = '<div class="full flex fade-me intro-screen"><div class="intro-text">' + (_text ?? '') + '</div></div>';
+			if(!__isPC)
+				addClass(_gameUI, 'd-none');
 			cssAnimationProps.black = { start: _gameTick, p1: _c, p2: (_ms ?? 4000) + (_delay ?? 0), p3: _text, p4: _func, p5: _delay, p6:_after };
 		}
 	},
@@ -33138,6 +36737,34 @@ const cssAnimations = {
 			cssAnimationProps.shakevert = { start: _gameTick, p1: _c, p2: _ms, p3: _infinite};
 		}
 	},
+	shakevertbelow: function (_c, _ms, _infinite) {
+		if(cssAnimationProps.shakevertbelow) {
+			if((_gameTick - cssAnimationProps.shakevertbelow.start) > (_ms ?? 1000)) {
+				removeClass(_gamePad, 'shake-vert-below');
+				episode.removeEffect('shake');
+				delete cssAnimationProps.shakevertbelow;
+			}
+		}
+		else {
+			addClass(_gamePad, 'shake-vert-below');
+			episode.addEffect('shake', { rate: 2 });
+			cssAnimationProps.shakevertbelow = { start: _gameTick, p1: _c, p2: _ms, p3: _infinite};
+		}
+	},
+	shakevertbelowtiny: function (_c, _ms, _infinite) {
+		if(cssAnimationProps.shakevertbelowtiny) {
+			if((_gameTick - cssAnimationProps.shakevertbelowtiny.start) > (_ms ?? 1000)) {
+				removeClass(_gamePad, 'shake-vert-below-tiny');
+				episode.removeEffect('shake');
+				delete cssAnimationProps.shakevertbelowtiny;
+			}
+		}
+		else {
+			addClass(_gamePad, 'shake-vert-below-tiny');
+			episode.addEffect('shake', { rate: 1 });
+			cssAnimationProps.shakevertbelowtiny = { start: _gameTick, p1: _c, p2: _ms, p3: _infinite};
+		}
+	},
 	shakevertical: function (_c, _ms, _infinite) {
 		if(cssAnimationProps.film)
 			return;
@@ -33176,6 +36803,18 @@ const cssAnimations = {
 		else {
 			addClass(_gamePad, 'shake-tiny');
 			cssAnimationProps.shaketiny = { start: _gameTick, p1: _c, p2: _ms, p3: _infinite};
+		}
+	},
+	shakestomp: function (_c, _ms, _infinite) {
+		if(cssAnimationProps.shakestomp) {
+			if((_gameTick - cssAnimationProps.shakestomp.start) > (_ms ?? 500)) {
+				removeClass(_gamePad, 'shake-stomp');
+				delete cssAnimationProps.shakestomp;
+			}
+		}
+		else {
+			addClass(_gamePad, 'shake-stomp');
+			cssAnimationProps.shakestomp = { start: _gameTick, p1: _c, p2: _ms, p3: _infinite};
 		}
 	},
 	air: function (_c, _ms) {
@@ -33294,6 +36933,74 @@ const cssAnimations = {
 				start: _gameTick,
 				p1: _char,
 				p2: _ms ?? 1000,
+				p3: null,
+				p4: 0,
+				p5: fc
+			};
+		}
+		return true;
+	},
+	whiteblood: function (_char, _ms, _ctx, _opacity, _cnvs) {
+		if (cssAnimationProps.whiteblood) {
+			var fc = document.getElementById('filter-canvas');
+			if(!fc)
+				return false;
+			if (_ms > 0 && ((_gameTick - cssAnimationProps.whiteblood.start) > _ms)) {
+				_opacity -= (100 - _opacity) * 0.45;
+				if(_opacity < 0){
+					delete cssAnimationProps.whiteblood;
+					fc.remove();
+					return false;
+				}
+			}
+			else
+				_opacity += (100 - _opacity) * 0.45;
+
+			if (_opacity <= 100) {
+				cssAnimationProps.whiteblood.p4 = _opacity;
+				const alpha = _opacity / 100;
+				fc.style.background =
+					`radial-gradient(circle at center,
+					rgba(255,245,220,${alpha}) 0%,
+					rgba(255,255,255,${alpha * 0.7}) 35%,
+					rgba(255,255,255,0) 100%)`;
+				//c9.style.opacity = _canvasF.style.opacity = (1 - alpha) * 1.2;
+				const exposure = 1 - (alpha * 0.35);
+				c9.style.opacity = exposure;
+				_canvasF.style.opacity = exposure;
+				_canvasBRB.style.opacity = 1 - (alpha * 0.15);
+				_canvasBRB.style.opacity = (1 - alpha) * .85;
+				// const blurAmount =
+				// 	Math.min(
+				// 		episode.cWidth * 0.0022,
+				// 		episode.cHeight * 0.003
+				// 	) * alpha;
+
+				// fc.style.backdropFilter = `blur(${blurAmount}px)`;
+			}
+
+			return false;
+		}
+		else {
+			var fc = document.getElementById('filter-canvas');
+
+			if (!fc) {
+				fc = document.createElement("div");
+				fc.id = 'filter-canvas';
+
+				fc.style.position = 'absolute';
+				fc.style.left = '0';
+				fc.style.top = '0';
+				fc.style.width = '100%';
+				fc.style.height = '100%';
+				fc.style.background = 'rgba(255,255,255,0)';
+				fc.style.pointerEvents = 'none';
+				_css.appendChild(fc);
+			}
+			cssAnimationProps.whiteblood = {
+				start: _gameTick,
+				p1: _char,
+				p2: 333,
 				p3: null,
 				p4: 0,
 				p5: fc
@@ -33995,6 +37702,8 @@ function ligthenGradientColored2(x, y, radius, ctx, _color) {
     ctx.fill();
 }
 async function PlaySound(_s, _alternateKeys, _volumeRate) {
+	if(_s.possibility && getRandomValue2(1, 100) > _s.possibility)
+		return undefined;
 	const _hidden = !__account.options.sound || episode?.hasSkippableScreen || episodeVisibilityHidden || __batterySaveMode;
 	const _hasEnd = _s.end;
 	if((_hidden && !_hasEnd) || (_s?.force ? false : __switchingMap))
@@ -34031,7 +37740,7 @@ async function PlaySound(_s, _alternateKeys, _volumeRate) {
 	catch(cex) {
 		console.log(_alternateKeys);
 	}
-	return await window.SoundManager.play(_soundKey, _s.path, (_hasEnd && _hidden) ? 0 : (_s.volume ?? .1) * (_s.volumeRate ?? 1), _s.loop, _s.rate, _s.reset, _s.force, _s.end, _s.bind);
+	return await window.SoundManager.play(_soundKey, _s.path, (_hasEnd && _hidden) ? 0 : (_s.volume ?? .1) * (_s.volumeRate ?? 1) * __volume, _s.loop, _s.rate, _s.reset, _s.force, _s.end, _s.bind);
 }
 function flash(_count, _elem) {
 	setTimeout(function () {
@@ -34198,7 +37907,7 @@ function rain(_container, _noSound, _force) {
 	dancingInTheRain(_container);
 	if(!_noSound) {
 		__weather.sound = getSound(null, 'rain');
-		__weather.sound.volume = 1;
+		__weather.sound.volume = 1 * __volume;
 		__weather.sound.loop = true;
 		__weather.sound.play();
 	}
@@ -34345,14 +38054,12 @@ function showMenuTutorial(_arr, _key) {
 		return '';
 	const _data = _arr[getLang()];
 	return `<div class="full flex menu-tutorial-content" style="flex-direction:column">
-				<img style="position:absolute;top: 2.5%;left: 3%;width: 13%;" src="./images/ui/corner-small.png" />
-				<img style="position:absolute;top: 2.5%;right: 3%;width: 13%;transform: scaleX(-1);" src="./images/ui/corner-small.png" />
-				<img style="position:absolute;bottom: 2.8%;left: 3%;width: 13%;transform: scaleY(-1);" src="./images/ui/corner-small.png" />
-				<img style="position:absolute;bottom: 2.8%;right: 3%;width: 13%;transform: scale(-1,-1);" src="./images/ui/corner-small.png" />
-				<div class="menu-tutorial-header w-100 flex">${_data.title}</div>
-				<div class="menu-tutorial-desc w-100 flex flex-ai-start"><div class="w-100 flex">${_data.desc}</div></div>
-				<div class="menu-tutorial-skip w-100 flex"><div class="flex game-btn3 animate-me" onexactclick="skipMenuTutorial('${_key}')">${getLangData('UNDERSTOOD')}</div></div>
-	</div>`;
+				<div class="full flex menu-tutorial-content-inner">
+					<div class="menu-tutorial-header w-100 flex"><img src="./images/ui/game/big-title-badge.png" />${_data.title}<img src="./images/ui/game/big-title-badge-r.png" /></div>
+					<div class="menu-tutorial-desc w-100 flex flex-ai-start"><div class="w-100 flex">${_data.desc}</div></div>
+					<div class="menu-tutorial-skip w-100 flex"><div class="flex game-btn3 animate-me" onexactclick="skipMenuTutorial('${_key}')">${getLangData('UNDERSTOOD')}</div></div>
+				</div>
+			</div>`;
 }
 function skipMenuTutorial(_key) {
 	const _clicked = document.querySelector('.menu-tutorial-content');
@@ -34510,7 +38217,7 @@ function askExitApp(){
 		const _isActive = _fs && !hasClass(_fs, 'v-none');
 		playClick();
 		if(!__story){
-			askSomething(getLangData('Application will be closed'), "exitApplication()", "exit-app-question", _isActive ? _fs : undefined);
+			askSomething(getLangData('Application will be closed'), "exitApplication()", "modal_2x1", _isActive ? _fs : undefined);
 			return;
 		}
 		let _options = [
@@ -34555,16 +38262,16 @@ function askExitApp(){
 		}
 		let _buttons = '';
 		for(let _op of _options)
-			_buttons += `<div class="game-menu-button flex animate-me" style="padding:0 2vh;height:5.4vh!important;font-size:3vh!important;min-width:80%;margin:1.25vh 0" onexactclick="${_op.action}">${_op.title[getLang()]}</div>`;
-		let _modal = `<div class="full fade-me show-ui flex inventory-question show-info">
+			_buttons += `<div class="orange-action-btn flex animate-me wot-button" onexactclick="${_op.action}">${_op.title[getLang()]}</div>`;
+		let _modal = `<div class="full fade-me show-ui flex inventory-question show-info" data-singleton-key="modal_1x1">
 			<div class="inventory-modal flex quit-modal" style="width:25%;flex-direction:column;position:relative;aspect-ratio:auto">
-				<div style="padding:6vh 4vh 2vh 4vh" class="flex w-100">
-					<span style="color:#F4BB44 !important;font-size:3.2vh !important">${getLangData('Go back')}?</span>
+				<div class="flex w-100 question-modal-title-container">
+					<span class="question-modal-title wot-title">${getLangData('Go back')}?</span>
 				</div>
-				<div class="flex w-100" style="padding:2vh 2vh 4vh 2vh">`
+				<div class="flex w-100" style="padding:0 2vh 6vh 2vh">`
 					+ _buttons +
 				`</div>
-				<div onexactclick="closeInventoryQuestionModal()" style="font-size:4.2vh !important;color:#9d987f !important;padding:1.6vh 3.2vh" class="item-info-modal-close">&times;</div>
+				<div onexactclick="closeInventoryQuestionModal()" class="item-info-modal-close"></div>
 			</div>
 		</div>`;
 		const _div = document.createElement('div');
@@ -34576,6 +38283,7 @@ function askExitApp(){
 
 function exitApplication() {
 	closeInventoryQuestionModal();
+	quitGame();
 	try{
 		if (typeof globalThis.__APP_EXIT_HANDLER__ === "function") {
 			globalThis.__APP_EXIT_HANDLER__();
@@ -34585,7 +38293,58 @@ function exitApplication() {
 
 	}
 }
+function quitGame() {
 
+    try {
+
+        const isElectron = navigator.userAgent.includes("Electron");
+        if (isElectron) {
+
+            const electron = window.require('electron');
+            const ipcRenderer = electron.ipcRenderer;
+
+            ipcRenderer.send('force-close-game');
+            return;
+        }
+		try {
+			AndroidBridge.quit();
+			return;
+		}
+		catch(pluginEx) {
+			console.error(pluginEx);
+		}
+        // Android Cordova
+        if (window.plugins && window.plugins.exit) {
+            window.plugins.exit();
+            return;
+        }
+
+        // Eski Android fallback
+        if (navigator.app) {
+            navigator.app.exitApp();
+            return;
+        }
+
+        window.close();
+
+    } catch (err) {
+
+        console.error(err);
+
+        try {
+
+            if (navigator.app) {
+                navigator.app.exitApp();
+                return;
+            }
+
+            window.close();
+
+        } catch (e) {
+            console.error(e);
+        }
+    }
+}
 var extractDigit = function(a, bitMask, shiftRightAmount) {
     return (a & bitMask) >>> shiftRightAmount;
 }
@@ -34712,61 +38471,101 @@ function clearAudioCache(_sounds) {
   }
   _sounds.length = 0; // diziyi boşalt
 }
-
 (function () {
-  // cooldown süresi (ms)
   const EXACTCLICK_COOLDOWN = 250;
+  const MOVE_THRESHOLD = 8;
 
-  // Ortak helper -> gerçek listener
   function attachExactClick(el, handler) {
     if (!el._onexactclickAttached) {
-      let startX, startY, moved;
+      let startX = 0;
+      let startY = 0;
+      let pointerId = null;
+      let moved = false;
 
       const pointerDown = (e) => {
+        // Sol mouse / touch dışındaki pointerları ignore et
+        if (e.pointerType === "mouse" && e.button !== 0) {
+          return;
+        }
+
         startX = e.clientX;
         startY = e.clientY;
+        pointerId = e.pointerId;
         moved = false;
+
+        // Mobilde tarayıcının gesture davranışını azalt
+        if (e.pointerType === "touch") {
+          e.preventDefault();
+        }
 
         const moveListener = (moveEvent) => {
           if (
-            Math.abs(moveEvent.clientX - startX) > 5 ||
-            Math.abs(moveEvent.clientY - startY) > 5
+            moveEvent.pointerId !== pointerId
+          ) {
+            return;
+          }
+
+          if (
+            Math.abs(moveEvent.clientX - startX) > MOVE_THRESHOLD ||
+            Math.abs(moveEvent.clientY - startY) > MOVE_THRESHOLD
           ) {
             moved = true;
           }
         };
 
-        const upListener = (upEvent) => {
-          if (!moved && el._onexactclickHandler) {
-            const now = _gameTick;
-
-            // cooldown kontrolü
-            if (
-              !el._lastExactClick ||
-              now - el._lastExactClick > EXACTCLICK_COOLDOWN
-            ) {
-              el._lastExactClick = now;
-              el._onexactclickHandler.call(el, upEvent);
-            }
-          }
+        const cleanup = () => {
           document.removeEventListener("pointermove", moveListener);
           document.removeEventListener("pointerup", upListener);
+          document.removeEventListener("pointercancel", cancelListener);
+          pointerId = null;
+        };
+
+        const upListener = (upEvent) => {
+          if (upEvent.pointerId !== pointerId) {
+            return;
+          }
+
+          cleanup();
+        };
+
+        const cancelListener = (cancelEvent) => {
+          if (cancelEvent.pointerId !== pointerId) {
+            return;
+          }
+
+          cleanup();
         };
 
         document.addEventListener("pointermove", moveListener);
         document.addEventListener("pointerup", upListener);
+        document.addEventListener("pointercancel", cancelListener);
+
+        // HEMEN tetikle
+        if (!moved && el._onexactclickHandler) {
+          const now = performance.now();
+
+          if (
+            !el._lastExactClick ||
+            now - el._lastExactClick >= EXACTCLICK_COOLDOWN
+          ) {
+            el._lastExactClick = now;
+            el._onexactclickHandler.call(el, e);
+          }
+        }
       };
 
-      el.addEventListener("pointerdown", pointerDown);
+      el.addEventListener("pointerdown", pointerDown, {
+        passive: false,
+      });
+
       el._onexactclickAttached = true;
     }
 
-    // hangi handler atanmış onu sakla
     el._onexactclickHandler = handler;
   }
 
-  // setAttribute override -> <div onexactclick="...">
   const origSetAttribute = HTMLElement.prototype.setAttribute;
+
   HTMLElement.prototype.setAttribute = function (name, value) {
     if (name.toLowerCase() === "onexactclick") {
       const handler = new Function("event", value);
@@ -34776,47 +38575,162 @@ function clearAudioCache(_sounds) {
     }
   };
 
-  // property destekle -> div.onexactclick = function(){ }
   Object.defineProperty(HTMLElement.prototype, "onexactclick", {
     set: function (handler) {
       attachExactClick(this, handler);
     },
+
     get: function () {
       return this._onexactclickHandler || null;
     },
   });
 
-  // Mevcut DOM’u tara
   document.querySelectorAll("[onexactclick]").forEach((el) => {
     const code = el.getAttribute("onexactclick");
+
     if (code) {
       const handler = new Function("event", code);
       attachExactClick(el, handler);
     }
   });
 
-  // Sonradan eklenenler için
   const observer = new MutationObserver((mutations) => {
     for (const m of mutations) {
       m.addedNodes.forEach((node) => {
-        if (node.nodeType === 1) {
-          if (node.hasAttribute && node.hasAttribute("onexactclick")) {
-            const code = node.getAttribute("onexactclick");
+        if (node.nodeType !== 1) {
+          return;
+        }
+
+        if (node.hasAttribute?.("onexactclick")) {
+          const code = node.getAttribute("onexactclick");
+
+          if (code) {
             const handler = new Function("event", code);
             attachExactClick(node, handler);
           }
-          node.querySelectorAll &&
-            node.querySelectorAll("[onexactclick]").forEach((el) => {
-              const code = el.getAttribute("onexactclick");
-              const handler = new Function("event", code);
-              attachExactClick(el, handler);
-            });
         }
+
+        node.querySelectorAll?.("[onexactclick]").forEach((el) => {
+          const code = el.getAttribute("onexactclick");
+
+          if (code) {
+            const handler = new Function("event", code);
+            attachExactClick(el, handler);
+          }
+        });
       });
     }
   });
+
   observer.observe(document.documentElement, {
     childList: true,
     subtree: true,
   });
 })();
+// (function () {
+//   // cooldown süresi (ms)
+//   const EXACTCLICK_COOLDOWN = 250;
+
+//   // Ortak helper -> gerçek listener
+//   function attachExactClick(el, handler) {
+//     if (!el._onexactclickAttached) {
+//       let startX, startY, moved;
+
+//       const pointerDown = (e) => {
+//         startX = e.clientX;
+//         startY = e.clientY;
+//         moved = false;
+
+//         const moveListener = (moveEvent) => {
+//           if (
+//             Math.abs(moveEvent.clientX - startX) > 5 ||
+//             Math.abs(moveEvent.clientY - startY) > 5
+//           ) {
+//             moved = true;
+//           }
+//         };
+
+//         const upListener = (upEvent) => {
+//           if (!moved && el._onexactclickHandler) {
+//             const now = _gameTick;
+
+//             // cooldown kontrolü
+//             if (
+//               !el._lastExactClick ||
+//               now - el._lastExactClick > EXACTCLICK_COOLDOWN
+//             ) {
+//               el._lastExactClick = now;
+//               el._onexactclickHandler.call(el, upEvent);
+//             }
+//           }
+//           document.removeEventListener("pointermove", moveListener);
+//           document.removeEventListener("pointerup", upListener);
+//         };
+
+//         document.addEventListener("pointermove", moveListener);
+//         document.addEventListener("pointerup", upListener);
+//       };
+
+//       el.addEventListener("pointerdown", pointerDown);
+//       el._onexactclickAttached = true;
+//     }
+
+//     // hangi handler atanmış onu sakla
+//     el._onexactclickHandler = handler;
+//   }
+
+//   // setAttribute override -> <div onexactclick="...">
+//   const origSetAttribute = HTMLElement.prototype.setAttribute;
+//   HTMLElement.prototype.setAttribute = function (name, value) {
+//     if (name.toLowerCase() === "onexactclick") {
+//       const handler = new Function("event", value);
+//       attachExactClick(this, handler);
+//     } else {
+//       return origSetAttribute.apply(this, arguments);
+//     }
+//   };
+
+//   // property destekle -> div.onexactclick = function(){ }
+//   Object.defineProperty(HTMLElement.prototype, "onexactclick", {
+//     set: function (handler) {
+//       attachExactClick(this, handler);
+//     },
+//     get: function () {
+//       return this._onexactclickHandler || null;
+//     },
+//   });
+
+//   // Mevcut DOM’u tara
+//   document.querySelectorAll("[onexactclick]").forEach((el) => {
+//     const code = el.getAttribute("onexactclick");
+//     if (code) {
+//       const handler = new Function("event", code);
+//       attachExactClick(el, handler);
+//     }
+//   });
+
+//   // Sonradan eklenenler için
+//   const observer = new MutationObserver((mutations) => {
+//     for (const m of mutations) {
+//       m.addedNodes.forEach((node) => {
+//         if (node.nodeType === 1) {
+//           if (node.hasAttribute && node.hasAttribute("onexactclick")) {
+//             const code = node.getAttribute("onexactclick");
+//             const handler = new Function("event", code);
+//             attachExactClick(node, handler);
+//           }
+//           node.querySelectorAll &&
+//             node.querySelectorAll("[onexactclick]").forEach((el) => {
+//               const code = el.getAttribute("onexactclick");
+//               const handler = new Function("event", code);
+//               attachExactClick(el, handler);
+//             });
+//         }
+//       });
+//     }
+//   });
+//   observer.observe(document.documentElement, {
+//     childList: true,
+//     subtree: true,
+//   });
+// })();

@@ -116,6 +116,7 @@ function pvp() {
 					</div>
 				</div>
 			</div>
+			<div class="w-100 flex pvp-top-splitter"><img src="./images/ui/game/item-detail-top-splitter.png" /></div>
 			<div class="flex me-info">
 				<div class="flex pvp-info-0 w-100">
 				<div class="flex flex-jc-start w-50 page-detail-item-label">${getLangData('League')}</div>
@@ -164,7 +165,7 @@ function pvp() {
 			}
 		}
 		_container4.innerHTML = `<div class="flex w-50 flex-jc-start page-detail-item-label">${getLangData('Win Streak')}</div><div class="flex w-50 flex-jc-end page-detail-item-value">${__account.pvp.maxWinCount.formatWithDots()}</div>`;
-		_container.innerHTML = '<div class="flex w-50 flex-jc-start page-detail-item-label">' + getLangData('Active Duel') + '</div><div class="flex w-50 flex-jc-end page-detail-item-value">' + (__account.pvp.duelCount < 1 ? '0' : __account.pvp.duelCount.toString()) + ' / 10<span id="pvp-play-time-left"></span></div>';
+		_container.innerHTML = '<div class="flex w-50 flex-jc-start page-detail-item-label">' + getLangData('Active Duel') + '</div><div class="flex w-50 flex-jc-end page-detail-item-value"><span id="pvp-play-time-left"></span>' + (__account.pvp.duelCount < 1 ? '0' : __account.pvp.duelCount.toString()) + ' / 10</div>';
 		this.updatePlayStatus();
 	}
 	this.updatePlayStatus = function() {

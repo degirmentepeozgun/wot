@@ -38,7 +38,7 @@ function openSideMenu() {
 	for(let _m of __holoMenuItems)
 		_html += `<div id="lobby-${_m.icon}" class="flex menu-left-opener-item animate-me" onexactclick="openSectionFromMenu(${_m.order},${_m.subOrder},${_m.tabOrder ?? 0})">
 			<div class="w-100 flex">
-				<div class="w-100 flex"><img src="./images/ui/menu-icons/${_m.icon}.png" /></div>
+				<div class="w-100 flex"><img src="./images/ui/game/menu-icons/${_m.icon}.png" /></div>
 				<div class="w-100 flex">${_m.titles[getLang()]}</div>
 			</div>
 		</div>`;
@@ -55,9 +55,28 @@ function openSideMenu() {
 	document.querySelector('#game-ui').appendChild(_div.firstChild); 
 	document.addEventListener("click", outsideClick, true);
 }
+
 function createMenu() {
-	 if (document.querySelector('.lobby-navbar'))
+	if (document.querySelector('.lobby-navbar'))
         return;
+	if(_presentationMode === 1) {
+		__account.name = getLangData('Presentation');
+		_presentationMode = 2;
+		__fragments.forEach(x =>
+		updateFragment(x.key, 1500));
+		updateGem('fire', 1, 5);
+		updateGem('ice', 1, 5);
+		updateGem('shadow', 1, 5);
+		updateGem('lightning', 1, 5);
+		updateGem('toxic', 1, 5);
+		updateMisc({ type:'ticket-gem-selection', count: 1 });
+		const _actIds = __stories.filter(x => x.listed !== false && !x.mission).map(x => x.id);
+		__account.storyResults = [];
+		_actIds.forEach(x => __account.storyResults.push({id:x, stars: [1,2,4], perfect:true}));
+		__account.gold = 0;
+		updateGold(1000000);
+		connectSocket();
+	}
 	const _upperDiv = document.createElement('div');
 	_upperDiv.className = 'flex flex-jc-end show-ui lobby-navbar fade-in';
 	const _div = document.createElement('div');
@@ -65,13 +84,61 @@ function createMenu() {
 		<div class="lobby-navbar-left flex flex-jc-start" onexactclick="openSideMenu()">
 			<div id="side-hamburger-menu" class="flex menu-icon-wrapper">
 				<div class="menu-icon flex">
-					<img src="./images/icons/menu.png" />
+					<img src="./images/ui/game/menu.png" />
+				</div>
+			</div>
+			<div onexactclick="event.stopPropagation();askAvatar()" class="top-bar-avatar-wrapper">
+				<img class="top-bar-avatar" src="./images/ui/game/avatars/avatar${__account.avatarOrder ?? 21}.png" />
+			</div>
+			<div class="top-bar-character-info">
+				<div class="top-bar-character-info-name flex flex-jc-start">
+					${__account.name}
+				</div>
+				<div class="top-bar-character-info-progress flex flex-jc-start">
+					<div class="top-bar-character-info-level-frame flex">
+						<div class="top-bar-character-info-level-value">
+							${getLangData('Lv')}.&nbsp;${mainCharacter.level}
+						</div>
+					</div>
+					<div class="top-bar-experience-frame flex flex-jc-start">
+						<div style="width:${100 * (mainCharacter.experience / mainCharacter.maxExperience)}% !important" class="top-bar-experience-progress">
+
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
-		<div class="flex lobby-navbar-center"><div class="flex"></div></div>
+		<div class="flex lobby-navbar-center">
+			<div class="flex w-100 flex-jc-end">
+				<div class="top-bar-resource-frame flex">
+					<img src="./images/ui/game/platina.png" class="top-bar-resource-icon" />
+					<div class="flex top-bar-resource-value">
+						${(__account.platina ?? 0).formatWithDots()}
+					</div>
+				</div>
+				<div class="top-bar-resource-frame flex">
+					<img src="./images/ui/game/gold-coin.png" class="top-bar-resource-icon" />
+					<div class="flex top-bar-resource-value">
+						${__account.gold.formatWithDots()}
+					</div>
+				</div>
+				<div class="top-bar-plus-icon flex" onexactclick="howToGainGold()">
+					<img src="./images/ui/game/plus.png" />
+				</div>
+			</div>
+		</div>
 		<div class="lobby-navbar-right flex flex-jc-end">
-			#${__account.name}
+			<div class="top-bar-quick-menu flex w-100">
+				<div class="flex top-bar-quick-menu-icon-wrapper" onexactclick="openSectionFromMenu(4,2,0,1)">
+					<img src="./images/ui/game/notification.png" class="top-bar-quick-menu-icon" />
+				</div>
+				<div class="flex top-bar-quick-menu-icon-wrapper" onexactclick="openSectionFromMenu(9,1,0,1)">
+					<img src="./images/ui/game/settings.png" class="top-bar-quick-menu-icon" />
+				</div>
+				<div class="flex top-bar-quick-menu-icon-wrapper" onexactclick="askExitApp()">
+					<img src="./images/ui/game/menu-close.png" class="top-bar-quick-menu-icon" />
+				</div>
+			</div>
 		</div>
 		</div>
 	`;
@@ -79,14 +146,17 @@ function createMenu() {
 	_div.innerHTML = getStoryTemplates();
 	_gameUI.appendChild(_upperDiv);
 }
-function openSectionFromMenu(_order, _subOrder, _tabOrder) {
+function openSectionFromMenu(_order, _subOrder, _tabOrder, _force) {
 	const _ml = document.querySelector('.menu-left-opener');
-	if(!_ml || !hasClass(_ml, 'opened') || hasClass(_ml, 'closing'))
+	if(!_force && (!_ml || !hasClass(_ml, 'opened') || hasClass(_ml, 'closing')))
 		return;
 	playClick();
-	hideSideMenu(function() {
+	if(_force && !_ml)
 		switchBookPage(_order, _subOrder, _tabOrder);
-	})
+	else
+		hideSideMenu(function() {
+			switchBookPage(_order, _subOrder, _tabOrder);
+		});
 }
 function getStoryTemplates() {
 	let _html = '<div class="stories-wrapper">';

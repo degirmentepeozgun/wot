@@ -1,5 +1,6 @@
 ﻿'use strict';
-function mailbox() {
+(function(){
+	function mailbox() {
 	this.mails = _client.getMails();
 	this.key = 'mailbox';
 	this.tutorial = {
@@ -169,7 +170,7 @@ function mailbox() {
 			warn('<span>' + getLangData('Take attachment first') + '</span>', 'warn');
 			return;
 		}
-   		askSomething(`${getLangData('Remove mail from your mailbox?')}`, `getRef(\'mailbox\')?.deleteMail(${_id})`);
+   		askSomething(`${getLangData('Remove mail from your mailbox?')}`, `getRef(\'mailbox\')?.deleteMail(${_id})`, 'modal_2x1');
 	}
 	this.deleteMail = function(_id) {
 		const _m = this.mails.find(x => x.id === _id);
@@ -187,3 +188,6 @@ function mailbox() {
 	}
 	return this;
 }
+window.mailbox =mailbox;
+
+})();

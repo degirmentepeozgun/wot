@@ -1,5 +1,6 @@
 ﻿'use strict';
-function mailbox() {
+(function(){
+	function mailbox() {
 	this.mails = _client.getMails();
 	this.key = 'mailbox';
 	this.tutorial = {
@@ -33,7 +34,7 @@ function mailbox() {
 		`<div data-module='mailbox' class="menu-ui-left${_noAnimation ? '' : ' fade-me'}">
 			<div class="menu-modal-left menu-modal-left-content">
 				<div class="skills-content-left mailbox-content-left menu-modal-left-container">
-					<div style="padding:1% 5%;overflow-y:auto" class="full">`
+					<div style="overflow-y:auto" class="full">`
 						+ this.getMails(_id) +
 					`</div>
 				</div>
@@ -57,7 +58,7 @@ function mailbox() {
 		for (var _m of _arr) {
 			const _mail = __account.mailbox?.find(x => x.id === _m.id);
 			html += `<div data-key="${_m.id}" onexactclick="getRef(\'mailbox\')?.selectMail(${_m.id})" class="skill-card mailbox-card animate-me flex${_mail ? ' read' : ''}${_m.attachment ? ' loot' : ''}${_mail?.looted ? ' looted' : ''}">
-				<div class="skill-icon-wrapper flex"><div class="animate-me-1000 mailbox-card-icon"></div></div>
+				<div class="skill-icon-wrapper mail-skill-icon-wrapper flex"><div class="animate-me-1000 mailbox-card-icon"></div></div>
 				<div style="flex:1;height:100%">
 					<div class="flex flex-jc-start skill-card-title" style="height:50%;width:100%">${_m.owner?.[getLang()] ?? _m.owner}</div>
 					<div class="flex flex-jc-start skill-card-level mailbox-card-ts">
@@ -121,17 +122,18 @@ function mailbox() {
 				<div class="w-100 mailbox-attachment flex flex-jc-start">` + _attachment + `</div>
 			</div>
 			<div class="mailbox-buttons flex w-100 action-button-container" style="height:14%">
+				<div class="flex w-100 page-detail-splitter"></div>
 				<div class="flex w-50${!_m.attachment ? ' d-none' : ''}" style="height:100%">
-					<div class="game-menu-button animate-me flex${(_mail?.looted ? ' disabled' : '')}" onexactclick="getRef(\'mailbox\')?.lootMail(${_id})" style="height:65%">
+					<div class="page-detail-button-half animate-me flex${(_mail?.looted ? ' disabled' : '')}" onexactclick="getRef(\'mailbox\')?.lootMail(${_id})" style="height:65%">
 						<div class="flex">${getLangData('TAKE')}</div>
 					</div>
 				</div>
 				<div class="flex w-50${!_m.attachment ? ' d-none' : ''}" style="height:100%">
-					<div class="game-menu-button animate-me flex" onexactclick="getRef(\'mailbox\')?.askDeleteMail(${_id})" style="height:65%">
+					<div class="page-detail-button-half animate-me flex" onexactclick="getRef(\'mailbox\')?.askDeleteMail(${_id})" style="height:65%">
 						<div class="flex">${getLangData('DELETE')}</div>
 					</div>
 				</div>
-				<div class="game-menu-button animate-me flex${_m.attachment ? ' d-none' : ''}" onexactclick="getRef(\'mailbox\')?.askDeleteMail(${_id})" style="height:65%">
+				<div class="page-detail-button animate-me flex${_m.attachment ? ' d-none' : ''}" onexactclick="getRef(\'mailbox\')?.askDeleteMail(${_id})" style="height:65%">
 					<div class="flex">${getLangData('DELETE')}</div>
 				</div>
 			</div>`;
@@ -168,7 +170,7 @@ function mailbox() {
 			warn('<span>' + getLangData('Take attachment first') + '</span>', 'warn');
 			return;
 		}
-   		askSomething(`${getLangData('Remove mail from your mailbox?')}`, `getRef(\'mailbox\')?.deleteMail(${_id})`);
+   		askSomething(`${getLangData('Remove mail from your mailbox?')}`, `getRef(\'mailbox\')?.deleteMail(${_id})`, 'modal_2x1');
 	}
 	this.deleteMail = function(_id) {
 		const _m = this.mails.find(x => x.id === _id);
@@ -186,3 +188,6 @@ function mailbox() {
 	}
 	return this;
 }
+window.mailbox =mailbox;
+
+})();

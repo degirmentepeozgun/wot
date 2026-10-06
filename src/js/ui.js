@@ -10,7 +10,7 @@ const pvpAvatarTemplate = function (char, _name) {
 				</div>
 				<div class='war-player-card-right flex flex-jc-start'>
 					<div class="hp-war-player-name">
-						<div class="one-line">
+						<div class="one-line wot-title">
 							${char?.main ? __account.name ?? char.name : char?.displayName ?? char?.name}
 						</div>
 					</div>
@@ -55,29 +55,29 @@ const avatarTemplate = function (char, _name) {
 	if (_oldAvatar)
 		_oldAvatar.remove();
 	const _class = char.main ? '' : (episode?.pvp ? ' war-player-profile' : ' friendly-profile');
-	let _html = `<div style="margin-top:0 !important;cursor:pointer;position:relative;width:20.2vw;aspect-ratio:101/59;height:auto!important" ${char.main ? 'onexactclick="if(episode.id > 99 || __story) { return; } showMyModalPopUp(\'game-menu\');switchBookPage(1)" ' : 'onexactclick="switchCharacter(null,null,null,1)"'}class="profile${_class}" id="char-${char.key}">
-			<img src='./images/icons/hp-frame.png' class='full' style='left: 0; top: 0; position: absolute; z-index: 2; filter:drop-shadow(0 0 .8vh #000) drop-shadow(0 0 .8vh #000)' />
-			<div class="full flex">
-				<div style="color:white;width:34%;height:100%">
-					<div style="height:55%;padding:6.5% 5%;overflow:hidden;position:relative">
-						<div class="full flex" style="margin:14% 22% 15% 8%;transform:rotate(45deg);-webkit-transform:rotate(45deg);background:radial-gradient(circle at center, ${char.color}, black);border-radius:100%">
-							<span id="level-${char.key}" class="character-level-text">${char.level ?? 1}</span>
+	let _html = `<div ${char.main ? 'onexactclick="if(episode.id > 99 || __story) { return; } showMyModalPopUp(\'game-menu\');switchBookPage(1)" ' : 'onexactclick="switchCharacter(null,null,null,1)"'}class="hb-frame-wrapper profile${_class}" id="char-${char.key}">
+			<img src='./images/ui/game/hb2.png' class='full hb-frame' />
+			<div class="full flex hb-frame-inner">
+				<div class="hb-frame-inner-left">
+					<div class="hb-frame-inner-left-inner">
+						<div class="full flex hb-frame-inner-left-inner-top" style="background:radial-gradient(circle at center, ${char.color}, black)">
+							<span id="level-${char.key}" class="wot-title character-level-text">${char.level ?? 1}</span>
 						</div>
-						<div class="${!char.main && char.switchTime ? 'switch-character-cooldown' : 'd-none'}" style="opacity:0;margin-top:14%;position:absolute;width:100%;height:100%;top:0;left:0;background:#000000cc"></div>
+						<div class="hb-frame-inner-left-inner-bottom ${!char.main && char.switchTime ? 'switch-character-cooldown' : 'd-none'}"></div>
 					</div>
 				</div>
-				<div style="width:66%;height:100%">
-					<div class="flex flex-ai-start flex-jc-start" style="width:100%;height:24%">
-						<span class="character-name-text" style="color:#E2DFD2;font-weight:600;font-size:1.4vw !important;text-shadow:.25vh .25vh .5vh #000">${char?.main ? (__account.name === '' ? getLangData('Player') + ' ' + __account.id.substring(0,4).toUpperCase() : __account.name) ?? char.name : char?.displayName ?? char?.name}</span>
+				<div class="hb-frame-inner-right">
+					<div class="flex flex-ai-start flex-jc-start hb-frame-inner-right-top">
+						<span class="character-name-text hb-frame-inner-right-top-inner font-player-name wot-title">${char?.main ? (__account.name === '' ? getLangData('Player') + ' ' + __account.id.substring(0,4).toUpperCase() : __account.name) ?? char.name : char?.displayName ?? char?.name}</span>
 					</div>
-					<div style="position:relative;margin-top:2%;height:16%;background:#FFFFFF99;clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 0% 100%); width:95%;overflow:hidden">
-						<div class="full healthvalue" style="position:absolute;background:#880808;clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 0% 100%); width:${100 * (char.health / char.MAXHP)}%">
+					<div class="hb-frame-inner-right-middle">
+						<div class="full healthvalue hb-frame-inner-right-middle-top" style="width:${100 * (char.health / char.MAXHP)}%">
 						</div>
-						<div class="full healthvalue" style="position:absolute;background:#0818A8;clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 0% 100%); width:${100 * (char.health / char.MAXHP)}%">
+						<div class="full healthvalue hb-frame-inner-right-middle-bottom" style="width:${100 * (char.health / char.MAXHP)}%">
 						</div>
 					</div>
-					<div style="width:68%;height:10%;background:#FFFFFF99;clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 0% 100%);overflow:hidden">
-						<div class="full defbar-value" style="background:#BF40BF;clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 0% 100%)"></div>
+					<div class="hb-frame-inner-right-bottom">
+						<div class="full defbar-value hb-frame-inner-right-bottom-inner"></div>
 					</div>
 					<div class="buffs flex flex-jc-start" style="padding:.4vw .8vw"></div>
 				</div>
@@ -85,9 +85,9 @@ const avatarTemplate = function (char, _name) {
 			<img class="move-up d-none" src="./images/icons/upgrade.png" style="-webkit-filter:drop-shadow(0 0 .3vh #fff);filter:drop-shadow(0 0 .3vh #fff);z-index:2;position:absolute;width:1.8vw;left:.8vw" />
 			<img class="aid${episode?.pvp || char.main || char.isDead() || char.health >= char.MAXHP ? ' v-none' : ''}" id="aid-${char.key}" onexactclick="drinkPot(episode.enemies.find(x => x.key === '${char.key}'), mainCharacter, event)" src="./images/icons/aid.png" />`
 			if(char.main && char.heartCount > 1) {
-				_html += `<img src='./images/icons/heart.png' id='heartcount1' />
-					<img${char.heartCount > 1 ? '' : ' class="gray"'} src='./images/icons/heart.png' id='heartcount2' />
-					<img${char.heartCount > 2 ? '' : ' class="gray"'} src='./images/icons/heart.png' id='heartcount3' />`;
+				_html += `<img src='./images/icons/heart.png' id='heartcount1' style="display:none" />
+					<img${char.heartCount > 1 ? '' : ' class="gray"'} style="display:none" src='./images/icons/heart.png' id='heartcount2' />
+					<img${char.heartCount > 2 ? '' : ' class="gray"'} style="display:none" src='./images/icons/heart.png' id='heartcount3' />`;
 			}
 		return _html + '</div>';
 }
@@ -144,8 +144,13 @@ function drawDmgFrames() {
 					_frame.platformX = platformX;
 					_frame.totalStepY = getRandomValue2(15, 23);
 					_frame.maxStepY = _frame.totalStepY;
+					if(_frame.dir)
+						_frame.stepX = _frame.dir === __left ? -1 : 1;
 					if(_frame.crit){
 						_frame.zoom = 2;
+						_frame.stepY = 2;
+					}
+					else if(_frame.zoom) {
 						_frame.stepY = 2;
 					}
 					else{
@@ -194,6 +199,7 @@ function renderText(_frame, _i) {
 		x: _frame.x,
 		crit: _frame.text === 'crit',
 		frame: _frame,
+		height: MathRound((episode.dmgFrameHeight) * _frame.zoom),
 		from: _frame.from,
 		images: getDmgFrameNumbers2(_frame),
 		ms: 1000
@@ -249,22 +255,31 @@ function getDmgFrameNumbers2(_frame) {
 
 function renderTextElement2(_settings) {
 	if(_settings.images?.[0]){
-		let _l = _settings.x, i = 0, _settingsY = (_settings.frame.maxStepY - _settings.frame.totalStepY);
+		if(_settings.frame.stepX) {
+			if (!_settings.frame.startStepX)
+				_settings.frame.startStepX = _settings.frame.stepX;
+			else
+				_settings.frame.startStepX += _settings.frame.stepX;
+			_settings.frame.stepX -= (_settings.frame.stepX < 0 ? -.02 : .02);
+		}
+		let _l = _settings.x + (_settings.frame.startStepX ?? 0), i = 0, _settingsY = (_settings.frame.maxStepY - _settings.frame.totalStepY);
 		for(let _sprite of _settings.images)
 			if(_sprite) {
+				const _scale = _settings.frame.scale ?? 1;
 				const _sim = _sprite.img ?? _sprite;
-				const _spriteHeight = MathRound((episode.dmgFrameHeight) * _settings.frame.zoom);
+				const _spriteHeight = _settings.height * _scale;
 				const _y =  _settings.frame.startY - 
 				(_settings.frame.zoom > 1  ? 0 : MathRound(_settingsY * 
-				((_spriteHeight / _settings.frame.stepY))));
+				((_settings.height / _settings.frame.stepY))));
 				if(_y < episode.dmgFrameTopBoundary){
 					_settings.frame.remove = true;
 					return;
 				}
-				const _spriteWidth = (_sim.width *  _spriteHeight) / _sim.height;
+				const _spriteWidth = ((_sim.width *  _settings.height) / _sim.height) * _scale;
 				let _sWidth = _spriteWidth;//  MathRound(_spriteWidth * _settings.frame.zoom);
 				episode.offDmgCtx.drawImage(_sim, 
-					(_l + (_settings.frame.platformX - platformX)) - MathRound(i * (_spriteHeight / 5)) - MathRound((_sWidth - _spriteWidth) / 2),
+					(_l + (_settings.frame.platformX - platformX)) 
+					- MathRound(i * (_spriteHeight / 5)) - MathRound((_sWidth - _spriteWidth) / 2),
 					_y, _sWidth, _spriteHeight);
 				_l += _spriteWidth;
 				i++;
@@ -425,6 +440,18 @@ function loadUI() {
 		document.head.appendChild(link);
 	});
 	organizeScreenResize();
+	setNativeMethods();
+}
+function setNativeMethods() {
+	window.platformAPI = {
+		share(text, base64) {
+			if (window.AndroidBridge?.share)
+				return window.AndroidBridge.share(text, base64);
+			if (window.electronAPI?.share)
+				return window.electronAPI.share(text, base64);
+			//console.log("share fallback");
+		}
+	};
 }
 function loadWindowEvents() {
 	window.addEventListener('keyboardDidShow', (e) => {
@@ -464,7 +491,7 @@ function loadWindowEvents() {
 					mainCharacter.stopStepSound();
         			SoundManager.suspend();
 					pauseQuestTimer();
-					if(episode.hasGoSound)
+					if(episode?.hasGoSound)
 						episode.stopGoSound();	
 					episodeVisibilityHidden = _closeOpeningMusic = true;
 				} else {
@@ -480,23 +507,26 @@ function loadWindowEvents() {
 										_anm.coolDownStart2 += _diff;
 								}
 							});
-						if(episode.mobPhaseTick)
+						if(episode?.mobPhaseTick)
 							episode.mobPhaseTick += _diff;
 					}
 					organizeModules();
 					episodeVisibilityHidden = false;
-					if(episode && episode.bgMusic)
-						episode.playBgMusic();
-					if(episode && episode.bgSound)
-						episode.resumeAmbianceMusic();
-					if(__weather?.sound)
-						__weather.sound.play();
-					if(episode.hasGoSound)
-						PlaySound({key:'go', force: true, loop:true, volume:.5});
+					if(!_openingSound) {
+						if(episode && episode.bgMusic)
+							episode.playBgMusic();
+						if(episode && episode.bgSound && !_gameUI.sound)
+							episode.resumeAmbianceMusic();
+						if(__weather?.sound)
+							__weather.sound.play();
+						if(episode?.hasGoSound)
+							PlaySound({key:'go', force: true, loop:true, volume:.5});
+					}
         			SoundManager.resume();
 					resumeQuestTimer();
-
 					window.SoundManager.warmAudio();
+					if(__account?.gameOpening && _openingSound?.paused)
+						_openingSound.play();
 				}
 			}
 			catch(e) {
@@ -551,19 +581,23 @@ function loadWindowEvents() {
 							episode.mobPhaseTick += _diff;
 				}
 				episodeVisibilityHidden = false;
-				if(episode && episode.bgMusic)
-					episode.playBgMusic();
-				if(episode && episode.bgSound)
-					episode.resumeAmbianceMusic();
-				if(__weather?.sound)
-					__weather.sound.play();
-				if(episode.hasGoSound)
-					PlaySound({key:'go', force: true, loop:true, volume:.5});
+				if(!_openingSound) {
+					if(episode && episode.bgMusic)
+						episode.playBgMusic();
+					if(episode && episode.bgSound && !_gameUI.sound)
+						episode.resumeAmbianceMusic();
+					if(__weather?.sound)
+						__weather.sound.play();
+					if(episode?.hasGoSound)
+						PlaySound({key:'go', force: true, loop:true, volume:.5});
+				}
 				if (window.plugins && window.plugins.insomnia)
 					window.plugins.insomnia.keepAwake();
         		SoundManager.resume();
 				resumeQuestTimer();
 				window.SoundManager.warmAudio();
+				if(__account?.gameOpening && _openingSound?.paused)
+					_openingSound.play();
 			}
 			catch(ex) {
 
@@ -691,22 +725,8 @@ function warn(_html, _class, _ms, _new, _buttons, _important, _container) {
 function shine(_ms, _elem) {
 	addUpgradeEffect();
 	return true;
-	const _name = 'shine' + (_ms ? '-' + _ms.toString() : '');
-	const _shine = _elem ? _elem.querySelector('#shine') : document.getElementById('shine');
-	if (_shine && !_shine.shining) {
-		_shine.shining = true;
-		addClass(_shine, _name);
-		PlaySound({ key: 'upgrade', volume: .5, reset: true, force: true });
-		_shine.onanimationend = function(event) {
-			if(event.animationName === 'shine') {
-				_shine.shining = false;
-				removeClass(_shine, _name);
-			}
-		};
-		return true;
-	}
-	return false;
 }
+
 function hasActiveActions() {
 	for (let i = 0; i < actionButtons.length; i++) {
 		const el = actionButtons[i];
@@ -722,8 +742,8 @@ function resetSkill(_key, _char, _num) {
 	resetSkills(_c?.ultimate, 1, _char, _key);
 	return true;
 }
-function forceResetSkills(_char) {
-	resetSkills(null,null,_char,null,null,1);
+function forceResetSkills(_char, _endOfRage) {
+	resetSkills(null,null,_char,null,_endOfRage,1);
 }
 function resetSkills(_ultimate, _keepCD, _char, _k, _endOfRage, _force) {
 	const _c = _char ?? mainCharacter;
@@ -744,10 +764,15 @@ function resetSkills(_ultimate, _keepCD, _char, _k, _endOfRage, _force) {
 			if(_endOfRage && _skill.key === 'tag')
 				continue;
 			if ((!_keepCD && !_k && !_skill.chain && !_skill.maxCharge) || _force) {
-				if (_skill.coolDownLeft != undefined)
-					_skill.coolDownLeft = _force ? 1 : undefined;
-				if (_skill.coolDownStart2 != undefined)
-					_skill.coolDownStart2 = undefined;
+				if(_key !== 'tag'){
+					if (_skill.coolDownLeft != undefined)
+						_skill.coolDownLeft = _force ? 1 : undefined;
+					if (_skill.coolDownStart2 != undefined) {
+						_skill.coolDownStart2 = undefined;
+						if(_skill.maxCharge)
+							_skill.charge = _skill.maxCharge;
+					}
+				}
 			}
 			if (!(_c.ultimate || _ultimate) && _skill.skillOrder && !_k)
 				continue;
@@ -764,7 +789,7 @@ function resetSkills(_ultimate, _keepCD, _char, _k, _endOfRage, _force) {
 						addClass(_elem, 'bgless');
 					}
 					else {
-						if (_counter)
+						if (_counter && _key !== 'tag')
 							_counter.remove();
 						if ((_skill.coolDownLeft > 0) && _keepCD)
 							_c.startCooldown(_skill, 1);
@@ -776,7 +801,7 @@ function resetSkills(_ultimate, _keepCD, _char, _k, _endOfRage, _force) {
 						if(_elem)
 							if(_skill.before)
 							{
-								if(!_elem.swapTime || ((_gameTick - _elem.swapTime) > 400)) {
+								if(!_elem.swapTime || _endOfRage || ((_gameTick - _elem.swapTime) > 400)) {
 									if(hasClass(_elem, 'swap-skill')) {
 										removeClass(_elem, 'swap-skill');
 										addClass(_elem, 'swap-skill2');
@@ -919,8 +944,10 @@ function createTagSkill(_char, _tag) {
 						_mob.friendly = _mob.invulnerable = _mob.puppetMode = _mob.alp = _mob.important = true;
 						_mob.puppetXMove = 0;
 						_mob.related = _mob.owner = _e;
+						_mob.mustDraw = true;
 						_mob.experience = 0;
 						_mob.class = 'minion';
+						_mob.noDirection = false;
 						_mob.direction = _dir;
 						if(_c.animations.tag.modify)
 							_c.animations.tag.modify(_mob);
@@ -942,7 +969,10 @@ function createTagSkill(_char, _tag) {
 							});
 							_mob.atk = MathRound(_c.atk * (_limit.atk / (100 * _arr.length)));
 							_mob.standBy();
+							if(_c.animations.tag.end)
+								_c.animations.tag.end(_mob);
 							_mob.still = true;
+							_mob.swapAnimation('idle');
 							_mob.animations.idle.imediateBreak = false;
 							_mob.animations.idle.after = function() {
 								if(!_mob)
@@ -986,7 +1016,7 @@ function getTagSkillNode(_fr, _dir) {
 							</div>
 						</div>
 					</div>
-					<img src="./images/main/${_key}/concept.png" class="tag-char-concept" style="height:38vh;bottom:0;top:-7vh" />
+					<img src="./images/main/${_key}/concept.png" class="tag-char-concept" />
 					<div class="closer"></div>
 				</div>
 			</div>`;
@@ -1172,6 +1202,19 @@ function updateLevelUI(_c) {
 			_lvl.innerText = _c.level;
 	}
 }
+
+function calculateExperienceByLevel(_level) {
+	if(_level === 1)
+		return 0;
+	let _totalExp = 1000;
+	let _maxExp = 1000;
+	for(let i=2; i < _level; i++) {
+		_maxExp = MathRound(_maxExp * 1.2);
+		_totalExp += _maxExp;
+	}
+	return _totalExp;
+}
+
 function updateExperience(_value, _levelup, _char, _noWarn) {
 	if (!_mainExpBar && (!_char || _char.main))
 		_mainExpBar = document.getElementById('main-exp-bar');
@@ -1190,6 +1233,7 @@ function updateExperience(_value, _levelup, _char, _noWarn) {
 		return;
 	}
 	if (_levelup) {
+		_c.hbBars = undefined;
 		_c.setHealth(_c.MAXHP);
 		updateLevelUI(_c);
 		if (_c.main) {
@@ -1481,8 +1525,8 @@ function removeFromFriend(_id, _name) {
 		_client.saveState();
 	}
 }
-function playClick() {
-	PlaySound({key:'click', reset: true});
+function playClick(_volume) {
+	PlaySound({key:'click', reset: true, volume: _volume ?? .1});
 }
 function switchTipsUI(_inc) {
 	const _at = document.getElementById('all-tips');
@@ -1525,7 +1569,7 @@ function renderLockedContent(_requirement) {
 	 	<span style="text-align:center;color:#f7f7f7cc!important;font-size:3vh!important"><span style="color:#ff6c00 !important">[${getLangData('Content Is Locked')}]</span><br/>${getLangData(_requirement)}</span>
 	 </div>`;
 }
-function askSomething(_question, _okFuncString, _singletonAttr, _container) {
+function askSomething(_question, _okFuncString, _singletonAttr, _container, className) {
 	try	{
 		event.preventDefault();
 		event.stopPropagation();
@@ -1540,14 +1584,14 @@ function askSomething(_question, _okFuncString, _singletonAttr, _container) {
 				return;
 		}
 		const _addQuestionMark = !(_question.endsWith('>') || _question.endsWith('?'));
-		let _modal = `<div${_singletonAttr ? " data-singleton-key='" + _singletonAttr + "'" : ""} class="full fade-me show-ui flex inventory-question">
-			<div class="inventory-modal">
-				<div style="padding:4vh 2vh" class="flex">
-					<span class="flex" style="color:#f7f7f7dd !important;font-size:3vh !important">` + getLangData(_question) + `${_addQuestionMark ? '?' : ''}</span>
+		let _modal = `<div${_singletonAttr ? " data-singleton-key='" + _singletonAttr + "'" : ""} class="full fade-me show-ui flex inventory-question${className ? ' ' + className : ''}">
+			<div class="inventory-modal flex w-100" style="padding-top:0;flex-direction:column !important">
+				<div style="flex:1" class="flex question-modal-desc">
+					<span class="flex ask-something-modal-text wot-subtitle">` + getLangData(_question) + `${_addQuestionMark ? '?' : ''}</span>
 				</div>
-				<div style="padding:4vh 2vh" class="flex">
-					<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
-					<div class="quick-space-btn game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="${_okFuncString}">${getLangData('YES')}</div>
+				<div class="flex w-100 new-game-menu-buttons">
+					<div class="new-game-menu-button flex animate-me" style="cursor:pointer;min-width:80px" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
+					<div class="quick-space-btn new-game-menu-button flex animate-me" style="cursor:pointer;min-width:80px;" onexactclick="${_okFuncString}">${getLangData('YES')}</div>
 				</div>
 			</div>
 		</div>`;
@@ -1576,18 +1620,20 @@ function showInfo(_json) {
 	catch(ex) {}
 	try {
 		const _title = _json.titles?.[getLang()] ?? '';
-		let _modal = `<div class="full flex inventory-question show-info">
-			<div class="inventory-modal">
-				<div style="padding:6vh 2vh 2vh 2vh" class="flex">
-					<span class="flex show-info-title">${_title}</span>
+		let _modal = `<div data-singleton-key="modal_vert" class="full flex inventory-question show-info show-ui">
+			<div class="inventory-modal flex">
+				<div class="flex show-info-title-wrapper">
+					<span class="flex show-info-title wot-title">${_title}</span>
 				</div>
+				<div class="line1-splitter"></div>
 				<div id="show-info-navigations" style="padding:4vh 2vh" class="flex w-100"></div>
-				<div class="show-info-close flex" onexactclick="closeInventoryQuestionModal()">&times;</div>
+				<div class="item-info-modal-close" onexactclick="closeInventoryQuestionModal()"></div>
 			</div>
 		</div>`;
 		const _div = document.createElement('div');
 		_div.innerHTML = _modal;
-		document.querySelector('#menu-ui').appendChild(_div.querySelector('.inventory-question'));
+		const _parentDiv = document.querySelector('#menu-ui');
+		(_parentDiv ?? _gameUI).appendChild(_div.querySelector('.inventory-question'));
 		playClick();
 		const _container = document.getElementById('show-info-navigations');
 		for(let _n of _json.navigations ?? []) {
@@ -1595,7 +1641,7 @@ function showInfo(_json) {
 			_div2.className = 'info-nav-container flex';
 			_div2.innerHTML = 
 			`<div class="flex" style="height:100%">
-				<img src="./images/ui/menu-icons/${_n.icon}.png" />
+				<img src="./images/ui/game/menu-icons/${_n.icon}.png" />
 			</div>
 			<div class="info-nav flex flex-jc-start" style='flex:1'>
 				${_n.titles[getLang()]}
@@ -1720,6 +1766,7 @@ function detachModule() {
 						_arr[i].remove();
 				removeModule(_k);
 				delete __latestUIModule[_k];
+				delete window[_k];
 			}
 		}
 		catch(_lumex) { }
@@ -2054,8 +2101,18 @@ function applyAppliedRulesPreserveInlineFast(sourceEl, targetEl, options = {}) {
   return { matchedRules, appliedProps, skippedPropsBecauseInline, candidates: rulesToCheck.length };
 }
 
-
+let activeUpgradeEffect = null;
 function addUpgradeEffect() {
+
+  if (activeUpgradeEffect) {
+    clearTimeout(activeUpgradeEffect.timer1);
+    clearTimeout(activeUpgradeEffect.timer2);
+
+    activeUpgradeEffect.overlay?.remove();
+    activeUpgradeEffect.ghostWrap?.remove();
+
+    activeUpgradeEffect = null;
+  }
 
   const _area   = document.querySelector('.shine-area');
   if(!_area) return;
@@ -2175,11 +2232,32 @@ requestAnimationFrame(() => {
   }, 400);
 
   /* CLEAN */
-  setTimeout(() => {
-    overlay.remove();
-    ghostWrap.remove();
-  	removeClass(_item,'shining-item');
-  }, 1000);
+	const timer1 = setTimeout(() => {
+		ghost.style.transform = "scale(1)";
+		glow.style.opacity = "0";
+		ghostWrap.style.opacity = "0";
+		overlay.style.opacity = "0";
+	}, 400);
+
+
+	const timer2 = setTimeout(() => {
+		overlay.remove();
+		ghostWrap.remove();
+		removeClass(_item,'shining-item');
+
+		if(activeUpgradeEffect?.ghostWrap === ghostWrap){
+			activeUpgradeEffect = null;
+		}
+
+	}, 1000);
+
+
+	activeUpgradeEffect = {
+		overlay,
+		ghostWrap,
+		timer1,
+		timer2
+	};
 
 }
 function organizeScreenResize() {
@@ -2225,8 +2303,13 @@ function setWindowVariables() {
 		//const __rs = getComputedStyle(__r);
 	// if(!_gamePad)
 	// 	_gamePad = document.getElementById('game-pad');
+	const _w = MathRound(_gamePad.offsetWidth / __scale);
+	let _wr = 1;
+	if(__scale === 1 && _w > 1152)
+		_wr = 1152 / _w;
+	__scale /= _wr;
 	_canvas.width = _canvas1.width = _canvasB.width = _canvasGore.width = _canvasBRB.width = _canvasSPB.width = _canvas3.width = _canvas5.width = 
-	_canvasF.width = _canvasS.width = _canvasDMG.width = _canvasR.width = MathRound(_gamePad.offsetWidth / __scale);
+	_canvasF.width = _canvasS.width = _canvasDMG.width = _canvasR.width = MathRound(_w * _wr)
 	const root = document.querySelector(':root');
 	root.style.setProperty('--scale', __scale);
 	root.style.setProperty('--canvas-width', (_canvas.width * __scale)+ "px");
@@ -2238,6 +2321,11 @@ function setWindowVariables() {
 	_canvasS.height = _canvasSPB.height = _canvasBRB.height = _canvasF.height = _canvasR.height = MathRound(_gamePad.offsetHeight / __scale);
 	
 	__zoom = _canvas.width / 2048;
+	// if(_canvas.width > 1152){
+	// 	const _rate = _canvas.width / 1152;
+	// 	__scale *= _rate;
+	// 	__zoom /= _rate;
+	// }
 	__dmgFrameDistance = MathRound(100 * __zoom);
 	groundheight = MathRound(200 * __zoom);
 	idealground_height = groundheight;

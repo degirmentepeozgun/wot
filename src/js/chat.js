@@ -1,6 +1,7 @@
 ﻿'use strict';
-console.log('chat');
-function chat() {
+(function(){
+	console.log('chat');
+	function chat() {
 	this.render = function(_noAnimation) {
 		let _html = 
 		`<div data-module="chat" class="book-page-wrapper chat-container shop-container${_noAnimation ? '' : ' fade-me'}">
@@ -15,7 +16,7 @@ function chat() {
 						<input onkeydown="getRef(\'chat\')?.trySendMessage(event)" autocomplete="off" placeholder="${getLangData('Type your message')}" type="text" onpaste="return false" ondrop="return false" id="chat-message-owner-text" maxlength="200" />
 					</div>
 					<div class="flex chat-send-btn">
-						<img class="flip" src="./images/ui/2.png" />
+						<img src="./images/ui/game/chat-send.png" />
 					</div>
 				</div>
 			</div>
@@ -146,3 +147,6 @@ function chat() {
 	}
 	return this;
 }
+window.chat =chat;
+
+})();

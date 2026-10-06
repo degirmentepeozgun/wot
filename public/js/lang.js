@@ -22,6 +22,13 @@ const __langData = [
 	{ key: 'COMPLETE', tr: 'TAMAMLA' },
 	{ key: 'SELL', tr: 'SAT' },
 	{ key: 'SOLD', tr: 'ALINDI' },
+	{ key: 'UNCOMMON ITEM', tr: 'SIRADIŞI EŞYA'},
+	{ key: 'RARE ITEM', tr: 'NADİR EŞYA'},
+	{ key: 'EPIC ITEM', tr: 'DESTANSI EŞYA'},
+	{ key: 'LEGENDARY ITEM', tr: 'EFSANEVİ EŞYA'},
+	{ key: 'MYTHIC ITEM', tr: 'MİSTİK EŞYA'},
+	{ key: 'ARCANE ITEM', tr: 'GİZEMLİ EŞYA'},
+	{ key: 'DIVINE ITEM', tr: 'İLAHİ EŞYA'},
 	{ key: 'RANDOMIZE', tr: 'DEĞİŞTİR' },
 	{ key: 'UPDATE', tr: 'YÜKSELT' },
 	{ key: 'UPGRADE', tr: 'YÜKSELT' },
@@ -617,6 +624,14 @@ const __langData = [
 	{ key: 'grade talisman, adds bonus attributes when you combine with other set pieces', tr: 'seviye tılsım, diğer set parçaları ile kombinlendiğinde size ekstra güç verir' }
 ];
 const __openingScreenLangData = [
+	{ 
+		key: 'DEMO',
+		tr: 'DEMO'
+	},
+	{ 
+		key: 'PROTOTYPE',
+		tr: 'PROTOTİP'
+	},
 	{ 
 		key: 'NEW GAME',
 		tr: 'YENİ OYUN'

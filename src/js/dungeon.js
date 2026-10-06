@@ -1,5 +1,6 @@
 ﻿'use strict';
-function dungeon() {
+(function() {
+	function dungeon() {
 	this.key = 'dungeon';
 	this.tutorial = {
 		tr: {
@@ -21,7 +22,7 @@ function dungeon() {
 		`<div data-module='dungeon' class="menu-ui-left${_noAnimation ? '' : ' fade-me'}">
 			<div class="menu-modal-left menu-modal-left-content">
 				<div class="skills-content-left stories-content-left dungeon-content-left menu-modal-left-container">
-					<div style="padding:1% 5%;overflow-y:auto" class="full">`
+					<div style="overflow-y:auto" class="full">`
 						+ this.getDungeons(_id) +
 					`</div>
 				</div>
@@ -93,17 +94,19 @@ function dungeon() {
 			for(let _rs of _s.resultStars){
 				_goals += `<div class="w-100 story-goal-item flex">
 					<div class="flex story-goal-icon">
-						<img src="./images/ui/star-on.png" />
+						<img src="./images/ui/game/quest-star.png" />
 					</div>
-					<div class="flex flex-jc-start story-goal-title">
+					<div style="color:#c3b9a4 !important" class="flex flex-jc-start story-goal-title wot-subtitle">
 						${getLangData(_rs.title)}
 					</div>
 				</div>`;
 			}
-		let _html = `<div class="flex full show-ui story-detail${_noAnimation ? '' : ' fade-me'}"><div class="flex flex-jc-end story-detail-close"><div>${_s.title[getLang()]}</div></div>
+		let _html = `<div class="flex full show-ui story-detail${_noAnimation ? '' : ' fade-me'}"><div class="flex flex-jc-end story-detail-close"><div class="page-detail-header">${_s.title[getLang()]}</div></div><div class="page-detail-splitter-thin"></div>
 			<div class="story-detail-wrapper">`
 			+ _goals +
-			`<div class="flex flex-jc-start story-detail-heading" style="margin-top:2vh">${getLangData('Rewards')}</div>
+			`<div class="page-detail-splitter"></div>
+			<div class="flex flex-jc-start story-detail-heading page-detail-header">${getLangData('Rewards')}</div>
+			<div class="page-detail-splitter-thin"></div>
 			<div class="story-rewards w-100 flex flex-jc-start">`;
 		for(const _r of _s.rewards) {
 			if(_r.key === 'fragment'){
@@ -116,10 +119,10 @@ function dungeon() {
 							+ _img +
 							`</div>
 							<div style="flex:1" class="flex">
-								<div class="w-100 flex flex-jc-start">
+								<div class="w-100 flex flex-jc-start page-detail-desc">
 									${(_r.count ? _r.count.formatWithDots() : ((_r.minCount && _r.maxCount) ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1))}
 								</div>
-								<div style="color:#ff6c00 !important" class="w-100 flex-jc-start flex${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
+								<div style="color:#ff6c00 !important" class="w-100 page-detail-desc flex-jc-start flex${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
 							</div>
 						</div>`;
 			}
@@ -129,10 +132,10 @@ function dungeon() {
 								<img class="item-img" src="./images/gems/${_r.type}${_r.grade ?? 1}.png" />
 							</span>
 							<div style="flex:1;padding-left:1vh" class="flex">
-								<div class="w-100 flex flex-jc-start">
+								<div class="w-100 flex flex-jc-start page-detail-desc">
 									${(_r.count ? _r.count.formatWithDots() : ((_r.minCount && _r.maxCount) ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1))}
 								</div>
-								<div style="color:#ff6c00 !important" class="flex flex-jc-start w-100${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
+								<div style="color:#ff6c00 !important" class="flex page-detail-desc flex-jc-start w-100${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
 							</div>
 						</div>`;
 			else if(_r.key === 'item')
@@ -141,31 +144,34 @@ function dungeon() {
 								<img class="item-img" src="./images/items/icons/${(_r.type ?? _r.key) === 'weapon' ? mainCharacter.class + '/' : ''}${_r.type ?? _r.key}${_r.grade ?? 1}.png" />
 							</span>
 							<div style="flex:1;padding-left:1vh" class="flex">
-								<div class="w-100 flex flex-jc-start">
+								<div class="w-100 flex flex-jc-start page-detail-desc">
 									${(_r.count ? _r.count.formatWithDots() : ((_r.minCount && _r.maxCount) ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1))}
 								</div>
-								<div style="color:#ff6c00 !important" class="flex flex-jc-start w-100${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
+								<div style="color:#ff6c00 !important" class="flex page-detail-desc flex-jc-start w-100${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
 							</div>
 						</div>`;
 			else
 				_html += `<div class="flex flex-jc-start w-50 story-reward">
 								<img src="./images/${_r.key === 'item' ? 'items/' : ''}icons/${_r.type ?? _r.key}${_r.grade ?? ''}.png" />
 								<div style="flex:1" class="flex">
-									<div class="w-100 flex flex-jc-start">
+									<div class="w-100 flex flex-jc-start page-detail-desc">
 										${(_r.count ? _r.count.formatWithDots() : ((_r.minCount && _r.maxCount) ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1))}
 									</div>
-									<div style="color:#ff6c00 !important" class="flex flex-jc-start w-100${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
+									<div style="color:#ff6c00 !important" class="flex page-detail-desc flex-jc-start w-100${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
 								</div>
 							</div>`;
 		}
 		_html +=
 			`</div>
-			<div class="flex flex-jc-start story-detail-heading" style="margin-top:2vh">${getLangData('Description')}</div>
-			<div class="story-description">${_s.description[getLang()]}</div>
+			<div class="page-detail-splitter"></div>
+			<div class="flex flex-jc-start story-detail-heading page-detail-header">${getLangData('Description')}</div>
+			<div class="page-detail-splitter-thin"></div>
+			<div class="story-description page-detail-desc">${_s.description[getLang()]}</div>
 			</div>
-			<div class="w-100 flex action-button-container" style="height:14%">
-				<div onexactclick="getRef('dungeon')?.start(${_id})" class="flex game-menu-button">
-					<div class="flex" style="font-size:3vh!important">${getLangData('START')}</div>
+			<div class="w-100 flex action-button-container">
+				<div class="page-detail-splitter w-100"></div>
+				<div onexactclick="getRef('dungeon')?.start(${_id})" class="flex page-detail-button">
+					<div class="flex">${getLangData('START')}</div>
 				</div>
 			</div>
 		</div>`;
@@ -219,3 +225,6 @@ function dungeon() {
 	}
 	return this;
 }
+window.dungeon =dungeon;
+
+})();

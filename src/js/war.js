@@ -1,4 +1,5 @@
 ﻿'use strict';
+(function(){
 function war() {
 	this.unlockLevel = 10;
 	this.findOpponents = function () {
@@ -27,7 +28,7 @@ function war() {
 			_content = `<div id="war-match-opponents" class="full flex"></div>
 				<div class="flex full" style="position:absolute">
 					<img class="d-none war-loading" src="./images/icons/war.png" />
-					<div class="flex game-btn2 animate-me" onexactclick="getRef(\'war\')?.match()">${getLangData('MATCH').toLocaleUpperCase(getLang())}</div>
+					<div class="flex orange-action-btn animate-me" onexactclick="getRef(\'war\')?.match()">${getLangData('MATCH').toLocaleUpperCase(getLang())}</div>
 				</div>`;
 		let _html = 
 		`<div data-module="war" class="book-page-wrapper war-container shop-container${_noAnimation ? '' : ' fade-me'}">
@@ -47,7 +48,7 @@ function war() {
 		if(episode && episode.bgSound)
 			episode.pauseAmbianceMusic();
 		_warMatchInProgress = true;
-		const _btn = document.querySelector('.war-container .game-btn2');
+		const _btn = document.querySelector('.war-container .orange-action-btn');
 		addClass(_btn, 'd-none');
 		const _loading = document.querySelector('.war-container .war-loading');
 		addClass(_loading, 'fade-me');
@@ -85,3 +86,6 @@ function war() {
 	}
 	return this;
 }
+ window.war = war;
+
+})();

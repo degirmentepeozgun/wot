@@ -255,7 +255,7 @@ function getMiscItemIcon(_item) {
         return '';
     let _level = '';
     if(_item.count > 1)
-        _level = '<span style="bottom:-.8vh;right:-.8vh;position:absolute;display:inline-block;padding:0 .8vh;color:#f7f7f7cc !important;font-size:2vh !important;background:#262626">' + _item.count + '</span>';
+        _level = '<span style="z-index:3;bottom:-.8vh;right:-.8vh;position:absolute;display:inline-block;padding:0 .8vh;color:#f7f7f7cc !important;font-size:2vh !important;background:#262626">' + _item.count + '</span>';
     return '<span class="item-in-slot full' + (_item.grade !== undefined ? ' grade' + _item.grade + '-item' : '') + '" style="display:inline-block;position:relative"><img style="background:#010101" onexactclick="openMiscItemInfoModal(\'' + _item.type + '\', ' + _item.grade + ')" class="item-img" src="./images/icons/' + _item.type + '.png"/>' + _level +
     (_item.new ? '<div style="height:2vh;width:2vh;top:-.5vh;right:-.5vh;position:absolute;background:darkred;border-radius:100%"></div>' : '') + '</span>';
 }
@@ -264,7 +264,7 @@ function getMailAttachmentIcon(_item) {
         return '';
     let _level = '';
     if(_item.count > 1)
-        _level = '<span style="bottom:-.8vh;right:-.8vh;position:absolute;display:inline-block;padding:0 .8vh;color:#f7f7f7cc !important;font-size:2vh !important;background:#262626">' + _item.count + '</span>';
+        _level = '<span style="z-index:3;bottom:-.8vh;right:-.8vh;position:absolute;display:inline-block;padding:0;color:#f7f7f7cc !important;font-size:2vh !important;background:#262626">' + _item.count + '</span>';
     return '<span class="item-in-slot full' + (_item.grade !== undefined ? ' grade' + _item.grade + '-item' : '') + '" style="display:inline-block;position:relative"><img style="background:#010101" onexactclick="openMiscItemInfoModal(\'' + _item.type + '\', ' + _item.grade + ')" class="item-img" src="' + getRewardIcon(_item.grade??1, _item.key, _item.type).src + '"/>' + _level + '</span>';
 }
 function getGemItemIcon(_item, _c) {
@@ -272,7 +272,7 @@ function getGemItemIcon(_item, _c) {
         return '';
     let _level = '';
     if((_c ?? _item.count) > 1)
-        _level = '<span style="bottom:-.8vh;right:-.8vh;position:absolute;display:inline-block;padding:0 .8vh;color:#f7f7f7cc !important;font-size:2vh !important;background:#262626">' + ((_c ?? _item.count) > 99 ? '99+' : (_c ?? _item.count)) + '</span>';
+        _level = '<span style="z-index:3;bottom:-.8vh;right:-.8vh;position:absolute;display:inline-block;padding:0 .8vh;color:#f7f7f7cc !important;font-size:2vh !important;background:#262626">' + ((_c ?? _item.count) > 99 ? '99+' : (_c ?? _item.count)) + '</span>';
     return '<span class="item-in-slot full' + (_item.grade !== undefined ? ' grade' + _item.grade + '-item' : '') + '" style="display:inline-block;position:relative"><img style="background:#010101" data-gem-key="' + _item.key + '" data-gem-grade="' + _item.grade + '" onexactclick="openGemItemInfoModal(\'' + _item.key + '\', ' + _item.grade + ')" class="item-img" src="./images/gems/' + _item.key + _item.grade + '.png"/>' + _level +
     (_item.new ? '<div style="height:2vh;width:2vh;top:-.5vh;right:-.5vh;position:absolute;background:darkred;border-radius:100%"></div>' : '') + '</span>';
 }
@@ -552,7 +552,9 @@ function switchInventoryTab(_elem, _order, _noSound) {
                 break;
         }
         requestAnimationFrame(() => {
-            _slots.scrollTop = 0;
+            const _slotss = document.querySelector('.inventory-inner');
+            if(_slotss)
+                _slotss.scrollTop = 0;
         });
     }
 }
@@ -631,15 +633,16 @@ function selectGemForSocket(_type, _grade) {
     removeClass(document.getElementById('item-selection-approve-btn'), 'disabled');
     const _itemIcons = document.querySelectorAll('#gem-picking-area img');
     for(let _ic of _itemIcons) {
-        removeClass(_ic, 'selected');
+        const _p = _ic.parentNode.parentNode;
+        removeClass(_p, 'selected');
         if(_ic.getAttribute('data-gem-key') === _type &&
             _ic.getAttribute('data-gem-grade') === _grade.toString())
-            addClass(_ic, 'selected');
+            addClass(_p, 'selected');
     }
 }
 function acceptGemSelection(_id) {
     //seçili gem i bul
-    const _itemIcon = document.querySelector('#gem-picking-area img.selected');
+    const _itemIcon = document.querySelector('#gem-picking-area .selected img');
     if(_itemIcon) {
         PlaySound({ key: 'geminsert', volume:1, reset: true });
         var _items = getItems();
@@ -670,7 +673,7 @@ function tryRemoveSocket(_id, _socketIndex) {
     var _item = _items.find(x => x.id === _id);
     const _socket = _item.sockets.sort((a, b) => (b.grade ?? 0) - (a.grade ?? 0))[_socketIndex];
     const _cost = MathRound(10000 * Math.pow(2, (_item.grade - 1)));
-    askSomething(`<img style="height:4vh" src="${getRewardIcon(_socket.grade, 'gem', _socket.key).src}" />&nbsp;${getLangData('Remove this gem for')} <b style="margin-left:1vh;color:#F3f4f5 !important">${_cost.formatWithDots()}</b>&nbsp;<img style="height:2.2vh" src="./images/icons/coin.png" />&nbsp;`, `acceptAndRemoveGemFromSocket(${_id}, ${_cost}, ${_socketIndex})`,1);
+    askSomething(`<img style="height:4vh" src="${getRewardIcon(_socket.grade, 'gem', _socket.key).src}" />&nbsp;${getLangData('Remove this gem for')} <b style="margin-left:1vh;color:#F3f4f5 !important">${_cost.formatWithDots()}</b>&nbsp;<img style="height:2.2vh" src="./images/icons/coin.png" />&nbsp;`, `acceptAndRemoveGemFromSocket(${_id}, ${_cost}, ${_socketIndex})`, 'modal_2x1');
 }
 function acceptAndRemoveGemFromSocket(_id, _cost, _socketIndex) {
     playClick();
@@ -705,19 +708,19 @@ function tryAddSocket(_id) {
     let _choices = getGemTabContent() ?? '';
     if(_choices)
         _choices = _choices.replace(/openGemItemInfoModal/g, 'selectGemForSocket');
-    let _modal = `<div class="full fade-me flex inventory-question">
+    let _modal = `<div data-singleton-key="modal_middle" class="full fade-me flex inventory-question gem-pick-question">
         <div class="inventory-modal">
-            <div style="padding:6vh 4vh 4vh 4vh" class="flex">
-                <span style="color:#f7f7f7dd !important;font-size:3vh !important">${getLangData('Pick a gem for socket')}</span>
+            <div class="flex question-modal-title">
+                ${getLangData('Pick a gem for socket')}
             </div>
-            <div class="flex w-100" style="padding:2vh;max-height:33vh;overflow-y:auto">
+            <div class="flex w-100 question-modal-desc" style="overflow-y:auto">
                 <div id="gem-picking-area" class="flex w-100">`
                + _choices +
                 `</div>
             </div>
-            <div style="padding:4vh 2vh" class="flex">
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('CANCEL')}</div>
-                <div id="item-selection-approve-btn" class="game-menu-button flex animate-me disabled" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="acceptGemSelection(${_id})">${getLangData('APPROVE')}</div>
+            <div class="flex w-100 new-game-menu-buttons">
+                <div class="new-game-menu-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('CANCEL')}</div>
+                <div id="item-selection-approve-btn" class="new-game-menu-button flex animate-me disabled" onexactclick="acceptGemSelection(${_id})">${getLangData('APPROVE')}</div>
             </div>
         </div>
     </div>`;
@@ -742,8 +745,8 @@ function getItemInfoModalHtml(_id) {
    
     var _props = ''; // '<div class="flex w-100 item-prop"><div class="flex w-100"><div class="flex flex-jc-start wot-subtitle w-50">' + getLangData('Gear Score') + ':</div><div class="flex flex-jc-end w-50 wot-subtitle">' + parseInt(_power).formatWithDots() + _powerDiffHtml + '</div></div></div>';
     let _socketsHtml = '', _socketProps = '';
-    if(!_item.sockets) 
-        _item.sockets = [{},{},{},{}];
+    // if(!_item.sockets) 
+    //     _item.sockets = [{},{},{},{}];
     if(_item.sockets){
         
         // let _si = 0;
@@ -816,27 +819,35 @@ function getItemInfoModalHtml(_id) {
     if(_item.for && (_item.for !== mainCharacter.class))
         _props += '<div class="item-prop flex" style="font-size:3vh!important;width:100%;padding:1vh 7%;color:#9d987f !important">' + getLangData(_item.for).toProperCase() + ' item</div>';
     
-    _equips[_item.type]['grade' + _item.grade].grade = 3;
-    _item.grade = 3;
-    _item.name = 'AynZaur';
-     const __CLONE = structuredClone(_item); 
-     for(let ci = 0; ci < 2; ci++) {
-        var cprops = getRandomProps(__CLONE.type, __CLONE.grade, __CLONE.level);
-        __CLONE.props.push(cprops[0]);
-     }
+    // _equips[_item.type]['grade' + _item.grade].grade = 3;
+    // _item.grade = 3;
+    // _item.name = 'AynZaur';
+    //  const __CLONE = structuredClone(_item); 
+    //  for(let ci = 0; ci < 2; ci++) {
+    //     var cprops = getRandomProps(__CLONE.type, __CLONE.grade, __CLONE.level);
+    //     __CLONE.props.push(cprops[0]);
+    //  }
     
     
-    _props += renderItemProps(__CLONE);
+    _props += renderItemProps(_item);
     _props += _socketProps;
     _props += '<div class="item-prop flex w-100"><div class="flex flex-jc-start w-50 wot-subtitle">' + getLangData('Cost') + ':</div><div class="flex flex-jc-end w-50 wot-subtitle item-detail-cost">' + sellCost.formatWithDots() + '<img style="height:2vh;margin-left:.5vh" src="./images/icons/coin.png" /></div></div>';
     let _html = 
         `<div class="flex w-100 item-detail-container">
             <div class="flex flex-jc-start flex-ai-start item-detail-container-inner">
-                <div class="item-modal-icon-container">
-                    <div class="item-back-frame full">
+                <div class="item-modal-icon-container flex">`
+                
+                    + (_item.grade === 4 ?
+                     `<div class="item-back-frame full">
                         <img src="./images/ui/game/weapon-bg1.gif" />
-                    </div>
-                    <img style="padding:14%" class="item-current-frame" src="./images/ui/game/items/AynZaur.png" />
+                    </div>` : '') +
+
+                    (_item.grade === 3 ? 
+                        `<div class="item-back-frame full">
+                            <img src="./images/ui/game/weapon-bg2.gif" />
+                        </div>` : '') +
+
+                     `<img style="padding:14%" class="item-current-frame" src="./images/items/icons/${_item.type === 'weapon' ? mainCharacter.class + '/rect/' : ''}${_item.type}${_item.grade}.png" />
                     <div class="item-front-frame full"></div>` +
                     //${(_item.for ? (_item.for + '/') : '')}${_item.type}${_item.grade}.png" class="full grade${_item.grade}-item${_item.grade > 5 ? ' glow' : ''}" />
                     `<div class="grade-letter d-none" style="position:absolute;font-size:7vh !important;bottom:-5%;left:-5%">${getItemGradeLetter(_item.grade)}</div>
@@ -845,8 +856,8 @@ function getItemInfoModalHtml(_id) {
                     <div class="item-detail-title wot-title">
                         ${getLangData('Lvl')}&nbsp;${_item.level ?? 1} - ${_item.name ?? getLangData(_item.type).toLocaleUpperCase(getLang())}
                     </div>
-                    <div class="item-detail-desc wot-title">
-                        UNCOMMON ITEM
+                    <div class="item-detail-desc item-detail-desc-grade-${_item.grade} wot-title" lang="${getLang()}">
+                        ${getGradeNameOfItem(_item.grade)}
                     </div>
                     <div class="flex flex-jc-start w-100 item-detail-power">
                          <div class="wot-subtitle item-detail-power-title"> 
@@ -890,6 +901,24 @@ function getItemInfoModalHtml(_id) {
             <div lang="${getLang()}" class="wot-title game-menu-button-half animate-me flex${(_item.weared === mainCharacter.class) ? '' : ' d-none'}" onexactclick="unWearItem(${_id})">${getLangData('UNWEAR')}</div>
         </div>`
     return _html;
+}
+function getGradeNameOfItem(_grade) {
+    switch(_grade) {
+        case 2:
+            return getLangData("RARE ITEM");
+        case 3:
+            return getLangData("EPIC ITEM");
+        case 4:
+            return getLangData("LEGENDARY ITEM");
+        case 5:
+            return getLangData("MYTHIC ITEM");
+        case 6:
+            return getLangData("ARCANE ITEM");
+        case 7:
+            return getLangData("DIVINE ITEM");
+        default:
+            return getLangData("UNCOMMON ITEM");
+    }
 }
 function openItemInfoModal(_id) {
     const _parent = document.querySelector('#inventory-list');
@@ -1339,7 +1368,7 @@ function openGemMeltModal(_type, _grade) {
             <div class="melt-place" id="melt-3" onexactclick="removeMeltGem(3)"></div>
             <div class="melt-place" id="melt-4" onexactclick="removeMeltGem(4)"></div>
             <div class="melt-place" id="melt-5" onexactclick="removeMeltGem(5)"></div>
-            <div onexactclick="acceptMelt()" class="melt-btn game-btn2 flex">${getLangData('MELT')}</div>
+            <div onexactclick="acceptMelt()" class="melt-btn orange-action-btn flex">${getLangData('MELT')}</div>
         </div>
     </div>
     </div>
@@ -1503,20 +1532,22 @@ function acceptMelt(_force) {
         for(let _p of _possibilities.sort((a,b) => b.value - a.value))
             _choices += '<div class="flex gem-possibility">' + 
         getGemItemIcon({key:_p.key,count:1,grade:_grade + 1}) +
-        '<div class="w-100 flex p-2" style="padding-top:1vh">%' + _p.value + '</div></div>';
+        '<div class="w-100 flex p-2">%' + _p.value + '</div></div>';
         askSomething(
-            `<div class="flex w-100 p-2">
-                <span style="color:#F4BB44 !important;font-size:3.2vh !important">${getLangData('Different Gems Selected')}</span>
+            `<div class="flex w-100 question-modal-title-wrapper gem-possibilities-title-wrapper">
+                <div class="flex w-100 wot-title">
+                    ${getLangData('Different Gems Selected')}
+                </div>
+                <div class="flex w-100 wot-subtitle">
+                    ${getLangData('New gem possibilities')}
+                </div>
             </div>
-            <div class="flex w-100 p-2" style="padding-top:1vh">
-                <span style="color:#f3f4f5ab !important;font-size:3vh !important">${getLangData('New gem possibilities')}</span>
-            </div>
-            <div class="flex gem-possibilities w-100" style="padding:2vh 4%">`
+            <div class="flex gem-possibilities w-100 question-modal-desc">`
             + _choices +
             `</div>
-            <div class="flex w-100" style="padding-top:2vh">
-                <span style="color:#f3f4f5cc !important;line-height:2vh !important;font-size:3vh !important">${getLangData('Continue Anyway')}?</span>
-            </div>`, 'acceptMelt(1)');
+            <div class="flex w-100 new-game-menu-buttons">
+               <span>${getLangData('Continue Anyway')}?</span>
+            </div>`, 'acceptMelt(1)', 'modal_middle', null, 'gem-possibilities-modal');
         return;
     }
     else if(_force)
@@ -1717,31 +1748,34 @@ function askConfirmNewStats(_id, _noAnimation) {
     const _newPower = getPowerOfProps(_item.props, _item.type, _item.grade);
     var newPropsHTML = renderItemProps(_item);
     var _retry = _misc?.count > 0;
-    let _modal = `<div class="full${_noAnimation ? '' : ' fade-me'} flex inventory-question">
+    let _modal = `<div data-singleton-key="big_modal" class="full${_noAnimation ? '' : ' fade-me'} flex inventory-question dice-usage-question">
         <div class="inventory-modal random-approve-modal">
             <div class="flex random-stats-container">
                 <div class="flex random-stats-wrapper random-stats-old">
                     <div class="flex random-stats-title">${getLangData('Old Version')}</div>
                     <div class="random-stats-card flex flex-ai-start"><div class="w-100 flex">` + oldPropsHTML.replace(/item[-]prop/g, 'item-prop one-line') + `</div></div>
-                    <div class="random-stats-gear-score flex flex-jc-start w-100"><span style="color:#9d987f !important">${getLangData("Gear Score")}:</span>&nbsp;${_oldPower.formatWithDots()}</div>
+                    <div class="random-stats-gear-score flex flex-jc-start w-100"><span class="dice-usage-gear-score-old">${getLangData("Gear Score")}:</span>&nbsp;${_oldPower.formatWithDots()}</div>
                 </div>
                 <div class="flex random-stats-wrapper random-stats-new">
                     <div class="flex random-stats-title">${getLangData('New Version')}</div>
                     <div class="random-stats-card flex flex-ai-start"><div class="w-100 flex">` + newPropsHTML.replace(/item[-]prop/g, 'item-prop one-line') + `</div></div>
-                    <div class="random-stats-gear-score flex flex-jc-end w-100"><img${_newPower === _oldPower ? ' class="d-none"' : ''} src="./images/icons/${_newPower > _oldPower ? 'upgrade' : 'power-down'}.png" style="opacity:1 !important" /><span style="color:#9d987f !important">${getLangData("Gear Score")}:</span>&nbsp;${_newPower.formatWithDots()}</div>
+                    <div class="random-stats-gear-score flex flex-jc-end w-100"><img${_newPower === _oldPower ? ' class="d-none"' : ''} src="./images/icons/${_newPower > _oldPower ? 'upgrade' : 'power-down'}.png" style="opacity:1 !important" /><span class="dice-usage-gear-score-new">${getLangData("Gear Score")}:</span>&nbsp;${_newPower.formatWithDots()}</div>
                 </div>
-                <div style="position: absolute;width: 5vh;margin-top: 6vh;">
-                    <img src="./images/icons/swap-right.png" style="height: 5vh" />
-                    <img src="./images/icons/swap-right.png" style="height: 5vh;transform: scale(-1,1);-webkit-transform: scale(-1,1)" />
+                <div class="random-stats-swap-icons">
+                    <img src="./images/icons/swap-right.png" />
+                    <img src="./images/icons/swap-right.png" />
                 </div>
             </div>
             <div class="flex random-stats-question">
-                <span style="color:#f7f7f7dd !important;font-size:3vh !important">${getLangData('Choose an action')}</span>
+                <div class="w-100 flex random-stats-question-text">${getLangData('Choose an action')}</div>
+                <div class="w-100 flex">
+                    <img src="./images/ui/game/line5.png" />
+                </div>
             </div>
-            <div style="padding-bottom:2vh" class="flex random-stats-actions">
-                <div class="game-menu-button flex animate-me w-100${_retry ? '' : ' disabled'}" style="cursor:pointer;color:#F4BB44 !important;min-width:10vw;min-width:10vw;font-size:3vh !important" onexactclick="closeInventoryQuestionModal();acceptAndRandomizeItem(${_id},1)">${getLangData('RETRY')}</div>
-                <div class="game-menu-button flex animate-me w-100" style="cursor:pointer;color:#F4BB44 !important;min-width:10vw;min-width:10vw;font-size:3vh !important" onexactclick="closeInventoryQuestionModal();rollbackOldStats(${_id})">${getLangData('KEEP OLD STATS')}</div>
-                <div class="game-menu-button flex animate-me w-100" style="cursor:pointer;color:#F4BB44 !important;min-width:10vw;min-width:10vw;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('ACCEPT NEW STATS')}</div>
+            <div class="flex random-stats-actions game-menu-buttons-big">
+                <div class="game-menu-button flex animate-me w-100${_retry ? '' : ' disabled'}" onexactclick="closeInventoryQuestionModal();acceptAndRandomizeItem(${_id},1)">${getLangData('RETRY')}</div>
+                <div class="game-menu-button flex animate-me w-100" onexactclick="closeInventoryQuestionModal();rollbackOldStats(${_id})">${getLangData('KEEP OLD STATS')}</div>
+                <div class="game-menu-button flex animate-me w-100" onexactclick="closeInventoryQuestionModal()">${getLangData('ACCEPT NEW STATS')}</div>
             </div>
         </div>
     </div>`;
@@ -1749,25 +1783,72 @@ function askConfirmNewStats(_id, _noAnimation) {
     _div.innerHTML = _modal;
     document.querySelector('#menu-ui').appendChild(_div.firstChild);
 }
+function askAddSlot() {
+    playClick();
+    const _cost = 10000;
+    let _modal = `<div class="full fade-me flex inventory-question inventory-question-add-slot">
+        <div class="inventory-modal">
+            <div class="flex inventory-modal-title">
+                ${getLangData('Enlarge inventory capacity')}
+            </div>
+            <div class="inventory-question-add-slot-inner flex w-100">
+                <div class="inventory-question-add-slot-inner-left flex">
+                    <img src="./images/ui/game/bag.png" />
+                </div>
+                <div class="inventory-question-add-slot-inner-right flex">
+                    <div class="flex inventory-question-add-slot-count">
+                        <span class="flex flex-jc-start w-100">
+                            <div class="flex slot-amount-border">
+                                <div id="decrease-slot-btn" class="flex animate-me disabled" onexactclick="decreaseSlotAmount()"><img src="./images/ui/game/arrow-left.png" /></div>
+                                <div id="slot-amount">10</div>
+                                <div id="increase-slot-btn" class="flex animate-me" onexactclick="increaseSlotAmount()"><img src="./images/ui/game/arrow-right.png" /></div>          
+                            </div>
+                        </span>
+                    </div>
+                    <div class="flex inventory-question-add-slot-cost flex-jc-start w-100">
+                        <span class="flex">${getLangData('Cost')}:<span id="slot-cost">${_cost.formatWithDots()}</span><img src="./images/icons/coin.png" style="height:3vh" /></span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex new-game-menu-buttons">
+                <div class="new-game-menu-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
+                <div class="new-game-menu-button flex animate-me" onexactclick="acceptInventorySlot()">${getLangData('YES')}</div>
+            </div>
+        </div>
+    </div>`;
+    const _div = document.createElement('div');
+    _div.innerHTML = _modal;
+    const parentEl = document.querySelector('#menu-ui');
+    (parentEl ?? _gameUI).appendChild(_div.firstChild);
+}
 function sellMiscItem(_type, _grade) {
     playClick();
     const _item = __account.misc.find(x => x.type === _type  && (!_grade || (_grade && x.grade === _grade)));
     const _miscItem = misc.find(x => x.type === _type);
-    let _modal = `<div class="full flex inventory-question">
-        <div class="inventory-modal">
-            <div style="padding:6vh 2vh 2vh 2vh" class="flex">
-                 <span class="flex">
-                    <div id="decrease-count-btn" class="game-menu-button flex animate-me disabled" style="margin:0 1vh;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="decreaseSellCount('${_type}', ${_grade})">-</div>
-                    &nbsp;<span id="sell-count" style="font-size:3vh !important;color:#f3f4f5 !important">1</span>&nbsp;
-                    <div id="increase-count-btn" class="game-menu-button flex animate-me${_item.count > 1 ? '' : ' disabled'}" style="margin:0 1vh;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="increaseSellCount('${_type}', ${_grade})">+</div>          
-                </span>
+    let _modal = `<div class="full flex inventory-question inventory-question-add-slot">
+        <div class="inventory-modal sell-misc-item-modal">
+            <div class="flex inventory-modal-title">
+                <span>${getLangData('Sell this item for')} <b id="misc-sell-cost">${(_miscItem.cost * (_grade ?? 1)).formatWithDots()}</b> <img src="./images/icons/coin.png" /></span>
             </div>
-            <div style="padding:4vh 2vh" class="flex">
-                <span style="color:#f3f4f5cc !important;font-size:3vh !important">${getLangData('Sell this item for')} <b id="misc-sell-cost" style="color:#F3f4f5 !important">${(_miscItem.cost * (_grade ?? 1)).formatWithDots()}</b> <img style="height:2vh" src="./images/icons/coin.png" /></span>
+             <div class="inventory-question-add-slot-inner flex w-100">
+                <div class="inventory-question-add-slot-inner-left flex">
+                    <img src="./images/icons/${_type}.png" />
+                </div>
+                <div class="inventory-question-add-slot-inner-right flex">
+                    <div class="flex inventory-question-add-slot-count">
+                        <span class="flex flex-jc-start w-100">
+                            <div class="flex slot-amount-border">
+                                <div id="decrease-count-btn" class="flex animate-me disabled" onexactclick="decreaseSellCount('${_type}', ${_grade})"><img src="./images/ui/game/arrow-left.png" /></div>
+                                <div id="sell-count">1</div>
+                                <div id="increase-count-btn" class="flex animate-me${_item.count > 1 ? '' : ' disabled'}" onexactclick="increaseSellCount('${_type}', ${_grade})"><img src="./images/ui/game/arrow-right.png" /></div>          
+                            </div>
+                        </span>
+                    </div>
+                </div>
             </div>
-            <div style="padding:4vh 2vh" class="flex">
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="acceptMiscSellCount('${_type}', ${_grade})">${getLangData('YES')}</div>
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#9d987f;min-width:80px;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
+            <div class="flex new-game-menu-buttons">
+                <div class="new-game-menu-button flex animate-me" onexactclick="acceptMiscSellCount('${_type}', ${_grade})">${getLangData('YES')}</div>
+                <div class="new-game-menu-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
             </div>
         </div>
     </div>`;
@@ -1839,48 +1920,10 @@ function sellItem(_id, _noSound, _imediateSell) {
         acceptAndSellItem(_id, sellCost, _noSound);
         return;
     }
-    askSomething(`${getLangData('Sell this equipment for')} <b style="margin-left:1vh;color:#F3f4f5 !important">${sellCost.formatWithDots()}</b> <img style="height:2vh" src="./images/icons/coin.png" />`, `acceptAndSellItem(${_id}, ${sellCost})`, _noSound);
+    askSomething(`${getLangData('Sell this equipment for')} <b style="margin-left:1vh;color:#F3f4f5 !important">${sellCost.formatWithDots()}</b>&nbsp;<img style="height:2vh" src="./images/icons/coin.png" />`, `acceptAndSellItem(${_id}, ${sellCost})`, 'modal_2x1');
 }
 function askRandomizeItem(_id) {
-    askSomething(`${getLangData('Change attributes of this item for')} <b style="margin-left:1vh;color:#F4BB44 !important">1</b> ${getLangData('dice')}`, `acceptAndRandomizeItem(${_id})`);
-}
-function askAddSlot() {
-    playClick();
-    const _cost = 10000;
-    let _modal = `<div class="full fade-me flex inventory-question inventory-question-add-slot">
-        <div class="inventory-modal">
-            <div class="flex inventory-modal-title">
-                ${getLangData('Enlarge inventory capacity')}
-            </div>
-            <div class="inventory-question-add-slot-inner flex w-100">
-                <div class="inventory-question-add-slot-inner-left flex">
-                    <img src="./images/ui/game/bag.png" />
-                </div>
-                <div class="inventory-question-add-slot-inner-right flex">
-                    <div class="flex inventory-question-add-slot-count">
-                        <span class="flex flex-jc-start w-100">
-                            <div class="flex slot-amount-border">
-                                <div id="decrease-slot-btn" class="flex animate-me disabled" onexactclick="decreaseSlotAmount()"><img src="./images/ui/game/arrow-left.png" /></div>
-                                <div id="slot-amount">10</div>
-                                <div id="increase-slot-btn" class="flex animate-me" onexactclick="increaseSlotAmount()"><img src="./images/ui/game/arrow-right.png" /></div>          
-                            </div>
-                        </span>
-                    </div>
-                    <div class="flex inventory-question-add-slot-cost flex-jc-start w-100">
-                        <span class="flex">${getLangData('Cost')}:<span id="slot-cost">${_cost.formatWithDots()}</span><img src="./images/icons/coin.png" style="height:3vh" /></span>
-                    </div>
-                </div>
-            </div>
-            <div class="flex new-game-menu-buttons">
-                <div class="new-game-menu-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
-                <div class="new-game-menu-button flex animate-me" onexactclick="acceptInventorySlot()">${getLangData('YES')}</div>
-            </div>
-        </div>
-    </div>`;
-    const _div = document.createElement('div');
-    _div.innerHTML = _modal;
-    const parentEl = document.querySelector('#menu-ui');
-    (parentEl ?? _gameUI).appendChild(_div.firstChild);
+    askSomething(`${getLangData('Change attributes of this item for')} <b style="margin-left:1vh;color:#F4BB44 !important">1</b> ${getLangData('dice')}`, `acceptAndRandomizeItem(${_id})`, 'modal_2x1');
 }
 function selectAvatarImage(_order) {
     const _item = document.querySelector('.avatar-image' + _order);
@@ -1938,17 +1981,17 @@ function useItemSelectionTicket(_level) {
         _choices += `<div class="selection-item" onexactclick="selectSelectionItem(${_item.id}, this)" style="width:17%;aspect-ratio:1/1;position:relative;cursor:pointer">
             <img src="./images/items/icons/${(_item.for ? (_item.for + '/') : '')}${_item.type}${_item.grade}.png" class="full grade${_item.grade}-item${_item.grade > 5 ? ' glow' : ''}" />
         </div>`;
-    let _modal = `<div class="full fade-me flex inventory-question">
+    let _modal = `<div data-singleton-key="modal_middle" class="full fade-me flex inventory-question">
         <div class="inventory-modal">
-            <div style="padding:6vh 4vh 4vh 4vh" class="flex">
-                <span style="color:#f7f7f7dd !important;font-size:3vh !important">${getLangData('Choose your gift')}</span>
+            <div class="flex w-100 question-modal-title-wrapper">
+                <div class="wot-title">${getLangData('Choose your gift')}</div>
             </div>
-            <div class="flex" style="padding:2vh">`
+            <div class="flex w-100 question-modal-desc">`
                + _choices +
             `</div>
-            <div style="padding:4vh 2vh" class="flex">
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('CANCEL')}</div>
-                <div id="item-selection-approve-btn" class="game-menu-button flex animate-me disabled" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="acceptItemSelection(${_level})">${getLangData('APPROVE')}</div>
+            <div class="flex w-100 new-game-menu-buttons">
+                <div class="new-game-menu-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('CANCEL')}</div>
+                <div id="item-selection-approve-btn" class="new-game-menu-button flex animate-me disabled" onexactclick="acceptItemSelection(${_level})">${getLangData('APPROVE')}</div>
             </div>
         </div>
     </div>`;
@@ -1965,17 +2008,17 @@ function useGemSelectionTicket(_level) {
         _choices += `<div class="selection-item" onexactclick="selectSelectionItem(null, this)" style="width:17%;aspect-ratio:1/1;position:relative;cursor:pointer">
             <img src="./images/gems/${_item.key + _item.grade.toString()}.png" class="full grade${_item.grade}-item${_item.grade > 5 ? ' glow' : ''}" />
         </div>`;
-    let _modal = `<div class="full fade-me flex inventory-question">
+    let _modal = `<div data-singleton-key="modal_middle" class="full fade-me flex inventory-question">
         <div class="inventory-modal">
-            <div style="padding:6vh 4vh 4vh 4vh" class="flex">
-                <span style="color:#f7f7f7dd !important;font-size:3vh !important">${getLangData('Choose your gift')}</span>
+            <div class="flex question-modal-title-wrapper">
+                <div class="wot-title">${getLangData('Choose your gift')}</div>
             </div>
-            <div class="flex" style="padding:2vh">`
+            <div class="flex w-100 question-modal-desc">`
                + _choices +
             `</div>
-            <div style="padding:4vh 2vh" class="flex">
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('CANCEL')}</div>
-                <div id="item-selection-approve-btn" class="game-menu-button flex animate-me disabled" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="acceptGemTicketSelection()">${getLangData('APPROVE')}</div>
+            <div class="flex new-game-menu-buttons">
+                <div class="new-game-menu-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('CANCEL')}</div>
+                <div id="item-selection-approve-btn" class="new-game-menu-button flex animate-me disabled" onexactclick="acceptGemTicketSelection()">${getLangData('APPROVE')}</div>
             </div>
         </div>
     </div>`;

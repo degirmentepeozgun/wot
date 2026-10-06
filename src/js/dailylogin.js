@@ -1,6 +1,7 @@
 ﻿'use strict';
+(function(){
 console.log('daily login');
-function dailylogin() {
+	function dailylogin() {
 	const _rewards = [
 		{ key:'gold', iconPath:'./images/icons/gold.png', value:5000},
 		{ key:'pot', iconPath:'./images/icons/pot.png', value:1},
@@ -79,3 +80,6 @@ function dailylogin() {
 	}
 	return this;
 }
+window.dailylogin =dailylogin;
+
+})();

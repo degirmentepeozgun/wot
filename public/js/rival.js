@@ -36654,6 +36654,160 @@ const _allEnemies = {
 						}
 					]
 				},
+				air1: {
+					key: 'air1',
+					order: 5,
+					type: 'skill',
+					attack: true,
+					move: true,
+					primary: true,
+					cooldown: 10000,
+					totalRange: 50,
+					priority: 1,
+					maxRepeat:2,
+					frames: [
+						{
+							spriteLeft: 133,
+							spriteTop: 2436,
+							spriteWidth: 180,
+							spriteHeight: 264,
+							spriteOrigin: 67,
+							extraStepXRate:.6,
+							speed: 8,
+							def: {
+								iframe: true
+							},
+							atk: {
+								yRange: 15,
+								rate: 2,
+								type: 'common',
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									sound: {key:'headhit', volume:1}
+								}
+							}
+						},
+						{
+							spriteLeft: 510,
+							spriteTop: 2436,
+							spriteWidth: 202,
+							spriteHeight: 264,
+							spriteOrigin: 90,
+							extraStepXRate:.6,
+							speed: 8,
+							def: {
+								iframe: true
+							},
+							atk: {
+								yRange: 15,
+								rate: 2,
+								type: 'common',
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									sound: {key:'headhit', volume:1}
+								}
+							}
+						},
+						{
+							spriteLeft: 863,
+							spriteTop: 2436,
+							spriteWidth: 259,
+							spriteHeight: 264,
+							spriteOrigin: 137,
+							extraStepXRate:.6,
+							speed: 8,
+							objects: [
+								{ key: 'groundbackdust', position:'behind-feet', reset: true }
+							],
+							sound: { key: 'kongrun', volume:1, reset: true },
+							def: {
+								iframe: true
+							},
+							atk: {
+								yRange: 15,
+								rate: 2,
+								type: 'common',
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									sound: {key:'headhit', volume:1}
+								}
+							}
+						},
+						{
+							spriteLeft: 1297,
+							spriteTop: 2436,
+							spriteWidth: 206,
+							spriteHeight: 264,
+							spriteOrigin: 103,
+							extraStepXRate:.6,
+							speed: 8,
+							def: {
+								iframe: true
+							},
+							atk: {
+								yRange: 15,
+								rate: 2,
+								type: 'common',
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									sound: {key:'headhit', volume:1}
+								}
+							}
+						},
+						{
+							spriteLeft: 1707,
+							spriteTop: 2436,
+							spriteWidth: 206,
+							spriteHeight: 264,
+							spriteOrigin: 93,
+							extraStepXRate:.6,
+							speed: 8,
+							def: {
+								iframe: true
+							},
+							atk: {
+								yRange: 15,
+								rate: 2,
+								type: 'common',
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									sound: {key:'headhit', volume:1}
+								}
+							}
+						},
+						{
+							spriteLeft: 2066,
+							spriteTop: 2436,
+							spriteWidth: 246,
+							spriteHeight: 264,
+							spriteOrigin: 134,
+							extraStepXRate:.6,
+							speed: 8,
+							objects: [
+								{ key: 'groundbackdust', position:'behind-feet', reset: true }
+							],
+							sound: { key: 'kongrun', volume:1, reset: true },
+							def: {
+								iframe: true
+							},
+							atk: {
+								yRange: 15,
+								rate: 2,
+								type: 'common',
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									sound: {key:'headhit', volume:1}
+								}
+							}
+						}
+					]
+				},
 				// hurtfeet: createHurtFeet(),
 				// hurthip: createHurtHip(),
 				hurtground1: function() { 
@@ -36928,6 +37082,7 @@ const _allEnemies = {
 			width: 280,
 			height: 224,
 			maxHP: 100,
+			grade:2,
 			atk: 20,
 			def: 100,
 			bleed: true,
@@ -55595,6 +55750,7 @@ const _allEnemies = {
 					attack: true,
 					cooldown: 20000,
 					priority: 1,
+					primary: true,
 					skipHealthBar: true,
 					frames: [
 						{

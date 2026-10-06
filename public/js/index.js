@@ -274,7 +274,9 @@ function removeCoopCharacter(_force) {
 }
 function startWithThisCharacter(_id, _level, _select, _noSound) {
 	removeCoopCharacter(1);
-	const _clone = _allEnemies['enemy' + _id]();
+	let _clone = _allEnemies['enemy' + _id]?.();
+	if(!_clone)
+		_clone = _allEnemies['enemy' + getCharacterJSON(_id).realId]?.();
 	addCoopCharacter(null, _clone.class, 1, _level, 1, _select);
 	_squadMemberKey = _clone.class;
 	switchCharacter(1, 1, _noSound);
@@ -331,19 +333,21 @@ function getCharacterJSON(_prefix) {
 	switch (_prefix ?? _squadMemberKey) {
 		case 'arc':
 		case 'archer':
-			return { key: '2212' + Math.random().toString().replace(/[.]/g, ''), name: _conceptArts.archer.title, class: 'archer', width: 132, height: 191 };
+			return { realId: '02', key: '2212' + Math.random().toString().replace(/[.]/g, ''), name: _conceptArts.archer.title, class: 'archer', width: 132, height: 191 };
 		case 'thf':
 		case 'thief':
-			return { key: '3212' + Math.random().toString().replace(/[.]/g, ''), name: _conceptArts.thief.title, class: 'thief', width: 275, height: 155 };
+			return { realId: '03', key: '3212' + Math.random().toString().replace(/[.]/g, ''), name: _conceptArts.thief.title, class: 'thief', width: 275, height: 155 };
 		case 'wrr':
 		case 'warrior':
-			return { key: '1212' + Math.random().toString().replace(/[.]/g, ''), name: _conceptArts.warrior.title, class: 'warrior', width: 122, height: 212 };
+			return { realId: '01', key: '1212' + Math.random().toString().replace(/[.]/g, ''), name: _conceptArts.warrior.title, class: 'warrior', width: 122, height: 212 };
 		case 'cyc':
 		case 'cyclops':
-			return { key: '4212' + Math.random().toString().replace(/[.]/g, ''), name: 'Cyclops', class: 'cyclops', width: 400, height: 422 };
+			return { realId: '47', key: '4212' + Math.random().toString().replace(/[.]/g, ''), name: 'Cyclops', class: 'cyclops', width: 400, height: 422 };
 		case 'wwf':
 		case 'werewolf':
-			return { key: '5212' + Math.random().toString().replace(/[.]/g, ''), name: 'Werewolf', class: 'werewolf', width: 226, height: 172 };
+			return { realId: '29', key: '5212' + Math.random().toString().replace(/[.]/g, ''), name: 'Werewolf', class: 'werewolf', width: 226, height: 172 };
+		case 'al':
+			return { realId: '1000', key: '6212' + Math.random().toString().replace(/[.]/g, ''), name: 'Al Karısı', class: 'al', width: 297, height: 426 };
 		default:
 			return false;
 	}
@@ -556,8 +560,8 @@ function createTipsUI(_tipOrder, _showCurrent) {
 	`</div></div>`;
 	setTimeout(() => {
 		document.getElementById('loading-tip').innerHTML = `<div class="tip-wrapper flex flex-ai-start">
-			<div class="tip-label flex flex-jc-end wot-subtitle" lang="${getLang()}"> 
-				${getLangData('Tip')}<span id="tip-current">${_showCurrent ? ' ' + _current.toString() + '/' + _count.toString() : ': '}</span>
+			<div class="tip-label flex flex-ai-start flex-jc-end wot-subtitle" lang="${getLang()}"> 
+				${getLangData('Tip')}
 			</div>
 			<div class="flex flex-jc-start tip-text wot-subtitle" style="flex:1;padding:0 3vh 0 0" lang="${getLang()}">
 				${_tips[_tipOrder][getLang()]}
@@ -566,6 +570,7 @@ function createTipsUI(_tipOrder, _showCurrent) {
 	}, 20);
 	return _html;
 }
+setTimeout(function(){ createTipsUI(5)}, 6000);
 function initMainCharacter() {
 	const _mh = mainCharacter?.health;
 	const _me = mainCharacter?.experience;
@@ -1777,13 +1782,6 @@ function howToGetStronger() {
 				closeInventoryQuestionModal();
 				switchBookPage(3, 1);
 			}},
-			{ icon:'fragment', titles: {
-				en: 'Gather Fragment',
-				tr: 'Parçacık Topla'
-			}, func: function() {
-				closeInventoryQuestionModal();
-				switchBookPage(7, 1);
-			}},
 			{ icon:'skill', titles: {
 				en: 'Upgrade Skill',
 				tr: 'Yetenek Yükselt'
@@ -1804,6 +1802,13 @@ function howToGetStronger() {
 			}, func: function() {
 				closeInventoryQuestionModal();
 				switchBookPage(1, 1);
+			}},
+			{ icon:'fragment', titles: {
+				en: 'Gather Fragment',
+				tr: 'Parçacık Topla'
+			}, func: function() {
+				closeInventoryQuestionModal();
+				switchBookPage(7, 1);
 			}}
 		]
 	})
@@ -2428,7 +2433,7 @@ function activateGameStart(_quickPlay, _force) {
 	if(_quickPlay){
 		if(!_force) {
 			askSomething(`<div class="question-area">${getLangData('This section is designed solely to provide a quick overview of our game mechanics and gameplay. It doesn\'t award any rewards or impact your demo progress. Still want to play?')}</div>`, 
-				'activateGameStart(1, 1)', null, document.getElementById('first-splash'));
+				'activateGameStart(1, 1)', 'modal_2x1', document.getElementById('first-splash'));
 			return;
 		}
 		closeInventoryQuestionModal(1);
@@ -2775,7 +2780,6 @@ async function shareGeneratedImage(base64, _fromMenu) {
         }, 1500);
     }
 }
-
 async function takePhotoOfScreenForMobile(){
 	PlaySound({key:'photo', volume:1});
 	const _img = document.getElementById(
@@ -3498,8 +3502,11 @@ function installOpeningScreen(_instant, _lateOpening) {
 				<img src="./images/ui/game/logo3.png" />
 			</div>
 			<div id="game-opening-screen-menu" class="game-opening-screen-menu">
-				<div lang="${getLang()}" class="game-opening-screen-menu-item wot-menu-btn flex" onexactclick="tryOpenGame()">
-					${getLangData('NEW GAME', __openingScreenLangData)}
+				<div lang="${getLang()}" class="game-opening-screen-menu-item wot-menu-btn flex" onexactclick="if(gameopening){return;}_presentationMode = false;_client = new dataOperations(1);_client.loadState();__account.gameOpening = true; tryOpenGame()">
+					${getLangData('PROTOTYPE', __openingScreenLangData)}
+				</div>
+				<div lang="${getLang()}" class="game-opening-screen-menu-item wot-menu-btn flex" onexactclick="if(gameopening){return;} _presentationMode = 1;_client = new dataOperations();_client.loadState();__account.gameOpening = true; tryOpenGame()">
+					${getLangData('DEMO', __openingScreenLangData)}
 				</div>
 				<div lang="${getLang()}" class="game-opening-screen-menu-item wot-menu-btn flex" onexactclick="openCredits(1)">
 					${getLangData('CREDITS', __openingScreenLangData)}
@@ -3939,7 +3946,7 @@ function installCharacterSelection(_func) {
 }
 function installWorldMap() {
 	injectModule('world', function(_arr, _name) {
-		var x = new world();
+		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(3, 3);
 		checkUpdateAvailable2(3);
@@ -3948,7 +3955,7 @@ function installWorldMap() {
 }
 function installWarUI() {
 	injectModule('war', function(_arr, _name) {
-		var x = new war();
+		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(5, 3);
 		checkUpdateAvailable2(5);
@@ -3957,7 +3964,7 @@ function installWarUI() {
 }
 function installDungeonUI() {
 	injectModule('dungeon', function(_arr, _name) {
-		var x = new dungeon();
+		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(6, 1);
 		checkUpdateAvailable2(6);
@@ -3980,7 +3987,7 @@ function installStoryFinish(_failed, _extraGain, _content) {
 	episode.pauseBgMusic(1);
 	injectModule('storyfinish', function(_arr, _name) {
 		__latestUIModule[_name] = { data: _arr };
-		animateStart(_failed, _extraGain, _content);
+		window.storyfinish.animateStart(_failed, _extraGain, _content);
 	});
 }
 function installQuickPlayStageFinish(_failed) {
@@ -3999,7 +4006,7 @@ function installQuickPlayStageFinish(_failed) {
 }
 function installTalents() {
 	injectModule('talent', function(_arr, _name) {
-		var x = new talent();
+		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(2, 2);
 		checkUpdateAvailable2(2);
@@ -4008,7 +4015,7 @@ function installTalents() {
 }
 function installDailyLogin() {
 	injectModule('dailylogin', function(_arr, _name) {
-		var x = new dailylogin();
+		var x =new window[_name]();
 		x.render();
 		switchBookPageTabs(8, 3);
 		checkUpdateAvailable2(8);
@@ -4017,7 +4024,7 @@ function installDailyLogin() {
 }
 function installMailbox() {
 	injectModule('mailbox', function(_arr, _name) {
-		var x = new mailbox();
+		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(4, 2);
 		checkUpdateAvailable2(4);
@@ -4026,7 +4033,7 @@ function installMailbox() {
 }
 function installOnlineUsers() {
 	injectModule('onlineusers', function(_arr, _name) {
-		var x = new onlineusers();
+		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(4, 3);
 		checkUpdateAvailable2(4);
@@ -4035,18 +4042,18 @@ function installOnlineUsers() {
 }
 function installTips() {
 	injectModule('tips', function(_arr, _name) {
-		var x = new tips();
+		var x = new window[_name]();
 		x.render();
-		switchBookPageTabs(9);
+		switchBookPageTabs(9, 2);
 		checkUpdateAvailable2(9);
 		__latestUIModule[_name] = { data: _arr, ref: x };
 	});
 }
 function installChat() {
 	injectModule('chat', function(_arr, _name) {
-		var x = new chat();
+		var x = new window[_name]();
 		x.render();
-		switchBookPageTabs(4);
+		switchBookPageTabs(4, 1);
 		checkUpdateAvailable2(4);
 		__latestUIModule[_name] = { data: _arr, ref: x };
 	});

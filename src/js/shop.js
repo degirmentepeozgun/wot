@@ -24,11 +24,11 @@ function createStoreUI(_noAnimation) {
 			if(_lastReset < _date)
 				_ok = 0;
 		}
-		_html += `<div class="store-item">
-			<div${_price > 0 ? '' : ' id="free-store-item"'} class="store-item-wrapper flex${_ok ? '' : ' gray'}" onexactclick="askBuyStoreItem(${_si.id}, ${_ok})">
-				<div class="store-item-title one-line${(_price > 0 || _ok) ? '' : ' v-none'}">${_si.count > 2 ? _si.count.toString() + ' x ' : ''}${_title}</div>
+		_html += `<div class="store-item flex">
+			<div${_price > 0 ? '' : ' id="free-store-item"'} class="store-item-wrapper flex${_ok ? '' : ' gray-50'}" onexactclick="askBuyStoreItem(${_si.id}, ${_ok})">
+				<div class="store-item-title flex one-line${(_price > 0 || _ok) ? '' : ' v-none'}">${_si.count > 2 ? _si.count.toString() + ' x ' : ''}${_title}</div>
 				<div class="flex store-item-icon"><img${(_price > 0 || !_ok) ? '' : ' class="glow-yellow"'} src='./images/icons/${_si.key}.png' /></div>
-				<div class="store-item-price one-line${!_ok ? ' v-none': ''}${(_price > 0 || !_ok) ? '' : ' zoom-in-out'}"><span${_price > 0 ? '' : ' style="color:#F7C103 !important;font-weight:600;font-size:larger !important"'}>${_price}</span> <img${_price > 0 ? '' : ' class="d-none"'} src="./images/icons/coin.png" /></div>
+				<div class="flex store-item-price one-line${!_ok ? ' v-none': ''}${(_price > 0 || !_ok) ? '' : ' zoom-in-out'}"><span${_price > 0 ? '' : ' style="color:#F7C103 !important;font-weight:600;font-size:larger !important"'}>${_price}</span> <img${_price > 0 ? '' : ' class="d-none"'} src="./images/icons/coin.png" /></div>
 			</div>
 			<div class="store-item-price store-item-price-sold${_ok ? ' d-none': ' flex'}">${getLangData('SOLD')}!</div>
 		</div>`;
@@ -66,10 +66,10 @@ function askBuyStoreItem(_id, _ok) {
     //     return;
 	// }
 	askSomething(`<div class="flex store-item-purchase">
-				<div class="w-100 flex p-02"><img style="height:12vh !important" src='./images/icons/${_item.key}.png' /></div>
-                <div class="w-100 flex p-02">${getLangData('Confirm purchase')}?</div>
-                <div class="w-100 flex" style="padding:0 2vh"><div class="flex">${getLangData('Price')}:&nbsp;${_price.formatWithDots()}&nbsp;<img src='./images/icons/coin.png' /></div></div>
-			</div>`, 'buyStoreItem(' + _id + ')');
+				<div class="w-100 flex store-buy-item"><img src='./images/icons/${_item.key}.png' /></div>
+                <div class="w-100 flex wot-title">${getLangData('Confirm purchase')}?</div>
+                <div class="w-100 flex store-buy-price"><div class="flex wot-subtitle">${getLangData('Price')}:&nbsp;${_price.formatWithDots()}&nbsp;<img src='./images/icons/coin.png' /></div></div>
+			</div>`, 'buyStoreItem(' + _id + ')', 'modal_small');
 }
 
 function buyStoreItem(_id) {

@@ -125,7 +125,7 @@
 	}
 }
 #world-map {
-	height: 96% !important;
+	height:round(nearest, 96%, 1px) !important;
 	box-shadow: 5vh 0 7vh #00000080, -5vh 0 7vh #00000080;
 	position:relative;
 	aspect-ratio:983 / 500
@@ -133,19 +133,7 @@
 .world-map-container .book-page-bg {
     position: relative;
 }
-#map-detail-modal{
-	position: absolute;
-	height: 95%;
-	aspect-ratio: 770 / 770;
-    background-size: cover, cover !important;
-    background-repeat: no-repeat,no-repeat !important;
-	box-shadow: 0 0 2vh #000;
-	overflow: hidden;
-	padding: 2.5% 3.5% 1.5% 3.5%;
-	z-index: 2;
-	animation-duration: .3s !important;
-	-webkit-animation-duration: .3s !important
-}
+
 .world-map-container .book-page-bg:has(#map-detail-modal:not(.fade-out)) #world-map {
 	filter:blur(.5vh);
 	-webkit-filter:blur(.5vh) !important
@@ -153,30 +141,6 @@
 .map-detail-modal-inner {
 	overflow-y: auto;
 	position: relative;
-}
-.map-detail-modal-inner * {
-	font-size: 2.8vh !important;
-}
-.map-detail-modal-title {
-	color:#F4BB44 !important;
-	font-size: 3vh !important;
-	line-height: 3vh !important;
-	padding:0 0 1.5vh 0;
-	margin:1vh 0 1.5vh 0;
-	border-bottom: 1px solid #9d987f40;
-	height: calc(4.5vh + 1px);
-}
-.map-detail-modal-inner .w-50.flex-jc-start {
-	color:#9d987f !important;
-}
-.map-detail-modal-inner .w-50.flex-jc-end {
-	color:#f3f4f5cc !important;
-}
-.mission-desc-title {
-	color:#F4BB44 !important;
-	padding:1.5vh 0 1.5vh 0;
-	margin:1vh 0 1.5vh 0;
-	border-bottom: 1px solid #9d987f40;
 }
 .map-detail-modal-inner img {
 	max-height: 5vh !important;
@@ -193,26 +157,18 @@
 	text-indent: 4vh;
 }
 .map-detail-modal-content {
-	height:calc(86% - 1px - 7vh) !important;
 	overflow-y:auto !important
 }
 .map-detail-modal-btn {
 	height: 14% !important;
 	width: 100%;
-	border-top: 1px solid #9d987f40;
-	box-shadow: -2vh 0 4vh #000;
 }
 .map-detail-modal-btn .w-50 {
 	height: 100%;
 }
-.map-detail-modal-btn .game-menu-button {
-	width: 90%;
-	background:linear-gradient(90deg, #ffffff10, #ffffff20, #ffffff20, #ffffff20, #ffffff20, #ffffff10) !important
-}
 .map-detail-modal-inner .item-info-modal-close {
 	margin:0 !important;
 	padding: 0 !important;
-	font-size: 4vh !important;
 }
 .map-detail-modal-inner .w-50.flex-jc-end img {
 	margin-right: 0 !important;
@@ -255,11 +211,4 @@
 	width:50%;
 	cursor: pointer;
 	z-index: 3
-}
-
-.map-detail-modal-desc {
-	text-align: left;
-	color:#f3f4f5ab !important;
-	font-size: 2.8vh !important;
-	justify-content: flex-start !important;
 }

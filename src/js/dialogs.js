@@ -9,6 +9,29 @@ const _conceptArts = {
 	tank: { direction: 'right', title: 'Deli Dumrul' },
 	stables: { direction: 'right', title: 'Stable Master' }
 };
+const __gibTalks = {
+	warrior: [
+		{ en: 'Somebody call a doctor', tr: 'Biri doktor çağırsın' },
+		{ en: 'Oh my god', tr: 'Aman Tanrım' },
+		{ en: "Now that's gonna leave a mark", tr: 'Bu iz bırakacak' },
+		{ en: "Owww damn!", tr: 'Ayy kahretsin!' },
+		{ en: "Holy crap what a beating", tr: 'Vay canına, ne dayak!' },
+		{ en: "Damn i felt that one", tr: 'Kahretsin, bunu hissettim' },
+		{ en: "Well that's unfortunate", tr: 'Bu talihsiz bir durum' },
+		{ en: "That looks painful", tr: 'Bu acı verici görünüyor' },
+		{ en: "I definitely heard a crack", tr: 'Kesinlikle bir çatlama duydum' },
+		{ en: "Absolute blood bath", tr: 'Tam bir kan banyosu' },
+		{ en: "Ohh it's gonna hurt", tr: 'Ayy, bu acıyacak' },
+		{ en: "[Laughs]", tr: '[Gülüyor]' },
+		{ en: "[Laughs]", tr: '[Gülüyor]' }
+	],
+	cyclopsair: [
+		{ en: 'Back off before i crush you', tr: 'Seni ezmeden geri çekil' }
+	],
+	alair: [
+		{ en: 'I will eat your souls', tr: 'Ruhlarınızı yiyeceğim' }
+	]
+}
 let _dialogAppeared;
 function updateQuestArea(_skipIfNoUI, _qq, _force) {
 	let _elm = document.getElementById('quest-status');
@@ -43,7 +66,7 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 			_elm.innerHTML = '<div style="cursor:pointer;font-size:3vh !important" onexactclick="event.stopPropagation();event.preventDefault();askQuitFromStory()" class="full flex">' + getLangData('Back To Lobby') + '</div>';
 		return;
 	}
-	let _html = '<div class="full" style="overflow-y:auto">';
+	let _html = '<div class="full quest-list" style="overflow-y:auto">';
 	let _state = _qq?.state ?? __account.questStatus.state;
 	const _q = _qq ?? __account.questStatus.quest;
 	let _stepsAdded;
@@ -55,7 +78,8 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 			const _f = (_item.count ?? 0) >= _item.limit;
 			if(!_f)
 				_finish = undefined;
-			_steps += '<div class="flex flex-jc-start"><div class="d-none flex"><img style="height:.9rem;margin:0 .2rem;background:none" src="./images/icons/quest-progress.png"' + (!_finish ? 'class="gray"' : '') + ' /></div><div class="flex" style="justify-content:flex-start;height:100%;flex:1;color:' + (!_finish ? '#ffffff80' : '#fff') + ' !important">(' + (_item.count ?? 0) + '/' + _item.limit + ') ' + (_item.descriptions ?? _q.descriptions)[getLang()] + '</div></div>';
+			_steps += '<div class="flex flex-jc-start quest-status-desc"><div class="d-none flex"><img style="height:.9rem;margin:0 .2rem;background:none" src="./images/icons/quest-progress.png"' + (!_finish ? 'class="gray"' : '') + ' /></div><div class="flex wot-description" style="justify-content:flex-start;height:100%;padding:0 2vh;flex:1;color:' + (!_finish ? '#e2d4b599' : '#e2d4b5') + ' !important">' + (_item.descriptions ?? _q.descriptions)[getLang()] + '</div></div>';
+			_steps += `<div class="w-100 flex flex-jc-start timedquest-object-progress"><div class='timedquest-progress-wrapper'><div class='timedquest-progress' style="width:${((_item.count ?? 0) / _item.limit) * 100}% !important"></div></div><div class="flex flex-jc-end timedquest-object-info wot-description">` + (_item.count ?? 0) + ' / ' + _item.limit + `</div></div>`;
 			_stepsAdded = 1;
 		}
 		if (_finish) {
@@ -78,7 +102,8 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 				}
 			}
 		}
-		_html += '<div class="one-line" style="padding-bottom:3%;color:#DAA520' + (_state == 'end' ? '' : 'bb') + ' !important">-&nbsp;' + _q.names[getLang()] + '</div>' + _steps;
+		_html += '<div class="one-line quest-title font-quest-title wot-subtitle" style="padding-bottom:3%;color:#DAA520' + (_state == 'end' ? '' : 'bb') + ' !important"><img class="quest-title-icon" src="./images/ui/game/baklavagold.png"/>' + _q.names[getLang()] + '</div><div class="quest-line"></div>' + _steps;
+		
 	}
 	else if (_q?.kills) {
 		let _steps = '', _finish = 1;
@@ -88,7 +113,8 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 			const _f = (_item.count ?? 0) >= _item.limit;
 			if(!_f)
 				_finish = undefined;
-			_steps += '<div class="one-line flex flex-jc-start"><div class="d-none flex" style="width:15%"><img style="width:3vh;background:none" src="./images/icons/quest-progress.png"' + (!_finish ? ' class="gray"' : '') + ' /></div><div style="width:85%;color:' + (!_finish ? '#ffffff80' : '#fff') + ' !important">(' + (_item.count ?? 0) + '/' + _item.limit + ') ' + (_item.descriptions ?? _q.descriptions)[getLang()]  + '</div></div>';
+			_steps += '<div class="flex flex-jc-start quest-status-desc"><div class="d-none flex"><img style="height:.9rem;margin:0 .2rem;background:none" src="./images/icons/quest-progress.png"' + (!_finish ? 'class="gray"' : '') + ' /></div><div class="flex wot-description" style="justify-content:flex-start;padding:0 2vh;height:100%;flex:1;color:' + (!_finish ? '#e2d4b599' : '#e2d4b5') + ' !important">' + (_item.descriptions ?? _q.descriptions)[getLang()] + '</div></div>';
+			_steps += `<div class="w-100 flex flex-jc-start timedquest-object-progress"><div class='timedquest-progress-wrapper'><div class='timedquest-progress' style="width:${((_item.count ?? 0) / _item.limit) * 100}% !important"></div></div><div class="flex flex-jc-end timedquest-object-info wot-description">` + (_item.count ?? 0) + ' / ' + _item.limit + `</div></div>`;
 			_stepsAdded = 1;
 		}
 		if (_finish) {
@@ -104,7 +130,7 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 				}
 			}
 		}
-		_html += '<div  class="one-line" style="padding-bottom:3%;color:#DAA520' + (_state == 'end' ? '' : 'bb') + ' !important">-&nbsp;' + _q.names[getLang()] + '</div>' + _steps;
+		_html += '<div class="one-line font-quest-title quest-title wot-subtitle" style="padding-bottom:3%;color:#DAA520' + (_state == 'end' ? '' : '') + ' !important"><img class="quest-title-icon" src="./images/ui/game/baklavagold.png"/>' + _q.names[getLang()] + '</div><div class="quest-line"></div>' + _steps;
 	}
 	if(_q?.timer) {
 		if(!_q.timer.startTime)
@@ -114,10 +140,12 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 			let _icon = '';
 			if(_q.timer.iconPath)
 				_icon = '<img src="' + _q.timer.iconPath + '" class="timedquest-icon" />';
-			_steps += `<div class="timedquest-timer one-line flex flex-jc-start">`
-					+ _icon + 
-					`<div class='timedquest-progress-wrapper'><div class='timedquest-progress'></div></div></div>`;
-			_steps += '<div class="one-line flex flex-jc-start"><div style="width:100%;padding:0 2vh;color:' + (!_finish ? '#ffffff80' : '#fff') + ' !important">' + (_q.descriptions?.[getLang()] ?? '') + '</div></div>';
+			_steps += `<div class="timedquest-timer one-line flex flex-jc-start quest-desc-one-line font-normal-text">`
+					+ _icon;
+			_steps += '<div class="one-line flex flex-jc-start quest-desc-one-line quest-status-desc"><div class="wot-description" style="width:100%;padding:0 2vh;color:' + (!_finish ? '#ffffff80' : '#fff') + ' !important">' + (_q.descriptions?.[getLang()] ?? '') + '</div></div>';
+			if(_q.props)
+				_steps += `<div class="w-100 flex flex-jc-start timedquest-object-progress"><div class='timedquest-progress-wrapper'><div class='timedquest-progress' style="width:${(_q.props.current / _q.props.limit) * 100}% !important"></div></div><div class="flex flex-jc-end timedquest-object-info wot-description">` + _q.props.current + ' / ' + _q.props.limit + `</div></div>`;
+			_steps += `</div>`;
 		} 
 		else {
 			_state = 'end';
@@ -139,17 +167,17 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 		tQCounter = (_m > 9 ? _m : '0' + _m.toString()) + ':' 
 		+ (_s > 9 ? _s : '0' + _s.toString());
 		if(!_stepsAdded)
-			_html += '<div class="flex" style="width:100%"><div class="one-line" style="flex:1;padding-bottom:3%;color:#DAA520' + (_state == 'end' ? '' : 'bb') + ' !important">-&nbsp;' + _q.names[getLang()] + '</div>'
-		_html += '<div class="timedquest-counter">' + tQCounter + '</div>';
+			_html += '<div class="flex" style="width:100%"><div class="one-line quest-title font-quest-title wot-subtitle" style="flex:1;padding-bottom:3%;color:#d4b45f' + (_state == 'end' ? '' : '') + ' !important"><img src="./images/ui/game/baklavagold.png" class="quest-title-icon" />' + _q.names[getLang()] + '</div>'
+		_html += '<div class="timedquest-counter wot-subtitle">' + tQCounter + '</div>';
 		if(!_stepsAdded)
-			_html += '</div>';
+			_html += '</div><div class="quest-line"></div>';
 		_html += _steps;
 		_stepsAdded = 1;
 	}
 	if(!_stepsAdded) {
 		if (_qq) {
-			let _steps = '<div class="one-line flex flex-jc-start"><div class="d-none flex" style="width:15%"><img style="width:3vh;background:none" src="./images/icons/quest-progress.png" class="gray" /></div><div style="width:85%;color:#ffffff80 !important">' + _q.descriptions[getLang()] + '</div></div>';
-			_html += '<div  class="one-line" style="padding-bottom:3%;color:#DAA520' + (_state == 'end' ? '' : 'bb') + ' !important">-&nbsp;' + _q.names[getLang()] + '</div>' + _steps;
+			let _steps = '<div class="one-line flex flex-jc-start quest-desc-one-line font-normal-text"><div class="d-none flex" style="width:15%"><img style="width:3vh;background:none" src="./images/icons/quest-progress.png" class="gray" /></div><div style="width:85%;color:#ffffff80 !important">' + _q.descriptions[getLang()] + '</div></div>';
+			_html += '<div  class="one-line quest-title font-quest-title wot-subtitle" style="padding-bottom:3%;color:#8f7535' + (_state == 'end' ? '' : '') + ' !important"><img class="quest-title-icon" src="./images/ui/game/baklavagold.png"/>' + _q.names[getLang()] + '</div><div class="quest-line"></div>' + _steps;
 		}
 		else {
 			addClass(_elm, 'd-none');
@@ -167,8 +195,16 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 		removeClass(_elm, 'd-none');
 	}, 10);
 	_html += '</div>';
-	_elm.innerHTML = _html;
+	_elm.innerHTML = '<div class="quest-log-header" onclick="toggleQuestLog()"><div class="quest-log-header-text">' + getLangData('QUEST') + '</div></div>' + _html;
 	episode.reset();
+}
+function toggleQuestLog() {
+	playClick(1);
+	let _elm = document.getElementById('quest-status');
+	if(hasClass(_elm, 'collapsed'))
+		removeClass(_elm, 'collapsed');
+	else
+		addClass(_elm, 'collapsed');
 }
 function pauseQuestTimer() {
 	if(__account?.questStatus?.quest?.timer?.startTime)
@@ -194,10 +230,10 @@ function checkTimedQuest() {
 		const _rate = MathCeil(((__account.questStatus.quest.timer.ms - _time) / __account.questStatus.quest.timer.ms) * 100);
 		const _r = MathCeil(100 / MathRound(__account.questStatus.quest.timer.ms / 1000));
 		const RATE = MathCeil(_rate / _r) * _r;
-		if(RATE !== episode.timedQuestElem.dataRate){
-			episode.timedQuestElem.style.width = RATE + '%';
-			episode.timedQuestElem.dataRate = RATE;
-		}
+		// if(RATE !== episode.timedQuestElem.dataRate){
+		// 	episode.timedQuestElem.style.width = RATE + '%';
+		// 	episode.timedQuestElem.dataRate = RATE;
+		// }
 		let _ms = __account.questStatus.quest.timer.ms - _time;
 		_ms = MathFloor(_ms / 1000);
 		if(_ms >= 0 && _ms !== episode.timedQuestCounter.ms) {
@@ -281,12 +317,12 @@ function skipDialog() {
 						_gain += '&nbsp;<img src="./images/icons/' + _item.key + '.png" style="width:4vh" /> &nbsp;x &nbsp;' + _item.value;
 					}
 				if (__account.questStatus.state === 'begin') {
-					_skip.innerHTML = '<span style="color:#16F529 !important">' + getLangData('ACCEPT') + '</span>';
+					_skip.innerHTML = getLangData('ACCEPT');
 					if(_gain.length > 0)
 						_add = '<div class="flex" style="margin-top:2%;padding:1%;width:100%;border-top:1px solid #F4BB44;border-bottom:1px solid #F4BB44"><div class="flex" style="color:#fff !important">' + getLangData('Complete Rewards') + ': &nbsp;' + _gain + '</div></div>';
 				}
 				else if (__account.questStatus.state === 'end') {
-					_skip.innerHTML = '<span style="color:#16F529 !important">' + getLangData('COMPLETE') + '</span>';
+					_skip.innerHTML = '<span class="new-green">' + getLangData('COMPLETE') + '</span>';
 					if(_gain.length > 0)
 						_add = '<div class="flex" style="margin-top:2%;padding:1%;width:100%;border-top:1px solid #F4BB44;border-bottom:1px solid #F4BB44"><div class="flex" style="color:#fff !important">' + getLangData('Rewards') + ': &nbsp;' + _gain + '</div></div>';
 				}
@@ -305,7 +341,7 @@ function skipDialog() {
 				const _cImg = document.getElementById('concept-' + _class);
 				_cImg.src = './images/main/' + _class + '/' + (__account.questStatus.dialogArr[__account.questStatus.dialogOrder]?.faceExpression ??  'concept') + '.png';
 		}
-		document.getElementById('dialog-owner').innerHTML = '<span style="color:#f7f7f7cc !important;font-size:3vh !important">[' + (_conceptArts[_class]?.title ?? _class) + ']</span>' +
+		document.getElementById('dialog-owner').innerHTML = '<span>[' + (_conceptArts[_class]?.title ?? _class) + ']</span>' +
 			(__account.questStatus.dialogArr[__account.questStatus.dialogOrder].expression ?
 				''//'&nbsp;&nbsp;<span style="font-size:2.8vh!important" class="dialog-owner-expression">(' + __account.questStatus.dialogArr[__account.questStatus.dialogOrder].expression + ')</span>'
 				 : '');
@@ -626,9 +662,12 @@ function createBubbleText(_dialog) {
 		_d = document.createElement('div');
 		_d.className = 'talk-bubble show-ui';
 		if(_dialog.owner) {
-			const _borderColor = getCharacterChatColor(episode.enemies?.find(x => x.key === _dialog.owner)?.class);
+			const _charClass = episode.enemies?.find(x => x.key === _dialog.owner)?.class;
+			const _borderColor = getCharacterChatColor(_charClass);
 			if(_borderColor && (_borderColor !== '#f7f7f7'))
 				_d.style.borderColor = _borderColor;
+			if(_charClass)
+				_d.className += ' talk-bubble-' + _charClass;
 		}
 		if (_dialog.id)
 			_d.setAttribute('data-id', _dialog.id);
@@ -642,13 +681,13 @@ function createBubbleText(_dialog) {
 		_d.dialogText = getLangData(_dialog.text);
 		if(!_dialog.asap)
 			_d.letterOrder = 0;
-		_d.innerHTML = '<div class="talk-bubble-inner"' + (_dialog.color ? ' style="color:' + _dialog.color + ' !important"' : '') + '>' + (_dialog.asap ? _d.dialogText : '') + '</div>';
+		_d.innerHTML = '<div class="talk-bubble-inner wot-description"' + (_dialog.color ? ' style="color:' + _dialog.color + ' !important"' : '') + '>' + (_dialog.asap ? _d.dialogText : '') + '</div>';
 		_gameUI.appendChild(_d);
 		if(!episode.bubbles)
 			episode.bubbles = [];
 		episode.bubbles.push({key:_c.key, elem: _d});
 		if(__story)
-			PlaySound({key:'st' + __story.id + 'sc' + __storySceneOrder + 'id' + _dialog.id, volume:.5 })
+			PlaySound({path:'./images/scene/sounds/st' + __story.id + 'sc' + __storySceneOrder + 'id' + _dialog.id + '.mp3', volume:.75 })
 	}
 	if(!_c.still || _dialog.move || _firstCreation) {
 		let _left, _top;
@@ -657,9 +696,9 @@ function createBubbleText(_dialog) {
 		// 	_top = _c.top - MathRound(_canvas.height / 7);
 		// }
 		// else {
-			_top = MathRound(_c.TOP - (_canvas.height / 7) - (__zoom * (_dialog.bottomGap ?? 0)));
+			_top = MathRound(_c.TOP - (episode.cHeight / 7) - (__zoom * (_dialog.bottomGap ?? 0)));
 			if(__isPC && episode?.id > 1)
-				_top -= MathRound(_canvas.height / 25);
+				_top -= MathRound(episode.cUIHeight / 25);
 			//_left = MathRound(_c.EXACTLEFT -
 			//	(((_gamePad.clientWidth * .15) - _c.WIDTH) / 2));
 			_left = _c.HURTLEFT + _c._HURTBOX_half; // MathRound((_c.SCREENLEFT - ((_c.width / 2) * _c.ZOOM)) + (__zoom * (_dialog.leftGap ?? 0)));  //MathRound((_c.SCREENLEFT - 
@@ -667,7 +706,7 @@ function createBubbleText(_dialog) {
 		//}
 		// _d.style.top = _top + 'px';
 		// _d.style.left = _left + 'px';
-		_d.style.transform = 'translate(' + (_left * __scale) + 'px,' + (_top * __scale) + 'px) translate(-50%, -100%)'; // BURAYI DEĞİŞTİR
+		_d.style.transform = 'translate(' + (_left * __scale) + 'px,' + (_top * __scale) + 'px) translateX(-50%)'; // BURAYI DEĞİŞTİR
 		_d.style.setProperty('-webkit-transform', _d.style.transform);
 	}
 	//if(!episode.dialogs?.find(x => x.id === _dialog.id))
@@ -771,9 +810,9 @@ function createDialogScreen(_arr, _quest) {
 			+ "</div>";
 		_order++;
 	}
-	_html += '</div><div class="dialog-scr-left"></div><div onexactclick="skipDialog()" id="game-dialogs" style="border-top-left-radius:3vh;border-top-right-radius:3vh;overflow:hidden;width:70%;left:15%;top:65%;height:35%;background:#121212;position:absolute;z-index:99999 !important"><div style="height:20%;background:#00000080;border-bottom:2px solid #856b2c;color:#856b2c;padding-left:5%" id="dialog-owner" class="flex flex-jc-start"><span style="color:#f7f7f7cc!important;font-size:3vh !important">[' + _conceptArts[_people[0]].title + ']</span>' + (__account.questStatus.dialogArr[0].expression ? 
+	_html += '</div><div class="dialog-scr-left"></div><div onexactclick="skipDialog()" id="game-dialogs"><div id="dialog-owner" class="flex flex-jc-start"><span>[' + _conceptArts[_people[0]].title + ']</span>' + (__account.questStatus.dialogArr[0].expression ? 
 		'' //'&nbsp;&nbsp;<span style="font-size:2.8vh!important" class="dialog-owner-expression">(' + __account.questStatus.dialogArr[0].expression + ')</span>' 
-		: '') + '</div><div style="height:60%;padding:2% 5% 1% 5%"><div class="full" style="overflow-y:auto;color:#F4BB44 !important" id="dialog-text">' + replaceDialogText(__account.questStatus.dialogArr[0].texts?.[getLang()] ?? __account.questStatus.dialogArr[0].text) + '</div></div><div style="height:20%;padding:1% 5%"><span id="quest-skip" style="font-size:2.8vh!important;cursor:pointer;color:#fff !important">' + getLangData('NEXT') + ' &gt;&gt;</span></div></div><div class="dialog-scr-right"></div>';
+		: '') + '</div><div style="height:60%;padding:2% 5% 1% 5%"><div class="full" style="overflow-y:auto" id="dialog-text">' + replaceDialogText(__account.questStatus.dialogArr[0].texts?.[getLang()] ?? __account.questStatus.dialogArr[0].text) + '</div></div><div class="flex w-100 flex-jc-end flex-ai-start" style="height:20%"><div class="orange-action-btn" id="quest-skip">' + getLangData('NEXT') + ' &gt;&gt;</div></div></div><div class="dialog-scr-right"></div>';
 	_dialogScreen.innerHTML = _html;
 	setTimeout(function () {
 		removeClass(document.querySelectorAll('.concept-image')[0], 'gray-concept');

@@ -126,6 +126,7 @@ function enemy(_e) {
 	this.fireResistRate = _e.fireResistRate ?? 0;
 	this.toxicResistRate = _e.toxicResistRate ?? 0;
 	this.important = this.villain || this.alp || this.main || this.class === 'boss' || this.class === 'minion' || this.grade > 1;
+	console.log(this.grade);
 	this.baseProps = {
 		maxHP: _e.maxHP ?? 100,
 		critRate: _e.critRate ?? 5,
@@ -472,7 +473,7 @@ function enemy(_e) {
 		}
 		if(!_chosenKey) {
 			if((this.animationKeysShuffledTime + 1000) < _gameTick) {
-				shuffle(_theChar.attackKeys);
+				shuffle(_theChar.attackKeys, _theChar.primaryAttackKey);
 				this.animationKeysShuffledTime = _gameTick;
 			}
 			const _keys = _theChar.attackKeys;
@@ -556,6 +557,8 @@ function enemy(_e) {
 					_chosenKey = _k;
 					_chosenRange = _anima.totalRange;
 				}
+				if(this.primaryAttackKey && this.primaryAttackKey === _chosenKey)
+					break;
 			}
 		}
 		if(!_chosenKey && _useLastAttack && !_hasRange)
@@ -591,12 +594,13 @@ function enemy(_e) {
 				_anima.totalRange = 0;
 			_anima.yRange = 0;
 			let xRangePX = 0;
+			const _multiplyRate = _anima.maxRepeat ?? 1;
 			for (var _frame of _anima.frames) {
 				if (_frame.atk?.yRange > _anima.yRange)
 					_anima.yRange = _frame.atk.yRange;
 				if (_frame.atk?.rate && (_frame.spriteWidth - _frame.spriteOrigin) > xRangePX)
 					xRangePX = (_frame.spriteWidth - _frame.spriteOrigin) * this.getZoom();
-				_anima.totalRange += (_frame.speed * (_frame.extraStepXRate ?? 0));
+				_anima.totalRange += ((_frame.speed * (_frame.extraStepXRate ?? 0)) * _multiplyRate);
 				if (_frame.atk?.spell || _frame.spell) {
 					let _sp = _frame.atk?.spell ?? _frame.spell;
 					if(!Array.isArray(_sp))
@@ -1697,7 +1701,7 @@ function enemy(_e) {
 		// X mesafesine göre Y düzeltme gücü
 		// Yaklaştıkça daha hassas, uzakken daha serbest
 		// sahneye göre ayarlayabilirsin
-		const distanceFactor = Math.max(0, 1 - maxFactor);
+		const distanceFactor = maxFactor < .5 ? 0 : Math.max(0, 1 - maxFactor);
 
 		// Dalgalı hareket için zaman tabanlı sin
 		const time = (_gameTick ?? Date.now()) * .005;
@@ -1731,6 +1735,7 @@ function enemy(_e) {
 		if (MathAbs(diffY) > 2) {
 			this.yPosition += yStep;
 			this.limitYPosition();
+			this.yPositionUpdated = true;
 		}
 	}
 	this.autoCommand = function () {
@@ -7914,6 +7919,10 @@ this.getRotateVerticalRate = function(attacker, victim) {
 		return this.lastYStep;
 	}
 	this.calculateYStepAndMove = function (_solidity, _touch) {
+		if(this.yPositionUpdated) {
+			delete this.yPositionUpdated;
+			return;
+		}
 		if(this.stop || (_solidity && _solidity.moveY === 0)){
 			return;
 		}
@@ -10107,8 +10116,11 @@ this.getRotateVerticalRate = function(attacker, victim) {
 				});
 			else if(_ak.startsWith('hurtair'))
 				this.airHurtKeys.push(_ak);
-			else if(_aks.attack && !_aks.chain)
+			else if(_aks.attack && !_aks.chain){
 				this.attackKeys.push(_ak);
+				if(_aks.primary)
+					this.primaryAttackKey = _ak;
+			}
 			if(!this.hasChain && _aks.chain)
 				this.hasChain = 1;
 			//else if(_aks.delay)

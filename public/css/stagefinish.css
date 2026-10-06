@@ -14,9 +14,7 @@
 	max-height: 95%;
 	min-height: 90%;
 	width: auto;
-	border: 1px solid #f3f4f540;
 	box-shadow: 0 0 2vh #000;
-	border-radius: 2vh;
 	margin: auto !important;
 	left: 50%;
 	overflow:hidden;
@@ -113,9 +111,7 @@ body.mobile-device #story-finish.finish {
 }
 #story-finish .victory-header {
 	height: 17%;
-	color: #F4BB44 !important;
 	padding-top: 5%;
-	text-shadow: .4vh .4vh 0 #9d987f
 }
 .quickplay-leaderboards {
 	padding: 15% 15% 8% 15%;

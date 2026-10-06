@@ -1,6 +1,7 @@
 ﻿'use strict';
-console.log('tips');
+(function() {
 function tips() {
+	console.log('tips');
 	const _tips = [
 		{ id:1, texts: {
 			en: '',
@@ -185,4 +186,7 @@ function tips() {
 		});
 	}
 	return this;
-}
+} 
+	window.tips = tips;
+
+})();
