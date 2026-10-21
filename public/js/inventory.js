@@ -1944,20 +1944,21 @@ function chooseAvatar() {
     if(_tba)
         _tba.src = './images/ui/game/avatars/avatar' + _order + '.png';
     closeInventoryQuestionModal();
-    __account.avatarOrder = _order;
+    __account.avatarOrder = parseInt(_order);
     _client.saveState();
 }
 function askAvatar() {
     playClick();
     let _avatarHTML = '';
+    let _selectedAvatarOrder = __account.avatarOrder ?? 21;
     for(let i = 1; i < 22; i++) 
-        _avatarHTML += `<div onexactclick="selectAvatarImage(${i})" class="avatar-image${i} flex avatar-item"><img src="./images/ui/game/avatars/avatar${i}.png" /></div>`;
+        _avatarHTML += `<div onexactclick="selectAvatarImage(${i})" class="avatar-image${i}${_selectedAvatarOrder === i ? ' selected' : ''} flex avatar-item"><img src="./images/ui/game/avatars/avatar${i}.png" /></div>`;
     let _modal = `<div data-singleton-key="modal_7x4" class="full fade-me flex inventory-question show-ui avatars-container">
         <div class="inventory-modal">
             <div class="flex inventory-modal-title">
                 ${getLangData('Choose Your Avatar')}
             </div>
-            <div class="avatar-selection-inner flex w-100">`
+            <div data-selected="${_selectedAvatarOrder}" class="avatar-selection-inner flex w-100">`
                + _avatarHTML + 
             `</div>
             <div class="flex new-game-menu-buttons">

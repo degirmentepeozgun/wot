@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RedisCache")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+73c85c20a37f3ed66691aa45f4f6540378b5bdcb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d9f13bf72004c1412681b55f094576fef906c838")]
 [assembly: System.Reflection.AssemblyProductAttribute("RedisCache")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RedisCache")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -40742,6 +40742,989 @@ const _allEnemies = {
 			buffs: []
 		};
 	},
+	enemy633: function () {
+		return {
+			animations: {
+				walk: {
+					key: 'walk',
+					type: 'move',
+					imediateBreak: true,
+					hold: true,
+					mobilityY: true,
+					priority: 5,
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							sound: { key: 'cyanwalk', sound: .3, reset:true, bind:'walk' },
+							speed:3
+						},
+						{
+							spriteLeft: 300,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 300,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 600,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 600,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 1200,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 1200,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 1500,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 1500,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						}
+					]
+				},
+				run: {
+					key: 'run',
+					type: 'move',
+					imediateBreak: true,
+					hold: true,
+					mobilityY: true,
+					priority: 5,
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							sound: { key: 'cyanwalk', sound: .3, reset:true, bind:'walk' },
+							speed:3
+						},
+						{
+							spriteLeft: 300,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 300,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 600,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 600,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 1200,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 1200,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 1500,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 1500,
+							spriteTop: 800,
+							spriteWidth: 300,
+							spriteHeight: 100,
+							spriteOrigin: 150,
+							speed:3
+						}
+					]
+				},
+				attack: {
+					key: 'attack',
+					order: 1,
+					type: 'skill',
+					attack: true,
+					priority: 4,
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 600,
+							spriteTop: 0,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							atk: {
+								yRange: 15,
+								rate: 2,
+								type: 'common',
+								hurt: {
+									key: 'hurtground1',
+									type: 'ground'
+								}
+							},
+							speed: 12
+						},
+						{
+							spriteLeft: 1500,
+							spriteTop: 900,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							sound: { key: 'cyanattack', sound: .75 },
+							spriteOrigin: 150,
+							speed: 12
+						}
+					]
+				},
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					imediateBreak: true,
+					frames: [
+						{
+							spriteLeft: 1200,
+							spriteTop: 900,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 1500,
+							spriteTop: 900,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 1800,
+							spriteTop: 900,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 1500,
+							spriteTop: 900,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 12
+						},
+					]
+				},
+				hurtground1: createHurtGround(
+						{
+							spriteLeft: 300,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							invisibleWhenLay: true
+						},
+						null,
+						{ key: 
+		'goblinhurt1,goblinhurt2,goblinhurt3,goblinhurt4,goblinhurt5,goblinhurt6,goblinhurt7', 
+							volume:.5, reset: true }
+					),
+				hurtair: createHurtAir(
+					{
+						spriteLeft: 1800,
+						spriteTop: 300,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150
+					}, {
+						spriteLeft: 1200,
+						spriteTop: 300,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150
+					}, 
+					{ key: 'goblinhurt1,goblinhurt2,goblinhurt3,goblinhurt4,goblinhurt5,goblinhurt6,goblinhurt7', 
+						volume: .5, reset: true }
+				),
+				knockbackground:createKnockBackGround(
+					{
+						spriteLeft: 1500,
+						spriteTop: 300,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150
+					},
+					{
+						spriteLeft: 900,
+						spriteTop: 300,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150
+					},
+				),
+				knockbackair: createKnockBackAir(
+					{
+						spriteLeft: 1800,
+						spriteTop: 300,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150
+					}, {
+						spriteLeft: 1200,
+						spriteTop: 300,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150
+					}),
+				release: createRelease(
+					{
+						spriteLeft: 1800,
+						spriteTop: 300,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150
+					}, {
+						spriteLeft: 1200,
+						spriteTop: 300,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150
+					}
+				),
+				dead: {
+					key: 'dead',
+					type: 'skill',
+					interactive: true,
+					frames: [
+						{
+							spriteLeft: 600,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 1,
+							props: {
+								killingBy: undefined,
+								finishTarget: undefined,
+								dead: true
+							}
+						},
+						{
+							spriteLeft: 600,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							sound: {key:'cyandead', volume:1},
+							speed: 11
+						},
+						{
+							spriteLeft: 300,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 12,
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							alpha: true,
+							speed: 10
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 10
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							alpha: true,
+							speed: 8
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 8
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 0,
+							spriteHeight: 0,
+							spriteOrigin: 0,
+							props: {
+								remove: true
+							},
+							speed: 1
+						},
+					]
+				}
+			},
+			key: 'cpt-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 5,
+			id: 633,
+			healtbarGap: 0,
+			name: 'Cyan',
+			class: 'animal',
+			level: 1,
+			direction: 'left',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1.5,
+			width: 200,
+			height: 200,
+			maxHP: 100,
+			atk: 20,
+			def: 100,
+			bleed: true,
+			stepX: 8,
+			weight: 1000,
+			stepXRate: .35,
+			finishableWith: 'feet,hip',
+			finishAfter: 50,
+			src: './images/sprites/ep633/',
+			buffs: []
+		};
+	},
+	enemy634: function () {
+		return {
+			animations: {
+				walk: {
+					key: 'walk',
+					type: 'move',
+					imediateBreak: true,
+					hold: true,
+					mobilityY: true,
+					priority: 5,
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 1500,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 300,
+							spriteTop: 1500,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 600,
+							spriteTop: 1500,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 1500,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							sound: { key: 'cyan-run-down', sound: .5 },
+							speed:3
+						},
+						{
+							spriteLeft: 1200,
+							spriteTop: 1500,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 1500,
+							spriteTop: 1500,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 1998,
+							spriteTop: 1500,
+							spriteWidth: 102,
+							spriteHeight: 300,
+							spriteOrigin: 51,
+							def: {
+								iframe: true
+							},
+							speed:3
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 1900,
+							spriteWidth: 300,
+							spriteHeight: 200,
+							spriteOrigin: 150,
+							sound: { key: 'cyan-run-up', sound: .5 },
+							speed:3
+						},
+						{
+							spriteLeft: 300,
+							spriteTop: 1900,
+							spriteWidth: 300,
+							spriteHeight: 200,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 600,
+							spriteTop: 1900,
+							spriteWidth: 300,
+							spriteHeight: 200,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 1900,
+							spriteWidth: 300,
+							spriteHeight: 200,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 1200,
+							spriteTop: 1900,
+							spriteWidth: 300,
+							spriteHeight: 200,
+							spriteOrigin: 150,
+							speed:3
+						},
+					]
+				},
+				run: {
+					key: 'run',
+					type: 'move',
+					imediateBreak: true,
+					hold: true,
+					mobilityY: true,
+					priority: 5,
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 1500,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 300,
+							spriteTop: 1500,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 600,
+							spriteTop: 1500,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 1500,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							sound: { key: 'cyan-run-down', sound: .5 },
+							speed:3
+						},
+						{
+							spriteLeft: 1200,
+							spriteTop: 1500,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 1500,
+							spriteTop: 1500,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 1998,
+							spriteTop: 1500,
+							spriteWidth: 102,
+							spriteHeight: 300,
+							spriteOrigin: 51,
+							def: {
+								iframe: true
+							},
+							extraStepXRate: 2,
+							speed:3
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 1900,
+							spriteWidth: 300,
+							spriteHeight: 200,
+							spriteOrigin: 150,
+							sound: { key: 'cyan-run-up', sound: .5 },
+							speed:3
+						},
+						{
+							spriteLeft: 300,
+							spriteTop: 1900,
+							spriteWidth: 300,
+							spriteHeight: 200,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 600,
+							spriteTop: 1900,
+							spriteWidth: 300,
+							spriteHeight: 200,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 1900,
+							spriteWidth: 300,
+							spriteHeight: 200,
+							spriteOrigin: 150,
+							speed:3
+						},
+						{
+							spriteLeft: 1200,
+							spriteTop: 1900,
+							spriteWidth: 300,
+							spriteHeight: 200,
+							spriteOrigin: 150,
+							speed:3
+						},
+					]
+				},
+				attack: {
+					key: 'attack',
+					order: 1,
+					type: 'skill',
+					attack: true,
+					priority: 4,
+					frames: [
+						{
+							spriteLeft: 0,
+							spriteTop: 900,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 300,
+							spriteTop: 900,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 600,
+							spriteTop: 900,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 12,
+							spell: { key: 'cyanspell' }
+						}
+					]
+				},
+				idle: {
+					key: 'idle',
+					type: 'skill',
+					imediateBreak: true,
+					frames: [
+						{
+							spriteLeft: 1200,
+							spriteTop: 900,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 1500,
+							spriteTop: 900,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 1800,
+							spriteTop: 900,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 12
+						},
+						{
+							spriteLeft: 1500,
+							spriteTop: 900,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 12
+						},
+					]
+				},
+				hurtground1: createHurtGround(
+						{
+							spriteLeft: 300,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							invisibleWhenLay: true
+						},
+						null,
+						{ key: 
+		'goblinhurt1,goblinhurt2,goblinhurt3,goblinhurt4,goblinhurt5,goblinhurt6,goblinhurt7', 
+							volume:.5, reset: true }
+					),
+				hurtair: createHurtAir(
+					{
+						spriteLeft: 1800,
+						spriteTop: 300,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150
+					}, {
+						spriteLeft: 1200,
+						spriteTop: 300,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150
+					}, 
+					{ key: 'goblinhurt1,goblinhurt2,goblinhurt3,goblinhurt4,goblinhurt5,goblinhurt6,goblinhurt7', 
+						volume: .5, reset: true }
+				),
+				knockbackground:createKnockBackGround(
+					{
+						spriteLeft: 1500,
+						spriteTop: 300,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150
+					},
+					{
+						spriteLeft: 900,
+						spriteTop: 300,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150
+					},
+				),
+				knockbackair: createKnockBackAir(
+					{
+						spriteLeft: 1800,
+						spriteTop: 300,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150
+					}, {
+						spriteLeft: 1200,
+						spriteTop: 300,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150
+					}),
+				release: createRelease(
+					{
+						spriteLeft: 1800,
+						spriteTop: 300,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150
+					}, {
+						spriteLeft: 1200,
+						spriteTop: 300,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150
+					}
+				),
+				dead: {
+					key: 'dead',
+					type: 'skill',
+					interactive: true,
+					frames: [
+						{
+							spriteLeft: 600,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 1,
+							props: {
+								killingBy: undefined,
+								finishTarget: undefined,
+								dead: true
+							}
+						},
+						{
+							spriteLeft: 600,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							sound: {key:'cyandead', volume:1},
+							speed: 11
+						},
+						{
+							spriteLeft: 300,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 12,
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							alpha: true,
+							speed: 10
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 10
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							alpha: true,
+							speed: 8
+						},
+						{
+							spriteLeft: 900,
+							spriteTop: 300,
+							spriteWidth: 300,
+							spriteHeight: 300,
+							spriteOrigin: 150,
+							speed: 8
+						},
+						{
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 0,
+							spriteHeight: 0,
+							spriteOrigin: 0,
+							props: {
+								remove: true
+							},
+							speed: 1
+						},
+					]
+				}
+			},
+			key: 'cyn-' + Math.random().toString().replace(/[.]/g, ''),
+			yGap: 5,
+			id: 634,
+			healtbarGap: 0,
+			name: 'Centipate',
+			class: 'animal',
+			level: 1,
+			direction: 'left',
+			defaultDirection: 'right',
+			defaultAnimationKey: 'idle',
+			zoom: 1.5,
+			width: 200,
+			height: 200,
+			maxHP: 100,
+			atk: 20,
+			def: 100,
+			bleed: true,
+			stepX: 8,
+			ranged: true,
+			weight: 1000,
+			stepXRate: .35,
+			finishableWith: 'feet,hip',
+			finishAfter: 50,
+			src: './images/sprites/ep634/',
+			buffs: []
+		};
+	},
 	enemy20: function () {
 		return {
 			animations: {
@@ -70964,6 +71947,7 @@ const _allEnemies = {
 			noDirection: true,
 			noLoot: true,
 			skipHealthBar: true,
+			drawPriority: 999,
 			src: './images/sprites/ep71/',
 			buffs: []
 		};

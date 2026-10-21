@@ -2909,7 +2909,7 @@ function enemy(_e) {
 		
 		
 		let _goOn;
-		if (this.autoMode && !this.keyboard && this.class !== __spell){
+		if (this.autoMode && !this.keyboard && this.class !== __spell && !this.npc){
 			if(this.important || this.puppetMode || this.immobilize || this.harmless 
 				|| this.still || this.action || this.friendly || this.class === 'minion')
 				this.autoCommand();

@@ -27,7 +27,7 @@ function getOptionsUI() {
 			</div>
 		</div>
 		<div style="flex:1"></div>
-		<div onexactclick="getKeyboardPromo(1)" class="settings-row flex flex-jc-start${__isPC ? '' : ' d-none'}">${getLangData('Controls')}</div>
+		<div onexactclick="getKeyboardPromo(1,1)" class="settings-row flex flex-jc-start${__isPC ? '' : ' d-none'}">${getLangData('Controls')}</div>
 		<div onexactclick="askExitApp()" class="settings-row flex flex-jc-start">${getLangData('Quit Game')}</div>
 		</div>
 			</div>

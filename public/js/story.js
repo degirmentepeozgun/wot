@@ -2129,10 +2129,10 @@ const __stories = [
 						minX: 2400,
 						maxX: 2400,
 						count: 1,
-						// do: function(_e) {
-						// 	_e.npc = true;
-						// 	_e.dialogs = createTrainingDialog('tank');
-						// },
+						do: function(_e) {
+							_e.npc = true;
+							_e.dialogs = createTrainingDialog('tank');
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -3151,6 +3151,9 @@ const __stories = [
 						minX: 3340,
 						maxX: 3340,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -3178,6 +3181,9 @@ const __stories = [
 						minX: 4340,
 						maxX: 4340,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -3188,6 +3194,7 @@ const __stories = [
 						maxX: 2400,
 						count: 1,
 						do: function(_e) {
+							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.dialogs = createPotDialog('tank');
 							//_e.dialogs = createTrainingDialog('tank');
@@ -3201,6 +3208,9 @@ const __stories = [
 						minX: 4550,
 						maxX: 4550,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -3211,6 +3221,7 @@ const __stories = [
 						maxX: 1245,
 						count: 1,
 						do: function(_e) {
+							_e.drawPriority = 999;
 							if(episode.msNow < 501){
 								_e.reversed = true;
 								_e.direction = 'left';
@@ -3226,6 +3237,7 @@ const __stories = [
 						maxX: 1900,
 						count: 1,
 						do: function(_e) {
+							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.friendly = true;
 							_e.enemy = false;
@@ -3605,6 +3617,9 @@ const __stories = [
 						minX: 3340,
 						maxX: 3340,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -3614,6 +3629,9 @@ const __stories = [
 						minX: 4340,
 						maxX: 4340,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -3623,7 +3641,8 @@ const __stories = [
 						minX: 2400,
 						maxX: 2400,
 						count: 1,
-					do: function(_e) {
+						do: function(_e) {
+							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.dialogs = createPotDialog('tank');
 							//_e.dialogs = createTrainingDialog('tank');
@@ -3655,6 +3674,9 @@ const __stories = [
 						minX: 4550,
 						maxX: 4550,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -3665,6 +3687,7 @@ const __stories = [
 						maxX: 1245,
 						count: 1,
 						do: function(_e) {
+							_e.drawPriority = 999;
 							if(episode.msNow < 501){
 								_e.reversed = true;
 								_e.direction = 'left';
@@ -3680,6 +3703,7 @@ const __stories = [
 						maxX: 1900,
 						count: 1,
 						do: function(_e) {
+							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.friendly = true;
 							_e.enemy = false;
@@ -4049,6 +4073,9 @@ const __stories = [
 						minX: 3340,
 						maxX: 3340,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -4058,6 +4085,9 @@ const __stories = [
 						minX: 4340,
 						maxX: 4340,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -4068,6 +4098,7 @@ const __stories = [
 						maxX: 2400,
 						count: 1,
 						do: function(_e) {
+							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.dialogs = createPotDialog('tank');
 							//_e.dialogs = createTrainingDialog('tank');
@@ -4099,6 +4130,9 @@ const __stories = [
 						minX: 4550,
 						maxX: 4550,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -4109,6 +4143,7 @@ const __stories = [
 						maxX: 1245,
 						count: 1,
 						do: function(_e) {
+							_e.drawPriority = 999;
 							if(episode.msNow < 501){
 								_e.reversed = true;
 								_e.direction = 'left';
@@ -4124,6 +4159,7 @@ const __stories = [
 						maxX: 1900,
 						count: 1,
 						do: function(_e) {
+							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.friendly = true;
 							_e.enemy = false;
@@ -4457,6 +4493,9 @@ const __stories = [
 						minX: 3340,
 						maxX: 3340,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -4466,6 +4505,9 @@ const __stories = [
 						minX: 4340,
 						maxX: 4340,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -4476,6 +4518,7 @@ const __stories = [
 						maxX: 2400,
 						count: 1,
 						do: function(_e) {
+							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.dialogs = createPotDialog('tank');
 							//_e.dialogs = createTrainingDialog('tank');
@@ -4507,6 +4550,9 @@ const __stories = [
 						minX: 4550,
 						maxX: 4550,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -4516,6 +4562,9 @@ const __stories = [
 						minX: 1245,
 						maxX: 1245,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -4526,6 +4575,7 @@ const __stories = [
 						maxX: 1900,
 						count: 1,
 						do: function(_e) {
+							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.friendly = true;
 							_e.enemy = false;
@@ -4791,6 +4841,7 @@ const __stories = [
 						maxX: 6200,
 						count: 5,
 						do: function(_e) {
+							_e.drawPriority = 999;
 							_e.friendly = _e.invulnerable = true;
 							_e.enemy = false;
 						}
@@ -4800,6 +4851,9 @@ const __stories = [
 						minX: 3340,
 						maxX: 3340,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -4809,6 +4863,9 @@ const __stories = [
 						minX: 4340,
 						maxX: 4340,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -4819,6 +4876,7 @@ const __stories = [
 						maxX: 2400,
 						count: 1,
 						do: function(_e) {
+							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.dialogs = createPotDialog('tank');
 							//_e.dialogs = createTrainingDialog('tank');
@@ -4832,6 +4890,9 @@ const __stories = [
 						minX: 4550,
 						maxX: 4550,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -4841,6 +4902,9 @@ const __stories = [
 						minX: 1245,
 						maxX: 1245,
 						count: 1,
+						do: function(_e) {
+							_e.drawPriority = 999;
+						},
 						yPosition: function() {
 							return groundheight;
 						}
@@ -4851,6 +4915,7 @@ const __stories = [
 						maxX: 1900,
 						count: 1,
 						do: function(_e) {
+							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.friendly = true;
 							_e.enemy = false;
@@ -4867,6 +4932,7 @@ const __stories = [
 						maxX: 4150,
 						count: 1,
 						do: function(_e) {
+							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.enemy = false;
 							_e.direction = 'right';
@@ -7000,7 +7066,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		//startScene: 2,
+		startScene: 1,
 		scenes: [
 			{
 				when: function() {
@@ -8288,7 +8354,7 @@ const __stories = [
 					// 	experience: 1
 					// },
 					{
-						id: 619,
+						id: 634,
 						minX: 4000,
 						maxX: 6000,
 						count: 2,
@@ -10850,7 +10916,7 @@ function storyBonus(_func, _instant, _container) {
 		const _wrapper = document.createElement('div');
 		_wrapper.className = 'story-wrapper story-gift-wrapper fade-in';
 		const _sin = document.createElement('div');
-		_sin.className = 'full story-inner story-gift-inner';
+		_sin.className = 'full story-inner story-gift-inner story-gift-card-inner';
 		const _inner = document.createElement('div');
 		_inner.style.width = 'calc(36vh * 4)';
 		_inner.className = 'inner-wrapper story-gift flex flex-jc-start';

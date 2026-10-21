@@ -3197,6 +3197,11 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	cyanwalk: './images/sounds/cyan-walk.mp3',
+	cyanrunup: './images/sounds/cyan-run-up.mp3',
+	cyandead: './images/sounds/cyan-dead.mp3',
+	cyanrundown: './images/sounds/cyan-run-down.mp3',
+	cyanattack: './images/sounds/cyan-attack.mp3',
 	headhit: './images/sounds/head-hit.mp3',
 	kongrun: './images/sounds/kong-goblin-run.mp3',
 	groundslide: './images/sounds/groundslide.mp3',
@@ -22008,6 +22013,144 @@ const spells = {
 						spriteHeight: 276,
 						spriteOrigin: 11,
 						bottomGap: -40,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			}
+		}
+	},
+	cyanspell: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1,
+		invulnerable: true,
+		extraStepXRate: 1,
+		toxicDmgRate: 100,
+		class: __spell,
+		name: 'Venom Breath',
+		src: './images/sprites/ep634/sprite.png',
+		animations: {
+			idle: {
+				key: "idle",
+				type: 'skill',
+				attack: true,
+				move: true,
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 1200,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150,
+						extraStepXRate: 1,
+						extraStepYRate: -.25,
+						speed: 12,
+						atk: {
+							yRange: 10,
+							rate: 2,
+							reset: true,
+							aoe: 120,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground',
+								sound:{key:'punchhit', volume:.5}
+							},
+							type: 'toxic'
+						}
+					},
+					{
+						spriteLeft: 300,
+						spriteTop: 1200,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150,
+						extraStepXRate: 1,
+						extraStepYRate: -.2,
+						speed: 12,
+						atk: {
+							yRange: 10,
+							reset: true,
+							rate: 2,
+							aoe: 120,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground',
+								sound:{key:'punchhit', volume:.5}
+							},
+							type: 'toxic'
+						}
+					},
+					{
+						spriteLeft: 600,
+						spriteTop: 1200,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150,
+						extraStepXRate: 1,
+						extraStepYRate: -.15,
+						speed: 12,
+						atk: {
+							yRange: 10,
+							rate: 2,
+							aoe: 120,
+							reset: true,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground',
+								sound:{key:'punchhit', volume:.5}
+							},
+							type: 'toxic'
+						}
+					}
+				]
+			},
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 900,
+						spriteTop: 1200,
+						spriteWidth: 300,
+						sound: {key:'aduketdead', volume:1},
+						spriteHeight: 300,
+						spriteOrigin: 150,
+						extraStepXRate: .7,
+						extraStepYRate: -.1,
+						bottomGap: 60,
+						speed: 8
+					},
+					{
+						spriteLeft: 1200,
+						spriteTop: 1200,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150,
+						extraStepXRate: .4,
+						extraStepYRate: -.05,
+						bottomGap: 60,
+						speed: 8
+					},
+					{
+						spriteLeft: 1500,
+						spriteTop: 1200,
+						spriteWidth: 300,
+						spriteHeight: 300,
+						spriteOrigin: 150,
+						extraStepXRate: .3,
+						extraStepYRate: -.05,
+						bottomGap: 60,
+						speed: 8
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
 						props: {
 							remove: true
 						},

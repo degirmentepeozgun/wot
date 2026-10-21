@@ -1568,20 +1568,19 @@ svg#use-progress.use-in-progress circle {
 	-webkit-transform: translateZ(0);
 }
 .friendly-profile {
-	width: 20.2vw !important;
 	height: 18% !important;
 	margin-top: 5%;
 	transform: scale(.65) !important;
 	-webkit-transform: scale(.65) !important;
-	transform-origin: left 15% !important;
-	-webkit-transform-origin: left 15% !important;
+	transform-origin: left 40% !important;
+	-webkit-transform-origin: left 40% !important;
 	will-change: transform;
 	transform: translateZ(0);
 	-webkit-transform: translateZ(0);
 }
 
 	.friendly-profile:nth-child(3) {
-		left: -10% !important
+		left: -10% !important;
 	}
 .character-level-text {
 	color:#e2d4b5 !important;
@@ -2984,15 +2983,17 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	will-change: transform
 }
 #pvp-counter.map-name {
-	height:4.4vh;
-	top: 4.5%;
-	font-size: 3vh !important;
-	line-height: .2vh !important;
+	height:5%;
+	top: 3%;
+	font-family: 'Alegreya' !important;
+	font-size:calc(var(--wot-font-base) * 1.5) !important;
+	line-height:calc(var(--wot-font-base) * 1.5) !important;
 	border: none !important;
 	color: #dfe8f3 !important;
 	border-radius: 0 !important;
 	width: auto !important;
 	background: none !important;
+	font-weight: 700 !important;
 }
 	#pvp-counter.countdown {
 		top: 12%;
@@ -3970,9 +3971,9 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 }
 
 .aid {
-	width: 3.2vw;
-	right: -1.6vw;
-	top: .8vw;
+	width: 9%;
+	right: 1.5%;
+	top: 65%;
 	position: absolute;
 	z-index: 6
 }
@@ -7603,14 +7604,14 @@ body:not(.pc-mission) .tag-sf.bgless {
 	text-shadow: 0 0 1vh #000;
 	height:auto !important;
 	flex:1;
-	z-index: 2;
+	z-index: 2; 
 }
 .story-gift .selected .card-back {
 	background: url(./../images/ui/game/card-selected.png) !important;
 	background-size: 100% 100% !important;
 	aspect-ratio: 417 / 598 !important;
 }
-.story-gift-inner {
+.story-gift-inner.story-gift-card-inner {
 	height: 70% !important
 }
 .story-gift-wrapper {
@@ -7972,6 +7973,7 @@ body:not(.pc-mission) .tag-sf.bgless {
 	height:100%;
 	background:#0e0a06;
 	text-align:center;
+	min-width:calc(var(--wot-font-base) * 5) !important
 }
 .slot-amount-border {
 	width:36%;
@@ -15208,13 +15210,20 @@ body.pc-mission  #game-ui .intro-screen {
 	width:12.51%;
 	aspect-ratio: 1/1;
 	border-radius: 100%;
+	position:relative;
 }
 .avatar-item img {
 	width:90%;
 	border-radius: 100%;
 }
-.avatar-item.selected {
-	background:#d38d28
+.avatar-item.selected::after {
+	content:'';
+	position:absolute;
+	top:-2%;
+	left:-2%;
+	width:104%;
+	height:104%;
+	background: url(./../images/ui/game/avatar-select.png) center / contain no-repeat;
 }
 .avatar-item.selected img {
 	width:95%
@@ -16685,6 +16694,7 @@ div[data-module=dailylogin] .book-page-bg {
 	color:#fff !important;
 	text-align: center;
     font-size: calc(var(--wot-font-base) * 1.35) !important;
+	min-width:calc(var(--wot-font-base) * 5) !important
 }
 .menu-modal-right-container.honor-content-detail-wrapper {
     background: url(./../images/ui/game/page-frame-dark-border.png),
@@ -17016,6 +17026,8 @@ div[data-module=dailylogin] .book-page-bg {
 	width: 86% !important;
 	height: 75%;
 	margin: 0 auto;
+}
+.story-gift-inner:not(.story-gift-card-inner) .story-wrapper .inner-wrapper {
     transform: translateX(4.5%);
 }
 .story-wrapper .story-inner6 .inner-wrapper {

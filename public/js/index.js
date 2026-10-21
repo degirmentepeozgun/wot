@@ -2658,17 +2658,23 @@ function getBaseKeyboardKey(_newKey) {
 	if(i !== -1)
 		return{ title: _keyCombinations[i].title, baseKey: _keyCombinations[i].baseKey };
 }
-function getKeyboardPromo(_force) {
-	if(__switchingMap || gameopening)
+function getKeyboardPromo(_force, _fromInGame) {
+	if((__switchingMap || gameopening) && !_fromInGame)
 		return;
 	const _seenBefore = localStorage.getItem('keyboard-promo-skip');
 	if(_seenBefore && !_force)
 		return;
 	if(_force)
 		playClick();
+	let _parent = document.getElementById('first-splash');
+	let _bringToFront = false;
+	if(hasClass(_parent, 'v-none')){
+		_parent = _gameUI;
+		_bringToFront = true;
+	}
 	const _desc = document.createElement('div');
 	_desc.className = 'flex show-ui full keyboard-promo-container quick-play-desc-container fade-me-99 animate-me settings-before-play';
-	_desc.style = 'position:absolute;top:0;left:0;overflow:hidden;z-index:1499';
+	_desc.style = 'position:absolute;top:0;left:0;overflow:hidden;z-index:' + (_bringToFront ? 9999 : 1499);
 	//let _html = '<div style="height:calc(100% - 9vh);position:relative" class="w-100 flex"><img src="./images/icons/keys.png" style="border:.2vh solid #F3F4F599;border-top:0;position:absolute;object-fit:cover;max-width:100%;max-height:100%" /></div>';
 	// _desc.innerHTML = _html +
 	// 		`<div class="quick-play-desc-skip flex" style="padding:0 5vh;width:91% !important">
@@ -2714,9 +2720,6 @@ function getKeyboardPromo(_force) {
 					${getLangData('APPROVE')}
 				</div>
 			</div>`;
-	let _parent = document.getElementById('first-splash');
-	if(hasClass(_parent, 'v-none'))
-		_parent = document.querySelector('#menu-ui') ?? _gameUI;
 	_parent.appendChild(_desc);
 }
 function isElectron(){
