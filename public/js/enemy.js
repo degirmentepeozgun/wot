@@ -1,4 +1,4 @@
-﻿﻿﻿'use strict';
+﻿'use strict';
 const __attackTolerance = 2;
 
 function enemy(_e) {
@@ -18,6 +18,7 @@ function enemy(_e) {
 	this.divider = getRandomValue2(1000, 9999);
 	this.healthRate = 100;
 	this.blocked = false;
+	this.knockbackRate = 0;
 	this.defaultAnimationKey = _e.defaultAnimationKey ?? 'idle';
 	this.startAnimationKey = _e.startAnimationKey;
 	this.defaultDirection = _e.defaultDirection ?? __left;
@@ -1189,6 +1190,17 @@ function enemy(_e) {
 		this.slot = null;
 		this.lookingAtTarget = false;
 		this.slotJustReleasedTick = _gameTick;
+		this.beltPhase = undefined;
+		this.beltFlankSign = undefined;
+		this.beltFlankY = undefined;
+		this.beltFlankOwnerY = undefined;
+		this.beltGoalY = undefined;
+		this.beltGoalOwnerY = undefined;
+		this.beltPhaseStart = undefined;
+		this.beltGaitLock = undefined;
+		this.beltChasing = undefined;
+		this.beltXSettled = undefined;
+		this.beltLooked = undefined;
 	};
     this.updateSlot = function() {
         const _slot = this.slot;
@@ -1736,6 +1748,438 @@ function enemy(_e) {
 			this.yPosition += yStep;
 			this.limitYPosition();
 			this.yPositionUpdated = true;
+		}
+	}
+	this.beltAimY = function(desiredY, ownerY, slack) {
+		const arrived = this.beltGoalY !== undefined && MathAbs(this.yPosition - this.beltGoalY) <= Math.max(this.verticalStep || 8, 12);
+		const drifted = this.beltGoalOwnerY === undefined || MathAbs(ownerY - this.beltGoalOwnerY) > slack;
+		if (this.beltGoalY === undefined || (arrived && drifted)) {
+			let y = desiredY;
+			const maxY = getGroundHeight() - this.yGap;
+			if (y > maxY)
+				y = maxY;
+			else {
+				const minY = episode.getMinPositionY(this);
+				if (minY && y < minY.y)
+					y = minY.y;
+			}
+			this.beltGoalY = y;
+			this.beltGoalOwnerY = ownerY;
+		}
+		return this.beltGoalY;
+	}
+	this.beltClampY = function(y) {
+		const maxY = this.getMaxYPosition();
+		if (y > maxY)
+			y = maxY;
+		const minY = episode.getMinPositionY(this);
+		if (minY && y < minY.y)
+			y = minY.y;
+		return y;
+	}
+	this.beltNudgeY = function(destY, scale) {
+		destY = this.beltClampY(destY);
+		const diff = destY - this.yPosition;
+		if (diff <= 2 && diff >= -2) {
+			this.beltYRate = 0;
+			return true;
+		}
+		if (this.animation === 'idle')
+			return false;
+		let rate = this.beltYRate || 0.28;
+		rate += 0.08;
+		if (rate > 1)
+			rate = 1;
+		this.beltYRate = rate;
+		let step = (this.verticalStep || this.calculateYStep()) * 0.45 * (scale ?? 1) * rate;
+		if (step < 1)
+			step = 1;
+		const hopAbs = diff > 0 ? diff : -diff;
+		let hop = hopAbs < step ? diff : (diff > 0 ? step : -step);
+		hop = MathRound(hop);
+		if (hop === 0)
+			hop = diff > 0 ? 1 : -1;
+		const before = this.yPosition;
+		this.yPosition += hop;
+		this.limitYPosition();
+		this.yPositionUpdated = true;
+		if (this.yPosition === before)
+			return true;
+		const left = destY - this.yPosition;
+		return left <= 2 && left >= -2;
+	}
+	this.beltFace = function(myX, towardX) {
+		const dx = towardX - myX;
+		if (dx < 12 && dx > -12)
+			return;
+		const dir = dx > 0 ? __right : __left;
+		if (this.direction !== dir) {
+			this.oldDirection = this.direction;
+			this.direction = dir;
+			this.turned = true;
+		}
+	}
+	this.beltBoot = function() {
+		if (this.beltPace !== undefined)
+			return;
+		this.beltPace = getRandomValue2(82, 112) / 100;
+		this.beltBias = getRandomValue2(-3, 3) * 0.15;
+		this.beltDepart = _gameTick + getRandomValue2(0, 4) * 90;
+		this.beltFrameSeed = getRandomValue2(0, 6);
+	}
+	this.beltGait = function(mode) {
+		const anim = this.animation;
+		if (this.beltGaitMode === mode) {
+			if (mode === 'idle') {
+				if (anim === 'idle')
+					return;
+			}
+			else if (mode === 'rise') {
+				if (anim === 'walk' || anim === 'run') {
+					if (this.autoStepXRate !== 0)
+						this.autoStepXRate = this.extraStepXRate = 0;
+					return;
+				}
+			}
+			else if (anim === 'run' || anim === 'walk') {
+				if (this.moveDirection !== this.direction)
+					this.moveDirection = this.direction;
+				return;
+			}
+		}
+		if (mode === 'idle') {
+			if (anim !== 'idle')
+				this.idle(203);
+			this.autoStepXRate = 0;
+			this.extraStepXRate = 0;
+			this.moveDirection = undefined;
+			this.beltYRate = 0;
+			this.beltGaitMode = 'idle';
+			return;
+		}
+		const canRun = !!this.animations.run;
+		const useRun = mode === 'run' && canRun;
+		const key = useRun ? 'run' : (this.animations.walk ? 'walk' : (canRun ? 'run' : 'idle'));
+		if (key === 'idle') {
+			this.beltGaitMode = undefined;
+			this.beltGait('idle');
+			return;
+		}
+		if (anim !== key) {
+			this.animate(key, 1);
+			const frames = this.animations[key].frames;
+			const len = frames ? frames.length : 0;
+			if (len > 1)
+				this.frame = this.beltFrameSeed % len;
+		}
+		const anima = this.getCurrentAnimation();
+		if (mode === 'rise') {
+			anima.mobilityY = true;
+			this.autoStepXRate = 0;
+			this.extraStepXRate = 0;
+			this.moveDirection = undefined;
+		}
+		else {
+			anima.mobilityY = false;
+			this.moveDirection = this.direction;
+			const pace = this.beltPace || 1;
+			const loaf = this.slot?.support ? 0.78 : 1;
+			this.autoStepXRate = (useRun ? 0.9 : 0.56) * pace * loaf;
+			this.extraStepXRate = this.calculateMoveXStep();
+		}
+		this.beltGaitMode = mode;
+	}
+	this.beltCommitGait = function(mode) {
+		let wantKey = 'walk';
+		if (mode === 'idle')
+			wantKey = 'idle';
+		else if (mode === 'run' && this.animations.run)
+			wantKey = 'run';
+		else if (!this.animations.walk && this.animations.run)
+			wantKey = 'run';
+		const anim = this.animation;
+		const nowKey = (anim === 'run' || anim === 'walk' || anim === 'idle') ? anim : wantKey;
+		if (this.frame > 0)
+			this.beltGaitSawFrame = true;
+		const cycleDone = !!(this.beltGaitLock && this.beltGaitSawFrame && this.animationFinished && this.frame === 0);
+		if (wantKey !== nowKey && this.beltGaitLock && !cycleDone) {
+			this.beltGait(nowKey);
+			return;
+		}
+		const before = anim;
+		this.beltGait(mode);
+		if (this.animation !== before || cycleDone) {
+			this.beltGaitLock = true;
+			this.beltGaitSawFrame = false;
+		}
+		else if (!this.beltGaitLock && (this.animation === 'run' || this.animation === 'walk' || this.animation === 'idle'))
+			this.beltGaitLock = true;
+	}
+	this.pickBeltAttack = function(distPercent, touching) {
+		if (this.hasChain && !this.noCounter && this.getCurrentAnimation()?.hurt) {
+			this.pickRandomAttack(null, null, 1);
+			return;
+		}
+		if (this.ranged)
+			this.pickRandomAttack(null, null, 1);
+		else if (touching || distPercent < 11)
+			this.pickRandomAttack(null, null, 1);
+		else if (distPercent < 26)
+			this.pickRandomAttack(null, 8, 1);
+		else
+			this.pickRandomAttack(null, 16, 1);
+		const chosen = this.animations[this.upcomingAnimation];
+		if (!chosen?.attack)
+			this.pickRandomAttack(null, null, 1);
+	}
+	this.autoCommand3 = function () {
+		if (this.harmless || (episode.realTime && this.alp))
+			return;
+		if (!this.animationFinished && this.animations[this.animation]?.attack)
+			return;
+		if (this.isDead()) {
+			this.releaseSlot(true);
+			return;
+		}
+		if (this.animation === 'idle' && this.reactionStartTime && _gameTick < this.reactionStartTime)
+			return;
+		if (!this.autoTarget || this.autoTarget.isDead())
+			this.pickNewTarget();
+		if (!this.autoTarget || this.autoTarget.isDead()) {
+			if (this.animation !== 'idle')
+				this.idle(204);
+			return;
+		}
+		if (!this.autoTarget.slots)
+			this.autoTarget.createSlots(1);
+		if (this.touchDead && isObjectsInTouch(this, this.autoTarget).touch) {
+			this.toucher = this.autoTarget;
+			this.animate(this.deadAnimationKey ?? 'dead', 1);
+			return;
+		}
+		const away = this.animation === 'release' || this.animation.startsWith('knockback') || this.invisible;
+		if ((this.slot && (this.slot.owner?.isDead?.() || (!this.slot.support && this.slot.owner !== this.autoTarget))) || away)
+			this.releaseSlot();
+		const animaNow = this.getCurrentAnimation();
+		if ((animaNow.hurt && !this.animationFinished && (!this.hasChain || this.noCounter)) || this.animation === 'release' || this.dying || this.dead || this.immobilize) {
+			this.autoAttacking = false;
+			if (this.slot)
+				this.slot.attacking = false;
+			return;
+		}
+		this.validateSlot();
+		if (!this.tryCheckBetterSlot())
+			return;
+		if (!this.pickSlotOrder()) {
+			if (this.ranged) {
+				while (this.autoTarget.ringLevel < 3)
+					this.autoTarget.createSlots(this.autoTarget.ringLevel + 1);
+			}
+			else
+				this.autoTarget.createSlots(this.autoTarget.ringLevel + 1);
+			this.pickSlotOrder();
+		}
+		if (!this.slot)
+			return;
+		this.beltBoot();
+		if (_gameTick < this.beltDepart) {
+			this.beltGait('idle');
+			return;
+		}
+		if (this.beltSlotKey !== this.slot) {
+			this.beltSlotKey = this.slot;
+			this.beltFlankSign = undefined;
+			this.beltFlankY = undefined;
+			this.beltFlankOwnerY = undefined;
+			this.beltGoalY = undefined;
+			this.beltGoalOwnerY = undefined;
+			this.beltGaitLock = undefined;
+			this.beltChasing = undefined;
+			this.beltXSettled = undefined;
+			this.beltLooked = undefined;
+			this.beltPhase = undefined;
+			this.beltPhaseStart = undefined;
+			this.beltAround = undefined;
+			this.beltAroundCool = undefined;
+		}
+		const owner = this.autoTarget;
+		const myX = this.main ? this.left : this.left - platformX;
+		const ownerX = owner.main ? owner.left : owner.left - platformX;
+		let slotX = ownerX + this.slot.xGap;
+		if (this.slot.mustCross)
+			slotX += (this.slot.xGap < 0 ? -this.HURTWIDTH : this.HURTWIDTH) * 0.33;
+		const slotY = owner.yPosition + this.slot.yGap;
+		const bodyH = Math.max(this.HEIGHT || 70, owner.HEIGHT || 70);
+		const clear = bodyH * (this.ranged ? 0.7 : 0.9);
+		const margin = Math.max((owner._HURTBOX_half || 24) * 0.85, 16);
+		const ySlack = Math.max(bodyH * 0.72, 48);
+		const mySide = myX - ownerX;
+		const opposite = this.slot.xGap * mySide < 0;
+		if (this.slot.mustCross && !opposite && MathAbs(mySide) > margin)
+			this.slot.mustCross = false;
+		const xDist = MathAbs(slotX - myX);
+		let stepPx = (this.stepXRate + 0.9) * episode.cWidth * 0.01;
+		if (stepPx < 18)
+			stepPx = 18;
+		const xStop = this._HURTBOX_half > stepPx ? this._HURTBOX_half : stepPx;
+		if (this.beltXSettled) {
+			if (xDist > xStop + stepPx) {
+				this.beltXSettled = undefined;
+				this.beltLooked = undefined;
+			}
+		}
+		else if (xDist <= xStop)
+			this.beltXSettled = true;
+		const nearOwnerY = MathAbs(this.yPosition - owner.yPosition) < bodyH * 0.4;
+		const rangedFar = this.ranged && MathAbs(myX - ownerX) > margin * 2;
+		const sidestep = Math.min(clear, Math.max(24, (getGroundHeight() || 200) * 0.18));
+		if (rangedFar || !opposite) {
+			this.beltAround = false;
+		}
+		else if (this.beltAroundCool && _gameTick < this.beltAroundCool) {
+			this.beltAround = false;
+		}
+		else if (this.beltAround && this.beltFlankY !== undefined && MathAbs(this.yPosition - this.beltFlankY) <= 2) {
+			this.beltAround = false;
+			this.beltAroundCool = _gameTick + 800;
+			this.beltFlankY = undefined;
+			this.slot.mustCross = false;
+		}
+		else if (!this.beltAround && (this.slot.mustCross || nearOwnerY)) {
+			this.beltAround = true;
+		}
+		let around = !!this.beltAround;
+		if (around) {
+			if (!this.beltPhaseStart)
+				this.beltPhaseStart = _gameTick;
+			if ((_gameTick - this.beltPhaseStart) > 2800) {
+				this.slot.mustCross = false;
+				this.beltAround = false;
+				this.beltAroundCool = _gameTick + 800;
+				around = false;
+				this.beltPhase = undefined;
+				this.beltFlankY = undefined;
+			}
+		}
+		else
+			this.beltPhaseStart = undefined;
+		const yQuiet = Math.max((this.verticalStep || 8) * 1.25, 14);
+		const xTol = this.ranged ? Math.max(this._HURTBOX_half * 1.6, 28) : Math.max(12, this._HURTBOX_half * 0.5);
+		const runFar = episode.cWidth * (this.ranged ? 0.3 : 0.36);
+		const engaged = !this.slot.support && !this.ranged;
+		const goalY = this.beltAimY(slotY, owner.yPosition, ySlack);
+		if (around) {
+			if (this.beltFlankY === undefined || MathAbs(owner.yPosition - (this.beltFlankOwnerY ?? owner.yPosition)) > sidestep) {
+				if (this.beltFlankSign === undefined) {
+					const dy = this.yPosition - owner.yPosition;
+					this.beltFlankSign = (dy > 8 || dy < -8) ? (dy > 0 ? 1 : -1) : (this.beltBias >= 0 ? 1 : -1);
+				}
+				let flankY = this.beltClampY(owner.yPosition + (this.beltFlankSign * sidestep) + (this.beltBias * bodyH * 0.15));
+				if (MathAbs(flankY - owner.yPosition) < sidestep * 0.45) {
+					this.beltFlankSign *= -1;
+					flankY = this.beltClampY(owner.yPosition + (this.beltFlankSign * sidestep) + (this.beltBias * bodyH * 0.15));
+				}
+				this.beltFlankY = flankY;
+				this.beltFlankOwnerY = owner.yPosition;
+			}
+			const onLane = MathAbs((this.beltFlankY ?? this.yPosition) - this.yPosition) <= 2;
+			if (!onLane) {
+				this.beltPhase = 'rise';
+				this.beltCommitGait('rise');
+				if (this.animation !== 'idle')
+					this.beltNudgeY(this.beltFlankY, 1);
+				return;
+			}
+			if (!this.beltXSettled) {
+				this.beltFace(myX, slotX);
+				this.beltPhase = 'cross';
+				this.beltCommitGait(engaged && xDist > runFar ? 'run' : 'walk');
+				return;
+			}
+			this.slot.mustCross = false;
+			this.beltPhase = undefined;
+		}
+		const yGapNow = MathAbs(this.yPosition - goalY);
+		const yOk = this.ranged ? MathAbs(this.yPosition - owner.yPosition) <= ySlack : yGapNow <= yQuiet;
+		let hold;
+		if (this.beltXSettled && yOk)
+			hold = true;
+		else if (this.ranged) {
+			const chaseOut = Math.max(xTol * 2.4, runFar * 0.9, 84);
+			const chaseIn = Math.max(16, Math.min(xTol * 0.4, 26));
+			if (this.beltChasing)
+				this.beltChasing = xDist > chaseIn;
+			else
+				this.beltChasing = xDist > chaseOut;
+			hold = !this.beltChasing && yOk;
+		}
+		else
+			hold = xDist <= xTol && yOk;
+		if (!hold) {
+			this.lookingAtTarget = false;
+			this.slot.placed = false;
+			if (this.beltXSettled) {
+				if (yGapNow > yQuiet) {
+					this.beltCommitGait('rise');
+					if (this.animation !== 'idle')
+						this.beltNudgeY(goalY, 1);
+				}
+				else
+					this.beltGait('idle');
+				return;
+			}
+			this.beltFace(myX, slotX);
+			const chaseGait = (this.ranged ? xDist > runFar * 1.5 : engaged && xDist > runFar) ? 'run' : 'walk';
+			this.beltCommitGait(chaseGait);
+			if (this.animation !== 'idle' && yGapNow > yQuiet)
+				this.beltNudgeY(goalY, 0.4);
+			return;
+		}
+		this.beltPhase = 'hold';
+		this.lookingAtTarget = true;
+		this.slot.placed = true;
+		if (!this.beltLooked) {
+			this.beltLooked = true;
+			this.beltFace(myX, ownerX);
+		}
+		this.beltGait('idle');
+		if (this.ranged)
+			this.slot.mustCross = false;
+		if (!this.slot.lastAttackTime)
+			this.slot.lastAttackTime = _gameTick;
+		if (this.nextAttackTime && _gameTick <= this.nextAttackTime && !this.bestRing)
+			return;
+		const attackers = owner.attackers;
+		let canAttack = false;
+		if (this.ranged) {
+			const hitTime = owner.lastRangedHitTime;
+			if (!(hitTime && (_gameTick - hitTime) < this.getAttackMsByDifficulty() * 0.66))
+				canAttack = ((attackers && attackers.rangeds) ? attackers.rangeds.length : 0) < 1 && !this.slot.mustCross;
+		}
+		else if (!this.slot.support && !this.slot.mustCross) {
+			const meleeN = (attackers && attackers.melees) ? attackers.melees.length : 0;
+			const rear = this.slot.type === 'back' && ((owner.direction === __right && myX < ownerX) || (owner.direction === __left && myX > ownerX));
+			if (rear)
+				canAttack = meleeN < 2;
+			else {
+				const hitTime = owner.lastMeleeHitTime;
+				canAttack = meleeN < 2 && !(hitTime && (_gameTick - hitTime) < this.getAttackMsByDifficulty());
+			}
+		}
+		if (!canAttack && this.bestRing)
+			canAttack = true;
+		if (!canAttack)
+			return;
+		const dxOwner = ownerX > myX ? ownerX - myX : myX - ownerX;
+		const distPercent = (dxOwner * 100) / episode.cWidth;
+		const touching = isObjectsInTouch(this, owner).touch;
+		this.pickBeltAttack(distPercent, touching);
+		const chosen = this.animations[this.upcomingAnimation];
+		if (chosen && chosen.attack) {
+			if (chosen.chargeDistance && !touching)
+				chosen.useExtraStepXRate = distPercent < chosen.chargeDistance.value && distPercent > chosen.chargeDistance.value * 0.45;
+			this.animateSlotAttack();
+			this.slot.lastAttackTime = _gameTick;
 		}
 	}
 	this.autoCommand = function () {
@@ -2633,7 +3077,7 @@ function enemy(_e) {
 	// 	if(!_sound)
 	// 		this.soundPlaying = undefined;
 	// }
-	this.setSound = async function(_sf,_anima) {
+	this.setSound = async function(_sf,_anima,_force) {
 		if(_sf.possibility && getRandomValue2(1, 100) > _sf.possibility)
 			return;
 		let _volumeRate = 1;
@@ -2649,6 +3093,7 @@ function enemy(_e) {
 		_volumeRate = _volumeRate * (getRandomValue2(92,104) / 100);
 		let _sound = await PlaySound({
 			reset: _sf.reset,
+			force: _force,
 			key: (!this.main ? this.name.toLowerCase() : this.class) +
 			(typeof _sf === 'string' ? _sf : (_sf?.key ?? this.animation)),
 			volume:_sf.volume,
@@ -2914,7 +3359,7 @@ function enemy(_e) {
 				|| this.still || this.action || this.friendly || this.class === 'minion')
 				this.autoCommand();
 			else
-				this.autoCommand2();
+				this.autoCommand3();
 		}
 		//this.TESTSLOTS();
 		
@@ -3087,13 +3532,14 @@ function enemy(_e) {
 			this.stepSound.currentTime = 0;
 		}
 		var _sf = this.getCurrentFrame().sound;
-		if (_sf && this.soundPlaying != (this.frame + 1) && (!this.animationFinished || _sf.force)) {
+		const _forceSound = !!(_sf && (_sf.force || (_sf.reset && this.frame > 0 && !_anima.hurt)));
+		if (_sf && this.soundPlaying != (this.frame + 1) && (!this.animationFinished || _forceSound)) {
 			if(!_sf.range || (!this.main && _sf.range))
 			{
-				if((_gameTick - (this.lastSoundPlayedTime ?? 0)) > 500) {
+				if(_forceSound || (_gameTick - (this.lastSoundPlayedTime ?? 0)) > 500) {
 					this.soundPlaying = this.frame + 1;
 					this.lastSoundPlayedTime = _gameTick;
-					this.setSound(_sf, _anima);
+					this.setSound(_sf, _anima, _forceSound);
 				}
 			}
 		}
@@ -4909,7 +5355,7 @@ function enemy(_e) {
 			else if(this.ORIGINLEFT <= _enemy.ORIGINLEFT && _enemy.direction !== __left)
 				_enemy.direction = __left;
 			if(_enemy.animations.knockbackair){
-				_enemy.randomAirCoords(_enemy.animations.knockbackair);
+				_enemy.randomKnockbackAirCoords(_enemy.animations.knockbackair);
 				_enemy.animate('knockbackair', 1);
 			}
 			else if(_enemy.animations.knockbackground)
@@ -5580,6 +6026,7 @@ function enemy(_e) {
 				let _skillName = (_e.isDead() && this.alp && _e.animations.deadfly && _e.animation !== 'deadfly') ? 'deadfly' : 'knockback' + ((_enemyFrame.hurt && !_f.atk?.hurt?.reset) ? _enemyFrame.hurt : (_f.atk?.hurt?.type ?? 'air'));
 				if(_skillName === 'deadfly') {
 					_e.animate(_skillName);
+					_e.skipHealthBar = true;
 					(this.owner ?? this).talk();
 					continue;
 				}
@@ -6180,7 +6627,8 @@ this.getRotateVerticalRate = function(attacker, victim) {
 						_e.animate('hurtblock', 1);
 					else
 						_e.animate('block', 1);
-					_e.decreaseFatique(_t, _f.atk?.rate);
+					if (_e.decreaseFatique(_t, _f.atk?.rate))
+						_t.setBlockKnockback();
 					_e.autoAttacking = true;
 					_e.setAutoTarget(_t, null, 5);
 					addDmgFrame({
@@ -6228,7 +6676,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 			if (_f.atk.hurt.sound) {
 				requestAnimationFrame(() => {
 					if(_f.atk.hurt.sound.key)
-						PlaySound(_f.atk.hurt.sound);
+						PlaySound(Object.assign({}, _f.atk.hurt.sound, { owner: _e }));
 					else
 						PlaySound({ key: _e.class + _f.atk.hurt.sound, owner: _e }, [_f.atk.hurt.sound]);
 				});
@@ -6441,11 +6889,24 @@ this.getRotateVerticalRate = function(attacker, victim) {
 						}
 					}
 				}
-				_e.hurting = { hit: 4 };
 				_e.hurtingStart = 0;
-				_e.hurtColor = _f.atk.type === 'fire' ? '#E25822' : (_f.atk.type === 'toxic' ? '#66cc1a' : '#ffffff');
-				_e.hurting.count = _e.hurtColor ? ((_f.atk.type === 'fire' || _f.atk.type === 'ice' || _f.atk.type === 'toxic') ? 3 : 4) : 3; // _e.getCurrentFrame().speed;
-				if(_e.size === 'big')
+				const _atkType = _f.atk.type;
+				if (_atkType === 'lightning') {
+					_e.hurtColor = '#F3E7A1';
+					_e.hurting = { flicker: 0 };
+					_e.hurting.count = 4;
+				}
+				else if (_atkType === 'fire' || _atkType === 'toxic') {
+					_e.hurtColor = _atkType === 'fire' ? '#E25822' : '#66cc1a';
+					_e.hurting = { tint: 1 };
+					_e.hurting.count = 3;
+				}
+				else {
+					_e.hurtColor = '#ffffff';
+					_e.hurting = { tint: 1 };
+					_e.hurting.count = (_f.atk.rate ?? 1) < 1 ? 1 : 2;
+				}
+				if(_e.size === 'big' && _e.hurting.flicker == null)
 					_e.hurting.count = MathCeil(_e.hurting.count / 2);
 				if(_charged && _t.main){
 					requestAnimationFrame(function() { _t.addObject({ key: 'impact', position: 'css', p2: _t.direction });});
@@ -6461,7 +6922,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 					removeClass(_gamePad, 'zoom');
 				if (_f.atk.rate) {
 					if(_f.atk.hurt?.hitZoom)
-						_e.setHitZoom(_ef, _f.atk.hurt?.hitZoom);//_ef.hitZoom = _f.atk.hurt?.hitZoom;
+						_e.setHitZoom(_ef, _f.atk.hurt?.hitZoom);
 					if (!_f.atk.hurt.dead) {
 						let _hasEffect;
 						if ((_t.class === __spell || _t.start <= 1) && (_e.health > 0 && !_e.finishing)) {
@@ -6479,6 +6940,8 @@ this.getRotateVerticalRate = function(attacker, victim) {
 								if((_e.coopWith ?? _e).critDmgResistRate)
 									_dmg *= ((100 - (_e.coopWith ?? _e).critDmgResistRate) / 100);
 								_t.criticalHit = _critHitTaken = true;
+								if (!_e.main)
+									_e.hbPulse = 1;
 								if(_tr.alp)
 								{
 									const _rstp = _tr.getTalentPoint('passive-atk-speed');
@@ -6520,6 +6983,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 									heavy: _charged || _f.atk?.hurt?.slam || _f.atk.rate > 2 || _t.criticalHit,
 									x: _e.LEFT,
 									from:_t,
+									hitY: _e.yPosition,
 									y: episode.cHeight - _e.yPosition - _e.HEIGHT
 								});
 							else if(_dmg > 1 || (_t?.owner ?? _t?.related ?? _t).level < 10)
@@ -6529,6 +6993,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 									dir: _t.direction,
 									x: _e.LEFT,
 									from:_t,
+									hitY: _e.yPosition,
 									y:episode.cHeight - _e.yPosition - _e.HEIGHT
 								});
 							if (!_e.dmgTaken) {
@@ -6557,7 +7022,13 @@ this.getRotateVerticalRate = function(attacker, victim) {
 								_e.decreaseHealth(_dmg, _t.related ?? _t);
 								_e.lastDamage = _dmg;
 								if(_f.atk.hitZoom)
-									_t.setHitZoom(_f, _f.atk.hitZoom);//_f.hitZoom = _f.atk.hitZoom;
+									_t.setHitZoom(_f, _f.atk.hitZoom);
+								if ((_f.atk.hurt?.slam || _charged) && !cssAnimationProps.shake && !cssAnimationProps.shakehit
+									&& (!episode._hitShakeAt || (_gameTick - episode._hitShakeAt) > 650)) {
+									episode._hitShakeAt = _gameTick;
+									addClass(_gamePad, 'shake-hit');
+									cssAnimationProps.shakehit = { start: _gameTick };
+								}
 								if(_e.main && _critHitTaken && _cced){
 									_e.addObject({
 										// position: 'css',
@@ -6585,12 +7056,15 @@ this.getRotateVerticalRate = function(attacker, victim) {
 									}
 									else
 										_stopAdd = 1;
-									const _stopMe = (_f.atk.hitStop ?? _anima.hitStop) + _stopAdd;
+									let _stopMe = (_f.atk.hitStop ?? _anima.hitStop) + _stopAdd;
+									if (_stopMe < 0)
+										_stopMe = 0;
 									if(_e.class !== __spell && !_e.hitStop) {
 										if(!_f.hitStopTime || (_gameTick - _f.hitStopTime) > 500)
 										{
-											_e.hitStop = 2;
-											_t.hitStop = _stopMe;
+											_e.hitStop = (!_t.criticalHit && _f.atk.rate < 1) ? 1 : 2;
+											if (_stopMe > 0)
+												_t.hitStop = _stopMe;
 											_f.hitStopTime = _gameTick;
 											_canStop = 1;
 										}
@@ -6724,6 +7198,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 							const _enemyOriginX = _e.HURTLEFT + _e._HURTBOX_half;
 							const _attackerOriginX = _t.HURTLEFT + _t._HURTBOX_half;
 							_e.rotateDir = _enemyOriginX < _attackerOriginX ? __left : __right;
+							_e.hitSparkDir = _e.rotateDir === __left ? 180 : 0;
 							if(_e.animation.startsWith('hurtair'))
 								_e.rotateStartAngle = MathRound(_e.rotateStartAngle * 1.5);
 							else {
@@ -6993,6 +7468,8 @@ this.getRotateVerticalRate = function(attacker, victim) {
 							_enemy.blocked = false;
 						}
 					}
+					else
+						this.setBlockKnockback();
 				}
 				else if ((!_enemy.dying || (_enemy.dying && this.key == _enemy.killingBy)) && (_thisPriority < (_enemyPriority ?? 10))) {
 					_enemyHurted = this.hurtEnemy(_anima, _frame, _enemy, _enemyFrame, _enemyAnima);
@@ -8036,8 +8513,11 @@ this.getRotateVerticalRate = function(attacker, victim) {
 			else if ((this.enemy || this.dropType === 'quest-item') && (this.left > (episode.width - (yy * maxLeft))))
 				this.left = (episode.width - MathCeil(yy * maxLeft));
 		}
+		let _knockOrigin = 0;
+		if (this.knockbackRate && this.ZOOM)
+			_knockOrigin = (this.knockbackRate * (episode.cWidth || 0) / this.ZOOM) * (_reversed ? 1 : -1);
 		let _xDiff = ((_reversed ? -1 : 1) * (this.ZOOM * (_frame.leftGap ?? 0))) + ((_reversed ? 1 : -1) * 
-			((_frame.spriteOrigin + (this.extraOriginX ?? 0)) * this.ZOOM));
+			((_frame.spriteOrigin + (this.extraOriginX ?? 0) + _knockOrigin) * this.ZOOM));
 		let _sw = _frame.spriteWidth * this.ZOOM;
 		if(this.iFrameJitter)
 		{
@@ -8174,8 +8654,14 @@ this.getRotateVerticalRate = function(attacker, victim) {
 					// 	});
 					// }
 					// else
+						let _skinColor = this.freeze ? '#a2d2df70' : _frame.color;
+						if (!_skinColor && this.burn && !(this.hurting?.count > 0)) {
+							this._burnFlick = (this._burnFlick ?? (this.id % 14)) + 1;
+							if ((this._burnFlick % 14) === 0)
+								_skinColor = '#E25822';
+						}
 						_queue.push({
-							skinColor: this.freeze ? '#a2d2df70' : _frame.color,
+							skinColor: _skinColor,
 							particleColor: _particleColor,
 							drawPriority: this.drawPriority,
 							sprite: _frame.sprite ?? (_anima.sprite ?? this.sprite),
@@ -8227,6 +8713,11 @@ this.getRotateVerticalRate = function(attacker, victim) {
 				delete this.rotateAngle;
 		}
 		this.oldYPosition = this.yPosition;
+		if (this.knockbackRate) {
+			this.knockbackRate *= 0.5;
+			if (this.knockbackRate < 0.0004 && this.knockbackRate > -0.0004)
+				this.knockbackRate = 0;
+		}
 	}
 	this.getCenterSolid = function() {
 		let _top = this.TOP;
@@ -9300,6 +9791,15 @@ this.getRotateVerticalRate = function(attacker, victim) {
 		else if(this.direction === __right && _lm > _la)
 			this.direction = __left;
 	}
+	this.randomKnockbackAirCoords = function(anima) {
+		const _coords = randomizeKnockbackAirCoords();
+		const _frames = anima.frames;
+		const _len = _coords.length;
+		const _rate = getRandomValue2(100, 110) / 100;
+		for(var i = 0; i < _len; i++){
+			_frames[i].bottomGap = (_frames[i].baseBottomGap ?? 0) + (_coords[i] * _rate);
+		}
+	}
 	this.randomAirCoords = function(anima , _rate) {
 		const _coords = getRandomAirCoords();
 		const _frames = anima.frames;
@@ -9308,7 +9808,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 		const _xRate = _rate / 100;
 		let j = 0;
 		for(var i = 0; i < _len; i++){
-			_frames[j].bottomGap = _coords[i] * _rate;
+			_frames[j].bottomGap = (_frames[j].baseBottomGap ?? 0) + (_coords[i] * _rate);
 			if(_rate > 1)
 				_frames[j].extraStepXRate = -_xRate * (j + 1);
 			else
@@ -9316,7 +9816,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 			j++;
 		}
 		for(var i = _len - 1; i >= 0; i--){
-			_frames[j].bottomGap = _coords[i] * _rate;
+			_frames[j].bottomGap =  (_frames[j].baseBottomGap ?? 0) + (_coords[i] * _rate);
 			if(_rate > 1)
 				_frames[j].extraStepXRate = -_xRate * (j + 1);
 			else
@@ -9797,6 +10297,12 @@ this.getRotateVerticalRate = function(attacker, victim) {
 			// 	sendMessage(JSON.stringify(_mDiff));
 			// }
 			this.health = _realHP;
+			if (this.health > 0) {
+				if (this.hbBreak === -1)
+					delete this.hbBreak;
+			}
+			else if (this.hbBreak == null && !this.main && this.class !== __spell && !this.skipHealthBar)
+				this.hbBreak = 0;
 			// if(this.main && this.health <= 0 && this.heartCount > 0)
 			// 	this.standUp();
 			if (_attacker && this.health <= 0)
@@ -9834,6 +10340,12 @@ this.getRotateVerticalRate = function(attacker, victim) {
 		}
 		// if(this.main && episode.resultStars && (this.health * 2) < _maxHP)
 		// 	episode.resultStars[2].failed = 1;
+	}
+	this.setBlockKnockback = function () {
+		if (this.class === __spell)
+			return;
+		const _span = getRandomValue2(30, 60) / 10000;
+		this.knockbackRate = this.direction === __right ? -_span : _span;
 	}
 	this.decreaseFatique = function (_attacker, _rate) {
 		const _r = _rate ?? 1;

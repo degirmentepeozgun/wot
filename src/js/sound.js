@@ -103,6 +103,41 @@
     playback.end?.();
   }
 
+  function fadeCut(id, playback) {
+
+    if (!playback) return;
+
+    delete playing[id];
+
+    const end = playback.end;
+    playback.end = null;
+
+    let faded = false;
+    const gainParam = playback.gain?.gain;
+
+    if (gainParam) {
+      const t = ctx.currentTime;
+      try {
+        gainParam.cancelScheduledValues(t);
+        gainParam.setValueAtTime(gainParam.value, t);
+        gainParam.linearRampToValueAtTime(0, t + 0.01);
+        playback.source.onended = () => {
+          try { playback.source.disconnect(); } catch (_) {}
+          try { playback.panner?.disconnect(); } catch (_) {}
+          try { playback.gain?.disconnect(); } catch (_) {}
+        };
+        playback.source.stop(t + 0.01);
+        faded = true;
+      } catch (_) {}
+    }
+
+    if (!faded)
+      cleanupPlayback(id, playback);
+
+    if (end)
+      end();
+  }
+
   // ---------------------------------------------------
   // API
   // ---------------------------------------------------
@@ -163,7 +198,8 @@
       reset = false,
       force = false,
       end = null,
-      bind = false
+      bind = false,
+      pan = 0
     ) {
 
       // -----------------------------
@@ -226,7 +262,7 @@
             return undefined;
           }
 
-          cleanupPlayback(id, prev);
+          fadeCut(id, prev);
         }
       }
 
@@ -258,7 +294,10 @@
 
       const panner = ctx.createStereoPanner();
 
-      panner.pan.value = 0;
+      let _pan = 0;
+      if (!loop && Number.isFinite(pan))
+        _pan = pan < -1 ? -1 : (pan > 1 ? 1 : pan);
+      panner.pan.value = _pan;
 
       // -----------------------------
       // chain

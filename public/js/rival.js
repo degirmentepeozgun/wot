@@ -3542,7 +3542,8 @@ function createCharacter(_settings) {
 					// 	}
 					// 	]
 					// },
-					hurtair: createHurtAir(
+					hurtair: function() { 
+						const x = createHurtAir(
 						{
 							spriteLeft: 2320,
 							spriteTop: 2333,
@@ -3558,8 +3559,16 @@ function createCharacter(_settings) {
 							spriteHeight: 84,
 							spriteOrigin: 138
 						},
-						{key:'toygarhurt1,toygarhurt2,toygarhurt3,toygarhurt5', volume:.3, reset: true }
-					),
+						{key:'toygarhurt1,toygarhurt2,toygarhurt3,toygarhurt5', 
+							volume:.3, reset: true }
+					);
+						x.frames.forEach(frame => {
+							frame.chain = [
+								{ key: 'escape', num: 1 }
+							];
+						});
+						return x;
+					}(),
 					// {
 					// 	key: 'hurtair',
 					// 	hurt: 'air',
@@ -3866,7 +3875,8 @@ function createCharacter(_settings) {
 					// 	]
 					// },
 					hurtair2: 
-					createHurtAir(
+					function() {
+						const x =createHurtAir(
 						{
 							spriteLeft: 2846,
 							spriteTop: 2374,
@@ -3883,7 +3893,14 @@ function createCharacter(_settings) {
 							spriteOrigin: 138
 						},
 						{key:'toygarhurt1,toygarhurt2,toygarhurt3,toygarhurt5', volume:.3, reset: true }
-					),
+					);
+					x.frames.forEach(frame => {
+						frame.chain = [
+							{ key: 'escape', num: 1 }
+						];
+					});
+					return x;
+					}(),
 					// {
 					// 	key: 'hurtair2',
 					// 	hurt: 'air',
@@ -20997,12 +21014,12 @@ const _allEnemies = {
 						bottomGap: -150,
 					},
 					{
-						spriteLeft: 304,
-						spriteTop: 86,
-						spriteWidth: 213,
-						spriteHeight: 148,
-						spriteOrigin: 107,
-						bottomGap: -140
+						spriteLeft: 26,
+						spriteTop: 0,
+						spriteWidth: 201,
+						spriteHeight: 129,
+						spriteOrigin: 102,
+						src: './images/sprites/ep07/death.png'
 					},
 					'./images/sprites/ep07/hurt.png'
 				),
@@ -21017,13 +21034,12 @@ const _allEnemies = {
 						src: './images/sprites/ep07/hurt-air1.png'
 					},
 					{
-						spriteLeft: 82,
-						spriteTop: 75,
-						spriteWidth: 255 - 82,
-						spriteHeight: 237 - 75,
-						spriteOrigin: 93,
-						bottomGap: -140,
-						src: './images/sprites/ep07/hurt-air2.png',
+						spriteLeft: 26,
+						spriteTop: 0,
+						spriteWidth: 201,
+						spriteHeight: 129,
+						spriteOrigin: 102,
+						src: './images/sprites/ep07/death.png',
 						invisibleWhenLay: true
 					}
 				),
@@ -21060,16 +21076,15 @@ const _allEnemies = {
 						src: './images/sprites/ep07/hurt-air1.png'
 					},
 					{
-						spriteLeft: 82,
-						spriteTop: 75,
-						spriteWidth: 255 - 82,
-						spriteHeight: 237 - 75,
-						spriteOrigin: 93,
-						bottomGap: -140,
-						src: './images/sprites/ep07/hurt-air2.png',
+						spriteLeft: 26,
+						spriteTop: 0,
+						spriteWidth: 201,
+						spriteHeight: 129,
+						spriteOrigin: 102,
+						src: './images/sprites/ep07/death.png',
 						invisibleWhenLay: true
 					},
-					{ key: 'wasphurt', volume:.4, reset: true}, null, 1
+					{ key: 'wasphurt', volume:.4, reset: true}
 				),	
 				hurtground2: function() {
 					const _hg = createHurtGround({
@@ -21418,7 +21433,6 @@ const _allEnemies = {
 			toxicDmgRate: 5,
 			ranged: true,
 			src: './images/sprites/ep07/',
-			immunities: [ 'ice', 'toxic', 'earth' ],
 			professions: [ 'toxic' ],
 			buffs: []
 		};
@@ -33458,6 +33472,7 @@ const _allEnemies = {
 					key: 'deadfly',
 					type: 'skill',
 					interactive: true,
+					skipHealthBar: true,
 					frames: [
 						{
 							spriteLeft: 3103,
@@ -34505,6 +34520,7 @@ const _allEnemies = {
 					key: 'deadfly',
 					type: 'skill',
 					interactive: true,
+					skipHealthBar: true,
 					frames: [
 						{
 							spriteLeft: 901,
@@ -35014,7 +35030,7 @@ const _allEnemies = {
 			direction: 'left',
 			defaultDirection: 'right',
 			defaultAnimationKey: 'idle',
-			zoom: 1,
+			zoom: .95,
 			width: 236,
 			height: 200,
 			maxHP: 100,
@@ -35532,6 +35548,7 @@ const _allEnemies = {
 					key: 'deadfly',
 					type: 'skill',
 					interactive: true,
+					skipHealthBar: true,
 					frames: [
 						{
 							spriteLeft: 1567,
@@ -36076,7 +36093,7 @@ const _allEnemies = {
 			direction: 'left',
 			defaultDirection: 'right',
 			defaultAnimationKey: 'idle',
-			zoom: 1,
+			zoom: .95,
 			width: 205,
 			height: 201,
 			maxHP: 100,
@@ -36664,7 +36681,6 @@ const _allEnemies = {
 					cooldown: 10000,
 					totalRange: 50,
 					priority: 1,
-					maxRepeat:2,
 					frames: [
 						{
 							spriteLeft: 133,
@@ -36673,10 +36689,23 @@ const _allEnemies = {
 							spriteHeight: 264,
 							spriteOrigin: 67,
 							extraStepXRate:.6,
-							speed: 8,
+							speed: 1,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 133,
+							spriteTop: 2436,
+							spriteWidth: 180,
+							spriteHeight: 264,
+							spriteOrigin: 67,
+							extraStepXRate:.6,
+							speed: 7,
 							def: {
 								iframe: true
 							},
+							//sound: { key: 'gorillacharge', volume:1 },
 							atk: {
 								yRange: 15,
 								rate: 2,
@@ -36695,7 +36724,19 @@ const _allEnemies = {
 							spriteHeight: 264,
 							spriteOrigin: 90,
 							extraStepXRate:.6,
-							speed: 8,
+							speed: 1,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 510,
+							spriteTop: 2436,
+							spriteWidth: 202,
+							spriteHeight: 264,
+							spriteOrigin: 90,
+							extraStepXRate:.6,
+							speed: 7,
 							def: {
 								iframe: true
 							},
@@ -36717,11 +36758,23 @@ const _allEnemies = {
 							spriteHeight: 264,
 							spriteOrigin: 137,
 							extraStepXRate:.6,
-							speed: 8,
+							speed: 1,
+							sound: { key: 'kongrun', volume:1, reset: true, force: true },
 							objects: [
 								{ key: 'groundbackdust', position:'behind-feet', reset: true }
 							],
-							sound: { key: 'kongrun', volume:1, reset: true },
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 863,
+							spriteTop: 2436,
+							spriteWidth: 259,
+							spriteHeight: 264,
+							spriteOrigin: 137,
+							extraStepXRate:.6,
+							speed: 7,
 							def: {
 								iframe: true
 							},
@@ -36743,7 +36796,19 @@ const _allEnemies = {
 							spriteHeight: 264,
 							spriteOrigin: 103,
 							extraStepXRate:.6,
-							speed: 8,
+							speed: 1,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 1297,
+							spriteTop: 2436,
+							spriteWidth: 206,
+							spriteHeight: 264,
+							spriteOrigin: 103,
+							extraStepXRate:.6,
+							speed: 7,
 							def: {
 								iframe: true
 							},
@@ -36765,7 +36830,19 @@ const _allEnemies = {
 							spriteHeight: 264,
 							spriteOrigin: 93,
 							extraStepXRate:.6,
-							speed: 8,
+							speed: 1,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 1707,
+							spriteTop: 2436,
+							spriteWidth: 206,
+							spriteHeight: 264,
+							spriteOrigin: 93,
+							extraStepXRate:.6,
+							speed: 7,
 							def: {
 								iframe: true
 							},
@@ -36787,11 +36864,235 @@ const _allEnemies = {
 							spriteHeight: 264,
 							spriteOrigin: 134,
 							extraStepXRate:.6,
-							speed: 8,
+							speed: 1,
+							sound: { key: 'kongrun', volume:1, reset: true, force: true },
 							objects: [
 								{ key: 'groundbackdust', position:'behind-feet', reset: true }
 							],
-							sound: { key: 'kongrun', volume:1, reset: true },
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 2066,
+							spriteTop: 2436,
+							spriteWidth: 246,
+							spriteHeight: 264,
+							spriteOrigin: 134,
+							extraStepXRate:.6,
+							speed: 7,
+							def: {
+								iframe: true
+							},
+							atk: {
+								yRange: 15,
+								rate: 2,
+								type: 'common',
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									sound: {key:'headhit', volume:1}
+								}
+							}
+						},
+						{
+							spriteLeft: 133,
+							spriteTop: 2436,
+							spriteWidth: 180,
+							spriteHeight: 264,
+							spriteOrigin: 67,
+							extraStepXRate:.6,
+							speed: 1,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 133,
+							spriteTop: 2436,
+							spriteWidth: 180,
+							spriteHeight: 264,
+							spriteOrigin: 67,
+							extraStepXRate:.6,
+							speed: 7,
+							def: {
+								iframe: true
+							},
+							atk: {
+								yRange: 15,
+								rate: 2,
+								type: 'common',
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									sound: {key:'headhit', volume:1}
+								}
+							}
+						},
+						{
+							spriteLeft: 510,
+							spriteTop: 2436,
+							spriteWidth: 202,
+							spriteHeight: 264,
+							spriteOrigin: 90,
+							extraStepXRate:.6,
+							speed: 1,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 510,
+							spriteTop: 2436,
+							spriteWidth: 202,
+							spriteHeight: 264,
+							spriteOrigin: 90,
+							extraStepXRate:.6,
+							speed: 7,
+							def: {
+								iframe: true
+							},
+							atk: {
+								yRange: 15,
+								rate: 2,
+								type: 'common',
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									sound: {key:'headhit', volume:1}
+								}
+							}
+						},
+						{
+							spriteLeft: 863,
+							spriteTop: 2436,
+							spriteWidth: 259,
+							spriteHeight: 264,
+							spriteOrigin: 137,
+							extraStepXRate:.6,
+							speed: 1,
+							sound: { key: 'kongrun', volume:1, reset: true, force: true },
+							objects: [
+								{ key: 'groundbackdust', position:'behind-feet', reset: true }
+							],
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 863,
+							spriteTop: 2436,
+							spriteWidth: 259,
+							spriteHeight: 264,
+							spriteOrigin: 137,
+							extraStepXRate:.6,
+							speed: 7,
+							def: {
+								iframe: true
+							},
+							atk: {
+								yRange: 15,
+								rate: 2,
+								type: 'common',
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									sound: {key:'headhit', volume:1}
+								}
+							}
+						},
+						{
+							spriteLeft: 1297,
+							spriteTop: 2436,
+							spriteWidth: 206,
+							spriteHeight: 264,
+							spriteOrigin: 103,
+							extraStepXRate:.6,
+							speed: 1,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 1297,
+							spriteTop: 2436,
+							spriteWidth: 206,
+							spriteHeight: 264,
+							spriteOrigin: 103,
+							extraStepXRate:.6,
+							speed: 7,
+							def: {
+								iframe: true
+							},
+							atk: {
+								yRange: 15,
+								rate: 2,
+								type: 'common',
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									sound: {key:'headhit', volume:1}
+								}
+							}
+						},
+						{
+							spriteLeft: 1707,
+							spriteTop: 2436,
+							spriteWidth: 206,
+							spriteHeight: 264,
+							spriteOrigin: 93,
+							extraStepXRate:.5,
+							speed: 1,
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 1707,
+							spriteTop: 2436,
+							spriteWidth: 206,
+							spriteHeight: 264,
+							spriteOrigin: 93,
+							extraStepXRate:.5,
+							speed: 9,
+							def: {
+								iframe: true
+							},
+							atk: {
+								yRange: 15,
+								rate: 2,
+								type: 'common',
+								hurt: {
+									key: 'hurtair',
+									type: 'air',
+									sound: {key:'headhit', volume:1}
+								}
+							}
+						},
+						{
+							spriteLeft: 2066,
+							spriteTop: 2436,
+							spriteWidth: 246,
+							spriteHeight: 264,
+							spriteOrigin: 134,
+							extraStepXRate:.46,
+							speed: 1,
+							sound: { key: 'kongrun', volume:1, reset: true, force: true },
+							objects: [
+								{ key: 'groundbackdust', position:'behind-feet', reset: true }
+							],
+							def: {
+								iframe: true
+							}
+						},
+						{
+							spriteLeft: 2066,
+							spriteTop: 2436,
+							spriteWidth: 246,
+							spriteHeight: 264,
+							spriteOrigin: 134,
+							extraStepXRate:.46,
+							speed: 9,
 							def: {
 								iframe: true
 							},
@@ -36992,7 +37293,7 @@ const _allEnemies = {
 							spriteWidth: 256,
 							spriteHeight: 284,
 							spriteOrigin: 144,
-							sound: true,
+							sound: { key:'gorilladead', volume:1 },
 							speed: 5
 						},
 						{
@@ -37167,7 +37468,6 @@ const _allEnemies = {
 					cooldown: 20000,
 					attack: true,
 					push: true,
-					baseKey: 'counterground',
 					src: './images/sprites/ep622/kick.png',
 					priority: 1,
 					frames: [
@@ -39569,7 +39869,7 @@ const _allEnemies = {
 				// }
 			},
 			key: 'jsprgbln-' + Math.random().toString().replace(/[.]/g, ''),
-			yGap: 5,
+			yGap: 25,
 			id: 623,
 			healtbarGap: 0,
 			name: 'Jesper Goblin',
@@ -39590,7 +39890,7 @@ const _allEnemies = {
 			noSpeedChange: true,
 			touchDead: true,
 			weight: 1000,
-			stepXRate: .4,
+			stepXRate: .3,
 			bloodColor: 'green',
 			src: './images/sprites/ep623/',
 			buffs: []
@@ -86348,8 +86648,35 @@ function createHurtGround(_sprite1, _sprite2, _sprite3,
 		result.frames[0].objects = _effect;
 	return result;
 }
+function getKnockbackAirCoords() {
+	return [
+		-20,
+		-38,
+		-55,
+		-72,
+		-88,
+		-102,
+		-114,
+		-123,
+		-126,
+		-122,
+		-112,
+		-96,
+		-76,
+		-58,
+		-38,
+		-18,
+		0,
+		-18,
+		-30,
+		-38,
+		-28,
+		-16,
+	];
+}
 function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
-	return {
+	const _coords = getKnockbackAirCoords();
+	const _x = {
 		key: 'knockbackair',
 		transfer: true,
 		type: 'skill',
@@ -86369,7 +86696,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				extraStepXRate: .2,
-				bottomGap: -20,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[0],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				speed: 3
 			},
 			{
@@ -86380,7 +86708,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				extraStepXRate: .4,
-				bottomGap: -38,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[1],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				speed: 1,
 				objects: [
 				{
@@ -86396,7 +86725,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -55,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[2],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .4,
 				speed: 2
 			},
@@ -86407,7 +86737,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -72,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[3],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .4,
 				speed: 2
 			},
@@ -86418,7 +86749,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -88,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[4],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .4,
 				speed: 2
 			},
@@ -86429,7 +86761,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -102,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[5],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .4,
 				speed: 2
 			},
@@ -86440,7 +86773,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -114,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[6],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .4,
 				speed: 2
 			},
@@ -86451,7 +86785,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -123,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[7],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .5,
 				speed: 2
 			},
@@ -86462,7 +86797,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -126,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[8],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .6,
 				speed: 2
 			},
@@ -86473,7 +86809,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -122,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[9],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .3,
 				speed: 2
 			},
@@ -86484,7 +86821,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -112,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[10],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .3,
 				speed: 2
 			},
@@ -86495,7 +86833,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -96,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[11],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .3,
 				speed: 2
 			},
@@ -86506,7 +86845,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -76,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[12],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .3,
 				speed: 2
 			},
@@ -86517,7 +86857,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -58,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[13],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .3,
 				speed: 2
 			},
@@ -86528,7 +86869,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -38,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[14],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .3,
 				speed: 2
 			},
@@ -86539,7 +86881,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -18,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[15],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .3,
 				speed: 2
 			},
@@ -86549,7 +86892,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteWidth: _sprite2.spriteWidth,
 				spriteHeight: _sprite2.spriteHeight,
 				spriteOrigin: _sprite2.spriteOrigin,
-				bottomGap: _sprite2.bottomGap ?? 0,
+				bottomGap: (_sprite2.bottomGap ?? 0) + _coords[16],
+				baseBottomGap: _sprite2.bottomGap ?? 0,
 				src: _sprite2.src,
 				speed: 6,
 				sound:{key:'landing', volume:1},
@@ -86569,7 +86913,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -18,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[17],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .3,
 				speed: 3
 			},
@@ -86580,7 +86925,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -30,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[18],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .3,
 				speed: 4
 			},
@@ -86591,7 +86937,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -38,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[19],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .3,
 				speed: 6
 			},
@@ -86602,7 +86949,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -28,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[20],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .3,
 				speed: 4
 			},
@@ -86613,7 +86961,8 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
-				bottomGap: -16,
+				bottomGap: (_sprite1.bottomGap ?? 0) + _coords[21],
+				baseBottomGap: _sprite1.bottomGap ?? 0,
 				extraStepXRate: .3,
 				speed: 3
 			},
@@ -86625,6 +86974,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteOrigin: _sprite2.spriteOrigin,
 				src: _sprite2.src,
 				bottomGap: _sprite2.bottomGap ?? 0,
+				baseBottomGap: _sprite2.bottomGap ?? 0,
 				invisibleWhenLay: true,
 				speed: 1,
 				sound:{key:'landing', volume:.8, reset: true},
@@ -86643,6 +86993,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 				spriteHeight: _sprite2.spriteHeight,
 				spriteOrigin: _sprite2.spriteOrigin,
 				bottomGap: _sprite2.bottomGap ?? 0,
+				baseBottomGap: _sprite2.bottomGap ?? 0,
 				invisibleWhenLay: true,
 				lay: true,
 				src: _sprite2.src,
@@ -86650,6 +87001,7 @@ function createKnockBackAir(_sprite1, _sprite2, _sprite3, _src) {
 			}
 		]
 	};
+	return _x;
 }
 
 function createKnockBackGround(_sprite1, _sprite2, _src) {
@@ -88348,6 +88700,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin + 10,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + 10,
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				props: {
 					randomizeAirCoords: true
 				},
@@ -88360,6 +88713,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteHeight: _sprite1.spriteHeight,
 				spriteOrigin: _sprite1.spriteOrigin + 6,
 				bottomGap: (_sprite1.bottomGap ?? 0),
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				src: _sprite1.src,
 				speed: 3
 			},
@@ -88371,6 +88725,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + _arr[0],
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				sound: _sound,
 				objects: [{
 					position: 'under-feet',
@@ -88387,6 +88742,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + _arr[1],
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				speed: 3
 			},
 			{
@@ -88397,6 +88753,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + _arr[2],
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				speed: 3
 			},
 			{
@@ -88407,6 +88764,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + _arr[3],
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				speed: 3
 			},
 			{
@@ -88417,6 +88775,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + _arr[4],
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				speed: 4
 			},
 			{
@@ -88427,6 +88786,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + _arr[5],
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				speed: 4
 			},
 			{
@@ -88437,6 +88797,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + _arr[6],
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				speed:4
 			},
 			{
@@ -88447,6 +88808,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + _arr[7],
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				speed: 4
 			},
 			{
@@ -88457,6 +88819,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + _arr[8],
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				speed: 5
 			},
 			{
@@ -88467,6 +88830,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin + 4,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + _arr[8],
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				speed: 4
 			},
 			{
@@ -88477,6 +88841,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin + 10,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + _arr[7],
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				speed: 3
 			},
 			{
@@ -88487,6 +88852,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin + 10,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + _arr[6],
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				speed: 2
 			},
 			{
@@ -88497,6 +88863,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin + 10,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + _arr[5],
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				speed: 2
 			},
 			{
@@ -88507,6 +88874,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin + 10,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + _arr[4],
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				speed: 2
 			},
 			{
@@ -88517,6 +88885,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin + 10,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + _arr[2],
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				speed: 2
 			},
 			{
@@ -88527,6 +88896,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteOrigin: _sprite1.spriteOrigin + 10,
 				src: _sprite1.src,
 				bottomGap: (_sprite1.bottomGap ?? 0) + _arr[0],
+				baseBottomGap: (_sprite1.bottomGap ?? 0),
 				speed: 2
 			},
 			{
@@ -88536,6 +88906,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteHeight: _sprite2.spriteHeight,
 				spriteOrigin: _sprite2.spriteOrigin + 10,
 				bottomGap: _sprite2.bottomGap ?? 0,
+				baseBottomGap: (_sprite2.bottomGap ?? 0),
 				invisibleWhenLay: true,
 				src: _sprite2.src,
 				speed: 3,
@@ -88558,6 +88929,7 @@ function createHurtAir(_sprite1, _sprite2, _sound, _src, _skipLanding) {
 				spriteHeight: _sprite2.spriteHeight,
 				spriteOrigin: _sprite2.spriteOrigin + 10,
 				bottomGap: _sprite2.bottomGap ?? 0,
+				baseBottomGap: (_sprite2.bottomGap ?? 0),
 				src: _sprite2.src,
 				speed: 2,
 				invisibleWhenLay: true,

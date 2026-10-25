@@ -10375,6 +10375,7 @@ function switchStoryScene(_func, _newOrder) {
 	else if(__storySceneOrder >= 0)
 		__storySceneOrder++;
 	const _splash = document.getElementById('splash');
+	_splash.style.opacity = '.99';
 	removeClass(_splash, 'd-none');
 	hideMyModalPopUp(1);
 	closeInventoryQuestionModal(1);
@@ -10435,10 +10436,6 @@ function switchStoryScene(_func, _newOrder) {
 				episode.assets = images;
 
 				episode.loadCharacterSprites(function() {
-					addClass(_splash, 'd-none');
-					const _ts = document.getElementById('tip-screen');
-					if(_ts)
-						_ts.remove();
 					if(__storyCheckPoint?.warn) {
 						//warn('<div class="flex heading achievement achievement-system" style="position:relative"><img src="./images/icons/loader.gif" /><span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Checkpoint Marked') + '</span></div>', 'level-up',null, 1);
 						delete __storyCheckPoint.warn;
@@ -10450,6 +10447,11 @@ function switchStoryScene(_func, _newOrder) {
 					removeClass(_gameUI, 'demo-playing');
 					if(__storyScene.start)
 						__storyScene.start();
+					_splash.style.opacity = '.99';
+					addClass(_splash, 'd-none');
+					const _ts = document.getElementById('tip-screen');
+					if(_ts)
+						_ts.remove();
 					_storySceneSwitching = false;
 					_game.suspended = false;
 					const _ps = document.querySelectorAll('.placed-skill');

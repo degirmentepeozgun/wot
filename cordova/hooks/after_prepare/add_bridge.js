@@ -7,7 +7,7 @@ module.exports = function(ctx){
 
     const srcBridge = path.join(
         root,
-        "native/android/AndroidBridge.java"
+        "native/android/java/AndroidBridge.java"
     );
 
     const dstBridge = path.join(

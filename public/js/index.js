@@ -741,7 +741,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 				if(_onEnd)
 					_onEnd();
 				else if(!episode.pvp && !episode.war){
-					addClass(_splash, 'd-none');
+					//addClass(_splash, 'd-none');
 					const _ts = document.getElementById('tip-screen');
 					if(_ts)
 						_ts.remove();

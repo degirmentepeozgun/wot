@@ -44,8 +44,8 @@
       "cordova-plugin-navigationbar-color": {}
     },
     "platforms": [
-      "electron",
-      "android"
+      "android",
+      "electron"
     ]
   },
   "dependencies": {

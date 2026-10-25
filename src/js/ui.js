@@ -91,118 +91,172 @@ const avatarTemplate = function (char, _name) {
 			}
 		return _html + '</div>';
 }
+function bootDmgFrame(_item) {
+	if(_item.val)
+		_item.val = MathCeil(_item.val);
+	_item.platformX = platformX;
+	_item.startY = _item.y;
+	_item.age = 0;
+	_item.baseZoom = _item.zoom > 0 ? _item.zoom : 1;
+	const textOnly = _item.text && !_item.val;
+	const crit = !!_item.crit && !textOnly;
+	const big = crit || (_item.heavy && !textOnly);
+	const h = episode?.cHeight || 640;
+	_item.life = textOnly || _item.item ? 16 : (crit ? 36 : (big ? 22 : 18));
+	_item.rise = MathRound(h * (textOnly || _item.item ? 0.07 : (crit ? 0.2 : (big ? 0.13 : 0.11))));
+	_item.popLen = crit ? 9 : 6;
+	_item.popStrength = textOnly || _item.item ? 1.08 : (crit ? 1.85 : (big ? 1.28 : 1.12));
+	_item.popSettle = crit ? 1.28 : 1;
+	const w = episode?.cWidth || 1;
+	let sign = 1;
+	if(_item.dir === __left)
+		sign = -1;
+	else if(_item.dir !== __right)
+		sign = getRandomValue2(0, 1) === 0 ? -1 : 1;
+	let fan = 0;
+	const near = w * 0.04;
+	if(!textOnly) {
+		for(let i = 0; i < dmgFrames.length; i++) {
+			const o = dmgFrames[i];
+			if(!o || o.remove)
+				continue;
+			if((_gameTick - o.startTime) > 420)
+				continue;
+			const dx = o.x - _item.x;
+			if(dx > near || dx < -near)
+				continue;
+			fan++;
+			if(fan >= 4)
+				break;
+		}
+	}
+	const kick = textOnly ? getRandomValue2(4, 8) : getRandomValue2(10, 18);
+	_item.drift = sign * w * (kick + fan * 12) * 0.001;
+	if(crit)
+		_item.drift *= 1.4;
+	applyDmgDepth(_item);
+	_item.rise = MathRound(_item.rise * _item.depthScale);
+}
+function applyDmgDepth(_item) {
+	const attackerY = _item.from?.yPosition;
+	const victimY = _item.hitY;
+	const ground = getGroundHeight() || 1;
+	let depth = 1;
+	let behind = 0;
+	if(attackerY === attackerY && victimY === victimY) {
+		const span = ground * 0.28;
+		behind = (victimY - attackerY) / (span > 0 ? span : 1);
+		if(behind < 0)
+			behind = 0;
+		else if(behind > 1)
+			behind = 1;
+		depth = 1 - (victimY / ground);
+		if(depth < 0)
+			depth = 0;
+		else if(depth > 1)
+			depth = 1;
+	}
+	_item.depth = depth;
+	_item.depthScale = 1 - behind * 0.28;
+	_item.depthDark = 1 - behind * 0.62;
+}
 function addDmgFrame(_item) {
 	if(episode?.noDamageFrame)
 		return;
-	if(dmgFrames?.[0]){
-		let _found;
-		for(let df of dmgFrames)
-			if(df === _item && df.startTime > (_gameTick - 100)) {
-				if(_item.item?.key && df.item?.key === _item.item.key && 
-					(!_item.val || _item.val === df.val))
-					_found = 1;
-				else if(_item.val && df.val === _item.val && df.crit === _item.crit)
-					_found = 1;
-				else if(_item.text && df.text === _item.text)
-					_found = 1;
-				if(_found) {
-					df.startTime = _gameTick;
-					df.t = 0;
-					return;
-				}
+	if(_item.text && !_item.val) {
+		for(let i = 0; i < dmgFrames.length; i++) {
+			const df = dmgFrames[i];
+			if(!df.remove && df.text === _item.text) {
+				df.age = 0;
+				df.x = _item.x;
+				df.y = _item.y;
+				df.startY = _item.y;
+				df.platformX = platformX;
+				df.startTime = _gameTick;
+				applyDmgDepth(df);
+				return;
 			}
+		}
 	}
 	_item.startTime = _gameTick;
-	dmgFrames.push(_item);
+	bootDmgFrame(_item);
+	let alive = 0, oldest;
+	for(let i = 0; i < dmgFrames.length; i++) {
+		const df = dmgFrames[i];
+		if(df.remove)
+			continue;
+		alive++;
+		if(!oldest || df.startTime < oldest.startTime)
+			oldest = df;
+	}
+	let cap;
+	const _attackableCount = (episode?.seenEnemies?.length || 0);
+	if(_attackableCount < 6)
+		cap = 6;
+	else if(_attackableCount < 11)
+		cap = 7;
+	else
+		cap = 8;
+	if(alive >= cap && oldest) {
+		let drop = oldest;
+		if(_item.crit) {
+			for(let i = 0; i < dmgFrames.length; i++) {
+				const df = dmgFrames[i];
+				if(df.remove || df.crit)
+					continue;
+				if(!drop || drop.crit || df.startTime < drop.startTime)
+					drop = df;
+			}
+		}
+		drop.remove = true;
+	}
+	let at = dmgFrames.length;
+	if(!_item.crit) {
+		for(let i = 0; i < dmgFrames.length; i++) {
+			if((dmgFrames[i].depth ?? 1) > _item.depth) {
+				at = i;
+				break;
+			}
+		}
+	}
+	dmgFrames.splice(at, 0, _item);
 }
 var lastDmgFrameRenderTime;
 function drawDmgFrames() {
-	if(lastDmgFrameRenderTime && ((_gameTick - lastDmgFrameRenderTime) < 1000))
-		dmgFrames = dmgFrames.filter(x => !x.remove);
-	if(!dmgFrames?.[0]) {
+	let w = 0;
+	for(let i = 0; i < dmgFrames.length; i++) {
+		if(!dmgFrames[i].remove)
+			dmgFrames[w++] = dmgFrames[i];
+	}
+	dmgFrames.length = w;
+	if(!w) {
 		if(!cDMG.cleared)
 			cDMG.clearRect(0, 0, episode.cWidth, episode.cHeight);
 		return;
 	}
-	let dmg = 0;
-	const _texts = [];
 	cDMG.clearRect(0, 0, episode.cWidth, episode.cHeight);
 	episode.offDmgCtx.clearRect(0, 0, episode.cWidth, episode.cHeight);
-	cDMG.cleared =1;
-	for (var _frame of dmgFrames.sort(x => x.counterAttack ? 0 : (x.crit ? 1 : 2))) {
-		if(_frame.remove)
-			continue;
-		if (dmg < 5) {
-			if(_texts.find(x => x === _frame.text)){
-				dmg--; 
-				_frame.remove = true;
-			}
-			else {
-				if(_frame.text)
-					_texts.push(_frame.text);
-				if(_frame.totalStepY === undefined){
-					_frame.platformX = platformX;
-					_frame.totalStepY = getRandomValue2(15, 23);
-					_frame.maxStepY = _frame.totalStepY;
-					if(_frame.dir)
-						_frame.stepX = _frame.dir === __left ? -1 : 1;
-					if(_frame.crit){
-						_frame.zoom = 2;
-						_frame.stepY = 2;
-					}
-					else if(_frame.zoom) {
-						_frame.stepY = 2;
-					}
-					else{
-						_frame.zoom = getRandomValue2(10,13) / 10;
-						if(_frame.zoom < 1.1)
-							_frame.stepY = 5;
-						else if(_frame.zoom < 1.2)
-							_frame.stepY = 4;
-						else if(_frame.zoom <= 1.3)
-							_frame.stepY = 3;
-					}
-					_frame.startZoom = _frame.zoom;
-					if(_frame.heavy || _frame.crit)
-						_frame.pop = {
-							strength: getRandomValue2(101, 131) / 100, // heavy hit buradan ayarlanır
-							overshoot: getRandomValue2(105, 110) / 100,                   // ne kadar fazla şişsin
-							duration: getRandomValue2(5,6),                       // kaç frame sürecek
-							t: 0
-						};
-				}
-				renderText(_frame, dmg + 1);
-			}
-		}
-		else
-			_frame.remove = true;
-		dmg++;
-	}
+	cDMG.cleared = 1;
+	for(let i = 0; i < w; i++)
+		renderText(dmgFrames[i]);
 	cDMG.drawImage(episode.offDmgCanvas, 0, 0);
-	cDMG.cleared =0;
+	cDMG.cleared = 0;
 	lastDmgFrameRenderTime = _gameTick;
 }
-function renderText(_frame, _i) {
-	if (_frame.buff){
+function renderText(_frame) {
+	if(_frame.buff) {
 		_frame.remove = true;
 		return;
 	}
-	if(_frame.val)
-		_frame.val = MathCeil(_frame.val);
-	if (!_frame.val && !_frame.steal && !_frame.text && !_frame.buff) {
+	if(!_frame.val && !_frame.steal && !_frame.text && !_frame.buff) {
 		_frame.remove = true;
 		return;
 	}
-	if(_frame.startY === undefined)
-		_frame.startY = (_frame.y + (__dmgFrameDistance - (_i * 20))) -  __dmgFrameDistance;
 	renderTextElement2({
 		x: _frame.x,
-		crit: _frame.text === 'crit',
 		frame: _frame,
-		height: MathRound((episode.dmgFrameHeight) * _frame.zoom),
 		from: _frame.from,
-		images: getDmgFrameNumbers2(_frame),
-		ms: 1000
+		images: getDmgFrameNumbers2(_frame)
 	});
 }
 
@@ -223,8 +277,24 @@ function getDmgFrameNumbers2(_frame) {
 			_type = 'hit';
 			break;
 		default:
-			if(_frame.text)
-				return [getImage(`./images/frames/${_frame.text}.png`)];
+			if(_frame.text) {
+				const t = _frame.text;
+				let digits = t.length > 0;
+				for(let i = 0; i < t.length; i++) {
+					const c = t.charCodeAt(i);
+					if(c < 48 || c > 57) {
+						digits = false;
+						break;
+					}
+				}
+				if(digits) {
+					const out = [];
+					for(let i = 0; i < t.length; i++)
+						out.push(getImage('./images/frames/' + t.charAt(i) + '.png'));
+					return out;
+				}
+				return [getImage('./images/frames/' + t + '.png')];
+			}
 			else if(_frame.item?.quest)
 				return [ getImage('./images/frames/plus.png'), 
 					getImage('./images/frames/1.png'), 
@@ -253,91 +323,95 @@ function getDmgFrameNumbers2(_frame) {
 }
 
 
-function renderTextElement2(_settings) {
-	if(_settings.images?.[0]){
-		if(_settings.frame.stepX) {
-			if (!_settings.frame.startStepX)
-				_settings.frame.startStepX = _settings.frame.stepX;
-			else
-				_settings.frame.startStepX += _settings.frame.stepX;
-			_settings.frame.stepX -= (_settings.frame.stepX < 0 ? -.02 : .02);
+function dmgFrameZoom(_frame) {
+	const len = _frame.popLen || 6;
+	const age = _frame.age || 0;
+	const strength = _frame.popStrength || 1;
+	const base = _frame.baseZoom || 1;
+	const settle = _frame.popSettle || 1;
+	if(age >= len || strength <= 1)
+		return base * settle;
+	if(_frame.crit) {
+		const peakAt = len * 0.28;
+		if(age <= peakAt) {
+			const p = age / peakAt;
+			const e = 1 - (1 - p) * (1 - p);
+			return base * (1 + (strength - 1) * e);
 		}
-		let _l = _settings.x + (_settings.frame.startStepX ?? 0), i = 0, _settingsY = (_settings.frame.maxStepY - _settings.frame.totalStepY);
-		for(let _sprite of _settings.images)
-			if(_sprite) {
-				const _scale = _settings.frame.scale ?? 1;
-				const _sim = _sprite.img ?? _sprite;
-				const _spriteHeight = _settings.height * _scale;
-				const _y =  _settings.frame.startY - 
-				(_settings.frame.zoom > 1  ? 0 : MathRound(_settingsY * 
-				((_settings.height / _settings.frame.stepY))));
-				if(_y < episode.dmgFrameTopBoundary){
-					_settings.frame.remove = true;
-					return;
-				}
-				const _spriteWidth = ((_sim.width *  _settings.height) / _sim.height) * _scale;
-				let _sWidth = _spriteWidth;//  MathRound(_spriteWidth * _settings.frame.zoom);
-				episode.offDmgCtx.drawImage(_sim, 
-					(_l + (_settings.frame.platformX - platformX)) 
-					- MathRound(i * (_spriteHeight / 5)) - MathRound((_sWidth - _spriteWidth) / 2),
-					_y, _sWidth, _spriteHeight);
-				_l += _spriteWidth;
-				i++;
-			}
-		if(_settings.from?.hitStop)
-			return;
-		if (_settings.frame.zoom > 1) {
-			if (!_settings.frame.start)
-				_settings.frame.start = 0;
-			if(_settings.frame.pop) {
-				const pop = _settings.frame.pop;
-				if (_settings.frame.start < pop.duration) {
-					if (pop && pop.t < (pop.duration / 2)) {
-						const p = pop.t / pop.duration;
-
-						//const max = pop.strength;
-						// let ease;
-						// if (p < 0.3) {
-						// 	ease = 1 + (max - 1) * (p / 0.3);
-						// } else {
-						// 	const q = (p - 0.3) / 0.7;
-						// 	ease = max - (max - 1) * q;
-						// }
-						const ease = 1 + (pop.strength - 1) * (1 - Math.pow(1 - p, 2));
-
-						_settings.frame.zoom = _settings.frame.startZoom * ease;
-						pop.t++;
-					}
-					else {
-						// eski davranışın aynısı
-						//_settings.frame.zoom -= (_settings.frame.startZoom - 1) / 2;
-						_settings.frame.zoom += (1 - _settings.frame.zoom) * 0.35;
-					}
-				}
-				else if (_settings.frame.start === pop.duration)
-					_settings.frame.zoom = 1;
-			}
-			else {
-				if(_settings.frame.start === 2)
-					_settings.frame.zoom -= (_settings.frame.startZoom - 1) / 2;
-				else if (_settings.frame.start === 4)
-					_settings.frame.zoom = 1;
-			}
-			_settings.frame.start++;
-		}
-		else {
-			//_settings.frame.totalStepY--;
-			// POP bitmeden yukarı çıkma çok yavaş
-			if (_settings.frame.heavy || _settings.frame.crit) {
-				_settings.frame.totalStepY -= .75;
-			} else {
-				_settings.frame.totalStepY--;
-			}
-			
-		}
-		if (_settings.frame.totalStepY <= 0)
-			_settings.frame.remove = true;
+		const p = (age - peakAt) / (len - peakAt);
+		return base * (strength + (settle - strength) * p * p);
 	}
+	const half = len * 0.5;
+	if(age < half)
+		return base * (1 + (strength - 1) * (age / half));
+	return base * (strength + (1 - strength) * ((age - half) / half));
+}
+function renderTextElement2(_settings) {
+	const frame = _settings.frame;
+	const images = _settings.images;
+	if(!images?.[0]) {
+		frame.remove = true;
+		return;
+	}
+	const life = frame.life || 18;
+	let t = (frame.age || 0) / life;
+	if(t > 1)
+		t = 1;
+	const inv = 1 - t;
+	const y = frame.startY - frame.rise * (1 - inv * inv);
+	let alpha = t < 0.65 ? 1 : inv / 0.35;
+	if(y < episode.dmgFrameTopBoundary) {
+		const fadeBand = (episode.cHeight || 1) * 0.045;
+		alpha *= Math.max(0, 1 - (episode.dmgFrameTopBoundary - y) / fadeBand);
+		if(alpha <= 0.02) {
+			frame.remove = true;
+			return;
+		}
+	}
+	const driftT = t < 0.4 ? t / 0.4 : 1;
+	let x = _settings.x + frame.drift * (1 - (1 - driftT) * (1 - driftT)) + (frame.platformX - platformX);
+	const depthScale = (frame.depthScale || 1) * 0.82;
+	const zoom = dmgFrameZoom(frame) * depthScale;
+	const height = MathRound(episode.dmgFrameHeight * zoom);
+	const rest = (frame.baseZoom || 1) * (frame.popSettle || 1);
+	const baseH = MathRound(episode.dmgFrameHeight * rest * depthScale);
+	const yDraw = y - (height - baseH) * 0.5;
+	const ctx = episode.offDmgCtx;
+	let dark = frame.depthDark == null ? 1 : frame.depthDark;
+	if(frame.crit)
+		dark *= 1.45;
+	if(dark > 1.35)
+		dark = 1.35;
+	ctx.globalAlpha = alpha;
+	if(dark !== 1)
+		ctx.filter = 'brightness(' + dark + ')';
+	let i = 0;
+	for(let sprite of images) {
+		if(!sprite) {
+			i++;
+			continue;
+		}
+		const scale = frame.scale ?? 1;
+		const sim = sprite.img ?? sprite;
+		if(!sim.width || !sim.height) {
+			i++;
+			continue;
+		}
+		const spriteHeight = height * scale;
+		const spriteWidth = ((sim.width * height) / sim.height) * scale;
+		ctx.drawImage(sim,
+			x - MathRound(i * (spriteHeight / 5)),
+			yDraw, spriteWidth, spriteHeight);
+		x += spriteWidth;
+		i++;
+	}
+	ctx.filter = 'none';
+	ctx.globalAlpha = 1;
+	if(_settings.from?.hitStop)
+		return;
+	frame.age++;
+	if(frame.age >= life)
+		frame.remove = true;
 }
 function hideDmgFrames() {
 	if(episode?.damages?.[0])

@@ -1,4 +1,4 @@
-﻿﻿﻿'use strict';
+﻿'use strict';
 
 console.log('global');
 const __locations = [
@@ -3197,13 +3197,15 @@ const storySoundFiles = {
 	}
 }
 const soundFiles = {
+	gorilladead: './images/sounds/gorilla-goblin-dead.mp3',
+	gorillacharge: './images/sounds/gorilla-goblin-charge.mp3',
 	cyanwalk: './images/sounds/cyan-walk.mp3',
 	cyanrunup: './images/sounds/cyan-run-up.mp3',
 	cyandead: './images/sounds/cyan-dead.mp3',
 	cyanrundown: './images/sounds/cyan-run-down.mp3',
 	cyanattack: './images/sounds/cyan-attack.mp3',
 	headhit: './images/sounds/head-hit.mp3',
-	kongrun: './images/sounds/kong-goblin-run.mp3',
+	kongrun: './images/sounds/kong-goblin-run2.mp3',
 	groundslide: './images/sounds/groundslide.mp3',
 	voodooelectrix: './images/sounds/voodoo-electrix.mp3',
 	voodooland: './images/sounds/voodooland.mp3',
@@ -9819,7 +9821,7 @@ const spells = {
 							spriteOrigin: 69,
 							knockback: true,
 							priority:1,
-							sound: { key: 'jesperboom', volume:1},
+							sound: { key: 'jesperboom', volume:1, reset:true, force:true},
 							atk: {
 								yRange: 15,
 								rate: 5,
@@ -18379,17 +18381,9 @@ const spells = {
 						spriteLeft: 0,
 						spriteTop: 0,
 						spriteWidth: 96,
-						spriteHeight: 95,
+						spriteHeight: 0,
 						spriteOrigin: 48,
-						speed: 2
-					},
-					{
-						spriteLeft: 0,
-						spriteTop: 0,
-						spriteWidth: 96,
-						spriteHeight: 45,
-						spriteOrigin: 48,
-						speed: 2
+						speed: 33
 					},
 					{
 						spriteLeft: 0,
@@ -34603,8 +34597,9 @@ const canvasAnimations =  {
 	if (!_params._spawned) {
 		_params._spawned = true;
 
-		const rockCount = Math.min(55, 12 + strength * 14);
-		const baseSpeed = 2.2 + strength * 1.1;
+		const _ps = Math.max(0.85, Math.min(1.8, (episode?.cWidth || 1152) / 1152));
+		const rockCount = Math.min(16, 6 + MathRound(strength * 3));
+		const baseSpeed = (2.2 + strength * 1.1) * _ps;
 
 		let centerAngle = 270;
 		if (dir === __left) centerAngle = 210;
@@ -34626,7 +34621,7 @@ const canvasAnimations =  {
 				vx: Math.cos(rad) * spd,
 				vy: Math.sin(rad) * spd - (1.2 + Math.random()),
 				p: platformX,
-				radius: 1.4 + Math.random() * 2.5,
+				radius: (1.4 + Math.random() * 2.5) * _ps,
 				life: 1,
 				decay: 0.045,
 				gravity: 0.55,
@@ -34639,7 +34634,7 @@ const canvasAnimations =  {
 
 		for (let i = 0; i < clusterCount; i++) {
 
-			const size = sizeBase * (0.8 + Math.random() * 0.5);
+			const size = sizeBase * _ps * (0.8 + Math.random() * 0.5);
 			const shape = makeDustShape(size);
 
 			const path = new Path2D();
@@ -35513,7 +35508,7 @@ const canvasAnimations =  {
 // },
 	distortionhit01: function(_char, _params, _canv) {
 
-    if (episode.distorting && episode.distorting !== _char.key) {
+    if ((episode.seenEnemies?.length || 0) >= 8 || (episode.distorting && episode.distorting !== _char.key)) {
         _char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit');
         return;
     }
@@ -35671,7 +35666,7 @@ const canvasAnimations =  {
 },
 distortionhit: function(_char, _params, _canv) {
 
-    if (episode.distorting && episode.distorting !== _char.key) {
+    if ((episode.seenEnemies?.length || 0) >= 8 || (episode.distorting && episode.distorting !== _char.key)) {
         _char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit');
         return;
     }
@@ -35787,7 +35782,7 @@ distortionhit: function(_char, _params, _canv) {
 
 distortionhit2: function(_char, _params, _canv) {
 
-    if (episode.distorting && episode.distorting !== _char.key) {
+    if ((episode.seenEnemies?.length || 0) >= 8 || (episode.distorting && episode.distorting !== _char.key)) {
         _char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit2');
         return;
     }
@@ -35930,7 +35925,7 @@ distortionhit2: function(_char, _params, _canv) {
 },
 distortionhit3: function(_char, _params, _canv) {
 
-    if (episode.distorting && episode.distorting !== _char.key) {
+    if ((episode.seenEnemies?.length || 0) >= 8 || (episode.distorting && episode.distorting !== _char.key)) {
         _char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortionhit3');
         return;
     }
@@ -36055,7 +36050,7 @@ distortionhit3: function(_char, _params, _canv) {
 },
 
 distortion: function(_char, _params, _canv) {
-	if(episode.distorting && episode.distorting !== _char.key)
+	if((episode.seenEnemies?.length || 0) >= 8 || (episode.distorting && episode.distorting !== _char.key))
 	{
 		_char.canvasObjects = _char.canvasObjects.filter(o => o.key !== 'distortion');
 		return;
@@ -36876,6 +36871,14 @@ const cssAnimations = {
 			cssAnimationProps.shake = { start: _gameTick, p1: _c, p2: _ms, p3: _infinite};
 		}
 	},
+	shakehit: function () {
+		if (!cssAnimationProps.shakehit)
+			return;
+		if ((_gameTick - cssAnimationProps.shakehit.start) > 120) {
+			removeClass(_gamePad, 'shake-hit');
+			delete cssAnimationProps.shakehit;
+		}
+	},
 	shakevert: function (_c, _ms, _infinite) {
 		if(cssAnimationProps.shakevert) {
 			if((_gameTick - cssAnimationProps.shakevert.start) > (_ms ?? 1000)) {
@@ -36898,7 +36901,6 @@ const cssAnimations = {
 		}
 		else {
 			addClass(_gamePad, 'shake-vert-below');
-			episode.addEffect('shake', { rate: 2 });
 			cssAnimationProps.shakevertbelow = { start: _gameTick, p1: _c, p2: _ms, p3: _infinite};
 		}
 	},
@@ -36912,7 +36914,6 @@ const cssAnimations = {
 		}
 		else {
 			addClass(_gamePad, 'shake-vert-below-tiny');
-			episode.addEffect('shake', { rate: 1 });
 			cssAnimationProps.shakevertbelowtiny = { start: _gameTick, p1: _c, p2: _ms, p3: _infinite};
 		}
 	},
@@ -37891,7 +37892,24 @@ async function PlaySound(_s, _alternateKeys, _volumeRate) {
 	catch(cex) {
 		console.log(_alternateKeys);
 	}
-	return await window.SoundManager.play(_soundKey, _s.path, (_hasEnd && _hidden) ? 0 : (_s.volume ?? .1) * (_s.volumeRate ?? 1) * __volume, _s.loop, _s.rate, _s.reset, _s.force, _s.end, _s.bind);
+	let _pan = 0;
+	if (!_s.loop && _s.owner && episode?.cWidth) {
+		let _x = _s.owner.ORIGINLEFT;
+		if (!Number.isFinite(_x))
+			_x = _s.owner.SCREENLEFT;
+		if (!Number.isFinite(_x))
+			_x = _s.owner.main ? _s.owner.left : _s.owner.left - (typeof platformX === 'number' ? platformX : 0);
+		if (Number.isFinite(_x)) {
+			const _w = episode.cWidth;
+			if (_x < 0) _x = 0;
+			else if (_x > _w) _x = _w;
+			_pan = ((_x / _w) - 0.5) * 0.64;
+			if (_pan > 0.32) _pan = 0.32;
+			else if (_pan < -0.32) _pan = -0.32;
+			if (_pan < 0.04 && _pan > -0.04) _pan = 0;
+		}
+	}
+	return await window.SoundManager.play(_soundKey, _s.path, (_hasEnd && _hidden) ? 0 : (_s.volume ?? .1) * (_s.volumeRate ?? 1) * __volume, _s.loop, _s.rate, _s.reset, _s.force, _s.end, _s.bind, _pan);
 }
 function flash(_count, _elem) {
 	setTimeout(function () {

@@ -7901,7 +7901,7 @@ const __stories = [
 					mainCharacter.level = 0;
 					mainCharacter.experience = 0;
 					mainCharacter.maxExperience = 833;
-					setCharacterLevel(1, null, 1);
+					setCharacterLevel(10, null, 1);
 					mainCharacter.animations.tag.disabled = true;
 					resetSkills(null, 1, mainCharacter);
 					//setCharacterLevel(12, null, 1);
@@ -7935,7 +7935,7 @@ const __stories = [
 						catch(_e) {}
 					}
 					const _skipped = _json.indexOf(1) !== -1;
-					if(_skipped) {
+					if(!_skipped) {
 						const _desc = document.createElement('div');
 						_desc.className = 'flex show-ui full quick-play-desc-container quick-play-desc-container1';
 						let _html = '';
@@ -8354,13 +8354,12 @@ const __stories = [
 					// 	experience: 1
 					// },
 					{
-						id: 634,
+						id: 7,
 						minX: 4000,
 						maxX: 6000,
-						count: 2,
+						count: 1,
 						sight: 1000,
-						spawn: 3,
-						hp:60,
+						hp:60000,
 						experience: 500
 					},
 					// {
@@ -8581,7 +8580,7 @@ const __stories = [
 					episode.createBgMusic(null, null, null, 'cyclops1');
 					episode.playBgMusic();
 					const _skipped = _json.indexOf(2) !== -1;
-					if(_skipped) {
+					if(!_skipped) {
 						const _desc = document.createElement('div');
 						_desc.className = 'flex show-ui full quick-play-desc-container quick-play-desc-container2';
 						let _html = '';
@@ -10445,6 +10444,7 @@ function switchStoryScene(_func, _newOrder) {
 	else if(__storySceneOrder >= 0)
 		__storySceneOrder++;
 	const _splash = document.getElementById('splash');
+	_splash.style.opacity = '.99';
 	removeClass(_splash, 'd-none');
 	hideMyModalPopUp(1);
 	closeInventoryQuestionModal(1);
@@ -10505,10 +10505,6 @@ function switchStoryScene(_func, _newOrder) {
 				episode.assets = images;
 
 				episode.loadCharacterSprites(function() {
-					addClass(_splash, 'd-none');
-					const _ts = document.getElementById('tip-screen');
-					if(_ts)
-						_ts.remove();
 					if(__storyCheckPoint?.warn) {
 						//warn('<div class="flex heading achievement achievement-system" style="position:relative"><img src="./images/icons/loader.gif" /><span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Checkpoint Marked') + '</span></div>', 'level-up',null, 1);
 						delete __storyCheckPoint.warn;
@@ -10520,8 +10516,17 @@ function switchStoryScene(_func, _newOrder) {
 					removeClass(_gameUI, 'demo-playing');
 					if(__storyScene.start)
 						__storyScene.start();
+					_splash.style.opacity = '.99';
+					//addClass(_splash, 'd-none');
+					
 					_storySceneSwitching = false;
 					_game.suspended = false;
+					setTimeout(function() {
+						episode.splash = document.getElementById('splash');
+						const _ts = document.getElementById('tip-screen');
+						if(_ts)
+							_ts.remove();
+					}, 100);
 					const _ps = document.querySelectorAll('.placed-skill');
 					_ps?.forEach(x => addClass(x, 'v-none'));
 					blurKeyboard();

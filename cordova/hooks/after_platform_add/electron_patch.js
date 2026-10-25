@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-throw new Error("ELECTRON HOOT TEST");
 module.exports = function () {
 
     const mainPath = path.join(

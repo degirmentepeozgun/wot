@@ -1047,8 +1047,8 @@ svg#use-progress.use-in-progress circle {
 	aspect-ratio: 1 / 1;
     height: 3.4%;
 	padding:.25%;
-    top: 17.4%;
-    right: 1.75%;
+    top: 16.5%;
+    right: 1.7%;
 	opacity: .65;
 	z-index: 3
 }
@@ -1371,7 +1371,7 @@ svg#use-progress.use-in-progress circle {
 	position: absolute;
 	width: 98%;
 	height: 10%;
-	top: 2%;
+	top: 1%;
 	left: 1%;
 	z-index: 1
 }
@@ -1381,7 +1381,7 @@ svg#use-progress.use-in-progress circle {
 	width: 20%;
 	height: 10%;
 	z-index: 1;
-	top: 2%;
+	top: 1%;
 	right: 10%
 }
 .enemy-profile.pvp {
@@ -1584,7 +1584,7 @@ svg#use-progress.use-in-progress circle {
 	}
 .character-level-text {
 	color:#e2d4b5 !important;
-	font-family: cinzelsemibold !important;
+	font-family: "Grenze" !important;
 	text-shadow:.25vh .25vh .5vh #000;
 	will-change: transform;
 	transform: translateZ(0);
@@ -2880,7 +2880,7 @@ div::-webkit-scrollbar, div::-webkit-scrollbar-thumb, div::-webkit-scrollbar-tra
 	position: absolute;
 	width: 27%;
 	height: auto !important;
-	top: 24% !important;
+	top: 22.5% !important;
 	left: 1.6%;
 	background-image: url(./../images/ui/game/quest2.png), url(./../images/ui/game/quest3.png);
 	background-size: 100% auto !important;
@@ -4802,6 +4802,10 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	animation: shake-tiny .3s;
 	-webkit-animation: shake-tiny .3s
 }
+.shake-hit {
+	animation: shake-hit .12s linear;
+	-webkit-animation: shake-hit .12s linear
+}
 .shake-stomp {
 	animation: shake-stomp .2s;
 	-webkit-animation: shake-stomp .2s
@@ -4847,6 +4851,12 @@ body:has(.my-pop-up-wrapper.loaded .my-pop-up-content-body.selected .need-money)
 	80% { transform: translate(.2vh, 0) rotate(-.5deg); }
 	100% { transform: translate(0, -.2vh) rotate(0deg); }
   }
+@keyframes shake-hit {
+	0% { transform: translate(.15vh, 0); }
+	35% { transform: translate(-.22vh, .06vh); }
+	70% { transform: translate(.08vh, -.04vh); }
+	100% { transform: translate(0, 0); }
+}
 @keyframes shake-stomp {
 	0%   { transform: translate(0, 0) rotate(0deg); }
 	15%  { transform: translate(.12vh, .03vh) rotate(.08deg); }
@@ -6158,7 +6168,7 @@ video::-webkit-media-controls-start-playback-button {
 }
 #world-mini-map {
 	width:9%;
-	top:4%;
+	top:3%;
 	right:1%;
 	z-index: 1;
 	aspect-ratio: 1 / 1;
@@ -6168,7 +6178,7 @@ video::-webkit-media-controls-start-playback-button {
 }
 body.pc-mission #world-mini-map {
 	width:9%;
-	top:4%;
+	top:3%;
 	right:1%;
 }
 
@@ -6184,7 +6194,7 @@ body.pc-mission #world-mini-map {
 }
 body.pc-mission #world-mini-map img {
 	right:1%;
-	top:2%;
+	top:1%;
 }
 #world-mini-map .world-mini-map-img {
 	transform: scale(.5) translate(-50%,-50%);
@@ -17049,4 +17059,13 @@ div[data-module=dailylogin] .book-page-bg {
 }
 .story-wrapper.story-with-description .story-skip {
 	height: 12%;
+}
+.leaderboard-item-right {
+	font-family: "Grenze" !important;
+	font-size:calc(var(--wot-font-base) * 1.4) !important
+}
+.timedquest-counter {
+	font-family: "Grenze" !important;
+	font-size:calc(var(--wot-font-base) * 1.5) !important;
+	font-weight: 400 !important;
 }

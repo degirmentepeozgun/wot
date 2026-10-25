@@ -1,4 +1,4 @@
-﻿﻿﻿'use strict';
+﻿'use strict';
 const _borderRates = [
 	1.06, 1.06, 1.06, 
 	1.05, 1.05, 1.05, 1.05,
@@ -1522,26 +1522,27 @@ function map(_m) {
 			return false;
 		if(this.skipTinyCameraMove) {
 			this.skipTinyCameraMove--;
+			if (!this.skipTinyCameraMove)
+				this.cameraEaseIn = 0;
 			return false;
 		}
 		if(!mainCharacter || mainCharacter.hitStop || this?.still || this.ultimateTimeStop || __storyCutScenePlaying || mainCharacter.animation === 'run')
 			return false;
 		const _deadLeft = mainCharacter.direction === __left ? this.cWidth * .55 : this.cWidth * .35;
 		const _deadRight = mainCharacter.direction === __left ? this.cWidth * .65 : this.cWidth * .45;
-		if(mainCharacter.left > _deadLeft && mainCharacter.left < _deadRight)
+		if(mainCharacter.left > _deadLeft && mainCharacter.left < _deadRight) {
+			this.cameraEaseIn = 0;
 			return false;
-		if(!this.cameraEasing){
-			this.cameraEasing = 1;
-			this.cameraEasingStart = 0;
 		}
-		this.cameraEasingStart++;
-		if(this.cameraEasingStart !== this.cameraEasing)
-			return false;
-		else
-			this.cameraEasingStart = 0;
 		const _half = mainCharacter.direction === __left ? _deadRight : _deadLeft;
 		const _part = this.cWidth / 10;
 		let _step = episode.cWidth / 400;
+		let ramp = this.cameraEaseIn || 0;
+		if(ramp < 8)
+			ramp++;
+		this.cameraEaseIn = ramp;
+		const t = ramp / 8;
+		_step *= t * t * (3 - 2 * t);
 		if(mainCharacter.left < (_half - _step))
 		{
 			if(mainCharacter.getCurrentAnimation()?.attack || mainCharacter.animation === 'roll'
@@ -2852,15 +2853,25 @@ function map(_m) {
 			this._colorCache = Object.create(null);
 		let _opc = 1;
 		let _color, _isHurtFlash;
-		if (_item?.char?.hurting?.hit) {
-			const h = _item.char.hurting.hit;
+		const _hurt = _item?.char?.hurting;
+		if (_hurt?.flicker != null) {
+			_color = (_hurt.flicker % 4) === 0 ? 'rgba(255,255,255,1)' : 'rgba(243,231,161,1)';
+			_isHurtFlash = 1;
+		}
+		else if (_hurt?.tint <= 1) {
+			_color = 'rgba(255,255,255,1)';
+			_hurt.tint++;
+			_isHurtFlash = 1;
+		}
+		else if (_hurt?.hit) {
+			const h = _hurt.hit;
 			if (h >= 3)
 				_color = 'rgba(255,255,255,1)';
 			else if (h === 2)
 				_color = 'rgba(255,230,150,0.85)';
 			else
 				_color = 'rgba(255,110,40,0.55)';
-			_item.char.hurting.hit--;
+			_hurt.hit--;
 			_isHurtFlash = 1;
 		}
 		else {
@@ -3685,9 +3696,16 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 
 		const sizeFactor = (_char.width * _char.ZOOM) / 30;
 
-		const count =
+		let count =
 			(16 + _countRate) +
 			strength * _countRate * sizeFactor;
+		const _sparkCap = (strength >= 2 || _key === 'slam' || _key === 'heavy') ? 18 : 14;
+		if (count > _sparkCap)
+			count = _sparkCap;
+		if (_char.particles.length >= _sparkCap)
+			count = 0;
+		else if (count > _sparkCap - _char.particles.length)
+			count = _sparkCap - _char.particles.length;
 
 		const spread =
 			(20 + _countRate) +
@@ -3750,8 +3768,10 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 				p: platformX,
 
 				radius:
-					RADIUS_MIN +
-					Math.random() * RADIUS_RANGE,
+					Math.max(
+						this.cWidth * 0.0032,
+						RADIUS_MIN + Math.random() * RADIUS_RANGE
+					),
 
 				rx:
 					getRandomValue2(
@@ -3807,7 +3827,7 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 
 	const hitSlow =
 		_char.hitStop
-			? 0.9
+			? 0.85
 			: _char.particleSpeed;
 
 	if (_char.particleSpeed > 1)
@@ -3880,18 +3900,11 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			lastColor = p.color;
 		}
 
+		const _rx = p.radius * sizeMul * p.rx;
+		const _ry = p.radius * sizeMul * p.ry;
+		const _px = p.x - ((_reversed ? -1 : 1) * (platformX - p.p));
 		offCtx.beginPath();
-
-		offCtx.ellipse(
-			p.x - ((_reversed ? -1 : 1) * (platformX - p.p)),
-			p.y,
-			p.radius * sizeMul * p.rx,
-			p.radius * sizeMul * p.ry,
-			0,
-			0,
-			Math.PI * 2
-		);
-
+		offCtx.ellipse(_px, p.y, _rx, _ry, 0, 0, Math.PI * 2);
 		offCtx.fill();
 	}
 
@@ -4199,6 +4212,21 @@ this.getShadowOffset = function(_char) {
         y: Math.sin(angle) * offset
     };
 };
+	this.drawBoltGlow = function(ctx, img, sx, sy, sw, sh, x, y, w, h, blur) {
+		if(!img || !img.width || !sw || !sh || !w || !h)
+			return;
+		const padX = MathRound(w * 0.14);
+		const padY = MathRound(h * 0.22);
+		ctx.save();
+		ctx.globalCompositeOperation = 'lighter';
+		ctx.globalAlpha = 0.32;
+		if(blur) {
+			ctx.shadowBlur = Math.max(2, MathRound(this.cWidth * 0.006));
+			ctx.shadowColor = 'rgba(190,225,255,0.85)';
+		}
+		ctx.drawImage(img, sx, sy, sw, sh, x - (padX >> 1), y - (padY >> 1), w + padX, h + padY);
+		ctx.restore();
+	};
 	this.drawCharacterQueue = function (_queue) {
 		if (this.disposing || !_queue?.[0]){
 			this.checkSceneActions();
@@ -4265,6 +4293,17 @@ this.getShadowOffset = function(_char) {
 			}
 		}
 		let i = 0;
+		let _boltBlur = 0;
+		if(!__batterySaveMode && this.enemies) {
+			let _bn = 0;
+			for(let _bi = 0; _bi < this.enemies.length; _bi++) {
+				const _be = this.enemies[_bi];
+				if(_be && !_be.remove && _be.lightColor === '#0000FF10')
+					_bn++;
+			}
+			if(_bn)
+				_boltBlur = _bn <= 4 ? 2 : 1;
+		}
 		offCtx.reversed = c10.reversed = offGoreCtx.reversed = false;// = _cNPC.cleared = false;
 		//let _zoomRate, _zoomedWidth, _zoomedHeight, _zoomedLeft, _zoomedTop, 
 		let _hurt, _hurted, _rotate, rotateX, rotateY, _wDiff, _hDiff, _hurtedCount = 0, _bounceCount = 0;
@@ -4314,6 +4353,7 @@ this.getShadowOffset = function(_char) {
 			if(_hurt && !_item.char.getCurrentAnimation()?.hurt) {
 				_hurt = false;
 				_item.char.hurting.count = 0;
+				delete _item.char.hurting.flicker;
 			}
 			// && (!_item.char.lastHurtTime || ((_gameTick - _item.char.lastHurtTime) > 200));
 			_shadowItems = [];
@@ -4339,8 +4379,10 @@ this.getShadowOffset = function(_char) {
 			}
 			if (_hurt){
 				_item.char.hurting.count--;
-				if(_item.char.hurting.count <= 0)
+				if(_item.char.hurting.count <= 0) {
 					_item.char.lastHurtTime = _gameTick;
+					delete _item.char.hurting.flicker;
+				}
 			}
 			if (!_out) {
 				if(_item.char.release || _item.animation === 'release' || 
@@ -4396,10 +4438,11 @@ this.getShadowOffset = function(_char) {
 						_y = MathRound(_item.top + _hDiff) - rotateY;
 						_w = MathRound(_item.width * (_item.zoom ?? 1));
 						_h = MathRound(_item.height * (_item.zoom ?? 1));
-						if((_hurted && _anim.hurt && _item.char.hurtingStart < 3 && (_hurtedCount < 4 || _item.char.main)) || _item.skinColor) {
-							//if(!_item.char.colorized) {
-								//_item.char.colorized = _colorized = true;
-								 _item.char.hurtingStart++;
+						const _flicker = _hurt ? _item.char.hurting?.flicker : null;
+						const _zapOn = _flicker != null && (_flicker % 2) === 0;
+						if(_flicker != null ? _zapOn : ((_hurted && _anim.hurt && _item.char.hurtingStart < 3 && (_hurtedCount < 4 || _item.char.main)) || _item.skinColor)) {
+							if (_flicker == null)
+								_item.char.hurtingStart++;
 								const _hurtSprite = this.colorizeSprite4(_item, null, _item.skinColor ? 1 : null);
 								if(_hurtSprite?.width > 0)
 									offCtx.drawImage(_hurtSprite,
@@ -4482,6 +4525,8 @@ this.getShadowOffset = function(_char) {
 							}
 							_x = MathRound(_charCan.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff)) - rotateX;
 							if(!_cropped) {
+								if(_boltBlur && _item.char.lightColor === '#0000FF10' && _item.spriteWidth)
+									this.drawBoltGlow(_charCan, _item.sprite, _item.spriteX, _item.spriteY, _item.spriteWidth, _item.spriteHeight, _x, _y, _w, _h, _boltBlur === 2);
 								_charCan.drawImage(_item.sprite, _item.spriteX, _item.spriteY,
 									_item.spriteWidth, _item.spriteHeight,
 									_x,
@@ -4504,6 +4549,8 @@ this.getShadowOffset = function(_char) {
 							}
 							else if(_cropped.width > 0) {
 								_coordsSet = 1;
+								if(_boltBlur && _item.char.lightColor === '#0000FF10')
+									this.drawBoltGlow(_charCan, _cropped, 0, 0, _cropped.width, _cropped.height, _x, _y, _w, _h, _boltBlur === 2);
 								this.drawCharacterGhost(_item,_cropped,_x,_y,_w,_h);
 								_charCan.drawImage(_cropped,_x,_y,_w,_h);
 								// this.applyLightOnCharacter(
@@ -4583,6 +4630,8 @@ this.getShadowOffset = function(_char) {
 								_charCan.restore();
 							}
 						}
+						if (_flicker != null && _item.char.hurting)
+							_item.char.hurting.flicker++;
 						if(_rotate) { 
 							offCtx.restore();
 						}
@@ -4599,10 +4648,12 @@ this.getShadowOffset = function(_char) {
 								_hs = 4;
 							else 
 								_hs += (_knockback ? 2 : (_item.particleColor ? 3 : 0));
+							const _lean = _item.char.hitSparkDir === 180 ? -16 : 16;
 							this.drawHitParticles(_item.char, _x + MathRound(_w / 2),
-							_y + MathRound(_h / 2), getRandomValue2(150, 190), 
+							_y + MathRound(_h / 2), getRandomValue2(150, 190) + _lean, 
 							_item.char.bloodColor === 'green' ? '#1f6f2e' : '#880808', 
 							_hs, _knockback, _item.char.hurtingStrength);
+							delete _item.char.hitSparkDir;
 							delete _item.char.hurtingStrength;
 							_drawParticles = 0;
 						}
@@ -4636,7 +4687,7 @@ this.getShadowOffset = function(_char) {
 					}
 				}
 			}
-			if (!_item.char.friendly && !_anim?.skipHealthBar)
+			if (!_item.char.friendly && (!_anim?.skipHealthBar || _item.char.health <= 0 || _item.char.dead || _item.char.hbBreak >= 0))
 				this.drawHealthBar2(_item);
 			this.checkBubbleText(_item.char);
 			if (_item.shadow 
@@ -4685,6 +4736,13 @@ this.getShadowOffset = function(_char) {
 		}
 		this.applySceneLighting(offCtx);
 		c10.drawImage(this.offCanvas, 0, 0);
+		if (this._barDeathQueue?.length) {
+			for (let _i = 0; _i < this._barDeathQueue.length; _i++) {
+				const _d = this._barDeathQueue[_i];
+				this.drawHealthBarDeath(c10, _d.x, _d.y, _d.w, _d.h, _d.step, _d.img, _d.bossPad, _d.life);
+			}
+			this._barDeathQueue.length = 0;
+		}
 		if (__account.options.gore){
 			if(offGoreCtx.reversed)
 				offGoreCtx.restore();
@@ -6346,6 +6404,82 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 	// 		offCtx.scale(-1, 1);
 	// 	}
 	// }
+	this.queueHealthBarDeath = function (_item) {
+		const _char = _item.char;
+		if (_char.class === __spell || _char.main)
+			return;
+		if (_char.hbBreak === undefined)
+			_char.hbBreak = 0;
+		const _life = (_char.grade ?? 0) <= 1 ? 22 : 16;
+		if (_char.hbBreak >= _life) {
+			_char.hbBreak = -1;
+			return;
+		}
+		const step = _char.hbBreak++;
+		const _isBoss = _char.class === 'boss';
+		const _gradeBar = (_char.grade ?? 0) > 1;
+		let w = MathRound((this.cWidth / 100) * (_isBoss ? 10 : 4));
+		if (_char.healthBarWidthRate)
+			w = MathRound(_char.healthBarWidthRate * w);
+		const _xGap = MathRound((_char.WIDTH - w) / 2);
+		const _hLeft = MathRound(_char.EXACTLEFT + _xGap);
+		const _extraTop = MathRound(-10 * __zoom * __scale);
+		let _hHeight = this.cHeight / 75;
+		if (_char.healthBarHeightRate)
+			_hHeight *= _char.healthBarHeightRate;
+		const _hTop = MathRound(
+			(this.cHeight + _extraTop)
+			- _hHeight
+			- ((_item.hbGap ?? 0))
+			- _char.yPosition
+			- _char.HEIGHT
+			- (_item.yGap ?? 0)
+			- ((_char.yGap ?? 0))
+		);
+		let h = MathRound(w * (26 / 124));
+		let img = this.HBMob;
+		if (_gradeBar) {
+			img = this.HBBoss;
+			w = MathRound(w * 252 / 105);
+			if (_isBoss) {
+				h = MathRound(h * .6);
+				w = MathRound(w * .6);
+			}
+		}
+		if (!this._barDeathQueue)
+			this._barDeathQueue = [];
+		this._barDeathQueue.push({ x: _hLeft, y: _hTop, w: w, h: h, step: step, img: img, bossPad: _gradeBar, life: _life });
+	}
+	this.drawHealthBarDeath = function (ctx, x, y, w, h, step, img, bossPad, life) {
+		if (!img || w < 1 || h < 1)
+			return;
+		const hold = 6;
+		life = life || 16;
+		const grown = 1 + 0.14 * Math.min(1, (step + 1) / hold);
+		let narrow = 1;
+		let alpha = 1;
+		if (step >= hold) {
+			const t = Math.min(1, (step - hold + 1) / (life - hold));
+			narrow = 1 - t;
+			alpha = narrow * narrow;
+		}
+		if (narrow <= 0)
+			return;
+		const dw = w * grown * narrow;
+		const dh = h * grown;
+		if (dw < 1)
+			return;
+		const dx = x + (w - dw) * 0.5;
+		const dy = y - (dh - h) * 0.5;
+		ctx.save();
+		ctx.globalAlpha = alpha;
+		ctx.drawImage(img, dx, dy, dw, dh);
+		const padX = dw * (bossPad ? 0.03 : 0.06);
+		const padY = dh * 0.225;
+		ctx.fillStyle = '#B8B3AA';
+		ctx.fillRect(dx + padX, dy + padY, Math.max(0, dw - padX * 2), Math.max(0, dh - padY * 2));
+		ctx.restore();
+	}
 	this.drawMobHealthBar = function (ctx, _item, x, y, w) {
 		const _char = _item.char;
 		const h = MathRound(w * (26 / 124));
@@ -6369,6 +6503,22 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 
 		// 🔑 WORLD-SPACE FIX
 		const drawX = ctx.reversed ? (-x - w) : x;
+
+		let _ps = 1;
+		if (_char.hbPulse > 0) {
+			_ps = 1 + 0.08 * Math.sin(_char.hbPulse * Math.PI);
+			_char.hbPulse -= 0.1;
+			if (_char.hbPulse <= 0)
+				delete _char.hbPulse;
+		}
+		if (_ps !== 1) {
+			const _cx = drawX + w * 0.5;
+			const _cy = y + h * 0.5;
+			ctx.save();
+			ctx.translate(_cx, _cy);
+			ctx.scale(_ps, _ps);
+			ctx.translate(-_cx, -_cy);
+		}
 
 		// --- FRAME ---
 		ctx.drawImage(this.HBMob, drawX, y, w, h);
@@ -6409,6 +6559,8 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		}
 
 		ctx.restore();
+		if (_ps !== 1)
+			ctx.restore();
 	};
 
 
@@ -6478,6 +6630,22 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		// Reverse fix
 		const _rev = offCtx.reversed;
 		if (_rev) offCtx.restore();
+
+		let _ps = 1;
+		if (_char.hbPulse > 0) {
+			_ps = 1 + 0.08 * Math.sin(_char.hbPulse * Math.PI);
+			_char.hbPulse -= 0.1;
+			if (_char.hbPulse <= 0)
+				delete _char.hbPulse;
+		}
+		if (_ps !== 1) {
+			const _cx = x + w * 0.5;
+			const _cy = y + h * 0.5;
+			cofftx.save();
+			cofftx.translate(_cx, _cy);
+			cofftx.scale(_ps, _ps);
+			cofftx.translate(-_cx, -_cy);
+		}
 
 		// --- 1. ÇERÇEVE ---
 		cofftx.drawImage(this.HBBoss, x, y, w, h);
@@ -6558,6 +6726,8 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 			cofftx.restore();
 		}
 		
+		if (_ps !== 1)
+			cofftx.restore();
 		this.drawBossName(cofftx, _item.char, x + padX, y, w, MathRound(padX * .5), h);
 		// Reverse geri al
 		if (_rev) {
@@ -6568,6 +6738,12 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 
 	this.drawHealthBar2 = function (_item) {
 		const _isPvp = !this.gold && ((this.pvp || this.war) || _item.char.flagCapturer);
+		if (_item.char.hbBreak === -1 && (_item.char.health <= 0 || _item.char.dead))
+			return;
+		if ((_item.char.health <= 0 || _item.char.dead || _item.char.hbBreak >= 0) && !_isPvp && !_item.char.main && !_item.char.skipHealthBar) {
+			this.queueHealthBarDeath(_item);
+			return;
+		}
 		if(__batterySaveMode || _item.char.skipHealthBar || _item.char.health <= 0 || _item.char.dead)
 			return;
 
@@ -7477,40 +7653,79 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 	setBusyState(!(this.menu || this.lobby));
 	this.initLightRadiusLayer();
 	this.getMinPositionY = function(_e) {
-		if(!this.playGrounds)
-			return { y:minPositionY };
-		const _eCenter = _e.HURTLEFT + _e._HURTBOX_half + platformX;
-		const _oldCenter = _e.oldHURTLEFT + _e._HURTBOX_half;
-		for(let _pg of this.playGrounds) {
-			if(_eCenter >= _pg.minX && _eCenter <= _pg.maxX){
-				if(_pg.round) {
-					const _dist = MathAbs(_pg.minX - _pg.maxX);
-					const _rate = (_dist * _pg.round.rate);
-					if(_pg.round.dir === __right) {
-						const _esik = (_pg.maxX - _rate);
-						if(_eCenter > _esik)
-							return { 
-								//noXRate: _oldCenter < _eCenter, 
-								y:MathRound(((_eCenter - _esik) * minPositionY) / _rate)
-							};
-					}	
-					else {
-						const _esik = (_pg.minX + _rate);
-						if(_eCenter < _esik)
-							return { 
-								//noXRate: _oldCenter > _eCenter, 
-								y:MathRound(((_esik - _eCenter) * minPositionY) / _rate)
-							};
-					}	
-					return { y:_pg.bottomGap };
-				}
-				return { y:_pg.bottomGap};
-			}
-			else {
-				
+		const ready = _startAnimate && !_game.suspended && !__switchingMap && _e.HURTLEFT === _e.HURTLEFT;
+		let box;
+		if (ready) {
+			box = _e._minYBox;
+			if (!box)
+				box = _e._minYBox = { y: 0, minX: 0, maxX: -1 };
+			const center = _e.HURTLEFT + _e._HURTBOX_half + platformX;
+			if (!box.slope && center >= box.minX && center <= box.maxX)
+				return box;
+		}
+		else {
+			box = { y: 0 };
+			if (_e._minYBox) {
+				_e._minYBox.slope = 1;
+				_e._minYBox.maxX = -1;
 			}
 		}
-		return { y:minPositionY };
+		const _eCenter = _e.HURTLEFT + _e._HURTBOX_half + platformX;
+		const _oldCenter = _e.oldHURTLEFT + _e._HURTBOX_half;
+		box.slope = 0;
+		box.noXRate = undefined;
+		if (!this.playGrounds) {
+			box.y = minPositionY;
+			if (ready) {
+				box.minX = -1e9;
+				box.maxX = 1e9;
+			}
+			return box;
+		}
+		for (let _pg of this.playGrounds) {
+			if (_eCenter < _pg.minX || _eCenter > _pg.maxX)
+				continue;
+			if (_pg.round) {
+				box.slope = 1;
+				if (ready) {
+					box.minX = 0;
+					box.maxX = -1;
+				}
+				const _dist = MathAbs(_pg.minX - _pg.maxX);
+				const _rate = _dist * _pg.round.rate;
+				if (_pg.round.dir === __right) {
+					const _esik = _pg.maxX - _rate;
+					if (_eCenter > _esik) {
+						//noXRate: _oldCenter < _eCenter
+						box.y = MathRound(((_eCenter - _esik) * minPositionY) / _rate);
+						return box;
+					}
+				}
+				else {
+					const _esik = _pg.minX + _rate;
+					if (_eCenter < _esik) {
+						//noXRate: _oldCenter > _eCenter
+						box.y = MathRound(((_esik - _eCenter) * minPositionY) / _rate);
+						return box;
+					}
+				}
+				box.y = _pg.bottomGap;
+				return box;
+			}
+			box.y = _pg.bottomGap;
+			if (ready) {
+				box.minX = _pg.minX;
+				box.maxX = _pg.maxX;
+			}
+			return box;
+		}
+		box.y = minPositionY;
+		box.slope = 1;
+		if (ready) {
+			box.minX = 0;
+			box.maxX = -1;
+		}
+		return box;
 	}
 	this.resize = function() {
 		particleScale = Math.max(0.25, Math.min(2, this.cWidth / 1152));
