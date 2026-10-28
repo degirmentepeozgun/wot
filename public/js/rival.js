@@ -1018,7 +1018,7 @@ function createCharacter(_settings) {
 								spriteOrigin: 49,
 								extraStepXRate: .5,
 								bottomGap: -30,
-								sound: { key: 'taktak', volume: .5, reset: true },
+								sound: { key: 'taktak', volume: 1, reset: true },
 								speed: 4,
 								objects: [
 									{
@@ -1078,7 +1078,7 @@ function createCharacter(_settings) {
 										// },
 										key: 'hurtair',
 										type: 'air',
-										sound: { key:'tak', volume:.3, reset: true},
+										sound: { key:'tak', volume:1, reset: true},
 										objects: [
 											{
 												key: 'crit',
@@ -1105,7 +1105,7 @@ function createCharacter(_settings) {
 								spriteOrigin: 71,
 								speed: 4,
 								bottomGap: -81,
-								sound: { key: 'taktak', volume: .3, reset: true },
+								sound: { key: 'taktak', volume: 1, reset: true },
 								extraStepXRate: .85,
 								objects: [
 									{ key: 'zoom', position: 'css', p1: 1.5, p2: 1400, p3: 9 }
@@ -1159,7 +1159,7 @@ function createCharacter(_settings) {
 										// },
 										key: 'hurtair',
 										type: 'air',
-										sound: { key:'tak', volume:.3, reset: true},
+										sound: { key:'tak', volume:1, reset: true},
 										objects: [{
 												key: 'crit',
 												position: 'middle'
@@ -1185,7 +1185,7 @@ function createCharacter(_settings) {
 								spriteOrigin: 66,
 								bottomGap: -96,
 								speed: 4,
-								sound: { key: 'taktak', volume: .3, reset: true },
+								sound: { key: 'taktak', volume: 1, reset: true },
 								extraStepXRate: .85,
 								objects: [
 									{ key: 'zoom', position: 'css', p1: 1.5, p2: 1400, p3: 9}
@@ -1239,7 +1239,7 @@ function createCharacter(_settings) {
 										// },
 										key: 'hurtair',
 										type: 'air',
-										sound: { key:'tak', volume:.3, reset: true},
+										sound: { key:'tak', volume:1, reset: true},
 										objects: [{
 												key: 'crit',
 												position: 'middle'
@@ -1265,7 +1265,7 @@ function createCharacter(_settings) {
 								spriteOrigin: 41,
 								bottomGap: -81,
 								speed: 4,
-								sound: { key: 'taktak', volume: .3, reset: true },
+								sound: { key: 'taktak', volume: 1, reset: true },
 								extraStepXRate: .85,
 								objects: [
 									{ key: 'zoom', position: 'css', p1: 1.5, p2: 1400, p3: 9 }
@@ -1333,7 +1333,7 @@ function createCharacter(_settings) {
 										// 	}
 										// },
 										key: 'hurtair',
-										sound: { key:'tak', volume:.3, reset: true},
+										sound: { key:'tak', volume:1, reset: true},
 										type: 'air',
 										objects: [{
 												key: 'crit',
@@ -1348,7 +1348,7 @@ function createCharacter(_settings) {
 									},
 									type: 'common'
 								},
-								sound: { key: 'taktak', volume: .3, reset: true },
+								sound: { key: 'taktak', volume: 1, reset: true },
 								def: {
 									rate: .8
 								}
@@ -21019,6 +21019,7 @@ const _allEnemies = {
 						spriteWidth: 201,
 						spriteHeight: 129,
 						spriteOrigin: 102,
+						invisibleWhenLay: true,
 						src: './images/sprites/ep07/death.png'
 					},
 					'./images/sprites/ep07/hurt.png'
@@ -39869,7 +39870,7 @@ const _allEnemies = {
 				// }
 			},
 			key: 'jsprgbln-' + Math.random().toString().replace(/[.]/g, ''),
-			yGap: 25,
+			yGap: 5,
 			id: 623,
 			healtbarGap: 0,
 			name: 'Jesper Goblin',

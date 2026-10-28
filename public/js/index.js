@@ -2039,7 +2039,7 @@ function createArena(_opponent, _realTime) {
 				x.level = 10;
 				//applyCharacterStats(1, x);
 				resetSkills(null, null, x);
-				x.groupId = x.alp = 1;
+				x.teamId = x.alp = 1;
 				x.villain = false;
 				//x.setHealth(x.MAXHP);
 				_enemyProfile.innerHTML = avatarTemplate(x);
@@ -2114,7 +2114,7 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 				maxX: i <= _halfPlace ? 250 : 5800,
 				sight: 1000,
 				count: 1,
-				groupId: _team,
+				teamId: _team,
 				inventory: _opponent.inventory?.[0] ? JSON.parse(JSON.stringify(_opponent.inventory)) : [],
 				minLevel: _opponent.level,
 				maxLevel: _opponent.level,
@@ -2144,7 +2144,7 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 			hideMenu();
 			removeClass(_gameUI, 'disable-ui');
 			_enemyProfile.innerHTML = '';
-			mainCharacter.groupId = _myTeam;
+			mainCharacter.teamId = _myTeam;
 			mainCharacter.maxHP = mainCharacter.MAXHP = mainCharacter.health = mainCharacter.maxHP * 5;
 			_navbar.innerHTML = pvpAvatarTemplate(mainCharacter);
 			episode.enemies.filter(x => !x.main).forEach(x => {
@@ -2152,10 +2152,10 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 				resetSkills(null, null, x);
 				x.alp = 1;
 				x.important = true;
-				if(x.groupId === _myTeam)
+				if(x.teamId === _myTeam)
 					x.skipHealthBar = true;
 				x.health = x.maxHP = x.MAXHP = x.maxHP * 5;
-				if(x.groupId === _myTeam)
+				if(x.teamId === _myTeam)
 					_navbar.innerHTML += pvpAvatarTemplate(x);
 				else
 					_enemyProfile.innerHTML += pvpAvatarTemplate(x);

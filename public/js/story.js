@@ -7901,7 +7901,7 @@ const __stories = [
 					mainCharacter.level = 0;
 					mainCharacter.experience = 0;
 					mainCharacter.maxExperience = 833;
-					setCharacterLevel(10, null, 1);
+					setCharacterLevel(1, null, 1);
 					mainCharacter.animations.tag.disabled = true;
 					resetSkills(null, 1, mainCharacter);
 					//setCharacterLevel(12, null, 1);
@@ -8354,12 +8354,13 @@ const __stories = [
 					// 	experience: 1
 					// },
 					{
-						id: 7,
+						id: 619,
 						minX: 4000,
 						maxX: 6000,
-						count: 1,
+						count: 2,
 						sight: 1000,
-						hp:60000,
+						spawn: 3,
+						hp:60,
 						experience: 500
 					},
 					// {
@@ -9608,7 +9609,7 @@ const __stories = [
 										tr: 'Takım Bonusu'
 									},
 									icon: 'war',
-									value: (episode['team' + mainCharacter.groupId + 'score'] ?? 0) * 500
+									value: (episode['team' + mainCharacter.teamId + 'score'] ?? 0) * 500
 								}
 							]
 						};

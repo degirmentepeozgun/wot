@@ -1972,8 +1972,9 @@ async function connectSocket() {
     //		accessTokenFactory: () => _socketId
     //	}).withAutomaticReconnect([0, 1000, 5000, 10000, 30000])
     //	.build();
+    const _priorSocket = __account?.socketId || mainCharacter?.oldSocketId;
     _my_hub = new signalR.HubConnectionBuilder().withUrl('wss://api.warriorsoftengri.com/gamehub?n=' + //'https://localhost:7298/gamehub?n=' + 
-    encodeURIComponent(__account.name) + (mainCharacter?.oldSocketId ? '&s=' + mainCharacter.oldSocketId : '') + ((!episode || episode.menu || episode.lobby) ? '' : '&b=1'), {
+    encodeURIComponent(__account.name) + (_priorSocket ? '&s=' + _priorSocket : '') + ((!episode || episode.menu || episode.lobby) ? '' : '&b=1'), {
         //accessTokenFactory: () => _socketId,
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets
@@ -1983,6 +1984,10 @@ async function connectSocket() {
         mainCharacter.socketId = __socketId = assignedId;
         if (!mainCharacter.oldSocketId)
             mainCharacter.oldSocketId = __socketId;
+        if (__account) {
+            __account.socketId = assignedId;
+            _client?.saveState(1);
+        }
     }
     );
     _my_hub.on("M", async (cmd, message) => {
@@ -2025,6 +2030,8 @@ async function connectSocket() {
                 {
                     if (_json.t !== __socketId)
                         return;
+                    if (mainCharacter)
+                        mainCharacter.leader = 1;
                     createArena(_json, 1);
                     joinRoom(_json.e);
                 }
@@ -2073,25 +2080,34 @@ async function connectSocket() {
                     }
                     const jsonStr = encodeURIComponent(JSON.stringify(_json));
                     const _opponentGrade = _selectableChars.find(x => x.class === _json.cl).grade;
-                    let _modal = `<div class="full fade-me show-ui flex inventory-question">
-							<div class="inventory-modal">` + `<div class="flex w-100" style="padding:4vh 0 0 0"><div class="selection-item selection-char flex" style="width:17%;aspect-ratio:1/1;position:relative">
-									<img src="./images/main/avatars/${_json.cl}.png" style="padding:2%;height:80%" class="grade${_opponentGrade}-item" />
-								</div></div>` + `<div class="flex w-100" style="padding:2vh">
-									<div class="flex" style="font-size:3vh;color:#f3f4f5cc !important">
-										<img style="margin:1vh;height:4vh" src="./images/icons/duel.png" />
-										${_json.n}
-										<img style="margin:1vh;height:4vh" src="./images/icons/duel.png" />
-									</div>
-								</div>` + `<div style="padding:0 4vh 4vh 4vh" class="flex">
-									<span style="color:#f7f7f7dd !important;font-size:3.2vh !important">${getLangData("Let's Duel")}!</span>
+                    let _modal = `<div data-singleton-key="modal_square_duel" class="duel-char-selection full fade-me show-ui flex inventory-question">
+							<div class="inventory-modal">` + 
+                                `<div class="flex w-100 duel-char-selection-avatar">
+                                    <div class="selection-item selection-char flex">
+                                        <img src="./images/main/avatars/${_json.cl}.png" class="grade${_opponentGrade}-item" />
+                                    </div>
+                                </div>` + 
+                                `<div class="flex w-100 question-modal-title-wrapper duel-char-selection-title-wrapper">
+                                    <div class="flex question-modal-title">
+                                        <img src="./images/ui/game/duel.png" />
+                                        ${_json.n}
+                                        <img src="./images/ui/game/duel.png" />
+                                    </div>
+								</div>` + 
+                                `<div class="flex w-100 question-modal-desc duel-char-selection-desc">
+                                    <div class="duel-line1 w-100 flex"><img src="./images/ui/game/duel-line1.png" /></div>
+									<div>${getLangData("Let's Duel")}!</div>
+                                    <div class="duel-line2 w-100 flex"><img src="./images/ui/game/duel-line2.png" /></div>
 								</div>
-								<div class="flex" style="padding:2vh 4%">` + _choices + `</div>
-								<div class="w-100 flex" style="padding:2vh 4%">
-									<div style="color:#ff6c00cc;font-size:3vh !important"><span id="duel-counter" style="color:#F4BB44cc">20</span>&nbsp;${getLangData('seconds to give decision')}</div>
+								<div class="flex w-100 question-modal-choices duel-char-selection-choices">` + _choices + `</div>
+								<div class="w-100 flex duel-counter-wrapper duel-char-selection-counter">
+									<div class="duel-counter">
+                                    <span id="duel-counter">20</span>&nbsp;${getLangData('seconds to give decision')}
+                                    </div>
 								</div>
-								<div style="padding:4vh 2vh 6vh 2vh" class="flex">
-									<div class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="rejectDuelRequest('${_json.s}')">${getLangData('REJECT')}</div>
-									<div id="item-selection-approve-btn" class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="acceptDuelRequest('${jsonStr}')">${getLangData('APPROVE')}</div>
+								<div class="flex new-game-menu-buttons duel-char-selection-buttons">
+									<div class="new-game-menu-button flex animate-me" onexactclick="rejectDuelRequest('${_json.s}')">${getLangData('REJECT')}</div>
+									<div id="item-selection-approve-btn" class="new-game-menu-button flex animate-me" onexactclick="acceptDuelRequest('${jsonStr}')">${getLangData('APPROVE')}</div>
 								</div>
 							</div>
 						</div>`;
@@ -2181,6 +2197,8 @@ function acceptDuelRequest(_j) {
     const _class = _selected.getAttribute('data-class');
     const _side = getRandomValue2(0, 1);
     const _roomId = getRandomValue2(1, 99999);
+    if (mainCharacter)
+        mainCharacter.leader = undefined;
     createRoom(_roomId);
     sendMessage({
         c: 'accept-duel',
@@ -2199,8 +2217,9 @@ function acceptDuelRequest(_j) {
     createArena(_json, 1);
 }
 function disconnect() {
-    if (!mainCharacter)
+    if (!mainCharacter || mainCharacter.disconnected)
         return;
+    mainCharacter.disconnected = true;
     if (episode?.roomId) {
         leaveRoom(episode.roomId);
         setTransferMessage([{
@@ -2209,10 +2228,9 @@ function disconnect() {
             s: __socketId
         }]);
     }
-    mainCharacter.disconnected = true;
-    console.log('disconnected');
-    if (mainCharacter)
-        mainCharacter.socketId = __socketId = undefined;
+    if (_my_hub && _my_hub.state !== signalR.HubConnectionState.Disconnected)
+        _my_hub.stop().catch(function() {});
+    mainCharacter.socketId = __socketId = undefined;
 }
 async function reconnectSocket() {
     if (!_my_hub || _my_hub.state === signalR.HubConnectionState.Disconnected)
@@ -2222,9 +2240,12 @@ async function reconnectSocket() {
             console.error("Reconnect failed:", err);
         }
 }
-window.onbeforeunload = function(e) {
+window.onbeforeunload = function() {
     disconnect();
 };
+window.addEventListener('pagehide', function() {
+    disconnect();
+});
 
 async function fetchOnlineUsers() {
     if (episode?.menu || episode?.lobby)

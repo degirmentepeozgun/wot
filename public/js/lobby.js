@@ -60,7 +60,7 @@ function createMenu() {
 	if (document.querySelector('.lobby-navbar'))
         return;
 	if(_presentationMode === 1) {
-		__account.name = getLangData('Presentation');
+		__account.name = getLangData('Guest') + getRandomValue2(1000, 9999);
 		_presentationMode = 2;
 		__fragments.forEach(x =>
 		updateFragment(x.key, 1500));

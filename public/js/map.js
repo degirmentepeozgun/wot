@@ -543,6 +543,8 @@ function map(_m) {
 				_enemy.spawnTime = _mob.spawnTimeStart = _mob.spawnTime;
 			if (_mob.groupId)
 				_enemy.groupId = _mob.groupId;
+			if (_mob.teamId)
+				_enemy.teamId = _mob.teamId;
 			_enemy.displayName = _mob.name;
 			_enemy.level = getRandomValue2(_mob.minLevel ?? 1, _mob.maxLevel ?? (_mob.minLevel ?? 1));
 			let _levelRate = 1;
@@ -1048,7 +1050,7 @@ function map(_m) {
 			return;
 		}
 		const _enemies = this.enemies?.filter(x => x.enemy && x.class !== __spell && x.class !== 'object' && !x.isDead() && !x.remove);
-		const _teamMates = this.enemies?.filter(x => (x.friendly || x.main || (x.groupId && x.groupId === (mainCharacter.realGroupId ?? mainCharacter.groupId))) && x.class !== __spell && x.class !== 'object' && !x.isDead() && !x.remove);
+		const _teamMates = this.enemies?.filter(x => (x.friendly || x.main || (x.teamId && x.teamId === (mainCharacter.realTeamId ?? mainCharacter.teamId))) && x.class !== __spell && x.class !== 'object' && !x.isDead() && !x.remove);
 		const _deads = this.enemies?.filter(x => x.class !== __spell && x.class !== 'minion' && x.class !== 'object' && x.killedBy);
 		if(this.war){
 			if(mainCharacter.remove && !mainCharacter.ghosted) {
@@ -1060,7 +1062,7 @@ function map(_m) {
 						const _ghost = summonMob(500, MathRound(mainCharacter.SCREENLEFT / __zoom),
 						mainCharacter.yPosition);
 						_ghost.killCount = mainCharacter.killCount;
-						_ghost.realGroupId = mainCharacter.groupId;
+						_ghost.teamId = _ghost.realTeamId = mainCharacter.teamId;
 						_ghost.noDirection = _ghost.still = _ghost.hasShadow = false;
 						_ghost.stepX = mainCharacter.stepX;
 						_ghost.stepXRate = mainCharacter.oldProps.stepXRate;
@@ -1103,21 +1105,21 @@ function map(_m) {
 					x.grayAvatar = true;
 					const _killer = episode.enemies.find(y => y.key === x.killedBy);
 					_killer.killCount++;
-					const _gsb = document.querySelector('.team' + _killer.groupId + '-score');
+					const _gsb = document.querySelector('.team' + _killer.teamId + '-score');
 					if(_gsb) {
 						const _teamScore = parseInt(_gsb.innerText) + 1;
-						episode['team' + _killer.groupId + 'score'] = _teamScore;
+						episode['team' + _killer.teamId + 'score'] = _teamScore;
 						if(_teamScore > 9) {
 							this.pvpStarted = 1;
 						}
-						if(_teamScore > episode['team' + x.groupId + 'score']){
-							if(episode.winningTeam && episode.winningTeam !== _killer.groupId) {
+						if(_teamScore > episode['team' + x.teamId + 'score']){
+							if(episode.winningTeam && episode.winningTeam !== _killer.teamId) {
 								//comeback
-								const isMain = mainCharacter.groupId === _killer.groupId;
-								//warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/flag' + _killer.groupId + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Comeback') + '!</span></div>', null, null, 1);
+								const isMain = mainCharacter.teamId === _killer.teamId;
+								//warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/flag' + _killer.teamId + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Comeback') + '!</span></div>', null, null, 1);
 								PlaySound({ key: isMain ? 'comebackwin' : 'comebackloose', volume: 1 });
 							}
-							episode.winningTeam = _killer.groupId;
+							episode.winningTeam = _killer.teamId;
 						}
 						_gsb.innerText = _teamScore;
 					}
@@ -1154,8 +1156,8 @@ function map(_m) {
 			let _table;
 			if(!this.skipPvPFinalScreen) {
 				if(this.war) {
-					const _team1 = this.enemies.filter(x => x.groupId === 1);
-					const _team2 = this.enemies.filter(x => x.groupId === 2);
+					const _team1 = this.enemies.filter(x => x.teamId === 1);
+					const _team2 = this.enemies.filter(x => x.teamId === 2);
 					let _rewardsHtml = '';
 					_rewards.push({key:'honor', title:getLangData('Blood Honor'), count:mainCharacter.killCount ?? 0});
 					if(_status > 1){
@@ -1726,10 +1728,8 @@ function map(_m) {
 				mainCharacter.firstTransferDone = 1;
 				mainCharacter.synced = true;
 			}
-			else {
-				_dataItem = mainCharacter.getNewStatus2(0, !mainCharacter.synced);
-				mainCharacter.synced = !mainCharacter.synced;
-			}
+			else
+				_dataItem = mainCharacter.getNewStatus2(0);
 			if(!_dataItem)
 				return;
 			const _last = JSON.stringify(_dataItem);
@@ -7226,7 +7226,7 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		else if(_item.char.gradeLeft)
 			_bg = getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
 		// === Cache'e bak ===
-		const cacheKey = _isPvp ? `group-${_item.char.groupId}` : `group-${hpGroupRate}-${_hWidth}x${_hHeight}-${_bg}`;
+		const cacheKey = _isPvp ? `group-${_item.char.teamId}` : `group-${hpGroupRate}-${_hWidth}x${_hHeight}-${_bg}`;
 		let cached = this.healthBarCache.get(cacheKey);
 
 		if (!cached) {

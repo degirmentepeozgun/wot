@@ -305,6 +305,7 @@ function dataOperations(_quickPlay) {
 			_reset = true;
 		let _r = this.quickPlay ?? _reset;
 		let _json = JSON.parse(localStorage.getItem(this.storageKey) ?? '{}');
+		const _keptSocketId = _json?.socketId;
 		if(_presentationMode || _json?.version !== this.getDefaultData().version){
 			localStorage.removeItem(this.storageKey);
 			_json = {};
@@ -316,6 +317,8 @@ function dataOperations(_quickPlay) {
 		else {
 			__account = this.getDefaultData();
 			__account.inventory.forEach(x => x.weared = 'warrior');
+			if(_keptSocketId)
+				__account.socketId = _keptSocketId;
 			this.saveState(1);
 		}
 		if(_kb && !__account.keyboard)

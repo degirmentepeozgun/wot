@@ -54,7 +54,8 @@ console.log('onlineusers');
 			this.loading = 1;
 			setTimeout(() => {
 				let _html = '', _counter = 0;
-				for(let ou of __onlineUsers) {
+				const _users = (__onlineUsers ?? []).slice().sort((a, b) => new Date(b.connectedAt) - new Date(a.connectedAt));
+				for(let ou of _users) {
 					if(ou.socketId === __socketId)
 						continue;
 					const _minute = MathFloor(ou.onlineDuration / 60000);

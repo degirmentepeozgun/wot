@@ -1591,8 +1591,8 @@ svg#use-progress.use-in-progress circle {
 	-webkit-transform: translateZ(0);
 }
 .enemy-profile .character-level-text {
-	transform: scale(-1, 1) rotate(45deg) !important;
-	-webkit-transform: scale(-1, 1) rotate(45deg) !important
+	transform: scale(-1, 1) !important;
+	-webkit-transform: scale(-1, 1) !important
 }
 .enemy-profile .character-name-text {
 	transform: scale(-1, 1) !important;
@@ -10501,7 +10501,8 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	text-shadow: 1px 1px 2px #000;
 }
 .selection-item.selection-char {
-	width:18% !important
+	display: inline-block;
+	position: relative;
 }
 .menu-ui-splash {
 	top:0;
@@ -14527,6 +14528,14 @@ body.pc-mission  #game-ui .intro-screen {
 	aspect-ratio:627/254;
 	height:auto!important
 }
+.war-map .hb-frame-wrapper {
+	width:70% !important;
+    align-self: flex-start !important;
+    margin-top: 0 !important;
+}
+.war-map #mini-menu {
+	display:none !important;
+}
 .hb-frame-inner-left {
 	color:white;
 	width:38% !important;
@@ -15075,6 +15084,15 @@ body.pc-mission  #game-ui .intro-screen {
 	border-radius: 0 !important;
 	aspect-ratio: 456 / 512 !important;
 	box-shadow: none !important
+}
+.inventory-question[data-singleton-key="modal_square_duel"] .inventory-modal {
+	background:url(./../images/ui/game/duel-frame.png) !important;
+	background-size:100% 100% !important;
+	border:none !important;
+	border-radius: 0 !important;
+	aspect-ratio: 897 / 925 !important;
+	box-shadow: none !important;
+	overflow-y: auto !important;
 }
 .inventory-question[data-singleton-key="modal_middle"] .inventory-modal {
 	background:url(./../images/ui/game/modal-middle.png) !important;
@@ -17068,4 +17086,97 @@ div[data-module=dailylogin] .book-page-bg {
 	font-family: "Grenze" !important;
 	font-size:calc(var(--wot-font-base) * 1.5) !important;
 	font-weight: 400 !important;
+}
+.duel-char-selection .duel-char-selection-avatar {
+	aspect-ratio: 1/1;
+	height: 20% !important
+}
+.duel-char-selection .selection-item.selection-char {
+	height:100% !important;
+	width:auto !important;
+}
+.duel-char-selection .duel-char-selection-avatar img {
+	height: 100% !important
+}
+.duel-char-selection .inventory-modal {
+	padding:9% 4% 6% 4% !important
+}
+.duel-char-selection .question-modal-title-wrapper {
+	height: 12% !important;
+	padding: 0 !important;
+	padding-top:2% !important
+}
+.duel-char-selection .question-modal-title-wrapper * {
+	color:#edcea5 !important;
+    font-size: calc(var(--wot-font-base) * 1.5) !important;
+	font-family: "Alegreya" !important;
+	font-weight: 600 !important;
+}
+.duel-char-selection .question-modal-title-wrapper .question-modal-title {
+	justify-content: center !important;
+}
+.duel-char-selection .question-modal-title-wrapper img{
+	height: 66% !important;
+	margin:0 3.5% !important;
+	width: auto !important;
+}
+.duel-char-selection .duel-char-selection-desc {
+	height: 20% !important;
+}
+.duel-char-selection .duel-char-selection-desc * {
+	color:#edcea5 !important;
+    font-size: calc(var(--wot-font-base) * 1.2) !important;
+	font-family: "Alegreya" !important;
+}
+.duel-char-selection .duel-line1 {
+	height: 30% !important;
+}
+.duel-char-selection .duel-line2 {
+	height: 30% !important;
+}
+.duel-char-selection .duel-line1 img,
+.duel-char-selection .duel-line2 img {
+	height: 100% !important;
+}
+.duel-char-selection .duel-char-selection-choices {
+	height: 24% !important;
+	padding:2% 0 !important;
+}
+.duel-char-selection .duel-char-selection-choices img {
+	height: 100% !important;
+	width: auto !important;
+}
+.duel-char-selection .duel-counter-wrapper {
+	height:13% !important;
+	width:100% !important;
+}
+.duel-char-selection .duel-counter {
+	color:#ad6711 !important;
+    font-size: calc(var(--wot-font-base) * 1.2) !important;
+	font-family: "Alegreya" !important;
+	width:100%;
+	text-align: center;
+}
+.duel-char-selection .duel-counter span {
+	color:#e3c594 !important;
+    font-size: calc(var(--wot-font-base) * 1.35) !important;
+	font-family: "Grenze" !important;
+	font-weight: 600 !important;
+	display: inline-block !important;
+	margin-right:.5% !important;
+}
+.duel-char-selection .new-game-menu-buttons {
+	height:19% !important;
+	padding-top:1% !important;
+}
+.selection-item.selection-char img:not(.duel-char-selection-avatar img) {
+	width:100% !important;
+	height:auto !important;
+}
+.selection-item.selection-char {
+	width:17% !important;
+	margin:1.5% !important;
+}
+.pvp-player-item-left {
+	color:#9c8f67 !important;
 }

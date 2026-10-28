@@ -6,7 +6,7 @@ const pvpAvatarTemplate = function (char, _name) {
 	const _class = char.main ? ' war-player-profile-me' : ' war-player-profile';
 	return `<div${char.main ? '' : ' onexactclick="episode.focusOnPlayer(\'' + char.key + '\')"'} class="flex war-player-card profile${_class}" id="char-${char.key}">
 				<div class='war-player-card-left flex'>
-					<div class='flex war-player-card-left-content war-player-team-${char.groupId}'><img src="./images/icons/${char.class}.png" /></div>
+					<div class='flex war-player-card-left-content war-player-team-${char.teamId}'><img src="./images/icons/${char.class}.png" /></div>
 				</div>
 				<div class='war-player-card-right flex flex-jc-start'>
 					<div class="hp-war-player-name">

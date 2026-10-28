@@ -420,7 +420,8 @@ function enemy(_e) {
 			const _ua = this.animations[this.lastAttack ?? this.animation].next;
 			const _uas = this.animations[_ua];
 			this.getSkillRange(_uas);
-			if(!_hasRange || (_minRange <= _uas.totalRange))
+			const _reachOk = this.beltGateDx === undefined || this.beltCanHit(_uas, this.beltGatePct, this.beltGateDepth, this.beltGateCorner);
+			if(_reachOk && (!_hasRange || (_minRange <= _uas.totalRange)))
 			{
 				this.upcomingAnimation = _ua;
 				return;
@@ -515,6 +516,8 @@ function enemy(_e) {
 					continue;
 				}
 				this.getSkillRange(_anima);
+				if (this.beltGateDx !== undefined && !this.beltCanHit(_anima, this.beltGatePct, this.beltGateDepth, this.beltGateCorner))
+					continue;
 				if (_immunities)
 					if (_anima.frames.filter(x => x.atk).map(x => x.atk.type ?? 'common')?.find(x => x.includes(_immunities)))
 					{
@@ -1406,6 +1409,24 @@ function enemy(_e) {
 
 		return true;
 	};
+	this.crowdPace = function() {
+		if (this.walkPace)
+			return this.walkPace;
+		this.walkPace = getRandomValue2(82, 112) / 100;
+		this.walkPhase = getRandomValue2(0, 5);
+		return this.walkPace;
+	}
+	this.crowdStep = function(key) {
+		const pace = this.crowdPace();
+		if (this.animation !== key) {
+			this.animate(key, 1);
+			const frames = this.animations[key] && this.animations[key].frames;
+			const len = frames ? frames.length : 0;
+			if (len > 1)
+				this.frame = this.walkPhase % len;
+		}
+		return pace;
+	}
     this.autoCommand2 = function () { 
         if (this.harmless || (episode.realTime && this.alp))
             return;
@@ -1585,26 +1606,28 @@ function enemy(_e) {
 					}
 				}  
                 if(isObjectsVerticallyInSameOrder(_area, _target)) {
-                    if(this.animation !== 'walk'){
-                        this.animate('walk', 1);
-					}
+                    const _pace = this.crowdStep('walk');
                     _anima = this.getCurrentAnimation();
-                    _anima.mobilityY = true;
-					if(this.lookingAtTarget)
-                        this.moveDirection = undefined;
-                    else if(this.yPosition < _target.yPosition && this.moveDirection !== 'up')
-                        this.moveDirection = 'up';
-                    else if(this.yPosition > _target.yPosition && this.moveDirection !== 'down')
-                        this.moveDirection = 'down';
-                    if (MathAbs(_target.yPosition - this.yPosition) <= this.verticalStep) {
+                    _anima.mobilityY = false;
+					if(!this.verticalStep)
+						this.verticalStep = this.calculateYStep();
+					const _yGap = _target.yPosition - this.yPosition;
+					const _yAbs = MathAbs(_yGap);
+					const _yCap = Math.max(1, MathRound(this.verticalStep * 0.5 * _pace));
+                    if (_yAbs <= _yCap) {
                         this.lookingAtTarget = true;
+						this.moveDirection = undefined;
 						if(this.slot && _touch.touch)
 							this.slot.placed = _isPlacing = true;
 						this.autoStepXRate = 0;
-						// if(!this.slot?.support && this.slots) {
-						// 	this.slots.forEach(s => s.occupant?.releaseSlot?.());
-						// }
                     }
+					else {
+						const _hop = _yAbs < _yCap ? _yGap : (_yGap > 0 ? _yCap : -_yCap);
+						this.yPosition += _hop;
+						this.limitYPosition();
+						this.yPositionUpdated = true;
+						this.moveDirection = _yGap > 0 ? 'up' : 'down';
+					}
                 }
 				else {
 					const _thisOrigin = this.HURTLEFT + this._HURTBOX_half;
@@ -1635,36 +1658,15 @@ function enemy(_e) {
 					const _autoTargetOrigin = this.autoTarget.HURTLEFT + this.autoTarget._HURTBOX_half;
 					const diffX = Math.abs(_autoTargetOrigin - _thisOrigin);
 					if(!this.noSpeedChange) {
-						let _runAway;
-						const _targetExactOrigin = this.autoTarget ?
-							this.autoTarget.HURTLEFT + this.autoTarget._HURTBOX_half 
-							: _targetOrigin;
-						if((_thisOrigin < _targetExactOrigin && this.direction === __left)
-							||
-							(_thisOrigin > _targetExactOrigin && this.direction === __right))
-							_runAway = 1;
-						if(_runAway || (diffX > maxInfluenceDistance && !this.slot?.support)) {
-							if(_runAway || (diffX > episode.cWidth || getRandomValue2(1, 10) === 10)) {
-								if(this.slot && this.animation !== 'run') {
-									this.animate('run', 1);
-									this.autoStepXRate = 1;
-									if(!this.extraStepXRate)
-										this.extraStepXRate = this.calculateMoveXStep();
-								}
-								else if(this.slot && _runAway)
-									this.autoStepXRate = 1;
-							}
-							else if(this.animation !== 'run') {
-								if(this.animation !== 'walk')
-									this.moveDirection = undefined;
-								if(this.extraStepXRate > 0)
-									this.extraStepXRate = 0;
-							}
+						const _runFar = episode.cWidth * 0.28;
+						if(diffX > _runFar && !this.slot?.support) {
+							const _pace = this.crowdStep('run');
+							this.autoStepXRate = 0.9 * _pace;
+							if(!this.extraStepXRate)
+								this.extraStepXRate = this.calculateMoveXStep();
 						}
 						else {
-							if(this.animation !== 'walk'){
-								this.animate('walk', 1);
-							}
+							const _pace = this.crowdStep('walk');
 							_anima = this.getCurrentAnimation();
 							_anima.mobilityY = false;
 							this.moveDirection = this.direction;
@@ -1673,14 +1675,12 @@ function enemy(_e) {
 								-
 								(this.HURTLEFT + this._HURTBOX_half)
 							);
-							if(realDiffX < this.HURTBOX_half * 1.5 && this.autoStepXRate !== undefined)
-    							this.autoStepXRate *= 0.3;
-							else {
-								if(this.slot?.support)
-									this.autoStepXRate = .5 + ((diffX / episode.cWidth) * 0.1);
-								else
-									this.autoStepXRate = .5 + ((diffX / episode.cWidth) * 0.5);
-							}
+							if(realDiffX < this.HURTBOX_half * 1.5)
+								this.autoStepXRate = 0.22 * _pace;
+							else if(this.slot?.support)
+								this.autoStepXRate = (.5 + ((diffX / episode.cWidth) * 0.1)) * _pace;
+							else
+								this.autoStepXRate = (.5 + ((diffX / episode.cWidth) * 0.35)) * _pace;
 							if(!this.extraStepXRate)
 								this.extraStepXRate = this.calculateMoveXStep();
 						}
@@ -1709,63 +1709,113 @@ function enemy(_e) {
 			return;
 		}
 		const diffY = _target.yPosition - this.yPosition;
-
-		// X mesafesine göre Y düzeltme gücü
-		// Yaklaştıkça daha hassas, uzakken daha serbest
-		// sahneye göre ayarlayabilirsin
+		const diffAbs = MathAbs(diffY);
+		if(!this.verticalStep)
+			this.verticalStep = this.calculateYStep();
+		const yCap = Math.max(1, MathRound(this.verticalStep * 0.5 * this.crowdPace()));
+		if(diffAbs <= yCap)
+			return;
 		const distanceFactor = maxFactor < .5 ? 0 : Math.max(0, 1 - maxFactor);
-
-		// Dalgalı hareket için zaman tabanlı sin
-		const time = (_gameTick ?? Date.now()) * .005;
-
-		let _mod = this.getRandom(200);
-		const wave =
-			Math.sin(time + _mod) * .6 +   // ana dalga
-			Math.sin(time * .5 + _mod) * .4; // yumuşatma
-
-		// Random mikro jitter
-		const jitter = (Math.random() - .5) * .3;
-
-		// Toplam Y düzeltme gücü
-		const baseAdjust = .6 * distanceFactor; // yaklaştıkça azalır
-
-		// const yStep =
-		// 	MathRound((diffY * 0.04) +            // hedefe yaklaşma eğilimi
-		// 	(wave * baseAdjust) +       // doğal dalga
-		// 	jitter);                     // mikro kaos
-		let yStep = MathRound(
-			(diffY * .04) +
-			(diffY * wave * baseAdjust * .2) +
-			jitter * .2
-		);
-
-		// sadece aşırı spike'ı kes
-		if (MathAbs(yStep) > MathAbs(diffY))
-			yStep = diffY * .5;
-
-		// Çok küçük fark varsa titreşmesin
-		if (MathAbs(diffY) > 2) {
+		let yStep = diffY * .04;
+		if(diffAbs > yCap * 2) {
+			const time = (_gameTick ?? Date.now()) * .005;
+			const _mod = this.getRandom(200);
+			const wave = Math.sin(time + _mod) * .6 + Math.sin(time * .5 + _mod) * .4;
+			yStep += diffY * wave * (0.6 * distanceFactor) * .2;
+		}
+		yStep = MathRound(yStep);
+		if(yStep > yCap)
+			yStep = yCap;
+		else if(yStep < -yCap)
+			yStep = -yCap;
+		if(MathAbs(yStep) > diffAbs)
+			yStep = diffY > 0 ? diffAbs : -diffAbs;
+		if(yStep !== 0) {
 			this.yPosition += yStep;
 			this.limitYPosition();
 			this.yPositionUpdated = true;
 		}
 	}
-	this.beltAimY = function(desiredY, ownerY, slack) {
-		const arrived = this.beltGoalY !== undefined && MathAbs(this.yPosition - this.beltGoalY) <= Math.max(this.verticalStep || 8, 12);
-		const drifted = this.beltGoalOwnerY === undefined || MathAbs(ownerY - this.beltGoalOwnerY) > slack;
-		if (this.beltGoalY === undefined || (arrived && drifted)) {
-			let y = desiredY;
-			const maxY = getGroundHeight() - this.yGap;
-			if (y > maxY)
-				y = maxY;
-			else {
-				const minY = episode.getMinPositionY(this);
-				if (minY && y < minY.y)
-					y = minY.y;
-			}
-			this.beltGoalY = y;
-			this.beltGoalOwnerY = ownerY;
+	this.beltDepth = function(unit) {
+		return unit.yPosition + ((unit.yGap ?? 10) / 2);
+	}
+	this.beltLaneTol = function(yRange) {
+		return (episode.cHeight / 200) * (yRange ?? 10);
+	}
+	this.beltSkillRange = function(anima) {
+		this.getSkillRange(anima);
+		return anima.totalRange || 0;
+	}
+	this.beltStand = function() {
+		const keys = this.attackKeys;
+		let total = 0;
+		let min = 0;
+		if (!keys)
+			return { total: 0, min: 0 };
+		for (let i = 0; i < keys.length; i++) {
+			const anima = this.animations[keys[i]];
+			if (!anima?.attack || anima.disabled || anima.coolDownLeft > 0)
+				continue;
+			const reach = this.beltSkillRange(anima);
+			if (reach > total)
+				total = reach;
+			if (anima.minRange > min)
+				min = anima.minRange;
 		}
+		if (!(total > 0) || min >= total)
+			min = 0;
+		return { total: total, min: min };
+	}
+	this.beltBoxed = function(ownerX, myX) {
+		const worldX = this.main ? (this.left + platformX) : this.left;
+		const goingLeft = ownerX >= myX;
+		if (goingLeft)
+			return worldX <= 48;
+		return worldX >= ((episode.width || 0) - 48);
+	}
+	this.beltMeleeBudget = function() {
+		const df = this.difficulty ?? __account?.difficulty ?? 4;
+		if (df <= 1)
+			return 1;
+		return 2;
+	}
+	this.beltCanHit = function(anima, distPercent, depthDiff, cornered) {
+		if (!anima?.attack)
+			return false;
+		const reach = this.beltSkillRange(anima);
+		if (!(reach > 0) || distPercent > reach)
+			return false;
+		if (!cornered && anima.minRange > 0 && distPercent < anima.minRange)
+			return false;
+		if (depthDiff > this.beltLaneTol(anima.yRange > 0 ? anima.yRange : 10))
+			return false;
+		return true;
+	}
+	this.beltAnyHit = function(distPercent, depthDiff, cornered) {
+		const keys = this.attackKeys;
+		if (!keys)
+			return false;
+		for (let i = 0; i < keys.length; i++) {
+			const anima = this.animations[keys[i]];
+			if (!anima?.attack || anima.disabled || anima.coolDownLeft > 0)
+				continue;
+			if (this.beltCanHit(anima, distPercent, depthDiff, cornered))
+				return true;
+		}
+		return false;
+	}
+	this.beltAimY = function(desiredY, slack) {
+		let y = desiredY;
+		const maxY = getGroundHeight() - this.yGap;
+		if (y > maxY)
+			y = maxY;
+		else {
+			const minY = episode.getMinPositionY(this);
+			if (minY && y < minY.y)
+				y = minY.y;
+		}
+		if (this.beltGoalY === undefined || MathAbs(y - this.beltGoalY) > slack)
+			this.beltGoalY = y;
 		return this.beltGoalY;
 	}
 	this.beltClampY = function(y) {
@@ -1777,14 +1827,14 @@ function enemy(_e) {
 			y = minY.y;
 		return y;
 	}
-	this.beltNudgeY = function(destY, scale) {
+	this.beltNudgeY = function(destY, scale, allowIdle) {
 		destY = this.beltClampY(destY);
 		const diff = destY - this.yPosition;
 		if (diff <= 2 && diff >= -2) {
 			this.beltYRate = 0;
 			return true;
 		}
-		if (this.animation === 'idle')
+		if (this.animation === 'idle' && !allowIdle)
 			return false;
 		let rate = this.beltYRate || 0.28;
 		rate += 0.08;
@@ -1811,6 +1861,18 @@ function enemy(_e) {
 	this.beltFace = function(myX, towardX) {
 		const dx = towardX - myX;
 		if (dx < 12 && dx > -12)
+			return;
+		const dir = dx > 0 ? __right : __left;
+		if (this.direction !== dir) {
+			this.oldDirection = this.direction;
+			this.direction = dir;
+			this.turned = true;
+		}
+	}
+	this.beltFaceOrigin = function(towardX) {
+		const myX = this.main ? this.left : this.left - platformX;
+		const dx = towardX - myX;
+		if (dx < 18 && dx > -18)
 			return;
 		const dir = dx > 0 ? __right : __left;
 		if (this.direction !== dir) {
@@ -2003,182 +2065,146 @@ function enemy(_e) {
 			this.beltAroundCool = undefined;
 		}
 		const owner = this.autoTarget;
+		const ownerOriginX = owner.HURTLEFT + owner._HURTBOX_half;
+		const myOriginX = this.HURTLEFT + this._HURTBOX_half;
+		const myGap = this.yGap ?? 10;
+		const ownerGap = owner.yGap ?? 10;
+		const laneTol = this.beltLaneTol(10);
+		const depthDiff = MathAbs(this.beltDepth(this) - this.beltDepth(owner));
+		const dxOwner = MathAbs(ownerOriginX - myOriginX);
+		const distPercent = (dxOwner * 100) / episode.cWidth;
+		const yQuiet = Math.max((this.verticalStep || 8) * 1.25, 14);
+		const runFar = episode.cWidth * 0.28;
 		const myX = this.main ? this.left : this.left - platformX;
 		const ownerX = owner.main ? owner.left : owner.left - platformX;
-		let slotX = ownerX + this.slot.xGap;
-		if (this.slot.mustCross)
-			slotX += (this.slot.xGap < 0 ? -this.HURTWIDTH : this.HURTWIDTH) * 0.33;
-		const slotY = owner.yPosition + this.slot.yGap;
-		const bodyH = Math.max(this.HEIGHT || 70, owner.HEIGHT || 70);
-		const clear = bodyH * (this.ranged ? 0.7 : 0.9);
-		const margin = Math.max((owner._HURTBOX_half || 24) * 0.85, 16);
-		const ySlack = Math.max(bodyH * 0.72, 48);
-		const mySide = myX - ownerX;
-		const opposite = this.slot.xGap * mySide < 0;
-		if (this.slot.mustCross && !opposite && MathAbs(mySide) > margin)
-			this.slot.mustCross = false;
-		const xDist = MathAbs(slotX - myX);
-		let stepPx = (this.stepXRate + 0.9) * episode.cWidth * 0.01;
-		if (stepPx < 18)
-			stepPx = 18;
-		const xStop = this._HURTBOX_half > stepPx ? this._HURTBOX_half : stepPx;
-		if (this.beltXSettled) {
-			if (xDist > xStop + stepPx) {
-				this.beltXSettled = undefined;
-				this.beltLooked = undefined;
-			}
-		}
-		else if (xDist <= xStop)
-			this.beltXSettled = true;
-		const nearOwnerY = MathAbs(this.yPosition - owner.yPosition) < bodyH * 0.4;
-		const rangedFar = this.ranged && MathAbs(myX - ownerX) > margin * 2;
-		const sidestep = Math.min(clear, Math.max(24, (getGroundHeight() || 200) * 0.18));
-		if (rangedFar || !opposite) {
-			this.beltAround = false;
-		}
-		else if (this.beltAroundCool && _gameTick < this.beltAroundCool) {
-			this.beltAround = false;
-		}
-		else if (this.beltAround && this.beltFlankY !== undefined && MathAbs(this.yPosition - this.beltFlankY) <= 2) {
-			this.beltAround = false;
-			this.beltAroundCool = _gameTick + 800;
-			this.beltFlankY = undefined;
-			this.slot.mustCross = false;
-		}
-		else if (!this.beltAround && (this.slot.mustCross || nearOwnerY)) {
-			this.beltAround = true;
-		}
-		let around = !!this.beltAround;
-		if (around) {
-			if (!this.beltPhaseStart)
-				this.beltPhaseStart = _gameTick;
-			if ((_gameTick - this.beltPhaseStart) > 2800) {
-				this.slot.mustCross = false;
-				this.beltAround = false;
-				this.beltAroundCool = _gameTick + 800;
-				around = false;
-				this.beltPhase = undefined;
-				this.beltFlankY = undefined;
-			}
-		}
-		else
-			this.beltPhaseStart = undefined;
-		const yQuiet = Math.max((this.verticalStep || 8) * 1.25, 14);
-		const xTol = this.ranged ? Math.max(this._HURTBOX_half * 1.6, 28) : Math.max(12, this._HURTBOX_half * 0.5);
-		const runFar = episode.cWidth * (this.ranged ? 0.3 : 0.36);
-		const engaged = !this.slot.support && !this.ranged;
-		const goalY = this.beltAimY(slotY, owner.yPosition, ySlack);
-		if (around) {
-			if (this.beltFlankY === undefined || MathAbs(owner.yPosition - (this.beltFlankOwnerY ?? owner.yPosition)) > sidestep) {
-				if (this.beltFlankSign === undefined) {
-					const dy = this.yPosition - owner.yPosition;
-					this.beltFlankSign = (dy > 8 || dy < -8) ? (dy > 0 ? 1 : -1) : (this.beltBias >= 0 ? 1 : -1);
-				}
-				let flankY = this.beltClampY(owner.yPosition + (this.beltFlankSign * sidestep) + (this.beltBias * bodyH * 0.15));
-				if (MathAbs(flankY - owner.yPosition) < sidestep * 0.45) {
-					this.beltFlankSign *= -1;
-					flankY = this.beltClampY(owner.yPosition + (this.beltFlankSign * sidestep) + (this.beltBias * bodyH * 0.15));
-				}
-				this.beltFlankY = flankY;
-				this.beltFlankOwnerY = owner.yPosition;
-			}
-			const onLane = MathAbs((this.beltFlankY ?? this.yPosition) - this.yPosition) <= 2;
-			if (!onLane) {
-				this.beltPhase = 'rise';
-				this.beltCommitGait('rise');
+		if (this.touchDead) {
+			const goalY = this.beltAimY(owner.yPosition + ((ownerGap - myGap) / 2), laneTol);
+			const xGapNow = MathAbs(ownerX - myX);
+			this.beltFaceOrigin(ownerX);
+			if (xGapNow > 36 || MathAbs(this.yPosition - goalY) > yQuiet) {
+				this.beltCommitGait(xGapNow > runFar ? 'run' : 'walk');
 				if (this.animation !== 'idle')
-					this.beltNudgeY(this.beltFlankY, 1);
-				return;
+					this.beltNudgeY(goalY, 0.7);
 			}
-			if (!this.beltXSettled) {
-				this.beltFace(myX, slotX);
-				this.beltPhase = 'cross';
-				this.beltCommitGait(engaged && xDist > runFar ? 'run' : 'walk');
-				return;
-			}
-			this.slot.mustCross = false;
-			this.beltPhase = undefined;
-		}
-		const yGapNow = MathAbs(this.yPosition - goalY);
-		const yOk = this.ranged ? MathAbs(this.yPosition - owner.yPosition) <= ySlack : yGapNow <= yQuiet;
-		let hold;
-		if (this.beltXSettled && yOk)
-			hold = true;
-		else if (this.ranged) {
-			const chaseOut = Math.max(xTol * 2.4, runFar * 0.9, 84);
-			const chaseIn = Math.max(16, Math.min(xTol * 0.4, 26));
-			if (this.beltChasing)
-				this.beltChasing = xDist > chaseIn;
 			else
-				this.beltChasing = xDist > chaseOut;
-			hold = !this.beltChasing && yOk;
+				this.beltGait('idle');
+			return;
 		}
-		else
-			hold = xDist <= xTol && yOk;
-		if (!hold) {
+		let destX = ownerOriginX;
+		let destY = owner.yPosition;
+		let cornered = false;
+		if (this.ranged) {
+			const stand = this.beltStand();
+			const side = myX >= ownerX ? 1 : -1;
+			let reach = stand.total > 0 ? (stand.total / 100) * episode.cWidth : Math.max((owner._HURTBOX_half || 24) + 80, 120);
+			const tooClose = stand.min > 0 && distPercent < stand.min;
+			cornered = tooClose && this.beltBoxed(ownerX, myX);
+			if (tooClose && !cornered)
+				reach = Math.max(reach, (stand.min / 100) * episode.cWidth);
+			destX = ownerX + side * reach;
+			destY = owner.yPosition + ((ownerGap - myGap) / 2);
+		}
+		else {
+			let ox = this.slot.xGap || 0;
+			let oy = this.slot.yGap || 0;
+			const minX = Math.max(((owner._HURTBOX_half || 24) + (this._HURTBOX_half || 24)) * 1.2, 72);
+			const minY = Math.max(42, ((owner.yGap || 10) + (this.yGap || 10)) * 0.55);
+			if (MathAbs(ox) < 8 && MathAbs(oy) < 8)
+				ox = (myX >= ownerX ? 1 : -1) * minX;
+			const fit = Math.max(MathAbs(ox) / minX, MathAbs(oy) / minY, 0.001);
+			if (fit < 1) {
+				ox /= fit;
+				oy /= fit;
+			}
+			destX = ownerX + ox;
+			destY = owner.yPosition + oy;
+			const side = myX >= ownerX ? 1 : -1;
+			if (ox * side < 0 && MathAbs(this.yPosition - destY) > yQuiet)
+				destX = ownerX + side * minX;
+			else if (this.slot.mustCross) {
+				const crossed = (this.slot.type === 'back' && myX < ownerX) || (this.slot.type === 'front' && myX > ownerX);
+				if (crossed)
+					this.slot.mustCross = false;
+			}
+		}
+		const goalY = this.beltAimY(destY, this.ranged ? laneTol : Math.max(yQuiet * 2, 28));
+		const xDist = MathAbs(destX - myX);
+		const yDist = MathAbs(this.yPosition - goalY);
+		const yOk = this.ranged ? depthDiff <= laneTol : yDist <= yQuiet;
+		const yLost = this.ranged ? depthDiff > laneTol * 1.6 : yDist > yQuiet * 2.5;
+		if (this.beltSettled) {
+			if (xDist > 96 || yLost)
+				this.beltSettled = false;
+		}
+		else if (xDist <= 28 && yOk)
+			this.beltSettled = true;
+		if (!this.beltSettled) {
 			this.lookingAtTarget = false;
 			this.slot.placed = false;
-			if (this.beltXSettled) {
-				if (yGapNow > yQuiet) {
-					this.beltCommitGait('rise');
-					if (this.animation !== 'idle')
-						this.beltNudgeY(goalY, 1);
-				}
-				else
-					this.beltGait('idle');
-				return;
+			this.beltArmed = undefined;
+			if (xDist > 96) {
+				this.beltFaceOrigin(destX);
+				this.beltCommitGait(xDist > runFar ? 'run' : 'walk');
+				if (this.animation !== 'idle' && yDist > yQuiet)
+					this.beltNudgeY(goalY, this.ranged ? 0.55 : 0.75);
 			}
-			this.beltFace(myX, slotX);
-			const chaseGait = (this.ranged ? xDist > runFar * 1.5 : engaged && xDist > runFar) ? 'run' : 'walk';
-			this.beltCommitGait(chaseGait);
-			if (this.animation !== 'idle' && yGapNow > yQuiet)
-				this.beltNudgeY(goalY, 0.4);
+			else {
+				this.beltFaceOrigin(destX);
+				this.beltGait('idle');
+				if (yDist > yQuiet)
+					this.beltNudgeY(goalY, this.ranged ? 0.55 : 0.75, true);
+			}
 			return;
 		}
 		this.beltPhase = 'hold';
 		this.lookingAtTarget = true;
 		this.slot.placed = true;
-		if (!this.beltLooked) {
-			this.beltLooked = true;
-			this.beltFace(myX, ownerX);
-		}
 		this.beltGait('idle');
-		if (this.ranged)
-			this.slot.mustCross = false;
+		this.beltFaceOrigin(ownerX);
 		if (!this.slot.lastAttackTime)
 			this.slot.lastAttackTime = _gameTick;
-		if (this.nextAttackTime && _gameTick <= this.nextAttackTime && !this.bestRing)
+		if (!this.beltArmed) {
+			this.beltArmed = true;
+			const waitMs = this.getAttackMsByDifficulty();
+			const stagger = (this.beltFrameSeed || 0) * 35;
+			if (!this.nextAttackTime || _gameTick >= this.nextAttackTime)
+				this.nextAttackTime = _gameTick + (waitMs ? waitMs + getRandomValue2(0, 160) + stagger : 0);
+		}
+		if (this.nextAttackTime && _gameTick < this.nextAttackTime)
 			return;
 		const attackers = owner.attackers;
+		const hitTime = this.ranged ? owner.lastRangedHitTime : owner.lastMeleeHitTime;
+		if (hitTime && (_gameTick - hitTime) < (this.getAttackMsByDifficulty() * (this.ranged ? 0.66 : 1)))
+			return;
+		const meleeN = (attackers && attackers.melees) ? attackers.melees.length : 0;
+		const rangedN = (attackers && attackers.rangeds) ? attackers.rangeds.length : 0;
 		let canAttack = false;
-		if (this.ranged) {
-			const hitTime = owner.lastRangedHitTime;
-			if (!(hitTime && (_gameTick - hitTime) < this.getAttackMsByDifficulty() * 0.66))
-				canAttack = ((attackers && attackers.rangeds) ? attackers.rangeds.length : 0) < 1 && !this.slot.mustCross;
-		}
-		else if (!this.slot.support && !this.slot.mustCross) {
-			const meleeN = (attackers && attackers.melees) ? attackers.melees.length : 0;
-			const rear = this.slot.type === 'back' && ((owner.direction === __right && myX < ownerX) || (owner.direction === __left && myX > ownerX));
-			if (rear)
-				canAttack = meleeN < 2;
-			else {
-				const hitTime = owner.lastMeleeHitTime;
-				canAttack = meleeN < 2 && !(hitTime && (_gameTick - hitTime) < this.getAttackMsByDifficulty());
-			}
-		}
-		if (!canAttack && this.bestRing)
-			canAttack = true;
+		if (this.ranged)
+			canAttack = rangedN < 1 && this.beltAnyHit(distPercent, depthDiff, cornered);
+		else if (!this.slot.support)
+			canAttack = meleeN < this.beltMeleeBudget();
 		if (!canAttack)
 			return;
-		const dxOwner = ownerX > myX ? ownerX - myX : myX - ownerX;
-		const distPercent = (dxOwner * 100) / episode.cWidth;
 		const touching = isObjectsInTouch(this, owner).touch;
+		if (this.ranged) {
+			this.beltGateDx = dxOwner;
+			this.beltGatePct = distPercent;
+			this.beltGateDepth = depthDiff;
+			this.beltGateCorner = cornered;
+		}
 		this.pickBeltAttack(distPercent, touching);
+		this.beltGateDx = undefined;
+		this.beltGateCorner = undefined;
 		const chosen = this.animations[this.upcomingAnimation];
 		if (chosen && chosen.attack) {
 			if (chosen.chargeDistance && !touching)
 				chosen.useExtraStepXRate = distPercent < chosen.chargeDistance.value && distPercent > chosen.chargeDistance.value * 0.45;
 			this.animateSlotAttack();
+			if (this.autoAttacking && owner.attackers) {
+				const list = this.ranged ? owner.attackers.rangeds : owner.attackers.melees;
+				if (list.indexOf(this) < 0)
+					list.push(this);
+			}
 			this.slot.lastAttackTime = _gameTick;
 		}
 	}
@@ -3359,7 +3385,7 @@ function enemy(_e) {
 				|| this.still || this.action || this.friendly || this.class === 'minion')
 				this.autoCommand();
 			else
-				this.autoCommand3();
+				this.autoCommand2();
 		}
 		//this.TESTSLOTS();
 		
@@ -8086,6 +8112,8 @@ this.getRotateVerticalRate = function(attacker, victim) {
 					for(let _i = 0; _i < spl.animations[_key].frames.length; _i++)
 						_spell.animations[_key].frames[_i].do = spl.animations[_key].frames[_i].do;
 			_en.spellKey = _spKey;
+			if (this.realTime && !this.main)
+				_en.realTime = true;
 			if(_sp.harmless)
 				_en.harmless = true;
 			if (_spell.push)
@@ -8482,7 +8510,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 		let _reversed = _dirReversed || this.reversed;
 		if(_frame.reversed)
 			_reversed = !_reversed;
-		if (!_anima.move || (_frame.extraStepXRate && (_anima.useExtraStepXRate || (!this.keyboard && (!this.alp || _anima.rivalXMove))) && (_anima.move && !_solidity)))
+		if (!_anima.move || (_frame.extraStepXRate && (_anima.useExtraStepXRate || this.pvpExtraStep || (!this.keyboard && (!this.alp || _anima.rivalXMove))) && (_anima.move && !_solidity)))
 		{
 			_xRate = (_frame.extraStepXRate ?? 0) * _speedRate;
 		}
@@ -9096,19 +9124,28 @@ this.getRotateVerticalRate = function(attacker, victim) {
 					this.invisible = (_diff.g & 8) > 0;
 					this.immobilize = (_diff.g & 16) > 0;
 					this.charging = (_diff.g & 32) > 0;
+					this.pvpExtraStep = (_diff.g & 64) > 0;
 					this.pull = (_diff.g & 128) > 0;
 					this.invulnerable = (_diff.g & 256) > 0;
+					this.leader = (_diff.g & 512) > 0 ? 1 : undefined;
 					break;
 				case 'p':
 					this.fps = _diff.p;
 					break;
-				case 'y':
-					this.yPosition = _diff.y * getGroundHeight();
+				case 'y': {
+					const nextY = _diff.y * getGroundHeight();
+					const yFar = Math.max(28, (this.verticalStep || 12) * 2);
+					if (MathAbs(nextY - this.yPosition) > yFar)
+						this.yPosition = nextY;
 					break;
-				case 'x':
-					//_diff.x ekranına göre oran
-					this.left = MathRound(_diff.x * episode.width);
+				}
+				case 'x': {
+					const nextX = MathRound(_diff.x * episode.width);
+					const xFar = Math.max(48, episode.cWidth * 0.04);
+					if (MathAbs(nextX - this.left) > xFar)
+						this.left = nextX;
 					break;
+				}
 				case 'l':
 					this.level = _diff.l;
 					break;
@@ -9181,7 +9218,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 			flag: (this.release ? 1 : 0) + (this.remove ? 2 : 0) +
 				(this.sleep ? 4 : 0) + (this.invisible ? 8 : 0) + (this.immobilize ? 16 : 0)
 				+ (this.charging ? 32 : 0) + (_anima.useExtraStepXRate ? 64 : 0)
-				+ (this.pull ? 128 : 0) + (this.invulnerable ? 256 : 0),
+				+ (this.pull ? 128 : 0) + (this.invulnerable ? 256 : 0) + (this.leader ? 512 : 0),
 			maxHP: this.MAXHP,
 			dir: this.convertMDAndDirectionData(this.moveDirection, this.direction),
 			keyboardDirection: this.getDirection(),
@@ -9233,9 +9270,27 @@ this.getRotateVerticalRate = function(attacker, victim) {
 			_diff.g = _status.flag;
 		if (this.oldStatus?.p !== _status.fps)
 			_diff.p = _status.fps;
+		if (_status.extraStepYRate === 0) {
+			if (!this.extraStepYRateReset) {
+				this.extraStepYRateReset = 1;
+				_diff.v = 0;
+			}
+		}
+		else
+			this.extraStepYRateReset = undefined;
+		const worldX = this.left + (this.enemy ? 0 : platformX);
+		const xFar = Math.max(48, episode.cWidth * 0.04);
+		const yFar = Math.max(28, (this.verticalStep || 12) * 2);
+		let place = !!(_firstTime || _add);
+		if (!place) {
+			const dx = this.pvpSentX === undefined ? Infinity : MathAbs(worldX - this.pvpSentX);
+			const dy = this.pvpSentY === undefined ? Infinity : MathAbs(this.yPosition - this.pvpSentY);
+			if ((!this.chargeProperties && dx > xFar) || dy > yFar)
+				place = true;
+		}
 		const _keys = Object.keys(_diff);
 		const _hasKey = _keys?.[0];
-		if (_hasKey || _add) {
+		if (_hasKey || place) {
 			if (!this.oldStatus)
 				this.oldStatus = {};
 			if(_hasKey)
@@ -9246,18 +9301,13 @@ this.getRotateVerticalRate = function(attacker, victim) {
 				_diff.l = this.level;
 				this.lastSyncDate = msNow;
 			}
-			if(_add) {
-				if(_status.extraStepYRate === 0) {
-					if(!this.extraStepYRateReset) {
-						this.extraStepYRateReset = 1;
-						_diff.v = 0;
-					}
-				}
-				else
-					this.extraStepYRateReset = undefined;
+			if (place) {
 				_diff.y = to3Decimals(this.yPosition / getGroundHeight());
-				if(!this.chargeProperties)
-					_diff.x = to4Decimals((this.left + (this.enemy ? 0 : platformX)) / episode.width); //this.left + (this.enemy ? 0 : platformX);
+				this.pvpSentY = this.yPosition;
+				if (!this.chargeProperties) {
+					_diff.x = to4Decimals(worldX / episode.width);
+					this.pvpSentX = worldX;
+				}
 				this.lastSyncDate = msNow;
 			}
 			return _diff;

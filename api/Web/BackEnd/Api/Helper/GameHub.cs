@@ -314,7 +314,10 @@ namespace Web.BackEnd.Api.Helper {
 		}
 
 		public Task<List<OnlineUser>> GetOnlineUsers() {
-			return Task.FromResult(ConnectedUsers.Values.ToList());
+			return Task.FromResult(ConnectedUsers.Values
+				.OrderByDescending(x => x.ConnectedAt ?? DateTime.MinValue)
+				.Take(100)
+				.ToList());
 		}
 	}
 }

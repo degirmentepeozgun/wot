@@ -142,7 +142,7 @@
 		_hasNext = _story.missin ? false : __stories.find(x => x.order > __story.order && !x.passive && x.list);
 	const _template = `<div data-module='storyfinish' id="story-finish" class="finish flex d-none">
 		<div class="w-50 side-left flex flex-jc-start" style="height:100% !important;width:55%;flex-direction:column">
-			<div class="${_draw ? 'gray ' : ''}w-100 flex op-none ${_failed ? 'defeat' : 'victory'}-header ms250" lang="${getLang()}">${getLangData(_failed ? (_draw ? 'DRAW' : 'DEFEAT') : 'VICTORY')}
+			<div class="w-100 flex op-none ${_failed ? 'victory' : 'victory'}-header ms250" lang="${getLang()}">${getLangData(_failed ? (_draw ? 'DRAW' : 'DEFEAT') : 'VICTORY')}
 				<div class="page-detail-splitter-thin"></div>
 			</div>
 			<img src="./images/${_draw ? 'icons/war.png' : 'main/' + (episode.realClass ?? mainCharacter.class) + '/' + (_failed ? 'loose' : 'finish') + '-concept.png'}" class="char slide-right">

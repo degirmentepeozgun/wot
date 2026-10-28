@@ -109,7 +109,6 @@
 		}
 		let _nextStageTimer, _nextStageCounter = 0, _playTicks;
 		_nextStageTimer = setInterval(() => {
-			return;
 			const _cd = document.getElementById('next-stage-counter');
 			if(!_cd){
 				clearInterval(_nextStageTimer);

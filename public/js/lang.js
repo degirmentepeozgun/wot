@@ -465,6 +465,7 @@ const __langData = [
 	{ key: 'Rage', tr: 'Öfke' },
 	{ key: 'Next stage in', tr: 'Sonraki bölüm' },
 	{ key: 'Presentation', tr: 'Tanıtım' },
+	{ key: 'Guest', tr: 'Misafir' },
 	{ key: 'Controls', tr: 'Kontroller' },
 	{ key: 'Photo copied to clipboard', tr: 'Fotoğraf panoya kopyalandı' },
 	{ key: 'Reset to default settings', tr: 'Varsayılan ayarlara geri dön' },
