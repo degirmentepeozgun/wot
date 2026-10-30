@@ -403,7 +403,7 @@
 			</div>`
 			+ _redHTML +
 			`<div class="flex w-100 duel-create-room-button">
-				<div class="flex duel-start-button${(_readyCount === _room.p?.length && _blueReadyCount > 0 && _redReadyCount > 0) ? '' : ' disabled'}" onexactclick="getRef('duel')?.StartDuel()">
+				<div class="flex duel-start-button${(_readyCount === _room.p?.length && _blueReadyCount > 0 && _redReadyCount > 0 && mainCharacter.leader) ? '' : ' disabled'}" onexactclick="getRef('duel')?.StartDuel()">
 					${getLangData('START DUEL')}
 				</div>
 			</div>

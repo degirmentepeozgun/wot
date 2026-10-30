@@ -270,6 +270,8 @@ const __langData = [
 	{ key: 'Defeat', tr: 'Yenilgi'},
 	{ key: 'Comeback', tr: 'Öne Geçti'},
 	{ key: 'Conversation', tr: 'Konuşma'},
+	{ key: 'Enter Room Password', tr: 'Odaya Girme Şifresi' },
+	{ key: 'Wrong Password', tr: 'Yanlış Şifre' },
 	{ key: 'Not started yet', tr: 'Henüz Başlanmadı'},
 	{ key: 'Min Level Requirement', tr: 'Seviye Gereksinimi'},
 	{ key: 'Max Upgrade Level', tr: 'Max Yükseltme Seviyesi'},

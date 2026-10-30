@@ -169,16 +169,55 @@ namespace Web.BackEnd.Api.Helper {
 	// Yeni RoomInfo sınıfı
 	public class RoomInfo {
 		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+		public DateTime LastPacket { get; set; } = DateTime.UtcNow;
 		public HashSet<string> Members { get; set; } = new();
+	}
+
+	public class DuelSeat {
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+		public string? S { get; set; }
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+		public string? Id { get; set; }
+		public string? N { get; set; }
+		public string? C { get; set; }
+		public int P { get; set; }
+		public byte T { get; set; }
+		public byte R { get; set; }
+		public byte L { get; set; }
+	}
+
+	public class DuelRoomView {
+		public string? S { get; set; }
+		public string? N { get; set; }
+		public byte T { get; set; }
+		public List<DuelSeat> P { get; set; } = new();
+	}
+
+	class DuelRoomState {
+		public string Id = "";
+		public string Name = "";
+		public byte Private;
+		public string? Password;
+		public bool Started;
+		public DateTime CreatedAt = DateTime.UtcNow;
+		public DateTime LastPacket = DateTime.UtcNow;
+		public List<DuelSeat> Players = new();
+		public HashSet<string> Connections = new();
+		public object Sync = new();
 	}
 
 	public class GameHub : Hub {
 		const string _receive = "R";
 		protected IHubContext<GameHub> _context;
 		private static readonly Dictionary<string, OnlineUser> ConnectedUsers = new();
+		static IHubContext<GameHub>? _hub;
+		static int _sweepStarted;
 
 		public GameHub(IHubContext<GameHub> context) {
 			this._context = context;
+			_hub = context;
+			if(Interlocked.Exchange(ref _sweepStarted, 1) == 0)
+				_ = SweepIdleLoop();
 		}
 
 		public void Send(TransferObject command) {
@@ -228,6 +267,8 @@ namespace Web.BackEnd.Api.Helper {
 		// RoomId -> RoomInfo
 		private static readonly ConcurrentDictionary<string, RoomInfo> _rooms
 			= new();
+		private static readonly ConcurrentDictionary<string, DuelRoomState> _duels
+			= new();
 
 		// Room oluştur
 		public async Task CreateRoom(string roomId) {
@@ -238,21 +279,7 @@ namespace Web.BackEnd.Api.Helper {
 				}
 			}
 
-			// 2. 10 dakikadan eski tüm odaları sil
-			var expired = _rooms
-				.Where(kvp => (DateTime.UtcNow - kvp.Value.CreatedAt).TotalMinutes > 10)
-				.Select(kvp => kvp.Key)
-				.ToList();
-
-			foreach(var expId in expired) {
-				if(_rooms.TryRemove(expId, out var expRoom)) {
-					foreach(var connId in expRoom.Members) {
-						await Groups.RemoveFromGroupAsync(connId, expId);
-					}
-				}
-			}
-
-			// 3. Yeni oda ekle
+			// Yeni oda ekle
 			var newRoom = new RoomInfo {
 				CreatedAt = DateTime.UtcNow
 			};
@@ -301,12 +328,14 @@ namespace Web.BackEnd.Api.Helper {
 				if(room.Members.Contains(Context.ConnectionId))
 					await LeaveRoom(roomId);
 			}
+			await LeaveDuel(Context.ConnectionId);
 			ConnectedUsers.Remove(Context.ConnectionId);
 			await base.OnDisconnectedAsync(exception);
 		}
 
 		// Mesajı sadece odaya gönder (gönderen hariç)
 		public async Task SendToRoom(string roomId, List<TransferObject> message) {
+			TouchRoom(roomId);
 			await Clients.OthersInGroup(roomId).SendAsync("T", message);
 		}
 		public async Task SetBusyState(bool state) {
@@ -318,6 +347,375 @@ namespace Web.BackEnd.Api.Helper {
 				.OrderByDescending(x => x.ConnectedAt ?? DateTime.MinValue)
 				.Take(100)
 				.ToList());
+		}
+
+		static string DuelGroup(string roomId) => "duel:" + roomId;
+
+		static void TouchRoom(string roomId) {
+			var now = DateTime.UtcNow;
+			var id = roomId.StartsWith("duel:") ? roomId.Substring(5) : roomId;
+			if(_duels.TryGetValue(id, out var duel))
+				duel.LastPacket = now;
+			if(_rooms.TryGetValue(roomId, out var room))
+				room.LastPacket = now;
+		}
+
+		static async Task SweepIdleLoop() {
+			while(true) {
+				try {
+					await Task.Delay(TimeSpan.FromMinutes(1));
+					await SweepIdle();
+				}
+				catch { }
+			}
+		}
+
+		static async Task SweepIdle() {
+			var hub = _hub;
+			if(hub == null)
+				return;
+			var now = DateTime.UtcNow;
+			foreach(var room in _duels.Values.Where(x => x.Started && (now - x.LastPacket).TotalMinutes >= 10).ToList())
+				await CloseDuelCore(hub, room);
+			foreach(var kvp in _rooms.Where(x => (now - x.Value.LastPacket).TotalMinutes >= 10).ToList())
+				await CloseFightCore(hub, kvp.Key, kvp.Value);
+		}
+
+		static async Task CloseFightCore(IHubContext<GameHub> hub, string roomId, RoomInfo room) {
+			if(!_rooms.TryRemove(roomId, out _))
+				return;
+			foreach(var conn in room.Members.ToArray())
+				await hub.Groups.RemoveFromGroupAsync(conn, roomId);
+		}
+
+		static string Clip(string? value, int max) {
+			value = (value ?? "").Trim();
+			return value.Length <= max ? value : value.Substring(0, max);
+		}
+
+		OnlineUser Me() {
+			if(!ConnectedUsers.TryGetValue(Context.ConnectionId, out var user) || string.IsNullOrEmpty(user.SocketId))
+				throw new HubException("missing");
+			return user;
+		}
+
+		DuelRoomState? FindDuel(string connectionId) {
+			foreach(var room in _duels.Values)
+				if(room.Connections.Contains(connectionId))
+					return room;
+			return null;
+		}
+
+		DuelRoomState RoomOrThrow(string roomId) {
+			if(!_duels.TryGetValue(roomId, out var room))
+				throw new HubException("Room not found");
+			return room;
+		}
+
+		void RequireLeader(DuelRoomState room, OnlineUser me) {
+			if(room.Id != me.SocketId)
+				throw new HubException("Only the leader can do this");
+		}
+
+		static string SeatKey(DuelSeat seat) => seat.S ?? seat.Id ?? "";
+
+		DuelRoomView View(DuelRoomState room) {
+			lock(room.Sync) {
+				return new DuelRoomView {
+					S = room.Id,
+					N = room.Name,
+					T = room.Private,
+					P = room.Players.Select(x => new DuelSeat {
+						S = x.S,
+						Id = x.Id,
+						N = x.N,
+						C = x.C,
+						P = x.P,
+						T = x.T,
+						R = x.R,
+						L = x.L
+					}).ToList()
+				};
+			}
+		}
+
+		async Task PushRoom(DuelRoomState room) {
+			await Clients.Group(DuelGroup(room.Id)).SendAsync("Duel", "room", View(room));
+		}
+
+		async Task PushChanged() {
+			await Clients.All.SendAsync("Duel", "changed");
+		}
+
+		async Task CloseDuel(DuelRoomState room) {
+			await CloseDuelCore(_hub ?? _context, room);
+		}
+
+		static async Task CloseDuelCore(IHubContext<GameHub> hub, DuelRoomState room) {
+			if(!_duels.TryRemove(room.Id, out var current))
+				return;
+			var group = DuelGroup(current.Id);
+			await hub.Clients.Group(group).SendAsync("Duel", "closed", current.Id);
+			foreach(var conn in current.Connections.ToArray())
+				await hub.Groups.RemoveFromGroupAsync(conn, group);
+			await hub.Clients.All.SendAsync("Duel", "changed");
+		}
+
+		async Task LeaveDuel(string connectionId) {
+			var room = FindDuel(connectionId);
+			if(room == null)
+				return;
+			if(!ConnectedUsers.TryGetValue(connectionId, out var user))
+				return;
+			if(room.Id == user.SocketId) {
+				await CloseDuel(room);
+				return;
+			}
+			lock(room.Sync) {
+				room.Connections.Remove(connectionId);
+				room.Players.RemoveAll(x => x.S == user.SocketId);
+			}
+			await Groups.RemoveFromGroupAsync(connectionId, DuelGroup(room.Id));
+			await PushRoom(room);
+			await PushChanged();
+		}
+
+		public Task<List<DuelRoomView>> DuelRooms() {
+			var list = _duels.Values
+				.Where(x => !x.Started)
+				.OrderByDescending(x => x.CreatedAt)
+				.Select(View)
+				.ToList();
+			return Task.FromResult(list);
+		}
+
+		public async Task<DuelRoomView> DuelCreate(string name, string? password, string className, int power) {
+			var me = Me();
+			name = Clip(name, 20);
+			if(name.Length == 0)
+				throw new HubException("Name is required");
+			password = Clip(password, 20);
+			var current = FindDuel(Context.ConnectionId);
+			if(current != null)
+				await LeaveDuel(Context.ConnectionId);
+			if(_duels.TryGetValue(me.SocketId, out var led))
+				await CloseDuel(led);
+			var room = new DuelRoomState {
+				Id = me.SocketId,
+				Name = name,
+				Private = string.IsNullOrEmpty(password) ? (byte)0 : (byte)1,
+				Password = string.IsNullOrEmpty(password) ? null : password,
+				CreatedAt = DateTime.UtcNow
+			};
+			room.Players.Add(new DuelSeat {
+				S = me.SocketId,
+				N = me.Name,
+				C = Clip(className, 16),
+				P = power,
+				T = 1,
+				R = 0,
+				L = 1
+			});
+			room.Connections.Add(Context.ConnectionId);
+			_duels[room.Id] = room;
+			await Groups.AddToGroupAsync(Context.ConnectionId, DuelGroup(room.Id));
+			await PushRoom(room);
+			await PushChanged();
+			return View(room);
+		}
+
+		public async Task<DuelRoomView> DuelJoin(string roomId, string? password, string className, int power) {
+			var me = Me();
+			var room = RoomOrThrow(roomId);
+			if(room.Started)
+				throw new HubException("Duel already started");
+			var already = false;
+			lock(room.Sync) {
+				if(room.Players.Any(x => x.S == me.SocketId)) {
+					room.Connections.Add(Context.ConnectionId);
+					already = true;
+				}
+			}
+			if(already) {
+				await Groups.AddToGroupAsync(Context.ConnectionId, DuelGroup(room.Id));
+				return View(room);
+			}
+			if(room.Private == 1 && (room.Password ?? "") != Clip(password, 20))
+				throw new HubException("Wrong Password");
+			var current = FindDuel(Context.ConnectionId);
+			if(current != null && current.Id != room.Id)
+				await LeaveDuel(Context.ConnectionId);
+			lock(room.Sync) {
+				if(room.Players.Count >= 6)
+					throw new HubException("Room is full");
+				var blue = room.Players.Count(x => x.T == 1);
+				var red = room.Players.Count(x => x.T == 2);
+				if(blue >= 3 && red >= 3)
+					throw new HubException("Room is full");
+				room.Players.Add(new DuelSeat {
+					S = me.SocketId,
+					N = me.Name,
+					C = Clip(className, 16),
+					P = power,
+					T = (byte)(blue <= red ? 1 : 2),
+					R = 0,
+					L = 0
+				});
+				room.Connections.Add(Context.ConnectionId);
+			}
+			await Groups.AddToGroupAsync(Context.ConnectionId, DuelGroup(room.Id));
+			await PushRoom(room);
+			await PushChanged();
+			return View(room);
+		}
+
+		public async Task DuelLeave() {
+			await LeaveDuel(Context.ConnectionId);
+		}
+
+		public async Task DuelKick(string key) {
+			var me = Me();
+			var room = FindDuel(Context.ConnectionId) ?? throw new HubException("Room not found");
+			RequireLeader(room, me);
+			if(key == me.SocketId) {
+				await CloseDuel(room);
+				return;
+			}
+			string? kickedConn = null;
+			lock(room.Sync) {
+				var seat = room.Players.FirstOrDefault(x => SeatKey(x) == key);
+				if(seat == null)
+					throw new HubException("missing");
+				room.Players.Remove(seat);
+				if(!string.IsNullOrEmpty(seat.S)) {
+					kickedConn = ConnectedUsers.FirstOrDefault(x => x.Value.SocketId == seat.S).Key;
+					if(!string.IsNullOrEmpty(kickedConn))
+						room.Connections.Remove(kickedConn);
+				}
+			}
+			if(!string.IsNullOrEmpty(kickedConn)) {
+				await Clients.Client(kickedConn).SendAsync("Duel", "kicked", room.Id);
+				await Groups.RemoveFromGroupAsync(kickedConn, DuelGroup(room.Id));
+			}
+			await PushRoom(room);
+			await PushChanged();
+		}
+
+		public async Task DuelReady() {
+			var me = Me();
+			var room = FindDuel(Context.ConnectionId) ?? throw new HubException("Room not found");
+			lock(room.Sync) {
+				var seat = room.Players.FirstOrDefault(x => x.S == me.SocketId);
+				if(seat == null)
+					throw new HubException("missing");
+				seat.R = seat.R == 1 ? (byte)0 : (byte)1;
+			}
+			await PushRoom(room);
+		}
+
+		public async Task DuelSwap(string key, byte direction) {
+			var me = Me();
+			var room = FindDuel(Context.ConnectionId) ?? throw new HubException("Room not found");
+			RequireLeader(room, me);
+			lock(room.Sync) {
+				var ordered = room.Players.Where(x => x.T == 1).Concat(room.Players.Where(x => x.T == 2)).ToList();
+				var index = ordered.FindIndex(x => SeatKey(x) == key);
+				if(index < 0)
+					throw new HubException("missing");
+				if((index == 0 && direction == 1) || (index == ordered.Count - 1 && direction == 2))
+					return;
+				var other = ordered[index + (direction == 1 ? -1 : 1)];
+				var player = ordered[index];
+				var team = player.T;
+				player.T = other.T;
+				other.T = team;
+				var i1 = room.Players.IndexOf(player);
+				var i2 = room.Players.IndexOf(other);
+				room.Players[i1] = other;
+				room.Players[i2] = player;
+			}
+			await PushRoom(room);
+		}
+
+		public async Task DuelBot(string id, string name, string className, int power, byte team, int index = -1) {
+			var me = Me();
+			var room = FindDuel(Context.ConnectionId) ?? throw new HubException("Room not found");
+			RequireLeader(room, me);
+			id = Clip(id, 8);
+			name = Clip(name, 20);
+			className = Clip(className, 16);
+			if(id.Length == 0 || name.Length == 0 || className.Length == 0)
+				throw new HubException("missing");
+			if(team != 1 && team != 2)
+				throw new HubException("missing");
+			var added = false;
+			lock(room.Sync) {
+				if(index >= 0) {
+					if(index >= room.Players.Count)
+						throw new HubException("missing");
+					var current = room.Players[index];
+					if(!string.IsNullOrEmpty(current.S))
+						throw new HubException("missing");
+					if(room.Players.Any(x => x.Id == id && !ReferenceEquals(x, current)))
+						throw new HubException("missing");
+					var teamCount = room.Players.Count(x => x.T == team && !ReferenceEquals(x, current));
+					if(teamCount >= 3)
+						throw new HubException("Room is full");
+					room.Players[index] = new DuelSeat {
+						Id = id,
+						N = name,
+						C = className,
+						P = power,
+						T = team,
+						R = 1
+					};
+				}
+				else {
+					if(room.Players.Count >= 6 || room.Players.Count(x => x.T == team) >= 3)
+						throw new HubException("Room is full");
+					if(room.Players.Any(x => x.Id == id))
+						throw new HubException("missing");
+					room.Players.Add(new DuelSeat {
+						Id = id,
+						N = name,
+						C = className,
+						P = power,
+						T = team,
+						R = 1
+					});
+					added = true;
+				}
+			}
+			await PushRoom(room);
+			if(added)
+				await PushChanged();
+		}
+
+		public async Task DuelStart() {
+			var me = Me();
+			var room = FindDuel(Context.ConnectionId) ?? throw new HubException("Room not found");
+			RequireLeader(room, me);
+			lock(room.Sync) {
+				if(room.Started)
+					throw new HubException("Duel already started");
+				if(!room.Players.Any(x => x.T == 1) || !room.Players.Any(x => x.T == 2))
+					throw new HubException("Not ready");
+				if(room.Players.Any(x => !string.IsNullOrEmpty(x.S) && x.R != 1))
+					throw new HubException("Not ready");
+				room.Started = true;
+				room.LastPacket = DateTime.UtcNow;
+			}
+			await Clients.Group(DuelGroup(room.Id)).SendAsync("Duel", "start", View(room));
+			await PushChanged();
+		}
+
+		public async Task DuelEnd() {
+			var me = Me();
+			var room = FindDuel(Context.ConnectionId) ?? throw new HubException("Room not found");
+			RequireLeader(room, me);
+			if(!room.Started)
+				return;
+			await CloseDuel(room);
 		}
 	}
 }

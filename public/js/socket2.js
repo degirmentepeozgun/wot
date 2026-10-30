@@ -1973,7 +1973,7 @@ async function connectSocket() {
     //	}).withAutomaticReconnect([0, 1000, 5000, 10000, 30000])
     //	.build();
     const _priorSocket = __account?.socketId || mainCharacter?.oldSocketId;
-    _my_hub = new signalR.HubConnectionBuilder().withUrl('wss://api.warriorsoftengri.com/gamehub?n=' + //'https://localhost:7298/gamehub?n=' + 
+    _my_hub = new signalR.HubConnectionBuilder().withUrl("ws://localhost:5298/gamehub?n=" + /*'wss://api.warriorsoftengri.com/gamehub?n=' + */ //'https://localhost:7298/gamehub?n=' + 
     encodeURIComponent(__account.name) + (_priorSocket ? '&s=' + _priorSocket : '') + ((!episode || episode.menu || episode.lobby) ? '' : '&b=1'), {
         //accessTokenFactory: () => _socketId,
         skipNegotiation: true,
