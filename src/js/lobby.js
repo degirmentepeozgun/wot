@@ -39,7 +39,7 @@ function openSideMenu() {
 		_html += `<div id="lobby-${_m.icon}" class="flex menu-left-opener-item animate-me" onexactclick="openSectionFromMenu(${_m.order},${_m.subOrder},${_m.tabOrder ?? 0})">
 			<div class="w-100 flex">
 				<div class="w-100 flex"><img src="./images/ui/game/menu-icons/${_m.icon}.png" /></div>
-				<div class="w-100 flex">${_m.titles[getLang()]}</div>
+				<div class="w-100 flex">${_m.lang ? getLangData(_m.lang) : _m.titles[getLang()]}</div>
 			</div>
 		</div>`;
 	'</div>';

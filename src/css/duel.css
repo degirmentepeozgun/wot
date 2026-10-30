@@ -1,0 +1,21 @@
+.duel-create-top {
+	height: 82%;
+	flex: none;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 4% 8%;
+	box-sizing: border-box;
+}
+.duel-room-input {
+	width: 86%;
+	height: 6vh;
+	margin-top: 1vh;
+	background: #00000088;
+	border: 1px solid #F4BB44;
+	color: #f3f4f5;
+	font-size: 2.2vh;
+	text-align: center;
+	outline: none;
+}

@@ -1292,6 +1292,8 @@ function switchBookPage(_order, _subOrder, _tabOrder) {
 				getHonorStoreUI();
 			else if (_order === 5 && _subOrder === 3)
 				installWarUI();
+			else if (_order === 5 && _subOrder === 4)
+				installDuelUI();
 			else if (_order === 5)
 				__pvp.render();
 			else if (_order === 6)
@@ -1521,6 +1523,7 @@ function getLeftMenuTemplate(_index) {
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-5" data-index="1"><img onexactclick="switchBookPage(5, 1)" src="./images/ui/menu/pvp-1.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-5" data-index="2"><img onexactclick="switchBookPage(5, 2)" src="./images/ui/menu/craft.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-5" data-index="3"><img onexactclick="switchBookPage(5, 3)" src="./images/ui/menu/war.png"></div>
+		<div class="w-100 menu-sub-button animate-me menu-sub-button-5" data-index="4"><img onexactclick="switchBookPage(5, 4)" src="./images/ui/menu/shield.png"></div>
 
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-6" data-index="1"><img onexactclick="switchBookPage(6, 1)" src="./images/ui/menu/exit.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-7" data-index="1"><img onexactclick="switchBookPage(7, 1)" src="./images/ui/menu/pet.png"></div>
@@ -3961,6 +3964,15 @@ function installWarUI() {
 		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(5, 3);
+		checkUpdateAvailable2(5);
+		__latestUIModule[_name] = { data: _arr, ref: x };
+	});
+}
+function installDuelUI() {
+	injectModule('duel', function(_arr, _name) {
+		var x = new window[_name]();
+		x.render();
+		switchBookPageTabs(5, 4);
 		checkUpdateAvailable2(5);
 		__latestUIModule[_name] = { data: _arr, ref: x };
 	});

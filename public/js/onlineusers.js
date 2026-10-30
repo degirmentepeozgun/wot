@@ -1,6 +1,13 @@
 ﻿'use strict';
 (function() {
 console.log('onlineusers');
+	let _onlineListTimer = null;
+	function clearOnlineListTimer() {
+		if(_onlineListTimer) {
+			clearInterval(_onlineListTimer);
+			_onlineListTimer = null;
+		}
+	}
 	function onlineusers() {
 		this.key = 'onlineuser';
 		this.tutorial = {
@@ -18,11 +25,7 @@ console.log('onlineusers');
 		this.render = function() {
 			updateMenuBottom(3);
 			const _container = selectMenuContainer();
-			let _content = showMenuTutorial(this.tutorial, this.key);
-			if(_content === '')
-				_content = `<div class="flex full">
-								<div class="flex online-players-refresh orange-action-btn animate-me" onexactclick="getRef('onlineusers')?.refresh()">${getLangData('REFRESH')}</div>
-							</div>`
+			const _content = showMenuTutorial(this.tutorial, this.key);
 			_container.innerHTML = 
 						'<div data-module="onlineusers" class="menu-ui-left fade-me">' +
 							'<div class="menu-modal-left menu-modal-left-content w-100">' +
@@ -43,19 +46,41 @@ console.log('onlineusers');
 							'</div>' +
 						'</div>' +
 					'</div>';
+			clearOnlineListTimer();
+			const self = this;
+			_onlineListTimer = setInterval(function() {
+				self.pullOnlineUsers();
+			}, 5000);
 		}
-		this.refresh = function() {
-			if(this.loading)
+		this.refreshing = false;
+		this.pullOnlineUsers = async function() {
+			const _root = document.getElementById('online-users-list');
+			if(!_root) {
+				clearOnlineListTimer();
 				return;
-			playClick();
-			document.getElementById('online-users-list').innerHTML = this.getOnlineUsers();
+			}
+			if(this.refreshing)
+				return;
+			this.refreshing = true;
+			try {
+				if(typeof fetchOnlineUsers === 'function')
+					await fetchOnlineUsers();
+				const _still = document.getElementById('online-users-list');
+				if(!_still) {
+					clearOnlineListTimer();
+					return;
+				}
+				_still.innerHTML = this.fillOnlineUsers();
+			} catch(err) {
+				console.warn(err);
+			} finally {
+				this.refreshing = false;
+			}
 		}
-		this.getOnlineUsers = function() {
-			this.loading = 1;
-			setTimeout(() => {
-				let _html = '', _counter = 0;
-				const _users = (__onlineUsers ?? []).slice().sort((a, b) => new Date(b.connectedAt) - new Date(a.connectedAt));
-				for(let ou of _users) {
+		this.fillOnlineUsers = function() {
+			let _html = '', _counter = 0;
+			const _users = (__onlineUsers ?? []).slice().sort((a, b) => new Date(b.connectedAt) - new Date(a.connectedAt));
+			for(let ou of _users) {
 					if(ou.socketId === __socketId)
 						continue;
 					const _minute = MathFloor(ou.onlineDuration / 60000);
@@ -93,9 +118,14 @@ console.log('onlineusers');
 				}
 				if(_html === '')
 					_html = `<div class="full flex wot-subtitle" style="color:#f3f4f580 !important">${getLangData('No players online')}</div>`;
+			return _html;
+		}
+		this.getOnlineUsers = function() {
+			this.loading = 1;
+			setTimeout(() => {
 				const _cont = document.getElementById('online-users-list');
 				if(_cont)
-					_cont.innerHTML = _html;
+					_cont.innerHTML = this.fillOnlineUsers();
 				this.loading = 0;
 			}, 1000);
 			return `<div class="full flex"><img style="width:18%;opacity:.5;aspect-ratio:1/1" src="./images/icons/loader.gif" /></div>`;

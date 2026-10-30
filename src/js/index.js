@@ -1288,6 +1288,8 @@ function switchBookPage(_order, _subOrder, _tabOrder) {
 				getHonorStoreUI();
 			else if (_order === 5 && _subOrder === 3)
 				installWarUI();
+			else if (_order === 5 && _subOrder === 4)
+				installDuelUI();
 			else if (_order === 5)
 				__pvp.render();
 			else if (_order === 6)
@@ -3954,6 +3956,15 @@ function installWarUI() {
 		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(5, 3);
+		checkUpdateAvailable2(5);
+		__latestUIModule[_name] = { data: _arr, ref: x };
+	});
+}
+function installDuelUI() {
+	injectModule('duel', function(_arr, _name) {
+		var x = new window[_name]();
+		x.render();
+		switchBookPageTabs(5, 4);
 		checkUpdateAvailable2(5);
 		__latestUIModule[_name] = { data: _arr, ref: x };
 	});

@@ -3947,9 +3947,9 @@ const __holoMenuItems = [
 		en: 'Map',
 		tr: 'Harita'
 	}},
-	{ icon: 'settings', order:9, subOrder:1, titles: {
-		en: 'Settings',
-		tr: 'Ayarlar'
+	{ icon: 'settings', order:5, subOrder:4, tabOrder:0, lang: 'DUEL', titles: {
+		en: 'DUEL',
+		tr: 'DÜELLO'
 	}}
 	,
 	{ icon: 'tip', order:9, subOrder:2, titles: {

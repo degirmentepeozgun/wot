@@ -3954,9 +3954,9 @@ const __holoMenuItems = [
 		en: 'Map',
 		tr: 'Harita'
 	}},
-	{ icon: 'settings', order:9, subOrder:1, titles: {
-		en: 'Settings',
-		tr: 'Ayarlar'
+	{ icon: 'duel', order:5, subOrder:4, tabOrder:0, lang: 'DUEL', titles: {
+		en: 'DUEL',
+		tr: 'DÜELLO'
 	}}
 	,
 	{ icon: 'tip', order:9, subOrder:2, titles: {
@@ -34125,6 +34125,24 @@ function setCharacterFunctions(_char, _pvp) {
 	_newChar.experience = 0; //_char.experience ?? 500;
 	_newChar.maxExperience = _char.maxExperience;
 	return _newChar;
+}
+function createRandomPlayer(_level, _grade, _class) {
+	const _classes = ['warrior', 'archer', 'thief'];
+	const _picked = _class || _classes[getRandomValue2(1, _classes.length) - 1];
+	const _idx = _classes.indexOf(_picked);
+	const _e = setCharacterFunctions(_allEnemies['enemy0' + (_idx >= 0 ? _idx + 1 : getRandomValue2(1, _classes.length))](), 1);
+	_e.level = _level ?? mainCharacter?.level ?? 10;
+	_e.inventory = getRandomItems(_grade ?? 2, _e.class);
+	_e.inventory.forEach(x => x.weared = _e.class);
+	_e.totalPower = getTotalPower(_e).total;
+	return _e;
+}
+function getRandomString(_length) {
+	const _chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+	let _s = '';
+	for (let i = 0; i < (_length ?? 5); i++)
+		_s += _chars[getRandomValue2(0, _chars.length - 1)];
+	return _s;
 }
 function showBorders(_l, _t, _w, _h, _id, _key) {
 	let _a = document.getElementById(_key ?? _id ?? 'main-frame');

@@ -1,0 +1,135 @@
+.duel-create-top {
+	height: 82%;
+	flex: none;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 4% 8%;
+	box-sizing: border-box;
+}
+.duel-room-input {
+	width: 86%;
+	height: 6vh;
+	margin-top: 1vh;
+	background: #00000088;
+	border: 1px solid #F4BB44;
+	color: #f3f4f5;
+	font-size: 2.2vh;
+	text-align: center;
+	outline: none;
+}
+
+div[data-module="duel"] .skill-card-title,
+div[data-module="duel"] .story-level,
+div[data-module="duel"] .story-consume  {
+	padding-left:8% !important;
+    font-size: calc(var(--wot-font-base) * 1.3) !important;
+	font-weight: 600 !important;
+	line-height: calc(var(--wot-font-base) * 1.4) !important;
+}
+div[data-module="duel"] .story-level {
+    font-size: calc(var(--wot-font-base) * .9) !important;
+	line-height: calc(var(--wot-font-base) * 1.15) !important;
+	font-weight: 400 !important;
+}
+div[data-module="duel"] .story-consume {
+    font-size: calc(var(--wot-font-base) * .9) !important;
+	line-height: calc(var(--wot-font-base) * 1.15) !important;
+	font-weight: 400 !important;
+}
+div[data-module="duel"] .room-visibility {
+	font-family: 'Alegreya', serif !important;
+    font-size: calc(var(--wot-font-base) * 1.15) !important;
+	padding-right: 5% !important;
+}
+.duel-detail {
+	padding: 4% 5% !important;
+}
+.duel-create-room-container {
+	background:url('./../images/ui/game/duel-bg.jpg') !important;
+	background-size: auto 100% !important;
+	background-position: center center !important;
+}
+.duel-create-room-title {
+	height: 12% !important;
+	margin: 4% 0 3% 0
+}
+.duel-create-room-title-item {
+	height: 100% !important;
+	background:url('./../images/ui/game/duel-title-frame.png') !important;
+	aspect-ratio: 625 / 96;
+	background-size: auto 100% !important;
+	background-position: center center !important;
+	color:#daab7b !important;
+	font-family: 'Alegreya', serif !important;
+	font-size: calc(var(--wot-font-base) * 1.4) !important;
+	font-weight: 600 !important;
+}
+.duel-create-room-input {
+	margin:0 5% 3% 5%;
+	width:90% !important;
+	height:9%;
+	justify-content: center !important;
+}
+.duel-create-room-input img {
+	height:100%
+}
+.duel-create-room-input input {
+	height:100%;
+	background:url('./../images/ui/game/duel-txt.png') !important;
+	aspect-ratio: 543 / 68;
+	width:auto;
+	background-size: 100% 100% !important;
+	align-items: center !important;
+	display: flex !important;
+	padding:2% 5%;
+	text-align: left !important;
+	font-size: calc(var(--wot-font-base) * 1.05) !important;
+	font-family: 'Alegreya', serif !important;
+	color:#b0885e!important;
+}
+.duel-create-room-types {
+	height:20% !important;
+	margin-top:2%
+}
+.duel-create-room-types-wrapper {
+	height: 100% !important;
+	background:url('./../images/ui/game/duel-type-frame.png') !important;
+	aspect-ratio: 540 / 126;
+	background-size: auto 100% !important;
+	background-position: center center !important;
+	color:#daab7b !important;
+	font-family: 'Alegreya', serif !important;
+	font-size: calc(var(--wot-font-base) * 1.4) !important;
+	font-weight: 600 !important;
+}
+.duel-create-room-types-wrapper .w-50 {
+	height:100% !important;
+	justify-content: center !important;
+}
+.duel-create-room-types-wrapper img {
+	height: 40% !important;
+	margin-right: 2%
+}
+.duel-create-room-button {
+	height: 22%;
+}
+.duel-create-room-button-item {
+	height:50%;
+	background:url('./../images/ui/game/duel-btn.png') !important;
+	aspect-ratio: 556 / 112;
+	background-size: 100% 100% !important;
+	color:#ebca8b !important;
+	font-family: 'Alegreya', serif !important;
+	font-size: calc(var(--wot-font-base) * 1.4) !important;
+	font-weight: 600 !important;
+	margin-top:1%
+}
+.duel-create-room-container .gray input {
+	user-select: none !important;
+	pointer-events: none !important;
+}
+.duel-create-room-container .gray input::placeholder {
+	opacity: .5 !important;
+}
