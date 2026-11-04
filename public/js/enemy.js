@@ -127,7 +127,6 @@ function enemy(_e) {
 	this.fireResistRate = _e.fireResistRate ?? 0;
 	this.toxicResistRate = _e.toxicResistRate ?? 0;
 	this.important = this.villain || this.alp || this.main || this.class === 'boss' || this.class === 'minion' || this.grade > 1;
-	console.log(this.grade);
 	this.baseProps = {
 		maxHP: _e.maxHP ?? 100,
 		critRate: _e.critRate ?? 5,
@@ -144,7 +143,7 @@ function enemy(_e) {
 	this.noLoot = _e.noLoot;
 	this.immunities = _e.immunities;
 	this.fps = _e.fps ?? 1;
-	this.releaseAfter = (episode.war ? 2 : 1) * (_e.releaseAfter ?? 19);
+	this.releaseAfter = (episode.war || episode.pvp ? 2 : 1) * (_e.releaseAfter ?? 19);
 	this.oldProps = {
 		expEnabled: false,
 		goldEnabled: false,
@@ -229,7 +228,7 @@ function enemy(_e) {
 	this.HURTHEIGHT = this._HURTBOX.h;
 	this._HURTBOX_half = MathRound(this._HURTBOX.w / 2);
 	this.setAutoMode = function (_mode, _force) {
-		if(episode.realTime && this.alp)
+		if(episode.realTime && this.alp && !this.duelBot)
 			return;
 		var _am = this.autoMode;
 		if((_am === undefined) && this.main && this.keyboard)
@@ -1428,7 +1427,7 @@ function enemy(_e) {
 		return pace;
 	}
     this.autoCommand2 = function () { 
-        if (this.harmless || (episode.realTime && this.alp))
+        if (this.harmless || (episode.realTime && this.alp && !this.duelBot))
             return;
         if(!this.animationFinished && this.animations[this.animation]?.attack)
             return;
@@ -1995,7 +1994,7 @@ function enemy(_e) {
 			this.pickRandomAttack(null, null, 1);
 	}
 	this.autoCommand3 = function () {
-		if (this.harmless || (episode.realTime && this.alp))
+		if (this.harmless || (episode.realTime && this.alp && !this.duelBot))
 			return;
 		if (!this.animationFinished && this.animations[this.animation]?.attack)
 			return;
@@ -2209,7 +2208,7 @@ function enemy(_e) {
 		}
 	}
 	this.autoCommand = function () {
-		if (this.keyboard || this.sleep || this.harmless || (episode.realTime && this.alp))
+		if (this.keyboard || this.sleep || this.harmless || (episode.realTime && this.alp && !this.duelBot))
 			return;
 		if(!this.animationFinished && this.animations[this.animation]?.attack){
 			if(!this.chargimg && this.autoTarget && this.start <= 1 && this.getCurrentFrame()?.directionChangeEnabled) {
@@ -5661,6 +5660,12 @@ function enemy(_e) {
 						};
 					}
 					else if(this.chargeProperties) {
+						if(this.chargeProperties.speed === undefined) {
+							_speed = 0;
+							for (var i = 0; i <= (_anima.chargeDistance.untilFrame ?? 0); i++)
+								_speed += _anima.frames[i].speed;
+							this.chargeProperties.speed = _speed;
+						}
 						if(this.chargeProperties.stop)
 							this.chargeProperties.stepX = 0;
 						else
@@ -8581,7 +8586,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 		}
 		if (this.turned)
 			this.turned = false;
-		let _invisible = (this.invisible && this.enemy) || this.unseen;
+		let _invisible = (this.invisible && this.enemy) || (this.unseen && !(episode.duelLeader && this.duelBot));
 		if (_queue && !_invisible) {
 			try {
 				//let _oldYPosition = this.yPosition;;
@@ -9132,20 +9137,12 @@ this.getRotateVerticalRate = function(attacker, victim) {
 				case 'p':
 					this.fps = _diff.p;
 					break;
-				case 'y': {
-					const nextY = _diff.y * getGroundHeight();
-					const yFar = Math.max(28, (this.verticalStep || 12) * 2);
-					if (MathAbs(nextY - this.yPosition) > yFar)
-						this.yPosition = nextY;
+				case 'y':
+					this.yPosition = _diff.y * getGroundHeight();
 					break;
-				}
-				case 'x': {
-					const nextX = MathRound(_diff.x * episode.width);
-					const xFar = Math.max(48, episode.cWidth * 0.04);
-					if (MathAbs(nextX - this.left) > xFar)
-						this.left = nextX;
+				case 'x':
+					this.left = MathRound(_diff.x * episode.width);
 					break;
-				}
 				case 'l':
 					this.level = _diff.l;
 					break;
@@ -9181,7 +9178,25 @@ this.getRotateVerticalRate = function(attacker, victim) {
 				return undefined;
 		}
 	}
+	this.getBotDirection = function() {
+		if(this.animation !== 'run' && this.animation !== 'walk')
+			return 0;
+		switch(this.moveDirection) {
+			case __right:
+				return 17;
+			case __left:
+				return 34;
+			case 'up':
+				return 68;
+			case 'down':
+				return 136;
+			default:
+				return 0;
+		}
+	}
 	this.getDirection = function(){
+		if(!this.keyboard)
+			return this.direction;
 		const _x = this.keyboard.getXMove()?.name;
 		const _y = this.keyboard.getYMove()?.name;
 		const _m = this.keyboard.getMove();
@@ -9221,7 +9236,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 				+ (this.pull ? 128 : 0) + (this.invulnerable ? 256 : 0) + (this.leader ? 512 : 0),
 			maxHP: this.MAXHP,
 			dir: this.convertMDAndDirectionData(this.moveDirection, this.direction),
-			keyboardDirection: this.getDirection(),
+			keyboardDirection: (this.duelBot && !this.keyboard) ? this.getBotDirection() : this.getDirection(),
 			chargeProperties: this.chargeProperties,
 			fps: this.getFps(),
 			//rivalXMove: this.convertKeyboardXMove(this.getKeyboardXMove()),
@@ -9278,7 +9293,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 		}
 		else
 			this.extraStepYRateReset = undefined;
-		const worldX = this.left + (this.enemy ? 0 : platformX);
+		const worldX = this.main ? (this.left + platformX) : this.left;
 		const xFar = Math.max(48, episode.cWidth * 0.04);
 		const yFar = Math.max(28, (this.verticalStep || 12) * 2);
 		let place = !!(_firstTime || _add);
@@ -10027,7 +10042,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 		}
 		if(anima.attack && anima.totalRange === undefined)
 			this.getSkillRange(anima);
-		if(this.main)
+		if(this.main || this.duelBot || (this.socketId && !this.realTime))
 			this.animationChanged = true;
 		if (this.crossEnemyAnimation && this.crossEnemyAnimation !== _skill)
 			this.crossEnemyAnimation = undefined;
@@ -10155,7 +10170,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 		this.extraStepYRate = this.start = this.frame = 0;
 		this.animation = 'run';
 		this.animationFinished = false;
-		if(this.main)
+		if(this.main || this.duelBot || (this.socketId && !this.realTime))
 			this.animationChanged = true;
 	}
 	this.getNextSkill = function (_next) {
@@ -10177,7 +10192,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 				this.swapAnimation(_key);
 			this.extraStepYRate = this.extraStepXRate = this.start = this.frame = 0;
 		}
-		if(this.main && this.animation !== _key)
+		if((this.main || this.duelBot || (this.socketId && !this.realTime)) && this.animation !== _key)
 			this.animationChanged = true;
 		if(this.autoTarget && (this.animation === 'run' || this.animation === 'walk')) {
 			const _fr = this.getCurrentFrame();

@@ -2263,6 +2263,204 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 		//	_setMapVariables();
 	}
 }
+function createJusticeWar(_opponents, _roomId) {
+	resetStoryVariables();
+	const _mapId = 500;
+	const _map = mapSprites.find(x => x.id === _mapId);
+	const _ms = mapSprites.filter(x => x.pvp);
+	let _pick = 0;
+	const _seed = String(_roomId ?? '');
+	for(let i = 0; i < _seed.length; i++)
+		_pick = (_pick + _seed.charCodeAt(i)) % Math.max(_ms.length, 1);
+	const _assetMap = _ms[_pick] ?? _map;
+	_map.assetPath = _assetMap.theme;
+	const _doFunc = _assetMap.do;
+	_map.do = function() {
+		if(_doFunc)
+			_doFunc();
+	};
+	const _afterFunc = _assetMap.after;
+	_map.after = function() {
+		if(_afterFunc)
+			_afterFunc();
+	};
+	_map.ambiancePath = './images/music/' + getRandomValue(1, 14) + '.mp3';
+	_map.tiles = JSON.parse(JSON.stringify(_assetMap.tiles ?? []));
+	_map.ground = JSON.parse(JSON.stringify(_assetMap.ground));
+	if(_assetMap.background)
+		_map.background = JSON.parse(JSON.stringify(_assetMap.background));
+	else
+		delete _map.background;
+	_map.objects = [];
+	const _oldPvPValue = _map.pvp;
+	if(!_oldPvPValue)
+		_map.pvp = true;
+	const _myTeam = mainCharacter.duelTeam;
+	const _myClassId = _selectableChars.find(x => x.class === mainCharacter.duelClass)?.id;
+	const _teamOf = function(_op) {
+		return _op === mainCharacter ? mainCharacter.duelTeam : _op.duelTeam;
+	};
+	const _placeTeam = function(_list, _team) {
+		const _two = _list.length === 2;
+		const _step = _list.length <= 1 ? .5 : .25;
+		for(let i = 0; i < _list.length; i++) {
+			const x = _list[i];
+			x.yPosition = MathRound(getGroundHeight() * (_two ? (i === 0 ? .25 : .75) : _step * (i + 1)));
+			const _div = (!_two && i === 1) ? 4 : 5;
+			if(_team === 1) {
+				x.left = MathRound(episode.cWidth / _div);
+				x.direction = __right;
+			}
+			else {
+				const _base = MathRound(episode.cWidth / _div);
+				x.left = (episode.cWidth - _base - x.getWidth()) + (x.main ? 0 : episode.width - episode.cWidth);
+				x.direction = __left;
+			}
+			x.startLeft = x.left;
+			x.updateVariables();
+		}
+	};
+	_map.mobs = [];
+	for(const _opponent of _opponents) {
+		if(_opponent === mainCharacter) {
+			mainCharacter.displayName = mainCharacter.pvpName = __account.name;
+			continue;
+		}
+		const _team = _teamOf(_opponent);
+		_map.mobs.push({
+			id: _opponent.id,
+			minX: _team === 1 ? 250 : 5800,
+			maxX: _team === 1 ? 250 : 5800,
+			sight: 1000,
+			count: 1,
+			teamId: _team,
+			inventory: [],
+			minLevel: 10,
+			maxLevel: 10,
+			direction: _team === 1 ? __right : __left,
+			name: _opponent.pvpName ?? 'Player',
+			difficulty: 0,
+			enemy: _team !== _myTeam,
+			props: { alp: true },
+			do: function(_enemy) {
+				_enemy.duelSocket = _opponent.socketId;
+				if(_opponent.duelBot)
+					_enemy.duelBot = 1;
+			}
+		});
+	}
+	hideMyModalPopUp(1);
+	const _setMapVariables = function() {
+		episode.war = true;
+		episode.realTime = true;
+		episode.leadTo = {
+			bottomPageIndex: 5,
+			leftPageIndex: 4
+		};
+		episode.roomId = 'duel:' + _roomId;
+		episode.duelLeader = mainCharacter.leader ? 1 : undefined;
+		mainCharacter.dead = false;
+		delete mainCharacter.firstTransferDone;
+		delete mainCharacter.lastRealTimePack;
+		prevPlatformX = undefined;
+		if(_myTeam <= 1)
+			platformX = 0;
+		else
+			platformX = episode.width - episode.cWidth;
+		resetSkills(null);
+		hideMyMenu();
+		hideMenu();
+		removeClass(_gameUI, 'disable-ui');
+		_enemyProfile.innerHTML = '';
+		mainCharacter.teamId = _myTeam;
+		applyDefaultCharacterStats(mainCharacter);
+		_navbar.innerHTML = pvpAvatarTemplate(mainCharacter);
+		episode.enemies.filter(x => !x.main).forEach(x => {
+			applyDefaultCharacterStats(x);
+			resetSkills(null, null, x);
+			x.alp = 1;
+			x.important = true;
+			if(x.teamId === _myTeam)
+				x.skipHealthBar = true;
+			if(x.duelSocket) {
+				x.socketId = x.duelSocket;
+				if(x.duelBot && episode.duelLeader)
+					delete x.realTime;
+				else {
+					x.realTime = true;
+					x.autoMode = undefined;
+					if(!episode.duelLeader)
+						delete x.duelBot;
+				}
+			}
+			if(x.teamId === _myTeam)
+				_navbar.innerHTML += pvpAvatarTemplate(x);
+			else
+				_enemyProfile.innerHTML += pvpAvatarTemplate(x);
+		});
+		addClass(_enemyProfile, 'pvp');
+		const _spawned = episode.enemies.filter(x => !x.main);
+		const _left = [];
+		const _right = [];
+		for(const _op of _opponents) {
+			const _isMain = _op === mainCharacter || (!!_op.socketId && (_op.socketId === mainCharacter.socketId || _op.socketId === __socketId));
+			const _fighter = _isMain ? mainCharacter : _spawned.find(x => x.duelSocket === _op.socketId);
+			if(!_fighter)
+				continue;
+			if(_isMain)
+				mainCharacter.duelTeam = _op.duelTeam ?? _myTeam;
+			if(_teamOf(_op) === 1)
+				_left.push(_fighter);
+			else
+				_right.push(_fighter);
+		}
+		_placeTeam(_left, 1);
+		_placeTeam(_right, 2);
+		_map.pvp = _oldPvPValue;
+	};
+	switchMap(_mapId, 1, function() {
+		const _firstIds = _opponents.filter(x => _teamOf(x) === 1).map(x => x === mainCharacter ? mainCharacter.id : x.id);
+		const _lastIds = _opponents.filter(x => _teamOf(x) === 2).map(x => x === mainCharacter ? mainCharacter.id : x.id);
+		episode.loadCharacterSprites(function() {
+			if(_myClassId && mainCharacter.class !== _selectableChars.find(x => x.id === _myClassId)?.class) {
+				const _socket = mainCharacter.socketId || __socketId;
+				const _leader = mainCharacter.leader;
+				episode.realTime = true;
+				startWithThisCharacter(_myClassId, 10, null, 1);
+				mainCharacter.socketId = __socketId = _socket;
+				if(_leader)
+					mainCharacter.leader = _leader;
+				mainCharacter.duelTeam = _myTeam;
+				mainCharacter.duelClass = _selectableChars.find(x => x.id === _myClassId)?.class;
+			}
+			_setMapVariables();
+			if(__storyCheckPoint?.warn)
+				delete __storyCheckPoint.warn;
+			removeFocus();
+			__account.commonInventory = [];
+			if(mainCharacter && !__storyScene?.enableCommonSkills)
+				mainCharacter.disableCommonInventory();
+			removeClass(_gameUI, 'demo-playing');
+			_storySceneSwitching = _game.suspended = false;
+			const _ps = document.querySelectorAll('.placed-skill');
+			_ps?.forEach(x => addClass(x, 'v-none'));
+			blurKeyboard();
+			removeClass(_gameUI, 'disable-ui');
+			episode.beforePVPStart = function() {
+				episode.enemies.forEach(x => {
+					if(!x || x.class === 'object' || x.class === __spell)
+						return;
+					applyDefaultCharacterStats(x);
+					x.setHealth(x.MAXHP);
+				});
+			};
+			requestIdleCallback(() => {
+				episode.loadCharacterSprites(function() {
+				}, _lastIds);
+			});
+		}, _firstIds);
+	});
+}
 document.addEventListener("deviceready", onDeviceReady, false);
 let _socialSharing = null;
 function getDeviceId() {

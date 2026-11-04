@@ -217,7 +217,7 @@
 					<div class="w-50 flex" onexactclick="playClick();hideMyModalPopUp(1);detachModule();switchStoryScene(null, __storySceneOrder)" style="padding: 1%;height: 100%">
 						<div class="btn animate-me-500 flex">${getLangData('QUIT')}</div>
 					</div>
-					<div class="w-50 flex" onexactclick="playClick();hideMyModalPopUp(1);detachModule();switchStoryScene(function() { switchBookPage(${episode.realTime ? 4 : 5}, ${episode.war ? 3 : (episode.realTime ? 3 : 1)}); }, __storySceneOrder)" style="padding: 1%;height: 100%">
+					<div class="w-50 flex" onexactclick="playClick();hideMyModalPopUp(1);detachModule();switchStoryScene(function() { switchBookPage(${episode.leadTo?.bottomPageIndex ?? (episode.realTime ? 4 : 5)}, ${episode.leadTo?.leftPageIndex ?? (episode.war ? 3 : (episode.realTime ? 3 : 1))}); }, __storySceneOrder)" style="padding: 1%;height: 100%">
 						<div class="btn animate-me-500 flex">${getLangData('BACK')}</div>
 					</div>
 				</div>

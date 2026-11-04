@@ -1973,7 +1973,8 @@ async function connectSocket() {
     //	}).withAutomaticReconnect([0, 1000, 5000, 10000, 30000])
     //	.build();
     const _priorSocket = __account?.socketId || mainCharacter?.oldSocketId;
-    _my_hub = new signalR.HubConnectionBuilder().withUrl("ws://localhost:5298/gamehub?n=" + /*'wss://api.warriorsoftengri.com/gamehub?n=' + */ //'https://localhost:7298/gamehub?n=' + 
+    //_my_hub = new signalR.HubConnectionBuilder().withUrl("ws://localhost:5298/gamehub?n=" + 
+    _my_hub = new signalR.HubConnectionBuilder().withUrl('wss://api.warriorsoftengri.com/gamehub?n=' + 
     encodeURIComponent(__account.name) + (_priorSocket ? '&s=' + _priorSocket : '') + ((!episode || episode.menu || episode.lobby) ? '' : '&b=1'), {
         //accessTokenFactory: () => _socketId,
         skipNegotiation: true,
@@ -2022,6 +2023,11 @@ async function connectSocket() {
             }
     }
     );
+    _my_hub.on("Duel", (kind, payload) => {
+        const _duel = getRef('duel');
+        if (_duel?.onDuel)
+            _duel.onDuel(kind, payload);
+    });
     _my_hub.on("R", async (cmd, message) => {
         if (cmd) {
             let _json = cmd ? cmd : null;
@@ -2269,6 +2275,10 @@ function joinRoom(_id) {
 function leaveRoom(_id) {
     if (_my_hub && _my_hub.q === 'Connected' && _id > 0)
         _my_hub.invoke("LeaveRoom", _id.toString()).catch(err => console.error(err.toString()));
+}
+function markDuelMatchEnded() {
+    if (_my_hub && _my_hub.q === 'Connected')
+        _my_hub.invoke("DuelMatchEnd").catch(err => console.error(err.toString()));
 }
 function setBusyState(_state) {
     if (_my_hub && _my_hub.q === 'Connected')

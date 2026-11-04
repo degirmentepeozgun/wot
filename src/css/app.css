@@ -459,6 +459,10 @@ body.pc-mission .common img {
 	-webkit-justify-content: flex-end !important;
 	justify-content: flex-end !important;
 }
+.flex-jc-center {
+	-webkit-justify-content: center !important;
+	justify-content: center !important;
+}
 
 .flex-jc-start {
 	-webkit-justify-content: flex-start !important;
@@ -10052,59 +10056,130 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	color:#ff6c00 !important
 }
 
-.war-final-screen .war-final-screen-row {
-	height:4vh;
-	width:100%
-}
 .war-final-screen .war-final-screen-row.war-final-screen-row-me * {
 	color: #F4BB44 !important
 }
-.war-final-screen .team-1-header {
-	background:linear-gradient(-235deg, transparent, #6B1A11, #f3f4f520, #f3f4f540, #f3f4f530);
-	border-radius: 1vh;
-	box-shadow: -1vh 0 .5vh #000;
-	border-bottom-right-radius: 2vh;
-	border-top-right-radius: 2vh;
+.war-final-screen .war-final-screen-row:not(.war-final-screen-row-me) * {
+	color: #cfbfae !important
 }
-.war-final-screen .team-2-header {
-	background:linear-gradient(-235deg, transparent, #1E3A73, #f3f4f520, #f3f4f540, #f3f4f530);
-	border-radius: 1vh;
-	border-top-right-radius: 2vh;
-	border-bottom-right-radius: 2vh;
-	box-shadow: -1vh 0 .5vh #000
+.war-final-screen .team-2-header.war-final-screen-row *,
+.war-final-screen .team-1-header.war-final-screen-row * {
+	color: #efd6b8 !important;
+	padding-left:19%
+}
+.war-final-screen .duel-final-blue-team-bg {
+	background:url(./../images/ui/game/duel-final-blue-team-bg.png) no-repeat center center / 100% 100%;
+	aspect-ratio: 563/167;
+	width:100% !important;
+	height:auto !important
+}
+.war-final-screen .war-final-screen-row.team-1-header,
+.war-final-screen .war-final-screen-row.team-2-header {
+	width:100% !important;
+	height:auto !important;
+	aspect-ratio: 563/46;
+}
+.war-final-screen .war-final-screen-row:not(.team-1-header, .team-2-header) {
+	width:100% !important;
+	height:auto !important;
+	aspect-ratio: 563/35;
+	padding-right:3%
+}
+.war-final-screen .war-final-screen-row:not(.team-1-header, .team-2-header) img{
+	height: 80% !important;
+	display: block !important;
+	margin:0 10%;
+}
+.war-final-screen .war-final-screen-row:not(.team-1-header, .team-2-header) * {
+	line-height: 1px !important;
+	font-size:calc(var(--wot-font-base) * 1.15) !important;
+}
+.war-final-screen .duel-final-red-team-bg {
+	margin-top:4%;
+	background:url(./../images/ui/game/duel-final-red-team-bg.png) no-repeat center center / 100% 100%;
+	aspect-ratio: 563/167;
+	width:100% !important;
+	height:auto !important
 }
 .war-final-screen .war-final-screen-row .war-final-screen-cell-50 {
-	border-top-left-radius: 1vh;
-	border-bottom-left-radius: 2vh;
 	width:50%;
 	height:100%;
 	overflow: hidden;
-	padding-left:2vh
+	padding-left:14%
 }
 .war-final-screen img {
 	height:3vh !important;
 	display: block;
-	border:1px solid #000;
-	border-radius: 100%;
 }
 .war-final-screen .war-final-screen-row .war-final-screen-cell-25 {
-	width:25%;
+	width:calc(25% - 1px);
 	height:100%
 }
 .war-final-screen * {
-	font-size: 2.6vh !important;
-	line-height: 3vh !important;
+	font-family: "Grenze" !important;
+	font-size:calc(var(--wot-font-base) * 1.35) !important;
 }
-.war-final-screen .war-final-screen-row.team-1-header,
-.war-final-screen .war-final-screen-row.team-2-header {
-	border-top-left-radius: 0;
-	border-bottom-left-radius: 2vh;
-	height:3.5vh;
-	margin:1vh 0 .5vh 0;
-	line-height: 1px !important;
-	overflow: hidden;
+.war-final-blue-separator {
+	height: 1px; /* Çizginin kalınlığı */
+	border: none;
+	background: linear-gradient(
+	  to right, 
+	  rgba(255, 255, 255, 0),     /* Sol başı tamamen saydam */
+	  rgba(255, 255, 255, 0.4) 50%, /* Ortası belirgin (rengi ve opaklığı ihtiyacınıza göre ayarlayabilirsiniz) */
+	  rgba(255, 255, 255, 0)      /* Sağ başı tamamen saydam */
+	);
+	width: 100%;
+	margin: 0;
+  }
+  .war-final-red-separator {
+	height: 1px; /* Çizginin kalınlığı */
+	border: none;
+	background: linear-gradient(
+		to right, 
+		rgba(212, 163, 89, 0),     /* Sol başı tamamen saydam */
+		rgba(212, 163, 89, 0.6) 50%, /* Orta kısım altın sarısı/turuncu tonunda belirgin */
+		rgba(212, 163, 89, 0)      /* Sağ başı tamamen saydam */
+	);
+	width: 100%;
+	margin: 0;
+  }
+  .war-final-blue-vertical-separator {
+	width: 1px;
+	height: 100%; /* İhtiyacınıza göre ayarlayabilirsiniz */
+	display: inline-block;
+	background: linear-gradient(
+	  to bottom, 
+	  rgba(255, 255, 255, 0),     /* Üst kısım tamamen saydam */
+	  rgba(255, 255, 255, 0.4) 50%, /* Orta kısım belirgin beyaz */
+	  rgba(255, 255, 255, 0)      /* Alt kısım tamamen saydam */
+	);
+	margin: 0;
+	vertical-align: middle;
+  }
+  .war-final-red-vertical-separator {
+	width: 1px;
+	height: 100%; /* İhtiyacınıza göre ayarlayabilirsiniz */
+	display: inline-block;
+	background: linear-gradient(
+		to bottom, 
+		rgba(212, 163, 89, 0),     /* Üst kısım tamamen saydam */
+		rgba(212, 163, 89, 0.6) 50%, /* Orta kısım belirgin altın sarısı/turuncu */
+		rgba(212, 163, 89, 0)      /* Alt kısım tamamen saydam */
+	);
+	margin: 0;
+	vertical-align: middle;
+  }
+  .war-map  #story-finish > .side-right > .full > div.flex.flex-ai-start.w-100 {
+	padding:0 5% !important;
+	margin: 0 1% !important
+  }
+  .war-map  #story-finish .stars {
+	top:-2% !important;
+	background:url(./../images/ui/game/duel-final-header.png) no-repeat center center / 100% 100% !important;
+	aspect-ratio: 720 / 195 !important;
+	height:auto !important;
+	padding-top:3.5%
 }
-
 .enemy-profile .war-player-card,
 #top-nav .war-player-card {
     flex: 0 0 32%;
@@ -16648,10 +16723,10 @@ div[data-module=dailylogin] .book-page-bg {
 	transition: width 0.3s ease;
 }
 #story-finish:not([data-module="stagefinish"]) {
-	background:url(./../images/ui/game/final-screen-bg.png) !important;
-	background-size: 100% 100% !important;
-	box-shadow: none !important;
-	aspect-ratio: 1530 / 784 !important;
+	background: url(./../images/ui/game/final-screen-bg3.png), linear-gradient(to bottom, #000, #000) !important;
+	background-size: 100% 100%, 100% 100% !important;
+	box-shadow: 0 0 2vh 2vh #000, 0 0 2vh 2vh #000 !important;
+	aspect-ratio: 1404 / 768 !important;
 	max-width: 100% !important;
 	max-height: 100% !important;
 	height:auto !important;
@@ -17350,4 +17425,17 @@ div[data-module=dailylogin] .book-page-bg {
 .team-player-row--red.me .duel-join-player-info .duel-join-player-info-name, 
 .team-player-row--blue.me .duel-join-player-info .duel-join-player-info-name{
 	color:#F4BB44 !important
+}
+.duel-char-selection .inventory-modal {
+	flex-direction: column !important;
+	display:flex !important
+}
+.duel-char-selection .inventory-modal .selection-item.selection-char {
+	width:18% !important;
+	aspect-ratio: 1 / 1;
+	height:auto !important;
+	margin:1% !important;
+}
+.duel-char-selection .inventory-modal .question-modal-choices.duel-char-selection-choices {
+	flex: 1 !important
 }

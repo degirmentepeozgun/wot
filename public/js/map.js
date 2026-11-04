@@ -1156,8 +1156,18 @@ function map(_m) {
 			let _table;
 			if(!this.skipPvPFinalScreen) {
 				if(this.war) {
-					const _team1 = this.enemies.filter(x => x.teamId === 1);
-					const _team2 = this.enemies.filter(x => x.teamId === 2);
+					const _team1 = this.enemies.filter(x => x.teamId === 1 && !x.ghosted);
+					const _team2 = this.enemies.filter(x => x.teamId === 2 && !x.ghosted);
+					const _warFinalRow = function(_p, _teamId) {
+						if(!_p)
+							return `<div class="war-final-screen-row flex"><div class="war-final-screen-cell-50 flex flex-jc-start"></div><div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh"></div><div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh"></div></div>`;
+						return `<div class="war-final-screen-row flex${_p.main ? ' war-final-screen-row-me' : ''}">
+							<div class="war-final-screen-cell-50 flex flex-jc-start">${_p.main ? __account.name : (_p.displayName ?? _p.name ?? '')}</div>
+							<div class="war-final-screen-cell-25 flex flex-jc-center" style="padding-right:1vh"><img src="./images/ui/game/duel-kill-count.png" />&nbsp;${_p.killCount ?? 0}</div>
+							<div class="war-final-${_teamId === 1 ? 'blue' : 'red'}-vertical-separator"></div>
+							<div class="war-final-screen-cell-25 flex flex-jc-center" style="padding-right:2vh"><img src="./images/ui/game/duel-dead-count.png" />&nbsp;${_p.isDead() ? 1 : 0}</div>
+						</div>`;
+					};
 					let _rewardsHtml = '';
 					_rewards.push({key:'honor', title:getLangData('Blood Honor'), count:mainCharacter.killCount ?? 0});
 					if(_status > 1){
@@ -1190,93 +1200,29 @@ function map(_m) {
 								</div>
 								<div class="flex" style="width:100%;overflow-y:auto;height:100%">
 									<div class="war-final-screen flex w-100">
-										<div class="war-final-screen-row flex team-1-header">
-											<div class="war-final-screen-cell-50 flex flex-jc-start">
-												&nbsp;
+										<div class="w-100 duel-final-blue-team-bg">
+											<div class="war-final-screen-row flex team-1-header">
+												<div class="w-100 flex flex-jc-start">
+													${getLangData("Blue Team")}
+												</div>
 											</div>
-											<div class="war-final-screen-cell-25 flex flex-jc-end">
-												<img src="./images/icons/kill.png">
-											</div>
-											<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
-												<img src="./images/icons/dead.png">
-											</div>
+											${_warFinalRow(_team1[0], 1)}
+											<hr class="war-final-blue-separator" />
+											${_warFinalRow(_team1[1], 1)}
+											<hr class="war-final-blue-separator" />
+											${_warFinalRow(_team1[2], 1)}
 										</div>
-										<div class="war-final-screen-row flex${_team1[0].main ? ' war-final-screen-row-me' : ''}">
-											<div class="war-final-screen-cell-50 flex flex-jc-start">
-												${_team1[0].main ? __account.name : _team1[0].displayName ?? _team1[0].name}
+										<div class="w-100 duel-final-red-team-bg">
+											<div class="war-final-screen-row flex team-2-header">
+												<div class="w-100 flex flex-jc-start">
+													${getLangData("Red Team")}
+												</div>
 											</div>
-											<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
-												${_team1[0].killCount ?? 0}
-											</div>
-											<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
-												${_team1[0].isDead() ? 1 : 0}
-											</div>
-										</div>
-										<div class="war-final-screen-row flex${_team1[1].main ? ' war-final-screen-row-me' : ''}">
-											<div class="war-final-screen-cell-50 flex flex-jc-start">
-												${_team1[1].main ? __account.name : _team1[1].displayName ?? _team1[1].name}
-											</div>
-											<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
-												${_team1[1].killCount ?? 0}
-											</div>
-											<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
-												${_team1[1].isDead() ? 1 : 0}
-											</div>
-										</div>
-										<div class="war-final-screen-row flex${_team1[2].main ? ' war-final-screen-row-me' : ''}">
-											<div class="war-final-screen-cell-50 flex flex-jc-start">
-												${_team1[2].main ? __account.name : _team1[2].displayName ?? _team1[2].name}
-											</div>
-											<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
-												${_team1[2].killCount ?? 0}
-											</div>
-											<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
-												${_team1[2].isDead() ? 1 : 0}
-											</div>
-										</div>
-										<div class="war-final-screen-row flex team-2-header">
-											<div class="war-final-screen-cell-50 flex flex-jc-start">
-												&nbsp;
-											</div>
-											<div class="war-final-screen-cell-25 flex flex-jc-end">
-												<img src="./images/icons/kill.png">
-											</div>
-											<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
-												<img src="./images/icons/dead.png">
-											</div>
-										</div>
-										<div class="war-final-screen-row flex${_team2[0].main ? ' war-final-screen-row-me' : ''}">
-											<div class="war-final-screen-cell-50 flex flex-jc-start">
-												${_team2[0].main ? __account.name : _team2[0].displayName ?? _team2[0].name}
-											</div>
-											<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
-												${_team2[0].killCount ?? 0}
-											</div>
-											<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
-												${_team2[0].isDead() ? 1 : 0}
-											</div>
-										</div>
-										<div class="war-final-screen-row flex${_team2[1].main ? ' war-final-screen-row-me' : ''}">
-											<div class="war-final-screen-cell-50 flex flex-jc-start">
-												${_team2[1].main ? __account.name : _team2[1].displayName ?? _team2[1].name}
-											</div>
-											<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
-												${_team2[1].killCount ?? 0}
-											</div>
-											<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
-												${_team2[1].isDead() ? 1 : 0}
-											</div>
-										</div>
-										<div class="war-final-screen-row flex${_team2[2].main ? ' war-final-screen-row-me' : ''}">
-											<div class="war-final-screen-cell-50 flex flex-jc-start">
-												${_team2[2].main ? __account.name : _team2[2].displayName ?? _team2[2].name}
-											</div>
-											<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh">
-												${_team2[2].killCount ?? 0}
-											</div>
-											<div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh">
-												${_team2[2].isDead() ? 1 : 0}
-											</div>
+											${_warFinalRow(_team2[0], 2)}
+											<hr class="war-final-red-separator" />
+											${_warFinalRow(_team2[1], 2)}
+											<hr class="war-final-red-separator" />
+											${_warFinalRow(_team2[2], 2)}
 										</div>
 									</div>
 									<div class="flex flex-ai-start w-100 d-none">`
@@ -1291,7 +1237,7 @@ function map(_m) {
 							</div>`;
 				}
 				else {
-					_table = '<div class="flex full pvp-result-table arena-result"><div class="flex" style="flex-direction:column;justify-content:space-between;width:100%;overflow-y:auto;height:87.5%;padding:0 12.5%"><div class="flex" style="width:80%;margin-bottom:10%">';
+					_table = '<div class="flex full pvp-result-table arena-result"><div class="flex" style="flex-direction:column;justify-content:space-between;width:100%;overflow-y:auto;height:87.5%"><div class="flex" style="width:80%;margin-bottom:10%">';
 					switch(_status) {
 						case 2: 
 							_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:1});
@@ -1370,6 +1316,8 @@ function map(_m) {
 				x.upcomingAnimation = 'idle';
 			});
 			this.pvpEnded = true;
+			if(this.realTime && this.duelLeader)
+				markDuelMatchEnded();
 			switchAutoMode(1);
 			if(this.realTime)
 				_rewards = [];
@@ -1722,22 +1670,71 @@ function map(_m) {
 			}
 		if(this.realTime && !this.pvpEnded && !__switchingMap)
 		{
-			let _dataItem;
-			if(!mainCharacter.firstTransferDone){
-				_dataItem = mainCharacter.getNewStatus2(1);
-				mainCharacter.firstTransferDone = 1;
-				mainCharacter.synced = true;
+			const _pack = [];
+			if(!mainCharacter.ghosted && !mainCharacter.ghost) {
+				let _dataItem;
+				if(!mainCharacter.firstTransferDone){
+					_dataItem = mainCharacter.getNewStatus2(1);
+					mainCharacter.firstTransferDone = 1;
+					mainCharacter.synced = true;
+				}
+				else
+					_dataItem = mainCharacter.getNewStatus2(0);
+				if(_dataItem) {
+					const _last = JSON.stringify(_dataItem);
+					if(mainCharacter.lastRealTimePack !== _last) {
+						mainCharacter.lastRealTimePack = _last;
+						_dataItem.s = __socketId;
+						_pack.push(_dataItem);
+					}
+				}
 			}
-			else
-				_dataItem = mainCharacter.getNewStatus2(0);
-			if(!_dataItem)
+			const _realtimeBody = function(_e) {
+				if(!_e)
+					return false;
+				if(_e.main || _e === mainCharacter)
+					return true;
+				return !!(_e.realTime && !_e.duelBot);
+			};
+			const _pushActor = function(_actor) {
+				if(!_actor || _actor.main || _actor.remove || _actor.ghost || _actor.ghosted)
+					return;
+				if(_actor.class === __spell || _actor.class === 'object')
+					return;
+				const _first = !_actor.firstTransferDone;
+				const _item = _actor.getNewStatus2(_first ? 1 : 0);
+				if(_first)
+					_actor.firstTransferDone = 1;
+				if(!_item)
+					return;
+				if(_item.x !== undefined) {
+					const _worldX = _actor.main ? (_actor.left + platformX) : _actor.left;
+					_item.x = to4Decimals(_worldX / episode.width);
+				}
+				if(!_actor.socketId) {
+					const _root = _actor.owner || _actor.related;
+					_actor.socketId = (_root?.socketId || __socketId) + ':' + (_actor.key ?? _actor.id ?? '');
+				}
+				_item.s = _actor.socketId;
+				_pack.push(_item);
+			};
+			for(const _actor of this.enemies) {
+				if(!_actor || _actor.main || _actor.remove)
+					continue;
+				const _roots = [_actor.owner, _actor.related].filter(Boolean);
+				if(_roots.some(r => r === mainCharacter || r.main)) {
+					_pushActor(_actor);
+					continue;
+				}
+				if(!this.duelLeader)
+					continue;
+				if(_realtimeBody(_actor) || _roots.some(_realtimeBody))
+					continue;
+				_pushActor(_actor);
+			}
+			if(!_pack.length)
 				return;
-			const _last = JSON.stringify(_dataItem);
-			if(mainCharacter.lastRealTimePack === _last)
-				return;
-			mainCharacter.lastRealTimePack = _last;
-			_dataItem.s = __socketId;
-			setTransferMessage([_dataItem]);
+			setTransferMessage(_pack);
 		}
 		if(this.splash) {
 			addClass(this.splash, 'd-none');

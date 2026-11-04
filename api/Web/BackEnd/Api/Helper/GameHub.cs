@@ -199,6 +199,7 @@ namespace Web.BackEnd.Api.Helper {
 		public byte Private;
 		public string? Password;
 		public bool Started;
+		public bool MatchEnded;
 		public DateTime CreatedAt = DateTime.UtcNow;
 		public DateTime LastPacket = DateTime.UtcNow;
 		public List<DuelSeat> Players = new();
@@ -467,7 +468,7 @@ namespace Web.BackEnd.Api.Helper {
 				return;
 			if(!ConnectedUsers.TryGetValue(connectionId, out var user))
 				return;
-			if(room.Id == user.SocketId) {
+			if(room.Id == user.SocketId && !room.MatchEnded) {
 				await CloseDuel(room);
 				return;
 			}
@@ -476,6 +477,11 @@ namespace Web.BackEnd.Api.Helper {
 				room.Players.RemoveAll(x => x.S == user.SocketId);
 			}
 			await Groups.RemoveFromGroupAsync(connectionId, DuelGroup(room.Id));
+			if(room.MatchEnded) {
+				if(room.Connections.Count == 0)
+					await CloseDuel(room);
+				return;
+			}
 			await PushRoom(room);
 			await PushChanged();
 		}
@@ -613,6 +619,25 @@ namespace Web.BackEnd.Api.Helper {
 			await PushRoom(room);
 		}
 
+		public async Task DuelUnready() {
+			var me = Me();
+			var room = FindDuel(Context.ConnectionId) ?? throw new HubException("Room not found");
+			var changed = false;
+			lock(room.Sync) {
+				if(room.Started)
+					return;
+				var seat = room.Players.FirstOrDefault(x => x.S == me.SocketId);
+				if(seat == null)
+					throw new HubException("missing");
+				if(seat.R != 0) {
+					seat.R = 0;
+					changed = true;
+				}
+			}
+			if(changed)
+				await PushRoom(room);
+		}
+
 		public async Task DuelSwap(string key, byte direction) {
 			var me = Me();
 			var room = FindDuel(Context.ConnectionId) ?? throw new HubException("Room not found");
@@ -691,6 +716,22 @@ namespace Web.BackEnd.Api.Helper {
 				await PushChanged();
 		}
 
+		public async Task DuelClass(string className, int power) {
+			var me = Me();
+			var room = FindDuel(Context.ConnectionId) ?? throw new HubException("Room not found");
+			className = Clip(className, 16);
+			if(className != "warrior" && className != "archer" && className != "thief" && className != "cyclops" && className != "werewolf")
+				throw new HubException("missing");
+			lock(room.Sync) {
+				if(room.Started)
+					throw new HubException("Duel already started");
+				var seat = room.Players.FirstOrDefault(x => x.S == me.SocketId) ?? throw new HubException("missing");
+				seat.C = className;
+				seat.P = power < 0 ? 0 : power;
+			}
+			await PushRoom(room);
+		}
+
 		public async Task DuelStart() {
 			var me = Me();
 			var room = FindDuel(Context.ConnectionId) ?? throw new HubException("Room not found");
@@ -707,6 +748,14 @@ namespace Web.BackEnd.Api.Helper {
 			}
 			await Clients.Group(DuelGroup(room.Id)).SendAsync("Duel", "start", View(room));
 			await PushChanged();
+		}
+
+		public async Task DuelMatchEnd() {
+			var me = Me();
+			var room = FindDuel(Context.ConnectionId);
+			if(room == null || room.Id != me.SocketId || !room.Started)
+				return;
+			room.MatchEnded = true;
 		}
 
 		public async Task DuelEnd() {

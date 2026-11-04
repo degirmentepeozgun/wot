@@ -42,6 +42,7 @@
 					r: 0
 				}
 			],
+			dummy: 1
 		},
 		{ 
 			n: 'Champions League', 
@@ -67,8 +68,12 @@
 					r: 0
 				}
 			],
+			dummy: 1
 		}
 	];
+	this.dummyRooms = this.rooms;
+	this.serverRooms = [];
+	this.botChars = {};
 	this.render = function(_noAnimation) {
 		updateMenuBottom(4);
 		this.roomType = 'public';
@@ -91,12 +96,15 @@
 			</div>
 		</div>`;
 		this.renderCreateRoomUI(_noAnimation);
+		this.loadRooms();
 	}
 	this.getRooms = function() {
 		let _html = '';
 		for (let i = 0; i < this.rooms.length; i++) {
 			const _r = this.rooms[i];
-			const _owner = _r.p.find(x => x.l);
+			const _owner = _r.p?.find(x => x.l);
+			if(!_owner)
+				continue;
 			const _ch = (typeof _selectableChars !== 'undefined') ? _selectableChars.find(x => x.class === _owner.c) : undefined;
 			const _grade = _ch?.grade ?? 3;
 			const _vis = !_r.t ? getLangData('Public') : getLangData('Private');
@@ -161,43 +169,67 @@
 		</div>`;
 	}
 	this.TryJoinRoom = function(_roomId) {
-		const _room = this.rooms.find(x => x.s === _roomId);
+		const _room = this.roomById(_roomId);
 		if(!_room)
 			return;
-		const _password = document.querySelector('#duel-join-room-password').value?.trim();
-		if(_password !== _room.pwd) {
+		const _password = document.querySelector('#duel-join-room-password')?.value?.trim() || '';
+		if(_room.dummy && _password !== _room.pwd) {
 			warn('<span>' + getLangData('Wrong Password') + '</span>', 'warn');
 			return;
 		}
 		closeInventoryQuestionModal();
-		this.JoinRoom(_roomId, 1);
+		this.JoinRoom(_roomId, 1, _password);
 	}
-	this.JoinRoom = function(_roomId, _pass) {
-		const _room = this.rooms.find(x => x.s === _roomId);
+	this.JoinRoom = function(_roomId, _pass, _password) {
+		const _room = this.roomById(_roomId);
 		if(!_room)
 			return;
-		if(_room.p?.length >= 6) {
+		if(_room.dummy)
+			return this.joinDummyRoom(_room, _pass);
+		if((_room.p?.length ?? 0) >= 6) {
 			warn('<span>' + getLangData('Room is full') + '</span>', 'warn');
 			return;
 		}
-		if(this.roomId) {
-			this.KickPlayer(mainCharacter.socketId);
-		}
-		//eğer oyunculardan biri zaten bensem return;
 		if(_room.p?.find(x => x.s === mainCharacter.socketId)) {
+			this.renderJoinRoomUI(_roomId, 1, 1);
 			return;
 		}
 		if(_room.t && !_pass) {
-			//password ekranı soracaz
 			askSomething(
 			`<div class="flex w-100 duel-create-room-input">
 				<input placeholder="${getLangData('Enter Room Password')}" id="duel-join-room-password" class="duel-room-input" type="text" maxlength="20" autocomplete="off" />
 			</div>`, `getRef(\'duel\')?.TryJoinRoom(\'${_roomId}\')`, 'modal_2x1');
 			return;
 		}
-		//beni bu odadaki p arrayinde eğer t si 1 ve 2 olanlara bakarak oyuncusu en az olan takıma ekle eğer eşitlerse 1. takıma ekle
-		const _bluePlayers = _room.p?.filter(x => x.t === 1)??[];
-		const _redPlayers = _room.p?.filter(x => x.t === 2)??[];
+		this.joinServerRoom(_roomId, _password || '');
+	}
+	this.joinDummyRoom = function(_room, _pass) {
+		if((_room.p?.length ?? 0) >= 6 && !_room.p?.some(x => x.s === mainCharacter.socketId)) {
+			warn('<span>' + getLangData('Room is full') + '</span>', 'warn');
+			return;
+		}
+		if(_room.p?.find(x => x.s === mainCharacter.socketId)) {
+			this.renderJoinRoomUI(_room.s);
+			return;
+		}
+		if(_room.t && !_pass) {
+			askSomething(
+			`<div class="flex w-100 duel-create-room-input">
+				<input placeholder="${getLangData('Enter Room Password')}" id="duel-join-room-password" class="duel-room-input" type="text" maxlength="20" autocomplete="off" />
+			</div>`, `getRef(\'duel\')?.TryJoinRoom(\'${_room.s}\')`, 'modal_2x1');
+			return;
+		}
+		if(this.roomId && this.roomId !== _room.s) {
+			const _current = this.roomById(this.roomId);
+			if(_current && !_current.dummy) {
+				this.leaveServerRoom(() => this.joinDummyRoom(_room, _pass));
+				return;
+			}
+			this.leaveDummyLocal();
+		}
+		delete mainCharacter.leader;
+		const _bluePlayers = _room.p?.filter(x => x.t === 1) ?? [];
+		const _redPlayers = _room.p?.filter(x => x.t === 2) ?? [];
 		const _myTeam = _bluePlayers.length <= _redPlayers.length ? 1 : 2;
 		_room.p.push({
 			c: mainCharacter.class,
@@ -207,29 +239,148 @@
 			t: _myTeam,
 			r: 0
 		});
-		this.updateRoomPlayersCount(_roomId);
-		this.renderJoinRoomUI(_roomId);
+		this.updateRoomPlayersCount(_room.s);
+		this.renderJoinRoomUI(_room.s);
 	}
 	this.updateRoomPlayersCount = function(_roomId) {
 		const _room = this.rooms.find(x => x.s === _roomId);
 		if(!_room)
 			return;
-		document.getElementById(`duel-room-players-count-${_roomId}`).innerHTML = (_room.p?.length ?? 0) + ' / 6';
+		const _el = document.getElementById(`duel-room-players-count-${_roomId}`);
+		if(_el)
+			_el.innerHTML = (_room.p?.length ?? 0) + ' / 6';
+	}
+	this.rollClassPower = function(_class) {
+		const _ch = (typeof _selectableChars !== 'undefined') ? _selectableChars.find(x => x.class === _class) : undefined;
+		const _src = _ch ? _allEnemies['enemy' + _ch.id] : undefined;
+		if(!_src)
+			return 0;
+		const _e = setCharacterFunctions(_src(), 1);
+		_e.level = 10;
+		_e.inventory = getRandomItems(2, _e.class);
+		_e.inventory.forEach(x => x.weared = _e.class);
+		return getTotalPower(_e).total || 0;
+	}
+	this.PickClass = async function(_botId) {
+		if(this.pending || typeof _selectableChars === 'undefined')
+			return;
+		const _room = this.roomById(this.roomId);
+		if(!_room)
+			return;
+		this.pickBotId = _botId || undefined;
+		const _seat = _botId ? _room.p.find(x => x.id === _botId) : _room.p.find(x => x.s === mainCharacter.socketId);
+		if(!_seat)
+			return;
+		if(!_botId && _seat.r) {
+			if(_room.dummy) {
+				_seat.r = 0;
+				this.renderJoinRoomUI(this.roomId, 1, 1);
+			}
+			else {
+				this.pending = 1;
+				try {
+					const _res = await this.invoke('DuelUnready');
+					if(!this.afterInvoke(_res))
+						return;
+				}
+				finally {
+					delete this.pending;
+				}
+			}
+		}
+		const _current = _seat.c || _selectableChars[0].class;
+		__selectedPvPClass = _current;
+		let _choices = '';
+		for(const _item of _selectableChars) {
+			_choices += `<div data-class="${_item.class}" class="selection-item selection-char${_item.class === _current ? ' selected-character' : ''} flex" onexactclick="selectDuelCharacter('${_item.class}')" style="width:21%;aspect-ratio:1/1;position:relative;cursor:pointer">
+				<img src="./images/main/avatars/${_item.class}.png" style="padding:2%;height:84%" class="grade${_item.grade}-item" />
+			</div>`;
+		}
+		closeInventoryQuestionModal();
+		const _modal = `<div data-singleton-key="modal_square_duel" class="duel-char-selection full fade-me show-ui flex inventory-question">
+			<div class="inventory-modal">
+				<div class="flex w-100 question-modal-title-wrapper duel-char-selection-title-wrapper">
+					<div class="flex question-modal-title">${getLangData('Choose your character')}</div>
+				</div>
+				<div class="flex w-100 question-modal-choices duel-char-selection-choices">${_choices}</div>
+				<div class="flex new-game-menu-buttons duel-char-selection-buttons">
+					<div class="new-game-menu-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('CANCEL')}</div>
+					<div class="new-game-menu-button flex animate-me" onexactclick="getRef('duel')?.ConfirmClass()">${getLangData('APPROVE')}</div>
+				</div>
+			</div>
+		</div>`;
+		const _div = document.createElement('div');
+		_div.innerHTML = _modal;
+		(document.querySelector('#menu-ui') ?? _gameUI).appendChild(_div.firstChild);
+		playClick(1);
+	}
+	this.ConfirmClass = async function() {
+		const _class = __selectedPvPClass;
+		if(!_class || this.pending)
+			return;
+		closeInventoryQuestionModal();
+		const _power = this.rollClassPower(_class);
+		if(this.pickBotId)
+			return this.confirmBotClass(_class, _power);
+		this.pending = 1;
+		try {
+			const _res = await this.invoke('DuelClass', _class, _power);
+			if(!this.afterInvoke(_res))
+				return;
+		}
+		finally {
+			delete this.pending;
+		}
+	}
+	this.confirmBotClass = async function(_class, _power) {
+		const _room = this.roomById(this.roomId);
+		const _bot = _room?.p?.find(x => x.id === this.pickBotId);
+		if(!_bot)
+			return;
+		if(_room.dummy) {
+			_bot.c = _class;
+			_bot.p = _power;
+			_bot.r = 1;
+			this.renderJoinRoomUI(this.roomId, 1, 1);
+			return;
+		}
+		const _index = _room.p.indexOf(_bot);
+		const _ch = _selectableChars.find(x => x.class === _class);
+		const _src = _ch ? _allEnemies['enemy' + _ch.id] : undefined;
+		if(_src) {
+			const _e = setCharacterFunctions(_src(), 1);
+			_e.aiId = _bot.id;
+			_e.name = _bot.n;
+			_e.level = 10;
+			_e.inventory = getRandomItems(2, _e.class);
+			_e.inventory.forEach(x => x.weared = _e.class);
+			_e.totalPower = _power;
+			this.botChars[_bot.id] = _e;
+		}
+		this.pending = 1;
+		try {
+			const _res = await this.invoke('DuelBot', _bot.id, _bot.n, _class, _power, _bot.t, _index);
+			this.afterInvoke(_res);
+		}
+		finally {
+			delete this.pending;
+		}
 	}
 	this.RePickBot = function(_botId) {
-		const _room = this.rooms.find(x => x.s === this.roomId);
+		const _room = this.roomById(this.roomId);
 		if(!_room)
 			return;
 		const _bot = _room.p.find(x => x.id === _botId);
 		if(!_bot)
 			return;
-		const _index = _room.p.indexOf(_bot);
-		this.AddBot(this.roomId, _bot.t, _index);
+		this.PickClass(_botId);
 	}
 	this.AddBot = function(_roomId, _teamNo, _specificIndex) {
-		const _room = this.rooms.find(x => x.s === _roomId);
+		const _room = this.roomById(_roomId);
 		if(!_room)
 			return;
+		if(!_room.dummy)
+			return this.addServerBot(_room, _teamNo, _specificIndex);
 		if(_specificIndex === undefined) {
 			const _players = _room.p.filter(x => x.team === _teamNo);
 			if(_players?.length >= 3)
@@ -255,7 +406,7 @@
 		this.renderJoinRoomUI(_roomId, 1);
 	}
 	this.renderJoinRoomUI = function(_roomId, _noAnimation, _noSound) {
-		const _room = this.rooms.find(x => x.s === _roomId);
+		const _room = this.roomById(_roomId);
 		if(!_room)
 			return;
 		const _right = document.querySelector('.duel-content-right .menu-modal-right-container');
@@ -273,10 +424,9 @@
 			playClick(1);
 		const _bluePlayers = _room.p?.filter(x => x.t === 1)??[];
 		const _redPlayers = _room.p?.filter(x => x.t === 2)??[];
+		const _humans = _room.p?.filter(x => x.s) ?? [];
+		const _canStart = !!mainCharacter.leader && _humans.length > 0 && _humans.every(x => x.r) && _bluePlayers.length > 0 && _redPlayers.length > 0;
 		let _blueHTML = '';
-		let _readyCount = 0;
-		let _blueReadyCount = 0;
-		let _redReadyCount = 0;
 		for (let i = 0; i < _bluePlayers.length; i++) {
 			const _p = _bluePlayers[i];
 			const _isMe = _p.s === mainCharacter.socketId;
@@ -285,10 +435,6 @@
 			const _grade = _ch?.grade ?? 3;
 			const _ready = _p.r ? 'ready' : 'away';
 			const _isBot = _p.id;
-			if(_p.r) {
-				_readyCount++;
-				_blueReadyCount++;
-			}
 			_blueHTML += `<div class="flex w-100 team-player-row--blue${_isMe ? ' me' : ''}">
 				<div class="flex duel-join-player-avatar">
 					<img class="grade${_grade}-item" src="./images/main/avatars/${_p.c}.png" />
@@ -305,11 +451,14 @@
 					<div class="duel-square${_isMe ? '' : ' d-none'}" onexactclick="getRef('duel')?.SetReady('${_p.s}')">
 						<img src="./images/ui/game/duel-${_ready}.png" />
 					</div>
+					<div class="duel-square${_isMe ? '' : ' d-none'}" onexactclick="getRef('duel')?.PickClass()">
+						<img src="./images/ui/game/duel-refresh.png" />
+					</div>
 					<div class="duel-square${!_isMe && !_isBot ? '' : ' d-none'}">
-						<img src="./images/ui/game/duel-${_ready}.png" />
+						<img src="./images/ui/game/duel-rival-${_ready}.png" />
 					</div>
 					<div class="duel-square${_isBot && !mainCharacter.leader ? '' : ' d-none'}">
-						<img src="./images/ui/game/duel-ready.png" />
+						<img src="./images/ui/game/duel-rival-ready.png" />
 					</div>
 					<div class="duel-square${_isBot && mainCharacter.leader ? '' : ' d-none'}" onexactclick="getRef('duel')?.RePickBot('${_p.id}')">
 						<img src="./images/ui/game/duel-refresh.png" />
@@ -342,10 +491,6 @@
 			const _isMeOrLeader = _isMe || mainCharacter.leader;
 			const _isBot = _p.id;
 			const _ready = _p.r ? 'ready' : 'away';
-			if(_p.r) {
-				_readyCount++;
-				_redReadyCount++;
-			}
 			_redHTML += `<div class="flex w-100 team-player-row--red${_isMe ? ' me' : ''}">
 				<div class="flex duel-join-player-avatar">
 					<img class="grade${_grade}-item" src="./images/main/avatars/${_p.c}.png" />
@@ -362,11 +507,14 @@
 					<div class="duel-square${_isMe ? '' : ' d-none'}" onexactclick="getRef('duel')?.SetReady('${_p.s}')">
 						<img src="./images/ui/game/duel-${_ready}.png" />
 					</div>
+					<div class="duel-square${_isMe ? '' : ' d-none'}" onexactclick="getRef('duel')?.PickClass()">
+						<img src="./images/ui/game/duel-refresh.png" />
+					</div>
 					<div class="duel-square${!_isMe && !_isBot ? '' : ' d-none'}">
-						<img src="./images/ui/game/duel-${_ready}.png" />
+						<img src="./images/ui/game/duel-rival-${_ready}.png" />
 					</div>
 					<div class="duel-square${_isBot && !mainCharacter.leader ? '' : ' d-none'}">
-						<img src="./images/ui/game/duel-ready.png" />
+						<img src="./images/ui/game/duel-rival-ready.png" />
 					</div>
 					<div class="duel-square${_isBot && mainCharacter.leader ? '' : ' d-none'}" onexactclick="getRef('duel')?.RePickBot('${_p.id}')">
 						<img src="./images/ui/game/duel-refresh.png" />
@@ -403,7 +551,7 @@
 			</div>`
 			+ _redHTML +
 			`<div class="flex w-100 duel-create-room-button">
-				<div class="flex duel-start-button${(_readyCount === _room.p?.length && _blueReadyCount > 0 && _redReadyCount > 0 && mainCharacter.leader) ? '' : ' disabled'}" onexactclick="getRef('duel')?.StartDuel()">
+				<div class="flex duel-start-button${_canStart ? '' : ' disabled'}" onexactclick="getRef('duel')?.StartDuel()">
 					${getLangData('START DUEL')}
 				</div>
 			</div>
@@ -438,9 +586,9 @@
 				break;
 		}
 	}
-	this.CreateRoom = function() {
-		const _roomName = document.querySelector('#duel-room-name').value?.trim();
-		const _password = document.querySelector('#duel-room-password').value?.trim();
+	this.CreateRoom = async function() {
+		const _roomName = document.querySelector('#duel-room-name')?.value?.trim();
+		const _password = document.querySelector('#duel-room-password')?.value?.trim();
 		if(!_roomName) {
 			warn('<span>' + getLangData('Please enter room name') + '</span>', 'warn');
 			return;
@@ -449,35 +597,33 @@
 			warn('<span>' + getLangData('Please enter password') + '</span>', 'warn');
 			return;
 		}
-		mainCharacter.leader = 1;
-		const _socketId = mainCharacter.socketId;
-		this.rooms.push({
-			n: _roomName,
-			s: _socketId,
-			pwd: this.roomType === 'public' ? null : _password,
-			t: this.roomType === 'public' ? 0 : 1,
-			p: [
-				{ 
-					c: mainCharacter.class, 
-					n: __account.name, 
-					l: 1,
-					s: _socketId,
-					p: getTotalPower(mainCharacter).total,
-					t: 1,
-					r: 0
-				}
-			],
-			selected: true
-		});
-		const _duelRoomsContainer = document.querySelector('.duel-rooms-container');
-		_duelRoomsContainer.innerHTML = this.getRooms();
-		this.renderJoinRoomUI(_socketId, 1);
+		if(this.pending)
+			return;
+		this.pending = 1;
+		try {
+			if(this.roomId && this.roomById(this.roomId)?.dummy)
+				this.leaveDummyLocal();
+			const _res = await this.invoke('DuelCreate', _roomName, this.roomType === 'private' ? _password : '', mainCharacter?.class || '', this.myPower());
+			if(!this.afterInvoke(_res))
+				return;
+			if(_res.value)
+				this.applyServerRoom(_res.value, 1);
+		}
+		finally {
+			delete this.pending;
+		}
 	}
 	this.SwapPlayers = function(_socketId, _upOrDown) {
 		//1 ise yukarı 2 ise aşağı. Sıra ekrandaki gibi: önce mavi takım, sonra kırmızı.
-		const _room = this.rooms.find(x => x.s === this.roomId);
+		const _room = this.roomById(this.roomId);
 		if(!_room)
 			return;
+		if(!_room.dummy) {
+			if(!mainCharacter.leader)
+				return;
+			this.invoke('DuelSwap', _socketId, _upOrDown).then(_res => this.afterInvoke(_res));
+			return;
+		}
 		const _ordered = [
 			..._room.p.filter(x => x.t === 1),
 			..._room.p.filter(x => x.t === 2)
@@ -501,7 +647,7 @@
 		this.renderJoinRoomUI(this.roomId, 1);
 	}
 	this.AskKickPlayer = function(_socketId) {
-		const _room = this.rooms.find(x => x.s === this.roomId);
+		const _room = this.roomById(this.roomId);
 		if(!_room)
 			return;
 		const _player = _room.p.find(x => (x.s ?? x.id) === _socketId);
@@ -519,24 +665,22 @@
 			askSomething(getLangData('Leave the room')+'?', `getRef(\'duel\')?.KickPlayer(\'${_player.s ?? _player.id}\')`, 'modal_2x1');
 	}
 	this.KickPlayer = function(_socketId) {
-		const _room = this.rooms.find(x => x.s === this.roomId);
+		const _room = this.roomById(this.roomId);
 		if(!_room)
 			return;
 		const _player = _room.p.find(x => (x.s ?? x.id) === _socketId);
 		if(!_player)
 			return;
 		closeInventoryQuestionModal();
-		if(_player.s === mainCharacter.socketId && mainCharacter.leader) {
-			this.rooms = this.rooms.filter(x => x.s !== this.roomId);
-			delete this.roomId;
-			delete mainCharacter.leader;
-			this.render(1);
+		if(!_room.dummy) {
+			if(_player.s === mainCharacter.socketId)
+				this.leaveServerRoom(() => this.backToList());
+			else if(mainCharacter.leader)
+				this.invoke('DuelKick', _socketId).then(_res => this.afterInvoke(_res));
 			return;
 		}
-		else if(_player.s === mainCharacter.socketId) {
-			_room.p = _room.p.filter(x => (x.s ?? x.id) !== _socketId);
-			this.updateRoomPlayersCount(this.roomId);
-			delete this.roomId;
+		if(_player.s === mainCharacter.socketId) {
+			this.leaveDummyLocal();
 			this.render(1);
 			return;
 		}
@@ -545,9 +689,15 @@
 		this.renderJoinRoomUI(this.roomId, 1);
 	}
 	this.SetReady = function(_socketId) {
-		const _room = this.rooms.find(x => x.s === this.roomId);
+		const _room = this.roomById(this.roomId);
 		if(!_room)
 			return;
+		if(!_room.dummy) {
+			if(_socketId !== mainCharacter.socketId)
+				return;
+			this.invoke('DuelReady').then(_res => this.afterInvoke(_res));
+			return;
+		}
 		const _player = _room.p.find(x => x.s === _socketId);
 		if(!_player)
 			return;
@@ -555,6 +705,278 @@
 		this.renderJoinRoomUI(this.roomId, 1);
 	}
 	this.StartDuel = function() {
+		const _room = this.roomById(this.roomId);
+		if(!_room)
+			return;
+		if(_room.s !== mainCharacter.socketId) {
+			warn('<span>' + getLangData('Only the room leader can start the duel') + '</span>', 'warn');
+			return;
+		}
+		if(_room.p?.some(x => x.s && !x.r))
+			return;
+		const _blue = _room.p?.filter(x => x.t === 1).length ?? 0;
+		const _red = _room.p?.filter(x => x.t === 2).length ?? 0;
+		if(_blue < 3 || _red < 3) {
+			askSomething('Teams are not full yet. Do you still want to start?', `getRef('duel')?.ConfirmStartDuel()`, 'modal_2x1');
+			return;
+		}
+		this.ConfirmStartDuel();
+	}
+	this.ConfirmStartDuel = function() {
+		closeInventoryQuestionModal();
+		const _room = this.roomById(this.roomId);
+		if(!_room || _room.s !== mainCharacter.socketId)
+			return;
+		this.invoke('DuelStart').then(_res => this.afterInvoke(_res));
+	}
+	this.roomById = function(_roomId) {
+		return this.rooms.find(x => x.s === _roomId) || (this.liveRoom?.s === _roomId ? this.liveRoom : null);
+	}
+	this.myPower = function() {
+		return getTotalPower().total || 0;
+	}
+	this.invoke = async function(_method, ..._args) {
+		if(!_my_hub || _my_hub.q !== 'Connected')
+			return { ok: 0, offline: 1 };
+		try {
+			const _value = await _my_hub.invoke(_method, ..._args);
+			return { ok: 1, value: _value };
+		}
+		catch(_err) {
+			return { ok: 0, error: _err };
+		}
+	}
+	this.afterInvoke = function(_res) {
+		if(_res?.ok)
+			return 1;
+		if(_res?.offline)
+			warn('<span>' + getLangData('Not connected') + '</span>', 'warn');
+		else
+			this.hubFail(_res?.error);
+		return 0;
+	}
+	this.hubFail = function(_err) {
+		let _msg = String(_err?.message || 'missing');
+		const _i = _msg.indexOf('HubException:');
+		if(_i >= 0)
+			_msg = _msg.slice(_i + 'HubException:'.length).trim();
+		if(_msg === 'Name is required')
+			_msg = 'Please enter room name';
+		warn('<span>' + getLangData(_msg) + '</span>', 'warn');
+	}
+	this.attachBotChars = function(_room) {
+		if(!_room?.p)
+			return;
+		for(const _p of _room.p)
+			if(_p.id && this.botChars[_p.id])
+				_p.char = this.botChars[_p.id];
+	}
+	this.syncLeader = function(_room) {
+		const _me = _room?.p?.find(x => x.s === mainCharacter.socketId);
+		if(_me?.l)
+			mainCharacter.leader = 1;
+		else
+			delete mainCharacter.leader;
+	}
+	this.paintRoomList = function() {
+		const _box = document.querySelector('.duel-rooms-container');
+		if(!_box)
+			return;
+		_box.innerHTML = this.getRooms();
+		if(this.roomId)
+			addClass(document.getElementById('duel-card-' + this.roomId), 'selected');
+	}
+	this.applyServerRoom = function(_view, _open) {
+		if(!_view?.s || this.dummyRooms.some(x => x.s === _view.s))
+			return;
+		this.attachBotChars(_view);
+		const _i = this.serverRooms.findIndex(x => x.s === _view.s);
+		if(_i >= 0)
+			this.serverRooms[_i] = _view;
+		else
+			this.serverRooms.unshift(_view);
+		this.rooms = this.dummyRooms.concat(this.serverRooms);
+		const _mine = _view.p?.some(x => x.s === mainCharacter.socketId);
+		if(_mine)
+			this.liveRoom = _view;
+		if(this.switching) {
+			this.paintRoomList();
+			return;
+		}
+		if(_open || this.roomId === _view.s || _mine) {
+			this.syncLeader(_view);
+			this.paintRoomList();
+			this.renderJoinRoomUI(_view.s, 1, 1);
+			return;
+		}
+		this.paintRoomList();
+	}
+	this.removeServerRoom = function(_roomId) {
+		this.serverRooms = this.serverRooms.filter(x => x.s !== _roomId);
+		this.rooms = this.dummyRooms.concat(this.serverRooms);
+		if(this.liveRoom?.s === _roomId)
+			delete this.liveRoom;
+	}
+	this.leaveDummyLocal = function() {
+		const _room = this.dummyRooms.find(x => x.s === this.roomId);
+		if(_room)
+			_room.p = _room.p.filter(x => x.s !== mainCharacter.socketId);
+		if(_room) {
+			delete this.roomId;
+			delete mainCharacter.leader;
+		}
+	}
+	this.leaveServerRoom = async function(_then) {
+		if(this.pending)
+			return;
+		this.pending = 1;
+		this.switching = 1;
+		try {
+			const _res = await this.invoke('DuelLeave');
+			if(!this.afterInvoke(_res))
+				return;
+			delete this.roomId;
+			delete this.liveRoom;
+			delete mainCharacter.leader;
+			if(_then)
+				_then();
+		}
+		finally {
+			delete this.pending;
+			delete this.switching;
+		}
+	}
+	this.backToList = function() {
+		delete this.roomId;
+		delete this.liveRoom;
+		delete this.startedRoom;
+		delete mainCharacter.leader;
+		this.botChars = {};
+		if(document.querySelector("[data-module='duel']"))
+			this.render(1);
+	}
+	this.joinServerRoom = async function(_roomId, _password) {
+		if(this.pending)
+			return;
+		this.pending = 1;
+		try {
+			if(this.roomId && this.roomId !== _roomId && this.roomById(this.roomId)?.dummy)
+				this.leaveDummyLocal();
+			const _res = await this.invoke('DuelJoin', _roomId, _password || '', mainCharacter?.class || '', this.myPower());
+			if(!this.afterInvoke(_res))
+				return;
+			if(_res.value)
+				this.applyServerRoom(_res.value, 1);
+		}
+		finally {
+			delete this.pending;
+		}
+	}
+	this.addServerBot = async function(_room, _teamNo, _specificIndex, _oldId) {
+		if(!mainCharacter.leader || this.pending)
+			return;
+		const _char = createRandomPlayer(mainCharacter.level);
+		_char.aiId = getRandomString(5);
+		_char.name = 'BOT' + getRandomValue2(1000, 9999);
+		this.botChars[_char.aiId] = _char;
+		const _index = _specificIndex === undefined ? -1 : _specificIndex;
+		this.pending = 1;
+		try {
+			const _res = await this.invoke('DuelBot', _char.aiId, _char.name, _char.class, _char.totalPower || 0, _teamNo, _index);
+			if(!this.afterInvoke(_res)) {
+				delete this.botChars[_char.aiId];
+				return;
+			}
+			if(_oldId && _oldId !== _char.aiId)
+				delete this.botChars[_oldId];
+		}
+		finally {
+			delete this.pending;
+		}
+	}
+	this.loadRooms = async function() {
+		const _seq = (this.listSeq = (this.listSeq || 0) + 1);
+		const _res = await this.invoke('DuelRooms');
+		if(_seq !== this.listSeq)
+			return;
+		if(!_res.ok || !Array.isArray(_res.value)) {
+			if(_res.error)
+				this.hubFail(_res.error);
+			return;
+		}
+		this.serverRooms = _res.value.filter(x => !this.dummyRooms.some(d => d.s === x.s));
+		for(const _room of this.serverRooms)
+			this.attachBotChars(_room);
+		this.rooms = this.dummyRooms.concat(this.serverRooms);
+		this.paintRoomList();
+		if(this.switching || this.pending || this.roomId)
+			return;
+		const _mine = this.serverRooms.find(x => x.p?.some(p => p.s === mainCharacter.socketId));
+		if(_mine)
+			this.joinServerRoom(_mine.s, '');
+	}
+	this.onDuelStart = function(_view) {
+		if(!_view)
+			return;
+		this.startedRoom = _view;
+		this.removeServerRoom(_view.s);
+		this.paintRoomList();
+		this.beginDuel(_view);
+	}
+	this.beginDuel = function(_view) {
+		if(this.fightStarted || !_view?.p?.length)
+			return;
+		this.fightStarted = 1;
+		const _me = mainCharacter.socketId;
+		if(_view.s === _me)
+			mainCharacter.leader = 1;
+		else
+			delete mainCharacter.leader;
+		const _seatToFighter = function(_seat) {
+			if(_seat.s === _me) {
+				mainCharacter.pvpName = __account.name;
+				mainCharacter.duelTeam = _seat.t;
+				mainCharacter.duelClass = _seat.c;
+				return mainCharacter;
+			}
+			const _ch = (typeof _selectableChars !== 'undefined') ? _selectableChars.find(x => x.class === _seat.c) : undefined;
+			return {
+				id: _ch?.id ?? 10001,
+				pvpName: _seat.n,
+				level: 10,
+				duelTeam: _seat.t,
+				socketId: _seat.s || _seat.id,
+				duelBot: _seat.s ? undefined : 1
+			};
+		};
+		const _ops = [
+			..._view.p.filter(x => x.t === 1).map(_seatToFighter),
+			..._view.p.filter(x => x.t === 2).map(_seatToFighter)
+		];
+		createJusticeWar(_ops, _view.s);
+	}
+	this.onDuel = function(_kind, _payload) {
+		if(_kind === 'changed')
+			return this.loadRooms();
+		if(_kind === 'room')
+			return this.applyServerRoom(_payload, 0);
+		if(_kind === 'closed') {
+			this.removeServerRoom(_payload);
+			if(!this.switching && this.roomId === _payload)
+				this.backToList();
+			else
+				this.paintRoomList();
+			return;
+		}
+		if(_kind === 'kicked') {
+			if(!this.switching)
+				this.backToList();
+			else
+				this.paintRoomList();
+			return;
+		}
+		if(_kind === 'start')
+			this.onDuelStart(_payload);
 	}
 	return this;
 }
