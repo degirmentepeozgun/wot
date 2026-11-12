@@ -244,6 +244,23 @@ namespace Web.BackEnd.Api.Helper {
 		public async Task M(ChatMessage command) {
 			await Clients.Others.SendAsync("M", command);
 		}
+		public async Task DuelChat(string text) {
+			if(string.IsNullOrWhiteSpace(text))
+				return;
+			text = text.Trim();
+			if(text.Length > 200)
+				text = text.Substring(0, 200);
+			if(!ConnectedUsers.TryGetValue(Context.ConnectionId, out var me))
+				return;
+			var room = FindDuel(Context.ConnectionId);
+			if(room == null)
+				return;
+			await Clients.OthersInGroup(DuelGroup(room.Id)).SendAsync("Duel", "chat", new ChatMessage {
+				N = me.Name,
+				M = text,
+				S = me.SocketId
+			});
+		}
 
 		public async override Task OnConnectedAsync() {
 			var httpContext = Context.GetHttpContext();

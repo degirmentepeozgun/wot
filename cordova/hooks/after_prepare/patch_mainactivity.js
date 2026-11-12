@@ -15,6 +15,8 @@ module.exports = function (ctx) {
 
     // already patched check
     if (code.includes("attachBridge()")) {
+        code = paintWebViewBlack(code);
+        fs.writeFileSync(file, code, "utf8");
         console.log("MainActivity already patched");
         return;
     }
@@ -72,7 +74,17 @@ import android.webkit.WebView;`
         attachBridge + "\n}"
     );
 
+    code = paintWebViewBlack(code);
     fs.writeFileSync(file, code, "utf8");
 
     console.log("MainActivity patched to final structure");
 };
+
+function paintWebViewBlack(code) {
+	if (code.includes("setBackgroundColor"))
+		return code;
+	return code.replace(
+		/\(\(WebView\) (v\d)\)\.addJavascriptInterface\(/g,
+		"((WebView) $1).setBackgroundColor(android.graphics.Color.BLACK);\n\t\t\t\t((WebView) $1).addJavascriptInterface("
+	);
+}

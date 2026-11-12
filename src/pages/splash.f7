@@ -205,6 +205,8 @@
 			reviveAtLobby();
 		}
 		$on('pageAfterIn', (e, page) => {
+			if (typeof fitWrapperParent === 'function')
+				fitWrapperParent();
 			//app.statusbar.hide();
 			_css = document.getElementById('css-canvas');
 			_cssF = document.getElementById('css-canvas-foreground');

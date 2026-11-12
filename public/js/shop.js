@@ -104,7 +104,7 @@ function buyStoreItem(_id) {
 		_si.date = new Date();
 	else
 		__account.storeDates.push({id: _id, date: new Date()});
-	warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/' + _item.key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + (_item.count > 1 ? _item.count.toString() + ' x ' : '') + _title + '</span></div>', null, null, 1);
+	warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/' + _item.key + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + (_item.count > 1 ? _item.count.toString() + ' x ' : '') + _title + '</span></div>', null, null, 1);
 	getChestReward(__account.grade ?? 1, _item.key === 'pot' ? 'pot' : 'misc', _item.key, _item.count);
 	closeInventoryQuestionModal();
 	createStoreUI(1);
@@ -128,7 +128,7 @@ function getDailyFreeStoreItem(_id) {
 		__account.storeDates.push({id: _id, date: new Date()});
 	closeInventoryQuestionModal();
 	createStoreUI(1);
-	warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/chest.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, null, 1);
+	warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/chest.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, null, 1);
 	getChestReward(__account.grade ?? 1, 'misc', 'chest');
 	_client.saveState();
 	checkUpdateAvailable2(8);

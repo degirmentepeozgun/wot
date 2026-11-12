@@ -14,6 +14,53 @@ const _borderRates = [
 	1.06, 1.06, 1.06,
 ];
 console.log('map');
+function duelActorMine(_actor) {
+	if (!_actor)
+		return false;
+	if (_actor.main || _actor.socketId === __socketId || _actor.duelSocket === __socketId)
+		return true;
+	return !!(episode?.duelLeader && _actor.duelBot && !_actor.realTime);
+}
+function applyDuelKill(_victim, _killerSocket) {
+	if (!_victim || _victim.grayAvatar || !_killerSocket || !episode?.war || !episode.realTime)
+		return;
+	if (_victim.class === __spell || _victim.class === 'minion' || _victim.class === 'object')
+		return;
+	const _killer = episode.enemies.find(y => y && (y.socketId === _killerSocket || y.duelSocket === _killerSocket || (y.main && (__socketId === _killerSocket || y.socketId === _killerSocket))));
+	if (!_killer)
+		return;
+	_victim.grayAvatar = true;
+	_victim.killedBy = _killer.key;
+	_killer.killCount++;
+	const _gsb = document.querySelector('.team' + _killer.teamId + '-score');
+	if (_gsb) {
+		const _teamScore = parseInt(_gsb.innerText) + 1;
+		episode['team' + _killer.teamId + 'score'] = _teamScore;
+		if (_teamScore > 9)
+			episode.pvpStarted = 1;
+		if (_teamScore > episode['team' + _victim.teamId + 'score']) {
+			if (episode.winningTeam && episode.winningTeam !== _killer.teamId) {
+				const isMain = mainCharacter.teamId === _killer.teamId;
+				PlaySound({ key: isMain ? 'comebackwin' : 'comebackloose', volume: 1 });
+			}
+			episode.winningTeam = _killer.teamId;
+		}
+		_gsb.innerText = _teamScore;
+	}
+	let _msg = '';
+	if (_killer.killCount > 1) {
+		episode.playSound({ key: _killer.gender + 'laugh', reset: true });
+		_msg = '<div class="flex" style="color:#FD1C03;font-weight:600;font-size:larger !important">' + _killer.killCount + ' x Killing Spree!</div>';
+	}
+	if (_victim.pvpRespawn)
+		_victim.addPVPRespawnFrame();
+	warn('<div class="pvp-kill">' + _msg + (_killer.main ? __account.name : _killer.displayName ?? _killer.name) + '&nbsp;<span class="' + (_killer.enemy ? 'red' : 'blue') + '-kill">' + getLangData('killed') + '</span>&nbsp;' + (_victim.main ? __account.name : _victim.displayName ?? _victim.name) + '</div>', 'level-up', null, null, 1);
+	if (!_victim.enemy) {
+		const _avatar = document.getElementById('char-' + _victim.key);
+		if (_avatar)
+			addClass(_avatar, 'gray');
+	}
+}
 function map(_m) {
 	
 	if (!window._distortFX) {
@@ -52,6 +99,10 @@ function map(_m) {
 	this.FootShadow = getImage('./images/related/shadow-dark.png');
 	this.HBMob = getImage('./images/icons/hbmob.png');
 	this.HBBoss = getImage('./images/icons/hbboss.png');
+	this.meSign = getImage('./images/icons/me-sign.png');
+	this.p1Sign = getImage('./images/icons/p1-sign.png');
+	this.p2Sign = getImage('./images/icons/p2-sign.png');
+	this.rivalSign = getImage('./images/icons/rival-sign.png');
 	let _sb = document.getElementById('score-board');
 	if(_sb)
 		_sb.remove();
@@ -307,22 +358,54 @@ function map(_m) {
 	this.croppedSprites = new Map();
 	this.croppedSpritesOrder = [];
 	this.MAX_CROPPED_SPRITES = 800; // mobil-safe limit
+	this._touchCroppedSprite = function (_src, _key) {
+		const flatKey = _src + '|' + _key;
+		const i = this.croppedSpritesOrder.indexOf(flatKey);
+		if (i === -1)
+			this.croppedSpritesOrder.push(flatKey);
+		else if (i < this.croppedSpritesOrder.length - 1) {
+			this.croppedSpritesOrder.splice(i, 1);
+			this.croppedSpritesOrder.push(flatKey);
+		}
+	};
 	this.getCroppedSprite = function (_x, _y, _w, _h, _char, _src, _fKey) {
-
+		if (!_src || !_w || !_h)
+			return undefined;
 		const _key = _fKey ?? ('l' + _x + 't' + _y + 'w' + _w + 'h' + _h);
-
-		if (_char.lastSpriteKey === _key)
+		if (_char.lastSpriteKey === _key && _char.lastSprite?.width > 0 && _char.lastSprite?.height > 0) {
+			this._touchCroppedSprite(_src, _key);
 			return _char.lastSprite;
-
-		const srcMap = this.croppedSprites.get(_src);
-
-		if (srcMap) {
-			const sprite = srcMap.get(_key);
+		}
+		let srcMap = this.croppedSprites.get(_src);
+		let sprite = srcMap?.get(_key);
+		if (sprite && (sprite.width < 1 || sprite.height < 1)) {
+			srcMap.delete(_key);
+			const _at = this.croppedSpritesOrder.indexOf(_src + '|' + _key);
+			if (_at > -1)
+				this.croppedSpritesOrder.splice(_at, 1);
+			sprite = undefined;
+		}
+		if (!sprite) {
+			const sheet = getExistingImage(_src);
+			if (sheet?.width > 0 && !sheet.notYet) {
+				const canvas = document.createElement('canvas');
+				canvas.width = _w;
+				canvas.height = _h;
+				const ctx = canvas.getContext('2d');
+				ctx.imageSmoothingEnabled = false;
+				ctx.drawImage(sheet, _x, _y, _w, _h, 0, 0, _w, _h);
+				this._storeCroppedSprite(_src, _key, canvas);
+				sprite = this.croppedSprites.get(_src)?.get(_key) || canvas;
+			}
+		}
+		else
+			this._touchCroppedSprite(_src, _key);
+		if (sprite?.width > 0 && sprite?.height > 0) {
 			_char.lastSprite = sprite;
 			_char.lastSpriteKey = _key;
 			return sprite;
 		}
-
+		//console.log('sprite bulunamadı: ' + _src + ' ' + _key);
 		return undefined;
 	};
 	this._storeCroppedSprite = function (_src, _key, canvas) {
@@ -783,11 +866,11 @@ function map(_m) {
 		else
 			this.enemies.forEach(x => x.immobilize = true);
 		const _missionGain = !_diff ? 0 : _diff * 100;
-		let _table = '<div class="flex full pvp-result-table tower-result"><div class="flex" style="width:100%;height:15vh;position:relative"><img src="./images/icons/reward-star.png" style="height:100%;position:absolute"' + (_fail ? ' class="gray"': '') + ' /><span style="z-index:2;margin-top:4.7vh;font-size:3.15vh!important;font-weight:600;text-shadow:0px 0px 1vh #000;color:' + (_fail ? 'crimson' : '#F4BB44') + ' !important">' + getLangData('Mission' + (_fail ? ' Failed' : ' Cleared')) + '</span></div><div style="width:100%;overflow-y:auto;height:calc(100% - 15vh)"><div style="width:100%" class="flex"><span>';
+		let _table = '<div class="flex full pvp-result-table tower-result"><div class="flex" style="width:100%;height:15cqh;position:relative"><img src="./images/icons/reward-star.png" style="height:100%;position:absolute"' + (_fail ? ' class="gray"': '') + ' /><span style="z-index:2;margin-top:4.7cqh;font-size:3.15cqh!important;font-weight:600;text-shadow:0px 0px 1cqh #000;color:' + (_fail ? 'crimson' : '#F4BB44') + ' !important">' + getLangData('Mission' + (_fail ? ' Failed' : ' Cleared')) + '</span></div><div style="width:100%;overflow-y:auto;height:calc(100% - 15cqh)"><div style="width:100%" class="flex"><span>';
 		for(let _star of this.resultStars)
-			_table += `<div class="flex" style="padding:2vh 2vh 0 2vh;width:100%;height:6vh">
-				<img src="./images/icons/star.png" style="height:4vh"${_star.failed ? ' class="gray"' : ' class="glow"'} />
-				<div class="flex flex-jc-start" style="padding-left:2vh;flex:1;font-size:2.4vh !important;height:100%;${_star.failed ? 'color:#f7f7f799 !important;text-decoration: line-through' : 'color:F4BB44 !important'}">
+			_table += `<div class="flex" style="padding:2cqh 2cqh 0 2cqh;width:100%;height:6cqh">
+				<img src="./images/icons/star.png" style="height:4cqh"${_star.failed ? ' class="gray"' : ' class="glow"'} />
+				<div class="flex flex-jc-start" style="padding-left:2cqh;flex:1;font-size:2.4cqh !important;height:100%;${_star.failed ? 'color:#f7f7f799 !important;text-decoration: line-through' : 'color:F4BB44 !important'}">
 					${getLangData(_star.title)}
 				</div>
 			</div>`;
@@ -803,11 +886,11 @@ function map(_m) {
 						_rewards.push(getChestReward(_g.grade ?? 1));
 				else
 					_rewards.push(structuredClone2(_g));
-			_table += `<div class="flex" style="width:100%;padding:2vh 0 1vh 0;color:#F4BB44 !important; font-size:2.6vh !important; font-weight: 600">${getLangData('Chest Rewards')}</div>`;
+			_table += `<div class="flex" style="width:100%;padding:2cqh 0 1cqh 0;color:#F4BB44 !important; font-size:2.6cqh !important; font-weight: 600">${getLangData('Chest Rewards')}</div>`;
 				for(let _reward of _rewards)
-					_table += `<div class="flex" style="width:100%;height:5vh"><div style="height:100%" class="flex"><img style="width:5vh" src="${_reward.src ?? './images/icons/' + _reward.key + '.png'}" /><div class="flex" style="height:100%;font-size:2.4vh !important;color:#f7f7f7cc !important;padding-left:2vh">${_reward.count ?? 1}x ${getLangData(_reward.title ?? _reward.type).toProperCase()}</div></div></div>`;
-				_table += `<div class="flex" style="width:100%;padding:2vh 0 1vh 0;color:#F4BB44 !important; font-size:2.6vh !important; font-weight: 600">${getLangData('Mission Rewards')}</div>
-				<div class="flex" style="width:100%;height:5vh"><div style="height:100%" class="flex"><img style="width:5vh" src="./images/icons/coin.png" /><div class="flex" style="height:100%;font-size:2.4vh !important;color:#f7f7f7cc !important;padding-left:2vh">${_missionGain} ${getLangData('Gold')} (+Bonus)</div></div></div>
+					_table += `<div class="flex" style="width:100%;height:5cqh"><div style="height:100%" class="flex"><img style="width:5cqh" src="${_reward.src ?? './images/icons/' + _reward.key + '.png'}" /><div class="flex" style="height:100%;font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">${_reward.count ?? 1}x ${getLangData(_reward.title ?? _reward.type).toProperCase()}</div></div></div>`;
+				_table += `<div class="flex" style="width:100%;padding:2cqh 0 1cqh 0;color:#F4BB44 !important; font-size:2.6cqh !important; font-weight: 600">${getLangData('Mission Rewards')}</div>
+				<div class="flex" style="width:100%;height:5cqh"><div style="height:100%" class="flex"><img style="width:5cqh" src="./images/icons/coin.png" /><div class="flex" style="height:100%;font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">${_missionGain} ${getLangData('Gold')} (+Bonus)</div></div></div>
 			`;
 			if(_t.current < 10) {
 				if(_t.max < _t.current)
@@ -819,15 +902,15 @@ function map(_m) {
 			else 
 				_needUpdateFirst = 1;
 		}
-		_table += `</div><div class="flex" style="width:100%;height:8vh">
-			<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
-				<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important;line-height:3vh !important" onexactclick="hideMyModalPopUp(1);reviveAtLobby()">${getLangData('QUIT')}</div>
+		_table += `</div><div class="flex" style="width:100%;height:8cqh">
+			<div class="flex" style="width:calc(50% - 1cqh);margin-right:1cqh;overflow:hidden;position:relative;height:100%">
+				<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3cqh !important;line-height:3cqh !important" onexactclick="hideMyModalPopUp(1);reviveAtLobby()">${getLangData('QUIT')}</div>
 			</div>
-			<div class="${_fail ? 'd-none' : 'flex'}" style="width:calc(50% - 1vh);margin-left:1vh;overflow:hidden;position:relative;height:100%">
-				<div class="game-menu-button btn-info full flex animate-me${_needUpdateFirst ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important;line-height:3vh !important" onexactclick="trySwitchMap(${episode.id})">${getLangData('NEXT')}</div>
+			<div class="${_fail ? 'd-none' : 'flex'}" style="width:calc(50% - 1cqh);margin-left:1cqh;overflow:hidden;position:relative;height:100%">
+				<div class="game-menu-button btn-info full flex animate-me${_needUpdateFirst ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3cqh !important;line-height:3cqh !important" onexactclick="trySwitchMap(${episode.id})">${getLangData('NEXT')}</div>
 			</div>
-			<div class="${_fail ? 'flex' : 'd-none'}" style="width:calc(50% - 1vh);margin-left:1vh;overflow:hidden;position:relative;height:100%">
-				<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important;line-height:3vh !important" onexactclick="trySwitchMap(${episode.id})">${getLangData('RETRY')}</div>
+			<div class="${_fail ? 'flex' : 'd-none'}" style="width:calc(50% - 1cqh);margin-left:1cqh;overflow:hidden;position:relative;height:100%">
+				<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3cqh !important;line-height:3cqh !important" onexactclick="trySwitchMap(${episode.id})">${getLangData('RETRY')}</div>
 			</div>
 		</div>`;
 		pvpStatus.innerHTML = _table + '</div>';
@@ -906,30 +989,30 @@ function map(_m) {
 		else
 			mainCharacter.immobilize = true;
 		//const _missionGain = _fail ? 0 : (!_diff ? 0 : _diff * 100);
-		let _table = '<div class="flex full pvp-result-table tower-result"><div class="flex" style="width:100%;height:16vh;position:relative"><span style="margin-top:4.7vh;z-index:2;font-size:3.15vh !important;font-weight:600;text-shadow:0px 0px 1vh #000;color:' + (_fail ? 'crimson' : '#F4BB44') + ' !important">' + getLangData('Mission' + (_fail ? ' Failed' : ' Cleared')) + '!</span></div><div style="width:100%;overflow-y:auto;height:calc(100% - 24vh);z-index:2"><div style="width:100%" class="flex"><span>';
+		let _table = '<div class="flex full pvp-result-table tower-result"><div class="flex" style="width:100%;height:16cqh;position:relative"><span style="margin-top:4.7cqh;z-index:2;font-size:3.15cqh !important;font-weight:600;text-shadow:0px 0px 1cqh #000;color:' + (_fail ? 'crimson' : '#F4BB44') + ' !important">' + getLangData('Mission' + (_fail ? ' Failed' : ' Cleared')) + '!</span></div><div style="width:100%;overflow-y:auto;height:calc(100% - 24cqh);z-index:2"><div style="width:100%" class="flex"><span>';
 		_table += `</span></div>`;
 		let _reachedMax = false;
-		_table += `<div class="flex flex-jc-start" style="z-index:2;width:100%;padding:2vh 0 1vh 0;color:#F3F4F5 !important; font-size:2.6vh !important;padding-top: 4%;padding: 1%;border-bottom: 1px solid #9d987f60">${getLangData('Finish Rewards')}</div>`;
-		_table += `<div class="flex flex-jc-start" style="padding:4% 2%;z-index:2;width:100%"><div class="flex flex-ai-end"><img style="width:5vh" src="./images/icons/gold.png" /><div style="font-size:2.4vh !important;color:#f7f7f7cc !important;padding-left:2vh">&nbsp;x&nbsp;${_goldGain}</div></div></div>`;
+		_table += `<div class="flex flex-jc-start" style="z-index:2;width:100%;padding:2cqh 0 1cqh 0;color:#F3F4F5 !important; font-size:2.6cqh !important;padding-top: 4%;padding: 1%;border-bottom: 1px solid #9d987f60">${getLangData('Finish Rewards')}</div>`;
+		_table += `<div class="flex flex-jc-start" style="padding:4% 2%;z-index:2;width:100%"><div class="flex flex-ai-end"><img style="width:5cqh" src="./images/icons/gold.png" /><div style="font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">&nbsp;x&nbsp;${_goldGain}</div></div></div>`;
 		if(!_fail && _missionGain > 0)
-			_table += `<div class="flex flex-jc-start" style="z-index:2;width:100%;padding:2vh 0 1vh 0;color:#F3F4F5 !important; font-size:2.6vh !important; ;padding-top: 4%;padding: 1%;border-bottom: 1px solid #9d987f60">${getLangData('Mission Rewards')}</div>
-				<div class="flex flex-jc-start" style="padding:4% 2%;z-index:2;width:100%"><div class="flex"><img style="width:5vh" src="./images/icons/coin.png" /><div style="font-size:2.4vh !important;color:#f7f7f7cc !important;padding-left:2vh">&nbsp;x&nbsp;${_missionGain} (+Bonus)</div></div></div>`;
+			_table += `<div class="flex flex-jc-start" style="z-index:2;width:100%;padding:2cqh 0 1cqh 0;color:#F3F4F5 !important; font-size:2.6cqh !important; ;padding-top: 4%;padding: 1%;border-bottom: 1px solid #9d987f60">${getLangData('Mission Rewards')}</div>
+				<div class="flex flex-jc-start" style="padding:4% 2%;z-index:2;width:100%"><div class="flex"><img style="width:5cqh" src="./images/icons/coin.png" /><div style="font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">&nbsp;x&nbsp;${_missionGain} (+Bonus)</div></div></div>`;
 		//_t.current++;
 		// if(_miss.limit <= _t.current)
 		// 	_reachedMax = 1;
 		updateGold(_missionGain + _goldGain);
-		_table += `</div><div class="flex" style="width:100%;height:8vh;z-index:2">
-			<div class="flex" style="width:calc(50% - 1vh);margin-left:1vh;overflow:hidden;position:relative;height:100%">
-				<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="quitFromStory()">${getLangData('QUIT')}</div>
+		_table += `</div><div class="flex" style="width:100%;height:8cqh;z-index:2">
+			<div class="flex" style="width:calc(50% - 1cqh);margin-left:1cqh;overflow:hidden;position:relative;height:100%">
+				<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3cqh !important" onexactclick="quitFromStory()">${getLangData('QUIT')}</div>
 			</div>
-			<div class="flex" style="width:calc(50% - 1vh);margin-left:1vh;overflow:hidden;position:relative;height:100%">
-				<div class="game-menu-button btn-info full flex animate-me${_reachedMax ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="loadLastStoryCheckPoint()">${getLangData('RETRY')}</div>
+			<div class="flex" style="width:calc(50% - 1cqh);margin-left:1cqh;overflow:hidden;position:relative;height:100%">
+				<div class="game-menu-button btn-info full flex animate-me${_reachedMax ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3cqh !important" onexactclick="loadLastStoryCheckPoint()">${getLangData('RETRY')}</div>
 			</div>
 		</div>`;
 		//pvpStatus.innerHTML = _table + '</div>';
 		const _parent = document.createElement('div');
 		_parent.innerHTML = `<div class="flex my-pop-up-wrapper show" id="pvp-result">
-				<div id="game-over-pvp-content" class="flex" style="padding: 2%; width: 50%; height: 80%; border: 2px solid #b8860bcc; border-radius: 4vh; box-shadow: 0px 0px 2vh #000; background: linear-gradient(180deg, #000000cc, #00000099), url(./images/icons/battle.png); background-size:cover">
+				<div id="game-over-pvp-content" class="flex" style="padding: 2%; width: 50%; height: 80%; border: 2px solid #b8860bcc; border-radius: 4cqh; box-shadow: 0px 0px 2cqh #000; background: linear-gradient(180deg, #000000cc, #00000099), url(./images/icons/battle.png); background-size:cover">
 					<div style="width:100%" class="flex full">
 						<div class="full" style="width:80%;color:#fff;text-align:center" id="pvp-status">`
 							+ _table + '</div>' +
@@ -949,8 +1032,13 @@ function map(_m) {
 		// 	return;
 		// this.lastPvPTimeCheck = _gameTick;
 		let _end, _diff;
+		let _holdIntro = false;
 		if (!this.pvpStarted) {
-			this.pvpStarted = Date.now();
+			const _clock = this.duelStartedAt || (this.season === 500 ? window.__duelClock : 0);
+			if(_clock)
+				delete window.__duelClock;
+			this.pvpStarted = _clock ? _clock + 3000 : Date.now();
+			_holdIntro = !_clock || (Date.now() - this.pvpStarted) < 1000;
 			const _splash = document.getElementById('splash');
 			addClass(_splash, 'd-none');
 			const _ts = document.getElementById('tip-screen');
@@ -960,16 +1048,20 @@ function map(_m) {
 			pvpCounter = document.createElement('div');
 			pvpCounter.className = 'flex animate-me countdown pop2';
 			pvpCounter.id = 'pvp-counter';
-			pvpCounter.innerHTML = this.tower ? '<span style="font-weight:600;color:crimson!important">FLOOR ' +__account.missions.find(x => x.key === 'tower').current + '</span>' : 3;
-			if(!this.tower)
+			if(this.tower)
+				pvpCounter.innerHTML = '<span style="font-weight:600;color:crimson!important">FLOOR ' +__account.missions.find(x => x.key === 'tower').current + '</span>';
+			else if(_holdIntro) {
+				pvpCounter.innerHTML = 3;
 				this.playSound({ key: 'beep', volume:.3 });
+			}
 			_gameUI.appendChild(pvpCounter);
 		}
-		else {
+		if(!_holdIntro) {
 			let _baseTime = this.baseTime;
 			if(!_baseTime) 
 				_baseTime = ((this.tower && (__account.missions.find(x => x.key === 'tower').current % 10) > 0) || this.gold) ? 60 : 180;
-			_diff = (_baseTime + (this.tower ? 4 : 3)) - MathFloor(((this.pauseTime ?? Date.now()) - this.pvpStarted) / 1000);
+			const _clockNow = this.realTime ? Date.now() : (this.pauseTime ?? Date.now());
+			_diff = (_baseTime + (this.tower ? 4 : 3)) - MathFloor((_clockNow - this.pvpStarted) / 1000);
 			if (_diff < 10)
 				addClass(pvpCounter, 'pvp-end-soon');
 			if (_diff < 0 || (_diff > _baseTime && this.challangeStarted)) {
@@ -1018,6 +1110,13 @@ function map(_m) {
 			// 		pvpCounter.innerText = _diff;
 			// }
 			else {
+				if(this.missionCountDown && _diff >= 0) {
+					if(!document.getElementById('score-board'))
+						this.addScoreBoard();
+					if(this.beforePVPStart)
+						this.beforePVPStart();
+					delete this.missionCountDown;
+				}
 				const diffStr = _diff.toString();
 				const currentText = pvpCounter.textContent;
 
@@ -1096,11 +1195,24 @@ function map(_m) {
 						_ghost.autoMode = undefined;
 						_ghost.unseen = false;
 						_ghost.located = true;
-						warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/ghost.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('You are in ghost mode') + '</span></div>', null, null, 1);
+						warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/ghost.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('You are in ghost mode') + '</span></div>', null, null, 1);
 					}
 				}
 			}
 			_deads?.forEach(x => {
+				if (this.realTime) {
+					if (!x.grayAvatar) {
+						const _own = x.main || x.socketId === __socketId || x.duelSocket === __socketId;
+						const _myBot = this.duelLeader && x.duelBot && !x.realTime;
+						if (_own || _myBot) {
+							const _killer = this.enemies.find(y => y && y.key === x.killedBy);
+							const _ks = typeof duelKillerSocket === 'function' ? duelKillerSocket(_killer) : undefined;
+							if (_ks)
+								applyDuelKill(x, _ks);
+						}
+					}
+					return;
+				}
 				if (!x.grayAvatar) {
 					x.grayAvatar = true;
 					const _killer = episode.enemies.find(y => y.key === x.killedBy);
@@ -1116,7 +1228,7 @@ function map(_m) {
 							if(episode.winningTeam && episode.winningTeam !== _killer.teamId) {
 								//comeback
 								const isMain = mainCharacter.teamId === _killer.teamId;
-								//warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/flag' + _killer.teamId + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Comeback') + '!</span></div>', null, null, 1);
+								//warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/flag' + _killer.teamId + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Comeback') + '!</span></div>', null, null, 1);
 								PlaySound({ key: isMain ? 'comebackwin' : 'comebackloose', volume: 1 });
 							}
 							episode.winningTeam = _killer.teamId;
@@ -1130,7 +1242,7 @@ function map(_m) {
 					}
 					if(x.pvpRespawn)
 						x.addPVPRespawnFrame();
-					warn('<div class="pvp-kill">' + _msg + (_killer.main ? __account.name : _killer.displayName ?? _killer.name) + '&nbsp;<span style="color:' + (_killer.enemy ? 'red' : 'blue') + ' !important">' + getLangData('killed') + '</span>&nbsp;' + (x.main ? __account.name : x.displayName ?? x.name) + '</div>', 'level-up', null, null, 1);
+					warn('<div class="pvp-kill">' + _msg + (_killer.main ? __account.name : _killer.displayName ?? _killer.name) + '&nbsp;<span class="' + (_killer.enemy ? 'red' : 'blue') + '-killed">' + getLangData('killed') + '</span>&nbsp;' + (x.main ? __account.name : x.displayName ?? x.name) + '</div>', 'level-up', null, null, 1);
 				}
 				else
 					return;
@@ -1143,7 +1255,7 @@ function map(_m) {
 		}
 		const _eCount = _enemies?.length ?? 0;
 		const _tCount = _teamMates?.length ?? 0;
-		if(!this.pauseTime && this.canPause !== false && (!_enemies?.filter(x => !x.isDead())?.length || !_teamMates?.filter(x => !x.isDead())?.length))
+		if(!this.realTime && !this.pauseTime && this.canPause !== false && (!_enemies?.filter(x => !x.isDead())?.length || !_teamMates?.filter(x => !x.isDead())?.length))
 			this.pauseTime = Date.now();
 		if(_deads?.length) {
 			if((_deads.filter(x => x.remove)?.length ?? 0) < _deads.length)
@@ -1160,12 +1272,12 @@ function map(_m) {
 					const _team2 = this.enemies.filter(x => x.teamId === 2 && !x.ghosted);
 					const _warFinalRow = function(_p, _teamId) {
 						if(!_p)
-							return `<div class="war-final-screen-row flex"><div class="war-final-screen-cell-50 flex flex-jc-start"></div><div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1vh"></div><div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2vh"></div></div>`;
+							return `<div class="war-final-screen-row flex"><div class="war-final-screen-cell-50 flex flex-jc-start"></div><div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1cqh"></div><div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2cqh"></div></div>`;
 						return `<div class="war-final-screen-row flex${_p.main ? ' war-final-screen-row-me' : ''}">
 							<div class="war-final-screen-cell-50 flex flex-jc-start">${_p.main ? __account.name : (_p.displayName ?? _p.name ?? '')}</div>
-							<div class="war-final-screen-cell-25 flex flex-jc-center" style="padding-right:1vh"><img src="./images/ui/game/duel-kill-count.png" />&nbsp;${_p.killCount ?? 0}</div>
+							<div class="war-final-screen-cell-25 flex flex-jc-center" style="padding-right:1cqh"><img src="./images/ui/game/duel-kill-count.png" />&nbsp;${_p.killCount ?? 0}</div>
 							<div class="war-final-${_teamId === 1 ? 'blue' : 'red'}-vertical-separator"></div>
-							<div class="war-final-screen-cell-25 flex flex-jc-center" style="padding-right:2vh"><img src="./images/ui/game/duel-dead-count.png" />&nbsp;${_p.isDead() ? 1 : 0}</div>
+							<div class="war-final-screen-cell-25 flex flex-jc-center" style="padding-right:2cqh"><img src="./images/ui/game/duel-dead-count.png" />&nbsp;${_p.isDead() ? 1 : 0}</div>
 						</div>`;
 					};
 					let _rewardsHtml = '';
@@ -1175,28 +1287,28 @@ function map(_m) {
 						//__account.pvp.honor+=_honorCount;
 						_client.saveState();
 						_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:1});
-						// _rewardsHtml = `<div class="flex w-100" style="padding:1vh 0;color:#F4BB44 !important; font-size:3.15vh !important; font-weight: 600">
+						// _rewardsHtml = `<div class="flex w-100" style="padding:1cqh 0;color:#F4BB44 !important; font-size:3.15cqh !important; font-weight: 600">
 						// 				${getLangData('Victory Rewards')}
 						// 			</div>
 						// 			<div class="flex w-100">
-						// 				<div class="flex" style="height:4.5vh">
-						// 					<img style="width:4vh" src="./images/icons/honor.png" />
-						// 					<div style="font-size:3vh !important;color:#f7f7f7cc !important;padding-left:2vh">+1 ${getLangData('Win Bonus')}</div>
+						// 				<div class="flex" style="height:4.5cqh">
+						// 					<img style="width:4cqh" src="./images/icons/honor.png" />
+						// 					<div style="font-size:3cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">+1 ${getLangData('Win Bonus')}</div>
 						// 				</div>
 						// 			</div>`;
 						// if(mainCharacter.killCount > 0)
 						// 		_rewardsHtml += `<div class="flex w-100">
-						// 				<div class="flex" style="height:4.5vh">
-						// 					<img style="width:4vh" src="./images/icons/honor.png" />
-						// 					<div style="font-size:3vh !important;color:#f7f7f7cc !important;padding-left:2vh">+${mainCharacter.killCount} ${getLangData('Kill Bonus')}</div>
+						// 				<div class="flex" style="height:4.5cqh">
+						// 					<img style="width:4cqh" src="./images/icons/honor.png" />
+						// 					<div style="font-size:3cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">+${mainCharacter.killCount} ${getLangData('Kill Bonus')}</div>
 						// 				</div>
 						// 			</div>`;
 					}
 					else
 						_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:0});
 					_table = `<div class="flex full pvp-result-table arena-result" style="height:68%">
-								<div class="flex d-none" style="width:100%;height:11vh;position:relative">
-									<span style="margin-top:5vh;z-index:2;font-size:3.15vh !important;font-weight:600;text-shadow:0px 0px 1vh #000;color:${(!_status ? 'crimson' : '#F4BB44')} !important">${getLangData(!_status ? 'Defeat' : (_status > 1 ? 'Victory' : 'Draw'))}</span>
+								<div class="flex d-none" style="width:100%;height:11cqh;position:relative">
+									<span style="margin-top:5cqh;z-index:2;font-size:3.15cqh !important;font-weight:600;text-shadow:0px 0px 1cqh #000;color:${(!_status ? 'crimson' : '#F4BB44')} !important">${getLangData(!_status ? 'Defeat' : (_status > 1 ? 'Victory' : 'Draw'))}</span>
 								</div>
 								<div class="flex" style="width:100%;overflow-y:auto;height:100%">
 									<div class="war-final-screen flex w-100">
@@ -1229,9 +1341,9 @@ function map(_m) {
 										+ _rewardsHtml +
 									`</div>
 								</div>
-								<div class="flex d-none" style="width:100%;height:6vh">
+								<div class="flex d-none" style="width:100%;height:6cqh">
 									<div class="flex w-100" style="overflow:hidden;position:relative;height:100%">
-										<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(null, __storySceneOrder)">${getLangData('QUIT')}</div>
+										<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3cqh !important" onexactclick="switchStoryScene(null, __storySceneOrder)">${getLangData('QUIT')}</div>
 									</div>
 								</div>
 							</div>`;
@@ -1289,18 +1401,18 @@ function map(_m) {
 								updateGlobalQuest('pvp-league-silver');
 							else if(_newOrder > 1000)
 								updateGlobalQuest('pvp-league-gold');
-							warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/pvp.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Pvp League Updated') + '</span></div>', null, null, 1);
+							warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/pvp.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Pvp League Updated') + '</span></div>', null, null, 1);
 						}
-						// _table += `<div class="flex" style="width:100%;padding:4vh 0 1vh 0;color:#F4BB44 !important; font-size:2.6vh !important; font-weight: 600">${getLangData('Duel Rewards')}</div>
-						// 	<div class="flex" style="width:100%"><div class="flex"><img style="width:5vh" src="./images/icons/honor.png" /><div style="font-size:2.4vh !important;color:#f7f7f7cc !important;padding-left:2vh">+1 ${getLangData('Honor Point')}</div></div></div>`;
+						// _table += `<div class="flex" style="width:100%;padding:4cqh 0 1cqh 0;color:#F4BB44 !important; font-size:2.6cqh !important; font-weight: 600">${getLangData('Duel Rewards')}</div>
+						// 	<div class="flex" style="width:100%"><div class="flex"><img style="width:5cqh" src="./images/icons/honor.png" /><div style="font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">+1 ${getLangData('Honor Point')}</div></div></div>`;
 					}
 					_client.saveState();
-					_table += `</div><div class="flex d-none w-100" style="height:8vh">
-						<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
-							<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(null, __storySceneOrder)">${getLangData('QUIT')}</div>
+					_table += `</div><div class="flex d-none w-100" style="height:8cqh">
+						<div class="flex" style="width:calc(50% - 1cqh);margin-right:1cqh;overflow:hidden;position:relative;height:100%">
+							<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3cqh !important" onexactclick="switchStoryScene(null, __storySceneOrder)">${getLangData('QUIT')}</div>
 						</div>
-						<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
-							<div class="game-menu-button btn-info full flex animate-me${!__account.pvp.duelCount ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(function() { switchBookPage(` + (this.realTime ? '4,3' : '5,1') + `); }, __storySceneOrder)">${getLangData('BACK')}</div>
+						<div class="flex" style="width:calc(50% - 1cqh);margin-right:1cqh;overflow:hidden;position:relative;height:100%">
+							<div class="game-menu-button btn-info full flex animate-me${!__account.pvp.duelCount ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3cqh !important" onexactclick="switchStoryScene(function() { switchBookPage(` + (this.realTime ? '4,3' : '5,1') + `); }, __storySceneOrder)">${getLangData('BACK')}</div>
 						</div>
 					</div>`;
 				}
@@ -1668,7 +1780,7 @@ function map(_m) {
 				if(sprite.hitStop > 0)
 					sprite.hitStop--;
 			}
-		if(this.realTime && !this.pvpEnded && !__switchingMap)
+		if(this.realTime && !this.pvpEnded && !__switchingMap && !this._duelHoldSend)
 		{
 			const _pack = [];
 			if(!mainCharacter.ghosted && !mainCharacter.ghost) {
@@ -1686,6 +1798,8 @@ function map(_m) {
 						mainCharacter.lastRealTimePack = _last;
 						_dataItem.s = __socketId;
 						_pack.push(_dataItem);
+						if(_dataItem.n)
+							applyDuelKill(mainCharacter, _dataItem.n);
 					}
 				}
 			}
@@ -1697,7 +1811,11 @@ function map(_m) {
 				return !!(_e.realTime && !_e.duelBot);
 			};
 			const _pushActor = function(_actor) {
-				if(!_actor || _actor.main || _actor.remove || _actor.ghost || _actor.ghosted)
+				if(!_actor || _actor.main || _actor.ghost || _actor.ghosted)
+					return;
+				const _death = episode.war && _actor.health <= 0 && _actor.killedBy && !_actor.killAnnounced && _actor.class !== __spell && _actor.class !== 'minion' && _actor.class !== 'object';
+				const _gone = episode.war && _actor.remove && !_actor.removeSent && _actor.class !== __spell && _actor.class !== 'minion' && _actor.class !== 'object';
+				if(_actor.remove && !_death && !_gone)
 					return;
 				if(_actor.class === __spell || _actor.class === 'object')
 					return;
@@ -1717,13 +1835,32 @@ function map(_m) {
 				}
 				_item.s = _actor.socketId;
 				_pack.push(_item);
+				if(_actor.remove)
+					_actor.removeSent = 1;
+				if(_item.n)
+					applyDuelKill(_actor, _item.n);
 			};
 			for(const _actor of this.enemies) {
-				if(!_actor || _actor.main || _actor.remove)
+				if(!_actor || _actor.main)
 					continue;
+				const _death = this.war && _actor.health <= 0 && _actor.killedBy && !_actor.killAnnounced && _actor.class !== __spell && _actor.class !== 'minion' && _actor.class !== 'object';
+				const _gone = this.war && _actor.remove && !_actor.removeSent && duelActorMine(_actor) && _actor.class !== __spell && _actor.class !== 'minion' && _actor.class !== 'object';
+				if(_actor.remove && !_death && !_gone)
+					continue;
+				if(_gone) {
+					_pushActor(_actor);
+					continue;
+				}
 				const _roots = [_actor.owner, _actor.related].filter(Boolean);
 				if(_roots.some(r => r === mainCharacter || r.main)) {
 					_pushActor(_actor);
+					continue;
+				}
+				if(_death) {
+					const _own = _actor.socketId === __socketId || _actor.duelSocket === __socketId;
+					const _myBot = this.duelLeader && _actor.duelBot && !_actor.realTime;
+					if(_own || _myBot)
+						_pushActor(_actor);
 					continue;
 				}
 				if(!this.duelLeader)
@@ -1734,7 +1871,13 @@ function map(_m) {
 			}
 			if(!_pack.length)
 				return;
-			setTransferMessage(_pack);
+			if(String(this.roomId || '').indexOf('duel:') === 0) {
+				if(typeof relayDuelPack === 'function' && typeof duelTargets === 'function')
+					for(const _peer of duelTargets())
+						relayDuelPack(_peer, _pack);
+			}
+			else
+				setTransferMessage(_pack);
 		}
 		if(this.splash) {
 			addClass(this.splash, 'd-none');
@@ -1797,7 +1940,7 @@ function map(_m) {
 				}
 				if(_warn) {
 					_client.saveState();
-					warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/forge.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Item Is Ready') + '</span></div>',  null, null, 1);
+					warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/forge.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Item Is Ready') + '</span></div>',  null, null, 1);
 					PlaySound({ key: 'forgeready', volume: .5 });
 				}
 			}
@@ -2901,51 +3044,39 @@ function map(_m) {
 			'w' + _item.spriteWidth +
 			'h' + _item.spriteHeight;
 		const _key = _key1 + _key2 + _key3;
-		if (_key === _item.char.lastHurtSpriteKey)
+		if (_key === _item.char.lastHurtSpriteKey && _item.char.lastHurtSprite?.width > 0 && _item.char.lastHurtSprite?.height > 0)
 			return _item.char.lastHurtSprite;
 		const _arr = _isHurtFlash ? this.hurtFlashSprites : this.hurtSprites;
 		let _hs = _arr[_key1]?.[_key2]?.[_key3];
+		if (_hs && (_hs.width < 1 || _hs.height < 1)) {
+			delete _arr[_key1][_key2][_key3];
+			_hs = undefined;
+		}
 		if (!_hs) {
-			if (!this._colorizeCanvas) {
-				this._colorizeCanvas = document.createElement('canvas');
-				this._colorizeCtx = this._colorizeCanvas.getContext('2d');
-				this._colorizeCtx.imageSmoothingEnabled = false;
-			}
-			const _osc = this._colorizeCanvas;
-			let ctx = this._colorizeCtx;
-			if(!ctx) {
-				this._colorizeCtx = this._colorizeCanvas.getContext('2d');
-				this._colorizeCtx.imageSmoothingEnabled = false;
-				ctx = this._colorizeCtx;
-			}
-			_osc.width = _item.spriteWidth;
-			_osc.height = _item.spriteHeight;
-			ctx.clearRect(0, 0, _osc.width, _osc.height);
-			const _cropped = this.getCroppedSprite(_item.spriteX, _item.spriteY, _item.spriteWidth, _item.spriteHeight, 
+			const _sw = _item.spriteWidth;
+			const _sh = _item.spriteHeight;
+			if (!_sw || !_sh)
+				return undefined;
+			const _cropped = this.getCroppedSprite(_item.spriteX, _item.spriteY, _sw, _sh,
 				_item.char, _item.sprite.relativeSrc, _item.frameKey);
-			if(_cropped)
-				ctx.drawImage(_cropped, 0, 0, _osc.width, _osc.height);
+			const _sheet = _item.sprite;
+			const _useCrop = _cropped?.width > 0 && _cropped?.height > 0;
+			if (!_useCrop && (!_sheet || _sheet.notYet || !_sheet.width))
+				return undefined;
+			const out = document.createElement('canvas');
+			out.width = _sw;
+			out.height = _sh;
+			const ctx = out.getContext('2d');
+			ctx.imageSmoothingEnabled = false;
+			if (_useCrop)
+				ctx.drawImage(_cropped, 0, 0, _sw, _sh);
 			else
-				ctx.drawImage(
-					_item.sprite,
-					_item.spriteX,
-					_item.spriteY,
-					_item.spriteWidth,
-					_item.spriteHeight,
-					0, 0,
-					_osc.width,
-					_osc.height
-				);
+				ctx.drawImage(_sheet, _item.spriteX, _item.spriteY, _sw, _sh, 0, 0, _sw, _sh);
 			ctx.globalCompositeOperation = 'source-atop';
 			ctx.fillStyle = _color;
-			ctx.fillRect(0, 0, _osc.width, _osc.height);
+			ctx.fillRect(0, 0, _sw, _sh);
 			ctx.globalCompositeOperation = 'source-over';
-			const out = document.createElement('canvas');
-			out.width = _osc.width;
-			out.height = _osc.height;
-			if(_osc.width > 0)
-				out.getContext('2d').drawImage(_osc, 0, 0);
-			if (!_arr[_key1]) 
+			if (!_arr[_key1])
 				_arr[_key1] = Object.create(null);
 			if (!_arr[_key1][_key2]) _arr[_key1][_key2] = Object.create(null);
 			_arr[_key1][_key2][_key3] = _hs = out;
@@ -3173,6 +3304,41 @@ function map(_m) {
 
 	const _maxSort = 200000000;
 	let _yTol = 7 * __zoom;
+	this.getDepthDrawScaleY = function(y) {
+		const g = getGroundHeight();
+		if (!g || y == null)
+			return 1;
+		let t = y / g;
+		if (t < 0)
+			t = 0;
+		else if (t > 1)
+			t = 1;
+		const k = 0.45;
+		const far = 1 / (1 + k);
+		const u = ((1 / (1 + k * t)) - far) / (1 - far);
+		return 0.9 + 0.2 * u;
+	}
+	this.getDepthDrawScale = function(_char) {
+		if (!_char || _char.yPosition == null)
+			return 1;
+		return this.getDepthDrawScaleY(_char.yPosition);
+	}
+	this.scaleFromFoot = function(x, y, w, h, footX, footY, d) {
+		if (d === 1)
+			return { x: x, y: y, w: w, h: h };
+		return {
+			x: footX + (x - footX) * d,
+			y: footY + (y - footY) * d,
+			w: w * d,
+			h: h * d
+		};
+	}
+	this.charFoot = function(_char, yGap) {
+		return {
+			x: _char.EXACTLEFT + _char.WIDTH / 2,
+			y: this.cHeight - _char.yPosition - (yGap ?? 0) - (_char.yGap ?? 0)
+		};
+	}
 	this.getPerspectiveRate = function(_char, _force, _animation) {
 		if(_char.lastYPosition === _char.yPosition)
 			return _char.lastPerspectiveRate;
@@ -3245,6 +3411,7 @@ function map(_m) {
         // ----------------------------
 
 		offCtx.fillStyle = "#c7b8a3";
+		const _dustD = this.getDepthDrawScale(_item.char);
 
 		for (let i = d.trails.length - 1; i >= 0; i--) {
 			const t = d.trails[i];
@@ -3257,10 +3424,12 @@ function map(_m) {
 
 			offCtx.globalAlpha = t.alpha;
 
+			const _trx = t.size * 1.3;
+			const _try = t.size * 0.75;
 			offCtx.beginPath();
 			offCtx.ellipse(
-				t.worldX, t.y,
-				t.size * 1.3, t.size * 0.75,
+				t.worldX, t.y + _try * (1 - _dustD),
+				_trx * _dustD, _try * _dustD,
 				0, 0, Math.PI * 2
 			);
 			offCtx.fill();
@@ -3275,10 +3444,12 @@ function map(_m) {
         offCtx.globalAlpha = alpha;
         offCtx.fillStyle = "#d6c7b4";
 
+        const _prx = s * 1.1;
+        const _pry = s * 0.7;
         offCtx.beginPath();
         offCtx.ellipse(
-            camX, py,
-            s * 1.1, s * 0.7,
+            camX, py + _pry * (1 - _dustD),
+            _prx * _dustD, _pry * _dustD,
             0, 0, Math.PI * 2
         );
         offCtx.fill();
@@ -3901,11 +4072,12 @@ this.drawHitParticles = function(_char, x, y, direction, color, strength, revers
 			lastColor = p.color;
 		}
 
-		const _rx = p.radius * sizeMul * p.rx;
-		const _ry = p.radius * sizeMul * p.ry;
+		const _pd = this.getDepthDrawScale(_char);
+		const _rx0 = p.radius * sizeMul * p.rx;
+		const _ry0 = p.radius * sizeMul * p.ry;
 		const _px = p.x - ((_reversed ? -1 : 1) * (platformX - p.p));
 		offCtx.beginPath();
-		offCtx.ellipse(_px, p.y, _rx, _ry, 0, 0, Math.PI * 2);
+		offCtx.ellipse(_px, p.y + _ry0 * (1 - _pd), _rx0 * _pd, _ry0 * _pd, 0, 0, Math.PI * 2);
 		offCtx.fill();
 	}
 
@@ -3988,23 +4160,22 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 
 		// ---------- EASE OUT ----------
 		const ease = 1 - Math.pow(1 - r.t, 3);
+		const _rd = this.getDepthDrawScale(_char);
 
-		const radius =
-			r.startR +
-			(r.maxR - r.startR) * ease;
+		let radius =
+			(r.startR +
+			(r.maxR - r.startR) * ease) * _rd;
 
 		const alpha = r.life;
 
 		const wobble =
-			SIN_LUT[(r.t * 120 + r.wobble) % 360] * 2;
+			SIN_LUT[(r.t * 120 + r.wobble) % 360] * 2 * _rd;
 
 		// ---------- WORLD → SCREEN ----------
 		const _centerX = _char.HURTLEFT + _char._HURTBOX_half;
 		let drawX =  (offCtx.reversed ? -1 * _centerX : _centerX);
-		// if (reversed)
-		// 	drawX = this.cWidth - drawX;
-		// (platformX - r.p) ile dünya-kamera farkını uygula  ve uygularken reverse durumunu da hesaba kat
-		const drawY = r.y;
+		const _footY = _char.TOP + _char.HEIGHT;
+		let drawY = _footY + (r.y - _footY) * _rd;
 		if (r.t < 0.3) {
 
 			const coreSize = Math.max(4, radius * 0.5);
@@ -4046,7 +4217,7 @@ this.animateIFrameRipple = function (_item, _wDiff) {
 		// =========================
 		// 🔵 GLOW RING (kalın)
 		// =========================
-		const _lw = MathRound(this.cWidth / 800);
+		const _lw = MathRound((this.cWidth / 800) * _rd);
 		offCtx.beginPath();
 		offCtx.arc(drawX, drawY, radius + wobble, 0, Math.PI * 2);
 		offCtx.lineWidth = _lw * 3;
@@ -4267,7 +4438,7 @@ this.getShadowOffset = function(_char) {
 			}
 			if(!_hasDmg && (_item.char.hurting?.count > 0 || _item.skinColor))
 				_hasDmg = true;
-			if (!_item.unseen && _item.char?.shadow && !_item.char.unseen) {
+			if (!_item.unseen && _item.char?.shadow && !_item.char.unseen && !_item.alpha) {
 				const _rel = _item.char.shadow;
 				const _relZoom = _item.char.WIDTH / (_rel.width);
 				const _shadowHeight = _item.char.ZOOM * (_item.char.yGap < 5 ? 8 : _item.char.yGap) * 3;
@@ -4276,7 +4447,10 @@ this.getShadowOffset = function(_char) {
 					if(_item.char.SHADOWWIDTHRATE > 0)
 						_shadowZoomRate = _item.char.SHADOWWIDTHRATE;
 					const _shadowWidth = MathFloor(_rel.width * _relZoom);
-					const _shadowZoomedWidth = MathFloor(_shadowWidth * _shadowZoomRate);
+					const _depth = this.getDepthDrawScale(_item.char);
+					const _shadowZoomedWidth = MathFloor(_shadowWidth * _shadowZoomRate * _depth);
+					const _shadowDrawH = MathFloor(_shadowHeight * _depth);
+					const _shadowAnchor = _item.char.yGap < 5 ? 0.5 : 0.75;
 					const shadowOffset = this.getShadowOffset(_item.char);
 					offCtx.drawImage(
 						this.FootShadow, 
@@ -4285,10 +4459,9 @@ this.getShadowOffset = function(_char) {
 						_rel.width,
 						_rel.height,
 						_item.char.LEFT + MathRound((_shadowWidth - _shadowZoomedWidth) / 2) + shadowOffset.x,
-						MathRound(this.cHeight - _item.char.yPosition - (_item.char.yGap < 5 ? 
-							_shadowHeight / 2 : ((_shadowHeight * 3) / 4))),// + shadowOffset.y,
+						MathRound(this.cHeight - _item.char.yPosition - (_shadowDrawH * _shadowAnchor)),
 						_shadowZoomedWidth, 
-						MathFloor(_shadowHeight)
+						_shadowDrawH
 					);
 				}
 			}
@@ -4372,8 +4545,9 @@ this.getShadowOffset = function(_char) {
 			// }
 			if (__account.options.effect && _item.char.shadowData?.length > 0 && 
 			!_item.char.unseen && !_hurt) {
+				const _useShadowCount = _item.shadowCount > 0;
 				for (var shadowindex = 0; shadowindex < (_item.char.shadowData?.length ?? 1); shadowindex++) {
-					if ((shadowindex % (_item.char.shadowIndex ?? 2)) > 0)
+					if (!_useShadowCount && (shadowindex % (_item.char.shadowIndex ?? 2)) > 0)
 						continue;
 					_shadowItems.push(_item.char.shadowData?.[shadowindex] ?? _item);
 				}
@@ -4395,25 +4569,58 @@ this.getShadowOffset = function(_char) {
 				else if(_item.char.releaseCount)
 					delete _item.char.releaseCount;
 				if(!_item.char.releaseCount || ((_item.char.releaseCount % 8) < 4)) {
-					_wDiff = (offCtx.reversed ? -1 : 1) * ((_item.width - (_item.width * (_item.zoom ?? 1))) / 2);
-					_hDiff = (_item.height - (_item.height * (_item.zoom ?? 1)));
+					const _z = (_item.zoom ?? 1) * this.getDepthDrawScale(_item.char);
+					_wDiff = (offCtx.reversed ? -1 : 1) * ((_item.width - (_item.width * _z)) / 2);
+					_hDiff = (_item.height - (_item.height * _z));
 					if(!__batterySaveMode) {
 						_hurted = !(_item.char.readyForFatality && _item.animation === 'hurtground1') && 
 						(_hurt || _item.skinColor);// && (_item.char.frame + _item.char.start) > 0;
 						if(!_hurted && !_item.char.dead && _shadowItems?.[0]) {
-							let _shadowItemOrder = 55;
-							for(let _shadowItem of _shadowItems) {
-								if(_shadowItemOrder > 255)
-									break;
-								const _shadowSprite = this.colorizeSprite4(_item, _item.shadow + _shadowItemOrder.toString(16), 1);
-								if(_shadowSprite?.width > 0)
-									offCtx.drawImage(_shadowSprite,
-										MathRound(_shadowItem.reversed ? (-1 * _shadowItem.left) + (platformX - (_shadowItem.platformX ?? platformX))
-											: _shadowItem.left - (platformX - (_shadowItem.platformX ?? platformX))), 
-											MathRound(_shadowItem.top), 
-											_shadowItem.width,
-										_shadowItem.height);
-								_shadowItemOrder += 50;
+							if(_item.shadowCount > 0 && _item.shadow?.startsWith('#')) {
+								const _tint = this.colorizeSprite4(_item, _item.shadow.slice(0, 7), 1);
+								const _n = Math.min(4, _shadowItems.length);
+								if(_tint?.width > 0 && _n > 0) {
+									const _prevAlpha = offCtx.globalAlpha;
+									const _fade = [[], [0.8], [0.4, 0.8], [0.2, 0.6, 0.8], [0.1, 0.2, 0.4, 0.8]];
+									for(let _shadowDrawIndex = 0; _shadowDrawIndex < _n; _shadowDrawIndex++) {
+										const _shadowItem = _shadowItems[_shadowItems.length - _n + _shadowDrawIndex];
+										offCtx.globalAlpha = _prevAlpha * _fade[_n][_shadowDrawIndex];
+										const _sd = this.getDepthDrawScale(_item.char);
+										const _sw = _shadowItem.width * _sd;
+										const _sh = _shadowItem.height * _sd;
+										const _sl = _shadowItem.left + (_shadowItem.width - _sw) / 2;
+										const _st = _shadowItem.top + (_shadowItem.height - _sh);
+										offCtx.drawImage(_tint,
+											MathRound(_shadowItem.reversed ? (-1 * _sl) + (platformX - (_shadowItem.platformX ?? platformX))
+												: _sl - (platformX - (_shadowItem.platformX ?? platformX))),
+												MathRound(_st),
+												_sw,
+											_sh);
+									}
+									offCtx.globalAlpha = _prevAlpha;
+								}
+							}
+							else {
+								let _shadowItemOrder = 55;
+								for(let _shadowItem of _shadowItems) {
+									if(_shadowItemOrder > 255)
+										break;
+									const _shadowSprite = this.colorizeSprite4(_item, _item.shadow + _shadowItemOrder.toString(16), 1);
+									if(_shadowSprite?.width > 0) {
+										const _sd = this.getDepthDrawScale(_item.char);
+										const _sw = _shadowItem.width * _sd;
+										const _sh = _shadowItem.height * _sd;
+										const _sl = _shadowItem.left + (_shadowItem.width - _sw) / 2;
+										const _st = _shadowItem.top + (_shadowItem.height - _sh);
+										offCtx.drawImage(_shadowSprite,
+											MathRound(_shadowItem.reversed ? (-1 * _sl) + (platformX - (_shadowItem.platformX ?? platformX))
+												: _sl - (platformX - (_shadowItem.platformX ?? platformX))),
+												MathRound(_st),
+												_sw,
+											_sh);
+									}
+									_shadowItemOrder += 50;
+								}
 							}
 						}
 						_rotate = _item.char.rotateAngle ? (_item.char.rotateAngle * Math.PI / 180) :
@@ -4437,24 +4644,24 @@ this.getShadowOffset = function(_char) {
 						let _drawParticles = 1;
 						let _w, _x, _h, _y, _coordsSet;
 						_y = MathRound(_item.top + _hDiff) - rotateY;
-						_w = MathRound(_item.width * (_item.zoom ?? 1));
-						_h = MathRound(_item.height * (_item.zoom ?? 1));
+						_w = MathRound(_item.width * _z);
+						_h = MathRound(_item.height * _z);
 						const _flicker = _hurt ? _item.char.hurting?.flicker : null;
 						const _zapOn = _flicker != null && (_flicker % 2) === 0;
-						if(_flicker != null ? _zapOn : ((_hurted && _anim.hurt && _item.char.hurtingStart < 3 && (_hurtedCount < 4 || _item.char.main)) || _item.skinColor)) {
+						const _wantTint = _flicker != null ? _zapOn : ((_hurted && _anim.hurt && _item.char.hurtingStart < 3 && (_hurtedCount < 4 || _item.char.main)) || _item.skinColor);
+						let _hurtSprite;
+						if (_wantTint) {
 							if (_flicker == null)
 								_item.char.hurtingStart++;
-								const _hurtSprite = this.colorizeSprite4(_item, null, _item.skinColor ? 1 : null);
-								if(_hurtSprite?.width > 0)
-									offCtx.drawImage(_hurtSprite,
-										MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff)) - rotateX, 
-										_y, 
-										_w * 1.02,
-										_h * 1.02);
-								_hurtedCount++;
-							// }
-							// else if(_item.char.colorized)
-							// 	_item.char.colorized = false;
+							_hurtSprite = this.colorizeSprite4(_item, null, _item.skinColor ? 1 : null);
+							_hurtedCount++;
+						}
+						if (_hurtSprite?.width > 0) {
+							offCtx.drawImage(_hurtSprite,
+								MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff)) - rotateX,
+								_y,
+								_w * 1.02,
+								_h * 1.02);
 						}
 						else
 						{
@@ -4485,8 +4692,8 @@ this.getShadowOffset = function(_char) {
 										MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff + _zoomedBLeft) : 
 										(_item.left + _wDiff - _zoomedBLeft)) - rotateX, 
 										MathRound(_item.top + _hDiff - _zoomedBTop) - rotateY, 
-										MathRound(_zoomedBWidth * (_item.zoom ?? 1)),
-										MathRound(_zoomedBHeight * (_item.zoom ?? 1)));
+										MathRound(_zoomedBWidth * _z),
+										MathRound(_zoomedBHeight * _z));
 							}
 							else if(_item.char.borderIndex >= 0)
 								delete _item.char.borderIndex;
@@ -4640,8 +4847,8 @@ this.getShadowOffset = function(_char) {
 							if(!_coordsSet) {
 								_x = MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff));
 								_y = MathRound(_item.top + _hDiff);
-								_w = MathRound(_item.width * (_item.zoom ?? 1));
-								_h = MathRound(_item.height * (_item.zoom ?? 1));
+								_w = MathRound(_item.width * _z);
+								_h = MathRound(_item.height * _z);
 							}
 							const _knockback = _item.char.animation.startsWith('knockback');
 							let _hs = _item.char.hurtingStrength;
@@ -4673,13 +4880,14 @@ this.getShadowOffset = function(_char) {
 								_restored = 1;
 							}
 							const _text = getLangData(_item.char.text.value).toLocaleUpperCase(getLang());
-							if(offCtx.font !== 'bold 3vh immortal')
-								offCtx.font = "bold 3vh immortal";
+							if(offCtx.font !== 'bold 3cqh immortal')
+								offCtx.font = "bold 3cqh immortal";
 							offCtx.fillStyle = "#1B1212";
 							offCtx.textAlign = 'center';
+							const _td = this.getDepthDrawScale(_item.char);
 							offCtx.fillText(_text, 
-								MathRound((_item.left + _wDiff - (_item.char.ZOOM * _item.char.text.left))), 
-								MathRound(_item.top + _hDiff + (_item.char.ZOOM * _item.char.text.top)));
+								MathRound((_item.left + _wDiff - (_item.char.ZOOM * _item.char.text.left * _td))), 
+								MathRound(_item.top + _hDiff + (_item.char.ZOOM * _item.char.text.top * _td)));
 							if(_restored) {
 								offCtx.save();
 								offCtx.scale(-1, 1);
@@ -4688,7 +4896,9 @@ this.getShadowOffset = function(_char) {
 					}
 				}
 			}
-			if (!_item.char.friendly && !_item.char.skipHealthBar && (!_anim?.skipHealthBar || _item.char.health <= 0 || _item.char.dead || _item.char.hbBreak >= 0))
+			const _myTeam = mainCharacter?.realTeamId ?? mainCharacter?.teamId;
+			const _mateSign = (this.war || this.realTime) && _myTeam && _item.char.teamId === _myTeam && !_item.char.main && _item.char.class !== __spell && _item.char.class !== 'object';
+			if (_mateSign || (!_item.char.friendly && !_item.char.skipHealthBar && (!_anim?.skipHealthBar || _item.char.health <= 0 || _item.char.dead || _item.char.hbBreak >= 0)))
 				this.drawHealthBar2(_item);
 			this.checkBubbleText(_item.char);
 			if (_item.shadow 
@@ -4697,6 +4907,11 @@ this.getShadowOffset = function(_char) {
 			) {
 				if (!_item.char.shadowData)
 					_item.char.shadowData = [];
+				else if (_item.shadowCount > 0) {
+					const _keep = Math.min(4, _item.shadowCount);
+					if (_item.char.shadowData.length >= _keep)
+						_item.char.shadowData.splice(0, _item.char.shadowData.length - _keep + 1);
+				}
 				else if (_item.char.shadowData.length > (_item.char.class === 'boss' ? 3 : 1))
 				_item.char.shadowData.splice(0, _item.char.shadowIndex ?? 2);
 				_item.platformX = platformX;
@@ -6594,7 +6809,7 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 	// 		if(hbInner && 
 	// 			hbInner.gradeLeft != _item.char.gradeLeft) {
 	// 			hbInner.gradeLeft = _item.char.gradeLeft;
-	// 			hb.innerHTML = hb.innerHTML + '<span style="position:absolute;height:100%;display:flex;align-items:center;left:1vw;top:0;color:#f7f7f7 !important;text-shadow:0 0 .5vh #000">Lvl ' + _item.char.level + ' - ' + _item.char.displayName + '</span><span id="boss-grade-count" style="color:#f7f7f7 !important;text-shadow:0 0 .5vh #000;position:absolute;top:0;height:100%;right:1vw;display:flex;align-items:center">' + (_item.char.gradeLeft > 0 ? 'x' + (_item.char.gradeLeft + 1) : '') + '</span>';
+	// 			hb.innerHTML = hb.innerHTML + '<span style="position:absolute;height:100%;display:flex;align-items:center;left:1cqw;top:0;color:#f7f7f7 !important;text-shadow:0 0 .5cqh #000">Lvl ' + _item.char.level + ' - ' + _item.char.displayName + '</span><span id="boss-grade-count" style="color:#f7f7f7 !important;text-shadow:0 0 .5cqh #000;position:absolute;top:0;height:100%;right:1cqw;display:flex;align-items:center">' + (_item.char.gradeLeft > 0 ? 'x' + (_item.char.gradeLeft + 1) : '') + '</span>';
 	// 		}
 	// 		hb.scrLeft = _hLeft;
 	// 		hb.scrTop = _hTop;
@@ -6802,7 +7017,9 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		}
 		if (!this._barDeathQueue)
 			this._barDeathQueue = [];
-		this._barDeathQueue.push({ c:_char, x: _hLeft, y: _hTop, w: w, h: h, step: step, img: img, bossPad: _gradeBar, life: _life });
+		const _foot = this.charFoot(_char, _item.yGap);
+		const _box = this.scaleFromFoot(_hLeft, _hTop, w, h, _foot.x, _foot.y, this.getDepthDrawScale(_char));
+		this._barDeathQueue.push({ c:_char, x: _box.x, y: _box.y, w: _box.w, h: _box.h, step: step, img: img, bossPad: _gradeBar, life: _life });
 	}
 	this.drawHealthBarDeath = function (ctx, x, y, w, h, step, img, bossPad, life) {
 		if (!img || w < 1 || h < 1)
@@ -6836,7 +7053,7 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 	}
 	this.drawMobHealthBar = function (ctx, _item, x, y, w) {
 		const _char = _item.char;
-		const h = MathRound(w * (26 / 124));
+		let h = MathRound(w * (26 / 124));
 
 		let ratio = _char.health / _char.MAXHP;
 		if (ratio < 0) ratio = 0;
@@ -6856,7 +7073,13 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		_char.previousHPRatio = ratio;
 
 		// 🔑 WORLD-SPACE FIX
-		const drawX = ctx.reversed ? (-x - w) : x;
+		let drawX = ctx.reversed ? (-x - w) : x;
+		const _foot = this.charFoot(_char, _item.yGap);
+		const _box = this.scaleFromFoot(drawX, y, w, h, ctx.reversed ? -_foot.x : _foot.x, _foot.y, this.getDepthDrawScale(_char));
+		drawX = _box.x;
+		y = _box.y;
+		w = _box.w;
+		h = _box.h;
 
 		let _ps = 1;
 		if (_char.hbPulse > 0) {
@@ -6960,6 +7183,12 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 			h = MathRound(h * .6);
 			w = MathRound(w * .6);
 		}
+		const _foot = this.charFoot(_char, _item.yGap);
+		const _box = this.scaleFromFoot(x, y, w, h, _foot.x, _foot.y, this.getDepthDrawScale(_char));
+		x = _box.x;
+		y = _box.y;
+		w = _box.w;
+		h = _box.h;
 		// HP Ratio
 		let ratio = Math.max(0, Math.min(1, _char.health / _char.MAXHP));
 
@@ -7090,6 +7319,30 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		}
 	};
 
+	this.playerTag = function(_char) {
+		if(!_char || _char.class === __spell || _char.class === 'object' || _char.class === 'minion')
+			return;
+		if(_char.main || _char === mainCharacter)
+			return this.meSign;
+		if(!this._playerTags) {
+			const _myTeam = mainCharacter?.realTeamId ?? mainCharacter?.teamId;
+			const _sid = function(x) {
+				return String(x.socketId || x.duelSocket || x.key || x.id || '');
+			};
+			const _body = function(x) {
+				return x && x !== mainCharacter && !x.main && x.class !== __spell && x.class !== 'object' && x.class !== 'minion' && !x.ghost;
+			};
+			const _mates = this.enemies.filter(x => _body(x) && _myTeam && x.teamId === _myTeam);
+			const _foes = this.enemies.filter(x => _body(x) && !(_myTeam && x.teamId === _myTeam));
+			_mates.sort((a, b) => _sid(a).localeCompare(_sid(b)));
+			_foes.sort((a, b) => _sid(a).localeCompare(_sid(b)));
+			const _map = new Map();
+			_mates.forEach((x, i) => _map.set(x, i ? this.p2Sign : this.p1Sign));
+			_foes.forEach(x => _map.set(x, this.rivalSign));
+			this._playerTags = _map;
+		}
+		return this._playerTags.get(_char);
+	}
 	this.drawHealthBar2 = function (_item) {
 		const _isPvp = !this.gold && ((this.pvp || this.war) || _item.char.flagCapturer);
 		if (_item.char.hbBreak === -1 && (_item.char.health <= 0 || _item.char.dead))
@@ -7098,7 +7351,9 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 			this.queueHealthBarDeath(_item);
 			return;
 		}
-		if(__batterySaveMode || _item.char.skipHealthBar || _item.char.health <= 0 || _item.char.dead)
+		if(__batterySaveMode || _item.char.health <= 0 || _item.char.dead)
+			return;
+		if(_item.char.skipHealthBar && !_isPvp)
 			return;
 
 		// if(!(_item.char.grade > 1))
@@ -7119,14 +7374,6 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 				return;
 		}
 		else{
-			const _isBoss = _item.char.class === 'boss';
-
-			let _hWidth = MathRound((this.cWidth / 100) * (_isBoss ? 10 : 4));
-			if (_item.char.healthBarWidthRate)
-				_hWidth = MathRound(_item.char.healthBarWidthRate * _hWidth);
-
-			const _xGap = MathRound((_item.char.WIDTH - _hWidth) / 2);
-			const _hLeft = MathRound(_item.char.EXACTLEFT + _xGap);
 			const isWarPlayer = _item.char.enemy;
 			const _extraTop = isWarPlayer ? MathRound(-40 * __zoom * __scale) : MathRound(-10 * __zoom * __scale);
 			let _hHeight = this.cUIHeight / 75;
@@ -7142,37 +7389,25 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 				- (_item.yGap ?? 0)
 				- ((_item.char.yGap ?? 0))
 			);
-			const c = document.createElement('canvas');
-			const _ch = _hHeight * 2;
-			c.width = _hWidth;
-			c.height = _ch;
-			const ctx = c.getContext('2d');
-			ctx.imageSmoothingEnabled = false;
-
-			// Üçgenin noktaları
-			const _hbWidth = MathRound(this.cWidth / 30);
-			const x1 = MathRound(_hbWidth * .25), y1 = 0;   // sol üst
-			const x2 = MathRound(_hbWidth * .75), y2 = 0;  // sağ üst
-			const x3 = MathRound(_hbWidth * .5), y3 = _ch; // alt orta (uç)
-
-			// Çizim
-			ctx.beginPath();
-			ctx.moveTo(x1, y1);
-			ctx.lineTo(x2, y2);
-			ctx.lineTo(x3, y3);
-			ctx.closePath();
-
-			// Dolgu rengi
-			ctx.fillStyle = _item.char.main ? "orange" : "red";
-			ctx.fill();
-
-			// Çerçeve (opsiyonel)
-			ctx.strokeStyle = "black";
-			ctx.lineWidth = MathCeil(episode.cHeight / 500);
-			ctx.stroke();
+			const _sign = this.playerTag(_item.char);
 			if(offCtx.reversed)
 				offCtx.restore();
-			offCtx.drawImage(c, _hLeft, _hTop);
+			if(_sign) {
+				const _base = Math.max(32, MathRound(this.cWidth / 44));
+				let _size = _base;
+				if(_sign !== this.meSign)
+					_size = MathRound(_base * 1.35);
+				if(_sign === this.rivalSign)
+					_size = MathRound(_size * 1.26);
+				const _tx = MathRound(_item.char.EXACTLEFT + (_item.char.WIDTH / 2) - (_size / 2));
+				const _ty = _hTop + MathRound(_hHeight * 2) - _size;
+				const _foot = this.charFoot(_item.char, _item.yGap);
+				const _box = this.scaleFromFoot(_tx, _ty, _size, _size, _foot.x, _foot.y, this.getDepthDrawScale(_item.char));
+				offCtx.save();
+				offCtx.imageSmoothingEnabled = true;
+				offCtx.drawImage(_sign, _box.x, _box.y, _box.w, _box.h);
+				offCtx.restore();
+			}
 			if(offCtx.reversed) {
 				offCtx.save();
 				offCtx.scale(-1, 1);
@@ -7472,24 +7707,34 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 							spriteHeight: _rel.height
 						}, _rel.color, _rel.key + '-frame' + (_rel.frame ?? 0));
 					if(_spr?.width > 0){
+						let _dx = MathRound(_relLeft);
+						let _dy = MathRound((_rel.stillTop ?? _rel.top) - (((_rel.stillTop ? 0 : (_item.yGap ?? 0)) + ((_rel.yGap ?? 0))) / __scale));
+						let _dw = MathFloor((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom);
+						let _dh = MathFloor(_rel.height * _rel.zoom);
+						const _relFootX = _item.left + _item.width / 2;
+						const _relBox = this.scaleFromFoot(_dx, _dy, _dw, _dh, _can.reversed ? -_relFootX : _relFootX, _item.top + _item.height, this.getDepthDrawScale(_item.char));
+						_dx = _relBox.x;
+						_dy = _relBox.y;
+						_dw = MathFloor(_relBox.w);
+						_dh = MathFloor(_relBox.h);
 						if(_rel.alpha < 1) {
 							this.drawSpriteWithFade(_can, _spr, 
 								((_fl ?? 0) * _rel.width) + (_rel.baseLeft ?? 0), 
 								_ft + (_rel.baseTop ?? 0), 
 								_rel.width - (_rel.baseRight ?? 0), 
 								_rel.height,
-							MathRound(_relLeft),
-							MathRound((_rel.stillTop ?? _rel.top) - (((_rel.stillTop ? 0 : (_item.yGap ?? 0)) + ((_rel.yGap ?? 0))) / __scale)),
-							MathFloor((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom), 
-							MathFloor(_rel.height * _rel.zoom), _rel.alpha);
+							_dx,
+							_dy,
+							_dw, 
+							_dh, _rel.alpha);
 							if(_rel.fadeZoom)
 								_rel.zoom *= _rel.fadeZoom;
 						}
 						else 
 							_can.drawImage(_spr, ((_fl ?? 0) * _rel.width) + (_rel.baseLeft ?? 0), _ft + (_rel.baseTop ?? 0), _rel.width - (_rel.baseRight ?? 0), _rel.height,
-							MathRound(_relLeft),
-							MathRound((_rel.stillTop ?? _rel.top) - (((_rel.stillTop ? 0 : (_item.yGap ?? 0)) + ((_rel.yGap ?? 0))) / __scale)),
-							MathFloor((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom), MathFloor(_rel.height * _rel.zoom));
+							_dx,
+							_dy,
+							_dw, _dh);
 					}
 					if(_rel.fade) {
 						if(!_rel.alpha)
@@ -7595,11 +7840,18 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 					_fl = frameIndex % _rel.col;
 					_ft = (frameIndex / _rel.col | 0) * _rel.height;
 				}
-				if(!__batterySaveMode)
+				if(!__batterySaveMode) {
+					const _gx = MathRound(_relLeft);
+					const _gy = MathRound((_rel.stillTop ?? _rel.top) - ((_rel.yGap ?? 0) * _rel.zoom));
+					const _gw = MathFloor((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom) - (_rel.baseRight ?? 0);
+					const _gh = MathFloor(_rel.height * _rel.zoom);
+					const _gd = this.getDepthDrawScaleY(this.cHeight - (_gy + _gh));
+					const _gBox = this.scaleFromFoot(_gx, _gy, _gw, _gh, _gx + _gw / 2, _gy + _gh, _gd);
 					offGoreCtx.drawImage(_rel.sprite, (_fl ?? 0) * _rel.width, _ft + (_rel.baseTop ?? 0), _rel.width - (_rel.baseRight ?? 0), _rel.height,
-						MathRound(_relLeft),
-						MathRound((_rel.stillTop ?? _rel.top) - ((_rel.yGap ?? 0) * _rel.zoom)),
-						MathFloor((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom) - (_rel.baseRight ?? 0), MathFloor(_rel.height * _rel.zoom));
+						_gBox.x,
+						_gBox.y,
+						_gBox.w, _gBox.h);
+				}
 			}
 			if (_rel.start >= 0)
 				_rel.start++;
@@ -7935,6 +8187,16 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 
 		// DOM cleanup (safe batch)
 		document.querySelectorAll('.dmg')?.forEach?.(x => x.remove());
+		document.getElementById('filter-canvas')?.remove();
+		if (c9)
+			c9.style.opacity = 1;
+		if (typeof _canvasF !== 'undefined' && _canvasF)
+			_canvasF.style.opacity = 1;
+		if (typeof _canvasBRB !== 'undefined' && _canvasBRB)
+			_canvasBRB.style.opacity = 1;
+		if (typeof cssAnimationProps !== 'undefined')
+			for (const _k of Object.keys(cssAnimationProps))
+				delete cssAnimationProps[_k];
 
 		// canvases HARD invalidate (important)
 		const _killCanvas = (c) => {

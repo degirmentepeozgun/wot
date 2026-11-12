@@ -257,7 +257,7 @@ function dataOperations(_quickPlay) {
 			]
 		});
 		requestAnimationFrame(() => {
-			warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/mailbox.png" />&nbsp;<span style="flex:1">' + getLangData('Item Pushed Into Your Mailbox') + '</span></div>', null, null, 1);
+			warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/ui/menu-icons/mailbox.png" />&nbsp;<span style="flex:1">' + getLangData('Item Pushed Into Your Mailbox') + '</span></div>', null, null, 1);
 		});
 		this.saveMailState();
 	}

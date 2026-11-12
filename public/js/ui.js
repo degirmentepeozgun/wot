@@ -23,7 +23,7 @@ const pvpAvatarTemplate = function (char, _name) {
 					<div class="war-player-defbar-wrapper">
 						<div class="full animate-me defbar-value" style="background:#702963"></div>
 					</div>
-					<div class="buffs flex flex-jc-start" style="padding:.4vw .8vw"></div>
+					<div class="buffs flex flex-jc-start" style="padding:.4cqw .8cqw"></div>
 				</div>
 			</div>`;
 
@@ -43,7 +43,7 @@ const pvpAvatarTemplate = function (char, _name) {
 					<div>
 						<div class="full animate-me defbar-value"></div>
 					</div>
-					<div class="buffs flex flex-jc-start" style="padding:.4vw .8vw"></div>
+					<div class="buffs flex flex-jc-start" style="padding:.4cqw .8cqw"></div>
 				</div>
 			</div>
 		</div>`;
@@ -79,10 +79,10 @@ const avatarTemplate = function (char, _name) {
 					<div class="hb-frame-inner-right-bottom">
 						<div class="full defbar-value hb-frame-inner-right-bottom-inner"></div>
 					</div>
-					<div class="buffs flex flex-jc-start" style="padding:.4vw .8vw"></div>
+					<div class="buffs flex flex-jc-start" style="padding:.4cqw .8cqw"></div>
 				</div>
 			</div>
-			<img class="move-up d-none" src="./images/icons/upgrade.png" style="-webkit-filter:drop-shadow(0 0 .3vh #fff);filter:drop-shadow(0 0 .3vh #fff);z-index:2;position:absolute;width:1.8vw;left:.8vw" />
+			<img class="move-up d-none" src="./images/icons/upgrade.png" style="-webkit-filter:drop-shadow(0 0 .3cqh #fff);filter:drop-shadow(0 0 .3cqh #fff);z-index:2;position:absolute;width:1.8cqw;left:.8cqw" />
 			<img class="aid${episode?.pvp || char.main || char.isDead() || char.health >= char.MAXHP ? ' v-none' : ''}" id="aid-${char.key}" onexactclick="drinkPot(episode.enemies.find(x => x.key === '${char.key}'), mainCharacter, event)" src="./images/icons/aid.png" />`
 			if(char.main && char.heartCount > 1) {
 				_html += `<img src='./images/icons/heart.png' id='heartcount1' style="display:none" />
@@ -434,26 +434,17 @@ function moveInput(_rate) {
 }
 var keyboardHeight = 0, initialHeight;
 function resizeOuterWindow(_keyboardHeight) {
-	if(_keyboardHeight){
-		addClass(document.getElementById('wrapper'), 'scrollcontent');
+	removeClass(document.getElementById('wrapper'), 'scrollcontent');
+	if(_keyboardHeight) {
+		placeChatAboveKeyboard();
+		return;
 	}
-	else {
-		removeClass(document.getElementById('wrapper'), 'scrollcontent');
-	}
-	return;
-	if(_keyboardHeight){
-		setTimeout(() => {
-			const _focused = document.querySelector('input');
-			let _bottom = 0;
-			if(_focused) {
-				_bottom = _focused.getBoundingClientRect().bottom + (window.innerHeight * .02);
-				_bottom = keyboardHeight - (window.innerHeight - _bottom);
-				_gameUI.style.top = (-_bottom) + 'px';
-			}
-		}, 300);
-	}
-	else
-		_gameUI.style.top = keyboardHeight = 0;
+	_menuShift = 0;
+	_keyboardInput = null;
+	const _panel = document.getElementById('menu-ui');
+	if(_panel)
+		_panel.style.transform = '';
+	fitWrapperParent();
 }
 let _lastGameTick;
 function loadUI() {
@@ -561,10 +552,21 @@ function loadWindowEvents() {
 					if(episode?.hasGoSound)
 						episode.stopGoSound();	
 					episodeVisibilityHidden = _closeOpeningMusic = true;
+					if(window.__duelBgTimer)
+						clearInterval(window.__duelBgTimer);
+					window.__duelBgAt = Date.now();
+					window.__duelBgTimer = setInterval(function() {
+						if(typeof stepDuelBotsHidden === 'function')
+							stepDuelBotsHidden();
+					}, 50);
 				} else {
+					if(window.__duelBgTimer) {
+						clearInterval(window.__duelBgTimer);
+						window.__duelBgTimer = 0;
+					}
 					_gameTick = Date.now();
 					reconnectSocket();
-					if(_lastGameTick){
+					if(_lastGameTick && !episode?.realTime){
 						const _diff = (Date.now() - _lastGameTick);
 						if(episode?.enemies?.[0])
 							episode.enemies.forEach(x => {
@@ -634,7 +636,7 @@ function loadWindowEvents() {
 				_gameTick = Date.now();
 				organizeModules();
 				reconnectSocket();
-				if(_lastGameTick){
+				if(_lastGameTick && !episode?.realTime){
 					const _diff = (Date.now() - _lastGameTick);
 					if(episode?.enemies?.[0])
 							episode.enemies.forEach(x => {
@@ -687,7 +689,7 @@ function warn(_html, _class, _ms, _new, _buttons, _important, _container) {
 		return;
 	if(_toastWrappers?.[0]){
 		_toastWrappers.forEach(tw => {
-			if((tw.showTime + tw.showMS) < _gameTick){
+			if(!tw.isConnected || (tw.showTime + tw.showMS) < _gameTick){
 				tw.remove();
 				tw.removed = true;
 			}
@@ -1073,7 +1075,7 @@ function getTagSkillNode(_fr, _dir) {
 	const _tag = document.createElement('div');
 	_tag.className = `wrapper-3d fade-me-slide-${_dir === __left ? __left : __right}`;
 	_tag.innerHTML = `<div class="tag-char-area-wrapper-outer${_dir === __left ? ' rtl' : ''}">
-				<div class="tag-char-area-wrapper" style="margin-top:5vh;top:0!important">
+				<div class="tag-char-area-wrapper" style="margin-top:5cqh;top:0!important">
 					<div class="page-tear-bg full">
 						<div class="tag-char-area">
 							<div class="tag-char-area-inner full" style="background:linear-gradient(0deg, #000000cc, ${_fr.color}, ${_fr.color}, #000000cc) !important">
@@ -1305,11 +1307,11 @@ function updateExperience(_value, _levelup, _char, _noWarn) {
 		updateLevelUI(_c);
 		if (_c.main) {
 			if(!_noWarn && !_client.quickPlay && (_c.level === __pvp.unlockLevel)) {
-				warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/duel.png" />&nbsp;<span style="flex:1">' + getLangData('Pvp Content Unlocked') + '</span></div>', null, null, 1);
-				warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/rage.png" />&nbsp;<span style="flex:1">' + getLangData('Rage Mode Activated') + '</span></div>', null, null, 1);
+				warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/duel.png" />&nbsp;<span style="flex:1">' + getLangData('Pvp Content Unlocked') + '</span></div>', null, null, 1);
+				warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/rage.png" />&nbsp;<span style="flex:1">' + getLangData('Rage Mode Activated') + '</span></div>', null, null, 1);
 			}
 			if(!_noWarn && !episode?.menu){
-				//warn('<div class="flex leveling"><img style="height:14vh" src="./images/icons/level-up.png" /></div>', 'level-up');
+				//warn('<div class="flex leveling"><img style="height:14cqh" src="./images/icons/level-up.png" /></div>', 'level-up');
 				PlaySound({ key: 'levelup', volume: .5 });
 			}
 			updateGlobalQuest('level-up');
@@ -1331,7 +1333,7 @@ function updateExperience(_value, _levelup, _char, _noWarn) {
 			if (_c.skills[_key].unlockLevel === _c.level) {
 				_c.skills[_key].locked = false;
 				if(!_noWarn)
-					warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/skill.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('New skill unlocked') + '!</span></div>', null, null, 1);
+					warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/ui/menu-icons/skill.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('New skill unlocked') + '!</span></div>', null, null, 1);
 				break;
 			}
 		resetSkills(_c?.ultimate, null, _c);
@@ -1458,9 +1460,12 @@ function removeHitCount(_char) {
 	if (!_char || _char.main) {
 		addClass(_hitCount, 'v-none');
 		removeClass(_hitCount, 'minimize');
+		removeClass(_hitCount, 'squash');
 	}
-	(_char ?? mainCharacter).lastHitDate = undefined;
-	(_char ?? mainCharacter).hitCount = 0;
+	const _who = _char ?? mainCharacter;
+	_who.lastHitDate = undefined;
+	_who.hitCount = 0;
+	_who._hitShown = undefined;
 }
 
 function switchAutoMode(_off) {
@@ -1500,7 +1505,7 @@ function activatePowerSaveMode() {
 	_scr.innerHTML += `
 		<div class="flex" style="width:100%">
 			<img src="./images/icons/battery.png" style="width:30%" />
-			<div class="flex" style="width:100%;color:#f7f7f780 !important;padding:3vh;font-size:3.5vh !important">
+			<div class="flex" style="width:100%;color:#f7f7f780 !important;padding:3cqh;font-size:3.5cqh !important">
 				${getLangData('Battery Save Mode')}
 			</div>
 		</div>`;
@@ -1536,15 +1541,15 @@ function closeUserActionsModal() {
 function openGameOverModal() {
 	hideMyModalPopUp();
 	let _html = `<div style="width:100%;height:50%" class="flex">
-					<div style="width:80%;color:#f7f7f7dd;text-align:center;font-size:2.8vh !important">
+					<div style="width:80%;color:#f7f7f7dd;text-align:center;font-size:2.8cqh !important">
 						${getLangData('You died! You will revive at closest lobby after')} <span style="color:#ff6c00 !important" id="dead-countdown"></span> ${getLangData('seconds')}
 					</div>
 				</div>
 				<div style="width:100%;height:25%" class="flex">
-					<div style="color:#f7f7f7cc !important;height:90% !important;font-size:3vh !important" class="game-btn2 flex one-line" onexactclick="closeGameOverModal();reviveAtLobby()">${getLangData('Go To Village')}</div>
+					<div style="color:#f7f7f7cc !important;height:90% !important;font-size:3cqh !important" class="game-btn2 flex one-line" onexactclick="closeGameOverModal();reviveAtLobby()">${getLangData('Go To Village')}</div>
 				</div>
 				<div style="width:100%;height:25%" class="flex">
-					<div style="color:#f7f7f7cc !important;height:90% !important;font-size:3vh !important" class="game-btn2 flex one-line" onexactclick="closeGameOverModal();reviveHere()">${getLangData('Revive Here')}</div>
+					<div style="color:#f7f7f7cc !important;height:90% !important;font-size:3cqh !important" class="game-btn2 flex one-line" onexactclick="closeGameOverModal();reviveHere()">${getLangData('Revive Here')}</div>
 				</div>`;
 	document.getElementById('game-over-content').innerHTML = _html;
 	showMyModalPopUp('game-over');
@@ -1554,19 +1559,19 @@ function openUserActionsModal(_id, _name) {
 	//hideMyModalPopUp();
 	const _isFriend = __account.friends?.find(x => x.id === _id);
 	let _html = `<div style="width:100%;height:50%" class="flex">
-					<div style="width:80%;color:#f7f7f7dd;text-align:center;font-size:2.8vh !important">
+					<div style="width:80%;color:#f7f7f7dd;text-align:center;font-size:2.8cqh !important">
 						<span class="player-name">${_name}</span>
 					</div>
 				</div>
 				<div style="width:100%;height:25%" class="flex">
-					<div style="color:#f7f7f7cc !important;font-size:3vh !important" class="game-btn2 flex one-line" onexactclick="closeUserActionsModal();openChatPage();selectPersonFromBigChat('${_id}','${_name}')">${getLangData('Send Message')}</div>
+					<div style="color:#f7f7f7cc !important;font-size:3cqh !important" class="game-btn2 flex one-line" onexactclick="closeUserActionsModal();openChatPage();selectPersonFromBigChat('${_id}','${_name}')">${getLangData('Send Message')}</div>
 				</div>
 				<div style="width:100%;height:25%" class="flex">
-					<div style="color:#f7f7f7cc !important;font-size:3vh !important" class="game-btn2 flex one-line" onexactclick="closeUserActionsModal()">${getLangData('Duel Request')}</div>
+					<div style="color:#f7f7f7cc !important;font-size:3cqh !important" class="game-btn2 flex one-line" onexactclick="closeUserActionsModal()">${getLangData('Duel Request')}</div>
 				</div>
 				<div style="width:100%;height:25%" class="flex">
-					<div style="color:#f7f7f7cc !important;font-size:3vh !important" class="game-btn2 flex one-line${_isFriend ? ' d-none' : ''}" onexactclick="addAsFriend('${_id}','${_name}');openUserActionsModal('${_id}','${_name}')">${getLangData('Add Friend')}</div>
-					<div style="color:#f7f7f7cc !important;font-size:3vh !important" class="game-btn2 flex one-line${!_isFriend ? ' d-none' : ''}" onexactclick="removeFromFriend('${_id}','${_name}');openUserActionsModal('${_id}','${_name}')">${getLangData('Remove Friend')}</div>
+					<div style="color:#f7f7f7cc !important;font-size:3cqh !important" class="game-btn2 flex one-line${_isFriend ? ' d-none' : ''}" onexactclick="addAsFriend('${_id}','${_name}');openUserActionsModal('${_id}','${_name}')">${getLangData('Add Friend')}</div>
+					<div style="color:#f7f7f7cc !important;font-size:3cqh !important" class="game-btn2 flex one-line${!_isFriend ? ' d-none' : ''}" onexactclick="removeFromFriend('${_id}','${_name}');openUserActionsModal('${_id}','${_name}')">${getLangData('Remove Friend')}</div>
 				</div>
 				<div onexactclick="closeUserActionsModal()" class="user-actions-close">&times;</div>`;
 	document.getElementById('user-actions-content').innerHTML = _html;
@@ -1609,18 +1614,18 @@ function switchTipsUI(_inc) {
 
 function renderTipsUI() {
 	return `<div class="book-page-wrapper">
-		<div id="all-tips" data-order="0" style="height:calc(100% - 10vh);width:100%">`
+		<div id="all-tips" data-order="0" style="height:calc(100% - 10cqh);width:100%">`
 			+ createTipsUI(0, 1) +
 		`</div>
-		<div class="tips-nav flex" style="height:10vh;width:100%">
-			<div onexactclick="switchTipsUI(-1)" style="height:100%;width:10vh;z-index:5" class="flex flex-jc-end">
-				<img style="transform: scale(-1,1) !important;max-height:8vh;max-width:8vh" src="./images/icons/nav.png" />
+		<div class="tips-nav flex" style="height:10cqh;width:100%">
+			<div onexactclick="switchTipsUI(-1)" style="height:100%;width:10cqh;z-index:5" class="flex flex-jc-end">
+				<img style="transform: scale(-1,1) !important;max-height:8cqh;max-width:8cqh" src="./images/icons/nav.png" />
 			</div>
-			<div class="flex" style="height:100%;width:calc(100% - 20vh)">
+			<div class="flex" style="height:100%;width:calc(100% - 20cqh)">
 				${getLangData('How to play tips')}
 			</div>
-			<div onexactclick="switchTipsUI(1)" style="height:100%;width:10vh;z-index:5" class="flex flex-jc-start">
-				<img style="max-height:8vh;max-width:8vh" src="./images/icons/nav.png" />
+			<div onexactclick="switchTipsUI(1)" style="height:100%;width:10cqh;z-index:5" class="flex flex-jc-start">
+				<img style="max-height:8cqh;max-width:8cqh" src="./images/icons/nav.png" />
 			</div>
 		</div>
 	</div>`;
@@ -1628,12 +1633,12 @@ function renderTipsUI() {
 
 function renderComingSoonContent(_content) {
 	return `<div class="full flex">
-	 	<span style="text-align:center;color:#f7f7f7cc!important;font-size:3vh!important;font-weight:600"><span style="color:#ff6c00 !important">[${getLangData(_content)}]</span><br/>${getLangData('Coming Soon')}</span>
+	 	<span style="text-align:center;color:#f7f7f7cc!important;font-size:3cqh!important;font-weight:600"><span style="color:#ff6c00 !important">[${getLangData(_content)}]</span><br/>${getLangData('Coming Soon')}</span>
 	</div>`;
 }
 function renderLockedContent(_requirement) {
 	return `<div class="full flex">
-	 	<span style="text-align:center;color:#f7f7f7cc!important;font-size:3vh!important"><span style="color:#ff6c00 !important">[${getLangData('Content Is Locked')}]</span><br/>${getLangData(_requirement)}</span>
+	 	<span style="text-align:center;color:#f7f7f7cc!important;font-size:3cqh!important"><span style="color:#ff6c00 !important">[${getLangData('Content Is Locked')}]</span><br/>${getLangData(_requirement)}</span>
 	 </div>`;
 }
 function askSomething(_question, _okFuncString, _singletonAttr, _container, className) {
@@ -1693,7 +1698,7 @@ function showInfo(_json) {
 					<span class="flex show-info-title wot-title">${_title}</span>
 				</div>
 				<div class="line1-splitter"></div>
-				<div id="show-info-navigations" style="padding:4vh 2vh" class="flex w-100">
+				<div id="show-info-navigations" style="padding:4cqh 2cqh" class="flex w-100">
 					<div id="show-info-navigations-inner" class="flex w-100">
 				
 					</div>
@@ -2172,6 +2177,27 @@ function applyAppliedRulesPreserveInlineFast(sourceEl, targetEl, options = {}) {
   return { matchedRules, appliedProps, skippedPropsBecauseInline, candidates: rulesToCheck.length };
 }
 
+function clippedClientRect(el) {
+  const base = el.getBoundingClientRect();
+  let left = base.left, top = base.top, right = base.right, bottom = base.bottom;
+  let node = el.parentElement;
+  while (node && node !== document.body && node !== document.documentElement) {
+    const cs = getComputedStyle(node);
+    if (cs.overflowX !== 'visible' || cs.overflowY !== 'visible') {
+      const r = node.getBoundingClientRect();
+      if (cs.overflowX !== 'visible') {
+        left = Math.max(left, r.left);
+        right = Math.min(right, r.right);
+      }
+      if (cs.overflowY !== 'visible') {
+        top = Math.max(top, r.top);
+        bottom = Math.min(bottom, r.bottom);
+      }
+    }
+    node = node.parentElement;
+  }
+  return { left: left, top: top, width: Math.max(0, right - left), height: Math.max(0, bottom - top) };
+}
 let activeUpgradeEffect = null;
 function addUpgradeEffect() {
 
@@ -2192,12 +2218,11 @@ function addUpgradeEffect() {
   const _item   = target.firstElementChild;
   if(!_item) return;
 
-  /* RESET + TRIGGER ITEM */
   removeClass(_item,'shining-item');
-  void _item.offsetWidth;
-  addClass(_item,'shining-item');
 
-  const rect = _item.getBoundingClientRect();
+  const rect = clippedClientRect(_item);
+  const origin = _item.closest('.page') || document.body;
+  const originRect = origin.getBoundingClientRect();
 
   /* OVERLAY */
   const overlay = document.createElement("div");
@@ -2207,43 +2232,54 @@ function addUpgradeEffect() {
   const ghostWrap = document.createElement("div");
   ghostWrap.className = "ghost-wrap active-shine";
   Object.assign(ghostWrap.style,{
-    position: "fixed",
-    top: rect.top + "px",
-    left: rect.left + "px",
+    position: "absolute",
+    top: (rect.top - originRect.top) + "px",
+    left: (rect.left - originRect.left) + "px",
     width: rect.width + "px",
     height: rect.height + "px",
     zIndex: 9999,
     pointerEvents: "none",
     "--angle": "0deg",
     opacity: 1,
-    transition: "1s"
+    margin: "0",
+    overflow: "visible",
+    transition: "opacity 1s ease"
   });
 
   /* CLONE */
   const ghost = _item.cloneNode(true);
   applyAppliedRulesPreserveInlineFast(_item, ghost);
 
-  Object.assign(ghost.style, {
-    width: "100%",
-    height: "100%",
-    margin: 0,
-    pointerEvents: "none",
-    transform: "scale(1)",
-    transition: "transform .4s cubic-bezier(.2,.8,.3,1.2)"
-  });
+  ghost.style.setProperty('position', 'relative', 'important');
+  ghost.style.setProperty('width', '100%', 'important');
+  ghost.style.setProperty('height', '100%', 'important');
+  ghost.style.setProperty('max-width', '100%', 'important');
+  ghost.style.setProperty('max-height', '100%', 'important');
+  ghost.style.setProperty('min-width', '0', 'important');
+  ghost.style.setProperty('min-height', '0', 'important');
+  ghost.style.setProperty('aspect-ratio', 'auto', 'important');
+  ghost.style.setProperty('left', '0', 'important');
+  ghost.style.setProperty('top', '0', 'important');
+  ghost.style.setProperty('right', 'auto', 'important');
+  ghost.style.setProperty('bottom', 'auto', 'important');
+  ghost.style.setProperty('margin', '0', 'important');
+  ghost.style.transformOrigin = 'center center';
+  ghost.style.transform = 'scale(1)';
+  ghost.style.pointerEvents = 'none';
+  ghost.style.transition = 'transform .4s cubic-bezier(.2,.8,.3,1.2)';
 
   /* GLOW LAYER */
   const glow = document.createElement("div");
   Object.assign(glow.style, {
     position: "absolute",
-    inset: "-0.7vh",
+    inset: "-0.7cqh",
     boxShadow: `
-  0 0 1vh rgba(255, 240, 200, 0.9),
-  0 0 4vh rgba(255, 210, 120, 0.75),
-  0 0 8vh rgba(255, 170, 40, 0.55),
-  0 0 14vh rgba(255, 160, 0, 0.35),
-  inset 0 0 4vh rgba(255, 240, 200, 0.65),
-  inset 0 0 2vh rgba(255, 255, 255, 0.25)
+  0 0 1cqh rgba(255, 240, 200, 0.9),
+  0 0 4cqh rgba(255, 210, 120, 0.75),
+  0 0 8cqh rgba(255, 170, 40, 0.55),
+  0 0 14cqh rgba(255, 160, 0, 0.35),
+  inset 0 0 4cqh rgba(255, 240, 200, 0.65),
+  inset 0 0 2cqh rgba(255, 255, 255, 0.25)
     `,
     opacity: "1",
     pointerEvents: "none",
@@ -2254,8 +2290,8 @@ function addUpgradeEffect() {
 	/* APPEND ORDER */
 	ghostWrap.appendChild(ghost);
 	ghostWrap.appendChild(glow);
-	document.body.appendChild(overlay);
-	document.body.appendChild(ghostWrap);
+	origin.appendChild(overlay);
+	origin.appendChild(ghostWrap);
 
 ghostWrap.style.setProperty("--angle", "360deg"); 
 
@@ -2282,14 +2318,13 @@ requestAnimationFrame(() => {
     requestAnimationFrame(() => {
 		ghostWrap.style.animation = "micro-wiggle 90ms 2 linear";
   		PlaySound({ key: 'upgrade', volume: .5, reset: true, force: true });
-		ghostWrap.style.transition = "0.2s ease";
-		glow.style.transition       = "0.3s ease";
-		overlay.style.transition    = "0.3s ease";
-		ghost.style.transition      = "0.25s ease";
+		ghostWrap.style.transition = "opacity .2s ease";
+		glow.style.transition       = "opacity .3s ease";
+		overlay.style.transition    = "opacity .3s ease";
+		ghost.style.transition      = "opacity .25s ease, transform .4s cubic-bezier(.2,.8,.3,1.2)";
     });
 });
-  /* SCALE UP */
-    ghost.style.transform = "scale(1)";
+  ghost.style.transform = "scale(1)";
   requestAnimationFrame(() => {
     ghost.style.transform = "scale(1.03)";
   });
@@ -2331,8 +2366,148 @@ requestAnimationFrame(() => {
 	};
 
 }
+let _screenBox = null;
+let _holdingForKeyboard = false;
+let _keyboardInput = null;
+let _menuShift = 0;
+function keyboardOverlap() {
+	let plugin = 0;
+	if(typeof keyboardHeight === 'number' && keyboardHeight > 0) {
+		plugin = keyboardHeight;
+		if(window.devicePixelRatio > 1 && plugin > (window.screen?.height || 4000))
+			plugin = Math.round(plugin / window.devicePixelRatio);
+	}
+	let cover = 0;
+	const view = window.visualViewport;
+	if(view && _screenBox && Math.abs((view.width || 0) - _screenBox.vw) <= 40) {
+		cover = _screenBox.vh - (view.height + (view.offsetTop || 0));
+		if(cover < 0)
+			cover = 0;
+	}
+	if(plugin > 0)
+		return Math.max(plugin, cover);
+	if(cover > 80 && window.matchMedia && window.matchMedia('(pointer: coarse)').matches)
+		return cover;
+	return 0;
+}
+function menuField() {
+	const panel = document.getElementById('menu-ui');
+	if(!panel)
+		return null;
+	const active = document.activeElement;
+	if(active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA') && panel.contains(active))
+		return active;
+	if(_keyboardInput && _keyboardInput.isConnected && panel.contains(_keyboardInput))
+		return _keyboardInput;
+	return null;
+}
+function placeChatAboveKeyboard() {
+	const panel = document.getElementById('menu-ui');
+	if(!panel)
+		return;
+	const field = menuField();
+	const overlap = keyboardOverlap();
+	if(!field || overlap <= 80) {
+		_menuShift = 0;
+		panel.style.transform = '';
+		return;
+	}
+	const view = window.visualViewport;
+	const visibleBottom = view ? (view.offsetTop + view.height) : window.innerHeight;
+	const boxBottom = _screenBox ? _screenBox.top + _screenBox.height : visibleBottom;
+	const limit = Math.min(visibleBottom, boxBottom - overlap) - 6;
+	const extra = Math.ceil(field.getBoundingClientRect().bottom - limit);
+	let next = _menuShift - extra;
+	if(next > 0)
+		next = 0;
+	_menuShift = next;
+	panel.style.transform = next < 0 ? 'translateY(' + next + 'px)' : '';
+}
+function fitWrapperParent() {
+	const wrapper = document.getElementById('wrapper');
+	const parent = wrapper && wrapper.parentElement;
+	if (!parent)
+		return;
+	const root = document.documentElement;
+	const body = document.body;
+	const view = window.visualViewport;
+	const vw = Math.round(view?.width || window.innerWidth);
+	const vh = Math.round(view?.height || window.innerHeight);
+	if (vw < 2 || vh < 2)
+		return;
+	if(_screenBox && Math.abs(vw - _screenBox.vw) <= 40 && keyboardOverlap() > 80) {
+		_holdingForKeyboard = true;
+		placeChatAboveKeyboard();
+		return;
+	}
+	_holdingForKeyboard = false;
+	let width, height, left, top;
+	if (vw * 9 < vh * 16) {
+		width = vw;
+		height = Math.round(width * 9 / 16);
+		left = 0;
+		top = Math.round((vh - height) / 2);
+	}
+	else {
+		height = vh;
+		width = Math.round(height * 16 / 9);
+		if (width > vw)
+			width = vw;
+		top = 0;
+		left = Math.round((vw - width) / 2);
+	}
+	[root, body, parent, wrapper].forEach(function (el, i) {
+		if (!el)
+			return;
+		el.style.position = i === 0 ? 'fixed' : 'absolute';
+		el.style.margin = '0';
+		el.style.right = 'auto';
+		el.style.bottom = 'auto';
+		el.style.left = (i === 0 ? left : 0) + 'px';
+		el.style.top = (i === 0 ? top : 0) + 'px';
+		el.style.width = width + 'px';
+		el.style.height = height + 'px';
+		el.style.minWidth = width + 'px';
+		el.style.minHeight = height + 'px';
+		el.style.maxWidth = width + 'px';
+		el.style.maxHeight = height + 'px';
+	});
+	_screenBox = { vw: vw, vh: vh, top: top, height: height };
+	_menuShift = 0;
+	const _panel = document.getElementById('menu-ui');
+	if(_panel)
+		_panel.style.transform = '';
+}
+function watchWrapperParent() {
+	window.addEventListener('resize', fitWrapperParent);
+	if (window.visualViewport) {
+		window.visualViewport.addEventListener('resize', fitWrapperParent);
+		window.visualViewport.addEventListener('scroll', function() {
+			if(keyboardOverlap() > 80)
+				placeChatAboveKeyboard();
+		});
+	}
+	document.addEventListener('focusin', function(e) {
+		const t = e.target;
+		if(!t || (t.tagName !== 'INPUT' && t.tagName !== 'TEXTAREA'))
+			return;
+		const panel = document.getElementById('menu-ui');
+		if(!panel || !panel.contains(t))
+			return;
+		_keyboardInput = t;
+		placeChatAboveKeyboard();
+	});
+	if (document.readyState === 'loading')
+		document.addEventListener('DOMContentLoaded', fitWrapperParent);
+	else
+		fitWrapperParent();
+}
+watchWrapperParent();
 function organizeScreenResize() {
 	function resizeCanvas() {
+		fitWrapperParent();
+		if(_holdingForKeyboard)
+			return;
 		const newWidth = _gamePad.offsetWidth;
 		if((newWidth ?? 0) <= 0)
 			return;
@@ -2387,7 +2562,7 @@ function setWindowVariables() {
 
 	document.getElementById('game-pad-left').style.width =
 	document.getElementById('game-pad-right').style.width =
-	'calc((100vw - ' + (_canvas.width * __scale) + 'px) / 2)';
+	'calc((100cqw - ' + (_canvas.width * __scale) + 'px) / 2)';
 	_canvas.height = _canvasDMG.height = _canvasB.height = _canvas3.height = _canvasGore.height = _canvas5.height = 
 	_canvasS.height = _canvasSPB.height = _canvasBRB.height = _canvasF.height = _canvasR.height = MathRound(_gamePad.offsetHeight / __scale);
 	

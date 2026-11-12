@@ -91,22 +91,22 @@ console.log('onlineusers');
 						_valid = MathFloor(_minute / 60) + getLangData('h');
 					_html += `<div onexactclick="" class="online-user-card skill-card animate-me flex">
 								<div class="skill-icon-wrapper flex">
-									<img style="margin-left:.6vh;padding:5%;border-radius:100%;border-color:#f3f4f5ab !important" src="./images/icons/player.png" />
+									<img style="margin-left:.6cqh;padding:5%;border-radius:100%;border-color:#f3f4f5ab !important" src="./images/icons/player.png" />
 								</div>
 								<div style="flex:1;height:100%" class="flex flex-jc-end">
 									<div class="w-100 flex" style="height:50%">
-										<div class="w-50 flex flex-jc-start" style="color:#d7b671;height:100%;padding-left:2vh">
+										<div class="w-50 flex flex-jc-start" style="color:#d7b671;height:100%;padding-left:2cqh">
 											${ou.name}
 										</div>
-										<div class="w-50 flex flex-jc-end${ou.isBusy ? ' fire' : ' toxic'}" style="height:100%;padding-right:3vh">
+										<div class="w-50 flex flex-jc-end${ou.isBusy ? ' fire' : ' toxic'}" style="height:100%;padding-right:3cqh">
 											${ou.isBusy ? getLangData('Busy') : getLangData('Available')}
 										</div>
 									</div>
 									<div class="w-100 flex" style="height:50%">
-										<div class="w-50 flex flex-jc-start${_valid ? '' : ' v-none'}" style="height:100%;padding-left:2vh">
+										<div class="w-50 flex flex-jc-start${_valid ? '' : ' v-none'}" style="height:100%;padding-left:2cqh">
 											${getLangData('Online')}:&nbsp;<span style="color:#f3f4f5ab">${_valid}</span>
 										</div>
-										<div class="w-50 flex flex-jc-end" style="height:100%;padding-right:2vh">
+										<div class="w-50 flex flex-jc-end" style="height:100%;padding-right:2cqh">
 											<div class="game-menu-button animate-me flex" onexactclick="getRef(\'onlineusers\').askDuelWithSelectingCharacter('${ou.socketId}')" style="height:75%;padding:0 10%"><div class="flex" style="color:#ff6c00 !important">${getLangData('Duel')}</div></div>
 										</div>
 									</div>
@@ -185,7 +185,7 @@ console.log('onlineusers');
 				t: _id
 			});
 			closeInventoryQuestionModal();
-			warn('<div class="flex important achievement" style="position:relative"><span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Duel request sent') + '!</span></div>', null, null, 1);
+			warn('<div class="flex important achievement" style="position:relative"><span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Duel request sent') + '!</span></div>', null, null, 1);
 		}
 		return this;
 	}

@@ -6,7 +6,7 @@ function getOptionsUI() {
 			<div class="skills-content-left settings-content-left menu-modal-left-container">
 				<div style="overflow-y:auto" class="full">
 		<div class="settings-row flex flex-jc-start">${getLangData('Language Choice')}</div>
-		<div onexactclick="langSelect('en')" class="settings-row settings-row-radio flex flex-jc-start" style="width:100%;padding:1vh;height:10vh">
+		<div onexactclick="langSelect('en')" class="settings-row settings-row-radio flex flex-jc-start" style="width:100%;padding:1cqh;height:10cqh">
 			<div class="my-radio-wrapper">
 				<div class="my-radio${(getLang()) === 'en' ? ' selected' : ''} flex">
 					<div></div>
@@ -16,7 +16,7 @@ function getOptionsUI() {
 				${getLangData('English')}
 			</div>
 		</div>
-		<div onexactclick="langSelect('tr')" class="settings-row settings-row-radio flex flex-jc-start" style="width:100%;padding:1vh;height:10vh">
+		<div onexactclick="langSelect('tr')" class="settings-row settings-row-radio flex flex-jc-start" style="width:100%;padding:1cqh;height:10cqh">
 			<div class="my-radio-wrapper">
 				<div class="my-radio${(getLang()) === 'tr' ? ' selected' : ''} flex">
 					<div></div>

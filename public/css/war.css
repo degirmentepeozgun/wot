@@ -1,11 +1,11 @@
 .war-container .war-player-card {
 	width: 28%;
 	position:absolute;
-	height:8vh;
+	height:8cqh;
 	background: linear-gradient(125deg, #36454F, #000);
-	border-radius: 1vh;
-	box-shadow: 0 .5vh 1vh #000;
-	border:.5vh solid #f3f4f520
+	border-radius: 1cqh;
+	box-shadow: 0 .5cqh 1cqh #000;
+	border:.5cqh solid #f3f4f520
 }
 .war-container .war-player-card .war-player-card-left {
 	height: 100%;
@@ -14,7 +14,7 @@
 }
 .war-container .war-player-card .war-player-card-left * {
 	font-weight: 600 !important;
-	text-shadow: 0 0 .5vh #000;
+	text-shadow: 0 0 .5cqh #000;
 	color:#f3f4f5cc !important
 }
 .war-container .war-player-card .war-player-card-medium {
@@ -29,7 +29,7 @@
 	height: 80%;
 	aspect-ratio: 1 / 1;
 	background-color:#000;
-	margin:0 2.5vh 0 2vh
+	margin:0 2.5cqh 0 2cqh
 }
 .war-container .war-player-card .war-player-card-right {
 	height:100%;
@@ -61,7 +61,7 @@
 }
 
 .war-container .war-player-card.war-player-card-me {
-	border:.5vh solid #F4BB4460
+	border:.5cqh solid #F4BB4460
 }
 .war-container .war-player-card.war-player-card-me *:not(.war-player-card-right-bottom) {
 	color: #F4BB44 !important

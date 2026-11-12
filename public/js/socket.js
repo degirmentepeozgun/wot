@@ -305,7 +305,7 @@ function getOnlineUsersUI() {
 		_lastMsg = _ch.m?.filter(x => !x.y);
 		_lastMsg = _lastMsg?.[_lastMsg?.length - 1];
 		_html += `<div data-key="${_ch.a}" onexactclick="openPersonelMessages('${_ch.a}')" class="pvp-opponent-item flex">
-				<div style="font-weight:600;padding-left:2.5vh !important" class="opponent-item-left flex flex-jc-start">
+				<div style="font-weight:600;padding-left:2.5cqh !important" class="opponent-item-left flex flex-jc-start">
 					${_ch.n}
 				</div>
 				<div class="opponent-item-center flex">
@@ -388,7 +388,7 @@ function renderFriendsList() {
 	let _html = '';
 	for(let _f of __account.friends) {
 		_html += `<div data-key="${_f.id}" onexactclick="openPersonelMessages('${_f.id}')" class="pvp-opponent-item flex">
-				<div style="font-weight:600;padding-left:2.5vh !important" class="opponent-item-left flex flex-jc-start">
+				<div style="font-weight:600;padding-left:2.5cqh !important" class="opponent-item-left flex flex-jc-start">
 					${_f.n}
 				</div>
 				<div class="opponent-item-center flex">

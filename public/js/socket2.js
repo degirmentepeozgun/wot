@@ -1980,6 +1980,7 @@ async function connectSocket() {
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets
     }).withAutomaticReconnect([0, 1000, 5000, 10000, 30000]).build();
+    _my_hub.serverTimeoutInMilliseconds = 5 * 60 * 1000;
     _my_hub.on("AssignId", (assignedId) => {
         resetOnlineDetection();
         mainCharacter.socketId = __socketId = assignedId;
@@ -2017,7 +2018,14 @@ async function connectSocket() {
             }
         } else
             for (let _d of cmd) {
-                const _e = episode.enemies?.find(x => x.socketId === (_d.t ?? _d.s));
+                if (_d && _d.k != null && _d.t) {
+                    const _victim = duelDamageVictim(_d);
+                    if (_victim)
+                        _victim.setNewStatus2(_d);
+                    continue;
+                }
+                const _id = _d.s;
+                const _e = episode?.enemies?.find(x => x.socketId === _id || x.duelSocket === _id);
                 if (_e)
                     _e.setNewStatus2(_d);
             }
@@ -2029,6 +2037,18 @@ async function connectSocket() {
             _duel.onDuel(kind, payload);
     });
     _my_hub.on("R", async (cmd, message) => {
+        if (cmd && cmd.k != null && cmd.t && !cmd.c) {
+            const _victim = duelDamageVictim(cmd);
+            if (_victim)
+                _victim.setNewStatus2(cmd);
+            return;
+        }
+        if (cmd && !cmd.c && cmd.s && cmd.t) {
+            const _e = episode?.enemies?.find(x => x.socketId === cmd.s || x.duelSocket === cmd.s);
+            if (_e)
+                _e.setNewStatus2(cmd);
+            return;
+        }
         if (cmd) {
             let _json = cmd ? cmd : null;
             switch (_json?.c) {
@@ -2292,7 +2312,57 @@ function sendChatMessage(_json) {
     if (_my_hub && _my_hub.q === 'Connected')
         _my_hub.invoke("M", _json).catch(err => console.error(err.toString()));
 }
+function duelDamageVictim(_d) {
+    if (!_d || _d.k == null || !_d.t || !episode?.enemies)
+        return;
+    const mine = __socketId || mainCharacter?.socketId;
+    if (!mine)
+        return;
+    const id = _d.cl || _d.t;
+    const _victim = episode.enemies.find(x => x && (x.socketId === id || x.duelSocket === id || (id === mine && x.main)));
+    if (!_victim)
+        return;
+    const _mine = _victim.main || _victim.socketId === mine || _victim.duelSocket === mine;
+    const _myBot = episode.duelLeader && _victim.duelBot && !_victim.realTime;
+    if (!_mine && !_myBot)
+        return;
+    const stamp = (_d.s || '') + ':' + (_d.z ?? '');
+    if (_d.z != null && _victim._dmgStamp === stamp)
+        return;
+    if (_d.z != null)
+        _victim._dmgStamp = stamp;
+    return _victim;
+}
 function setTransferMessage(_data) {
     if (_my_hub && _my_hub.q === 'Connected' && episode?.roomId)
         _my_hub.invoke("T", episode.roomId.toString(), _data).catch(err => console.error(err.toString() + ' ------> ' + JSON.stringify(_data)));
+}
+function duelTargets() {
+    const mine = __socketId || mainCharacter?.socketId;
+    if (!episode?.roomId || String(episode.roomId).indexOf('duel:') !== 0)
+        return [];
+    const out = [];
+    const add = function(id) {
+        if (!id || id === mine || out.indexOf(id) !== -1)
+            return;
+        out.push(id);
+    };
+    for (const e of episode.enemies || []) {
+        if (!e || e.main || !e.duelHuman)
+            continue;
+        if (e.class === __spell || e.class === 'object')
+            continue;
+        add(e.socketId || e.duelSocket);
+    }
+    return out;
+}
+function relayDuelPack(_peer, _pack) {
+    const mine = __socketId || mainCharacter?.socketId;
+    if (!_peer || _peer === mine || !_pack?.length || !_my_hub || _my_hub.q !== 'Connected')
+        return;
+    for (const item of _pack) {
+        if (!item?.s || item.s === _peer)
+            continue;
+        _my_hub.invoke('S', Object.assign({}, item, { t: _peer })).catch(function() {});
+    }
 }

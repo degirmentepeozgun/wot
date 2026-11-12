@@ -958,7 +958,7 @@ const _missions = [
 								${getLangData('Upgrade Cost')}
 							</div>
 							<div class="w-50 flex flex-jc-end">
-								${_props.cost.formatWithDots()}&nbsp;<img style="height:2.4vh !important" src="./images/icons/coin.png" />
+								${_props.cost.formatWithDots()}&nbsp;<img style="height:2.4cqh !important" src="./images/icons/coin.png" />
 							</div>
 						</div>
 						<div class="w-100 flex flex-jc-start mission-desc-title">${getLangData('Rewards')}</div>`;
@@ -1141,7 +1141,7 @@ const _missions = [
 								${getLangData('Upgrade Cost')}
 							</div>
 							<div class="w-50 flex flex-jc-end">
-								${_props.cost.formatWithDots()}&nbsp;<img style="height:2.4vh !important" src="./images/icons/coin.png" />
+								${_props.cost.formatWithDots()}&nbsp;<img style="height:2.4cqh !important" src="./images/icons/coin.png" />
 							</div>
 						</div>
 						<div class="w-100 flex flex-jc-start mission-desc-title">
@@ -1563,7 +1563,7 @@ const _npcQuests = [
 	// 	maps: [11],
 	// 	then: function() { 
 	// 		_client.upgradeVisitedMaps(6);
-	// 		warn('<div class="flex heading achievement" style="position:relative"><img style="height:12vh" src="./images/icons/scroll.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('New Map Discovered') + '!</span></div>', 'level-up');
+	// 		warn('<div class="flex heading achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/scroll.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('New Map Discovered') + '!</span></div>', 'level-up');
 	// 		PlaySound({ key: 'page', volume: .5 });
 	// 	},
 	// },
@@ -3205,6 +3205,8 @@ const soundFiles = {
 	cyanrundown: './images/sounds/cyan-run-down.mp3',
 	cyanattack: './images/sounds/cyan-attack.mp3',
 	headhit: './images/sounds/head-hit.mp3',
+	giantrunleft: './images/sounds/giant-run-left.mp3',
+	giantrunright: './images/sounds/giant-run-right.mp3',
 	kongrun: './images/sounds/kong-goblin-run2.mp3',
 	groundslide: './images/sounds/groundslide.mp3',
 	voodooelectrix: './images/sounds/voodoo-electrix.mp3',
@@ -3277,6 +3279,8 @@ const soundFiles = {
 	rockhit: './images/sounds/rock-hit.mp3',
 	rockhit2: './images/sounds/rock-hit2.mp3',
 	rockhit3: './images/sounds/rock-hit3.mp3',
+	rockhit4: './images/sounds/rock-hit4.wav',
+	rockhit5: './images/sounds/rock-hit5.wav',
 	bonusscore: './images/sounds/bonus-score.mp3',
 	bigbodydrop: './images/sounds/body-drop-big.mp3',
 	bodydrop: './images/sounds/body-drop.mp3',
@@ -3712,7 +3716,9 @@ const soundFiles = {
 	spiderhurt1: './images/sounds/spider-hurt1.mp3',
 	spiderhurt2: './images/sounds/spider-hurt2.mp3',
 	spiderdead: './images/sounds/spider-dead.mp3',
-	arrow: './images/sounds/arrow.mp3?x=3',
+	arrow: './images/sounds/arrow-fast.mp3',
+	arrowfaster: './images/sounds/arrow-faster.mp3',
+	arrowfastest: './images/sounds/bow-fastest.mp3',
 	explode: './images/sounds/explode.mp3?x=2',
 	firearrow: './images/sounds/fire-arrow.mp3',
 	thunderdzzt: './images/sounds/thunder-dzzt.wav?x=2',
@@ -6668,6 +6674,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: .85,
 		width: 76,
+		height: 0,
 		invulnerable: true,
 		pierce: true,
 		class: __spell,
@@ -7144,6 +7151,8 @@ const spells = {
 		noRelation: true,
 		class: __spell,
 		name: 'warriorhead',
+		width: 39,
+		height: 48,
 		animations: {
 			dead: {
 				key: "dead",
@@ -7432,6 +7441,8 @@ const spells = {
 		noRelation: true,
 		class: __spell,
 		name: 'teberhead',
+		width: 42,
+		height: 46,
 		animations: {
 			dead: {
 				key: "dead",
@@ -7713,6 +7724,8 @@ const spells = {
 		class: __spell,
 		name: 'Dynamite',
 		pierce: true,
+		width: 50,
+		height: 45,
 		animations: {
 			dead: {
 				key: "dead",
@@ -7847,6 +7860,8 @@ const spells = {
 		class: __spell,
 		name: 'Dynamite Short',
 		pierce: true,
+		width: 50,
+		height: 45,
 		animations: {
 			dead: {
 				key: "dead",
@@ -7981,6 +7996,8 @@ const spells = {
 		still: true,
 		class: __spell,
 		name: 'Spikes',
+		width: 77,
+		height: 35,
 		animations: {
 			dead: {
 				key: "dead",
@@ -8163,6 +8180,8 @@ const spells = {
 		invulnerable: true,
 		class: __spell,
 		name: 'Spikes',
+		width: 78,
+		height: 27,
 		animations: {
 			dead: {
 				key: "dead",
@@ -8441,6 +8460,8 @@ const spells = {
 		class: __spell,
 		name: 'Spikes',
 		priority: 1,
+		width: 136,
+		height: 19,
 		animations: {
 			dead: {
 				key: "dead",
@@ -8676,6 +8697,8 @@ const spells = {
 		class: __spell,
 		name: 'Spikes',
 		hasShadow: false,
+		width: 360,
+		height: 69,
 		animations: {
 			dead: {
 				key: "dead",
@@ -9187,6 +9210,8 @@ const spells = {
 		class: __spell,
 		name: 'TNT',
 		priority: 1,
+		width: 320,
+		height: 320,
 		animations: {
 			dead: {
 				key: "dead",
@@ -9397,6 +9422,8 @@ const spells = {
 		class: __spell,
 		name: 'Fire Claw',
 		priority: 1,
+		width: 131,
+		height: 169,
 		animations: {
 			dead: {
 				key: "dead",
@@ -9626,6 +9653,8 @@ const spells = {
 		extraStepXRate: 1,
 		class: __spell,
 		name: 'Spit',
+		width: 75,
+		height: 56,
 		animations: {
 			dead: {
 				key: "dead",
@@ -9781,6 +9810,8 @@ const spells = {
 		hasShadow: false,
 		class: __spell,
 		name: 'Suicide',
+		width: 137,
+		height: 200,
 		animations: {
 			dead: {
 				key: "dead",
@@ -9986,6 +10017,8 @@ const spells = {
 		extraStepXRate: 1,
 		class: __spell,
 		name: 'Emegen Spit',
+		width: 36,
+		height: 10,
 		animations: {
 			dead: {
 				key: "dead",
@@ -10189,6 +10222,8 @@ const spells = {
 		extraStepXRate: 1,
 		class: __spell,
 		name: 'Bee Spit',
+		width: 30,
+		height: 39,
 		animations: {
 			dead: {
 				key: "dead",
@@ -10393,6 +10428,8 @@ const spells = {
 		pierce: true,
 		class: __spell,
 		name: 'Tank Slash 1 Fast',
+		width: 107,
+		height: 207,
 		animations: {
 			dead: {
 				key: "dead",
@@ -10590,6 +10627,8 @@ const spells = {
 		pierce: true,
 		class: __spell,
 		name: 'Tank Slash 2 Fast',
+		width: 514,
+		height: 350,
 		animations: {
 			dead: {
 				key: "dead",
@@ -10787,6 +10826,8 @@ const spells = {
 		pierce: true,
 		class: __spell,
 		name: 'Tank Slash 3 Fast',
+		width: 555,
+		height: 353,
 		animations: {
 			dead: {
 				key: "dead",
@@ -10984,6 +11025,8 @@ const spells = {
 		pierce: true,
 		class: __spell,
 		name: 'Tank Slash 4 Fast',
+		width: 287,
+		height: 366,
 		animations: {
 			dead: {
 				key: "dead",
@@ -11186,6 +11229,8 @@ const spells = {
 		pierce: true,
 		class: __spell,
 		name: 'Tank Slash 1',
+		width: 107,
+		height: 307,
 		animations: {
 			dead: {
 				key: "dead",
@@ -11383,6 +11428,8 @@ const spells = {
 		pierce: true,
 		class: __spell,
 		name: 'Tank Slash 2',
+		width: 514,
+		height: 350,
 		animations: {
 			dead: {
 				key: "dead",
@@ -11580,6 +11627,8 @@ const spells = {
 		pierce: true,
 		class: __spell,
 		name: 'Tank Slash 3',
+		width: 555,
+		height: 353,
 		animations: {
 			dead: {
 				key: "dead",
@@ -11777,6 +11826,8 @@ const spells = {
 		pierce: true,
 		class: __spell,
 		name: 'Tank Slash 4',
+		width: 287,
+		height: 366,
 		animations: {
 			dead: {
 				key: "dead",
@@ -11979,6 +12030,8 @@ const spells = {
 		pierce: true,
 		class: __spell,
 		name: 'It Barak Ultimate 1',
+		width: 180,
+		height: 260,
 		animations: {
 			dead: {
 				key: "dead",
@@ -12165,6 +12218,8 @@ const spells = {
 		pierce: true,
 		class: __spell,
 		name: 'It Barak Ultimate 2',
+		width: 222,
+		height: 216,
 		animations: {
 			dead: {
 				key: "dead",
@@ -12351,6 +12406,8 @@ const spells = {
 		pierce: true,
 		class: __spell,
 		name: 'It Barak Ultimate 3',
+		width: 146,
+		height: 207,
 		animations: {
 			dead: {
 				key: "dead",
@@ -12538,6 +12595,8 @@ const spells = {
 		pierce: true,
 		class: __spell,
 		name: 'It Barak Ultimate 4',
+		width: 230,
+		height: 174,
 		animations: {
 			dead: {
 				key: "dead",
@@ -12728,6 +12787,8 @@ const spells = {
 		pierce: true,
 		class: __spell,
 		name: 'It Barak Ultimate 1 Faster',
+		width: 180,
+		height: 260,
 		animations: {
 			dead: {
 				key: "dead",
@@ -12914,6 +12975,8 @@ const spells = {
 		pierce: true,
 		class: __spell,
 		name: 'It Barak Ultimate 2 Faster',
+		width: 222,
+		height: 216,
 		animations: {
 			dead: {
 				key: "dead",
@@ -13100,6 +13163,8 @@ const spells = {
 		pierce: true,
 		class: __spell,
 		name: 'It Barak Ultimate 3 Faster',
+		width: 146,
+		height: 207,
 		animations: {
 			dead: {
 				key: "dead",
@@ -13287,6 +13352,8 @@ const spells = {
 		pierce: true,
 		class: __spell,
 		name: 'It Barak Ultimate 4 Faster',
+		width: 230,
+		height: 174,
 		animations: {
 			dead: {
 				key: "dead",
@@ -13476,6 +13543,8 @@ const spells = {
 		extraStepXRate: 1,
 		class: __spell,
 		name: 'Poisoncloud',
+		width: 600,
+		height: 335,
 		animations: {
 			dead: {
 				key: "dead",
@@ -14012,6 +14081,8 @@ const spells = {
 		name: 'Rasengan',
 		pierce: true,
 		priority: 1,
+		width: 43,
+		height: 70,
 		animations: {
 			dead: {
 				key: "dead",
@@ -14353,6 +14424,8 @@ const spells = {
 		class: __spell,
 		drawPriority: .5,
 		name: 'Poisonbubbles',
+		width: 28,
+		height: 245,
 		animations: {
 			dead: {
 				key: "dead",
@@ -14771,6 +14844,8 @@ const spells = {
 		extraStepXRate: 1,
 		class: __spell,
 		name: 'Poisonball',
+		width: 59,
+		height: 192,
 		animations: {
 			dead: {
 				key: "dead",
@@ -15038,6 +15113,8 @@ const spells = {
 		extraStepXRate: 2,
 		class: __spell,
 		name: 'Web',
+		width: 192,
+		height: 192,
 		animations: {
 			dead: {
 				key: "dead",
@@ -15200,6 +15277,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 1.91,
 		width: 520,
+		height: 300,
 		invulnerable: true,
 		autoAim: 50,
 		pierce: true,
@@ -15768,6 +15846,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 1.5,
 		width: 450,
+		height: 0,
 		invulnerable: true,
 		pierce: true,
 		class: __spell,
@@ -15983,6 +16062,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 1.2,
 		width: 400,
+		height: 400,
 		invulnerable: true,
 		autoAim: 50,
 		pierce: true,
@@ -16033,6 +16113,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 4,
 		width: 48,
+		height: 241 - 62,
 		invulnerable: true,
 		autoAim: 100,
 		pierce: true,
@@ -16383,6 +16464,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 2,
 		width: 256,
+		height: 180,
 		invulnerable: true,
 		autoAim: 50,
 		pierce: true,
@@ -16667,6 +16749,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 4,
 		width: 64,
+		height: 88,
 		invulnerable: true,
 		autoAim: 50,
 		pierce: true,
@@ -16837,6 +16920,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 1,
 		width: 160,
+		height: 85,
 		invulnerable: true,
 		still: true,
 		noDirection: true,
@@ -17263,6 +17347,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 2,
 		width: 71,
+		height: 15,
 		invulnerable: true,
 		autoAim: 50,
 		pierce: true,
@@ -17374,6 +17459,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 1,
 		width: 200,
+		height: 225,
 		invulnerable: true,
 		autoAim: 50,
 		pierce: true,
@@ -17613,6 +17699,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 2.2,
 		width: 71,
+		height: 0,
 		invulnerable: true,
 		pierce: true,
 		class: __spell,
@@ -17723,6 +17810,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 1.8,
 		width: 71,
+		height: 0,
 		invulnerable: true,
 		pierce: true,
 		class: __spell,
@@ -17833,6 +17921,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: .8,
 		width: 570,
+		height: 50,
 		invulnerable: true,
 		pierce: true,
 		class: __spell,
@@ -18146,6 +18235,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 2.4,
 		width: 252,
+		height: 180,
 		invulnerable: true,
 		autoAim: 50,
 		pierce: true,
@@ -18767,6 +18857,8 @@ const spells = {
 		class: __spell,
 		src: './images/main/archer/bomb.png',
 		name: 'Ground Explosion',
+		width: 47,
+		height: 61,
 		animations: {
 			idle: {
 				key: "idle",
@@ -18919,6 +19011,8 @@ const spells = {
 		class: __spell,
 		src: './images/main/archer/bomb.png',
 		name: 'Ground Explosion',
+		width: 47,
+		height: 61,
 		animations: {
 			idle: {
 				key: "idle",
@@ -19018,6 +19112,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep1000/sonic-wave2.png',
 		name: 'Sonicwave',
+		width: 228,
+		height: 500,
 		animations: {
 			idle: {
 				key: "idle",
@@ -19309,6 +19405,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep33/arrow.png',
 		name: 'Tug Arrow',
+		width: 120,
+		height: 80,
 		animations: {
 			idle: {
 				key: "idle",
@@ -19467,6 +19565,8 @@ const spells = {
 		pierce: true,
 		src: './images/sprites/ep33/flameeagle.png',
 		name: 'Tug Flame Eagle',
+		width: 68,
+		height: 110,
 		animations: {
 			idle: {
 				key: "idle",
@@ -19639,6 +19739,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep75/bomb.png',
 		name: 'Hurling Bomb',
+		width: 40,
+		height: 40,
 		animations: {
 			idle: {
 				key: "idle",
@@ -20001,6 +20103,8 @@ const spells = {
 		pierce: true,
 		src: './images/sprites/ep38/sprite.png',
 		name: 'Boomerang',
+		width: 67,
+		height: 94,
 		animations: {
 			idle: {
 				key: "idle",
@@ -20646,6 +20750,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep52/arrow.png',
 		name: 'Arrow',
+		width: 116,
+		height: 46,
 		animations: {
 			idle: {
 				key: "idle",
@@ -20855,6 +20961,125 @@ const spells = {
 			}
 		}
 	},
+	archerarrowyellow: {
+		defaultDirection: __right,
+		defaultAnimationKey: 'idle',
+		zoom: 1.2,
+		invulnerable: true,
+		extraStepXRate: 1,
+		class: __spell,
+		src: './images/main/archer/arrow-trail.png',
+		name: 'Arrow',
+		width: 180,
+		height: 110,
+		animations: {
+			idle: {
+				key: "idle",
+				type: 'skill',
+				attack: true,
+				move: true,
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 183,
+						spriteHeight: 110,
+						spriteOrigin: 92,
+						extraStepXRate: 1.65,
+						bottomGap: -80,
+						speed: 8,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: true,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 183,
+						spriteTop: 0,
+						spriteWidth: 183,
+						spriteHeight: 110,
+						spriteOrigin: 92,
+						extraStepXRate: 1.6,
+						bottomGap: -80,
+						speed: 8,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: true,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 80,
+						spriteWidth: 183,
+						spriteHeight: 110,
+						spriteOrigin: 92,
+						extraStepXRate: 1.55,
+						bottomGap: -80,
+						speed: 8,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: true,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 183,
+						spriteTop: 80,
+						spriteWidth: 183,
+						spriteHeight: 110,
+						spriteOrigin: 92,
+						extraStepXRate: 1.5,
+						bottomGap: -80,
+						speed: 8,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: true,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'common'
+						}
+					}
+				]
+			},
+			dead: {
+				key: "dead",
+				type: 'skill',
+				frames: [
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 0,
+						spriteHeight: 0,
+						spriteOrigin: 0,
+						props: {
+							remove: true
+						},
+						speed: 1
+					}
+				]
+			}
+		}
+	},
 	archerarrow: {
 		defaultDirection: __right,
 		defaultAnimationKey: 'idle',
@@ -20864,6 +21089,8 @@ const spells = {
 		class: __spell,
 		src: './images/main/archer/arrow2.png',
 		name: 'Arrow',
+		width: 140,
+		height: 110,
 		animations: {
 			idle: {
 				key: "idle",
@@ -20877,9 +21104,81 @@ const spells = {
 						spriteWidth: 140,
 						spriteHeight: 110,
 						spriteOrigin: 70,
+						extraStepXRate: 1.65,
+						bottomGap: -80,
+						speed: 8,
+						hasShadowBehind: true,
+						shadow: '#E8E8E8',
+						shadowCount: 4,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: true,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 140,
+						spriteHeight: 110,
+						spriteOrigin: 70,
+						extraStepXRate: 1.6,
+						bottomGap: -80,
+						speed: 8,
+						hasShadowBehind: true,
+						shadow: '#E8E8E8',
+						shadowCount: 4,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: true,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 140,
+						spriteHeight: 110,
+						spriteOrigin: 70,
+						extraStepXRate: 1.55,
+						bottomGap: -80,
+						speed: 8,
+						hasShadowBehind: true,
+						shadow: '#E8E8E8',
+						shadowCount: 4,
+						atk: {
+							yRange: 15,
+							rate: 2,
+							reset: true,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 140,
+						spriteHeight: 110,
+						spriteOrigin: 70,
 						extraStepXRate: 1.5,
 						bottomGap: -80,
-						speed: 32,
+						speed: 8,
+						hasShadowBehind: true,
+						shadow: '#E8E8E8',
+						shadowCount: 4,
 						atk: {
 							yRange: 15,
 							rate: 2,
@@ -20921,6 +21220,8 @@ const spells = {
 		still: true,
 		src: './images/main/archer/lightningarrow.png',
 		name: 'Lightning Arrow',
+		width: 220,
+		height: 300,
 		animations: {
 			idle: {
 				key: "idle",
@@ -21180,6 +21481,8 @@ const spells = {
 		class: __spell,
 		src: './images/main/archer/upperarrow.png',
 		name: 'Upper Arrow',
+		width: 126,
+		height: 78,
 		animations: {
 			idle: {
 				key: "idle",
@@ -21272,6 +21575,8 @@ const spells = {
 		class: __spell,
 		src: './images/main/archer/downrightarrow.png',
 		name: 'Down Right Arrow',
+		width: 126,
+		height: 78,
 		animations: {
 			idle: {
 				key: "idle",
@@ -21331,6 +21636,8 @@ const spells = {
 		class: __spell,
 		src: './images/main/archer/downleftarrow.png',
 		name: 'Down Left Arrow',
+		width: 126,
+		height: 78,
 		animations: {
 			idle: {
 				key: "idle",
@@ -21391,6 +21698,8 @@ const spells = {
 		class: __spell,
 		src: './images/main/archer/downarrow.png',
 		name: 'Down Arrow',
+		width: 126,
+		height: 78,
 		animations: {
 			idle: {
 				key: "idle",
@@ -21405,7 +21714,8 @@ const spells = {
 						spriteHeight: 78,
 						spriteOrigin: 63,
 						extraStepYRate: -1.25,
-						bottomGap: -40,
+						hasShadowBehind: true,
+						bottomGap: -380,
 						speed: 24
 					},
 					{
@@ -21451,6 +21761,8 @@ const spells = {
 		class: __spell,
 		src: './images/main/archer/arrow2.png',
 		name: 'TopArrow',
+		width: 140,
+		height: 110,
 		animations: {
 			idle: {
 				key: "idle",
@@ -21464,8 +21776,57 @@ const spells = {
 						spriteWidth: 140,
 						spriteHeight: 110,
 						spriteOrigin: 70,
-						extraStepXRate: 1.5,
+						extraStepXRate: 1.65,
+						hasShadowBehind: true,
+						shadow: '#E8E8E8',
+						shadowCount: 4,
 						speed: 8,
+						atk: {
+							push: 2,
+							yRange: 15,
+							rate: 2,
+							reset: true,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 140,
+						spriteHeight: 110,
+						spriteOrigin: 70,
+						extraStepXRate: 1.6,
+						hasShadowBehind: true,
+						shadow: '#E8E8E8',
+						shadowCount: 4,
+						speed: 8,
+						atk: {
+							push: 2,
+							yRange: 15,
+							rate: 2,
+							reset: true,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 140,
+						spriteHeight: 110,
+						spriteOrigin: 70,
+						extraStepXRate: 1.55,
+						speed: 8,
+						hasShadowBehind: true,
+						shadow: '#E8E8E8',
+						shadowCount: 4,
 						atk: {
 							push: 2,
 							yRange: 15,
@@ -21486,46 +21847,9 @@ const spells = {
 						spriteOrigin: 70,
 						extraStepXRate: 1.5,
 						speed: 8,
-						atk: {
-							push: 2,
-							yRange: 15,
-							rate: 2,
-							reset: true,
-							hurt: {
-								key: 'hurtground1',
-								type: 'ground'
-							},
-							type: 'common'
-						}
-					},
-					{
-						spriteLeft: 0,
-						spriteTop: 0,
-						spriteWidth: 140,
-						spriteHeight: 110,
-						spriteOrigin: 70,
-						extraStepXRate: 1.5,
-						speed: 8,
-						atk: {
-							push: 2,
-							yRange: 15,
-							rate: 2,
-							reset: true,
-							hurt: {
-								key: 'hurtground1',
-								type: 'ground'
-							},
-							type: 'common'
-						}
-					},
-					{
-						spriteLeft: 0,
-						spriteTop: 0,
-						spriteWidth: 140,
-						spriteHeight: 110,
-						spriteOrigin: 70,
-						extraStepXRate: 1.5,
-						speed: 8,
+						hasShadowBehind: true,
+						shadow: '#E8E8E8',
+						shadowCount: 4,
 						atk: {
 							push: 2,
 							yRange: 15,
@@ -21569,6 +21893,8 @@ const spells = {
 		class: __spell,
 		src: './images/main/archer/arrow2.png',
 		name: 'BottomArrow',
+		width: 140,
+		height: 110,
 		animations: {
 			idle: {
 				key: "idle",
@@ -21582,7 +21908,10 @@ const spells = {
 						spriteWidth: 140,
 						spriteHeight: 110,
 						spriteOrigin: 70,
-						extraStepXRate: 1.5,
+						extraStepXRate: 1.65,
+						hasShadowBehind: true,
+						shadow: '#E8E8E8',
+						shadowCount: 4,
 						speed: 8,
 						atk: {
 							push: 2,
@@ -21602,7 +21931,10 @@ const spells = {
 						spriteWidth: 140,
 						spriteHeight: 110,
 						spriteOrigin: 70,
-						extraStepXRate: 1.5,
+						extraStepXRate: 1.6,
+						hasShadowBehind: true,
+						shadow: '#E8E8E8',
+						shadowCount: 4,
 						speed: 8,
 						atk: {
 							push: 2,
@@ -21622,7 +21954,10 @@ const spells = {
 						spriteWidth: 140,
 						spriteHeight: 110,
 						spriteOrigin: 70,
-						extraStepXRate: 1.5,
+						extraStepXRate: 1.55,
+						hasShadowBehind: true,
+						shadow: '#E8E8E8',
+						shadowCount: 4,
 						speed: 8,
 						atk: {
 							push: 2,
@@ -21643,6 +21978,9 @@ const spells = {
 						spriteHeight: 110,
 						spriteOrigin: 70,
 						extraStepXRate: 1.5,
+						hasShadowBehind: true,
+						shadow: '#E8E8E8',
+						shadowCount: 4,
 						speed: 8,
 						atk: {
 							push: 2,
@@ -21686,6 +22024,8 @@ const spells = {
 		class: __spell,
 		src: './images/main/archer/arrow2.png',
 		name: 'Arrow Middle',
+		width: 140,
+		height: 110,
 		animations: {
 			idle: {
 				key: "idle",
@@ -21699,9 +22039,84 @@ const spells = {
 						spriteWidth: 140,
 						spriteHeight: 110,
 						spriteOrigin: 70,
+						extraStepXRate: 1.65,
+						hasShadowBehind: true,
+						shadow: '#E8E8E8',
+						shadowCount: 4,
+						bottomGap: -80,
+						speed: 8,
+						atk: {
+							push: 2,
+							yRange: 15,
+							reset: true,
+							rate: 2,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 140,
+						spriteHeight: 110,
+						spriteOrigin: 70,
+						extraStepXRate: 1.6,
+						bottomGap: -80,
+						hasShadowBehind: true,
+						shadow: '#E8E8E8',
+						shadowCount: 4,
+						speed: 8,
+						atk: {
+							push: 2,
+							yRange: 15,
+							reset: true,
+							rate: 2,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 140,
+						spriteHeight: 110,
+						spriteOrigin: 70,
+						extraStepXRate: 1.55,
+						bottomGap: -80,
+						speed: 8,
+						hasShadowBehind: true,
+						shadow: '#E8E8E8',
+						shadowCount: 4,
+						atk: {
+							push: 2,
+							yRange: 15,
+							reset: true,
+							rate: 2,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'common'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 140,
+						spriteHeight: 110,
+						spriteOrigin: 70,
 						extraStepXRate: 1.5,
 						bottomGap: -80,
-						speed: 32,
+						speed: 8,
+						hasShadowBehind: true,
+						shadow: '#E8E8E8',
+						shadowCount: 4,
 						atk: {
 							push: 2,
 							yRange: 15,
@@ -21746,6 +22161,8 @@ const spells = {
 		fireDmgRate: 100,
 		src: './images/main/archer/arrow2.png',
 		name: 'FireArrow',
+		width: 140,
+		height: 110,
 		animations: {
 			idle: {
 				key: "idle",
@@ -21759,15 +22176,87 @@ const spells = {
 						spriteWidth: 140,
 						spriteHeight: 110,
 						spriteOrigin: 70,
-						extraStepXRate: 1.5,
+						extraStepXRate: 1.9,
 						bottomGap: -80,
-						speed: 30,
+						hasShadowBehind: true,
+						shadow: '#FFC000',
+						shadowCount: 4,
+						speed: 8,
 						objects: [{
 							key: 'burn',
 							position: 'middle-front',
 							bind: true,
 							speed: 3
 						}],
+						atk: {
+							yRange: 6,
+							rate: 2,
+							reset: true,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'fire'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 140,
+						spriteHeight: 110,
+						spriteOrigin: 70,
+						extraStepXRate: 1.85,
+						bottomGap: -80,
+						hasShadowBehind: true,
+						shadow: '#FFC000',
+						shadowCount: 4,
+						speed: 8,
+						atk: {
+							yRange: 6,
+							rate: 2,
+							reset: true,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'fire'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 140,
+						spriteHeight: 110,
+						spriteOrigin: 70,
+						extraStepXRate: 1.8,
+						bottomGap: -80,
+						hasShadowBehind: true,
+						shadow: '#FFC000',
+						shadowCount: 4,
+						speed: 7,
+						atk: {
+							yRange: 6,
+							rate: 2,
+							reset: true,
+							hurt: {
+								key: 'hurtground1',
+								type: 'ground'
+							},
+							type: 'fire'
+						}
+					},
+					{
+						spriteLeft: 0,
+						spriteTop: 0,
+						spriteWidth: 140,
+						spriteHeight: 110,
+						spriteOrigin: 70,
+						extraStepXRate: 1.75,
+						bottomGap: -80,
+						hasShadowBehind: true,
+						shadow: '#FFC000',
+						shadowCount: 4,
+						speed: 7,
 						atk: {
 							yRange: 6,
 							rate: 2,
@@ -21809,6 +22298,8 @@ const spells = {
 		extraStepXRate: 1,
 		lightningDmgRate: 100,
 		lightColor: '#00FF0020',
+		width: 217,
+		height: 198 + 65,
 		class: __spell,
 		name: 'Aduket',
 		src: './images/main/warrior/sprite.png',
@@ -22026,6 +22517,8 @@ const spells = {
 		class: __spell,
 		name: 'Venom Breath',
 		src: './images/sprites/ep634/sprite.png',
+		width: 300,
+		height: 300,
 		animations: {
 			idle: {
 				key: "idle",
@@ -22163,6 +22656,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep02/sprite.png',
 		name: 'Teberweapon',
+		width: 144,
+		height: 167,
 		animations: {
 			idle: {
 				key: "idle",
@@ -22298,6 +22793,8 @@ const spells = {
 		lightColor: '#0000FF10',
 		src: './images/sprites/common/electricbolt.png',
 		name: 'Electricbolt',
+		width: 125,
+		height: 70,
 		animations: {
 			idle: {
 				key: "idle",
@@ -22623,6 +23120,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/common/el.png',
 		name: 'Electricboltsmall',
+		width: 125,
+		height: 70,
 		animations: {
 			idle: {
 				key: "idle",
@@ -22760,6 +23259,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/common/e.png',
 		name: 'Electricboltsmall2',
+		width: 91,
+		height: 54,
 		animations: {
 			idle: {
 				key: "idle",
@@ -22930,6 +23431,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/common/firespray.png',
 		name: 'Firespray',
+		width: 400,
+		height: 256,
 		animations: {
 			idle: {
 				key: "idle",
@@ -23172,6 +23675,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep622/stomp3.png',
 		name: 'Stomp',
+		width: 152,
+		height: 263,
 		animations: {
 			idle: {
 				key: "idle",
@@ -23368,6 +23873,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep34/fire.png',
 		name: 'Firewall',
+		width: 18,
+		height: 14,
 		animations: {
 			idle: {
 				key: "idle",
@@ -23710,6 +24217,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep34/fire.png',
 		name: 'Firewall2',
+		width: 18,
+		height: 14,
 		animations: {
 			idle: {
 				key: "idle",
@@ -23823,6 +24332,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep34/flame.png',
 		name: 'Firewall3',
+		width: 202,
+		height: 65,
 		animations: {
 			idle: {
 				key: "idle",
@@ -23940,6 +24451,8 @@ const spells = {
 		drawPriority: .5,
 		src: './images/sprites/ep34/flame5.png',
 		name: 'Firewall4',
+		width: 338,
+		height: 41,
 		animations: {
 			idle: {
 				key: "idle",
@@ -24926,6 +25439,8 @@ const spells = {
 		drawPriority: .5,
 		src: './images/sprites/ep33/toxicwall.png',
 		name: 'toxicwall',
+		width: 338,
+		height: 41,
 		animations: {
 			idle: {
 				key: "idle",
@@ -25909,6 +26424,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep34/fireball.png',
 		name: 'Fireball',
+		width: 57,
+		height: 47,
 		animations: {
 			idle: {
 				key: "idle",
@@ -26057,6 +26574,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/common/waterwave.png',
 		name: 'Waterwave',
+		width: 256,
+		height: 139,
 		animations: {
 			idle: {
 				key: "idle",
@@ -26272,6 +26791,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/common/waterwavehit.png',
 		name: 'Waterwavehit',
+		width: 76,
+		height: 52,
 		animations: {
 			idle: {
 				key: "idle",
@@ -26437,6 +26958,7 @@ const spells = {
 		zoom: 1.2 * 1.5,
 		invulnerable: true,
 		knockback: 5,
+		width: 193,
 		height: 179 * 1.5,
 		class: __spell,
 		src: './images/main/archer/gear.png',
@@ -26740,6 +27262,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 1.2 * .65,
 		invulnerable: true,
+		width: 80,
 		height: 54 * .65,
 		class: __spell,
 		src: './images/main/thief/blade.png',
@@ -26889,6 +27412,7 @@ const spells = {
 		zoom: 3,
 		invulnerable: true,
 		push: true,
+		width: 54,
 		height: 30,
 		class: __spell,
 		pierce: true,
@@ -27361,6 +27885,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 1.3,
 		invulnerable: true,
+		width: 250,
 		height: 250,
 		lightningDmgRate: 100,
 		class: __spell,
@@ -27509,6 +28034,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 1.2 * 1.5,
 		invulnerable: true,
+		width: 218,
 		height: 182 * 1.5,
 		lightningDmgRate: 100,
 		class: __spell,
@@ -27710,6 +28236,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 1.35,
 		invulnerable: true,
+		width: 257,
 		height: 600 * 1.35,
 		class: __spell,
 		pierce: true,
@@ -28318,6 +28845,7 @@ const spells = {
 		defaultAnimationKey: 'idle',
 		zoom: 1,
 		invulnerable: true,
+		width: 683,
 		height: 1365,
 		class: __spell,
 		src: './images/main/thief/lightning-ball.png',
@@ -28791,6 +29319,8 @@ const spells = {
 		lightColor: '#00FF0020',
 		name: 'Beyblade',
 		src: './images/main/warrior/sprite.png',
+		width: 255,
+		height: 269,
 		animations: {
 			idle: {
 				key: "idle",
@@ -29147,6 +29677,8 @@ const spells = {
 		class: __spell,
 		name: 'Horse',
 		src: './images/sprites/ep29/horse.png',
+		width: 380,
+		height: 291,
 		animations: {
 			idle: {
 				key: "idle",
@@ -29522,6 +30054,8 @@ const spells = {
 		name: 'Wolf',
 		pierce: true,
 		src: './images/sprites/ep29/wolf.png',
+		width: 300,
+		height: 240,
 		animations: {
 			idle: {
 				key: "idle",
@@ -29839,6 +30373,8 @@ const spells = {
 		name: 'Wolf 2',
 		pierce: true,
 		src: './images/sprites/ep29/wolf.png',
+		width: 300,
+		height: 240,
 		animations: {
 			idle: {
 				key: "idle",
@@ -30335,6 +30871,8 @@ const spells = {
 		autoAim: 30,
 		src: './images/sprites/ep14/sprite.png',
 		name: 'Bats',
+		width: 18,
+		height: 107,
 		animations: {
 			idle: {
 				key: "idle",
@@ -30434,6 +30972,8 @@ const spells = {
 		autoAim: 42,
 		src: './images/sprites/ep624/sprite.png',
 		name: 'Bat',
+		width: 200,
+		height: 200,
 		animations: {
 			idle: {
 				key: "idle",
@@ -30620,6 +31160,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep16/spell.png',
 		name: 'Medusa Bolt',
+		width: 100,
+		height: 85,
 		animations: {
 			idle: {
 				key: "idle",
@@ -30802,6 +31344,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep16/spell.png',
 		name: 'Medusa Bubble',
+		width: 92,
+		height: 44,
 		animations: {
 			idle: {
 				key: "idle",
@@ -31021,6 +31565,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep38/sprite.png',
 		name: 'Shaman Ravens',
+		width: 159,
+		height: 179,
 		animations: {
 			idle: {
 				key: "idle",
@@ -31381,6 +31927,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep36/sprite.png',
 		name: 'Shaman Fire Breath',
+		width: 286,
+		height: 191,
 		animations: {
 			idle: {
 				key: "idle",
@@ -31658,6 +32206,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep36/shaman-breath-rage.png',
 		name: 'Shaman Rage Breath',
+		width: 286,
+		height: 191,
 		animations: {
 			idle: {
 				key: "idle",
@@ -31982,6 +32532,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep36/sprite.png',
 		name: 'Shaman Fireball',
+		width: 132,
+		height: 76,
 		animations: {
 			idle: {
 				key: "idle",
@@ -32209,6 +32761,8 @@ const spells = {
 		class: __spell,
 		src: './images/sprites/ep36/sprite.png',
 		name: 'Shaman Skull',
+		width: 71,
+		height: 76,
 		animations: {
 			idle: {
 				key: "idle",
@@ -32437,6 +32991,7 @@ const spells = {
 		invulnerable: true,
 		class: __spell,
 		width: 120,
+		height: 60,
 		autoAim: 80,
 		drawPriority: .5,
 		pierce: true,
@@ -32779,6 +33334,7 @@ const spells = {
 		invulnerable: true,
 		class: __spell,
 		width: 256,
+		height: 40,
 		autoAim: 80,
 		drawPriority: .5,
 		pierce: true,
@@ -33084,10 +33640,15 @@ function addSlingStoneSpells() {
                             spriteOrigin: 30,
                             bottomGap: 0,
 							sound: {
-                                key: 'rockhit3',
+                                key: 'rockhit5',
                                 volume: 1,
                                 reset: true
                             },
+							objects: [{
+                                key: 'throwwhite',
+                                position: 'under-feet',
+                                yGap: 10
+                            }],
                             extraStepXRate: -.7,
                             speed: 6
                         },
@@ -33172,7 +33733,7 @@ function addSlingStoneSpells() {
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][1],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][1],
                             sound: _bottomGaps[_spellEffects[i - 1]][1] === 0 ? {
-                                key: 'rockhit3',
+                                key: 'rockhit4',
                                 volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][0]) / 50,
                                 reset: true
                             } : null,
@@ -33204,7 +33765,7 @@ function addSlingStoneSpells() {
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][2],
                             speed: 6,
                             sound: _bottomGaps[_spellEffects[i - 1]][2] === 0 ? {
-                                key: 'rockhit3',
+                                key: 'rockhit4',
                                 volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][1]) / 50,
                                 reset: true
                             } : null,
@@ -33234,7 +33795,7 @@ function addSlingStoneSpells() {
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][3],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][3],
                             sound: _bottomGaps[_spellEffects[i - 1]][3] === 0 ? {
-                                key: 'rockhit3',
+                                key: 'rockhit4',
                                 volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][2]) / 50,
                                 reset: true
                             } : null,
@@ -33266,7 +33827,7 @@ function addSlingStoneSpells() {
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][4],
                             speed: 6,
                             sound: _bottomGaps[_spellEffects[i - 1]][4] === 0 ? {
-                                key: 'rockhit3',
+                                key: 'rockhit4',
                                 volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][3]) / 50,
                                 reset: true
                             } : null,
@@ -33296,7 +33857,7 @@ function addSlingStoneSpells() {
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][5],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][5],
                             sound: _bottomGaps[_spellEffects[i - 1]][5] === 0 ? {
-                                key: 'rockhit3',
+                                key: 'rockhit4',
                                 volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][4]) / 50,
                                 reset: true
                             } : null,
@@ -33328,7 +33889,7 @@ function addSlingStoneSpells() {
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][6],
                             speed: 6,
                             sound: _bottomGaps[_spellEffects[i - 1]][6] === 0 ? {
-                                key: 'rockhit3',
+                                key: 'rockhit4',
                                 volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][5]) / 50,
                                 reset: true
                             } : null,
@@ -33359,7 +33920,7 @@ function addSlingStoneSpells() {
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][7],
                             speed: 6,
                             sound: _bottomGaps[_spellEffects[i - 1]][7] === 0 ? {
-                                key: 'rockhit3',
+                                key: 'rockhit4',
                                 volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][6]) / 50,
                                 reset: true
                             } : null,
@@ -33390,7 +33951,7 @@ function addSlingStoneSpells() {
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][8],
                             speed: 6,
                             sound: _bottomGaps[_spellEffects[i - 1]][8] === 0 ? {
-                                key: 'rockhit3',
+                                key: 'rockhit4',
                                 volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][7]) / 50,
                                 reset: true
                             } : null,
@@ -33421,7 +33982,7 @@ function addSlingStoneSpells() {
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][9],
                             speed: 6,
                             sound: _bottomGaps[_spellEffects[i - 1]][9] === 0 ? {
-                                key: 'rockhit3',
+                                key: 'rockhit4',
                                 volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][8]) / 50,
                                 reset: true
                             } : null,
@@ -33451,7 +34012,7 @@ function addSlingStoneSpells() {
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][10],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][10],
                             sound: _bottomGaps[_spellEffects[i - 1]][10] === 0 ? {
-                                key: 'rockhit3',
+                                key: 'rockhit4',
                                 volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][9]) / 50,
                                 reset: true
                             } : null,
@@ -33482,7 +34043,7 @@ function addSlingStoneSpells() {
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][11],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][11],
                             sound: _bottomGaps[_spellEffects[i - 1]][11] === 0 ? {
-                                key: 'rockhit3',
+                                key: 'rockhit4',
                                 volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][10]) / 50,
                                 reset: true
                             } : null,
@@ -33514,7 +34075,7 @@ function addSlingStoneSpells() {
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][12],
                             speed: 6,
                             sound: _bottomGaps[_spellEffects[i - 1]][12] === 0 ? {
-                                key: 'rockhit3',
+                                key: 'rockhit4',
                                 volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][11]) / 50,
                                 reset: true
                             } : null,
@@ -33545,7 +34106,7 @@ function addSlingStoneSpells() {
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][13],
                             speed: 6,
                             sound: _bottomGaps[_spellEffects[i - 1]][13] === 0 ? {
-                                key: 'rockhit3',
+                                key: 'rockhit4',
                                 volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][12]) / 50,
                                 reset: true
                             } : null,
@@ -33575,7 +34136,7 @@ function addSlingStoneSpells() {
                             bottomGap: _bottomGaps[_spellEffects[i - 1]][14],
                             extraStepXRate: _xCoords[_spellEffects[i - 1]][14],
                             sound: _bottomGaps[_spellEffects[i - 1]][14] === 0 ? {
-                                key: 'rockhit3',
+                                key: 'rockhit4',
                                 volume: MathAbs(_bottomGaps[_spellEffects[i - 1]][13]) / 50,
                                 reset: true
                             } : null,
@@ -36374,8 +36935,8 @@ const cssAnimations = {
 			_a = document.createElement('img');
 			_a.src = './images/bloods/claw' + getRandomValue(10, 18) + '.png';
 			_a.style.width = getRandomValue(episode.cUIWidth / 4, episode.cUIWidth / 2) + 'px';
-			_a.style.maxWidth = '25vw';
-			_a.style.maxHeight = '50vh';
+			_a.style.maxWidth = '25cqw';
+			_a.style.maxHeight = '50cqh';
 			_a.style.left = getRandomValue(_l - (episode.cUIWidth / 8), _l + (episode.cUIWidth / 8)) + 'px';
 			_a.style.top = getRandomValue(episode.cUIHeight * .1, episode.cUIHeight * .4) + 'px';
 			_a.style.opacity = getRandomValue(40, 80) / 100;
@@ -36466,7 +37027,7 @@ const cssAnimations = {
 				const _btnWrapper = document.createElement('div');
 				_btnWrapper.className = 'flex black-screen-ok-btn w-100';
 				const _btn = document.createElement('div');
-				_btn.style = 'color:#f7f7f7cc !important;height:6vh !important;font-size:3vh !important';
+				_btn.style = 'color:#f7f7f7cc !important;height:6cqh !important;font-size:3cqh !important';
 				_btn.className = "orange-action-btn flex one-line";
 				_btn.innerText = getLangData('Done');
 				if(__isPC)
@@ -36547,13 +37108,9 @@ const cssAnimations = {
 		}
 		addClass(_elem, 'focus-me');
 		const _gm = document.getElementById('game-ui');
-		let _container = _gm, _extraX = 0, _extraY = 0;
-		if(!hasClass(_gm, 'loaded')) {
+		let _container = _gm;
+		if(!hasClass(_gm, 'loaded'))
 			_container = _gameUI;
-			const _wrapper = document.getElementById('wrapper');
-			_extraX = _wrapper.offsetLeft ?? 0;
-			_extraY = _wrapper.offsetTop ?? 0;
-		}
 		_container.appendChild(_curt);
 		let _finger = document.querySelector('.push-me-finger');
 		if(_finger)
@@ -36570,8 +37127,9 @@ const cssAnimations = {
 				_finger.className += ' fade-me';
 		}
 		const _rect = _elem.getBoundingClientRect();
-		const L = MathRound(_rect.left - _extraX);
-		const T = MathRound(_rect.top - _extraY);
+		const _host = _curt.getBoundingClientRect();
+		const L = MathRound(_rect.left - _host.left);
+		const T = MathRound(_rect.top - _host.top);
 		const W = MathRound(_rect.width);
 		const H = MathRound(_rect.height);
 		const R = L + W;
@@ -36636,13 +37194,13 @@ const cssAnimations = {
 "></div>
 `;
 		if(!_noFinger) {
-			_finger.style.left = (_rect.left - _extraX) + 'px';
-			_finger.style.top = ((_rect.top - _extraY) + MathRound(.5 * _elem.offsetHeight)) + 'px';
+			_finger.style.left = (_rect.left - _host.left) + 'px';
+			_finger.style.top = ((_rect.top - _host.top) + MathRound(.5 * _elem.offsetHeight)) + 'px';
 			_finger.onload = function() {
 				const gifWidth = _finger.offsetWidth;
 				if(W > gifWidth){
 					const offsetX = (W - gifWidth) / 2;
-					_finger.style.left = (_rect.left - _extraX + offsetX) + 'px';
+					_finger.style.left = (_rect.left - _host.left + offsetX) + 'px';
 				}
 			}
 			_finger.src = './images/icons/push-me.gif';
@@ -37282,7 +37840,7 @@ const cssAnimations = {
 			if (!_a) {
 				_a = document.createElement('div');
 				_a.id = _key;
-				_a.style.border = '.5vh solid ' + (_char.color ?? '#f7f7f7');
+				_a.style.border = '.5cqh solid ' + (_char.color ?? '#f7f7f7');
 				_css.appendChild(_a);
 			}
 			addClass(_a, 'circle-started');
@@ -37299,8 +37857,8 @@ const cssAnimations = {
 		// if (!_a) {
 		// 	_a = document.createElement('div');
 		// 	_a.id = _key;
-		// 	_a.style.border = '.5vh solid ' + (_char.color ?? '#f7f7f7');
-		// 	_a.style.boxShadow = 'inset 0 0 2vh ' + (_char.color ?? '#f7f7f7');
+		// 	_a.style.border = '.5cqh solid ' + (_char.color ?? '#f7f7f7');
+		// 	_a.style.boxShadow = 'inset 0 0 2cqh ' + (_char.color ?? '#f7f7f7');
 		// 	_css.appendChild(_a);
 		// }
 		// else if (hasClass(_a, 'circle-started'))
@@ -37596,8 +38154,8 @@ const cssAnimations = {
 			let randY = (0.7 + Math.random() * 0.6).toFixed(2);
 			let randTime = (0.20 + Math.random() * 0.12).toFixed(3); // 0.20 - 0.32
 
-			_gamePad.style.setProperty('--ix', randX + 'vw');
-			_gamePad.style.setProperty('--iy', randY + 'vh');
+			_gamePad.style.setProperty('--ix', randX + 'cqw');
+			_gamePad.style.setProperty('--iy', randY + 'cqh');
 			_gamePad.style.setProperty('--impact-time', randTime + 's');
 
 			addClass(_gamePad, 'impact-dizzy');
@@ -37661,10 +38219,10 @@ const cssAnimations = {
 		if (!cssAnimationProps.zoomdynamic) {
 
 			// --- AAA RANDOM MOTION LAYERS ---
-			const micro = (Math.random() * 0.006 - 0.003);   // -0.003vw ~ +0.003vw
+			const micro = (Math.random() * 0.006 - 0.003);   // -0.003cqw ~ +0.003cqw
 			const delay = (Math.random() * 0.020);           // 0 ~ 20ms
 
-			_gamePad.style.setProperty('--shiftX', micro + 'vw');
+			_gamePad.style.setProperty('--shiftX', micro + 'cqw');
 			//_gamePad.style.animationDelay = delay + 's';
 			// ---------------------------------
 
@@ -38028,18 +38586,18 @@ function createRock(_rock, _container) {
 	var _h = getRandomValue(10, 60) / 10;
 	_rock.src = './images/texture/rock.png';
 	_rock.style.filter = 'brightness(' + (getRandomValue(75, 100) / 100) + ')';
-	_rock.style.height = _h + 'vh';
+	_rock.style.height = _h + 'cqh';
 	_rock.style.transform = 'scale(' + getRandomValue(0, 360) + 'deg)';
-	//_rock.style.borderRadius = (_w * .85) + 'vh ' + (_w / 10) + 'vh ' + (_w * 1.25) + 'vh ' + (_w / 10) + 'vh';
-	//_rock.style.boxShadow = 'inset 0 0 ' + (_w / 4) + 'vh #222';
+	//_rock.style.borderRadius = (_w * .85) + 'cqh ' + (_w / 10) + 'cqh ' + (_w * 1.25) + 'cqh ' + (_w / 10) + 'cqh';
+	//_rock.style.boxShadow = 'inset 0 0 ' + (_w / 4) + 'cqh #222';
 	_container.style.left = _l.toString() + '%';
 	_rock.startPlatformX = platformX;
-	_container.style.top = '-10vh';
+	_container.style.top = '-10cqh';
 	// let _br = 15;
 	// for(var i = 1; i <= 4; i++)
 	// 	removeClass(_leaf, 'leaf' + (_br + (i * 30)));
 	// addClass(_leaf, 'leaf' + (_br + (getRandomValue(1, 4) * 30)));
-	//_container.style.width = _leaf.style.width = _w + 'vh';
+	//_container.style.width = _leaf.style.width = _w + 'cqh';
 	if(episode){
 		PlaySound({key:'rockfallsmall', volume:.1});
 		episode.doTime = _gameTick;
@@ -38056,17 +38614,17 @@ function createLeaf(_leaf, _container, _limit) {
 	var _h = getRandomValue2(150, 250) / 60;
 	var _l = getRandomValue2(0, 200);
 	_leaf.src = './images/texture/leaf' + getRandomValue2(1, _limit ?? 5) + '.png';
-	_container.style.height = _leaf.style.height = _h + 'vh';
-	//_leaf.style.borderRadius = (_w * .85) + 'vh ' + (_w / 10) + 'vh ' + (_w * 1.25) + 'vh ' + (_w / 10) + 'vh';
-	//_leaf.style.boxShadow = 'inset 0 0 ' + (_w / 4) + 'vh #222';
-	_container.style.left = _l + 'vh';
+	_container.style.height = _leaf.style.height = _h + 'cqh';
+	//_leaf.style.borderRadius = (_w * .85) + 'cqh ' + (_w / 10) + 'cqh ' + (_w * 1.25) + 'cqh ' + (_w / 10) + 'cqh';
+	//_leaf.style.boxShadow = 'inset 0 0 ' + (_w / 4) + 'cqh #222';
+	_container.style.left = _l + 'cqh';
 	_leaf.startPlatformX = platformX;
-	_container.style.top = _limit ? -getRandomValue2(3, 6) + 'vh' : -getRandomValue2(10, 30) + 'vh';
+	_container.style.top = _limit ? -getRandomValue2(3, 6) + 'cqh' : -getRandomValue2(10, 30) + 'cqh';
 	// let _br = 15;
 	// for(var i = 1; i <= 4; i++)
 	// 	removeClass(_leaf, 'leaf' + (_br + (i * 30)));
 	// addClass(_leaf, 'leaf' + (_br + (getRandomValue(1, 4) * 30)));
-	//_container.style.width = _leaf.style.width = _w + 'vh';
+	//_container.style.width = _leaf.style.width = _w + 'cqh';
 	const _time = getRandomValue2(9, 12);
 	const _delay = _limit ? getRandomValue2(1, 3) : getRandomValue2(4, 12);
 	_leaf.fallingTime = (_time + _delay) * 1000;
@@ -38075,7 +38633,7 @@ function createLeaf(_leaf, _container, _limit) {
 	_leaf.style.animation = 'none';
 	_leaf.offsetHeight; /* trigger reflow */
 	_leaf.style.animation = null; 
-	_leaf.style.marginLeft = getRandomValue2(30, 60) + 'vh';
+	_leaf.style.marginLeft = getRandomValue2(30, 60) + 'cqh';
 	_leaf.style.animation = 'fall' + getRandomValue2(1,4) + ' ' + _time + 's ease-in ' + _delay + 's';
 	_container.style.transform = 'translate3d(0,0,0)';
 	_container.style.setProperty('-webkit-transform', _container.style.transform);
@@ -38464,7 +39022,7 @@ function askExitApp(){
 				<div class="flex w-100 question-modal-title-container">
 					<span class="question-modal-title wot-title">${getLangData('Go back')}?</span>
 				</div>
-				<div class="flex w-100" style="padding:0 2vh 6vh 2vh">`
+				<div class="flex w-100" style="padding:0 2cqh 6cqh 2cqh">`
 					+ _buttons +
 				`</div>
 				<div onexactclick="closeInventoryQuestionModal()" class="item-info-modal-close"></div>

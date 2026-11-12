@@ -1,6 +1,20 @@
 ﻿'use strict';
 const __attackTolerance = 2;
 
+function duelKillerSocket(_killer) {
+	if (!_killer)
+		return;
+	if (_killer.main)
+		return __socketId || _killer.socketId;
+	if (_killer.socketId)
+		return _killer.socketId;
+	if (_killer.duelSocket)
+		return _killer.duelSocket;
+	const _root = _killer.owner || _killer.related;
+	const _base = _root?.socketId || (_root?.main ? __socketId : undefined);
+	if (_base && _killer.key != null)
+		return _base + ':' + _killer.key;
+}
 function enemy(_e) {
 	this.key = _e.key;
 	this.id = _e.id;
@@ -147,6 +161,7 @@ function enemy(_e) {
 	this.oldProps = {
 		expEnabled: false,
 		goldEnabled: false,
+		smart: false,
 		itemEnabled: false,
 		reflect: false,
 		noCC: this.noCC,
@@ -948,10 +963,15 @@ function enemy(_e) {
 		}
         return { x: _x, y: _y };
     }
+    this.getDifficulty = function() {
+		if(this.smart)
+			return 0;
+		return this.difficulty ?? __account?.difficulty ?? 4;
+	}
     this.getAttackMsByDifficulty = function() {
 		if(this.friendly)
 			return 0;
-        const _df = this.difficulty ?? __account.difficulty ?? 4;
+        const _df = this.getDifficulty();
         switch(_df) {
             case 0: return 0;
             case 1: return 500;
@@ -1773,7 +1793,7 @@ function enemy(_e) {
 		return worldX >= ((episode.width || 0) - 48);
 	}
 	this.beltMeleeBudget = function() {
-		const df = this.difficulty ?? __account?.difficulty ?? 4;
+		const df = this.getDifficulty();
 		if (df <= 1)
 			return 1;
 		return 2;
@@ -2666,7 +2686,7 @@ function enemy(_e) {
 		else if(!_newAnima.attack)
 			this.lastAttackTime = undefined;
 		if(!shouldContinue && _c?.class !== 'object') {
-			if (monsterAttack && this.lastAttackTime && ((this.lastAttackTime + ((this.friendly ? 0 : this.difficulty) * 500)) > _gameTick))
+			if (monsterAttack && this.lastAttackTime && ((this.lastAttackTime + ((this.friendly ? 0 : this.getDifficulty()) * 500)) > _gameTick))
 				return false;
 			else if(_c.main && monsterAttack && _overwhelmed)
 				return false;
@@ -2762,6 +2782,12 @@ function enemy(_e) {
 			}
 		}
 	}
+	this.setPayBackBuff = function() {
+		if(this.important)
+			this.addBuff({ key: 'payback', level: getRandomValue2(2, 3) });
+		else
+			this.addBuff({ key: 'payback', level: getRandomValue2(1, 2) });
+	}
 	this.finishAnimation = function (_num) {
 		let _anima = this.animations[this.animation];
 		if(_anima.chargeStarted)
@@ -2773,7 +2799,14 @@ function enemy(_e) {
 		else
 			this.newBlocked = false;
 		if((this.animation === 'release' || _anima.hurt) && !this.main)
-			this.upcomingAnimation = this.animation = 'idle';
+		{
+			if(this.autoMode > 0 && this.getDifficulty() > 0 && !this.isDead() && (this.animation === 'release' || this.animation.startsWith('knockback')))
+			{
+				this.setPayBackBuff();
+			}
+			else
+				this.upcomingAnimation = this.animation = 'idle';
+		}
 		if(_anima?.attack)
 			this.lastFinishedAttack = this.animation;
 		if(_anima.repeat)
@@ -2813,7 +2846,7 @@ function enemy(_e) {
 		this.hurting = this.chargeProperties = this.chargimg = this.attackerCount = this.noCounter =
 		this.lastSpellTakenKey = this.attacked = this.attacking = this.upcomingAnimation =
 		this.randomStep = this.soundPlaying = this.rotateAngle = this.rotateStart =
-		this.rotateStartAngle = this.rotateDir = undefined;
+		this.rotateStartAngle = this.rotateDir = this.hitStopFrame = undefined;
 		//this.relatedObjects?.filter(x => x.bind === this.animation && !x.remove)?.forEach(x => x.remove = true);
 		if(this.keyboard) {
 			const _dirName = this.getKeyboardXMove();
@@ -2823,7 +2856,7 @@ function enemy(_e) {
 		if(_anima?.after)
 			_anima.after(this);
 		if(this.realTime) {
-			if(!this.main && !this.rivalMove && !_anima.hold)
+			if(!this.main && !this.rivalMove && !_anima.hold && !this.isDead())
 				this.animation = 'idle';
 			if(_anima.rivalXMove)
 				delete _anima.rivalXMove;
@@ -3102,7 +3135,7 @@ function enemy(_e) {
 	// 	if(!_sound)
 	// 		this.soundPlaying = undefined;
 	// }
-	this.setSound = async function(_sf,_anima,_force) {
+	this.setSound = async function(_sf,_anima,_force,_thick) {
 		if(_sf.possibility && getRandomValue2(1, 100) > _sf.possibility)
 			return;
 		let _volumeRate = 1;
@@ -3126,7 +3159,8 @@ function enemy(_e) {
 			volumeRate: _volumeRate,
 			speed: (_sf?.speed ?? 1) * (getRandomValue2(95,105) / 100),
 			owner: this,
-			bind: _sf.bind
+			bind: _sf.bind,
+			thick: _thick
 		}, [_sf?.key ??_sf], 1);
 
 		if (_sound && _sf.bind)
@@ -3251,6 +3285,11 @@ function enemy(_e) {
 		}
 		if (!this.started)
 			this.started = true;
+		if(this.spellStop && !(this.hitStop > 0)) {
+			this.spellStop = undefined;
+			if(this.class === __spell && !this.pierce && this.animation !== 'dead')
+				this.animate('dead', null, null, 6);
+		}
 		if(this.stop) {
 			this.render(this.getCurrentFrame(), _queue);
 			return;
@@ -3557,14 +3596,18 @@ function enemy(_e) {
 			this.stepSound.currentTime = 0;
 		}
 		var _sf = this.getCurrentFrame().sound;
+		const _thick = !!this._critHitSound;
+		delete this._critHitSound;
 		const _forceSound = !!(_sf && (_sf.force || (_sf.reset && this.frame > 0 && !_anima.hurt)));
 		if (_sf && this.soundPlaying != (this.frame + 1) && (!this.animationFinished || _forceSound)) {
 			if(!_sf.range || (!this.main && _sf.range))
 			{
-				if(_forceSound || (_gameTick - (this.lastSoundPlayedTime ?? 0)) > 500) {
+				const _sameKey = this.lastSoundPlayedKey === _sf.key;
+				if(_forceSound || !_sameKey || (_gameTick - (this.lastSoundPlayedTime ?? 0)) > 500) {
 					this.soundPlaying = this.frame + 1;
 					this.lastSoundPlayedTime = _gameTick;
-					this.setSound(_sf, _anima, _forceSound);
+					this.lastSoundPlayedKey = _sf.key;
+					this.setSound(_sf, _anima, _forceSound, _thick);
 				}
 			}
 		}
@@ -4097,7 +4140,7 @@ function enemy(_e) {
 							item: { key: 'gold' },
 							val: _goldAmount,
 							from: _ch,
-							//text: _goldAmount + ' x &nbsp;<img src="./images/icons/gold.png" style="width:4vh" />',
+							//text: _goldAmount + ' x &nbsp;<img src="./images/icons/gold.png" style="width:4cqh" />',
 							//class: 'effect-miss',
 							x: _ch.LEFT,
 							y: episode.cHeight - _ch.yPosition - _ch.HEIGHT
@@ -4761,7 +4804,8 @@ function enemy(_e) {
 			this.relatedObjects?.filter(x => x.key === 'regen')?.forEach(x => x.remove = true);
 			if ((msNow - this.lastHpRegenTime) > 999) {
 				const _decresement = MathRound(this.MAXHP / MathAbs(_hp * 100));
-				this.decreaseHealth(_decresement);
+				if(!(episode?.realTime && this.realTime && !this.main && !this.duelBot))
+					this.decreaseHealth(_decresement);
 				addDmgFrame({
 					//text: _decresement,
 					//class: 'effect-dmg-taken',
@@ -6692,6 +6736,8 @@ this.getRotateVerticalRate = function(attacker, victim) {
 			}
 		}
 		if (_f.atk.hurt) {
+			if(_t.animation.startsWith('counter'))
+				_t.setPayBackBuff();
 			let _decreaseHP;
 			_e.removeBuffByKey('invisibility');
 			if(_e.sleep && !_e.curse) {
@@ -6971,6 +7017,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 								if((_e.coopWith ?? _e).critDmgResistRate)
 									_dmg *= ((100 - (_e.coopWith ?? _e).critDmgResistRate) / 100);
 								_t.criticalHit = _critHitTaken = true;
+								_t._critHitSound = 1;
 								if (!_e.main)
 									_e.hbPulse = 1;
 								if(_tr.alp)
@@ -7042,15 +7089,30 @@ this.getRotateVerticalRate = function(attacker, victim) {
 							if(_hasReflect)
 								_tr.decreaseHealth(_dmg, _e);
 							else if(!_e.phased || _decreaseHP){
-								if(_e.realTime && (_t.main || (_t.related ?? _t.owner)?.main))
-									setTransferMessage([{
+								const _src = _t.related ?? _t.owner ?? _t;
+								const _mine = __socketId || mainCharacter?.socketId;
+								const _mySwing = _src.main || _t.main || (episode.duelLeader && !_src.realTime && (_src.duelBot || _t.duelBot));
+								const _remote = episode.realTime && _e.realTime && !_e.main && !_e.duelBot;
+								if(_mySwing && _remote && _e.socketId && _e.socketId !== _mine) {
+									const _seq = (_tr._dmgSeq = (_tr._dmgSeq || 0) + 1);
+									const _pkt = {
 										t: _e.socketId,
-										s: _tr.socketId,
-										k: _dmg
-									}]);
+										s: _src.socketId || _tr.socketId || _mine,
+										k: _dmg,
+										z: _seq
+									};
+									setTransferMessage([_pkt]);
+									if(_my_hub && _my_hub.q === 'Connected') {
+										_my_hub.invoke('S', { t: _e.socketId, s: _pkt.s, k: _dmg, z: _seq }).catch(function() {});
+										const _leader = (episode.roomId && String(episode.roomId).indexOf('duel:') === 0) ? episode.roomId.slice(5) : '';
+										if(_leader && _leader !== _mine && _leader !== _e.socketId)
+											_my_hub.invoke('S', { t: _leader, s: _pkt.s, k: _dmg, z: _seq, cl: _e.socketId }).catch(function() {});
+									}
+								}
 								if(_f.atk.hurt?.skipTinyCameraMove)
 									episode.skipTinyCameraMove = _f.atk.hurt.skipTinyCameraMove;
-								_e.decreaseHealth(_dmg, _t.related ?? _t);
+								if(!episode.realTime || (_mySwing && !_remote))
+									_e.decreaseHealth(_dmg, _src);
 								_e.lastDamage = _dmg;
 								if(_f.atk.hitZoom)
 									_t.setHitZoom(_f, _f.atk.hitZoom);
@@ -7075,9 +7137,10 @@ this.getRotateVerticalRate = function(attacker, victim) {
 								}
 								_e.increaseRage(_f.atk.hitTaken * (_t.criticalHit ? 2 : 1), null, 1);
 								let _canStop = false;
+								let _attackerStopped = false;
 								if(_f.atk.originX && !_t.extraOriginX)
 									_t.extraOriginX =_f.atk.originX;
-								if(_t.class !== __spell && !_t.hitStop && (_anima.hitStop || _f.atk.hitStop)) {
+								if(_t.class !== __spell && (_anima.hitStop || _f.atk.hitStop)) {
 									let _stopAdd = -1;
 									if(!_t.criticalHit) {
 										if(_f.atk.rate < 1)
@@ -7091,13 +7154,12 @@ this.getRotateVerticalRate = function(attacker, victim) {
 									if (_stopMe < 0)
 										_stopMe = 0;
 									if(_e.class !== __spell && !_e.hitStop) {
-										if(!_f.hitStopTime || (_gameTick - _f.hitStopTime) > 500)
-										{
-											_e.hitStop = (!_t.criticalHit && _f.atk.rate < 1) ? 1 : 2;
-											if (_stopMe > 0)
-												_t.hitStop = _stopMe;
-											_f.hitStopTime = _gameTick;
-											_canStop = 1;
+										_e.hitStop = (!_t.criticalHit && _f.atk.rate < 1) ? 1 : 2;
+										_canStop = 1;
+										if(!(_t.hitStop > 0) && _t.hitStopFrame !== _t.frame && _stopMe > 0) {
+											_t.hitStop = _stopMe;
+											_t.hitStopFrame = _t.frame;
+											_attackerStopped = true;
 										}
 									}
 								}
@@ -7140,7 +7202,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 								if(_canStop && _e.animation.startsWith('hurt')) {
 									if(_e.hitStop)
 										_e.start -= _e.hitStop;
-									if(_t.hitStop)
+									if(_attackerStopped)
 										_t.start -= _t.hitStop;
 								}
 							}
@@ -7357,7 +7419,15 @@ this.getRotateVerticalRate = function(attacker, victim) {
 		}
 		return false;
 	}
+	this.stopSpell = function () {
+		if(this.spellStop || this.class !== __spell || this.pierce || this.animation === 'dead')
+			return;
+		this.spellStop = 1;
+		this.hitStop = 2;
+	}
 	this.attack = function (_anima, _frame) {
+		if(this.spellStop)
+			return;
 		const trt = (this.related ?? this);
 		trt.removeBuffByKey('invisibility');
 		const _enemies = this.getAtackableUnits(_anima, _frame, this.important ? 1 : 0);
@@ -7443,12 +7513,11 @@ this.getRotateVerticalRate = function(attacker, victim) {
 								});
 							}
 						_enemyHurted = this.hurtEnemy(_anima, _frame, _enemy, _enemyFrame, _enemyAnima);
-						if (this.class === __spell && (!this.pierce) && this.animation !== 'dead')
-							this.animate('dead', null, null, 6);
+						this.stopSpell();
 						hurtedByPriority = true;
 					}
-					else if (this.class === __spell && (!this.pierce) && this.animation !== 'dead')
-						this.animate('dead', null, null, 7);
+					else
+						this.stopSpell();
 				}
 				else if(_enemy.ironSkin && !(this.owner ?? trt).ironSkin) {
 					_enemy.addObject({
@@ -7504,11 +7573,10 @@ this.getRotateVerticalRate = function(attacker, victim) {
 				}
 				else if ((!_enemy.dying || (_enemy.dying && this.key == _enemy.killingBy)) && (_thisPriority < (_enemyPriority ?? 10))) {
 					_enemyHurted = this.hurtEnemy(_anima, _frame, _enemy, _enemyFrame, _enemyAnima);
-					if (this.class === __spell && (!this.pierce) && this.animation !== 'dead')
-						this.animate('dead', null, null, 8);
+					this.stopSpell();
 				}
-				else if (this.class === __spell && (!this.pierce) && this.animation !== 'dead')
-					this.animate('dead', null, null, 9);
+				else if (this.class === __spell && !this.pierce && this.animation !== 'dead')
+					this.stopSpell();
 				else {
 					_enemyHurted = this.hurtEnemy(_anima, _frame, _enemy, _enemyFrame, _enemyAnima, _thisPriority ?? 10, _enemyPriority ?? 10);
 				}
@@ -7790,6 +7858,8 @@ this.getRotateVerticalRate = function(attacker, victim) {
 			else
 				this[_key] = _props[_key];
 		}
+		if (this.remove && episode?.war && episode.realTime)
+			this._duelGone = 1;
 	}
 	this.increaseRage = function (_point, _crit, _hurt) {
 		if (!this.animations.air2 || !this.animations.air2.ultimate)
@@ -8705,6 +8775,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 							spriteWidth: _frame.spriteWidth,
 							spriteHeight: _frame.spriteHeight,
 							shadow: _frame.hasShadowBehind ? (_frame.shadow ?? '#000000') : undefined,
+							shadowCount: _frame.shadowCount,
 							left: _left,
 							top: _top,
 							background: _frame.background ?? _anima.background,
@@ -9051,7 +9122,8 @@ this.getRotateVerticalRate = function(attacker, victim) {
 						});
 					break;
 				case 'h':
-					this.setHealth(_diff.h, null, null, 3);
+					if(!(this._duelGone && episode?.war && episode.realTime))
+						this.setHealth(_diff.h, null, null, 3);
 					break;
 				case 'k':
 					this.decreaseHealth(_diff.k, episode.enemies?.find(x => x.socketId === _diff.s), 1);
@@ -9125,6 +9197,10 @@ this.getRotateVerticalRate = function(attacker, victim) {
 				case 'g':
 					this.release = (_diff.g & 1) > 0;
 					this.remove = (_diff.g & 2) > 0;
+					if(episode?.war && episode.realTime && this._duelGone && this.health <= 0)
+						this.remove = true;
+					else if(this.remove && episode?.war && episode.realTime)
+						this._duelGone = 1;
 					this.sleep = (_diff.g & 4) > 0;
 					this.invisible = (_diff.g & 8) > 0;
 					this.immobilize = (_diff.g & 16) > 0;
@@ -9149,6 +9225,8 @@ this.getRotateVerticalRate = function(attacker, victim) {
 			}
 		if(_keys.indexOf('j') !== -1)
 			this.extraStepXRate = _diff.j;
+		if(_diff.n && this.health <= 0 && typeof applyDuelKill === 'function')
+			applyDuelKill(this, _diff.n);
 	}
 	this.convertMDAndDirectionData = function(_md, _dir) {
 		let _total = 0;
@@ -9254,6 +9332,18 @@ this.getRotateVerticalRate = function(attacker, victim) {
 			}));
 		if (this.oldStatus?.h !== _status.health)
 			_diff.h = _status.health;
+		if (episode?.war && episode.realTime && _status.health <= 0 && this.killedBy && !this.killAnnounced && this.class !== __spell && this.class !== 'minion' && this.class !== 'object') {
+			const _killer = episode.enemies.find(y => y && y.key === this.killedBy);
+			const _ks = duelKillerSocket(_killer);
+			if (_ks) {
+				_diff.n = _ks;
+				if (_diff.h === undefined)
+					_diff.h = _status.health;
+				this.killAnnounced = 1;
+			}
+		}
+		else if (_status.health > 0)
+			this.killAnnounced = undefined;
 		if (this.oldStatus?.f !== _status.fatique)
 			_diff.f = _status.fatique;
 		if (this.oldStatus?.j !== _status.extraStepXRate)
@@ -9272,7 +9362,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 		}
 		if(this.oldStatus?.d !== _status.dir)
 			_diff.d = _status.dir;
-		if ((!(_status.animation === 'idle' && this.start === 0) && (this.oldStatus?.a !== this.animations[_status.animation].id)) || this.animationChanged) {
+		if (this.animationChanged || this.oldStatus?.a !== this.animations[_status.animation].id) {
 			_diff.a = _anima.id;
 			if (this.animationChanged)
 				this.animationChanged = false;
@@ -9294,13 +9384,13 @@ this.getRotateVerticalRate = function(attacker, victim) {
 		else
 			this.extraStepYRateReset = undefined;
 		const worldX = this.main ? (this.left + platformX) : this.left;
-		const xFar = Math.max(48, episode.cWidth * 0.04);
-		const yFar = Math.max(28, (this.verticalStep || 12) * 2);
+		const xFar = Math.max(12, episode.cWidth * 0.01);
+		const yFar = 8;
 		let place = !!(_firstTime || _add);
 		if (!place) {
 			const dx = this.pvpSentX === undefined ? Infinity : MathAbs(worldX - this.pvpSentX);
 			const dy = this.pvpSentY === undefined ? Infinity : MathAbs(this.yPosition - this.pvpSentY);
-			if ((!this.chargeProperties && dx > xFar) || dy > yFar)
+			if (dx > xFar || dy > yFar)
 				place = true;
 		}
 		const _keys = Object.keys(_diff);
@@ -9319,10 +9409,8 @@ this.getRotateVerticalRate = function(attacker, victim) {
 			if (place) {
 				_diff.y = to3Decimals(this.yPosition / getGroundHeight());
 				this.pvpSentY = this.yPosition;
-				if (!this.chargeProperties) {
-					_diff.x = to4Decimals(worldX / episode.width);
-					this.pvpSentX = worldX;
-				}
+				_diff.x = to4Decimals(worldX / episode.width);
+				this.pvpSentX = worldX;
 				this.lastSyncDate = msNow;
 			}
 			return _diff;
@@ -9662,7 +9750,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 								if(this.action.artifactId) {
 									__account.artifacts.push({id:this.action.artifactId});
 									_client.saveState(1);
-									warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/rune.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Talisman found') + '!</span></div>', null, null, 1);
+									warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/rune.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Talisman found') + '!</span></div>', null, null, 1);
 
 									//warn('<div class="flex heading" style="position:relative"><img style="position:absolute;z-index:-1;left:-40%;width:180%" src="./images/icons/banner.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Talisman found') + '!</span></div>', 'level-up');
 									const _portal = document.getElementById('SPRT-' + this.action.loot);
@@ -9758,6 +9846,11 @@ this.getRotateVerticalRate = function(attacker, victim) {
 				x.bind === this.animation || (x.type === 'buff' && this.buffs.find(y => y.key === x.bind))));
 	}
 	this.modifySkill = function (_skill) {
+		if(!_skill)
+		{
+			_skill = 'idle';
+			return _skill;
+		}
 		if (this.ultimate)
 			if (this.animations[_skill + 'modified'])
 				return _skill + 'modified';
@@ -9868,25 +9961,42 @@ this.getRotateVerticalRate = function(attacker, victim) {
 	this.randomAirCoords = function(anima , _rate) {
 		const _coords = getRandomAirCoords();
 		const _frames = anima.frames;
+		if(!_frames?.[0])
+			return;
 		const _len = _coords.length;
 		_rate = _rate ? getRandomValue2(100, _rate * 110) / 100 : 1;
 		const _xRate = _rate / 100;
+		const _zoom = this.ZOOM || this.zoom || 1;
+		const _view = episode?.cHeight || 0;
+		const _y = this.yPosition || 0;
+		const _place = function(_frame, _i, _j) {
+			if(!_frame)
+				return false;
+			let _gap = (_frame.baseBottomGap ?? 0) + (_coords[_i] * _rate);
+			const _h = _frame.spriteHeight || 0;
+			if(_view > 0 && _h > 0 && _zoom > 0) {
+				const _min = MathRound(_h * 0.4 - ((_view - _y) / _zoom));
+				const _max = MathRound(_h * 0.6 + (_y / _zoom));
+				if(_gap < _min)
+					_gap = _min;
+				else if(_gap > _max)
+					_gap = _max;
+			}
+			_frame.bottomGap = _gap;
+			if(_rate > 1)
+				_frame.extraStepXRate = -_xRate * (_j + 1);
+			else
+				delete _frame.extraStepXRate;
+			return true;
+		};
 		let j = 0;
-		for(var i = 0; i < _len; i++){
-			_frames[j].bottomGap = (_frames[j].baseBottomGap ?? 0) + (_coords[i] * _rate);
-			if(_rate > 1)
-				_frames[j].extraStepXRate = -_xRate * (j + 1);
-			else
-				delete _frames[j].extraStepXRate;
-			j++;
+		for(var i = 0; i < _len && j < _frames.length; i++, j++){
+			if(!_place(_frames[j], i, j))
+				break;
 		}
-		for(var i = _len - 1; i >= 0; i--){
-			_frames[j].bottomGap =  (_frames[j].baseBottomGap ?? 0) + (_coords[i] * _rate);
-			if(_rate > 1)
-				_frames[j].extraStepXRate = -_xRate * (j + 1);
-			else
-				delete _frames[j].extraStepXRate;
-			j++;
+		for(var i = _len - 1; i >= 0 && j < _frames.length; i--, j++){
+			if(!_place(_frames[j], i, j))
+				break;
 		}
 	}
 	this.animate = function (_skill, _force, _dontResetFrame, num) {
@@ -9979,6 +10089,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 			}
 		}
 		this.chargeProperties = this.charging = undefined;
+		this.hitStopFrame = undefined;
 		this.animation = _skill;
 		let anima = this.animations[this.animation];
 		if(anima?.swapBeforeStart)
@@ -10239,12 +10350,9 @@ this.getRotateVerticalRate = function(attacker, victim) {
 	}
 	this.checkHitCount = function() {
 		if(this.countHit) {
-			if(!(this.lastHitDate > (_gameTick - 200)) && this.hitCount > 1) {
+			if(!(this.lastHitDate > (_gameTick - 300)) && this.hitCount > 1) {
 				delete this.countHit;
 				addClass(_hitCount, 'squash');
-				// for (var _v of _hitCountValues)
-				// 	if(_v.innerText !== this.hitCount.toString())
-				// 		_v.innerText = this.hitCount;
 				let _hcs = this.hitCount > 999 ? '999+' : this.hitCount.toString();
 				const _limit = _hitCountValues.length, _len = _hcs.length;
 				let j = 0, d;
@@ -10370,7 +10478,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 				this.hbBreak = 0;
 			// if(this.main && this.health <= 0 && this.heartCount > 0)
 			// 	this.standUp();
-			if (_attacker && this.health <= 0)
+			if (_attacker && this.health <= 0 && (!(episode?.war && episode.realTime) || !this.killedBy))
 				this.killedBy = (_attacker.parent ?? _attacker.owner ?? _attacker.related ?? _attacker)?.key; //allah ne verdiyse gönder
 			if (this.friendly && !episode.pvp) {
 				const _aidBtn = document.getElementById('aid-' + this.key);
@@ -10760,7 +10868,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 	}
 	this.acceptChanges();
 	this.enterFinishedState = function(_victoryKey) {
-		warn('<div class="flex heading achievement achievement-red" style="position:relative"><img style="height:12vh !important" src="./images/frames/fatality.png" /></div>', null, null, 1);
+		warn('<div class="flex heading achievement achievement-red" style="position:relative"><img style="height:12cqh !important" src="./images/frames/fatality.png" /></div>', null, null, 1);
 		const _t = this;
 		PlaySound({key:'fatality', volume:1, end: function() {
 			_t.animate(_victoryKey, 1);
@@ -10792,7 +10900,7 @@ this.getRotateVerticalRate = function(attacker, victim) {
 		this.removeBuffs();
 		const _obj = this.animations.hurtground1.frames[0].objects ?? [];
 		_obj.push({ key: 'stun', position: 'middle-head', yGap: -25 });
-		warn('<div class="flex heading achievement achievement-red" style="position:relative"><img style="height:12vh !important" src="./images/icons/finish.png" /><div class="w-100 flex" style="text-shadow:0px 0px 4px #880808;color:#ffffffcc !important;font-size:3.4vh !important; font-weight:bold !important">' + getLangData('FINISH THIS') + '</div><div class="flex"><img class="flip-90" src="./images/icons/left-keyboard.png" style="height:40px !important;width:40px !important;margin:1vh !important" />+<img class="flip-270" src="./images/icons/left-keyboard.png" style="height:40px !important;width:40px !important;margin:1vh !important" />+<span style="margin:1vh">Attack</span></div></div>', null, 3000, 1, null, 1);
+		warn('<div class="flex heading achievement achievement-red" style="position:relative"><img style="height:12cqh !important" src="./images/icons/finish.png" /><div class="w-100 flex" style="text-shadow:0px 0px 4px #880808;color:#ffffffcc !important;font-size:3.4cqh !important; font-weight:bold !important">' + getLangData('FINISH THIS') + '</div><div class="flex"><img class="flip-90" src="./images/icons/left-keyboard.png" style="height:40px !important;width:40px !important;margin:1cqh !important" />+<img class="flip-270" src="./images/icons/left-keyboard.png" style="height:40px !important;width:40px !important;margin:1cqh !important" />+<span style="margin:1cqh">Attack</span></div></div>', null, 3000, 1, null, 1);
 		this.animations.hurtground1.frames[0].objects = _obj;
 		this.health = 1;
 		this.readyForFatality = this.skipHealthBar = this.flying = true;

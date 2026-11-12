@@ -42,12 +42,14 @@
 			_achMS += 250;
 			_achievementsHtml += `<div class="w-100 flex flex-jc-start stage-achievement-item op-none ms${_achMS}">
 									<div class="flex flex-jc-start stage-achievement-item-left">
-										<img src="./images/ui/menu-icons/${_rs.icon}.png" style="height: 70%;margin-right: 2.5%;">
+										<img src="./images/ui/game/final-${_rs.icon}.png" style="height: 70%;margin-right: 2.5%;">
 									</div>
-									<div class="flex flex-jc-end stage-achievement-item-right">
-										<div class="flex flex-jc-end stage-achievement-item-right-top wot-minititle" lang="${getLang()}">
+									<div class="flex stage-achievement-item-right-1">
+										<div class="flex flex-jc-start w-100 stage-achievement-item-right-top wot-minititle" lang="${getLang()}">
 											${_rs.title[getLang()]}
 										</div>
+									</div>
+									<div class="flex flex-jc-end stage-achievement-item-right-2">
 										<div class="flex flex-jc-end stage-achievement-item-right-bottom wot-subtitle">
 											${_rs.value.formatWithDots()}
 										</div>
@@ -144,7 +146,7 @@
 			<div class="w-50 container side-right flex flex-ai-start${_hasNext ? ' has-next' : ''}">
 				<div class="full stage-results-screen-middle${_hasNext ? ' final-screen-before-next' : ''}" style="position:relative;z-index:2;margin: 0 13.5% 0 1.5%;width:85%">
 					<div class="stars flex w-100 flex-ai-end" style="height: 20%;position:relative;background: url(./images/ui/header.png);background-size: contain;background-repeat: no-repeat;background-position: center;">
-						<div class="w-50 flex one-line stars-title wot-header">` + _missionTitle + `</div>
+						<div class="w-50 flex one-line stars-title wot-header stage-final-stars-title">` + _missionTitle + `</div>
 					</div>
 					<div class="flex flex-ai-start w-100 stage-finish-body">
 						<div class="header-content w-100 flex flex-jc-start" style="height: 55%">`

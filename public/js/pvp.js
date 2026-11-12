@@ -65,7 +65,7 @@ function pvp() {
 		let _html = '<div class="skills-content-left menu-modal-left-container full"><div style="overflow-y:auto" class="full">';
 		for(let _opponent of this.opponents)
 			_html += `<div onexactclick="__pvp.selectOpponent(this,'${_opponent.key}')" class="skill-card animate-me flex">
-						<div class="skill-icon-wrapper flex" style="padding-right:.5vh">
+						<div class="skill-icon-wrapper flex" style="padding-right:.5cqh">
 							<img src="./images/main/avatars/${_opponent.class}.png" />
 						</div>
 						<div style="flex:1;height:100%" class="flex flex-jc-start">

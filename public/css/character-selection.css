@@ -1,6 +1,6 @@
 .c-i.c-i-stats .bonus-mission-title {
-	height: 10vh;
-	margin-top:4vh;
+	height: 10cqh;
+	margin-top:4cqh;
     background: url(./../images/icons/toast-bg.png);
     background-repeat: no-repeat;
     background-position: center;
@@ -10,11 +10,11 @@
 }
 .c-i.c-i-stats .bonus-mission-desc {
 	justify-content: flex-start !important;
-	padding:1vh 0
+	padding:1cqh 0
 }
 .c-i.c-i-stats .bonus-mission-desc img {
-	height: 6vh !important;
-	margin-right: 1.5vh;
+	height: 6cqh !important;
+	margin-right: 1.5cqh;
 }
 .char-selection-center-inner .c-i {
 	z-index: 2 !important
@@ -52,14 +52,14 @@
 }
 .c-i-choose {
 	color:#f7f7f7cc !important;
-	height:20vh;
+	height:20cqh;
 	position: relative;
 	left:0;
 	width: 100%;
 	background:url(./../images/icons/txtbg.png), radial-gradient(#000000, transparent, transparent);
 	background-repeat: no-repeat;
 	background-position: center;
-	background-size:56vh auto, cover !important
+	background-size:56cqh auto, cover !important
 }
 .char-selection-right, .char-selection-left {
 	width: 30%;
@@ -117,7 +117,7 @@
 	align-items: center;
 }
 .char-selection-center-inner {
-	max-height:calc(100% - 6vh);
+	max-height:calc(100% - 6cqh);
 	background-position: center;
 }
 .char-selection-center-inner:has(.c-i-choose) {
@@ -132,8 +132,8 @@
 	width:40% !important
 }
 .char-selection-center-inner table tr td {
-	padding-top:.4vh;
-	padding-bottom:.4vh
+	padding-top:.4cqh;
+	padding-bottom:.4cqh
 }
 .char-selection-center-inner table tr td:last-child {
 	padding-right: 12%;

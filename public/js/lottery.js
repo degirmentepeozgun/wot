@@ -69,15 +69,15 @@ function spinLottery() {
 					sbg.src = sbg.src.replace('.png', '0.png');
 					sbg2.style.background = sbg2.style.background.replace('-bgf.png', 'bg0.png');
 				}, 2000);
-				warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/' + _giftOrder[itemOrder].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, null, 1);
-				warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/' + _giftOrder[itemOrder2].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, null, 1);
+				warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/' + _giftOrder[itemOrder].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, null, 1);
+				warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/' + _giftOrder[itemOrder2].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, null, 1);
 				getChestReward(__account.grade ?? 1, _giftOrder[itemOrder].type, _giftOrder[itemOrder].key);
 				getChestReward(__account.grade ?? 1, _giftOrder[itemOrder2].type, _giftOrder[itemOrder2].key);
 				let itemOrder3;
 				if(itemOrder === itemOrder2){
 					PlaySound({key:'clap', volume:.3});
 					itemOrder3 = getRandomValue(0, _giftOrder.length - 1);
-					warn('<div class="flex achievement jackpot important" style="position:relative"><img style="height:12vh" src="./images/icons/' + _giftOrder[itemOrder3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">!!!' + getLangData('JACKPOT') + '!!!</span></div>', null, null, 1);
+					warn('<div class="flex achievement jackpot important" style="position:relative"><img style="height:12cqh" src="./images/icons/' + _giftOrder[itemOrder3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">!!!' + getLangData('JACKPOT') + '!!!</span></div>', null, null, 1);
 					getChestReward(__account.grade ?? 1, _giftOrder[itemOrder3].type, _giftOrder[itemOrder3].key);
 				}
 				_lot.lastActivity = Date.now();

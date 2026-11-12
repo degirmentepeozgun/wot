@@ -93,7 +93,7 @@ function pickTagSkill(_id, _grade) {
 			if(_c.getAttribute('data-key') === _item.key)
 				addClass(_c, 'activated');
 		}
-		warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/main/skill-icons/' + _item.key + '/' + _item.limits[_grade - 1].skill + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Tag Skill Selected') + '!</span></div>', null, null, 1);
+		warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/main/skill-icons/' + _item.key + '/' + _item.limits[_grade - 1].skill + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Tag Skill Selected') + '!</span></div>', null, null, 1);
 	}
 	else 
 		warn('<span>' + getLangData('Update character first') + '</span>', 'warn');
@@ -141,7 +141,7 @@ function getFragmentDetailUI(_id, _noSound, _noAnimation) {
 					<img style="background:radial-gradient(${_color}40, transparent)" src="./images/main/${_item.key}/concept.png" />
 				</div>
 				<div class="artifact-detail-header-info">
-					<div class="flex page-detail-header artifact-title artifact-detail-header-title" style="width:100%;padding:2vh">
+					<div class="flex page-detail-header artifact-title artifact-detail-header-title" style="width:100%;padding:2cqh">
 						${_item.name}
 					</div>
 					<div class="w-100 flex flex-jc-start fragment-char-quality">
@@ -151,10 +151,10 @@ function getFragmentDetailUI(_id, _noSound, _noAnimation) {
 						<img src="./images/ui/star-${_item.limits?.length > 3 ? 'on' : 'off'}.png" />
 						<img src="./images/ui/star-${_item.limits?.length > 4 ? 'on' : 'off'}.png" />
 					</div>
-					<div class="flex page-detail-desc artifact-description${_grade > 0 ? ' d-none' : ''}" style="width:100%;padding:2vh;text-align:center">
+					<div class="flex page-detail-desc artifact-description${_grade > 0 ? ' d-none' : ''}" style="width:100%;padding:2cqh;text-align:center">
 						${getLangData('Summon that character to use as support skill')}
 					</div>
-					<div class="flex tag-skills flex-jc-start${_grade === 0 ? ' d-none' : ''}" style="width:100%;padding:2vh;text-align:center">` + _skills + `</div>
+					<div class="flex tag-skills flex-jc-start${_grade === 0 ? ' d-none' : ''}" style="width:100%;padding:2cqh;text-align:center">` + _skills + `</div>
 				</div>
 			</div>
 			<div class="w-100 fragment-props">
@@ -190,7 +190,7 @@ function getFragmentDetailUI(_id, _noSound, _noAnimation) {
 				<div class="page-detail-splitter-thin"></div>
 				<div class="w-100 flex${_nextLimit ? '' : ' d-none'}">
 					<div class="w-50 flex flex-jc-start page-detail-item-label">${getLangData('Cost')}</div>
-					<div class="w-50 flex flex-jc-end page-detail-item-value">${_cost.formatWithDots()}<img src="./images/icons/coin.png" style="border:none!important;height:2.6vh !important" /></div>
+					<div class="w-50 flex flex-jc-end page-detail-item-value">${_cost.formatWithDots()}<img src="./images/icons/coin.png" style="border:none!important;height:2.6cqh !important" /></div>
 				</div>
 			</div>
 			<div class="flex action-button-container w-100">
@@ -222,7 +222,7 @@ function askSwapFragmentCharacter(_id) {
 	const _others = __fragments.filter(x => x.key !== _item.key);
 	let _html = '';
 	for(let _f of _others)
-		_html += `<div onexactclick="selectSwapFragment(this, '${_f.key}')" data-key="${_f.key}" class="fragment-list-item${_f.key === _others[0].key ? ' selected' : ''}"><img src="./images/fragments/${_f.key}.png" style="height:6vh" /></div>`;
+		_html += `<div onexactclick="selectSwapFragment(this, '${_f.key}')" data-key="${_f.key}" class="fragment-list-item${_f.key === _others[0].key ? ' selected' : ''}"><img src="./images/fragments/${_f.key}.png" style="height:6cqh" /></div>`;
 	const _myfr = __account.fragments.find(x => x.key === _item.key);
 	let _count = _myfr.count ?? 0;
 	if(_myfr.grade > 0)
@@ -233,7 +233,7 @@ function askSwapFragmentCharacter(_id) {
 				<div class="flex w-100 fragment-swap-question-header">
 					<div class="w-50 flex">
 						<div class="main-portrait flex w-100">
-							<img src="./images/fragments/${_item.key}.png" style="height:6vh" />
+							<img src="./images/fragments/${_item.key}.png" style="height:6cqh" />
 						</div>
 						<div class="flex w-100 swap-count-container">
 							<div id="decrease-count-btn" class="flex animate-me disabled" onexactclick="decreaseSwapCount('${_item.key}')">
@@ -249,7 +249,7 @@ function askSwapFragmentCharacter(_id) {
 					</div>
 					<div class="w-50 flex">
 						<div class="taken-fragment-portrait flex w-100">
-							<img src="./images/fragments/${_others[0].key}.png" style="height:6vh" />
+							<img src="./images/fragments/${_others[0].key}.png" style="height:6cqh" />
 						</div>
 						<div class="taken-fragment-count flex">
 							x 1
@@ -317,7 +317,7 @@ function swapCharacterFragment(_id) {
 		_newCount.innerText = (parseInt(_newCount.innerText) + _count).toString();
 		const _oldCount = document.querySelector('.fragment-card[data-key="' + _current.key + '"] #fragment-' + _current.key + '-level');
 		_oldCount.innerText = _myfr.count.toString();
-		warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/fragments/' + _key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + _count + '&nbsp;x&nbsp;' + _new.name + ' ' + getLangData('fragment') + '</span></div>', null, null, 1);
+		warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/fragments/' + _key + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + _count + '&nbsp;x&nbsp;' + _new.name + ' ' + getLangData('fragment') + '</span></div>', null, null, 1);
 	}
 	closeInventoryQuestionModal();
 }
@@ -326,7 +326,7 @@ function askUpgradeFragmentCharacter(_id, _summon) {
 	const _myfr = __account.fragments.find(x => x.key === _item.key);
 	const _limit = _item.limits[_myfr?.grade ?? 0];
 	const _cost = _limit.cost;
-    askSomething(`${getLangData((_summon ? 'Summon' : 'Upgrade') + ' this character for')} <b style="margin-left:1vh;color:#F3f4f5 !important">${_cost.formatWithDots()}</b> <img style="height:2vh" src="./images/icons/coin.png" />`, `acceptAndUpgradeFragment(${_id}, ${_cost})`, 'modal_2x1');
+    askSomething(`${getLangData((_summon ? 'Summon' : 'Upgrade') + ' this character for')} <b style="margin-left:1cqh;color:#F3f4f5 !important">${_cost.formatWithDots()}</b> <img style="height:2cqh" src="./images/icons/coin.png" />`, `acceptAndUpgradeFragment(${_id}, ${_cost})`, 'modal_2x1');
 }
 function acceptAndUpgradeFragment(_id, _cost) {
 	const _item = __fragments.find(x => x.id === _id);

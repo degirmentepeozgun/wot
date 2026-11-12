@@ -829,22 +829,22 @@ function characterSkill() {
 				'<div class="skill-content-desc">' + _skill.descriptions[getLang()] + (_skill.key.endsWith('modified') ? '<br/><span style="color:#ff6c00 !important">(' + getLangData('Rage mode only') + ')</span>' : '') + '</div>' +
 				'<div class="skill-props-container">' +
 				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Upgrade Cost') + '</div>' +
-				'<div style="padding:1vh 0" class="w-50 flex flex-jc-end"><span id="skill-cost">' + this.calculateSkillPrice(_skill.key) + '</span>&nbsp;<img src="./images/icons/coin.png" style="height:2.6vh" /></div></div>' +
+				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end"><span id="skill-cost">' + this.calculateSkillPrice(_skill.key) + '</span>&nbsp;<img src="./images/icons/coin.png" style="height:2.6cqh" /></div></div>' +
 				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Skill Break') + '</div>' +
-				'<div style="padding:1vh 0" class="w-50 flex flex-jc-end">' + getLangData(this.getSkillPriority(_animation.priority)) + '</div></div>' +
+				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">' + getLangData(this.getSkillPriority(_animation.priority)) + '</div></div>' +
 				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Skill Type') + '</div>' +
-				'<div style="padding:1vh 0" class="w-50 flex flex-jc-end">' + getLangData(_skill.skillClass ?? 'Common') + '</div></div>' +
+				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">' + getLangData(_skill.skillClass ?? 'Common') + '</div></div>' +
 				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Cooldown') + '</div>' +
-				'<div style="padding:1vh 0" class="w-50 flex flex-jc-end">' + this.getSkillCooldown(_animation.cooldown) + '</div></div>' +
+				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">' + this.getSkillCooldown(_animation.cooldown) + '</div></div>' +
 				(_skill.dmgType ?
 					'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Damage Type') + '</div>' +
-					'<div style="padding:1vh 0" class="w-50 flex flex-jc-end"><img style="height:3vh;margin-right:1vh" src="./images/elemental/' + _skill.dmgType.toLowerCase() + '.png" />' + getLangData(_skill.dmgType) + '</div></div>' : '') +
+					'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end"><img style="height:3cqh;margin-right:1cqh" src="./images/elemental/' + _skill.dmgType.toLowerCase() + '.png" />' + getLangData(_skill.dmgType) + '</div></div>' : '') +
 				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Affected Target') + '</div>' +
-				'<div style="padding:1vh 0" class="w-50 flex flex-jc-end">' + (_animation.maxAttackedCount ?? __maxAttackedCount) + '</div></div>' +
+				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">' + (_animation.maxAttackedCount ?? __maxAttackedCount) + '</div></div>' +
 				'<div id="skill-current-props"><div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Current Level') + '</div>' +
-				'<div style="padding:1vh 0" class="w-50 flex flex-jc-end">+ %' + _currentProps.value + ' ' + getLangData(_currentProps.type) + '</div></div></div>' +
+				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">+ %' + _currentProps.value + ' ' + getLangData(_currentProps.type) + '</div></div></div>' +
 				(_nextProps ? '<div id="skill-next-props"><div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Next Level') + '</div>' +
-					'<div style="padding:1vh 0" class="w-50 flex flex-jc-end">+ %' + _nextProps.value + ' ' + getLangData(_nextProps.type) + '</div></div></div>' : '') +
+					'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">+ %' + _nextProps.value + ' ' + getLangData(_nextProps.type) + '</div></div></div>' : '') +
 				'</div>' +
 				'</div>' +
 				'<div class="flex action-button-container"><div class="game-btn3 animate-me flex' + ((_nextProps && _skill.unlockLevel <= mainCharacter.level) ? '' : ' gray disabled') + '" onexactclick="skill.upgradeSkill(' + _order + ')" style="height:65%"><div class="flex">' + getLangData('UPGRADE') + '</div></div></div></div>';
@@ -920,13 +920,13 @@ function characterSkill() {
 	this.getPassiveSkillDetailUI = function (_index) {
 		const _skill = this.passiveSkills[_index??0];
 		let html = '<div style="height:90%;overflow-y:auto">' +
-			'<div style="padding:4vh 5vh 1vh 5vh">' + _skill.descriptions[getLang()] + '</div>' +
+			'<div style="padding:4cqh 5cqh 1cqh 5cqh">' + _skill.descriptions[getLang()] + '</div>' +
 			'<div class="skill-content-title">Gain</div>' +
-			'<div style="padding:1vh 5vh">' + _skill.gain[0] + '</div>' +
+			'<div style="padding:1cqh 5cqh">' + _skill.gain[0] + '</div>' +
 			'<div class="skill-content-title">Chance Rate</div>' +
-			'<div style="padding:1vh 5vh">%' + (_skill.chanceRate ?? 100) + '</div>' +
+			'<div style="padding:1cqh 5cqh">%' + (_skill.chanceRate ?? 100) + '</div>' +
 			'</div>' +
-			'<div style="height:10%" class="flex"><div class="game-btn flex' + (_skill.unlockLevel <= mainCharacter.level ? '' : ' gray disabled') + '" onexactclick="skill.activatePassiveSkill(' + _index + ')"><div class="flex">ACTIVATE&nbsp;<img src="./images/icons/coin.png" style="height:2.6vh" />&nbsp;' + _skill.price + '</div></div></div>';
+			'<div style="height:10%" class="flex"><div class="game-btn flex' + (_skill.unlockLevel <= mainCharacter.level ? '' : ' gray disabled') + '" onexactclick="skill.activatePassiveSkill(' + _index + ')"><div class="flex">ACTIVATE&nbsp;<img src="./images/icons/coin.png" style="height:2.6cqh" />&nbsp;' + _skill.price + '</div></div></div>';
 		return html;
 	}
 	this.upgradeSkill = function (_order) {
@@ -953,14 +953,17 @@ function characterSkill() {
 		const _currentProps = _skill.props.find(x => x.level === _skill.level);
 		document.getElementById('skill-current-props').innerHTML =
 			(_currentProps ? '<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Current Level') + '</div>' +
-				'<div style="padding:1vh 0" class="w-50 flex flex-jc-end">+ %' + _currentProps.value + ' ' + getLangData(_currentProps.type) + '</div></div>' : '');
+				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">+ %' + _currentProps.value + ' ' + getLangData(_currentProps.type) + '</div></div>' : '');
 		
 		const _nextProps = _skill.props.find(x => x.level === (_skill.level + 1));
 		document.getElementById('skill-next-props').innerHTML =
 			(_nextProps ? '<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Next Level') + '</div>' +
-				'<div style="padding:1vh 0" class="w-50 flex flex-jc-end">+ %' + _nextProps.value + ' ' + getLangData(_nextProps.type) + '</div></div>' : '');
+				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">+ %' + _nextProps.value + ' ' + getLangData(_nextProps.type) + '</div></div>' : '');
 		document.getElementById('skill-' + _skill.key + '-level').innerText = _skill.level;
 		document.getElementById('skill-cost').innerText = this.calculateSkillPrice(_skill.key);
+		const _cl = document.querySelector('.skill-content-level');
+		if(_cl)
+			_cl.innerText = _skill.level + ' / ' + _skill.props.length;
 		_client.upgradeSkill(mainCharacter, _skill);
 		checkUpdateAvailable2(2);
 	}

@@ -45,6 +45,9 @@ xmlns:android="http://schemas.android.com/apk/res/android">
     </provider>
 
 </config-file>
+	<edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application/activity[@android:name='MainActivity']">
+		<activity android:windowSoftInputMode="adjustNothing" />
+	</edit-config>
 	<preference name="AndroidWindowSplashScreenAnimatedIcon" value="" />
 	<preference name="StatusBarOverlaysWebView" value="true" />
 	<preference name="Fullscreen" value="true" />
@@ -54,6 +57,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 	<resource-file src="res/drawable/ic_cdv_splashscreen.xml" target="app/src/main/res/drawable/ic_cdv_splashscreen.xml" />
 	<preference name="AndroidWindowSplashScreenBackground" value="#000000" />
       <preference name="AndroidWindowBackground" value="#000000" />
+      <preference name="BackgroundColor" value="0xff000000" />
       <preference name="Orientation" value="landscape" />
 	<preference name="AndroidOverrideBackButton" value="true" />
 	<preference name="AndroidLaunchMode" value="singleTask" />
@@ -72,12 +76,12 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 	<preference name="SplashScreenDelay" value="0" />
 	<preference name="FadeSplashScreen" value="false" />
 	<preference name="ShowSplashScreenSpinner" value="false" />
-      <icon src="res/icon/android/icon.png" density="ldpi" />
-      <icon src="res/icon/android/icon.png" density="mdpi" />
-      <icon src="res/icon/android/icon.png" density="hdpi" />
-      <icon src="res/icon/android/icon.png" density="xhdpi" />
-      <icon src="res/icon/android/icon.png" density="xxhdpi" />
-      <icon src="res/icon/android/icon.png" density="xxxhdpi" /> 
+      <icon src="res/icon/android/icon-legacy.png" density="ldpi" foreground="res/icon/android/icon-foreground.png" background="res/icon/android/icon-background.png" />
+      <icon src="res/icon/android/icon-legacy.png" density="mdpi" foreground="res/icon/android/icon-foreground.png" background="res/icon/android/icon-background.png" />
+      <icon src="res/icon/android/icon-legacy.png" density="hdpi" foreground="res/icon/android/icon-foreground.png" background="res/icon/android/icon-background.png" />
+      <icon src="res/icon/android/icon-legacy.png" density="xhdpi" foreground="res/icon/android/icon-foreground.png" background="res/icon/android/icon-background.png" />
+      <icon src="res/icon/android/icon-legacy.png" density="xxhdpi" foreground="res/icon/android/icon-foreground.png" background="res/icon/android/icon-background.png" />
+      <icon src="res/icon/android/icon-legacy.png" density="xxxhdpi" foreground="res/icon/android/icon-foreground.png" background="res/icon/android/icon-background.png" /> 
 	  <resource-file src="res/xml/file_paths.xml" target="app/src/main/res/xml/file_paths.xml" />
 	  <resource-file src="native/android/java/AndroidBridge.java" target="app/src/main/java/tr/wot/gameapp/AndroidBridge.java" />
     </platform>
@@ -94,4 +98,5 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 	<preference name="ShowSplashScreenSpinner" value="false" />
 	<preference name="SplashScreen" value="none" />
     <preference name="AllowInlineMediaPlayback" value="true" />
+    <preference name="KeyboardResize" value="false" />
 </widget>

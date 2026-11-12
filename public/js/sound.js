@@ -199,7 +199,8 @@
       force = false,
       end = null,
       bind = false,
-      pan = 0
+      pan = 0,
+      thick = false
     ) {
 
       // -----------------------------
@@ -227,6 +228,9 @@
 
       if (!buffer)
         return undefined;
+
+      if (thick)
+        rate = (rate || 1) * 0.94;
 
       const now = performance.now();
 

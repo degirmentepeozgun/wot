@@ -57,7 +57,7 @@
 				<div class="skill-icon-wrapper flex">
 					<img${item.bgColor ? ' style="background:radial-gradient(' + item.bgColor + ', #000)"' : ''} src="./images/mission/icons/${item.mission}/icon.png" />
 				</div>
-				<div class="flex" style="flex:1;height:100%;padding:1vh 0">
+				<div class="flex" style="flex:1;height:100%;padding:1cqh 0">
 					<div class="flex flex-jc-start skill-card-title w-100" style="height:40%">${item.title[getLang()]}</div>
 					<div class="story-level flex flex-jc-start w-100" style="height:30%">${getLangData('Lvl')}&nbsp;${item.minLevel}&nbsp;${getLangData('required')}</div>
 					<div class="story-consume flex flex-jc-start w-100" style="height:30%;color:#f3f4f5bf !important">${getLangData('Used')}:&nbsp;<span style="color:${item.daily === _mission?.current ? '#ff6c00' : '#AAFF00'}!important">${_mission?.current ?? 0}&nbsp;/&nbsp;${item.daily}</span></div>
@@ -113,9 +113,9 @@
 				let _img = '';
 				const _arr = _r.name?.split(',') ?? ['random'];
 				for(let i = 0; i < _arr.length; i++)
-					_img += `<img style="left:${i * 5}vh;position:absolute;top:0" src="./images/fragments/${_arr[i]}.png" />`;
+					_img += `<img style="left:${i * 5}cqh;position:absolute;top:0" src="./images/fragments/${_arr[i]}.png" />`;
 				_html += `<div class="flex flex-jc-start w-50 story-reward story-reward-fragment">
-							<div style="position:relative;height:8vh;width:calc(8vh + ${((_arr.length - 1) * 5)}vh)">`
+							<div style="position:relative;height:8cqh;width:calc(8cqh + ${((_arr.length - 1) * 5)}cqh)">`
 							+ _img +
 							`</div>
 							<div style="flex:1" class="flex">
@@ -131,7 +131,7 @@
 							<span class="${_r.type === 'random' ? '' : 'story-reward-item grade' + (_r.grade ?? 1) + '-item'}" style="display:inline-block;position:relative">
 								<img class="item-img" src="./images/gems/${_r.type}${_r.grade ?? 1}.png" />
 							</span>
-							<div style="flex:1;padding-left:1vh" class="flex">
+							<div style="flex:1;padding-left:1cqh" class="flex">
 								<div class="w-100 flex flex-jc-start page-detail-desc">
 									${(_r.count ? _r.count.formatWithDots() : ((_r.minCount && _r.maxCount) ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1))}
 								</div>
@@ -143,7 +143,7 @@
 							<span class="story-reward-item grade${_r.grade ?? 1}-item" style="display:inline-block;position:relative">
 								<img class="item-img" src="./images/items/icons/${(_r.type ?? _r.key) === 'weapon' ? mainCharacter.class + '/' : ''}${_r.type ?? _r.key}${_r.grade ?? 1}.png" />
 							</span>
-							<div style="flex:1;padding-left:1vh" class="flex">
+							<div style="flex:1;padding-left:1cqh" class="flex">
 								<div class="w-100 flex flex-jc-start page-detail-desc">
 									${(_r.count ? _r.count.formatWithDots() : ((_r.minCount && _r.maxCount) ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1))}
 								</div>

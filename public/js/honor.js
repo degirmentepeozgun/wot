@@ -198,7 +198,7 @@ function askStartForge(_type) {
 		warn('<span>' + getLangData('Not enough honor points') + '</span>', 'warn');
 		return;
 	}
-	askSomething(`${getLangData('Redeem honor points')} <b style="margin:0 1vh;color:#F4BB44 !important">${_item.cost.formatWithDots()}</b> <img style="height:4vh" src="./images/icons/honor.png" />`, "startForge('" + _type + "')", "modal_2x1");
+	askSomething(`${getLangData('Redeem honor points')} <b style="margin:0 1cqh;color:#F4BB44 !important">${_item.cost.formatWithDots()}</b> <img style="height:4cqh" src="./images/icons/honor.png" />`, "startForge('" + _type + "')", "modal_2x1");
 }
 function startForge(_type) {
 	if(!__account.forges)

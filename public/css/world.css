@@ -5,65 +5,65 @@
 	font-weight: 600;
 	text-transform: uppercase;
 	color: #262626 !important;
-	font-size: 2vh !important
+	font-size: 2cqh !important
 }
 .waypoint-title {
 	position: absolute;
 	display: inline-block;
 	color: #d1cb84 !important;
-	font-size: 2.8vh !important;
-	text-shadow: .4vh .4vh .8vh #000;
-	line-height: 3vh !important;
+	font-size: 2.8cqh !important;
+	text-shadow: .4cqh .4cqh .8cqh #000;
+	line-height: 3cqh !important;
 	max-width: 12% !important;
 	text-align: center !important;
 	z-index: 2;
     transform: translate(-50%,-50%)!important;
 }
 .waypoint-title-small {
-	font-size: 2.4vh !important;
+	font-size: 2.4cqh !important;
 	max-width: 10% !important;
-	line-height: 2.6vh !important;
+	line-height: 2.6cqh !important;
 	opacity: .85 !important;
 }
 .waypoint-title.waypoint-locked {
 	opacity: .8
 }
 .waypoint-title.waypoint-quest {
-	text-shadow: .4vh .4vh .8vh #F4BB44;
+	text-shadow: .4cqh .4cqh .8cqh #F4BB44;
 }
 .waypoint-title {
-	text-shadow:0 0 .8vh #000, 0 0 .8vh #000, 0 0 .8vh #000;
+	text-shadow:0 0 .8cqh #000, 0 0 .8cqh #000, 0 0 .8cqh #000;
 }
 .waypoint-title.waypoint-current {
 	color: #F3F4F5 !important;
-	font-size:2.8vh !important
+	font-size:2.8cqh !important
 }
 .waypoint-title img {
 	display:none !important
 }
 .waypoint-title .map-lock {
 	position: absolute;
-	width: 3vh;
-	left: -2vh;
+	width: 3cqh;
+	left: -2cqh;
 	bottom: 0
 }
 
 		.waypoint-title .map-lock.map-icon {
-			width: 4vh;
+			width: 4cqh;
 		}
 
 	.waypoint-title .map-current-location {
 		position: absolute;
-		width: 3vh;
-		right: -1.4vh;
-		bottom: 2.6vh;
-		filter: drop-shadow(0 0 .2vh #fff) drop-shadow(1vh .5vh .25vh #262626bb);
-		-webkit-filter: drop-shadow(0 0 .2vh #fff) drop-shadow(1vh .5vh .25vh #262626bb)
+		width: 3cqh;
+		right: -1.4cqh;
+		bottom: 2.6cqh;
+		filter: drop-shadow(0 0 .2cqh #fff) drop-shadow(1cqh .5cqh .25cqh #262626bb);
+		-webkit-filter: drop-shadow(0 0 .2cqh #fff) drop-shadow(1cqh .5cqh .25cqh #262626bb)
 	}
 
 .map-compass {
-	height: 14vh;
-	margin: 1vh 2vh;
+	height: 14cqh;
+	margin: 1cqh 2cqh;
 	top: 0;
 	right: 0;
 	position: absolute
@@ -84,32 +84,32 @@
 	height: auto;
 }
 /* #map-coords {
-	background: radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 29% 69%/2vh 2vh, 
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 31% 74%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 29% 79%/2vh 2vh,
+	background: radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 29% 69%/2cqh 2cqh, 
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 31% 74%/2cqh 2cqh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 29% 79%/2cqh 2cqh,
 
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 16.5% 79%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 13.5% 76.5%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 11.5% 73%/2vh 2vh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 16.5% 79%/2cqh 2cqh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 13.5% 76.5%/2cqh 2cqh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 11.5% 73%/2cqh 2cqh,
 
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 12.5% 62.5%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 13.5% 58%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 15.5% 54%/2vh 2vh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 12.5% 62.5%/2cqh 2cqh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 13.5% 58%/2cqh 2cqh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 15.5% 54%/2cqh 2cqh,
 
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 23.5% 50.5%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 26.5% 49.5%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 29.5% 48%/2vh 2vh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 23.5% 50.5%/2cqh 2cqh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 26.5% 49.5%/2cqh 2cqh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 29.5% 48%/2cqh 2cqh,
 
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 26.5% 43%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 23% 41.5%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 20% 39%/2vh 2vh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 26.5% 43%/2cqh 2cqh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 23% 41.5%/2cqh 2cqh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 20% 39%/2cqh 2cqh,
 
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 28% 34%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 31% 32.5%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 33.5% 29.5%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 33% 18%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 31.75% 14%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 29.5% 11%/2vh 2vh;
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 28% 34%/2cqh 2cqh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 31% 32.5%/2cqh 2cqh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 33.5% 29.5%/2cqh 2cqh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 33% 18%/2cqh 2cqh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 31.75% 14%/2cqh 2cqh,
+	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 29.5% 11%/2cqh 2cqh;
 
 	background-repeat: no-repeat;
 } */
@@ -126,7 +126,7 @@
 }
 #world-map {
 	height:round(nearest, 96%, 1px) !important;
-	box-shadow: 5vh 0 7vh #00000080, -5vh 0 7vh #00000080;
+	box-shadow: 5cqh 0 7cqh #00000080, -5cqh 0 7cqh #00000080;
 	position:relative;
 	aspect-ratio:983 / 500
 }
@@ -135,26 +135,26 @@
 }
 
 .world-map-container .book-page-bg:has(#map-detail-modal:not(.fade-out)) #world-map {
-	filter:blur(.5vh);
-	-webkit-filter:blur(.5vh) !important
+	filter:blur(.5cqh);
+	-webkit-filter:blur(.5cqh) !important
 }
 .map-detail-modal-inner {
 	overflow-y: auto;
 	position: relative;
 }
 .map-detail-modal-inner img {
-	max-height: 5vh !important;
-	max-width: 5vh !important;
-	margin:0 1vh 0 .5vh
+	max-height: 5cqh !important;
+	max-width: 5cqh !important;
+	margin:0 1cqh 0 .5cqh
 }
 .mission-reward-item {
 	width:100%;
 	color:#f3f4f5cc !important;
-	margin-bottom: 1vh;
+	margin-bottom: 1cqh;
 }
 .mission-desc-text {
 	color:#f3f4f5ab !important;
-	text-indent: 4vh;
+	text-indent: 4cqh;
 }
 .map-detail-modal-content {
 	overflow-y:auto !important
@@ -176,9 +176,9 @@
 .act-map-part {
 	height:50%;
 	width:50%;
-	font-size: 6vh !important;
+	font-size: 6cqh !important;
 	color: #d1cb84 !important;
-	text-shadow: .4vh .4vh .8vh #000;
+	text-shadow: .4cqh .4cqh .8cqh #000;
 	backdrop-filter: grayscale(80%) brightness(100%) contrast(150%);
 }
 .act-map-part.active{

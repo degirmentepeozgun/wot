@@ -1,4 +1,4 @@
-﻿﻿﻿'use strict';
+﻿﻿'use strict';
 
 function createMainCharacter(_x) {
 	if (_x?.class)
@@ -35,7 +35,7 @@ function getCharacterChatColor(_class) {
 		case 'thief':
 			return '#00c4ffdd';
 		case 'cyclops':
-			return '#36454F';
+			return '#b92022';
 		case 'werewolf':
 			return '#7393B3';
 		case 'druid': 
@@ -716,7 +716,7 @@ function createCharacter(_settings) {
 								spriteHeight: 205,
 								spriteOrigin: 110,
 								speed: 1,
-								sound: {key:'warriorattack5', volume:.5}
+								sound: {key:'warriorattack5', volume:.6}
 							},
 							{
 								spriteLeft: 1855,
@@ -1652,8 +1652,8 @@ function createCharacter(_settings) {
 								// 		p1: { color: '#b57064', strength: 6, xVelocity: .2, yVelocity:.001 } 
 								// 	}
 								// ],
-								do: function() {
-									mainCharacter.addObject(
+								do: function(_e) {
+									_e.addObject(
 									{
 										key: 'flash', 
 										position: 'canvas', 
@@ -1943,8 +1943,8 @@ function createCharacter(_settings) {
 									key: 'earthspikes4',
 									pierce: true
 								},
-								do: function() {
-									mainCharacter.addObject(
+								do: function(_e) {
+									_e.addObject(
 									{
 										key: 'flash', 
 										position: 'canvas', 
@@ -8322,7 +8322,7 @@ function createCharacter(_settings) {
 								spriteHeight: 143,
 								spriteOrigin: 78,
 								extraStepXRate: 1.2,
-								extraStepYRate: -2.75,
+								extraStepYRate: -2.25,
 								speed: 8,
 								def: {
 									iframe: true
@@ -10760,7 +10760,7 @@ function createCharacter(_settings) {
 									key: 'archerarrow',
 									xGap: -75
 								},
-								sound: { key: 'arrow', volume: 1 },
+								sound: { key: 'arrowfaster', volume: 1 },
 								atk: {
 									yRange: 0,
 									rate: 0,
@@ -10804,7 +10804,7 @@ function createCharacter(_settings) {
 								spriteHeight: 236,
 								spriteOrigin: 65,
 								speed: 4,
-								sound: { key: 'arrow', volume: 1 },
+								sound: { key: 'arrowfaster', volume: 1, reset: true },
 								atk: {
 									yRange: 0,
 									rate: 0,
@@ -10877,7 +10877,7 @@ function createCharacter(_settings) {
 								spriteHeight: 236,
 								spriteOrigin: 65,
 								speed: 4,
-								sound: { key: 'arrow', volume: 1 },
+								sound: { key: 'arrowfastest', volume: 1 },
 								atk: {
 									yRange: 0,
 									rate: 0,
@@ -10925,7 +10925,7 @@ function createCharacter(_settings) {
 								spriteHeight: 236,
 								spriteOrigin: 65,
 								speed: 1,
-								sound: { key: 'arrow', volume: 1 },
+								sound: { key: 'arrowfastest', volume: 1, reset: true },
 								atk: {
 									yRange: 0,
 									rate: 0,
@@ -10973,7 +10973,7 @@ function createCharacter(_settings) {
 								spriteHeight: 236,
 								spriteOrigin: 65,
 								speed: 1,
-								sound: { key: 'arrow', volume: 1 },
+								sound: { key: 'arrowfastest', volume: 1, reset: true },
 								atk: {
 									yRange: 0,
 									rate: 0,
@@ -11161,6 +11161,7 @@ function createCharacter(_settings) {
 								spriteHeight: 237,
 								spriteOrigin: 65,
 								speed: 8,
+								sound: { key: 'firearrow', volume: 1 },
 								directionChangeEnabled: true,
 								def: {
 									rate: .8
@@ -11173,7 +11174,7 @@ function createCharacter(_settings) {
 								spriteHeight: 236,
 								spriteOrigin: 65,
 								speed: 4,
-								sound: { key: 'firearrow', volume: .1 },
+								sound: { key: 'arrow', volume: 1 },
 								atk: {
 									yRange: 0,
 									rate: 0,
@@ -36706,6 +36707,7 @@ const _allEnemies = {
 							def: {
 								iframe: true
 							},
+							sound: { key: 'giantrunright', volume:1, reset: true, force: true },
 							//sound: { key: 'gorillacharge', volume:1 },
 							atk: {
 								yRange: 15,
@@ -36714,7 +36716,7 @@ const _allEnemies = {
 								hurt: {
 									key: 'hurtair',
 									type: 'air',
-									sound: {key:'headhit', volume:1}
+									sound: {key:'headhit', volume:.5}
 								}
 							}
 						},
@@ -36748,7 +36750,7 @@ const _allEnemies = {
 								hurt: {
 									key: 'hurtair',
 									type: 'air',
-									sound: {key:'headhit', volume:1}
+									sound: {key:'headhit', volume:.5}
 								}
 							}
 						},
@@ -36760,7 +36762,6 @@ const _allEnemies = {
 							spriteOrigin: 137,
 							extraStepXRate:.6,
 							speed: 1,
-							sound: { key: 'kongrun', volume:1, reset: true, force: true },
 							objects: [
 								{ key: 'groundbackdust', position:'behind-feet', reset: true }
 							],
@@ -36786,7 +36787,7 @@ const _allEnemies = {
 								hurt: {
 									key: 'hurtair',
 									type: 'air',
-									sound: {key:'headhit', volume:1}
+									sound: {key:'headhit', volume:.5}
 								}
 							}
 						},
@@ -36810,6 +36811,7 @@ const _allEnemies = {
 							spriteOrigin: 103,
 							extraStepXRate:.6,
 							speed: 7,
+							sound: { key: 'giantrunleft', volume:1, reset: true, force: true },
 							def: {
 								iframe: true
 							},
@@ -36820,7 +36822,7 @@ const _allEnemies = {
 								hurt: {
 									key: 'hurtair',
 									type: 'air',
-									sound: {key:'headhit', volume:1}
+									sound: {key:'headhit', volume:.5}
 								}
 							}
 						},
@@ -36854,7 +36856,7 @@ const _allEnemies = {
 								hurt: {
 									key: 'hurtair',
 									type: 'air',
-									sound: {key:'headhit', volume:1}
+									sound: {key:'headhit', volume:.5}
 								}
 							}
 						},
@@ -36866,7 +36868,6 @@ const _allEnemies = {
 							spriteOrigin: 134,
 							extraStepXRate:.6,
 							speed: 1,
-							sound: { key: 'kongrun', volume:1, reset: true, force: true },
 							objects: [
 								{ key: 'groundbackdust', position:'behind-feet', reset: true }
 							],
@@ -36892,7 +36893,7 @@ const _allEnemies = {
 								hurt: {
 									key: 'hurtair',
 									type: 'air',
-									sound: {key:'headhit', volume:1}
+									sound: {key:'headhit', volume:.5}
 								}
 							}
 						},
@@ -36916,6 +36917,7 @@ const _allEnemies = {
 							spriteOrigin: 67,
 							extraStepXRate:.6,
 							speed: 7,
+							sound: { key: 'giantrunright', volume:1, reset: true, force: true },
 							def: {
 								iframe: true
 							},
@@ -36926,7 +36928,7 @@ const _allEnemies = {
 								hurt: {
 									key: 'hurtair',
 									type: 'air',
-									sound: {key:'headhit', volume:1}
+									sound: {key:'headhit', volume:.5}
 								}
 							}
 						},
@@ -36960,7 +36962,7 @@ const _allEnemies = {
 								hurt: {
 									key: 'hurtair',
 									type: 'air',
-									sound: {key:'headhit', volume:1}
+									sound: {key:'headhit', volume:.5}
 								}
 							}
 						},
@@ -36972,7 +36974,6 @@ const _allEnemies = {
 							spriteOrigin: 137,
 							extraStepXRate:.6,
 							speed: 1,
-							sound: { key: 'kongrun', volume:1, reset: true, force: true },
 							objects: [
 								{ key: 'groundbackdust', position:'behind-feet', reset: true }
 							],
@@ -36998,7 +36999,7 @@ const _allEnemies = {
 								hurt: {
 									key: 'hurtair',
 									type: 'air',
-									sound: {key:'headhit', volume:1}
+									sound: {key:'headhit', volume:.5}
 								}
 							}
 						},
@@ -37021,6 +37022,7 @@ const _allEnemies = {
 							spriteHeight: 264,
 							spriteOrigin: 103,
 							extraStepXRate:.6,
+							sound: { key: 'giantrunleft', volume:1, reset: true, force: true },
 							speed: 7,
 							def: {
 								iframe: true
@@ -37032,7 +37034,7 @@ const _allEnemies = {
 								hurt: {
 									key: 'hurtair',
 									type: 'air',
-									sound: {key:'headhit', volume:1}
+									sound: {key:'headhit', volume:.5}
 								}
 							}
 						},
@@ -37066,7 +37068,7 @@ const _allEnemies = {
 								hurt: {
 									key: 'hurtair',
 									type: 'air',
-									sound: {key:'headhit', volume:1}
+									sound: {key:'headhit', volume:.5}
 								}
 							}
 						},
@@ -37078,7 +37080,6 @@ const _allEnemies = {
 							spriteOrigin: 134,
 							extraStepXRate:.46,
 							speed: 1,
-							sound: { key: 'kongrun', volume:1, reset: true, force: true },
 							objects: [
 								{ key: 'groundbackdust', position:'behind-feet', reset: true }
 							],
@@ -37104,7 +37105,7 @@ const _allEnemies = {
 								hurt: {
 									key: 'hurtair',
 									type: 'air',
-									sound: {key:'headhit', volume:1}
+									sound: {key:'headhit', volume:.5}
 								}
 							}
 						}
@@ -40879,7 +40880,7 @@ const _allEnemies = {
 							spriteHeight: 263,
 							spriteOrigin: 50,
 							do: function(_e) {
-								warn('<div class="flex heading achievement-red" style="position:relative;width:auto"><img style="height:15vh;z-index:-1" src="./images/icons/txtbg.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Supply Incoming') + '</div></div>');
+								warn('<div class="flex heading achievement-red" style="position:relative;width:auto"><img style="height:15cqh;z-index:-1" src="./images/icons/txtbg.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Supply Incoming') + '</div></div>');
 								PlaySound({key:'airwhistle', volume:1});
 								const _start = _e.animations.start;
 								const _frames = _start.frames;
@@ -77517,8 +77518,8 @@ const _allEnemies = {
 							},
 							do: function(_e) {
 								const _killer = episode.enemies.find(x => x.key === _e.killedBy);
-								//warn('<div class="flex heading achievement-red" style="position:relative;width:auto"><img style="height:15vh;z-index:-1" src="./images/icons/txtbg.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Flag Captured') + '</div></div>');
-								warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/flag.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Flag Captured') + '!</span></div>', null, null, 1);
+								//warn('<div class="flex heading achievement-red" style="position:relative;width:auto"><img style="height:15cqh;z-index:-1" src="./images/icons/txtbg.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Flag Captured') + '</div></div>');
+								warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/flag.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Flag Captured') + '!</span></div>', null, null, 1);
 								PlaySound({ key: 'curse', volume: .75 });
 								_killer.flagCapturer = true;
 								episode.flagInCenter = false;
@@ -77643,6 +77644,8 @@ const _allEnemies = {
 							spriteHeight: 540,
 							spriteOrigin: 282,
 							do: function(_e) {
+								if(episode?.enemies?.filter(x => x.id === 7)?.length > 9)
+									return;
 								const _mob = summonMob(7, MathRound((_e.SCREENLEFT + platformX) / __zoom),
 								_e.yPosition - 5);
 								_mob.updateVariables();
@@ -79714,6 +79717,8 @@ const _allEnemies = {
 							spriteHeight: 1240,
 							spriteOrigin: 1223 - 899 - 33,
 							do: function(_e) {
+								if(episode?.enemies?.filter(x => x.id === 7)?.length > 9)
+									return;
 								const _mob = summonMob(7, MathRound((_e.SCREENLEFT + platformX) / __zoom),
 								_e.yPosition - 5);
 								_mob.updateVariables();
@@ -84506,7 +84511,7 @@ const _allEnemies = {
 							speed: 1,
 							sound: { key:'weaponfound', volume: .1 },
 							do : function(_e) {
-								warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/kill.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Weapon found') + '!</span></div>', null, null, 1);
+								warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/kill.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Weapon found') + '!</span></div>', null, null, 1);
 								//warn('<div class="flex heading" style="position:relative"><img style="position:absolute;z-index:-1;left:-40%;width:180%" src="./images/icons/banner.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Weapon found') + '!</span></div>', 'level-up');
 							},
 							def: {
@@ -84583,7 +84588,7 @@ const _allEnemies = {
 									updateQuestArea();
 									episode.dialogs = [{
 										id: 1, 
-										width: '30vw',
+										width: '30cqw',
 										location: { map: episode.id }, ms: 2000,
 										owner: _e.toucher, 
 										text: "I got you babe!", 
@@ -84594,7 +84599,7 @@ const _allEnemies = {
 											getQuestRewards(__account.questStatus.quest);
 											__account.questStatus.quest = __account.questStatus.state = undefined;
 											updateQuestArea();
-											//warn('<div class="flex heading quest-status-main" style="position:relative;width:auto"><img style="height:10vh;z-index:-1" src="./images/icons/quest-completed.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Quest Completed') + '</div></div>', 'level-up');
+											//warn('<div class="flex heading quest-status-main" style="position:relative;width:auto"><img style="height:10cqh;z-index:-1" src="./images/icons/quest-completed.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Quest Completed') + '</div></div>', 'level-up');
 											PlaySound({ key: 'questdone', volume: .8 });
 											episode.pauseAmbianceMusic();
 											episode.ambiancePath = './images/sounds/quake.mp3';
@@ -84835,7 +84840,7 @@ const _allEnemies = {
 							speed: 1,
 							sound: { key:'eggfall', volume: .4 },
 							do : function(_e) {
-								//warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/kill.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Weapon found') + '!</span></div>', null, null, 1);
+								//warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/kill.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Weapon found') + '!</span></div>', null, null, 1);
 								//warn('<div class="flex heading" style="position:relative"><img style="position:absolute;z-index:-1;left:-40%;width:180%" src="./images/icons/banner.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Weapon found') + '!</span></div>', 'level-up');
 							},
 							def: {

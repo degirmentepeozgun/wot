@@ -1,4 +1,57 @@
 ﻿"use strict"
+document.addEventListener('keydown', function(e) {
+	const _t = e.target;
+	if(!_t || _t.classList?.contains('key-combination-item'))
+		return;
+	const _tag = _t.tagName;
+	if(_tag !== 'INPUT' && _tag !== 'TEXTAREA')
+		return;
+	if(_tag === 'INPUT') {
+		const _type = (_t.type || 'text').toLowerCase();
+		if(_type !== 'text' && _type !== 'search' && _type !== 'password' && _type !== 'email' && _type !== 'tel' && _type !== 'url')
+			return;
+	}
+	if(e.key === '<' || e.key === '>')
+		e.preventDefault();
+}, true);
+document.addEventListener('beforeinput', function(e) {
+	const _t = e.target;
+	if(!_t || _t.classList?.contains('key-combination-item'))
+		return;
+	const _tag = _t.tagName;
+	if(_tag !== 'INPUT' && _tag !== 'TEXTAREA')
+		return;
+	if(!e.data || (e.data.indexOf('<') < 0 && e.data.indexOf('>') < 0))
+		return;
+	e.preventDefault();
+	const _clean = e.data.replace(/[<>]/g, '');
+	if(!_clean)
+		return;
+	const _start = _t.selectionStart ?? _t.value.length;
+	const _end = _t.selectionEnd ?? _start;
+	const _max = _t.maxLength > 0 ? _t.maxLength : _t.value.length + _clean.length;
+	const _next = (_t.value.slice(0, _start) + _clean + _t.value.slice(_end)).slice(0, _max);
+	_t.value = _next;
+	const _caret = Math.min(_next.length, _start + _clean.length);
+	if(_t.setSelectionRange)
+		_t.setSelectionRange(_caret, _caret);
+}, true);
+document.addEventListener('input', function(e) {
+	const _t = e.target;
+	if(!_t || typeof _t.value !== 'string')
+		return;
+	if(_t.value.indexOf('<') < 0 && _t.value.indexOf('>') < 0)
+		return;
+	const _tag = _t.tagName;
+	if(_tag !== 'INPUT' && _tag !== 'TEXTAREA')
+		return;
+	const _start = _t.selectionStart ?? _t.value.length;
+	const _before = _t.value.slice(0, _start).replace(/[<>]/g, '').length;
+	_t.value = _t.value.replace(/[<>]/g, '');
+	const _caret = Math.min(_t.value.length, _before);
+	if(_t.setSelectionRange)
+		_t.setSelectionRange(_caret, _caret);
+}, true);
 const setFps = (function () {
 
 	let _timer = null;
@@ -88,6 +141,32 @@ function animate(_tick) {
 	if(_moved)
 		prevPlatformX = undefined;
 	requestAnimationFrame(animate);
+}
+function stepDuelBotsHidden() {
+	if(!document.hidden || !episode?.duelLeader || !episode.realTime || episode.pvpEnded || episode.disposing || __switchingMap)
+		return;
+	const now = Date.now();
+	const prev = window.__duelBgAt || now;
+	window.__duelBgAt = now;
+	let elapsed = now - prev;
+	const frame = msPerFrame || 16;
+	if(elapsed < frame)
+		elapsed = frame;
+	if(elapsed > 1000)
+		elapsed = 1000;
+	let steps = Math.floor(elapsed / frame);
+	if(steps < 1)
+		steps = 1;
+	if(steps > 60)
+		steps = 60;
+	let tick = now - steps * frame;
+	for(let i = 0; i < steps; i++) {
+		tick += frame;
+		msNow = _gameTick = tick;
+		episode._duelHoldSend = i < steps - 1;
+		episode.drawEnemies([]);
+	}
+	episode._duelHoldSend = false;
 }
 //animate();
 requestAnimationFrame(animate);
@@ -552,7 +631,7 @@ function createTipsUI(_tipOrder, _showCurrent) {
 	// for(let i = 1; i <= (_tips[_tipOrder].imageCount ?? 1); i++)
 	// 	_images += `<img class="tip-img" style="height:100%" src="./images/tips/${_tipOrder}-${i}.png" onerror="this.remove()" />`;
 	let _html = 
-	`<div id="tip-screen" class="full" style="background:url(./images/loading/${getRandomValue2(1, 7)}.png);background-size:contain;background-position:center;background-repeat:no-repeat"><div class="flex" style="padding:0 2vw;width:100%;height:40%">
+	`<div id="tip-screen" class="full" style="background:url(./images/loading/${getRandomValue2(1, 7)}.png);background-size:contain;background-position:center;background-repeat:no-repeat"><div class="flex" style="padding:0 2cqw;width:100%;height:40%">
 		
 	</div>
 	<div class="flex tip-bg-image" style="width:100%;height:60%">`
@@ -563,7 +642,7 @@ function createTipsUI(_tipOrder, _showCurrent) {
 			<div class="tip-label flex flex-ai-start flex-jc-end wot-subtitle" lang="${getLang()}"> 
 				${getLangData('Tip')}
 			</div>
-			<div class="flex flex-jc-start tip-text wot-subtitle" style="flex:1;padding:0 3vh 0 0" lang="${getLang()}">
+			<div class="flex flex-jc-start tip-text wot-subtitle" style="flex:1;padding:0 3cqh 0 0" lang="${getLang()}">
 				${_tips[_tipOrder][getLang()]}
 			</div>
 		</div>`;
@@ -809,8 +888,8 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 				// 	__particles.cancel();
 				if(episode.war || episode.pvp){
 					addClass(_gameUI, 'war-map');
-					//document.querySelector('.enemy-profile').style.setProperty('width', '40vw', 'important');
-					//document.getElementById('top-nav').style.setProperty('width', '40vw', 'important');
+					//document.querySelector('.enemy-profile').style.setProperty('width', '40cqw', 'important');
+					//document.getElementById('top-nav').style.setProperty('width', '40cqw', 'important');
 				}
 				else {
 					removeClass(_gameUI, 'war-map');
@@ -905,11 +984,11 @@ function askSkipVideo(_video, _again) {
 	_modal.className = "full flex inventory-question";
 	_modal.style.zIndex = 9999;
     _modal.innerHTML = `<div class="inventory-modal">
-            <div style="padding:6vh 4vh 4vh 4vh" class="flex">
-                <span style="color:#f7f7f7dd !important;font-size:3vh !important">${getLangData('Skip Story')}?</span></div>
-            <div style="padding:4vh 2vh" class="flex">
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="skipVideo(null, ${_again})">${getLangData('YES')}</div>
-                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3vh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
+            <div style="padding:6cqh 4cqh 4cqh 4cqh" class="flex">
+                <span style="color:#f7f7f7dd !important;font-size:3cqh !important">${getLangData('Skip Story')}?</span></div>
+            <div style="padding:4cqh 2cqh" class="flex">
+                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3cqh !important" onexactclick="skipVideo(null, ${_again})">${getLangData('YES')}</div>
+                <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3cqh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
             </div>
         </div>`;
     _gameUI.appendChild(_modal);
@@ -1224,6 +1303,13 @@ function switchBookPage(_order, _subOrder, _tabOrder) {
 	{
 		warn('<span>' + getLangData('War match in progress') + '</span>', 'warn');
 		return;
+	}
+	if(!(_order === 5 && _subOrder === 4)) {
+		const _duel = getRef('duel');
+		if(_duel?.roomId && document.querySelector("[data-module='duel']")) {
+			_duel.askLeaveForMenu(_order, _subOrder, _tabOrder);
+			return;
+		}
 	}
 	// if(_order === 3 && _subOrder === 1 && __story && !__account.questStatus?.quest){
 	// 	warn('<span>' + getLangData('No quest for now') + '</span>', 'warn');
@@ -1724,7 +1810,7 @@ function howToGainTickets() {
 				switchBookPage(8, 3);
 			}},
 			{ icon:'achievement', titles: {
-				en: 'Qlobal Quests',
+				en: 'Global Quests',
 				tr: 'Global Görevler'
 			}, func: function() {
 				closeInventoryQuestionModal();
@@ -1748,7 +1834,7 @@ function howToGainHonor() {
 		},
 		navigations: [
 			{ icon:'achievement', titles: {
-				en: 'Qlobal Quests',
+				en: 'Global Quests',
 				tr: 'Global Görevler'
 			}, func: function() {
 				closeInventoryQuestionModal();
@@ -1962,6 +2048,7 @@ function normalizeSkills(_char) {
 	_char.animations['attack' + (i - 1)].priority = 3;
 }
 function createArena(_opponent, _realTime) {
+	delete window.__duelClock;
 	resetStoryVariables();
 	const _map = mapSprites.find(x => x.id === 500);
 	const _ms = mapSprites.filter(x => x.pvp);
@@ -2346,6 +2433,8 @@ function createJusticeWar(_opponents, _roomId) {
 				_enemy.duelSocket = _opponent.socketId;
 				if(_opponent.duelBot)
 					_enemy.duelBot = 1;
+				else
+					_enemy.duelHuman = 1;
 			}
 		});
 	}
@@ -2353,6 +2442,10 @@ function createJusticeWar(_opponents, _roomId) {
 	const _setMapVariables = function() {
 		episode.war = true;
 		episode.realTime = true;
+		if(window.duel?.startedAt) {
+			episode.duelStartedAt = window.duel.startedAt;
+			delete window.duel.startedAt;
+		}
 		episode.leadTo = {
 			bottomPageIndex: 5,
 			leftPageIndex: 4
@@ -2419,6 +2512,8 @@ function createJusticeWar(_opponents, _roomId) {
 		_map.pvp = _oldPvPValue;
 	};
 	switchMap(_mapId, 1, function() {
+		if(window.__duelClock)
+			episode.duelStartedAt = window.__duelClock;
 		const _firstIds = _opponents.filter(x => _teamOf(x) === 1).map(x => x === mainCharacter ? mainCharacter.id : x.id);
 		const _lastIds = _opponents.filter(x => _teamOf(x) === 2).map(x => x === mainCharacter ? mainCharacter.id : x.id);
 		episode.loadCharacterSprites(function() {
@@ -2733,13 +2828,13 @@ function approveSelectedLanguage() {
 }
 function getOpeningLanguages(_selected) {
 	_selected = _selected ?? getLang();
-	return `<div class="full flex fade-me"><div data-lang="en" onexactclick="selectOpeningLanguage('en')" class="opening-lang-item w-100 flex flex-jc-start${_selected === 'en' ? ' selected' : ''}" style="padding:2vh 0 1vh 0">
-		<img style="height:4.5vh" src="./images/ui/circle-${_selected === 'en' ? 'on' : 'off'}.png" />
-		<div class="question-modal-item wot-subtitle" style="margin-left:2vh;color:#f3f4f5${_selected === 'en' ? '' : 'cc'}">${getLangData("English")}</div>
+	return `<div class="full flex fade-me"><div data-lang="en" onexactclick="selectOpeningLanguage('en')" class="opening-lang-item w-100 flex flex-jc-start${_selected === 'en' ? ' selected' : ''}" style="padding:2cqh 0 1cqh 0">
+		<img style="height:4.5cqh" src="./images/ui/circle-${_selected === 'en' ? 'on' : 'off'}.png" />
+		<div class="question-modal-item wot-subtitle" style="margin-left:2cqh;color:#f3f4f5${_selected === 'en' ? '' : 'cc'}">${getLangData("English")}</div>
 	</div>
-	<div data-lang="tr" onexactclick="selectOpeningLanguage('tr')" class="opening-lang-item w-100 flex flex-jc-start${_selected === 'tr' ? ' selected' : ''}" style="padding:1vh 0 2vh 0">
-		<img style="height:4.5vh" src="./images/ui/circle-${_selected === 'tr' ? 'on' : 'off'}.png" />
-		<div class="question-modal-item wot-subtitle" style="margin-left:2vh;color:#f3f4f5${_selected === 'tr' ? '' : 'cc'}">${getLangData("Turkish")}</div>
+	<div data-lang="tr" onexactclick="selectOpeningLanguage('tr')" class="opening-lang-item w-100 flex flex-jc-start${_selected === 'tr' ? ' selected' : ''}" style="padding:1cqh 0 2cqh 0">
+		<img style="height:4.5cqh" src="./images/ui/circle-${_selected === 'tr' ? 'on' : 'off'}.png" />
+		<div class="question-modal-item wot-subtitle" style="margin-left:2cqh;color:#f3f4f5${_selected === 'tr' ? '' : 'cc'}">${getLangData("Turkish")}</div>
 	</div></div>`;
 }
 function selectOpeningLanguage(_key) {
@@ -2751,7 +2846,7 @@ function askChangeLanguage() {
 	let _modal = `<div data-singleton-key="modal_1x1" class="full fade-me show-ui language-change-modal flex inventory-question settings-before-play">
 		<div class="inventory-modal flex">`
 			+
-			`<div style="padding:6vh 4vh 2vh 4vh" class="flex w-100">
+			`<div style="padding:6cqh 4cqh 2cqh 4cqh" class="flex w-100">
 				<span class="question-modal-title wot-title">${getLangData('CHOOSE LANGUAGE')}</span>
 			</div>
 			<div id="opening-languages" class="flex w-50" style="padding:0 4%;flex:1">`
@@ -2776,10 +2871,10 @@ function askResetKeyboardConfig() {
 	let _modal = `<div class="full fade-me show-ui flex inventory-question modal_2x1">
 		<div class="inventory-modal flex">`
 			+
-			`<div style="padding:6vh 4vh 2vh 4vh" class="flex w-100">
+			`<div style="padding:6cqh 4cqh 2cqh 4cqh" class="flex w-100">
 				<span style="color:#F4BB44 !important" class="wot-title">${getLangData('Reset to default settings')}?</span>
 			</div>
-			<div style="padding:2vh 2vh 6vh 2vh" class="flex w-100">
+			<div style="padding:2cqh 2cqh 6cqh 2cqh" class="flex w-100">
 				<div class="orange-action-btn wot-button flex animate-me" onexactclick="closeInventoryQuestionModal()">${getLangData('IGNORE')}</div>
 				<div id="item-selection-approve-btn" class="orange-action-btn wot-button flex animate-me" onexactclick="resetKeyboardConfig()">${getLangData('APPROVE')}</div>
 			</div>
@@ -2876,20 +2971,20 @@ function getKeyboardPromo(_force, _fromInGame) {
 	const _desc = document.createElement('div');
 	_desc.className = 'flex show-ui full keyboard-promo-container quick-play-desc-container fade-me-99 animate-me settings-before-play';
 	_desc.style = 'position:absolute;top:0;left:0;overflow:hidden;z-index:' + (_bringToFront ? 9999 : 1499);
-	//let _html = '<div style="height:calc(100% - 9vh);position:relative" class="w-100 flex"><img src="./images/icons/keys.png" style="border:.2vh solid #F3F4F599;border-top:0;position:absolute;object-fit:cover;max-width:100%;max-height:100%" /></div>';
+	//let _html = '<div style="height:calc(100% - 9cqh);position:relative" class="w-100 flex"><img src="./images/icons/keys.png" style="border:.2cqh solid #F3F4F599;border-top:0;position:absolute;object-fit:cover;max-width:100%;max-height:100%" /></div>';
 	// _desc.innerHTML = _html +
-	// 		`<div class="quick-play-desc-skip flex" style="padding:0 5vh;width:91% !important">
+	// 		`<div class="quick-play-desc-skip flex" style="padding:0 5cqh;width:91% !important">
 	// 			<div id="key-promo-skip" onexactclick="skipKeyboardPromo()" class="flex flex-jc-start w-50${_seenBefore ? ' v-none' : ''}" style="height:100%">
 	// 				<div class="flex" style="height:100%">
-	// 					<img src="./images/ui/star-off.png" style="height:5vh;transform:rotate(44deg);-webkit-transform:rotate(44deg)" />
-	// 					<div class="flex" style="margin:0 2vh">${getLangData("Don't show again")}</div>
+	// 					<img src="./images/ui/star-off.png" style="height:5cqh;transform:rotate(44deg);-webkit-transform:rotate(44deg)" />
+	// 					<div class="flex" style="margin:0 2cqh">${getLangData("Don't show again")}</div>
 	// 				</div>
 	// 			</div>
 	// 			<div onexactclick="approveKeyboardPromo()" class="flex flex-jc-end w-50" style="height:100%">
 	// 				${getLangData('UNDERSTOOD')}
 	// 			</div>
 	// 		</div>`;
-	let _html = '<div style="height:calc(100% - 9vh);position:relative;background:radial-gradient(#00000080, #000000cc), linear-gradient(180deg, #000, transparent, transparent, #00000080, #000), url(./images/icons/kb-bg.png);background-size:contain;background-position:center;background-repeat:no-repeat" class="w-100 flex key-combinations"><div class="w-50" style="height:100%">';
+	let _html = '<div style="height:calc(100% - 9cqh);position:relative;background:radial-gradient(#00000080, #000000cc), linear-gradient(180deg, #000, transparent, transparent, #00000080, #000), url(./images/icons/kb-bg.png);background-size:contain;background-position:center;background-repeat:no-repeat" class="w-100 flex key-combinations"><div class="w-50" style="height:100%">';
 	for(let i = 0; i < 11; i++) {
 		const _item = { title: _keyCombinations[i].title, baseKey: __account.keyboard?.[i] ?? _keyCombinations[i].baseKey };
 		_html += `<div class="w-100 flex" style="height:9%">
@@ -2910,7 +3005,7 @@ function getKeyboardPromo(_force, _fromInGame) {
 		</div>`;
 	}
 	_desc.innerHTML = _html + '</div></div>' +
-			`<div class="quick-play-desc-skip flex" style="padding:0 10vh">
+			`<div class="quick-play-desc-skip flex" style="padding:0 10cqh">
 				<div onexactclick="cancelKeyboardConfig()" class="orange-action-btn flex wot-button">
 					${getLangData('CANCEL')}
 				</div>
@@ -2961,7 +3056,7 @@ async function shareGeneratedImage(base64, _fromMenu) {
         if (__isPC) {
 			if(window._cdvElectronIpc) {
 				window._cdvElectronIpc.copyImage(base64);
-				warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/film.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Photo copied to clipboard') + '!</span></div>', null, null, 1, null, null, _fromMenu ? document.getElementById('shareOverlay') : null);
+				warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/film.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Photo copied to clipboard') + '!</span></div>', null, null, 1, null, null, _fromMenu ? document.getElementById('shareOverlay') : null);
 			}
         } else {
 
@@ -3722,14 +3817,14 @@ function installOpeningScreen(_instant, _lateOpening) {
 					${getLangData('QUIT', __openingScreenLangData)}
 				</div>
 			</div>
-			<div style="height:20%;width:100%;padding-bottom:30vh;z-index:2" class="flex">
+			<div style="height:20%;width:100%;padding-bottom:30cqh;z-index:2" class="flex">
 				<div class="game-difficulty-wrapper flex w-100 d-none">
 					<div class="game-difficulty-content flex">
 						<div class="flex">
 							<div class="game-difficulty-title">${getLangData('Difficulty')}:</div>
-							<img${_current <= 1 ? ' class="disabled"':''} id="game-difficulty-down" onexactclick="changeDifficulty(-1)" style="margin:2vh;height:4vh;transform:rotate(-90deg)" src="./images/ui/arrow-up.png" />
+							<img${_current <= 1 ? ' class="disabled"':''} id="game-difficulty-down" onexactclick="changeDifficulty(-1)" style="margin:2cqh;height:4cqh;transform:rotate(-90deg)" src="./images/ui/arrow-up.png" />
 							<div class="game-difficulty-value one-line">${__difficulties[_current-1].text[getLang()]}</div>
-							<img${_current >= 5 ? ' class="disabled"':''} id="game-difficulty-up" onexactclick="changeDifficulty(1)" style="margin:2vh;height:4vh;transform:rotate(90deg) scale(-1,1)" src="./images/ui/arrow-up.png" />
+							<img${_current >= 5 ? ' class="disabled"':''} id="game-difficulty-up" onexactclick="changeDifficulty(1)" style="margin:2cqh;height:4cqh;transform:rotate(90deg) scale(-1,1)" src="./images/ui/arrow-up.png" />
 						</div>
 					</div>
 				</div>
@@ -3776,7 +3871,7 @@ function installOpeningScreen(_instant, _lateOpening) {
 	}
 	var _wrapper = document.getElementById('wrapper');
 	_opening.style.width = MathRound(_wrapper.clientWidth) + 'px';
-	_opening.style.height = '100vh';
+	_opening.style.height = '100cqh';
 	if(!_instant) {
 		_bg.style.background = 'url(./images/icons/logo-rect.png), linear-gradient(0deg, #000, #000)'
 		_bg.style.backgroundSize = '25%, cover';

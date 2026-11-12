@@ -63,7 +63,7 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 	if(__storyScene?.back) {
 		removeClass(_elm, 'd-none');
 		if(_elm)
-			_elm.innerHTML = '<div style="cursor:pointer;font-size:3vh !important" onexactclick="event.stopPropagation();event.preventDefault();askQuitFromStory()" class="full flex">' + getLangData('Back To Lobby') + '</div>';
+			_elm.innerHTML = '<div onexactclick="event.stopPropagation();event.preventDefault();askQuitFromStory()" class="full flex back-to-lobby-button">' + getLangData('Back To Lobby') + '</div>';
 		return;
 	}
 	let _html = '<div class="full quest-list" style="overflow-y:auto">';
@@ -78,7 +78,7 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 			const _f = (_item.count ?? 0) >= _item.limit;
 			if(!_f)
 				_finish = undefined;
-			_steps += '<div class="flex flex-jc-start quest-status-desc"><div class="d-none flex"><img style="height:.9rem;margin:0 .2rem;background:none" src="./images/icons/quest-progress.png"' + (!_finish ? 'class="gray"' : '') + ' /></div><div class="flex wot-description" style="justify-content:flex-start;height:100%;padding:0 2vh;flex:1;color:' + (!_finish ? '#e2d4b599' : '#e2d4b5') + ' !important">' + (_item.descriptions ?? _q.descriptions)[getLang()] + '</div></div>';
+			_steps += '<div class="flex flex-jc-start quest-status-desc"><div class="d-none flex"><img style="height:.9rem;margin:0 .2rem;background:none" src="./images/icons/quest-progress.png"' + (!_finish ? 'class="gray"' : '') + ' /></div><div class="flex wot-description" style="justify-content:flex-start;height:100%;padding:0 2cqh;flex:1;color:' + (!_finish ? '#e2d4b599' : '#e2d4b5') + ' !important">' + (_item.descriptions ?? _q.descriptions)[getLang()] + '</div></div>';
 			_steps += `<div class="w-100 flex flex-jc-start timedquest-object-progress"><div class='timedquest-progress-wrapper'><div class='timedquest-progress' style="width:${((_item.count ?? 0) / _item.limit) * 100}% !important"></div></div><div class="flex flex-jc-end timedquest-object-info wot-description">` + (_item.count ?? 0) + ' / ' + _item.limit + `</div></div>`;
 			_stepsAdded = 1;
 		}
@@ -113,7 +113,7 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 			const _f = (_item.count ?? 0) >= _item.limit;
 			if(!_f)
 				_finish = undefined;
-			_steps += '<div class="flex flex-jc-start quest-status-desc"><div class="d-none flex"><img style="height:.9rem;margin:0 .2rem;background:none" src="./images/icons/quest-progress.png"' + (!_finish ? 'class="gray"' : '') + ' /></div><div class="flex wot-description" style="justify-content:flex-start;padding:0 2vh;height:100%;flex:1;color:' + (!_finish ? '#e2d4b599' : '#e2d4b5') + ' !important">' + (_item.descriptions ?? _q.descriptions)[getLang()] + '</div></div>';
+			_steps += '<div class="flex flex-jc-start quest-status-desc"><div class="d-none flex"><img style="height:.9rem;margin:0 .2rem;background:none" src="./images/icons/quest-progress.png"' + (!_finish ? 'class="gray"' : '') + ' /></div><div class="flex wot-description" style="justify-content:flex-start;padding:0 2cqh;height:100%;flex:1;color:' + (!_finish ? '#e2d4b599' : '#e2d4b5') + ' !important">' + (_item.descriptions ?? _q.descriptions)[getLang()] + '</div></div>';
 			_steps += `<div class="w-100 flex flex-jc-start timedquest-object-progress"><div class='timedquest-progress-wrapper'><div class='timedquest-progress' style="width:${((_item.count ?? 0) / _item.limit) * 100}% !important"></div></div><div class="flex flex-jc-end timedquest-object-info wot-description">` + (_item.count ?? 0) + ' / ' + _item.limit + `</div></div>`;
 			_stepsAdded = 1;
 		}
@@ -142,7 +142,7 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 				_icon = '<img src="' + _q.timer.iconPath + '" class="timedquest-icon" />';
 			_steps += `<div class="timedquest-timer one-line flex flex-jc-start quest-desc-one-line font-normal-text">`
 					+ _icon;
-			_steps += '<div class="one-line flex flex-jc-start quest-desc-one-line quest-status-desc"><div class="wot-description" style="width:100%;padding:0 2vh;color:' + (!_finish ? '#ffffff80' : '#fff') + ' !important">' + (_q.descriptions?.[getLang()] ?? '') + '</div></div>';
+			_steps += '<div class="one-line flex flex-jc-start quest-desc-one-line quest-status-desc"><div class="wot-description" style="width:100%;padding:0 2cqh;color:' + (!_finish ? '#ffffff80' : '#fff') + ' !important">' + (_q.descriptions?.[getLang()] ?? '') + '</div></div>';
 			if(_q.props)
 				_steps += `<div class="w-100 flex flex-jc-start timedquest-object-progress"><div class='timedquest-progress-wrapper'><div class='timedquest-progress' style="width:${(_q.props.current / _q.props.limit) * 100}% !important"></div></div><div class="flex flex-jc-end timedquest-object-info wot-description">` + _q.props.current + ' / ' + _q.props.limit + `</div></div>`;
 			_steps += `</div>`;
@@ -176,7 +176,7 @@ function updateQuestArea(_skipIfNoUI, _qq, _force) {
 	}
 	if(!_stepsAdded) {
 		if (_qq) {
-			let _steps = '<div class="one-line flex flex-jc-start quest-desc-one-line font-normal-text"><div class="d-none flex" style="width:15%"><img style="width:3vh;background:none" src="./images/icons/quest-progress.png" class="gray" /></div><div style="width:85%;color:#ffffff80 !important">' + _q.descriptions[getLang()] + '</div></div>';
+			let _steps = '<div class="one-line flex flex-jc-start quest-desc-one-line font-normal-text"><div class="d-none flex" style="width:15%"><img style="width:3cqh;background:none" src="./images/icons/quest-progress.png" class="gray" /></div><div style="width:85%;color:#ffffff80 !important">' + _q.descriptions[getLang()] + '</div></div>';
 			_html += '<div  class="one-line quest-title font-quest-title wot-subtitle" style="padding-bottom:3%;color:#8f7535' + (_state == 'end' ? '' : '') + ' !important"><img class="quest-title-icon" src="./images/ui/game/baklavagold.png"/>' + _q.names[getLang()] + '</div><div class="quest-line"></div>' + _steps;
 		}
 		else {
@@ -314,7 +314,7 @@ function skipDialog() {
 						const _item = _quest.gain[i];
 						if (i > 0)
 							_gain += '&nbsp;, &nbsp;';
-						_gain += '&nbsp;<img src="./images/icons/' + _item.key + '.png" style="width:4vh" /> &nbsp;x &nbsp;' + _item.value;
+						_gain += '&nbsp;<img src="./images/icons/' + _item.key + '.png" style="width:4cqh" /> &nbsp;x &nbsp;' + _item.value;
 					}
 				if (__account.questStatus.state === 'begin') {
 					_skip.innerHTML = getLangData('ACCEPT');
@@ -343,7 +343,7 @@ function skipDialog() {
 		}
 		document.getElementById('dialog-owner').innerHTML = '<span>[' + (_conceptArts[_class]?.title ?? _class) + ']</span>' +
 			(__account.questStatus.dialogArr[__account.questStatus.dialogOrder].expression ?
-				''//'&nbsp;&nbsp;<span style="font-size:2.8vh!important" class="dialog-owner-expression">(' + __account.questStatus.dialogArr[__account.questStatus.dialogOrder].expression + ')</span>'
+				''//'&nbsp;&nbsp;<span style="font-size:2.8cqh!important" class="dialog-owner-expression">(' + __account.questStatus.dialogArr[__account.questStatus.dialogOrder].expression + ')</span>'
 				 : '');
 		const _customConcept = __account.questStatus.dialogArr[__account.questStatus.dialogOrder].concept;
 		if(_customConcept) {
@@ -422,7 +422,7 @@ function skipDialog() {
 				updateQuestArea();
 				removeNPCQuestMarks();
 				if(__account.questStatus?.quest && !__account.questStatus.quest.complete)
-					warn('<div class="flex heading quest-status-main" style="position:relative;width:auto"><img style="height:15vh;z-index:-1" src="./images/icons/txtbg.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Quest Completed') + '</div></div>', 'level-up');
+					warn('<div class="flex heading quest-status-main" style="position:relative;width:auto"><img style="height:15cqh;z-index:-1" src="./images/icons/txtbg.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Quest Completed') + '</div></div>', 'level-up');
 				PlaySound({ key: 'questdone', volume: .8 });
 			}
 		}
@@ -476,7 +476,7 @@ function takeQuest(_storyQuestIndex, _nowarn, _title, _state, _force){
 		_q = __story.quests[_storyQuestIndex];
 	}
 	//if(!_nowarn)
-	//	warn('<div class="flex heading toast-with-banner" style="position:relative;width:auto"><img style="height:10vh;z-index:-1" src="./images/icons/quest-accepted.png" /><div class="full flex" style="position:absolute;text-shadow:0px 0px 4px #000;color:#f7f7f7 !important">' + getLangData(_title ?? 'Quest Accepted') + '</div></div>', 'level-up');
+	//	warn('<div class="flex heading toast-with-banner" style="position:relative;width:auto"><img style="height:10cqh;z-index:-1" src="./images/icons/quest-accepted.png" /><div class="full flex" style="position:absolute;text-shadow:0px 0px 4px #000;color:#f7f7f7 !important">' + getLangData(_title ?? 'Quest Accepted') + '</div></div>', 'level-up');
 	if(!_state)
 		PlaySound({ key: 'questaccepted', volume: .8 });
 	console.log(_storyQuestIndex + ' take QUEST ' + _q);
@@ -549,7 +549,7 @@ function getQuestRewards(_quest, _isSideQuest) {
 				const _val = _item.value, _k = _item.key;
 				setTimeout(function () {
 					addDmgFrame({
-						//text: _val + ' x &nbsp;<img src="./images/icons/' + _k + '.png" style="width:4vh" />',
+						//text: _val + ' x &nbsp;<img src="./images/icons/' + _k + '.png" style="width:4cqh" />',
 						//class: 'dmg quest-reward',
 						val: _val,
 						item: { key: _k },
@@ -811,13 +811,13 @@ function createDialogScreen(_arr, _quest) {
 		_order++;
 	}
 	_html += '</div><div class="dialog-scr-left"></div><div onexactclick="skipDialog()" id="game-dialogs"><div id="dialog-owner" class="flex flex-jc-start"><span>[' + _conceptArts[_people[0]].title + ']</span>' + (__account.questStatus.dialogArr[0].expression ? 
-		'' //'&nbsp;&nbsp;<span style="font-size:2.8vh!important" class="dialog-owner-expression">(' + __account.questStatus.dialogArr[0].expression + ')</span>' 
+		'' //'&nbsp;&nbsp;<span style="font-size:2.8cqh!important" class="dialog-owner-expression">(' + __account.questStatus.dialogArr[0].expression + ')</span>' 
 		: '') + '</div><div style="height:60%;padding:2% 5% 1% 5%"><div class="full" style="overflow-y:auto" id="dialog-text">' + replaceDialogText(__account.questStatus.dialogArr[0].texts?.[getLang()] ?? __account.questStatus.dialogArr[0].text) + '</div></div><div class="flex w-100 flex-jc-end flex-ai-start" style="height:20%"><div class="orange-action-btn" id="quest-skip">' + getLangData('NEXT') + ' &gt;&gt;</div></div></div><div class="dialog-scr-right"></div>';
 	_dialogScreen.innerHTML = _html;
 	setTimeout(function () {
 		removeClass(document.querySelectorAll('.concept-image')[0], 'gray-concept');
 		_dialogScreen.style.opacity = __account.questStatus.dialogOrder = 1;
-		document.getElementById('concept-' + _people[0]).style.filter = 'drop-shadow:0px 0px .8vh #000';
+		document.getElementById('concept-' + _people[0]).style.filter = 'drop-shadow:0px 0px .8cqh #000';
 		_client.upgradeQuestStatus();
 	}, 20);
 }
@@ -838,17 +838,17 @@ function createDialog(_questId) {
 			_client.upgradeQuestStatus();
 			return;
 		}
-		let _gain = '<div class="flex" style="height:70%;padding-top:18vh;width:60%;margin:0 20%;color:#262626 !important;font-size:4vh !important;align-items:flex-start !important">' + _quest.texts[getLang()] + '</div><div class="flex" style="width:60%;margin:0 20%;color:#262626 !important;height:10%">';
+		let _gain = '<div class="flex" style="height:70%;padding-top:18cqh;width:60%;margin:0 20%;color:#262626 !important;font-size:4cqh !important;align-items:flex-start !important">' + _quest.texts[getLang()] + '</div><div class="flex" style="width:60%;margin:0 20%;color:#262626 !important;height:10%">';
 		if (_quest?.gain)
 			for (let i = 0; i < _quest.gain.length; i++) {
 				const _item = _quest.gain[i];
 				if (i > 0)
 					_gain += '&nbsp;, &nbsp;';
-				_gain += '<img src="./images/icons/' + _item.key + '.png" style="width:4vh" /> &nbsp;x &nbsp;' + _item.value;
+				_gain += '<img src="./images/icons/' + _item.key + '.png" style="width:4cqh" /> &nbsp;x &nbsp;' + _item.value;
 			}
 		_gain += '</div>';
 		if (!__account.questStatus.side.state)
-			_gain += '<div class="flex" style="width:100%;height:20%"><div class="game-btn flex" onexactclick="acceptSideQuest(' + _questId + ')" style="font-size:4vh !important;height:6vh !important">' + getLangData('ACCEPT') + '</div></div>';
+			_gain += '<div class="flex" style="width:100%;height:20%"><div class="game-btn flex" onexactclick="acceptSideQuest(' + _questId + ')" style="font-size:4cqh !important;height:6cqh !important">' + getLangData('ACCEPT') + '</div></div>';
 		document.getElementById('board-scroll-content').innerHTML = _gain;
 		showMyModalPopUp('board-scroll');
 		return;

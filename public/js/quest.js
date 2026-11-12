@@ -235,7 +235,7 @@ function warnHonorReward(_val) {
 	if(_h)
 		_h.innerText = __account.pvp.honor.formatWithDots();
     PlaySound({key: 'chestreward', volume: .3, reset: true });
-    warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/honor.png" />&nbsp;' + _val + 'x&nbsp;<span style="flex:1">' + getLangData('Honor Point') + '</span></div>', null, null, 1);
+    warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/honor.png" />&nbsp;' + _val + 'x&nbsp;<span style="flex:1">' + getLangData('Honor Point') + '</span></div>', null, null, 1);
 }
 function syncGlobalQuests() {
 	let _sync;
@@ -287,7 +287,7 @@ function updateGlobalQuest(_key, _val) {
 	if(_updated)
 		_client.saveState();
 	if(_finished)
-		warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/quest.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Achievement Completed') + '</span></div>');
+		warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/quest.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Achievement Completed') + '</span></div>');
 }
 
 function renderMainQuests() {
@@ -305,7 +305,7 @@ function renderMainQuests() {
 		`<div id="main-quest-${_i}" class="global-quest-item skill-card animate-me main-quest-item flex${_i === _quest.id ? ' current selected' : ''}" onexactclick="openMainQuestDescription(${_q.id})">
 			<div class="global-quest-item-left flex flex-jc-start">
 				${getLangData(_q.names[getLang()])}	
-				<div class="global-quest-item-status">(${_i} / ${_total})</div>		
+				<div class="global-quest-item-status">${_i} / ${_total}</div>		
 			</div>
 		</div>`;
 	}
@@ -331,7 +331,7 @@ function getMainQuestDescription(_id) {
 	else
 		for(let _g of _quest.gain) 
 			_rewards += `<div class="w-50 quest-description-text quest-reward-info-item flex flex-jc-start"><div class="flex">
-				<img style="height:5vh" src="./images/icons/${_g.key}.png" />&nbsp;${_g.value.formatWithDots()}</div></div>`;
+				<img style="height:5cqh" src="./images/icons/${_g.key}.png" />&nbsp;${_g.value.formatWithDots()}</div></div>`;
 	_rewards += '</div>';
 	let _locations = '';
 	for(let _m of _quest.maps) {
@@ -348,7 +348,7 @@ function getMainQuestDescription(_id) {
 	let _needs = '';
 	const _loots = _quest.loots ?? [];
 	for(let _l of _loots)
-		_needs += `<div class="quest-description-text flex flex-jc-start quest-need-item"><img onerror='this.parentNode.remove(); document.querySelector(".quest-needs").remove()' src='./images/quest-item/icons/${_l.key}.png' style='height:5vh' />&nbsp;${_current.loots.find(x => x.key === _l.key)?.count ?? 0}/${_l.limit}</div>`;
+		_needs += `<div class="quest-description-text flex flex-jc-start quest-need-item"><img onerror='this.parentNode.remove(); document.querySelector(".quest-needs").remove()' src='./images/quest-item/icons/${_l.key}.png' style='height:5cqh' />&nbsp;${_current.loots.find(x => x.key === _l.key)?.count ?? 0}/${_l.limit}</div>`;
 
 	return `<div class="quest-desc-container">
 		<div class="w-100 quest-desc-container-title flex flex-jc-start">${getLangData(__story.title[getLang()])} - ${_quest.names[getLang()]}</div>
@@ -450,7 +450,7 @@ function getEventReward(_index) {
 		__account.eventsDone.push(_order);
 		const _gold = (_index + 1) * 10000;
 		updateGold(_gold);
-		warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/coin.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + _gold.formatWithDots() + '</span></div>', null, null, 1);
+		warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/coin.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + _gold.formatWithDots() + '</span></div>', null, null, 1);
 		_client.saveState();
 		checkUpdateAvailable2(3);
 	}
@@ -475,48 +475,48 @@ function renderEvent() {
 			<div style="flex:1;overflow:hidden">
 				<div class="one-line">${getLangData('Stay online for')}&nbsp;${_mm * 1}&nbsp;${getLangData('minutes')}</div>
 			</div>
-			<div class="flex event-tick" style="padding:0 2vh">
+			<div class="flex event-tick" style="padding:0 2cqh">
 				<img src="./images/icons/tick-orange.png" />
 			</div>
 		</div>	
 		<div class="page-detail-splitter"></div>
 		<div class="event-item w-100 flex flex-jc-start${_diff > ((2 * _mm) * 60 * 1000) ? ' completed' : ''}">
 			<div class="flex event-item-icon"><img src="./images/ui/${_diff > ((2 * _mm) * 60 * 1000) ? 'star-on' : 'game/event-clock'}.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">${getLangData('Stay online for')}&nbsp;${_mm * 2}&nbsp;${getLangData('minutes')}</div></div>
-			<div class="flex event-tick" style="padding:0 2vh">
+			<div class="flex event-tick" style="padding:0 2cqh">
 				<img src="./images/icons/tick-orange.png" />
 			</div>
 		</div>	
 		<div class="page-detail-splitter"></div>
 		<div class="event-item w-100 flex flex-jc-start${_diff > ((3 * _mm) * 60 * 1000) ? ' completed' : ''}">
 			<div class="flex event-item-icon"><img src="./images/ui/${_diff > ((3 * _mm) * 60 * 1000) ? 'star-on' : 'game/event-clock'}.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">${getLangData('Stay online for')}&nbsp;${_mm * 3}&nbsp;${getLangData('minutes')}</div></div>
-			<div class="flex event-tick" style="padding:0 2vh">
+			<div class="flex event-tick" style="padding:0 2cqh">
 				<img src="./images/icons/tick-orange.png" />
 			</div>
 		</div>
 		<div class="page-detail-splitter"></div>
 		<div class="event-item w-100 flex flex-jc-start${_diff > ((4 * _mm) * 60 * 1000) ? ' completed' : ''}">
 			<div class="flex event-item-icon"><img src="./images/ui/${_diff > ((4 * _mm) * 60 * 1000) ? 'star-on' : 'game/event-clock'}.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">${getLangData('Stay online for')}&nbsp;${_mm * 4}&nbsp;${getLangData('minutes')}</div></div>
-			<div class="flex event-tick" style="padding:0 2vh">
+			<div class="flex event-tick" style="padding:0 2cqh">
 				<img src="./images/icons/tick-orange.png" />
 			</div>
 		</div>
 		<div class="page-detail-splitter"></div>
 		<div class="w-100 flex flex-ai-end event-gifts" style="height:20%">
 			<div class="quest-reward-1 flex flex-jc-start">
-				<img${__account.eventsDone.indexOf(1) === -1 ? (_diff > ((1 * _mm) * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="1" onexactclick="getEventReward(0)" src="./images/icons/reward${_diff > ((1 * _mm) * 60 * 1000) ? '2' : '3'}.png" style="height:5vh" />
+				<img${__account.eventsDone.indexOf(1) === -1 ? (_diff > ((1 * _mm) * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="1" onexactclick="getEventReward(0)" src="./images/icons/reward${_diff > ((1 * _mm) * 60 * 1000) ? '2' : '3'}.png" style="height:5cqh" />
 			</div>
 			<div class="quest-reward-2 flex">
-				<img${__account.eventsDone.indexOf(2) === -1 ? (_diff > ((2 * _mm) * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="2" onexactclick="getEventReward(1)" src="./images/icons/reward${_diff > ((2 * _mm) * 60 * 1000) ? '2' : '3'}.png" style="height:5vh" />
+				<img${__account.eventsDone.indexOf(2) === -1 ? (_diff > ((2 * _mm) * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="2" onexactclick="getEventReward(1)" src="./images/icons/reward${_diff > ((2 * _mm) * 60 * 1000) ? '2' : '3'}.png" style="height:5cqh" />
 			</div>
 			<div class="quest-reward-3 flex">
-				<img${__account.eventsDone.indexOf(3) === -1 ? (_diff > ((3 * _mm) * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="3" onexactclick="getEventReward(2)" src="./images/icons/reward${_diff > ((3 * _mm) * 60 * 1000) ? '2' : '3'}.png" style="height:5vh" />
+				<img${__account.eventsDone.indexOf(3) === -1 ? (_diff > ((3 * _mm) * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="3" onexactclick="getEventReward(2)" src="./images/icons/reward${_diff > ((3 * _mm) * 60 * 1000) ? '2' : '3'}.png" style="height:5cqh" />
 			</div>
 			<div class="quest-reward-4 flex flex-jc-end">
-				<img${__account.eventsDone.indexOf(4) === -1 ? (_diff > ((4 * _mm) * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="4" onexactclick="getEventReward(3)" src="./images/icons/reward${_diff > ((4 * _mm) * 60 * 1000) ? '2' : '3'}.png" style="height:5vh" />
+				<img${__account.eventsDone.indexOf(4) === -1 ? (_diff > ((4 * _mm) * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="4" onexactclick="getEventReward(3)" src="./images/icons/reward${_diff > ((4 * _mm) * 60 * 1000) ? '2' : '3'}.png" style="height:5cqh" />
 			</div>
 		</div>
 		<div class="event-path w-100 flex">
-			<div class="w-100 flex" style="padding:0 2vh">
+			<div class="w-100 flex" style="padding:0 2cqh">
 				<img src="./images/ui/game/bar-${_diff > ((2 * _mm) * 60 * 1000) ? 'shine' : 'gray'}.png" style="width:11.1%" />
 				<img src="./images/ui/game/bar-${_diff > ((2 * _mm) * 60 * 1000) ? 'shine' : 'gray'}.png" style="width:11.1%" />
 				<img src="./images/ui/game/bar-${_diff > ((2 * _mm) * 60 * 1000) ? 'shine' : 'gray'}.png" style="width:11.1%" />
@@ -528,10 +528,10 @@ function renderEvent() {
 				<img src="./images/ui/game/bar-${_diff > ((4 * _mm) * 60 * 1000) ? 'shine' : 'gray'}.png" style="width:11.1%" />
 			</div>
 			<div class="w-100 flex event-dots">
-				<img style="margin-left:1vh" src="./images/ui/game/${_diff > ((1 * _mm) * 60 * 1000) ? 'baklavagold' : 'event-badge'}.png" />
+				<img style="margin-left:1cqh" src="./images/ui/game/${_diff > ((1 * _mm) * 60 * 1000) ? 'baklavagold' : 'event-badge'}.png" />
 				<img src="./images/ui/game/${_diff > ((2 * _mm) * 60 * 1000) ? 'baklavagold' : 'event-badge'}.png" />
 				<img src="./images/ui/game/${_diff > ((3 * _mm) * 60 * 1000) ? 'baklavagold' : 'event-badge'}.png" />
-				<img style="margin-right:1vh" src="./images/ui/game/${_diff > ((4 * _mm) * 60 * 1000) ? 'baklavagold' : 'event-badge'}.png" />
+				<img style="margin-right:1cqh" src="./images/ui/game/${_diff > ((4 * _mm) * 60 * 1000) ? 'baklavagold' : 'event-badge'}.png" />
 			</div>
 		</div>
 	</div>`;
@@ -550,7 +550,7 @@ function renderGlobalQuest(_q) {
 	return `<div data-global-quest="${_q.id}" class="skill-card animate-me flex" onexactclick="collectGlobalQuestReward(${_q.id})">
 			<div class="global-quest-item-left flex flex-jc-start">
 				${replaceQuestTitle(getLangData(_q.names[getLang()]))}	
-				<div class="global-quest-item-status">(${_gQ.current.formatWithDots()} / ${_q.limit.formatWithDots()})</div>		
+				<div class="global-quest-item-status">${_gQ.current.formatWithDots()} / ${_q.limit.formatWithDots()}</div>		
 			</div>
 			<div class="global-quest-item-right flex">
 				<img class="${_gQ.rewarded || (_gQ.current < _q.limit) ? 'gray' : 'glow'}" src="${getRewardIcon(1,_q.reward?.type ?? _q.reward?.key ?? 'chest',_q.reward?.key).src}" />

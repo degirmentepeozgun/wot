@@ -517,6 +517,32 @@ const _allBuffs = {
 				ms: 2000
 			}
 		]
+	},
+	payback: {
+		id: 25,
+		gain: [
+			{
+				level: 1,
+				props: {
+					smart: true,
+				},
+				ms: 3000
+			},
+			{
+				level: 2,
+				props: {
+					smart: true,
+				},
+				ms: 4000
+			},
+			{
+				level: 3,
+				props: {
+					smart: true,
+				},
+				ms: 5000
+			}
+		]
 	}
 };
 

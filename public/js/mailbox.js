@@ -66,7 +66,7 @@
 							${getTimeDiffUntilDate(new Date(_m.ts), new Date())}
 						</div>
 						<div class="w-50 flex flex-jc-end mailbox-card-loot-icon" style="height:100%">
-							<img style="max-height:66%;margin-right:2vh" src="./images/icons/quest-start.png" />
+							<img style="max-height:66%;margin-right:2cqh" src="./images/icons/quest-start.png" />
 						</div>
 					</div>
 				</div>

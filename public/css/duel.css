@@ -10,12 +10,12 @@
 }
 .duel-room-input {
 	width: 86%;
-	height: 6vh;
-	margin-top: 1vh;
+	height: 6cqh;
+	margin-top: 1cqh;
 	background: #00000088;
 	border: 1px solid #F4BB44;
 	color: #f3f4f5;
-	font-size: 2.2vh;
+	font-size: 2.2cqh;
 	text-align: center;
 	outline: none;
 }

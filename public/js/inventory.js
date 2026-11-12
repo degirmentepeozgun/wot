@@ -131,7 +131,7 @@ function renderInventory(_noAnimation, _activeTab) {
                 <div style="cursor:pointer" class="item item-gloves"> ${getItemIcon(_wearedItems.find(x => x.type === 'gloves'))}</div>
                 <div style="cursor:pointer" class="item item-weapon"> ${getItemIcon(_wearedItems.find(x => x.type === 'weapon'))}</div>
                 <div onexactclick="howToGetStronger()" class="flex power-bg">
-<div style="text-shadow:0 0 .5vh #000;font-weight:600;height:100%;position:relative" class="flex">
+<div style="text-shadow:0 0 .5cqh #000;font-weight:600;height:100%;position:relative" class="flex">
 <img class="power-icon" src="./images/ui/game/power-icon.png" />
 <span class="character-total-power wot-title animate-me">${_power.total.formatWithDots()}</span></div></div>
 </div></div><div class="flex menu-ui-right${_noAnimation ? '' : ' fade-me'}" id="inventory-list">
@@ -147,7 +147,7 @@ function renderInventory(_noAnimation, _activeTab) {
         <div class="game-menu-button flex animate-me" onexactclick="askFilterSellItems()"><img src="./images/ui/game/sell.png" /></div>
         <div class="game-menu-button flex animate-me" onexactclick="askAutoWearItems()"><img src="./images/ui/game/wear.png" /></div>
     </div>
-    <div style="position:relative;height:80%" class="flex d-none"><img style="height:60%" src="./images/icons/coin.png" /><div style="font-size:2.6vh !important;font-weight:600;padding:0 1.6vh 0 .8vh;text-shadow:0 0 #000;color:#F7f7f7cc !important" class="d-none account-gold-value">${__account.gold.formatWithDots()}</div></div>
+    <div style="position:relative;height:80%" class="flex d-none"><img style="height:60%" src="./images/icons/coin.png" /><div style="font-size:2.6cqh !important;font-weight:600;padding:0 1.6cqh 0 .8cqh;text-shadow:0 0 #000;color:#F7f7f7cc !important" class="d-none account-gold-value">${__account.gold.formatWithDots()}</div></div>
     </div>
         </div>`;
     updateMenuBottom(0);
@@ -235,7 +235,7 @@ function askFilterSellItems() {
         <div class="inventory-modal flex" style="flex-direction:column">
             <div class="flex question-modal-title-wrapper">
                 <div class="flex w-100 wot-title">${getLangData('Group sell items')}</div>
-                <div class="flex w-100 wot-subtitle">${getLangData('Total')}: <span id="total-group-sell-cost">0</span> <img style="height:2.6vh" src="./images/icons/coin.png" /></div>
+                <div class="flex w-100 wot-subtitle">${getLangData('Total')}: <span id="total-group-sell-cost">0</span> <img style="height:2.6cqh" src="./images/icons/coin.png" /></div>
             </div>
             <div class="flex w-100 question-modal-middle" style="flex:1">`
                 + _html +
@@ -255,16 +255,16 @@ function getMiscItemIcon(_item) {
         return '';
     let _level = '';
     if(_item.count > 1)
-        _level = '<span style="z-index:3;bottom:-.8vh;right:-.8vh;position:absolute;display:inline-block;padding:0 .8vh;color:#f7f7f7cc !important;font-size:2vh !important;background:#262626">' + _item.count + '</span>';
+        _level = '<span style="z-index:3;bottom:-.8cqh;right:-.8cqh;position:absolute;display:inline-block;padding:0 .8cqh;color:#f7f7f7cc !important;font-size:2cqh !important;background:#262626">' + _item.count + '</span>';
     return '<span class="item-in-slot full' + (_item.grade !== undefined ? ' grade' + _item.grade + '-item' : '') + '" style="display:inline-block;position:relative"><img style="background:#010101" onexactclick="openMiscItemInfoModal(\'' + _item.type + '\', ' + _item.grade + ')" class="item-img" src="./images/icons/' + _item.type + '.png"/>' + _level +
-    (_item.new ? '<div style="height:2vh;width:2vh;top:-.5vh;right:-.5vh;position:absolute;background:darkred;border-radius:100%"></div>' : '') + '</span>';
+    (_item.new ? '<div style="height:2cqh;width:2cqh;top:-.5cqh;right:-.5cqh;position:absolute;background:darkred;border-radius:100%"></div>' : '') + '</span>';
 }
 function getMailAttachmentIcon(_item) {
     if(!_item)
         return '';
     let _level = '';
     if(_item.count > 1)
-        _level = '<span style="z-index:3;bottom:-.8vh;right:-.8vh;position:absolute;display:inline-block;padding:0;color:#f7f7f7cc !important;font-size:2vh !important;background:#262626">' + _item.count + '</span>';
+        _level = '<span style="z-index:3;bottom:-.8cqh;right:-.8cqh;position:absolute;display:inline-block;padding:0;color:#f7f7f7cc !important;font-size:2cqh !important;background:#262626">' + _item.count + '</span>';
     return '<span class="item-in-slot full' + (_item.grade !== undefined ? ' grade' + _item.grade + '-item' : '') + '" style="display:inline-block;position:relative"><img style="background:#010101" onexactclick="openMiscItemInfoModal(\'' + _item.type + '\', ' + _item.grade + ')" class="item-img" src="' + getRewardIcon(_item.grade??1, _item.key, _item.type).src + '"/>' + _level + '</span>';
 }
 function getGemItemIcon(_item, _c) {
@@ -272,9 +272,9 @@ function getGemItemIcon(_item, _c) {
         return '';
     let _level = '';
     if((_c ?? _item.count) > 1)
-        _level = '<span style="z-index:3;bottom:-.8vh;right:-.8vh;position:absolute;display:inline-block;padding:0 .8vh;color:#f7f7f7cc !important;font-size:2vh !important;background:#262626">' + ((_c ?? _item.count) > 99 ? '99+' : (_c ?? _item.count)) + '</span>';
+        _level = '<span style="z-index:3;bottom:-.8cqh;right:-.8cqh;position:absolute;display:inline-block;padding:0 .8cqh;color:#f7f7f7cc !important;font-size:2cqh !important;background:#262626">' + ((_c ?? _item.count) > 99 ? '99+' : (_c ?? _item.count)) + '</span>';
     return '<span class="item-in-slot full' + (_item.grade !== undefined ? ' grade' + _item.grade + '-item' : '') + '" style="display:inline-block;position:relative"><img style="background:#010101" data-gem-key="' + _item.key + '" data-gem-grade="' + _item.grade + '" onexactclick="openGemItemInfoModal(\'' + _item.key + '\', ' + _item.grade + ')" class="item-img" src="./images/gems/' + _item.key + _item.grade + '.png"/>' + _level +
-    (_item.new ? '<div style="height:2vh;width:2vh;top:-.5vh;right:-.5vh;position:absolute;background:darkred;border-radius:100%"></div>' : '') + '</span>';
+    (_item.new ? '<div style="height:2cqh;width:2cqh;top:-.5cqh;right:-.5cqh;position:absolute;background:darkred;border-radius:100%"></div>' : '') + '</span>';
 }
 function getItemIcon(_item, _noBadge) {
     if(!_item)
@@ -673,7 +673,7 @@ function tryRemoveSocket(_id, _socketIndex) {
     var _item = _items.find(x => x.id === _id);
     const _socket = _item.sockets.sort((a, b) => (b.grade ?? 0) - (a.grade ?? 0))[_socketIndex];
     const _cost = MathRound(10000 * Math.pow(2, (_item.grade - 1)));
-    askSomething(`<img style="height:4vh" src="${getRewardIcon(_socket.grade, 'gem', _socket.key).src}" />&nbsp;${getLangData('Remove this gem for')} <b style="margin-left:1vh;color:#F3f4f5 !important">${_cost.formatWithDots()}</b>&nbsp;<img style="height:2.2vh" src="./images/icons/coin.png" />&nbsp;`, `acceptAndRemoveGemFromSocket(${_id}, ${_cost}, ${_socketIndex})`, 'modal_2x1');
+    askSomething(`<img style="height:4cqh" src="${getRewardIcon(_socket.grade, 'gem', _socket.key).src}" />&nbsp;${getLangData('Remove this gem for')} <b style="margin-left:1cqh;color:#F3f4f5 !important">${_cost.formatWithDots()}</b>&nbsp;<img style="height:2.2cqh" src="./images/icons/coin.png" />&nbsp;`, `acceptAndRemoveGemFromSocket(${_id}, ${_cost}, ${_socketIndex})`, 'modal_2x1');
 }
 function acceptAndRemoveGemFromSocket(_id, _cost, _socketIndex) {
     playClick();
@@ -739,9 +739,9 @@ function getItemInfoModalHtml(_id) {
     var _powerDiff = _power - _currentItemPower;
     var _powerDiffHtml = '';
     if(_powerDiff > 0 && (!_item.for || _item.for === mainCharacter.class))
-        _powerDiffHtml += ' (<img style="height:2.5vh" src="./images/icons/power-up.png" /> ' + parseInt(_powerDiff).formatWithDots() + ')';
+        _powerDiffHtml += ' (<img style="height:2.5cqh" src="./images/icons/power-up.png" /> ' + parseInt(_powerDiff).formatWithDots() + ')';
     else if(_powerDiff < 0)
-        _powerDiffHtml += ' (<img style="height:2.5vh" src="./images/icons/power-down.png" /> ' + MathAbs(parseInt(_powerDiff)).formatWithDots() + ')';
+        _powerDiffHtml += ' (<img style="height:2.5cqh" src="./images/icons/power-down.png" /> ' + MathAbs(parseInt(_powerDiff)).formatWithDots() + ')';
    
     var _props = ''; // '<div class="flex w-100 item-prop"><div class="flex w-100"><div class="flex flex-jc-start wot-subtitle w-50">' + getLangData('Gear Score') + ':</div><div class="flex flex-jc-end w-50 wot-subtitle">' + parseInt(_power).formatWithDots() + _powerDiffHtml + '</div></div></div>';
     let _socketsHtml = '', _socketProps = '';
@@ -817,7 +817,7 @@ function getItemInfoModalHtml(_id) {
         }
     }
     if(_item.for && (_item.for !== mainCharacter.class))
-        _props += '<div class="item-prop flex" style="font-size:3vh!important;width:100%;padding:1vh 7%;color:#9d987f !important">' + getLangData(_item.for).toProperCase() + ' item</div>';
+        _props += '<div class="item-prop flex" style="font-size:3cqh!important;width:100%;padding:1cqh 7%;color:#9d987f !important">' + getLangData(_item.for).toProperCase() + ' item</div>';
     
     // _equips[_item.type]['grade' + _item.grade].grade = 3;
     // _item.grade = 3;
@@ -831,7 +831,7 @@ function getItemInfoModalHtml(_id) {
     
     _props += renderItemProps(_item);
     _props += _socketProps;
-    _props += '<div class="item-prop flex w-100"><div class="flex flex-jc-start w-50 wot-subtitle">' + getLangData('Cost') + ':</div><div class="flex flex-jc-end w-50 wot-subtitle item-detail-cost">' + sellCost.formatWithDots() + '<img style="height:2vh;margin-left:.5vh" src="./images/icons/coin.png" /></div></div>';
+    _props += '<div class="item-prop flex w-100"><div class="flex flex-jc-start w-50 wot-subtitle">' + getLangData('Cost') + ':</div><div class="flex flex-jc-end w-50 wot-subtitle item-detail-cost">' + sellCost.formatWithDots() + '<img style="height:2cqh;margin-left:.5cqh" src="./images/icons/coin.png" /></div></div>';
     let _html = 
         `<div class="flex w-100 item-detail-container">
             <div class="flex flex-jc-start flex-ai-start item-detail-container-inner">
@@ -850,7 +850,7 @@ function getItemInfoModalHtml(_id) {
                      `<img style="padding:14%" class="item-current-frame" src="./images/items/icons/${_item.type === 'weapon' ? mainCharacter.class + '/rect/' : ''}${_item.type}${_item.grade}.png" />
                     <div class="item-front-frame full"></div>` +
                     //${(_item.for ? (_item.for + '/') : '')}${_item.type}${_item.grade}.png" class="full grade${_item.grade}-item${_item.grade > 5 ? ' glow' : ''}" />
-                    `<div class="grade-letter d-none" style="position:absolute;font-size:7vh !important;bottom:-5%;left:-5%">${getItemGradeLetter(_item.grade)}</div>
+                    `<div class="grade-letter d-none" style="position:absolute;font-size:7cqh !important;bottom:-5%;left:-5%">${getItemGradeLetter(_item.grade)}</div>
                 </div>
                 <div class="item-detail-title-container">
                     <div class="item-detail-title wot-title">
@@ -892,8 +892,8 @@ function getItemInfoModalHtml(_id) {
             <div class="game-menu-icon-button w-25${(_item.weared === mainCharacter.class) ? '' : ' d-none'}" onexactclick="unWearItem(${_id})"><img src="./images/ui/game/item-detail-btn2.png" /></div>
         </div>
         <div class="flex game-menu-buttons-big d-none">
-            <div lang="${getLang()}" class="game-menu-button animate-me flex${hasMaterial('ticket-random') ? '' : ' disabled'}" onexactclick="askRandomizeItem(${_id})"><div class="flex game-menu-button-inner"><div class="flex wot-title">${getLangData('RANDOMIZE')} (<img style="height:3vh" src="./images/icons/ticket-random.png" />)</div></div></div>
-            <div lang="${getLang()}" class="game-menu-button animate-me flex${_itemProps.maxLevel > _item.level ? '' : ' disabled'}" onexactclick="upgradeItem(${_id})"><div class="flex game-menu-button-inner wot-title">${getLangData('UPDATE')}` + (updateCost > 0 ? ` (${updateCost.formatWithDots()} <img style="height:2vh;margin:0 0 0 1vh" src="./images/icons/coin.png" />)` : '') + `</div></div>
+            <div lang="${getLang()}" class="game-menu-button animate-me flex${hasMaterial('ticket-random') ? '' : ' disabled'}" onexactclick="askRandomizeItem(${_id})"><div class="flex game-menu-button-inner"><div class="flex wot-title">${getLangData('RANDOMIZE')} (<img style="height:3cqh" src="./images/icons/ticket-random.png" />)</div></div></div>
+            <div lang="${getLang()}" class="game-menu-button animate-me flex${_itemProps.maxLevel > _item.level ? '' : ' disabled'}" onexactclick="upgradeItem(${_id})"><div class="flex game-menu-button-inner wot-title">${getLangData('UPDATE')}` + (updateCost > 0 ? ` (${updateCost.formatWithDots()} <img style="height:2cqh;margin:0 0 0 1cqh" src="./images/icons/coin.png" />)` : '') + `</div></div>
         </div>
         <div class="flex game-menu-buttons-small d-none">
             <div lang="${getLang()}" class="wot-title game-menu-button-half animate-me flex${(_item.weared === mainCharacter.class) ? ' disabled' : ''}" onexactclick="sellItem(${_id})">${getLangData('SELL')}</div>
@@ -967,7 +967,7 @@ function renderItemProps(_item, _defaultColor) {
             else
                 _quality = 3;
         }
-        _props += '<div class="item-prop flex w-100"><div class="flex flex-jc-start w-50 page-detail-item-label"><img src="./images/ui/game/prop-badge.png" />' + _p.titles[getLang()] + 
+        _props += '<div class="item-prop flex w-100"><div class="flex flex-jc-start w-50 page-detail-item-label"><img class="item-prop-badge" src="./images/ui/game/prop-badge.png" />' + _p.titles[getLang()] + 
         ':</div><div class="page-detail-item-value flex flex-jc-end w-50 item-stat-value-max' + _quality + '">' + (_prop.value ? ((_p.key.endsWith('-rate')) ? '%' + parseFloat(_prop.value).toFixed(2) : _prop.value) + ' ' : '') + (_item.level > 1 ? '</div>' :  '&nbsp;<span class="item-prop-gap wot-subtitle">(' + getMinPropValue(_prop.key, _item) + ' - ' + getMaxPropValue(_prop.key, _item) + ')</span></div>') + '</div>';
     }
     return _props;
@@ -990,7 +990,7 @@ function openMiscItemInfoModal(_type, _grade) {
                 </div>
                 <div class="page-detail-splitter"></div>
                 <div class="flex wot-subtitle" style="width:80%">
-                    ${getLangData('Cost')}:&nbsp;${(_item.cost * (_grade ?? 1)).formatWithDots()}&nbsp;<img src="./images/icons/coin.png" style="height:2vh" />
+                    ${getLangData('Cost')}:&nbsp;${(_item.cost * (_grade ?? 1)).formatWithDots()}&nbsp;<img src="./images/icons/coin.png" style="height:2cqh" />
                 </div>
             </div>
             <div class="flex w-100 action-button-container ${_item.do ? '' : ' d-none'}">
@@ -1315,7 +1315,7 @@ function openCharacterInfoModal() {
     //_props += `<div style="text-align:right;color:#F7F7F780!important" class="stats-group-item">${getLangData('Base Armor')}: ${_stats.armor.formatWithDots()}</div>`;
     for(let _o of _defensiveProps)
         _props += `<div style="padding:0 6%" class="w-100 flex"><div class="w-50 flex flex-jc-start">${_o.title}:</div><div class="flex w-50 flex-jc-end" style="color:#f3f4f5cc !important">${_o.key.endsWith('-rate') ? '% ' + _o.value.toFixed(2) : _o.value.formatWithDots()}</div></div>`;
-    //_props += '<div style="margin-top:1vh;color:#f7f7f799 !important; position:relative" class="stats-group-title">' + getLangData('Other Stats') + '<img src="./images/icons/hp.png" style="opacity:.65;position:absolute;height:70%;top:15%;right:3vh" /></div>';
+    //_props += '<div style="margin-top:1cqh;color:#f7f7f799 !important; position:relative" class="stats-group-title">' + getLangData('Other Stats') + '<img src="./images/icons/hp.png" style="opacity:.65;position:absolute;height:70%;top:15%;right:3cqh" /></div>';
     //_props += `<div style="color:#F7F7F780!important" class="stats-group-item">${getLangData('Base Health')}: ${_stats.maxHP.formatWithDots()}</div>`;
     //for(let _o of _hpProps)
     //    _props += `<div${_o.color ? ' style="color:' + _o.color + '80!important"' : ''} class="stats-group-item">${_o.title}: ${_o.key.endsWith('-rate') ? '%' + _o.value.toFixed(2) : _o.value.formatWithDots()}</div>`;
@@ -1330,7 +1330,7 @@ function openCharacterInfoModal() {
             <div class="flex flex-jc-end item-info-modal-close character-info-close" onexactclick="closeCharacterInfoModal()"></div>
         </div>
         <div class="character-info-scroll-area">
-            <div class="flex flex-jc-start flex-ai-start" style="padding-bottom:2vh">`
+            <div class="flex flex-jc-start flex-ai-start" style="padding-bottom:2cqh">`
                 + _props +
                 `<div class="stats-group-stats-line"><img src="./images/ui/game/stats-line.png" /></div>
                 <div class="stats-group-title flex flex-jc-start">${getLangData('General')}<img src="./images/ui/game/stats-badge.png" /></div>
@@ -1559,7 +1559,7 @@ function acceptMelt(_force) {
     closeGemInfoModal();
     switchInventoryTab(null, 2);
     PlaySound({ key: 'upgrade', volume: .5, reset: true, force: true });
-    warn(`<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/gems/${_key}${_grade + 1}.png" />&nbsp;1x&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">${getLangData('Gem')}</span></div>`, null, null, 1);
+    warn(`<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/gems/${_key}${_grade + 1}.png" />&nbsp;1x&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">${getLangData('Gem')}</span></div>`, null, null, 1);
 }
 function closeItemInfoModal(_noSound) {
     removeClass(document.querySelector('#inventory-list'), 'item-info-opened');
@@ -1806,7 +1806,7 @@ function askAddSlot() {
                         </span>
                     </div>
                     <div class="flex inventory-question-add-slot-cost flex-jc-start w-100">
-                        <span class="flex">${getLangData('Cost')}:<span id="slot-cost">${_cost.formatWithDots()}</span><img src="./images/icons/coin.png" style="height:3vh" /></span>
+                        <span class="flex">${getLangData('Cost')}:<span id="slot-cost">${_cost.formatWithDots()}</span><img src="./images/icons/coin.png" style="height:3cqh" /></span>
                     </div>
                 </div>
             </div>
@@ -1920,10 +1920,10 @@ function sellItem(_id, _noSound, _imediateSell) {
         acceptAndSellItem(_id, sellCost, _noSound);
         return;
     }
-    askSomething(`${getLangData('Sell this equipment for')} <b style="margin-left:1vh;color:#F3f4f5 !important">${sellCost.formatWithDots()}</b>&nbsp;<img style="height:2vh" src="./images/icons/coin.png" />`, `acceptAndSellItem(${_id}, ${sellCost})`, 'modal_2x1');
+    askSomething(`${getLangData('Sell this equipment for')} <b style="margin-left:1cqh;color:#F3f4f5 !important">${sellCost.formatWithDots()}</b>&nbsp;<img style="height:2cqh" src="./images/icons/coin.png" />`, `acceptAndSellItem(${_id}, ${sellCost})`, 'modal_2x1');
 }
 function askRandomizeItem(_id) {
-    askSomething(`${getLangData('Change attributes of this item for')} <b style="margin-left:1vh;color:#F4BB44 !important">1</b> ${getLangData('dice')}`, `acceptAndRandomizeItem(${_id})`, 'modal_2x1');
+    askSomething(`${getLangData('Change attributes of this item for')} <b style="margin-left:1cqh;color:#F4BB44 !important">1</b> ${getLangData('dice')}`, `acceptAndRandomizeItem(${_id})`, 'modal_2x1');
 }
 function selectAvatarImage(_order) {
     const _item = document.querySelector('.avatar-image' + _order);
@@ -2394,7 +2394,7 @@ function warnChestReward(_cr) {
     var _crTitle = getLangData(_cr.title ?? _cr.type);
     PlaySound({key: 'chestreward', volume: .3, reset: true });
     _crTitle = _crTitle.charAt(0).toLocaleUpperCase(getLang()) + _crTitle.substring(1);
-    warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="' + _cr.src + '" />&nbsp;' + (_cr.count ?? 1).formatWithDots() + 'x&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + _crTitle + '</span></div>', null, null, 1);
+    warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="' + _cr.src + '" />&nbsp;' + (_cr.count ?? 1).formatWithDots() + 'x&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + _crTitle + '</span></div>', null, null, 1);
 }
 function getRewardIcon(_grade,_rewardKey, _rewardType) {
     switch(_rewardKey) {

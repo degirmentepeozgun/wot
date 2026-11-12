@@ -113,12 +113,12 @@
 				<div class="skill-icon-wrapper flex">
 					<img class="grade${_grade}-item" src="./images/main/avatars/${_owner.c}.png" />
 				</div>
-				<div class="flex" style="flex:1;height:100%;padding:1vh 1vh 1vh 0;min-width:0">
+				<div class="flex" style="flex:1;height:100%;padding:1cqh 1cqh 1cqh 0;min-width:0">
 					<div class="flex flex-jc-start skill-card-title w-100" style="height:34%">${_r.n ?? ''}</div>
 					<div class="story-level flex flex-jc-start w-100" style="height:33%">${_owner.n ?? ''}</div>
 					<div id="duel-room-players-count-${_r.s}" class="story-consume flex flex-jc-start w-100" style="height:33%">${_r.p?.length ?? 0} / 6</div>
 				</div>
-				<div class="flex flex-jc-start" style="height:100%;width:30%;flex-direction:column;justify-content:space-between;padding:.6vh 0">
+				<div class="flex flex-jc-start" style="height:100%;width:30%;flex-direction:column;justify-content:space-between;padding:.6cqh 0">
 					<div class="w-100 flex flex-jc-end ${_visClass} room-visibility" style="height:40%">${_vis}</div>
 					<div style="height:0%;flex:1"></div>
 					<div onexactclick="event.stopPropagation();getRef('duel')?.JoinRoom('${_r.s}')" class="list-item-btn animate-me flex" style="height:42%;width:100%;margin:0 0 6% 0">
@@ -413,13 +413,7 @@
 		if (!_right)
 			return;
 		this.roomId = _roomId;
-		if(this.roomId) {
-			const _roomCards = document.querySelectorAll('.duel-card');
-			if(_roomCards?.length > 0) {
-				_roomCards.forEach(x => removeClass(x, 'selected'));
-				addClass(document.getElementById(`duel-card-${_roomId}`), 'selected');
-			}
-		}
+		this.openRoomChat(_room);
 		if(!_noSound)
 			playClick(1);
 		const _bluePlayers = _room.p?.filter(x => x.t === 1)??[];
@@ -779,6 +773,8 @@
 			delete mainCharacter.leader;
 	}
 	this.paintRoomList = function() {
+		if(document.querySelector('.duel-room-chat'))
+			return;
 		const _box = document.querySelector('.duel-rooms-container');
 		if(!_box)
 			return;
@@ -818,6 +814,7 @@
 			delete this.liveRoom;
 	}
 	this.leaveDummyLocal = function() {
+		this.closeRoomChat();
 		const _room = this.dummyRooms.find(x => x.s === this.roomId);
 		if(_room)
 			_room.p = _room.p.filter(x => x.s !== mainCharacter.socketId);
@@ -825,6 +822,50 @@
 			delete this.roomId;
 			delete mainCharacter.leader;
 		}
+	}
+	this.askLeaveForMenu = async function(_order, _subOrder, _tabOrder) {
+		if(!this.roomId)
+			return;
+		this.pendingMenu = { order: _order, sub: _subOrder, tab: _tabOrder };
+		const _room = this.roomById(this.roomId);
+		const _me = _room?.p?.find(x => x.s === mainCharacter.socketId);
+		if(_me?.r) {
+			if(_room.dummy) {
+				_me.r = 0;
+				this.renderJoinRoomUI(this.roomId, 1, 1);
+			}
+			else if(this.pending)
+				return;
+			else {
+				this.pending = 1;
+				try {
+					const _res = await this.invoke('DuelUnready');
+					if(!this.afterInvoke(_res))
+						return;
+				}
+				finally {
+					delete this.pending;
+				}
+			}
+		}
+		if(document.querySelector(".inventory-question[data-singleton-key='modal_2x1']"))
+			return;
+		askSomething('bu eylem gruptan çıkmanıza sebep olacaktır?', `getRef('duel')?.confirmLeaveForMenu()`, 'modal_2x1');
+	}
+	this.confirmLeaveForMenu = function() {
+		closeInventoryQuestionModal();
+		const _nav = this.pendingMenu;
+		delete this.pendingMenu;
+		if(!_nav)
+			return;
+		const _go = () => switchBookPage(_nav.order, _nav.sub, _nav.tab);
+		const _room = this.roomById(this.roomId);
+		if(_room?.dummy) {
+			this.leaveDummyLocal();
+			_go();
+			return;
+		}
+		this.leaveServerRoom(_go);
 	}
 	this.leaveServerRoom = async function(_then) {
 		if(this.pending)
@@ -835,6 +876,7 @@
 			const _res = await this.invoke('DuelLeave');
 			if(!this.afterInvoke(_res))
 				return;
+			this.closeRoomChat();
 			delete this.roomId;
 			delete this.liveRoom;
 			delete mainCharacter.leader;
@@ -847,6 +889,7 @@
 		}
 	}
 	this.backToList = function() {
+		this.closeRoomChat();
 		delete this.roomId;
 		delete this.liveRoom;
 		delete this.startedRoom;
@@ -927,6 +970,7 @@
 		if(this.fightStarted || !_view?.p?.length)
 			return;
 		this.fightStarted = 1;
+		this.startedAt = window.__duelClock = Date.now();
 		const _me = mainCharacter.socketId;
 		if(_view.s === _me)
 			mainCharacter.leader = 1;
@@ -956,6 +1000,8 @@
 		createJusticeWar(_ops, _view.s);
 	}
 	this.onDuel = function(_kind, _payload) {
+		if(_kind === 'chat')
+			return this.receiveRoomChat(_payload);
 		if(_kind === 'changed')
 			return this.loadRooms();
 		if(_kind === 'room')
@@ -977,6 +1023,209 @@
 		}
 		if(_kind === 'start')
 			this.onDuelStart(_payload);
+	}
+	this.emojiSets = [
+		{ key: 'action', label: 'Action', items: ['⚔️','🛡️','🗡️','🏹','💥','🔥','❄️','⚡','☠️','💀','🩸','👊'] },
+		{ key: 'fantasy', label: 'Fantasy', items: ['👹','👺','🐉','🐍','🦇','👁️','🔱','🌙','☀️','🕯️','🪬','🌀'] },
+		{ key: 'feeling', label: 'Feeling', items: ['😈','😎','🤬','😂','😭','🤔','🫡','🤝','👏','💪','🙏','❤️'] }
+	];
+	this.escapeChat = function(_text) {
+		return String(_text ?? '').replace(/[&<>"']/g, function(_c) {
+			return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[_c];
+		});
+	}
+	this.chatClock = function() {
+		const _d = new Date();
+		return String(_d.getHours()).padStart(2, '0') + ':' + String(_d.getMinutes()).padStart(2, '0');
+	}
+	this.closeRoomChat = function() {
+		if(this.chatRoom && this.roomChats)
+			delete this.roomChats[this.chatRoom];
+		delete this.chatRoom;
+		this.chatCursor = null;
+		if(this._chatOutside) {
+			document.removeEventListener('pointerdown', this._chatOutside);
+			delete this._chatOutside;
+		}
+	}
+	this.openRoomChat = function(_room) {
+		const _box = document.querySelector('.duel-rooms-container');
+		if(!_box || !_room)
+			return;
+		if(this.chatRoom === _room.s && _box.querySelector('.duel-room-chat'))
+			return;
+		this.roomChats = this.roomChats || {};
+		this.roomChats[_room.s] = this.roomChats[_room.s] || [];
+		this.chatRoom = _room.s;
+		this.chatCursor = null;
+		let _tabs = '';
+		for(const _set of this.emojiSets)
+			_tabs += `<div class="duel-emoji-tab${_set.key === 'action' ? ' on' : ''}" onexactclick="getRef('duel')?.showEmojiSet('${_set.key}')">${_set.label}</div>`;
+		_box.innerHTML = `<div class="duel-room-chat">
+			<div class="duel-chat-log quest-list"><div class="duel-chat-spacer"></div><div class="duel-chat-rows"></div></div>
+			<div class="duel-chat-compose">
+				<div class="duel-emoji-panel d-none">
+					<div class="duel-emoji-tabs">${_tabs}</div>
+					<div class="duel-emoji-grid quest-list"></div>
+				</div>
+				<div class="duel-chat-field">
+					<input id="duel-chat-text" class="duel-chat-text-input" type="text" maxlength="200" autocomplete="off" placeholder="${getLangData('Type your message')}" onkeydown="getRef('duel')?.chatKey(event)" onkeyup="getRef('duel')?.rememberChatCursor()" onclick="getRef('duel')?.rememberChatCursor()" onselect="getRef('duel')?.rememberChatCursor()" onblur="getRef('duel')?.rememberChatCursor()" onpaste="getRef('duel')?.pasteRoomChat(event)" ondrop="event.preventDefault()" ondragover="event.preventDefault()" />
+					<div class="duel-emoji-btn" onexactclick="getRef('duel')?.toggleEmojiPanel()"><img src="./images/ui/game/group-chat-emoji.png" /></div>
+				</div>
+				<div class="duel-chat-send" onexactclick="getRef('duel')?.sendRoomChat()"><img src="./images/ui/game/group-chat-send.png" /></div>
+			</div>
+		</div>`;
+		this.showEmojiSet('action');
+		this.paintRoomMessages();
+		if(this._chatOutside)
+			document.removeEventListener('pointerdown', this._chatOutside);
+		this._chatOutside = (e) => {
+			const _panel = document.querySelector('.duel-emoji-panel');
+			if(!_panel || _panel.classList.contains('d-none'))
+				return;
+			if(e.target.closest?.('.duel-emoji-panel') || e.target.closest?.('.duel-emoji-btn'))
+				return;
+			_panel.classList.add('d-none');
+		};
+		document.addEventListener('pointerdown', this._chatOutside);
+	}
+	this.showEmojiSet = function(_key) {
+		const _set = this.emojiSets.find(x => x.key === _key) || this.emojiSets[0];
+		const _grid = document.querySelector('.duel-emoji-grid');
+		if(!_grid || !_set)
+			return;
+		document.querySelectorAll('.duel-emoji-tab').forEach(x => x.classList.toggle('on', x.textContent === _set.label));
+		let _html = '';
+		for(const _emoji of _set.items)
+			_html += `<div class="duel-emoji-item" onexactclick="getRef('duel')?.insertChatEmoji('${_emoji}')">${_emoji}</div>`;
+		_grid.innerHTML = _html;
+		_grid.scrollTop = 0;
+		playClick();
+	}
+	this.toggleEmojiPanel = function() {
+		const _panel = document.querySelector('.duel-emoji-panel');
+		if(!_panel)
+			return;
+		_panel.classList.toggle('d-none');
+	}
+	this.rememberChatCursor = function() {
+		const _input = document.getElementById('duel-chat-text');
+		if(!_input)
+			return;
+		this.chatCursor = _input.selectionStart ?? 0;
+	}
+	this.pasteRoomChat = function(e) {
+		e.preventDefault();
+		const _input = document.getElementById('duel-chat-text');
+		if(!_input)
+			return false;
+		const _clip = ((e.clipboardData || window.clipboardData)?.getData('text') || '').replace(/[<>]/g, '');
+		const _start = _input.selectionStart ?? 0;
+		const _end = _input.selectionEnd ?? _start;
+		const _raw = (_input.value.slice(0, _start) + _clip + _input.value.slice(_end)).replace(/[<>]/g, '').replace(/\r?\n/g, ' ');
+		_input.value = _raw.slice(0, 200);
+		const _caret = Math.min(_input.value.length, _start + _clip.replace(/\r?\n/g, ' ').length);
+		_input.setSelectionRange(_caret, _caret);
+		this.chatCursor = _caret;
+		return false;
+	}
+	this.insertChatEmoji = function(_emoji) {
+		const _input = document.getElementById('duel-chat-text');
+		if(!_input || !_emoji)
+			return;
+		const _at = (this.chatCursor == null || this.chatCursor < 0) ? 0 : this.chatCursor;
+		const _next = (_input.value.slice(0, _at) + _emoji + _input.value.slice(_at)).slice(0, 200);
+		_input.value = _next;
+		const _caret = Math.min(_next.length, _at + _emoji.length);
+		this.chatCursor = _caret;
+		_input.focus();
+		_input.setSelectionRange(_caret, _caret);
+	}
+	this.chatKey = function(e) {
+		if(e.key === 'Enter' || e.keyCode === 13) {
+			e.preventDefault();
+			this.sendRoomChat();
+		}
+	}
+	this.chatRowHtml = function(_row) {
+		const _avatar = _row.c ? `<div class="duel-chat-avatar-wrap"><img class="duel-chat-avatar" src="./images/main/avatars/${this.escapeChat(_row.c)}.png" /></div>` : '';
+		const _mine = _row.s && _row.s === mainCharacter?.socketId ? ' duel-chat-mine' : '';
+		return `<div class="duel-chat-row${_mine}">${_avatar}<div class="duel-chat-main"><div class="duel-chat-top"><div class="duel-chat-name" style="color:${getCharacterChatColor(_row.c) ?? 'inherit'} !important">${this.escapeChat(_row.n)}</div><div class="duel-chat-time">${this.escapeChat(_row.time)}</div></div><div class="duel-chat-body"><div class="duel-chat-text">${this.escapeChat(_row.m)}</div></div></div></div>`;
+	}
+	this.paintRoomMessages = function() {
+		const _rows = document.querySelector('.duel-chat-rows');
+		const _list = this.roomChats?.[this.chatRoom];
+		if(!_rows || !_list)
+			return;
+		let _html = '';
+		for(const _row of _list)
+			_html += this.chatRowHtml(_row);
+		_rows.innerHTML = _html;
+		this.scrollRoomChat();
+	}
+	this.scrollRoomChat = function() {
+		const _log = document.querySelector('.duel-chat-log');
+		if(!_log)
+			return;
+		_log.scrollTop = _log.scrollHeight;
+	}
+	this.pushRoomChat = function(_row) {
+		if(!this.chatRoom)
+			return;
+		this.roomChats = this.roomChats || {};
+		const _list = this.roomChats[this.chatRoom] = this.roomChats[this.chatRoom] || [];
+		_row.time = _row.time || this.chatClock();
+		_row.m = String(_row.m ?? '').slice(0, 200);
+		_list.push(_row);
+		const _extra = _list.length - 100;
+		if(_extra > 0)
+			_list.splice(0, _extra);
+		const _rows = document.querySelector('.duel-chat-rows');
+		if(_rows) {
+			const _div = document.createElement('div');
+			_div.innerHTML = this.chatRowHtml(_row);
+			_rows.appendChild(_div.firstChild);
+			while(_rows.children.length > 100)
+				_rows.firstChild.remove();
+			this.scrollRoomChat();
+		}
+	}
+	this.receiveRoomChat = function(_msg) {
+		if(!this.roomId || !_msg?.m)
+			return;
+		if(_msg.s && _msg.s === mainCharacter?.socketId)
+			return;
+		const _seat = this.roomById(this.roomId)?.p?.find(x => x.s === _msg.s);
+		this.pushRoomChat({
+			n: _msg.n || _seat?.n || '',
+			m: String(_msg.m).slice(0, 200),
+			s: _msg.s,
+			c: _seat?.c
+		});
+	}
+	this.sendRoomChat = async function() {
+		const _input = document.getElementById('duel-chat-text');
+		const _room = this.roomById(this.roomId);
+		if(!_input || !_room)
+			return;
+		const _text = _input.value.replace(/\r?\n/g, ' ').trim().slice(0, 200);
+		if(!_text)
+			return;
+		const _seat = _room.p?.find(x => x.s === mainCharacter?.socketId);
+		if(!_room.dummy) {
+			const _res = await this.invoke('DuelChat', _text);
+			if(!this.afterInvoke(_res))
+				return;
+		}
+		this.pushRoomChat({
+			n: __account?.name || _seat?.n || '',
+			m: _text,
+			s: mainCharacter?.socketId,
+			c: _seat?.c || mainCharacter?.class
+		});
+		_input.value = '';
+		this.chatCursor = 0;
+		playClick();
 	}
 	return this;
 }

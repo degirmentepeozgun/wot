@@ -64,7 +64,7 @@ function leaderboards() {
 			_self.secretKey = _response.secretKey;
 		}, function(_failResponse) {
 			PlaySound({key:'nointernet',volume:1});
-			warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/internet.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('No Internet') + '</span></div>', null, null, 1);
+			warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/ui/menu-icons/internet.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('No Internet') + '</span></div>', null, null, 1);
 			//token oluşturulamadı, internet yok vs. Kullanıcıyı uyar
 		});
 	}
@@ -99,7 +99,7 @@ function leaderboards() {
 			_func(_resp.data);
 		}, function(_failResponse) {
 			PlaySound({key:'nointernet',volume:1});
-			warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/internet.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('No Internet') + '</span></div>', null, null, 1);
+			warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/ui/menu-icons/internet.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('No Internet') + '</span></div>', null, null, 1);
 			//token oluşturulamadı, internet yok vs. Kullanıcıyı uyar
 		});
 	}
@@ -113,7 +113,7 @@ function leaderboards() {
 				if(_warn) {
 					//yeni rekorun diye uyar
 					PlaySound({key:'newrecord',volume:1});
-					warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/punch-blast.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('New Record') + '</span></div>', null, null, 1);
+					warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/ui/menu-icons/punch-blast.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('New Record') + '</span></div>', null, null, 1);
 				}
 			}
 		}
@@ -159,7 +159,7 @@ function leaderboards() {
 			}, function() {	
 				//internete bağlanamazsa burası çalışır
 				PlaySound({key:'nointernet',volume:1});
-				warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/internet.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('No Internet') + '</span></div>', null, null, 1);
+				warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/ui/menu-icons/internet.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('No Internet') + '</span></div>', null, null, 1);
 				_self.updateScore(_missionKey, _score, 1, _func);
 			});
 		});

@@ -1719,7 +1719,7 @@ function howToGainTickets() {
 				switchBookPage(8, 3);
 			}},
 			{ icon:'achievement', titles: {
-				en: 'Qlobal Quests',
+				en: 'Global Quests',
 				tr: 'Global Görevler'
 			}, func: function() {
 				closeInventoryQuestionModal();
@@ -1743,7 +1743,7 @@ function howToGainHonor() {
 		},
 		navigations: [
 			{ icon:'achievement', titles: {
-				en: 'Qlobal Quests',
+				en: 'Global Quests',
 				tr: 'Global Görevler'
 			}, func: function() {
 				closeInventoryQuestionModal();

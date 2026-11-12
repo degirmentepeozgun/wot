@@ -69,7 +69,7 @@ function createMenu() {
 		updateGem('shadow', 1, 5);
 		updateGem('lightning', 1, 5);
 		updateGem('toxic', 1, 5);
-		updateMisc({ type:'ticket-gem-selection', count: 1 });
+		updateMisc({ type:'ticket-gem-selection', count: 1, grade:2 });
 		const _actIds = __stories.filter(x => x.listed !== false && !x.mission).map(x => x.id);
 		__account.storyResults = [];
 		_actIds.forEach(x => __account.storyResults.push({id:x, stars: [1,2,4], perfect:true}));

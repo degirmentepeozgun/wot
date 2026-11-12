@@ -1,22 +1,22 @@
 {
   "version": 2,
-  "dgSpecHash": "au/RirtY0Qk=",
+  "dgSpecHash": "Om9cCEP1n/Q=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Administrator\\Desktop\\wot\\api\\Web\\BackEnd\\Api\\Api.csproj",
+  "projectFilePath": "c:\\Users\\Administrator\\Desktop\\wot\\api\\Web\\BackEnd\\Api\\Api.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\8e413ed2508908532075070216f8b533\\nuget\\messagepack\\2.5.108\\messagepack.2.5.108.nupkg.sha512",
-    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\8e413ed2508908532075070216f8b533\\nuget\\messagepack.annotations\\2.5.108\\messagepack.annotations.2.5.108.nupkg.sha512",
-    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\8e413ed2508908532075070216f8b533\\nuget\\microsoft.aspnetcore.connections.abstractions\\8.0.11\\microsoft.aspnetcore.connections.abstractions.8.0.11.nupkg.sha512",
-    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\8e413ed2508908532075070216f8b533\\nuget\\microsoft.aspnetcore.signalr.common\\8.0.11\\microsoft.aspnetcore.signalr.common.8.0.11.nupkg.sha512",
-    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\8e413ed2508908532075070216f8b533\\nuget\\microsoft.aspnetcore.signalr.protocols.messagepack\\8.0.11\\microsoft.aspnetcore.signalr.protocols.messagepack.8.0.11.nupkg.sha512",
-    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\8e413ed2508908532075070216f8b533\\nuget\\microsoft.extensions.dependencyinjection.abstractions\\8.0.0\\microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
-    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\8e413ed2508908532075070216f8b533\\nuget\\microsoft.extensions.features\\8.0.11\\microsoft.extensions.features.8.0.11.nupkg.sha512",
-    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\8e413ed2508908532075070216f8b533\\nuget\\microsoft.extensions.options\\8.0.2\\microsoft.extensions.options.8.0.2.nupkg.sha512",
-    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\8e413ed2508908532075070216f8b533\\nuget\\microsoft.extensions.primitives\\8.0.0\\microsoft.extensions.primitives.8.0.0.nupkg.sha512",
-    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\8e413ed2508908532075070216f8b533\\nuget\\microsoft.net.stringtools\\17.4.0\\microsoft.net.stringtools.17.4.0.nupkg.sha512",
-    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\8e413ed2508908532075070216f8b533\\nuget\\system.io.pipelines\\8.0.0\\system.io.pipelines.8.0.0.nupkg.sha512",
-    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\8e413ed2508908532075070216f8b533\\nuget\\system.memory\\4.5.5\\system.memory.4.5.5.nupkg.sha512",
-    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\8e413ed2508908532075070216f8b533\\nuget\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\019ef6209bec52e3602238027062cf83\\nuget\\messagepack\\2.5.108\\messagepack.2.5.108.nupkg.sha512",
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\019ef6209bec52e3602238027062cf83\\nuget\\messagepack.annotations\\2.5.108\\messagepack.annotations.2.5.108.nupkg.sha512",
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\019ef6209bec52e3602238027062cf83\\nuget\\microsoft.aspnetcore.connections.abstractions\\8.0.11\\microsoft.aspnetcore.connections.abstractions.8.0.11.nupkg.sha512",
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\019ef6209bec52e3602238027062cf83\\nuget\\microsoft.aspnetcore.signalr.common\\8.0.11\\microsoft.aspnetcore.signalr.common.8.0.11.nupkg.sha512",
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\019ef6209bec52e3602238027062cf83\\nuget\\microsoft.aspnetcore.signalr.protocols.messagepack\\8.0.11\\microsoft.aspnetcore.signalr.protocols.messagepack.8.0.11.nupkg.sha512",
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\019ef6209bec52e3602238027062cf83\\nuget\\microsoft.extensions.dependencyinjection.abstractions\\8.0.0\\microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\019ef6209bec52e3602238027062cf83\\nuget\\microsoft.extensions.features\\8.0.11\\microsoft.extensions.features.8.0.11.nupkg.sha512",
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\019ef6209bec52e3602238027062cf83\\nuget\\microsoft.extensions.options\\8.0.2\\microsoft.extensions.options.8.0.2.nupkg.sha512",
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\019ef6209bec52e3602238027062cf83\\nuget\\microsoft.extensions.primitives\\8.0.0\\microsoft.extensions.primitives.8.0.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\019ef6209bec52e3602238027062cf83\\nuget\\microsoft.net.stringtools\\17.4.0\\microsoft.net.stringtools.17.4.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\019ef6209bec52e3602238027062cf83\\nuget\\system.io.pipelines\\8.0.0\\system.io.pipelines.8.0.0.nupkg.sha512",
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\019ef6209bec52e3602238027062cf83\\nuget\\system.memory\\4.5.5\\system.memory.4.5.5.nupkg.sha512",
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\019ef6209bec52e3602238027062cf83\\nuget\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
   ],
   "logs": [
     {
@@ -26,7 +26,8 @@
       "message": "'Microsoft.AspNetCore.SignalR.Protocols.MessagePack' 8.0.11 paketinde önem derecesi orta olan bilinen bir https://github.com/advisories/GHSA-86xp-94pg-8r6r güvenlik açığı var",
       "libraryId": "Microsoft.AspNetCore.SignalR.Protocols.MessagePack",
       "targetGraphs": [
-        "net8.0"
+        "net8.0",
+        "net8.0/win-x64"
       ]
     },
     {
@@ -36,7 +37,8 @@
       "message": "'Microsoft.AspNetCore.SignalR.Protocols.MessagePack' 8.0.11 paketinde önem derecesi yüksek olan bilinen bir https://github.com/advisories/GHSA-f8h2-vmm9-qhj6 güvenlik açığı var",
       "libraryId": "Microsoft.AspNetCore.SignalR.Protocols.MessagePack",
       "targetGraphs": [
-        "net8.0"
+        "net8.0",
+        "net8.0/win-x64"
       ]
     }
   ]

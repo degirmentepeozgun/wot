@@ -14,7 +14,7 @@
 	max-height: 95%;
 	min-height: 90%;
 	width: auto;
-	box-shadow: 0 0 2vh #000;
+	box-shadow: 0 0 2cqh #000;
 	margin: auto !important;
 	left: 50%;
 	overflow:hidden;
@@ -94,7 +94,7 @@ body.mobile-device #story-finish.finish {
     color: #cfcfcf !important;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
     aspect-ratio: 500 / 125 !important;
-	box-shadow:0 -1vh 2vh #000;
+	box-shadow:0 -1cqh 2cqh #000;
 	cursor:pointer
 }
 #story-finish .btn:hover {
@@ -125,14 +125,14 @@ body.mobile-device #story-finish.finish {
 	width:100%
 }
 .leaderboard-item-left {
-	padding-left:2vh;
+	padding-left:2cqh;
     color: #ddd6c9!important;
     text-shadow:
         0 2px 2px rgba(0, 0, 0, 0.95);
     text-transform: none;
 }
 .leaderboard-item-right {
-	padding-right:2vh;
+	padding-right:2cqh;
     color: #b9a28a !important;
     text-shadow:
         0 2px 2px rgba(0, 0, 0, 0.95);
@@ -150,7 +150,7 @@ body.mobile-device #story-finish.finish {
             rgba(120, 86, 28, 0.82)
         );
 
-    border: 0.1vh solid rgba(220, 174, 73, 0.65);
+    border: 0.1cqh solid rgba(220, 174, 73, 0.65);
 
     box-shadow:
         inset 0 1px 0 rgba(255, 220, 130, 0.18),
@@ -168,7 +168,7 @@ body.mobile-device #story-finish.finish {
 	height: 12% !important;
 	color: #F4BB44 !important;
 	padding-top: 0% !important;
-	text-shadow: .4vh .4vh 0 #9d987f
+	text-shadow: .4cqh .4cqh 0 #9d987f
 }
 #story-finish .char {
 	max-width: 100% !important;
@@ -189,9 +189,7 @@ body.mobile-device #story-finish.finish {
 	height:100%;
 
 }
-#story-finish .stage-achievement-item-left img{
-	height:4vh !important
-}
+
 #story-finish .stage-achievement-item-right {
 	height:100%;
 	color:#e0b84a !important;
@@ -245,9 +243,6 @@ body.mobile-device #story-finish.finish {
 	 #story-finish .side-right.has-next {
 		padding-top:0 !important;
 	 }
-	 #story-finish .stage-achievement-item-left img {
-		height: 5vh !important;
-	}
 	#story-finish.finish {
 		max-height:100% !important;
 		min-height:100% !important;

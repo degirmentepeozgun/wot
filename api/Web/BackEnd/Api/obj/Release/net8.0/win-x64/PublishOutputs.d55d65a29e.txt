@@ -1,0 +1,15 @@
+c:\Users\Administrator\Desktop\api-release\Api.exe
+c:\Users\Administrator\Desktop\api-release\appsettings.Development.json
+c:\Users\Administrator\Desktop\api-release\appsettings.json
+c:\Users\Administrator\Desktop\api-release\Api.dll
+c:\Users\Administrator\Desktop\api-release\Api.deps.json
+c:\Users\Administrator\Desktop\api-release\Api.runtimeconfig.json
+c:\Users\Administrator\Desktop\api-release\Api.pdb
+c:\Users\Administrator\Desktop\api-release\MessagePack.dll
+c:\Users\Administrator\Desktop\api-release\MessagePack.Annotations.dll
+c:\Users\Administrator\Desktop\api-release\Microsoft.AspNetCore.Connections.Abstractions.dll
+c:\Users\Administrator\Desktop\api-release\Microsoft.AspNetCore.SignalR.Common.dll
+c:\Users\Administrator\Desktop\api-release\Microsoft.AspNetCore.SignalR.Protocols.MessagePack.dll
+c:\Users\Administrator\Desktop\api-release\Microsoft.Extensions.Features.dll
+c:\Users\Administrator\Desktop\api-release\Microsoft.Extensions.Options.dll
+c:\Users\Administrator\Desktop\api-release\Microsoft.NET.StringTools.dll

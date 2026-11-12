@@ -274,7 +274,7 @@ const __stories = [
 					updateQuestArea();
 					__account.questStatus.quest = undefined;
 					_client.upgradeQuestStatus();
-					warn('<div class="flex heading toast-with-banner ink" style="position:relative;width:auto"><img style="height:20vh;z-index:-1" src="./images/icons/txtbg.png" /><div class="full flex" style="position:absolute">' + getLangData('Quest Completed') + '</div></div>');
+					warn('<div class="flex heading toast-with-banner ink" style="position:relative;width:auto"><img style="height:20cqh;z-index:-1" src="./images/icons/txtbg.png" /><div class="full flex" style="position:absolute">' + getLangData('Quest Completed') + '</div></div>');
 					episode.playSound({ key: 'questdone', volume: .8 });
 					episode.showLocationHand('right');
 					episode.width *= 2;
@@ -379,7 +379,7 @@ const __stories = [
 						if(_q) {
 							_q.count = 1;
 							updateQuestArea();
-							warn('<div class="flex heading toast-with-banner ink" style="position:relative;width:auto"><img style="height:20vh;z-index:-1" src="./images/icons/txtbg.png" /><div class="full flex" style="position:absolute">' + getLangData('Quest Completed') + '</div></div>');
+							warn('<div class="flex heading toast-with-banner ink" style="position:relative;width:auto"><img style="height:20cqh;z-index:-1" src="./images/icons/txtbg.png" /><div class="full flex" style="position:absolute">' + getLangData('Quest Completed') + '</div></div>');
 							episode.playSound({ key: 'questdone', volume: .8 });
 							episode.dialogs = [{
 								id: 2,
@@ -1438,7 +1438,7 @@ const __stories = [
 								do: function() {
 									episode.dialogs = [{
 										id: 1,
-										width: '30vw',
+										width: '30cqw',
 										location: { map: episode.id }, ms: 1800,
 										owner: episode.enemies.find(x => x.id === 51 && !x.isDead()).key,
 										text: "What the hell are you?",
@@ -5015,7 +5015,7 @@ const __stories = [
 						episode.respawners = [];
 						//episode.loadCharacterSprites(function() {}, [37,38], null, 1);
 						episode.playSound({key:'bossalert', volume: .5});
-						warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
+						warn('<div class="flex leveling"><img style="height:22cqh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
 						// const _elm = document.getElementById('quest-status');
 						// addClass(_elm, 'mission-done');
 						// _elm.onanimationend = function(e) {
@@ -5749,7 +5749,7 @@ const __stories = [
 						do:function(){
 							//removeCoopCharacter(1);
 							episode.towerDefenseStart = _gameTick;
-							warn('<div class="flex heading achievement-red" style="position:relative;width:auto"><img style="height:15vh;z-index:-1" src="./images/icons/txtbg.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Bomber Frog Incoming') + '</div></div>');
+							warn('<div class="flex heading achievement-red" style="position:relative;width:auto"><img style="height:15cqh;z-index:-1" src="./images/icons/txtbg.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Bomber Frog Incoming') + '</div></div>');
 							episode.playSound({ key: 'curse', volume: .5 });
 							summonMobWithJson({
 								id: 83,
@@ -7066,7 +7066,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		startScene: 1,
+		startScene: 2,
 		scenes: [
 			{
 				when: function() {
@@ -7315,7 +7315,7 @@ const __stories = [
 									_current.remove();
 								const _div = document.createElement('div');
 								_div.className = "w-100 pt-3 toxic wot-subtitle fade-me flex w-100 flex-jc-start";
-								_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[1][getLang()]}!`;
+								_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6cqh" />&nbsp;${__storyScene.lang[1][getLang()]}!`;
 								_inner.appendChild(_div);
 								disposeFocus();
 								episode.boss.animations.ground1.chargeDistance = episode.boss.animations.ground1.chargingDistance;
@@ -7362,7 +7362,7 @@ const __stories = [
 									_current.remove();
 								const _div = document.createElement('div');
 								_div.className = "w-100 pt-3 toxic wot-subtitle fade-me flex w-100 flex-jc-start";
-								_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[3][getLang()]}!`;
+								_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6cqh" />&nbsp;${__storyScene.lang[3][getLang()]}!`;
 								_inner.appendChild(_div);
 								disposeFocus();
 								episode.tutorialOrder = 3;
@@ -7425,7 +7425,7 @@ const __stories = [
 							if(_current)
 								_current.remove();
 							_div.className = "w-100 pt-3 fire wot-subtitle fade-me flex w-100 flex-jc-start";
-							_div.innerHTML = `<img src="./images/icons/cross.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[5][getLang()]}!`;
+							_div.innerHTML = `<img src="./images/icons/cross.png" style="height:3.6cqh" />&nbsp;${__storyScene.lang[5][getLang()]}!`;
 							_inner.appendChild(_div);
 							mainCharacter.immobilize = true;
 							mainCharacter.disableKeyboard = mainCharacter.still = true;
@@ -7448,7 +7448,7 @@ const __stories = [
 								_current.remove();
 							const _div = document.createElement('div');
 							_div.className = "w-100 pt-3 toxic wot-substitle fade-me flex w-100 flex-jc-start";
-							_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[6][getLang()]}!`;
+							_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6cqh" />&nbsp;${__storyScene.lang[6][getLang()]}!`;
 							_inner.appendChild(_div);
 							mainCharacter.immobilize = true;
 							mainCharacter.disableKeyboard = mainCharacter.still = true;
@@ -7504,7 +7504,7 @@ const __stories = [
 								_current.remove();
 							const _div = document.createElement('div');
 							_div.className = "w-100 pt-3 toxic wot-subtitle fade-me flex w-100 flex-jc-start";
-							_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[8][getLang()]}!`;
+							_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6cqh" />&nbsp;${__storyScene.lang[8][getLang()]}!`;
 							_inner.appendChild(_div);
 							mainCharacter.immobilize = mainCharacter.still = true;
 							const _air2 = episode.boss.animations.air2;
@@ -7742,7 +7742,7 @@ const __stories = [
 							if(_current)
 								_current.remove();
 								_inner.innerHTML = `<div class="w-100 pt-3 toxic wot-subtitle fade-me flex w-100 flex-jc-start flex-ai-start">
-										<img src="./images/icons/tick.png" style="height:3.6vh" />&nbsp;${__storyScene.lang[13][getLang()]}!
+										<img src="./images/icons/tick.png" style="height:3.6cqh" />&nbsp;${__storyScene.lang[13][getLang()]}!
 								</div>`;
 							mainCharacter.immobilize = true;
 							mainCharacter.disableKeyboard = mainCharacter.still = mainCharacter.immobilize = true;
@@ -7957,7 +7957,7 @@ const __stories = [
 								</div>`;
 						}
 						_desc.innerHTML = _html +
-						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2vh" class="w-50 h-100 flex flex-jc-start wot-title" onclick="doNotShowAgain(this,event)"  lang="${getLang()}"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2vh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(0, 1, null, null, 1);skipQuickPlayTutorial(1)"><div class="orange-action-btn wot-button flex">${getLangData('OK')}</div></div></div>`;
+						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2cqh" class="w-50 h-100 flex flex-jc-start wot-title" onclick="doNotShowAgain(this,event)"  lang="${getLang()}"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2cqh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(0, 1, null, null, 1);skipQuickPlayTutorial(1)"><div class="orange-action-btn wot-button flex">${getLangData('OK')}</div></div></div>`;
 						_gameUI.appendChild(_desc);
 						episode.hasSkippableScreen = 1;
 						addClass(_gameUI, 'disable-ui');
@@ -8058,7 +8058,7 @@ const __stories = [
 							// 	episode.loadCharacterSprites(function() {}, [37,38], null, 1);
 							// }, 20);
 							PlaySound({key:'bossalert', volume: .5});
-							warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
+							warn('<div class="flex leveling"><img style="height:22cqh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
 							const _elm = document.getElementById('quest-status');
 							addClass(_elm, 'mission-done');
 							__storyScene.bossQuest = {
@@ -8246,7 +8246,7 @@ const __stories = [
 							// 	//PlaySound({key:'conquer', volume:.6});
 							// 	// getImage('./images/main/avatars/cyclops.png', function(_img) {
 							// 	// 	const url = _img.toDataURL();
-							// 	// 	warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
+							// 	// 	warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
 							// 	// });
 							// }
 						}
@@ -8592,7 +8592,7 @@ const __stories = [
 									</div>`;
 						}
 						_desc.innerHTML = _html +
-						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2vh" class="w-50 h-100 flex flex-jc-start wot-title" onclick="doNotShowAgain(this,event)" lang="${getLang()}"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2vh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(1, 1, null, null, 1);skipQuickPlayTutorial(2)"><div class="orange-action-btn wot-button flex">${getLangData('OK')}</div></div></div>`;
+						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2cqh" class="w-50 h-100 flex flex-jc-start wot-title" onclick="doNotShowAgain(this,event)" lang="${getLang()}"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2cqh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(1, 1, null, null, 1);skipQuickPlayTutorial(2)"><div class="orange-action-btn wot-button flex">${getLangData('OK')}</div></div></div>`;
 						addClass(_gameUI, 'disable-ui');
 						requestAnimationFrame(() => {
 							_game.suspended = true;
@@ -8653,7 +8653,7 @@ const __stories = [
 								</div>
 							</div>`;
 							PlaySound({key:'questaccepted', volume: .8});
-							warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/present.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1" class="wot-title">' + getLangData('Strongbox Found') + '</span></div>', null, null, 1);
+							warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/present.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1" class="wot-title">' + getLangData('Strongbox Found') + '</span></div>', null, null, 1);
 							
 							frag.appendChild(_subDiv.firstElementChild);
 							_div.prepend(frag);
@@ -8764,7 +8764,7 @@ const __stories = [
 												${_title}
 											</div>
 											<div class="item-title-wrapper flex w-50 wot-subtitle">
-												<img style="height:80%;max-height:2.6vh" src="./images/icons/power-up.png" />${_powerDiff}
+												<img style="height:80%;max-height:2.6cqh" src="./images/icons/power-up.png" />${_powerDiff}
 											</div>
 										</div>
 										<div class="item-action-wrapper flex w-100">
@@ -9200,7 +9200,7 @@ const __stories = [
 						},
 						do: function() {
 							delete episode.supportFound;
-							//warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/cyclops.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Supporter found') + '!</span></div>', null, null, 1);
+							//warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/cyclops.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Supporter found') + '!</span></div>', null, null, 1);
 							mainCharacter.direction = __right;
 							mainCharacter.animate('idle', 1);
 							const original = document.getElementById('skill12');
@@ -9216,7 +9216,7 @@ const __stories = [
 							requestAnimationFrame(() => {
 								mainCharacter.still = mainCharacter.immobilize = mainCharacter.disableKeyboard = true;
 								blurKeyboard();
-								focusMe('#skill12', null, null, "<div class='full flex' style='flex-direction: column;'><div class='flex wot-subtitle' style='padding-bottom:.5vh'>" + getLangData('You\'ve activated a support skill') + '</div><div class="flex wot-subtitle">' + getLangData('It can be used even in danger') + "</div></div>", null, null, __isPC ? null : true, 1);
+								focusMe('#skill12', null, null, "<div class='full flex' style='flex-direction: column;'><div class='flex wot-subtitle' style='padding-bottom:.5cqh'>" + getLangData('You\'ve activated a support skill') + '</div><div class="flex wot-subtitle">' + getLangData('It can be used even in danger') + "</div></div>", null, null, __isPC ? null : true, 1);
 								requestAnimationFrame(() => {
 									const _curt = document.getElementById('focus-ui');
 									_curt.appendChild(clone);
@@ -9287,7 +9287,7 @@ const __stories = [
 												const _btnWrapper = document.createElement('div');
 												_btnWrapper.className = 'flex black-screen-ok-btn w-100 focus-ui-done-btn-custom';
 												const _btn = document.createElement('div');
-												_btn.style = 'color:#f7f7f7cc !important;height:5vh !important';
+												_btn.style = 'color:#f7f7f7cc !important;height:5cqh !important';
 												_btn.className = "wot-button orange-action-btn flex one-line fade-me";
 												_btn.innerText = getLangData('Done');
 												_btn.onexactclick = function() {					
@@ -9306,7 +9306,7 @@ const __stories = [
 														onend: function() {
 															PlaySound({ key: 'puff5', volume:1 });
 															//episode.playSound({key:'bossalert', volume: .5});
-															//warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
+															//warn('<div class="flex leveling"><img style="height:22cqh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
 														
 															//setTimeout(() => {
 																//episode.playSound({key:'sistersenter', volume:1});
@@ -9949,7 +9949,7 @@ const __stories = [
 	// 				episode.phase = episode.boss.grade;
 	// 				// getImage('./images/main/avatars/cyclops.png', function(_img) {
 	// 				// 	const url = _img.toDataURL();
-	// 				// 	warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
+	// 				// 	warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
 	// 				// });
 	// 				// const _desc = document.createElement('div');
 	// 				// _desc.className = 'flex show-ui full quick-play-desc-container fade-me';
@@ -10010,7 +10010,7 @@ const __stories = [
 	// 									${_title}
 	// 								</div>
 	// 								<div class="item-title-wrapper flex w-50">
-	// 									<img style="height:80%;max-height:2.6vh" src="./images/icons/power-up.png" />${_powerDiff}
+	// 									<img style="height:80%;max-height:2.6cqh" src="./images/icons/power-up.png" />${_powerDiff}
 	// 								</div>
 	// 								<div class="item-action-wrapper flex flex-jc-start w-100">
 	// 									<div class="game-menu-button animate-me flex" onexactclick="wearStatusItem(${_item.id}, ${_powerDiff})">
@@ -10077,7 +10077,7 @@ const __stories = [
 	// 						});
 	// 						episode.mobs = episode.respawners = [];
 	// 						episode.playSound({key:'bossalert', volume: .5});
-	// 						warn('<div class="flex leveling"><img style="height:22vh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
+	// 						warn('<div class="flex leveling"><img style="height:22cqh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
 						
 	// 						setTimeout(() => {
 	// 							//episode.playSound({key:'sistersenter', volume:1});
@@ -10369,7 +10369,7 @@ function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
 			func:_func,
 			first:_isFirstStart
 		};
-    	askSomething(`<div class="w-100 flex" style="padding-top:2vh;color:#f3f4f5cc"><span>${getLangData('Minium adviced level is')}:&nbsp;<b>${_s.minLevel}</b></span></div><div class="w-100 flex p-2" style="color:#ff6c00">${'It might be hard for you'}</div><div style="color:#f3f4f5cc" class="w-100 flex">${getLangData('Continue Anyway')}?</div>`, `continueStoryAnyway()`, 'modal_2x1');
+    	askSomething(`<div class="w-100 flex" style="padding-top:2cqh;color:#f3f4f5cc"><span>${getLangData('Minium adviced level is')}:&nbsp;<b>${_s.minLevel}</b></span></div><div class="w-100 flex p-2" style="color:#ff6c00">${'It might be hard for you'}</div><div style="color:#f3f4f5cc" class="w-100 flex">${getLangData('Continue Anyway')}?</div>`, `continueStoryAnyway()`, 'modal_2x1');
 		return;
 	}
 	hideMyMenu();
@@ -10691,7 +10691,7 @@ function story(_id, _func, _noBlack, _desc, _after) {
 		const _sin = document.createElement('div');
 		_sin.className = 'full story-inner';
 		const _inner = document.createElement('div');
-		_inner.style.width = 'calc(36vh * ' + (this.data['st' + this.id].filter(x => !x.finish).length) + ')';
+		_inner.style.width = 'calc(36cqh * ' + (this.data['st' + this.id].filter(x => !x.finish).length) + ')';
 		_inner.className = 'inner-wrapper flex flex-jc-start';
 		_wrapper.appendChild(_sin);
 		if(_desc)
@@ -10845,7 +10845,7 @@ function storyTell(_id, _func, _noBlack, _desc, _after) {
 		const _sin = document.createElement('div');
 		_sin.className = 'full story-inner flex story-inner' + this.id;
 		const _inner = document.createElement('div');
-		_inner.style.width = 'calc(36vh * ' + (this.data['st' + this.id].filter(x => !x.finish).length) + ')';
+		_inner.style.width = 'calc(36cqh * ' + (this.data['st' + this.id].filter(x => !x.finish).length) + ')';
 		_inner.className = 'inner-wrapper flex flex-jc-start';
 		_wrapper.appendChild(_sin);
 		if(_desc)
@@ -10924,7 +10924,7 @@ function storyBonus(_func, _instant, _container) {
 		const _sin = document.createElement('div');
 		_sin.className = 'full story-inner story-gift-inner story-gift-card-inner';
 		const _inner = document.createElement('div');
-		_inner.style.width = 'calc(36vh * 4)';
+		_inner.style.width = 'calc(36cqh * 4)';
 		_inner.className = 'inner-wrapper story-gift flex flex-jc-start';
 		const _title = document.createElement('div');
 		_title.className = 'w-100 flex story-gift-title';
@@ -11160,10 +11160,10 @@ function createStoryResultScreen(_failed) {
 			PlaySound({ key: 'failure', volume: .3 });
 			episode.enemies.forEach(x => x.standBy());
 		}
-		let _table = '<div class="flex full pvp-result-table story-result"><div class="flex" style="width:100%;height:16vh;position:relative"><img src="./images/ui/wood.png" style="height:30%;margin-top:5vh;z-index:2;filter:drop-shadow(.5vh 1vh 1.5vh black);-webkit-filter:drop-shadow(.5vh 1vh 1.5vh black);position:absolute' + (_fail ? ';-webkit-filter:grayscale(66%);filter:grayscale(66%)': '') + '"' + (_fail ? ' class="gray"': '') + ' /><span style="z-index:2;margin-top:4.5vh;font-size:3.5vh!important;font-weight:600;text-shadow:0px 0px 1vh #000;color:' + (_fail ? 'crimson' : '#F4BB44') + ' !important">' + getLangData('Story' + (_fail ? ' Failed' : ' Cleared')) + '</span></div><div class="game-over-results"><div style="width:100%" class="flex"><span>';
+		let _table = '<div class="flex full pvp-result-table story-result"><div class="flex" style="width:100%;height:16cqh;position:relative"><img src="./images/ui/wood.png" style="height:30%;margin-top:5cqh;z-index:2;filter:drop-shadow(.5cqh 1cqh 1.5cqh black);-webkit-filter:drop-shadow(.5cqh 1cqh 1.5cqh black);position:absolute' + (_fail ? ';-webkit-filter:grayscale(66%);filter:grayscale(66%)': '') + '"' + (_fail ? ' class="gray"': '') + ' /><span style="z-index:2;margin-top:4.5cqh;font-size:3.5cqh!important;font-weight:600;text-shadow:0px 0px 1cqh #000;color:' + (_fail ? 'crimson' : '#F4BB44') + ' !important">' + getLangData('Story' + (_fail ? ' Failed' : ' Cleared')) + '</span></div><div class="game-over-results"><div style="width:100%" class="flex"><span>';
 		for(let _star of __story.resultStars)
-			_table += `<div class="flex" style="padding:2vh 2vh 0 2vh;width:100%;height:6vh">
-				<img src="./images/ui/star-${_star.failed ? 'off' : 'on'}.png" style="height:4vh"${_star.failed ? '' : ' class="glow"'} />
+			_table += `<div class="flex" style="padding:2cqh 2cqh 0 2cqh;width:100%;height:6cqh">
+				<img src="./images/ui/star-${_star.failed ? 'off' : 'on'}.png" style="height:4cqh"${_star.failed ? '' : ' class="glow"'} />
 				<div class="flex flex-jc-start one-line game-over-result" style="${_star.failed ? 'color:#f7f7f799 !important;text-decoration: line-through' : 'color:#F4BB44 !important'}">
 					${getLangData(_star.title)}
 				</div>
@@ -11188,7 +11188,7 @@ function createStoryResultScreen(_failed) {
 					}
 				}
 				if(_warn)
-					warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/icons/chest.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Bonus Reward') + '</span></div>', null, null, 1);
+					warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/chest.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Bonus Reward') + '</span></div>', null, null, 1);
 			}
 			if(__story.perfectFinishRewards && (__story.resultStars.filter(x => !x.failed)?.length ?? 0) === 3)
 				for(const _r of __story.perfectFinishRewards)
@@ -11228,27 +11228,27 @@ function createStoryResultScreen(_failed) {
 				_rewards.push(JSON.parse(JSON.stringify(_g)));
 			}
 		}
-		_table += `<div class="flex" style="width:100%;padding:2vh 0 1vh 0;color:#F4BB44 !important; font-size:2.6vh !important; font-weight: 600">${getLangData('Clear Rewards')}</div>`;
+		_table += `<div class="flex" style="width:100%;padding:2cqh 0 1cqh 0;color:#F4BB44 !important; font-size:2.6cqh !important; font-weight: 600">${getLangData('Clear Rewards')}</div>`;
 		for(let _reward of _rewards)
-			_table += `<div class="flex flex-jc-start" style="width:100%;height:5vh"><div style="height:100%" class="flex flex-jc-start"><img style="width:4vh;margin-left:2vh" src="${_reward.src ?? './images/icons/' + _reward.key + '.png'}" /><div class="flex one-line" style="flex:1;height:100%;font-size:2.4vh !important;color:#f7f7f7cc !important;padding-left:2vh">${(_reward.count ?? 1).formatWithDots()} x ${getLangData(_reward.title ?? _reward.type ?? _reward.key).toProperCase()}${_reward.bonus ? ' (bonus)' : ''}</div></div></div>`;
-			//_table += `<div class="flex" style="width:100%;padding:2vh 0 1vh 0;color:#F4BB44 !important; font-size:2.6vh !important; font-weight: 600">${getLangData('Mission Rewards')}</div>
-			//<div class="flex" style="width:100%;height:5vh"><div style="height:100%" class="flex"><img style="width:5vh" src="./images/icons/coin.png" /><div class="flex" style="height:100%;font-size:2.4vh !important;color:#f7f7f7cc !important;padding-left:2vh">${_missionGain} ${getLangData('Gold')} (+Bonus)</div></div></div>`;
+			_table += `<div class="flex flex-jc-start" style="width:100%;height:5cqh"><div style="height:100%" class="flex flex-jc-start"><img style="width:4cqh;margin-left:2cqh" src="${_reward.src ?? './images/icons/' + _reward.key + '.png'}" /><div class="flex one-line" style="flex:1;height:100%;font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">${(_reward.count ?? 1).formatWithDots()} x ${getLangData(_reward.title ?? _reward.type ?? _reward.key).toProperCase()}${_reward.bonus ? ' (bonus)' : ''}</div></div></div>`;
+			//_table += `<div class="flex" style="width:100%;padding:2cqh 0 1cqh 0;color:#F4BB44 !important; font-size:2.6cqh !important; font-weight: 600">${getLangData('Mission Rewards')}</div>
+			//<div class="flex" style="width:100%;height:5cqh"><div style="height:100%" class="flex"><img style="width:5cqh" src="./images/icons/coin.png" /><div class="flex" style="height:100%;font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">${_missionGain} ${getLangData('Gold')} (+Bonus)</div></div></div>`;
 
-		_table += `</div><div class="flex" style="width:100%;height:7.5vh;position:relative;z-index:2">
-			<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
-				<div class="framed-btn full flex animate-me" style="border:.2vh solid #B8860Bab;right:unset;top:unset;cursor:pointer;color:#B8860Bcc !important;font-size:3vh !important;line-height:6.5vh !important;height:6.5vh !important" onexactclick="quitFromStory()">${getLangData('QUIT')}</div>
+		_table += `</div><div class="flex" style="width:100%;height:7.5cqh;position:relative;z-index:2">
+			<div class="flex" style="width:calc(50% - 1cqh);margin-right:1cqh;overflow:hidden;position:relative;height:100%">
+				<div class="framed-btn full flex animate-me" style="border:.2cqh solid #B8860Bab;right:unset;top:unset;cursor:pointer;color:#B8860Bcc !important;font-size:3cqh !important;line-height:6.5cqh !important;height:6.5cqh !important" onexactclick="quitFromStory()">${getLangData('QUIT')}</div>
 			</div>`
-			// <div class="${_fail ? 'd-none' : 'flex'}" style="width:calc(50% - 1vh);margin-left:1vh;overflow:hidden;position:relative;height:100%">
-			// 	<div class="game-menu-button btn-info full flex animate-me" style="border:.2vh solid #B8860Bab;right:unset;top:unset;cursor:pointer;color:#B8860Bcc !important;font-size:3vh !important;line-height:3vh !important" onexactclick="trySwitchMap(${episode.id})">${getLangData('NEXT')}</div>
+			// <div class="${_fail ? 'd-none' : 'flex'}" style="width:calc(50% - 1cqh);margin-left:1cqh;overflow:hidden;position:relative;height:100%">
+			// 	<div class="game-menu-button btn-info full flex animate-me" style="border:.2cqh solid #B8860Bab;right:unset;top:unset;cursor:pointer;color:#B8860Bcc !important;font-size:3cqh !important;line-height:3cqh !important" onexactclick="trySwitchMap(${episode.id})">${getLangData('NEXT')}</div>
 			// </div>
-			+`<div class="${_fail ? 'flex' : 'd-none'}" style="width:calc(50% - 1vh);margin-left:1vh;overflow:hidden;position:relative;height:100%">
-				<div class="framed-btn full flex animate-me" style="border:.2vh solid #B8860Bab;height:6.5vh !important;right:unset;top:unset;cursor:pointer;color:#B8860Bcc !important;font-size:3vh !important;line-height:6.5vh !important" onexactclick="loadLastStoryCheckPoint(null,${episode.goldSelected ? 1 : 0}, ${episode.expSelected ? 1 : 0}, ${episode.itemSelected ? 1 : 0})">${getLangData('RETRY')}</div>
+			+`<div class="${_fail ? 'flex' : 'd-none'}" style="width:calc(50% - 1cqh);margin-left:1cqh;overflow:hidden;position:relative;height:100%">
+				<div class="framed-btn full flex animate-me" style="border:.2cqh solid #B8860Bab;height:6.5cqh !important;right:unset;top:unset;cursor:pointer;color:#B8860Bcc !important;font-size:3cqh !important;line-height:6.5cqh !important" onexactclick="loadLastStoryCheckPoint(null,${episode.goldSelected ? 1 : 0}, ${episode.expSelected ? 1 : 0}, ${episode.itemSelected ? 1 : 0})">${getLangData('RETRY')}</div>
 			</div>
 		</div>`;
 		//pvpStatus.innerHTML = _table + '</div>';
 		const _parent = document.createElement('div');
 		_parent.innerHTML = `<div class="flex my-pop-up-wrapper show" id="pvp-result">
-				<div id="game-over-pvp-content" class="flex" style="padding: 2%; width: 50%; height: 80%; border: 2px solid #b8860bcc; border-radius: 4vh; box-shadow: 0px 0px 2vh #000; background: linear-gradient(180deg, #000000cc, #00000099), url(./images/icons/battle.png); background-size:cover">
+				<div id="game-over-pvp-content" class="flex" style="padding: 2%; width: 50%; height: 80%; border: 2px solid #b8860bcc; border-radius: 4cqh; box-shadow: 0px 0px 2cqh #000; background: linear-gradient(180deg, #000000cc, #00000099), url(./images/icons/battle.png); background-size:cover">
 					<div style="width:100%" class="flex full">
 						<div class="full" style="width:80%;color:#fff;text-align:center" id="pvp-status">`
 							+ _table + '</div>' +
@@ -11394,7 +11394,7 @@ function createStoriesUI(_id) {
 			<div class="skill-icon-wrapper flex">
 				<img src="./images/main/${_s.boss}/concept.png" />
 			</div>
-			<div class="flex" style="flex:1;height:100%;padding:1vh 0">
+			<div class="flex" style="flex:1;height:100%;padding:1cqh 0">
 				<div class="flex flex-jc-start skill-card-title w-100" style="height:40%">${_s.title[getLang()]}</div>
 				<div class="story-level flex flex-jc-start w-100" style="height:30%">${getLangData('Lvl')}&nbsp;${_s.minLevel}&nbsp;${getLangData('required')}</div>
 				<div class="story-consume flex flex-jc-start w-50" style="height:30%">${_s.ticket}&nbsp;<img src="./images/icons/key.png" style="height:100%" /></div>
@@ -11469,9 +11469,9 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 			let _img = '';
 			const _arr = _r.name?.split(',') ?? ['random'];
 			for(let i = 0; i < _arr.length; i++)
-				_img += `<img style="left:${i * 5}vh;position:absolute;top:0" src="./images/fragments/${_arr[i]}.png" />`;
+				_img += `<img style="left:${i * 5}cqh;position:absolute;top:0" src="./images/fragments/${_arr[i]}.png" />`;
 			_html += `<div class="flex flex-jc-start w-50 story-reward story-reward-fragment">
-						<div style="position:relative;height:8vh;width:calc(8vh + ${((_arr.length - 1) * 5)}vh)">`
+						<div style="position:relative;height:8cqh;width:calc(8cqh + ${((_arr.length - 1) * 5)}cqh)">`
 						+ _img +
 						`</div>
 						<div style="flex:1" class="flex">
@@ -11487,7 +11487,7 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 						<span class="${_r.type === 'random' ? '' : 'story-reward-item grade' + (_r.grade ?? 1) + '-item'}" style="display:inline-block;position:relative">
 							<img class="item-img" src="./images/gems/${_r.type}${_r.grade ?? 1}.png" />
 						</span>
-						<div style="flex:1;padding-left:1vh" class="flex">
+						<div style="flex:1;padding-left:1cqh" class="flex">
 							<div class="w-100 flex flex-jc-start page-detail-desc">
 								${(_r.count ? _r.count.formatWithDots() : ((_r.minCount && _r.maxCount) ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1))}
 							</div>
@@ -11499,7 +11499,7 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 						<span class="story-reward-item grade${_r.grade ?? 1}-item" style="display:inline-block;position:relative">
 							<img class="item-img" src="./images/items/icons/${(_r.type ?? _r.key) === 'weapon' ? mainCharacter.class + '/' : ''}${_r.type ?? _r.key}${_r.grade ?? 1}.png" />
 						</span>
-						<div style="flex:1;padding-left:1vh" class="flex">
+						<div style="flex:1;padding-left:1cqh" class="flex">
 							<div class="w-100 flex flex-jc-start page-detail-desc">
 								${(_r.count ? _r.count.formatWithDots() : ((_r.minCount && _r.maxCount) ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1))}
 							</div>
@@ -11592,7 +11592,7 @@ function checkStoryBonusAchievement(_story, _isRealPlay) {
 			{
 				_myStat.done = 1;
 				updateGlobalQuest('complete-act-side');
-				warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/cup.png" />&nbsp;<span style="flex:1">' + getLangData('Bonus Achievement Completed') + '</span></div>', null, null, 1);
+				warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/ui/menu-icons/cup.png" />&nbsp;<span style="flex:1">' + getLangData('Bonus Achievement Completed') + '</span></div>', null, null, 1);
 				PlaySound({key:'bonusdone', volume:1});
 				warnChestReward(getChestReward(_sb.reward.grade ?? 1, _sb.reward.key, _sb.reward.type, _sb.reward.count ?? 1));
 			}
@@ -11600,7 +11600,7 @@ function checkStoryBonusAchievement(_story, _isRealPlay) {
 		else if(!_myStat) {
 			if(_sb.minCount === _rs.count) {
 				_myBonusStats.push({id:_sb.id});
-				warn('<div class="flex important achievement" style="position:relative"><img style="height:12vh" src="./images/ui/menu-icons/cup.png" />&nbsp;<span style="flex:1">' + getLangData('Bonus Achievement Unlocked') + '</span></div>', null, null, 1);
+				warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/ui/menu-icons/cup.png" />&nbsp;<span style="flex:1">' + getLangData('Bonus Achievement Unlocked') + '</span></div>', null, null, 1);
 				PlaySound({key:'bonusactive', volume:1});
 			}
 		}
@@ -11704,7 +11704,7 @@ function getStoryRewardsResultHtml(_story, _bonus, _pass, _looseGain, _isRealPla
 			const _newLevel = mainCharacter.level;
 			let _lastLevelStatus = '';
 			if(_pass && _newLevel > _oldLevel)
-				_lastLevelStatus = '<div class="flex flex-jc-start" style="color:#f3f4f5 !important;padding-left:1vh">' + getLangData('Lvl') + `&nbsp;${_oldLevel}<img style="height:2vh !important;width:auto !important" class="level-increment" src="./images/icons/power-up.png" />${_newLevel}`;
+				_lastLevelStatus = '<div class="flex flex-jc-start" style="color:#f3f4f5 !important;padding-left:1cqh">' + getLangData('Lvl') + `&nbsp;${_oldLevel}<img style="height:2cqh !important;width:auto !important" class="level-increment" src="./images/icons/power-up.png" />${_newLevel}`;
 			if(_bonus?.type === 'exp')
 				_count += _bonus.count;
 			_rewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 50%${episode.expSelected ? ';color:#F4BB44 !important' : ''}">
@@ -11998,11 +11998,11 @@ function delay(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 // setTimeout(() => {
-// 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/' + _giftOrder[2].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
-// 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/' + _giftOrder[3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
-// 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/' + _giftOrder[3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
-// 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/' + _giftOrder[3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
-// 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12vh" src="./images/icons/' + _giftOrder[3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8vh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
+// 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/' + _giftOrder[2].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
+// 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/' + _giftOrder[3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
+// 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/' + _giftOrder[3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
+// 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/' + _giftOrder[3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
+// 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/' + _giftOrder[3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
 // }, 15000);
 
 function createPromoScreen(_fromMenu) {
@@ -12289,8 +12289,8 @@ function createPromoScreen(_fromMenu) {
 				_content += '</div>';
 			}
 			_html += `<div class="quick-play-desc-item flex" style="background:#000 !important">
-			<div class="w-100 flex quick-play-desc-item-title${_content ? ' flex-jc-start' : ''}" style="height:5vh">${_tip[getLang()]}</div>`+
-				(_content ?? `<img style="max-height:calc(100% - 5vh);max-width:100%" src="./images/quickplay/${j.toString() + '-' + (i + 1).toString()}.png" />`) +
+			<div class="w-100 flex quick-play-desc-item-title${_content ? ' flex-jc-start' : ''}" style="height:5cqh">${_tip[getLang()]}</div>`+
+				(_content ?? `<img style="max-height:calc(100% - 5cqh);max-width:100%" src="./images/quickplay/${j.toString() + '-' + (i + 1).toString()}.png" />`) +
 			`</div>`;
 		}
 		_html += `</div>`;

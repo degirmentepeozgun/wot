@@ -207,6 +207,213 @@
           "buildTransitive/netcoreapp3.1/_._": {}
         }
       }
+    },
+    "net8.0/win-x64": {
+      "MessagePack/2.5.108": {
+        "type": "package",
+        "dependencies": {
+          "MessagePack.Annotations": "2.5.108",
+          "Microsoft.NET.StringTools": "17.4.0",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
+        },
+        "compile": {
+          "lib/net6.0/MessagePack.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/MessagePack.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "MessagePack.Annotations/2.5.108": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/MessagePack.Annotations.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/MessagePack.Annotations.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.Connections.Abstractions/8.0.11": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Features": "8.0.11",
+          "System.IO.Pipelines": "8.0.0"
+        },
+        "compile": {
+          "lib/net8.0/Microsoft.AspNetCore.Connections.Abstractions.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.AspNetCore.Connections.Abstractions.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.SignalR.Common/8.0.11": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Connections.Abstractions": "8.0.11",
+          "Microsoft.Extensions.Options": "8.0.2"
+        },
+        "compile": {
+          "lib/net8.0/Microsoft.AspNetCore.SignalR.Common.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.AspNetCore.SignalR.Common.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.SignalR.Protocols.MessagePack/8.0.11": {
+        "type": "package",
+        "dependencies": {
+          "MessagePack": "2.5.108",
+          "Microsoft.AspNetCore.SignalR.Common": "8.0.11"
+        },
+        "compile": {
+          "lib/net8.0/Microsoft.AspNetCore.SignalR.Protocols.MessagePack.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.AspNetCore.SignalR.Protocols.MessagePack.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions/8.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net6.0/_._": {}
+        }
+      },
+      "Microsoft.Extensions.Features/8.0.11": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/Microsoft.Extensions.Features.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.Extensions.Features.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Microsoft.Extensions.Options/8.0.2": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
+          "Microsoft.Extensions.Primitives": "8.0.0"
+        },
+        "compile": {
+          "lib/net8.0/Microsoft.Extensions.Options.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.Extensions.Options.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net6.0/Microsoft.Extensions.Options.targets": {}
+        }
+      },
+      "Microsoft.Extensions.Primitives/8.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/Microsoft.Extensions.Primitives.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.Extensions.Primitives.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net6.0/_._": {}
+        }
+      },
+      "Microsoft.NET.StringTools/17.4.0": {
+        "type": "package",
+        "dependencies": {
+          "System.Memory": "4.5.5",
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
+        },
+        "compile": {
+          "ref/net7.0/_._": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net7.0/Microsoft.NET.StringTools.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
+      "System.IO.Pipelines/8.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/System.IO.Pipelines.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/System.IO.Pipelines.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net6.0/_._": {}
+        }
+      },
+      "System.Memory/4.5.5": {
+        "type": "package",
+        "compile": {
+          "ref/netcoreapp2.1/_._": {}
+        },
+        "runtime": {
+          "lib/netcoreapp2.1/_._": {}
+        }
+      },
+      "System.Runtime.CompilerServices.Unsafe/6.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/_._": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/System.Runtime.CompilerServices.Unsafe.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/netcoreapp3.1/_._": {}
+        }
+      }
     }
   },
   "libraries": {
@@ -543,16 +750,16 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\8e413ed2508908532075070216f8b533\\nuget": {}
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\019ef6209bec52e3602238027062cf83\\nuget": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Administrator\\Desktop\\wot\\api\\Web\\BackEnd\\Api\\Api.csproj",
+      "projectUniqueName": "c:\\Users\\Administrator\\Desktop\\wot\\api\\Web\\BackEnd\\Api\\Api.csproj",
       "projectName": "Api",
-      "projectPath": "C:\\Users\\Administrator\\Desktop\\wot\\api\\Web\\BackEnd\\Api\\Api.csproj",
-      "packagesPath": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\8e413ed2508908532075070216f8b533\\nuget",
-      "outputPath": "C:\\Users\\Administrator\\Desktop\\wot\\api\\Web\\BackEnd\\Api\\obj\\",
+      "projectPath": "c:\\Users\\Administrator\\Desktop\\wot\\api\\Web\\BackEnd\\Api\\Api.csproj",
+      "packagesPath": "C:\\Users\\Administrator\\AppData\\Local\\Temp\\cursor-sandbox-cache\\019ef6209bec52e3602238027062cf83\\nuget",
+      "outputPath": "c:\\Users\\Administrator\\Desktop\\wot\\api\\Web\\BackEnd\\Api\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -610,6 +817,11 @@
         },
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.427/PortableRuntimeIdentifierGraph.json"
       }
+    },
+    "runtimes": {
+      "win-x64": {
+        "#import": []
+      }
     }
   },
   "logs": [
@@ -620,7 +832,8 @@
       "message": "'Microsoft.AspNetCore.SignalR.Protocols.MessagePack' 8.0.11 paketinde önem derecesi orta olan bilinen bir https://github.com/advisories/GHSA-86xp-94pg-8r6r güvenlik açığı var",
       "libraryId": "Microsoft.AspNetCore.SignalR.Protocols.MessagePack",
       "targetGraphs": [
-        "net8.0"
+        "net8.0",
+        "net8.0/win-x64"
       ]
     },
     {
@@ -630,7 +843,8 @@
       "message": "'Microsoft.AspNetCore.SignalR.Protocols.MessagePack' 8.0.11 paketinde önem derecesi yüksek olan bilinen bir https://github.com/advisories/GHSA-f8h2-vmm9-qhj6 güvenlik açığı var",
       "libraryId": "Microsoft.AspNetCore.SignalR.Protocols.MessagePack",
       "targetGraphs": [
-        "net8.0"
+        "net8.0",
+        "net8.0/win-x64"
       ]
     }
   ]

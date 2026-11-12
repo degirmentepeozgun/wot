@@ -132,19 +132,19 @@ function talent() {
 					</div>
 				</div>
 				<div class="artifact-detail-header-info">
-					<div class="page-detail-header flex artifact-title artifact-detail-header-title" style="width:100%;padding:2vh">
+					<div class="page-detail-header flex artifact-title artifact-detail-header-title" style="width:100%;padding:2cqh">
 						${_m.names[getLang()]}
 					</div>
 					<div class="flex talent-level flex-jc-start${_maxed ? ' maxed' : ''}">
 						${_level}&nbsp;/&nbsp;${_m.props.length}<span class="${_maxed ? '' : 'd-none '}already-maxed">&nbsp;(max)</span>
 					</div>
-					<div class="page-detail-desc flex artifact-description" style="width:100%;padding:2vh;text-align:center">
+					<div class="page-detail-desc flex artifact-description" style="width:100%;padding:2cqh;text-align:center">
 						${_m.descriptions[getLang()]}
 					</div>
 				</div>
 			</div>
 			<div class="w-100 flex page-detail-splitter"></div>
-			<div class="flex artifact-bonus" style="width:100%;padding:1vh">
+			<div class="flex artifact-bonus" style="width:100%;padding:1cqh">
                	<div class="w-100">
 			   		<div class="page-detail-title talent-props-header flex flex-jc-start w-100">
 						${getLangData('Current Level')}

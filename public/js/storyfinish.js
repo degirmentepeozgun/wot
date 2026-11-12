@@ -96,16 +96,16 @@
 	}
 	if((_isPerfect && _story.perfectFinishRewards && !_isBeforePerfect) && (_isFirstFinish && _story.firstFinishRewards))
 		_firstFinishRewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 100%">
-							<img style="/* filter: drop-shadow(0 0 1px #f3f4f5); */height: 100%;margin-right: 5%;filter: drop-shadow(0 0 .15vh orange) drop-shadow(0 0 .3vh #FF7518);" src="./images/icons/chest2.png">x 2
+							<img style="/* filter: drop-shadow(0 0 1px #f3f4f5); */height: 100%;margin-right: 5%;filter: drop-shadow(0 0 .15cqh orange) drop-shadow(0 0 .3cqh #FF7518);" src="./images/icons/chest2.png">x 2
 						</div>`;
 	else {
 		if(_isPerfect && _story.perfectFinishRewards && !_isBeforePerfect)
 			_firstFinishRewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 100%">
-								<img style="/* filter: drop-shadow(0 0 1px #f3f4f5); */height: 100%;margin-right: 5%;filter: drop-shadow(0 0 .15vh orange) drop-shadow(0 0 .3vh #FF7518);" src="./images/icons/chest2.png">x 1
+								<img style="/* filter: drop-shadow(0 0 1px #f3f4f5); */height: 100%;margin-right: 5%;filter: drop-shadow(0 0 .15cqh orange) drop-shadow(0 0 .3cqh #FF7518);" src="./images/icons/chest2.png">x 1
 							</div>`;
 		if(_isFirstFinish && _story.firstFinishRewards)
 			_firstFinishRewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 100%">
-								<img style="/* filter: drop-shadow(0 0 1px #f3f4f5); */height: 100%;margin-right: 5%;filter: drop-shadow(0 0 .15vh orange) drop-shadow(0 0 .3vh #FF7518);" src="./images/icons/chest2.png">x 1
+								<img style="/* filter: drop-shadow(0 0 1px #f3f4f5); */height: 100%;margin-right: 5%;filter: drop-shadow(0 0 .15cqh orange) drop-shadow(0 0 .3cqh #FF7518);" src="./images/icons/chest2.png">x 1
 							</div>`;
 	}
 	if(_firstFinishRewardsHtml !== '')
@@ -224,12 +224,12 @@
 			</div>
 		</div>
 	</div>`;
-	// <div class="flex d-none w-100" style="height:8vh">
-	// 	<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
-	// 		<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(null, __storySceneOrder)">${getLangData('QUIT')}</div>
+	// <div class="flex d-none w-100" style="height:8cqh">
+	// 	<div class="flex" style="width:calc(50% - 1cqh);margin-right:1cqh;overflow:hidden;position:relative;height:100%">
+	// 		<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3cqh !important" onexactclick="switchStoryScene(null, __storySceneOrder)">${getLangData('QUIT')}</div>
 	// 	</div>
-	// 	<div class="flex" style="width:calc(50% - 1vh);margin-right:1vh;overflow:hidden;position:relative;height:100%">
-	// 		<div class="game-menu-button btn-info full flex animate-me${!__account.pvp.duelCount ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3vh !important" onexactclick="switchStoryScene(function() { switchBookPage(5, 1); }, __storySceneOrder)">${getLangData('BACK')}</div>
+	// 	<div class="flex" style="width:calc(50% - 1cqh);margin-right:1cqh;overflow:hidden;position:relative;height:100%">
+	// 		<div class="game-menu-button btn-info full flex animate-me${!__account.pvp.duelCount ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3cqh !important" onexactclick="switchStoryScene(function() { switchBookPage(5, 1); }, __storySceneOrder)">${getLangData('BACK')}</div>
 	// 	</div>
 	// </div>
 	const _a = document.createElement('div');

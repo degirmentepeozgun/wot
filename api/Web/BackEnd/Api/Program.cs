@@ -9,7 +9,9 @@ builder.Services.AddCors(options => {
 			.AllowCredentials();
 	});
 });
-builder.Services.AddSignalR().AddMessagePackProtocol();
+builder.Services.AddSignalR(options => {
+	options.ClientTimeoutInterval = TimeSpan.FromMinutes(5);
+}).AddMessagePackProtocol();
 
 var app = builder.Build();
 app.UseCors("GamePolicy");
