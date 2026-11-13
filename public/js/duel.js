@@ -803,6 +803,7 @@
 			this.syncLeader(_view);
 			this.paintRoomList();
 			this.renderJoinRoomUI(_view.s, 1, 1);
+			this.noteRealJoins(_view);
 			return;
 		}
 		this.paintRoomList();
@@ -1038,7 +1039,30 @@
 		const _d = new Date();
 		return String(_d.getHours()).padStart(2, '0') + ':' + String(_d.getMinutes()).padStart(2, '0');
 	}
+	this.noteRealJoins = function(_view) {
+		if(!_view?.s || !_view.p?.some(x => x.s === mainCharacter?.socketId))
+			return;
+		this.roomHumans = this.roomHumans || {};
+		const _prev = this.roomHumans[_view.s];
+		const _now = {};
+		for(const _p of _view.p)
+			if(_p.s)
+				_now[_p.s] = _p.n || '';
+		this.roomHumans[_view.s] = _now;
+		if(!_prev || this.chatRoom !== _view.s)
+			return;
+		for(const _id in _now) {
+			if(_prev[_id] || _id === mainCharacter?.socketId)
+				continue;
+			this.pushRoomChat({
+				sys: 1,
+				m: (_now[_id] || 'Player') + ' ' + getLangData('joined the room')
+			});
+		}
+	}
 	this.closeRoomChat = function() {
+		if(this.chatRoom && this.roomHumans)
+			delete this.roomHumans[this.chatRoom];
 		if(this.chatRoom && this.roomChats)
 			delete this.roomChats[this.chatRoom];
 		delete this.chatRoom;
@@ -1148,6 +1172,8 @@
 		}
 	}
 	this.chatRowHtml = function(_row) {
+		if(_row.sys)
+			return `<div class="duel-system-message w-100 flex">&gt;&gt;&nbsp;${this.escapeChat(_row.m)}</div>`;
 		const _avatar = _row.c ? `<div class="duel-chat-avatar-wrap"><img class="duel-chat-avatar" src="./images/main/avatars/${this.escapeChat(_row.c)}.png" /></div>` : '';
 		const _mine = _row.s && _row.s === mainCharacter?.socketId ? ' duel-chat-mine' : '';
 		return `<div class="duel-chat-row${_mine}">${_avatar}<div class="duel-chat-main"><div class="duel-chat-top"><div class="duel-chat-name" style="color:${getCharacterChatColor(_row.c) ?? 'inherit'} !important">${this.escapeChat(_row.n)}</div><div class="duel-chat-time">${this.escapeChat(_row.time)}</div></div><div class="duel-chat-body"><div class="duel-chat-text">${this.escapeChat(_row.m)}</div></div></div></div>`;
@@ -1174,7 +1200,8 @@
 			return;
 		this.roomChats = this.roomChats || {};
 		const _list = this.roomChats[this.chatRoom] = this.roomChats[this.chatRoom] || [];
-		_row.time = _row.time || this.chatClock();
+		if(!_row.sys)
+			_row.time = _row.time || this.chatClock();
 		_row.m = String(_row.m ?? '').slice(0, 200);
 		_list.push(_row);
 		const _extra = _list.length - 100;

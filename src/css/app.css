@@ -9488,7 +9488,84 @@ body:has(#splash:not(.d-none)) #game-ui #focus-ui *  {
 	background-size: auto 100% !important;
 }
 .chat-send-wrapper {
+	position: relative;
 	border:none !important
+}
+.chat-send-text input {
+	width: 100%;
+	box-sizing: border-box;
+	padding-right: 12%;
+}
+.chat-emoji-btn {
+	position: absolute;
+	right: 1.5%;
+	top: 50%;
+	transform: translateY(-50%);
+	height: 62%;
+	aspect-ratio: 1;
+	z-index: 3;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	background: none;
+	border: none;
+	padding: 0;
+}
+.chat-emoji-btn img {
+	height: 100%;
+	width: 100%;
+	display: block;
+	object-fit: contain;
+}
+.chat-emoji-panel {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 100%;
+	margin-bottom: 1.5%;
+	z-index: 6;
+	overflow: hidden;
+	background: #140e0a;
+	border: 0.16cqh solid #8a6a3a;
+	border-radius: 0.8cqh;
+	box-shadow: 0 0.4cqh 1.2cqh #000;
+	padding: 1.2% 1.4% 1.4%;
+	box-sizing: border-box;
+}
+.chat-emoji-tabs {
+	display: flex;
+	gap: 2%;
+}
+.chat-emoji-tab {
+	flex: 1;
+	text-align: center;
+	cursor: pointer;
+	color: #8a7a62 !important;
+	font-family: 'Grenze', serif !important;
+	font-size: calc(var(--wot-font-base) * 1.2) !important;
+	line-height: 1.3 !important;
+	border-bottom: 0.15cqh solid #3a2e1c;
+	padding-bottom: 0.8%;
+}
+.chat-emoji-tab.on {
+	color: #e6d2a2 !important;
+	border-bottom-color: #d6a73b;
+}
+.chat-emoji-grid {
+	display: grid;
+	grid-template-columns: repeat(6, 1fr);
+	overflow: hidden;
+	margin-top: 1.2%;
+}
+.chat-emoji-item {
+	height: 6.4cqh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	font-size: 4.4cqh;
+	line-height: 1 !important;
 }
 .chat-send-wrapper {
 	color:#b8a186 !important;
@@ -13665,8 +13742,6 @@ body:not(.pc-mission) .chest-open-gift {
 body:not(.pc-mission) #game-ui .game-status-screen .talk-avatar-render {
 	width:84% !important;
 }
-#game-ui .game-status-screen .talk-avatar-render .status-item-icon-container {
-}
 #game-ui .game-status-screen .talk-avatar-render .status-item-action-container * {
 	line-height:1px !important;
 	padding-left:2cqh !important;
@@ -14526,6 +14601,9 @@ body:not(.pc-mission) #game-ui .game-status-screen .talk-avatar-render {
 .volume-panel .level{
     color:#f3d495;
 }
+#story-finish .side-right {
+	padding:2% 0 !important
+}
 @media
     (hover: none),
     (pointer: coarse),
@@ -14565,13 +14643,16 @@ body:not(.pc-mission) #game-ui .game-status-screen .talk-avatar-render {
 		-webkit-transform: scale(1.5) !important
 	}
 	#story-finish .side-right {
-		transform: scale(1.3) !important;
-		-webkit-transform: scale(1.3) !important;
-		height:89% !important
+		transform: none !important;
+		-webkit-transform: none !important;
+		height: 100% !important;
 	}
 	 #story-finish .side-right.has-next {
 		padding-top:0 !important;
 	 }
+	 #story-finish .side-right {
+		padding:6% 0 !important
+	}
 }
 body.pc-mission  #game-ui .intro-screen {
 	z-index: 9 !important
@@ -15023,7 +15104,7 @@ body.pc-mission  #game-ui .intro-screen {
     background-size: 100% 100% !important;
     width: auto !important;
     height: 90% !important;
-	color:#E8E5DE !important;
+	color:#c3a57f !important;
     aspect-ratio: 538 / 120 !important;
 	cursor:default
 }
@@ -16103,7 +16184,8 @@ body.pc-mission  #game-ui .intro-screen {
 .character-info-scroll-area {
 	width:100%;
 	height:90%;
-	overflow-y:auto
+	overflow-y:auto;
+	overflow-x:hidden;
 }
 .character-info-header {
 	width:100%;
@@ -17722,6 +17804,18 @@ div[data-module=dailylogin] .book-page-bg {
 	font-size: inherit;
 	font-family: inherit;
 }
+.duel-system-message {
+	width: 100%;
+	background: none !important;
+	border: none !important;
+	box-shadow: none !important;
+	color: #8C8275 !important;
+	font-family: 'Alegreya', sans-serif !important;
+	font-size: calc(var(--wot-font-base) * 1.05) !important;
+	line-height: 1.3 !important;
+	padding: .3cqh .5cqh;
+	justify-content: flex-start !important;
+}
 .duel-chat-mine .duel-chat-body {
 	color: #E8BE72 !important;
 	-webkit-text-fill-color: #E8BE72 !important;
@@ -17854,6 +17948,68 @@ div[data-module=dailylogin] .book-page-bg {
 	flex-wrap: wrap;
 	align-content: flex-start;
 }
+#chat-ticker {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 4.4cqh;
+	z-index: 40;
+	overflow: hidden;
+	pointer-events: none;
+	cursor: pointer;
+	opacity: 0;
+	background:linear-gradient(0deg, transparent, #000, transparent);
+	transition: opacity .4s ease;
+	-webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+	mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+}
+#chat-ticker.on {
+	opacity: 1;
+	pointer-events: auto;
+}
+.chat-ticker-track {
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	white-space: nowrap;
+	will-change: transform;
+}
+.chat-ticker-item {
+	flex: 0 0 auto;
+	padding-right: 8cqh;
+	color: #f6ead0;
+	font-family: 'Alegreya', serif;
+	font-size: calc(var(--wot-font-base) * 1.5) !important;
+	line-height: calc(var(--wot-font-base) * 3) !important;
+	white-space: nowrap;
+}
+.chat-ticker-gap {
+	flex: 0 0 auto;
+	padding: 0;
+	width: 0;
+}
+.chat-ticker-name {
+	font-weight: 700 !important;
+	color: #9c791a;
+	font-family: inherit;
+	font-size: inherit;
+	line-height: inherit !important;
+	font-size: calc(var(--wot-font-base) * 1.5) !important;
+	line-height: calc(var(--wot-font-base) * 3) !important;
+}
+.chat-ticker-text {
+	color: inherit;
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: 400 !important;
+	line-height: inherit !important;
+	font-size: calc(var(--wot-font-base) * 1.5) !important;
+	line-height: calc(var(--wot-font-base) * 3) !important;
+}
 .duel-emoji-item {
 	width: 16.66%;
 	aspect-ratio: 1;
@@ -17863,4 +18019,41 @@ div[data-module=dailylogin] .book-page-bg {
 	cursor: pointer;
 	line-height: 1 !important;
 	font-size: 2.4cqh;
+}
+
+.pvp-result-table > .flex {
+	align-items: flex-start !important;
+}
+#story-finish .finish-actions {
+	height: 9% !important
+}
+#story-finish .finish-actions .w-50{
+	justify-content:center !important
+}
+#story-finish:not([data-module="stagefinish"]) .side-right .finish-actions .w-50:not(.flex-jc-end) {
+	justify-content:center !important;
+	padding-left:0 !important
+}
+.duel-honor-slot * {
+	color:#ddd2be !important;
+	font-family: 'Grenze', serif !important;
+	font-size: calc(var(--wot-font-base) * 1.5) !important;
+	line-height: calc(var(--wot-font-base) * 2.5) !important;
+	font-weight: 700 !important;
+	text-shadow: 0 0 10px rgba(0, 0, 0, 0.5) !important;	
+}
+.duel-honor-slot .auto-pass-result-item-icon-wrapper {
+	display:inline-block !important;
+	aspect-ratio: 1/1;
+	height:100% !important;
+	padding:calc(var(--wot-font-base) * .25) !important;
+}
+.duel-honor-slot img {
+	height:calc(var(--wot-font-base) * 2) !important;
+	display: block;
+}
+#story-finish .duel-honor-slot > .flex.w-100 {
+	padding:0 !important;
+	height:calc(var(--wot-font-base) * 2.5) !important;
+	justify-content: center !important;
 }

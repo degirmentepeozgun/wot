@@ -1267,19 +1267,46 @@ function map(_m) {
 			let _status = (_eCount > 0 && _tCount > 0) ? 1 : (_tCount > 0 ? 2 : 0);
 			let _table;
 			if(!this.skipPvPFinalScreen) {
+				const _duelFinalRow = function(_p, _teamId) {
+					if(!_p)
+						return `<div class="war-final-screen-row flex"><div class="war-final-screen-cell-50 flex flex-jc-start"></div><div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1cqh"></div><div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2cqh"></div></div>`;
+					return `<div class="war-final-screen-row flex${_p.main ? ' war-final-screen-row-me' : ''}">
+						<div class="war-final-screen-cell-50 flex flex-jc-start">${_p.main ? __account.name : (_p.displayName ?? _p.name ?? '')}</div>
+						<div class="war-final-screen-cell-25 flex flex-jc-center" style="padding-right:1cqh"><img src="./images/ui/game/duel-kill-count.png" />&nbsp;${_p.killCount ?? 0}</div>
+						<div class="war-final-${_teamId === 1 ? 'blue' : 'red'}-vertical-separator"></div>
+						<div class="war-final-screen-cell-25 flex flex-jc-center" style="padding-right:2cqh"><img src="./images/ui/game/duel-dead-count.png" />&nbsp;${_p.isDead() ? 1 : 0}</div>
+					</div>`;
+				};
+				const _duelFinalTable = function(_team1, _team2) {
+					return `<div class="flex full pvp-result-table arena-result duel-final-board">
+							<div class="war-final-screen flex w-100">
+								<div class="w-100 duel-final-blue-team-bg">
+									<div class="war-final-screen-row flex team-1-header">
+										<div class="w-100 flex flex-jc-start">${getLangData("Blue Team")}</div>
+									</div>
+									${_duelFinalRow(_team1[0], 1)}
+									<hr class="war-final-blue-separator" />
+									${_duelFinalRow(_team1[1], 1)}
+									<hr class="war-final-blue-separator" />
+									${_duelFinalRow(_team1[2], 1)}
+								</div>
+								<div class="w-100 duel-final-red-team-bg">
+									<div class="war-final-screen-row flex team-2-header">
+										<div class="w-100 flex flex-jc-start">${getLangData("Red Team")}</div>
+									</div>
+									${_duelFinalRow(_team2[0], 2)}
+									<hr class="war-final-red-separator" />
+									${_duelFinalRow(_team2[1], 2)}
+									<hr class="war-final-red-separator" />
+									${_duelFinalRow(_team2[2], 2)}
+								</div>
+							</div>
+						<div class="duel-honor-slot flex"></div>
+					</div>`;
+				};
 				if(this.war) {
 					const _team1 = this.enemies.filter(x => x.teamId === 1 && !x.ghosted);
 					const _team2 = this.enemies.filter(x => x.teamId === 2 && !x.ghosted);
-					const _warFinalRow = function(_p, _teamId) {
-						if(!_p)
-							return `<div class="war-final-screen-row flex"><div class="war-final-screen-cell-50 flex flex-jc-start"></div><div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1cqh"></div><div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2cqh"></div></div>`;
-						return `<div class="war-final-screen-row flex${_p.main ? ' war-final-screen-row-me' : ''}">
-							<div class="war-final-screen-cell-50 flex flex-jc-start">${_p.main ? __account.name : (_p.displayName ?? _p.name ?? '')}</div>
-							<div class="war-final-screen-cell-25 flex flex-jc-center" style="padding-right:1cqh"><img src="./images/ui/game/duel-kill-count.png" />&nbsp;${_p.killCount ?? 0}</div>
-							<div class="war-final-${_teamId === 1 ? 'blue' : 'red'}-vertical-separator"></div>
-							<div class="war-final-screen-cell-25 flex flex-jc-center" style="padding-right:2cqh"><img src="./images/ui/game/duel-dead-count.png" />&nbsp;${_p.isDead() ? 1 : 0}</div>
-						</div>`;
-					};
 					let _rewardsHtml = '';
 					_rewards.push({key:'honor', title:getLangData('Blood Honor'), count:mainCharacter.killCount ?? 0});
 					if(_status > 1){
@@ -1306,50 +1333,16 @@ function map(_m) {
 					}
 					else
 						_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:0});
-					_table = `<div class="flex full pvp-result-table arena-result" style="height:68%">
-								<div class="flex d-none" style="width:100%;height:11cqh;position:relative">
-									<span style="margin-top:5cqh;z-index:2;font-size:3.15cqh !important;font-weight:600;text-shadow:0px 0px 1cqh #000;color:${(!_status ? 'crimson' : '#F4BB44')} !important">${getLangData(!_status ? 'Defeat' : (_status > 1 ? 'Victory' : 'Draw'))}</span>
-								</div>
-								<div class="flex" style="width:100%;overflow-y:auto;height:100%">
-									<div class="war-final-screen flex w-100">
-										<div class="w-100 duel-final-blue-team-bg">
-											<div class="war-final-screen-row flex team-1-header">
-												<div class="w-100 flex flex-jc-start">
-													${getLangData("Blue Team")}
-												</div>
-											</div>
-											${_warFinalRow(_team1[0], 1)}
-											<hr class="war-final-blue-separator" />
-											${_warFinalRow(_team1[1], 1)}
-											<hr class="war-final-blue-separator" />
-											${_warFinalRow(_team1[2], 1)}
-										</div>
-										<div class="w-100 duel-final-red-team-bg">
-											<div class="war-final-screen-row flex team-2-header">
-												<div class="w-100 flex flex-jc-start">
-													${getLangData("Red Team")}
-												</div>
-											</div>
-											${_warFinalRow(_team2[0], 2)}
-											<hr class="war-final-red-separator" />
-											${_warFinalRow(_team2[1], 2)}
-											<hr class="war-final-red-separator" />
-											${_warFinalRow(_team2[2], 2)}
-										</div>
-									</div>
-									<div class="flex flex-ai-start w-100 d-none">`
-										+ _rewardsHtml +
-									`</div>
-								</div>
-								<div class="flex d-none" style="width:100%;height:6cqh">
-									<div class="flex w-100" style="overflow:hidden;position:relative;height:100%">
-										<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3cqh !important" onexactclick="switchStoryScene(null, __storySceneOrder)">${getLangData('QUIT')}</div>
-									</div>
-								</div>
-							</div>`;
+					_table = _duelFinalTable(_team1, _team2);
 				}
 				else {
-					_table = '<div class="flex full pvp-result-table arena-result"><div class="flex" style="flex-direction:column;justify-content:space-between;width:100%;overflow-y:auto;height:87.5%"><div class="flex" style="width:80%;margin-bottom:10%">';
+					const _roster = (this.enemies || []).filter(x => x && !x.ghosted && x.class !== __spell && x.class !== 'object' && x.class !== 'minion');
+					let _blue = _roster.filter(x => x.main || !x.enemy);
+					let _red = _roster.filter(x => x.enemy && !x.main);
+					if(!_blue.length || !_red.length) {
+						_blue = _roster.filter(x => x.main);
+						_red = _roster.filter(x => !x.main);
+					}
 					switch(_status) {
 						case 2: 
 							_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:1});
@@ -1361,32 +1354,19 @@ function map(_m) {
 								__account.pvp.maxWinCount = __account.pvp.winStreak;
 							__account.pvp.winCount++;
 							__account.pvp.lastDuelWin = true;
-							_table += `<div class="pvp-player-item pvp-winner flex"><div class="pvp-player-item-left flex flex-jc-start">
-								${__account.name}</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>
-								<div class="pvp-player-item pvp-looser flex"><div class="pvp-player-item-left flex flex-jc-start">
-								Player</div><div class="pvp-player-item-right flex"><img src="./images/icons/dead.png" /></div></div>`;
 							break;
 						case 1: 
 							_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:0});
 							__account.pvp.lastDuelWin = false;
 							__account.pvp.winStreak = 0;
-							_table += `<div class="pvp-player-item pvp-draw flex"><div class="pvp-player-item-left flex flex-jc-start">
-								${__account.name}</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>
-								<div class="pvp-player-item pvp-draw flex"><div class="pvp-player-item-left flex flex-jc-start">
-								Player</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>`;
 							break;
 						case 0: 
 							_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:0});
 							__account.pvp.lastDuelWin = false;
 							__account.pvp.winStreak = 0;
 							__account.pvp.looseCount++;
-							_table += `<div class="pvp-player-item pvp-winner flex"><div class="pvp-player-item-left flex flex-jc-start">
-								Player</div><div class="pvp-player-item-right flex"><img src="./images/icons/kill.png" /></div></div>
-								<div class="pvp-player-item pvp-looser flex"><div class="pvp-player-item-left flex flex-jc-start">
-								${__account.name}</div><div class="pvp-player-item-right flex"><img src="./images/icons/dead.png" /></div></div>`;
 						break;
 					}
-					_table + `</div>`;
 					if(_status > 1) {
 						//__account.pvp.honor++;
 						updateGlobalQuest('pvp-win');
@@ -1407,14 +1387,7 @@ function map(_m) {
 						// 	<div class="flex" style="width:100%"><div class="flex"><img style="width:5cqh" src="./images/icons/honor.png" /><div style="font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">+1 ${getLangData('Honor Point')}</div></div></div>`;
 					}
 					_client.saveState();
-					_table += `</div><div class="flex d-none w-100" style="height:8cqh">
-						<div class="flex" style="width:calc(50% - 1cqh);margin-right:1cqh;overflow:hidden;position:relative;height:100%">
-							<div class="game-menu-button btn-info full flex animate-me" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3cqh !important" onexactclick="switchStoryScene(null, __storySceneOrder)">${getLangData('QUIT')}</div>
-						</div>
-						<div class="flex" style="width:calc(50% - 1cqh);margin-right:1cqh;overflow:hidden;position:relative;height:100%">
-							<div class="game-menu-button btn-info full flex animate-me${!__account.pvp.duelCount ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:darkgoldenrod !important;font-size:3cqh !important" onexactclick="switchStoryScene(function() { switchBookPage(` + (this.realTime ? '4,3' : '5,1') + `); }, __storySceneOrder)">${getLangData('BACK')}</div>
-						</div>
-					</div>`;
+					_table = _duelFinalTable(_blue, _red);
 				}
 			}
 			_enemies?.forEach(x => {
@@ -7393,7 +7366,7 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 			if(offCtx.reversed)
 				offCtx.restore();
 			if(_sign) {
-				const _base = Math.max(32, MathRound(this.cWidth / 44));
+				const _base = MathRound(this.cWidth / 44);
 				let _size = _base;
 				if(_sign !== this.meSign)
 					_size = MathRound(_base * 1.35);

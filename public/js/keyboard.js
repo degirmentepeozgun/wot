@@ -870,8 +870,9 @@ function activateTouchPad() {
 	};
 	const _maxLeft = MathRound(_rect.width / 2);
 	const _maxTop = _maxLeft;
-	const _padding = ((document.body.clientWidth - _gamePad.clientWidth) / 2);
 	const _dpadRect = document.getElementById('touch-d-pad').getBoundingClientRect();
+	const _centerX = _dpadRect.left + _dpadRect.width / 2;
+	const _centerY = _dpadRect.top + _dpadRect.height / 2;
 	const _gapY = episode.cUIHeight - _dpadRect.bottom;
 	const dpadRect = {
 		left: _dpadRect.left - _gapY,
@@ -883,7 +884,7 @@ function activateTouchPad() {
 		if(!mainCharacter?.keyboard)
 			return;
 		const _newTouches = {
-			x: MathRound(x - _padding),
+			x: MathRound(x),
 			y: MathRound(y)
 		};
 		calculateSin(_newTouches.x, _newTouches.y);
@@ -922,13 +923,13 @@ function activateTouchPad() {
 				touchID = t.identifier;
 				removeClass(_dPad, 'stay');
 				_touches = {
-					x: MathRound((_rect.left + (_rect.width / 2))),
-					y: MathRound((_rect.top + (_rect.height / 2)))
+					x: MathRound(_centerX),
+					y: MathRound(_centerY)
 				};
-				touch_startX = _touches.x; //MathRound(t.pageX - _padding);
-				touch_startY = _touches.y; // MathRound(t.pageY);
+				touch_startX = _touches.x;
+				touch_startY = _touches.y;
 				lastValidTouch = { x: touch_startX, y: touch_startY };
-				workForDPad(t.pageX, t.pageY);
+				workForDPad(t.clientX, t.clientY);
 			}
 		}
 	}, { passive: false });
@@ -944,11 +945,11 @@ function activateTouchPad() {
 			if (t.identifier === touchID) {
 				if (!_touches) {
 					_touches = {
-						x: MathRound(t.pageX - _padding),
-						y: MathRound(t.pageY)
+						x: MathRound(t.clientX),
+						y: MathRound(t.clientY)
 					};
 				}
-				workForDPad(t.pageX, t.pageY);
+				workForDPad(t.clientX, t.clientY);
 			}
 		}
 	}, { passive: false });

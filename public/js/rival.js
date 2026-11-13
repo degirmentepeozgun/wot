@@ -374,7 +374,8 @@ function createCharacter(_settings) {
 								objects: [
 									{
 										key: 'dark',
-										position: 'css'
+										position: 'css',
+										p1: 3000
 									},
 									{ 
 										key: 'halo', 
@@ -8394,7 +8395,8 @@ function createCharacter(_settings) {
 								objects: [
 									{
 										key: 'dark',
-										position: 'css'
+										position: 'css',
+										p1: 3000
 									},
 									{ 
 										key: 'halo', 
@@ -38588,7 +38590,8 @@ const _allEnemies = {
 							objects: [
 								{
 									key: 'dark',
-									position: 'css'
+									position: 'css',
+									p1: 3000
 								},
 								{ 
 									key: 'halo', 
@@ -81831,7 +81834,8 @@ const _allEnemies = {
 								objects: [
 									{
 										key: 'dark',
-										position: 'css'
+										position: 'css',
+										p1: 3000
 									},
 									{ 
 										key: 'halo', 

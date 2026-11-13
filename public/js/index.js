@@ -1967,6 +1967,112 @@ function updateMenuBottom(_order) {
 	_mmb.forEach(x => removeClass(x, 'selected'));
 	addClass(_mmb[_order], 'selected');
 }
+let _chatTickerX = 0;
+let _chatTickerLast = 0;
+let _chatTickerRun = false;
+function showChatTicker(_cmd) {
+	if(!episode?.menu || document.querySelector("[data-module='chat']"))
+		return;
+	const _wrap = document.getElementById('wrapper');
+	if(!_wrap)
+		return;
+	let _bar = document.getElementById('chat-ticker');
+	if(!_bar) {
+		_bar = document.createElement('div');
+		_bar.id = 'chat-ticker';
+		_bar.innerHTML = '<div class="chat-ticker-track"></div>';
+		_bar.onclick = function() {
+			switchBookPage(4, 1);
+		};
+		_wrap.appendChild(_bar);
+	}
+	let _text = String(_cmd?.m || '').replace(/[<>]/g, '').replace(/\s+/g, ' ').trim();
+	if(!_text)
+		return;
+	if(_text.length > 100)
+		_text = _text.slice(0, 100) + '...';
+	const _name = String(_cmd?.n || '').replace(/[<>]/g, '');
+	const _item = document.createElement('span');
+	_item.className = 'chat-ticker-item';
+	const _who = document.createElement('span');
+	_who.className = 'chat-ticker-name';
+	_who.textContent = '#' + _name + ':';
+	const _msg = document.createElement('span');
+	_msg.className = 'chat-ticker-text';
+	_msg.textContent = ' ' + _text;
+	_item.appendChild(_who);
+	_item.appendChild(_msg);
+	const _track = _bar.querySelector('.chat-ticker-track');
+	if(_chatTickerRun && _track.children.length) {
+		const _viewRight = _bar.clientWidth - _chatTickerX;
+		const _end = _track.scrollWidth;
+		if(_end < _viewRight - 1) {
+			const _gap = document.createElement('span');
+			_gap.className = 'chat-ticker-gap';
+			_gap.style.width = (_viewRight - _end) + 'px';
+			_track.appendChild(_gap);
+		}
+	}
+	else if(_chatTickerRun)
+		_chatTickerX = _bar.clientWidth;
+	_track.appendChild(_item);
+	_bar.classList.add('on');
+	if(!_chatTickerRun) {
+		_chatTickerX = _bar.clientWidth;
+		_chatTickerLast = 0;
+		_chatTickerRun = true;
+		requestAnimationFrame(stepChatTicker);
+	}
+}
+function closeChatTicker() {
+	const _bar = document.getElementById('chat-ticker');
+	if(_bar) {
+		_bar.classList.remove('on');
+		const _track = _bar.querySelector('.chat-ticker-track');
+		if(_track)
+			_track.innerHTML = '';
+	}
+	_chatTickerRun = false;
+	_chatTickerLast = 0;
+}
+function stepChatTicker(now) {
+	const _bar = document.getElementById('chat-ticker');
+	const _track = _bar?.querySelector('.chat-ticker-track');
+	if(!_bar || !_track || !episode?.menu || document.querySelector("[data-module='chat']")) {
+		closeChatTicker();
+		return;
+	}
+	if(!_chatTickerLast)
+		_chatTickerLast = now;
+	const _dt = Math.min(0.05, (now - _chatTickerLast) / 1000);
+	_chatTickerLast = now;
+	if(!_track.children.length) {
+		_bar.classList.remove('on');
+		_chatTickerRun = false;
+		_chatTickerLast = 0;
+		return;
+	}
+	const _boost = Math.min(2.4, 1 + Math.max(0, _track.children.length - 1) * 0.28);
+	_chatTickerX -= _bar.clientWidth * 0.11 * _boost * _dt;
+	while(_track.firstChild) {
+		const _el = _track.firstChild;
+		if(_chatTickerX + _el.offsetLeft + _el.offsetWidth <= 0) {
+			const _span = _el.offsetWidth;
+			_el.remove();
+			_chatTickerX += _span;
+		}
+		else
+			break;
+	}
+	_track.style.transform = 'translateX(' + _chatTickerX + 'px)';
+	if(!_track.children.length) {
+		_bar.classList.remove('on');
+		_chatTickerRun = false;
+		_chatTickerLast = 0;
+		return;
+	}
+	requestAnimationFrame(stepChatTicker);
+}
 function selectMenuContainer(_order) {
 	const _has = document.querySelector('#menu-ui .menu-bottom');
 	let _container;

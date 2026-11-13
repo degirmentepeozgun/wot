@@ -1999,9 +1999,12 @@ async function connectSocket() {
             text: cmd.m,
             socketId: cmd.s
         });
+        const _chatOpen = document.querySelector("[data-module='chat']");
         const _chatScr = getRef('chat');
-        if (_chatScr)
+        if (_chatOpen && _chatScr)
             _chatScr.writeRemoteMessage(cmd);
+        else if (episode?.menu)
+            showChatTicker(cmd);
         checkUpdateAvailable2(4);
     }
     );

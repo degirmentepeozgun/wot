@@ -7066,7 +7066,7 @@ const __stories = [
 			}
 		],
 		heartCount : 3,
-		startScene: 2,
+		//startScene: 2,
 		scenes: [
 			{
 				when: function() {

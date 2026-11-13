@@ -2,7 +2,21 @@
 (function(){
 	console.log('chat');
 	function chat() {
+	this.emojiSets = [
+		{ key: 'action', label: 'Action', items: ['⚔️','🛡️','🗡️','🏹','💥','🔥','❄️','⚡','☠️','💀','🩸','👊'] },
+		{ key: 'fantasy', label: 'Fantasy', items: ['👹','👺','🐉','🐍','🦇','👁️','🔱','🌙','☀️','🕯️','🪬','🌀'] },
+		{ key: 'feeling', label: 'Feeling', items: ['😈','😎','🤬','😂','😭','🤔','🫡','🤝','👏','💪','🙏','❤️'] }
+	];
+	this.chatCursor = null;
 	this.render = function(_noAnimation) {
+		const _old = getRef('chat');
+		if(_old?._emojiOutside) {
+			document.removeEventListener('pointerdown', _old._emojiOutside);
+			delete _old._emojiOutside;
+		}
+		let _tabs = '';
+		for(const _set of this.emojiSets)
+			_tabs += `<div class="chat-emoji-tab${_set.key === 'action' ? ' on' : ''}" onexactclick="getRef('chat')?.showEmojiSet('${_set.key}')">${_set.label}</div>`;
 		let _html = 
 		`<div data-module="chat" class="book-page-wrapper chat-container shop-container${_noAnimation ? '' : ' fade-me'}">
 			<div class="flex flex-ai-end book-page-bg">
@@ -12,8 +26,13 @@
 				`</div>
 				</div>
 				<div class="chat-send-wrapper flex w-100">
+					<div class="chat-emoji-panel d-none">
+						<div class="chat-emoji-tabs">${_tabs}</div>
+						<div class="chat-emoji-grid"></div>
+					</div>
 					<div class="flex chat-send-text flex-jc-start">
-						<input onkeydown="getRef(\'chat\')?.trySendMessage(event)" autocomplete="off" placeholder="${getLangData('Type your message')}" type="text" onpaste="return false" ondrop="return false" id="chat-message-owner-text" maxlength="200" />
+						<input onkeydown="getRef(\'chat\')?.trySendMessage(event)" onkeyup="getRef(\'chat\')?.rememberChatCursor()" onclick="getRef(\'chat\')?.rememberChatCursor()" onselect="getRef(\'chat\')?.rememberChatCursor()" onblur="getRef(\'chat\')?.rememberChatCursor()" autocomplete="off" placeholder="${getLangData('Type your message')}" type="text" onpaste="return false" ondrop="return false" id="chat-message-owner-text" maxlength="200" />
+						<div class="chat-emoji-btn" onexactclick="getRef(\'chat\')?.toggleEmojiPanel()"><img src="./images/ui/game/group-chat-emoji.png" /></div>
 					</div>
 					<div class="flex chat-send-btn">
 						<img src="./images/ui/game/chat-send.png" />
@@ -69,7 +88,56 @@
 			});
 		}, 20);
 		this.scrollChatToBottom();
+		this.showEmojiSet('action', 1);
+		this._emojiOutside = (e) => {
+			const _panel = document.querySelector("[data-module='chat'] .chat-emoji-panel");
+			if(!_panel || _panel.classList.contains('d-none'))
+				return;
+			if(e.target.closest?.("[data-module='chat'] .chat-emoji-panel") || e.target.closest?.("[data-module='chat'] .chat-emoji-btn"))
+				return;
+			_panel.classList.add('d-none');
+		};
+		document.addEventListener('pointerdown', this._emojiOutside);
 		__lastChatCheck = msNow;
+	}
+	this.showEmojiSet = function(_key, _silent) {
+		const _set = this.emojiSets.find(x => x.key === _key) || this.emojiSets[0];
+		const _root = document.querySelector("[data-module='chat']");
+		const _grid = _root?.querySelector('.chat-emoji-grid');
+		if(!_grid || !_set)
+			return;
+		_root.querySelectorAll('.chat-emoji-tab').forEach(x => x.classList.toggle('on', x.textContent === _set.label));
+		let _html = '';
+		for(const _emoji of _set.items)
+			_html += `<div class="chat-emoji-item" onexactclick="getRef('chat')?.insertChatEmoji('${_emoji}')">${_emoji}</div>`;
+		_grid.innerHTML = _html;
+		_grid.scrollTop = 0;
+		if(!_silent)
+			playClick();
+	}
+	this.toggleEmojiPanel = function() {
+		const _panel = document.querySelector("[data-module='chat'] .chat-emoji-panel");
+		if(!_panel)
+			return;
+		_panel.classList.toggle('d-none');
+	}
+	this.rememberChatCursor = function() {
+		const _input = document.getElementById('chat-message-owner-text');
+		if(!_input)
+			return;
+		this.chatCursor = _input.selectionStart ?? 0;
+	}
+	this.insertChatEmoji = function(_emoji) {
+		const _input = document.getElementById('chat-message-owner-text');
+		if(!_input || !_emoji)
+			return;
+		const _at = (this.chatCursor == null || this.chatCursor < 0) ? 0 : this.chatCursor;
+		const _next = (_input.value.slice(0, _at) + _emoji + _input.value.slice(_at)).slice(0, 200);
+		_input.value = _next;
+		const _caret = Math.min(_next.length, _at + _emoji.length);
+		this.chatCursor = _caret;
+		_input.focus();
+		_input.setSelectionRange(_caret, _caret);
 	}
 	this.renderChatMessages = function(){
 		let _html = '';
@@ -133,6 +201,7 @@
 		__chatMessages.push(_data);
 		sendChatMessage({n:__account.name, s:__socketId, m:_text.value});
 		_text.value = '';
+		this.chatCursor = 0;
 		_text.blur();
 		__account.lastMessageSent = msNow;
 		_client.saveState();

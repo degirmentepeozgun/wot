@@ -164,7 +164,7 @@
 						+Exp
 					</div>
 				</div>
-				<div class="flex flex-ai-start w-100" style="padding:${_isDuel ? '0' : '0 12.5%'};height:${_isPvp ? (episode.war ? '68%;margin:2% 0 1% 0' : '80%') : '62%'}">`
+				<div class="flex flex-ai-start w-100 finish-main" style="padding:${_isDuel ? '0' : '0 12.5%'}">`
 					+ (_content ??
 					`<div class="header-content w-100" style="height: 8%;">
 						<div class="w-100 flex op-none ms1000" style="padding: 0 1%;height: 100%">
@@ -188,18 +188,19 @@
 					<div class="header-content w-100 ms1500 op-none flex flex-jc-start" style="height: 24%;">`
 					 + _achievementsHtml +
 					`</div>`) +
-					`<div class="w-100 flex header flex-jc-start ms${_isPvp ? 1000 : 2000} op-none" style="height:${episode.war ? '0%' : '12%'}">
+					(_isPvp ? '' : (
+					`<div class="w-100 flex header flex-jc-start ms2000 op-none" style="height:12%">
 						<div class="header-inner${_rewardsHtml === '' ? ' v-none' : ''}">
-							${episode.war ? '' : getLangData('Rewards')}
+							${getLangData('Rewards')}
 						</div>
 						<div class="page-detail-splitter-thin"></div>
 					</div>
-					<div class="header-content w-100 flex flex-jc-start flex-ai-start ms${_isPvp ? 1000 : 2000} op-none" style="height:${episode.war ? '20%;margin:2% 0 3.5% 0' : '30%'}">`
+					<div class="header-content w-100 flex flex-jc-start flex-ai-start ms2000 op-none" style="height:30%">`
 						+ _rewardsHtml +
-					'</div>'
+					'</div>'))
 					+ _firstFinishRewardsHtml +
 				`</div>
-				<div class="flex w-100 ms2500 op-none${_isPvp ? ' d-none' : ''}" style="height: 10%">
+				<div class="flex w-100 ms2500 op-none finish-actions${_isPvp ? ' d-none' : ''}">
 					<div class="w-33 flex" onexactclick="playClick();hideMyModalPopUp(1);checkStoryFinish(${_failed ? 0 : 1}, ${_id}, ${episode.goldSelected ? 1 : 0}, ${episode.expSelected ? 1 : 0}, ${episode.itemSelected ? 1 : 0})" style="padding: 1%;height: 100%${_isFirstPlay ? ';pointer-events:none!important' : ''}">
 						<div style="height:74%!important" class="btn${((_isFirstPlay && !_failed) || !_hasRetry) ? ' inactivated' : ''} animate-me-500 flex">${getLangData('RETRY')}</div>
 					</div>
@@ -213,7 +214,7 @@
 						<div style="height:74%!important" class="btn${!_hasNext ? ' inactivated' : ''} animate-me-500 flex">${getLangData('NEXT')}</div>
 					</div>
 				</div>
-				<div class="flex w-100 ms1000 op-none${!_isPvp ? ' d-none' : ''}" style="height:${_isDuel ? 12 : 10}%;padding:0 4%">
+				<div class="flex w-100 ms1000 op-none finish-actions${!_isPvp ? ' d-none' : ''}" style="padding:0 4%">
 					<div class="w-50 flex" onexactclick="playClick();hideMyModalPopUp(1);detachModule();switchStoryScene(null, __storySceneOrder)" style="padding: 1%;height: 100%">
 						<div class="btn animate-me-500 flex">${getLangData('QUIT')}</div>
 					</div>
@@ -235,6 +236,9 @@
 	const _a = document.createElement('div');
 	_a.innerHTML = _template;
 	_gameUI.appendChild(_a.firstChild);
+	const _honorSlot = document.querySelector('#story-finish .duel-honor-slot');
+	if(_honorSlot && _rewardsHtml)
+		_honorSlot.innerHTML = _rewardsHtml;
 	setTimeout(function () {
 		const _sf = document.querySelector('#story-finish.finish');
 		const _seb = document.querySelector('#story-finish #exp-bar');
