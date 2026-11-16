@@ -4,9 +4,17 @@ const pvpAvatarTemplate = function (char, _name) {
 	if (_oldAvatar)
 		_oldAvatar.remove();
 	const _class = char.main ? ' war-player-profile-me' : ' war-player-profile';
+	let _slot = '';
+	if(!char.main && episode?.playerTag) {
+		const _sign = episode.playerTag(char);
+		const _src = _sign === episode.p1Sign ? 'p1-sign' : (_sign === episode.p2Sign ? 'p2-sign' : '');
+		if(_src)
+			_slot = `<img class="war-player-slot" src="./images/icons/${_src}.png" />`;
+	}
 	return `<div${char.main ? '' : ' onexactclick="episode.focusOnPlayer(\'' + char.key + '\')"'} class="flex war-player-card profile${_class}" id="char-${char.key}">
 				<div class='war-player-card-left flex'>
 					<div class='flex war-player-card-left-content war-player-team-${char.teamId}'><img src="./images/icons/${char.class}.png" /></div>
+					${_slot}
 				</div>
 				<div class='war-player-card-right flex flex-jc-start'>
 					<div class="hp-war-player-name">

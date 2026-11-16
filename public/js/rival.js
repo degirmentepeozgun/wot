@@ -1,4 +1,4 @@
-﻿﻿'use strict';
+﻿'use strict';
 
 function createMainCharacter(_x) {
 	if (_x?.class)
@@ -1675,9 +1675,9 @@ function createCharacter(_settings) {
 										slam: true,
 										airFlow: 1.25,
 										skipTinyCameraMove: 17,
-										do: function() {
+										do: function(_f, _t) {
 											requestAnimationFrame(function() {
-												mainCharacter.addObject(
+												_t.addObject(
 												{ 
 													key: 'distortionhit', 
 													position: 'canvas', 
@@ -1965,9 +1965,9 @@ function createCharacter(_settings) {
 										type: 'air',
 										slam: true,
 										skipTinyCameraMove: 17,
-										do: function() {
+										do: function(_f, _t) {
 											requestAnimationFrame(function() {
-												mainCharacter.addObject(
+												_t.addObject(
 												{ 
 													key: 'distortionhit', 
 													position: 'canvas', 

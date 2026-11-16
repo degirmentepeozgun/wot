@@ -2467,6 +2467,26 @@ const relatedObjects = [
 		id: 'whitedzzt', key: 'whitedzzt', baseTop: 450,
 		width: 300, height: 225, col:8, zoom: 1,
 		totalFrames: 32, speed: 3, singleton: true, still: true
+	},
+	{
+		id: 'airspark', key: 'airspark', type: 'hurt', 
+		width: 80, height: 80, col:4, zoom: 1,
+		totalFrames: 4, speed: 4, singleton: true, still: true
+	},
+	{
+		id: 'firstairspark', key: 'firstairspark', type: 'hurt', 
+		width: 197, height: 201, col:6, zoom: 1,
+		totalFrames: 11, frame: 1, speed: 3, singleton: true, still: true
+	},
+	{
+		id: 'firstairspark2', key: 'firstairspark2', type: 'hurt', 
+		width: 200, height: 415, col:6, zoom: .75,
+		totalFrames: 17, speed: 3, singleton: true, still: true
+	},
+	{
+		id: 'counterspark', key: 'counterspark',
+		width: 151, height: 151, col:5, zoom: 2,
+		totalFrames: 11, speed: 3, singleton: true, still: true
 	}
 ];
 function setRelatedObjectSpeed() {
@@ -2502,6 +2522,9 @@ const relatedObjectImages = {
 	},
 	sparks: function () {
 		return getImage('./images/related/sparks.png')
+	},
+	counterspark: function () {
+		return getImage('./images/related/counter-spark.png')
 	},
 	death: function () {
 		return getImage('./images/related/death.png')
@@ -2544,6 +2567,15 @@ const relatedObjectImages = {
 	},
 	sparkhitsmall: function () {
 		return getImage('./images/related/spark3.png')
+	},
+	firstairspark: function () {
+		return getImage('./images/related/first-airspark.png')
+	},
+	firstairspark2: function () {
+		return getImage('./images/related/first-airspark2.png')
+	},
+	airspark: function () {
+		return getImage('./images/related/spark5.png')
 	},
 	sparkhitmedium: function () {
 		return getImage('./images/related/spark3.png')

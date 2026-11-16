@@ -267,7 +267,7 @@ function enemy(_e) {
 	}
 	this.getAtkRate = function() {
 		const _char = this.coopWith ?? this;
-		let _atk = getRandomValue(MathCeil(_char.atk / 2), _char.atk);
+		let _atk = getRandomValue2(MathCeil(_char.atk / 2), _char.atk);
 		if(_char.atkRate > 0)
 			_atk *= ((100 * _char.atkRate) / 100);
 		const _buffAtk = _char.getBuffProps('atk');
@@ -341,16 +341,35 @@ function enemy(_e) {
 		if(this.chains && !_frame.chain && this.keyboard)
 			this.chains.forEach(x => this.keyboard.removeSkill?.(x.key));
 		if(!this.noCounter){
-			this.chains = _frame.chain;
-			if(this.chains) {
-				const _chainKeys = this.chains.map(x => x.key).join(',');
-				if(_chainKeys !== this.lastChainKeys && this.chainStatus)
+			const _next = _frame.chain;
+			if(_next) {
+				let _mask = 0;
+				for (let _i = 0; _i < _next.length; _i++)
+					_mask |= 1 << _next[_i].num;
+				if(_mask !== this._chainMask) {
+					if(this.chains) {
+						for (let _i = 0; _i < this.chains.length; _i++) {
+							const _c = this.chains[_i];
+							if(_mask & (1 << _c.num))
+								continue;
+							const _cs = chainSkills['skill' + _c.num];
+							if(_cs)
+								addClass(_cs, 'v-none');
+							this.keyboard?.removeSkill?.(_c.key);
+						}
+					}
 					delete this.chainStatus;
-				this.lastChainKeys = _chainKeys;
+					this._chainMask = _mask;
+				}
 			}
+			else
+				this._chainMask = 0;
+			this.chains = _next;
 		}
-		else
+		else {
 			this.chains = undefined;
+			this._chainMask = 0;
+		}
 		if (this.chains && !this.isDead()){
 			if(!this.chainStatus) {
 				for (let _c of this.chains) {
@@ -370,22 +389,26 @@ function enemy(_e) {
 			if(this.chainStatus) {
 				for (let _c of this.chains) {
 					const _skill = this.animations[_c.key];
+					const _cs = chainSkills['skill' + _c.num];
+					if(!_cs)
+						continue;
 					const _chainCD = _skill?.coolDownLeft;
-					if ((_chainCD >= 0) && _skill.coolDownStart2) {
-						const _cs = chainSkills['skill' + _c.num];
-						if(!_cs.cdStart || ((_gameTick - _cs.cdStart) > 1000)) {
-							_cs.cdStart = _gameTick;
-							let _csCounter = _cs.querySelector('.counter');
-							if(!_csCounter){
-								_csCounter = document.createElement('div');
-								_csCounter.className = 'counter flex';
-								_cs.appendChild(_csCounter);
-							}
-							const _co = MathFloor(_chainCD / 1000);
-							if(_csCounter.innerText !== _co.toString())
-								_csCounter.innerText = _co;
+					let _csCounter = _cs.querySelector('.counter');
+					if(_chainCD > 0) {
+						if(!_csCounter) {
+							_csCounter = document.createElement('div');
+							_csCounter.className = 'counter flex';
+							_cs.appendChild(_csCounter);
 						}
+						else if(hasClass(_csCounter, 'fadeOut'))
+							removeClass(_csCounter, 'fadeOut');
+						_csCounter.noText = false;
+						const _co = MathFloor(_chainCD / 1000);
+						if(_csCounter.innerText !== String(_co))
+							_csCounter.innerText = _co;
 					}
+					else if(_csCounter)
+						_csCounter.remove();
 				}
 			}
 		}
@@ -1526,22 +1549,21 @@ function enemy(_e) {
 			//const _canAttack = (_target.attackerCount ?? 0) < 2 && !this.slot?.support;
 			let _canAttack = false, _isPlacing = false;	
 			const _lht = this.ranged ? this.autoTarget?.lastRangedHitTime : this.autoTarget?.lastMeleeHitTime;
+			const _attackReady = !this.lastFinishedAttack || (this.nextAttackTime && _gameTick >= this.nextAttackTime);
 			if(_lht && (_gameTick - _lht) < (this.getAttackMsByDifficulty() * (this.ranged ? .66 : 1)))
 				_canAttack = false;
-			else {
-				if(!this.nextAttackTime || _gameTick > this.nextAttackTime){
-					if(this.ranged)
-						_canAttack =
-							((_target.attackers?.rangeds?.length ?? 0) < 1) &&
-							this.slot &&
-							!this.slot.mustCross;
-					else
-						_canAttack =
-							((_target.attackers?.melees?.length ?? 0) < 2) &&
-							this.slot &&
-							!this.slot.support &&
-							!this.slot.mustCross;
-				}
+			else if(_attackReady) {
+				if(this.ranged)
+					_canAttack =
+						((_target.attackers?.rangeds?.length ?? 0) < 1) &&
+						this.slot &&
+						!this.slot.mustCross;
+				else
+					_canAttack =
+						((_target.attackers?.melees?.length ?? 0) < 2) &&
+						this.slot &&
+						!this.slot.support &&
+						!this.slot.mustCross;
 			}
 			if(!_canAttack && this.bestRing)
 				_canAttack = true; // bestRing'li moblar slot kısıtlamasına takılmaz, her zaman saldırabilir
@@ -1607,7 +1629,7 @@ function enemy(_e) {
                 }
                 if(this.slot && !this.slot.lastAttackTime)
                     this.slot.lastAttackTime = _gameTick;
-                if(this.slot && _canAttack && (this.bestRing || (!this.nextAttackTime || _gameTick >= this.nextAttackTime))) {
+                if(this.slot && _canAttack && (this.bestRing || _attackReady)) {
                     this.pickRandomAttack();
                     if(this.upcomingAnimation && this.upcomingAnimation !== 'idle'){
                         this.animateSlotAttack();
@@ -2829,6 +2851,8 @@ function enemy(_e) {
 				this.lastAttackSlot.lastAttackTime = _gameTick;
 				this.lastAttackSlot = undefined;
 			}
+			const _wait = this.getAttackMsByDifficulty();
+			this.nextAttackTime = _gameTick + (_wait ? _wait + getRandomValue2(0, 120) : 0);
 		}
 		this.autoAttacking = false;
 		if(this.pushDirection || this.pushback)
@@ -3714,6 +3738,49 @@ function enemy(_e) {
 						_anima = this.getCurrentAnimation(1);
 						//_frame = this.getCurrentFrame();
 						_hasNextSkill = 1;
+					}
+					else if (this.autoMode > 0 && !this.keyboard && _anima.attack && _anima.next && _anima.imediateBreak) {
+						const _nextKey = this.getNextSkill(_anima.next);
+						const _nextAnima = this.animations[_nextKey];
+						if (_nextAnima && _nextAnima.totalRange === undefined)
+							this.getSkillRange(_nextAnima);
+						const _foe = _nextAnima && this.getClosestEnemy(_nextAnima.totalRange || 0, this.direction, function (_e) {
+							return !_e.invulnerable && !_e.isDead();
+						}, _nextAnima.yRange, __attackTolerance);
+						if (_foe?.enemy) {
+							this.animate(_nextKey);
+							this.frame = 0;
+							_anima = this.getCurrentAnimation(1);
+							_hasNextSkill = 1;
+						}
+						else {
+							const _target = this.autoTarget;
+							if (_target && !_target.isDead?.()) {
+								const _diff = _target.EXACTLEFT - this.EXACTLEFT;
+								const _tol = (4 * episode.cWidth) / 100;
+								let _dir = this.direction;
+								if (_diff > _tol)
+									_dir = __right;
+								else if (_diff < -_tol)
+									_dir = __left;
+								this.animation = 'idle';
+								this.animationFinished = false;
+								this.autoAttacking = false;
+								if (isObjectsVerticallyInSameOrder(this, _target)) {
+									this.setDirection(_dir, 1);
+									if (this.yPosition > _target.yPosition && this.moveDirection !== 'down')
+										this.moveDirection = 'down';
+									else if (this.yPosition < _target.yPosition && this.moveDirection !== 'up')
+										this.moveDirection = 'up';
+									this.animate('walk', 1);
+								}
+								else
+									this.run(this.getCurrentAnimation(), _dir, null, 2);
+							}
+							else
+								this.idle();
+							_anima = this.getCurrentAnimation(1);
+						}
 					}
 					else if(!_anima.next)
 						_backToIdle = true;
@@ -7225,7 +7292,11 @@ this.getRotateVerticalRate = function(attacker, victim) {
 							PlaySound({key:'chargehit1', reset: true, volume:.4});
 							episode.skipTinyCameraMove = 10;
 						}
-						else if(!_hasEffect && _animateSkill?.startsWith('hurtground')) {
+						else if(!_hasEffect) {
+							const _isGroundHit =_animateSkill?.startsWith('hurtground');
+							const _isAirHit =_animateSkill?.startsWith('hurtair');
+							const _alreadyAir = _ea.key?.startsWith('hurtair');
+							//const _counterSpark = _ea.attack && _anima.key?.startsWith('counter');
 							setTimeout(() => {
 								const _enemyOriginX = _e.HURTLEFT + _e._HURTBOX_half;
 								const _attackerOriginX = _t.HURTLEFT + _t._HURTBOX_half;
@@ -7245,19 +7316,36 @@ this.getRotateVerticalRate = function(attacker, victim) {
 									if(_f.atk.rate < 1) {
 										//ufak
 										_e.addObject({key:'shine', xGap: _gap , position: 'middle'});
-										_e.addObject({key:'sparkhitsmall', xGap: _gap , position: 'middle'});
+										if(_alreadyAir)
+											_e.addObject({key:'airspark', scale: .9, xGap: _gap , position: 'middle'});
+										else if(_isAirHit)
+											_e.addObject({key:'firstairspark2', xGap: _gap , position: 'middle'});
+										else
+											_e.addObject({key:'sparkhitsmall', xGap: _gap , position: 'middle'});
 									}
 									else if(_f.atk.rate < 2) {
 										//orta
 										_e.addObject({key:'shine', xGap: _gap , scale:1.1, position: 'middle'});
-										_e.addObject({key:'sparkhitmedium', xGap: _gap , position: 'middle'});
+										if(_alreadyAir)
+											_e.addObject({key:'airspark', xGap: _gap , position: 'middle'});
+										else if(_isAirHit)
+											_e.addObject({key:'firstairspark2', xGap: _gap , position: 'middle'});
+										else
+											_e.addObject({key:'sparkhitmedium', xGap: _gap , position: 'middle'});
 									}
 									else {
 										//büyük
 										_e.addObject({key:'shine', scale:1.2, xGap: _gap , position: 'middle'});
-										_e.addObject({key:'sparkhitbig', xGap: _gap , position: 'middle'});
+										if(_alreadyAir)
+											_e.addObject({key:'airspark', scale: 1.2, xGap: _gap , position: 'middle'});
+										else if(_isAirHit)
+											_e.addObject({key:'firstairspark2', xGap: _gap , position: 'middle'});
+										else
+											_e.addObject({key:'sparkhitbig', xGap: _gap , position: 'middle'});
 									}
 								}
+								//if(_counterSpark)
+									//_t.addObject({ key:'counterspark', position: 'middle-front' });
 							}, getRandomValue2(8,20));
 						}
 					}
@@ -8796,6 +8884,12 @@ this.getRotateVerticalRate = function(attacker, victim) {
 			catch (xxxxxx) {
 				console.log(xxxxxx.message);
 			}
+		}
+		else if (this.unseen && this.canvasObjects?.length) {
+			for (let _c of this.canvasObjects)
+				if (_c.params)
+					delete _c.params.start;
+			this.canvasObjects.length = 0;
 		}
 		if(this.solid || episode.hasSolid)
 			this.centerSolid = this.getCenterSolid();
@@ -10338,8 +10432,11 @@ this.getRotateVerticalRate = function(attacker, victim) {
 		return this.rivalYMove;
 	}
 	this.decreaseHealth = function (_dmg, _attacker, _force) {
-		if(episode.realTime && this.main && !_force)
-			return;
+		if(episode.realTime && this.main && !_force) {
+			const _src = _attacker?.related ?? _attacker?.owner ?? _attacker;
+			if(!(episode.duelLeader && _src && !_src.realTime && (_src.duelBot || _attacker?.duelBot)))
+				return;
+		}
 		let _hpLeft = this.health - MathAbs(_dmg);
 		let _realHP = _hpLeft;
 		_hpLeft = parseFloat(parseFloat(_hpLeft).toFixed(1));
@@ -10469,7 +10566,21 @@ this.getRotateVerticalRate = function(attacker, victim) {
 			// 	this.setDefaultMessage(_mDiff);
 			// 	sendMessage(JSON.stringify(_mDiff));
 			// }
+			const _hpBefore = this.health;
 			this.health = _realHP;
+			if(episode?._crowdPvp && !this.main && this.unseen && this.health > 0 && !this.dead && !this.dying
+				&& _hpBefore > this.health && (!this._mateFlashAt || (_gameTick - this._mateFlashAt) > 1000)) {
+				if(this._mateCard === undefined) {
+					const _card = document.getElementById('char-' + this.key);
+					this._mateCard = _card?.closest('#top-nav') ? _card : null;
+				}
+				if(this._mateCard) {
+					this._mateFlashAt = _gameTick;
+					removeClass(this._mateCard, 'mate-hp-flash');
+					void this._mateCard.offsetWidth;
+					addClass(this._mateCard, 'mate-hp-flash');
+				}
+			}
 			if (this.health > 0) {
 				if (this.hbBreak === -1)
 					delete this.hbBreak;

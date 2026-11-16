@@ -1277,6 +1277,14 @@ function hideMyMenu(_noSound) {
 		delete  episode.oldBGSoundVolume;
 	}
 }
+function closeGameMenu() {
+	const _duel = getRef('duel');
+	if(_duel?.roomId && document.querySelector("[data-module='duel']")) {
+		_duel.askLeaveForMenu();
+		return;
+	}
+	hideMyMenu();
+}
 function hideMyModalPopUp(_asap) { 
 	_dialogAppeared = 0;
 	const _modal = document.querySelector('.my-pop-up-wrapper.loaded');
@@ -1934,7 +1942,7 @@ function getTopMenuTemplate(_index) {
 		</div>
 		<div class="menu-top-item flex">
 		</div>
-		<img onexactclick="hideMyMenu()" src="./images/ui/game/kapat.png" class="top-menu-close animate-me" />
+		<img onexactclick="closeGameMenu()" src="./images/ui/game/kapat.png" class="top-menu-close animate-me" />
 	</div>`;	
 }
 function updateMenuBottom(_order) {
@@ -3916,7 +3924,7 @@ function installOpeningScreen(_instant, _lateOpening) {
 				<div lang="${getLang()}" class="game-opening-screen-menu-item wot-menu-btn flex" onexactclick="openCredits(1)">
 					${getLangData('CREDITS', __openingScreenLangData)}
 				</div>
-				<div lang="${getLang()}" class="game-opening-screen-menu-item wot-menu-btn flex" onexactclick="getKeyboardPromo(1)">
+				<div lang="${getLang()}" class="${__isPC ? '' : 'd-none '}game-opening-screen-menu-item wot-menu-btn flex" onexactclick="getKeyboardPromo(1)">
 					${getLangData('CONTROLS', __openingScreenLangData)}
 				</div>
 				<div lang="${getLang()}" class="game-opening-screen-menu-item wot-menu-btn flex" onexactclick="quitGame()">

@@ -1657,6 +1657,22 @@ function map(_m) {
 		if(mainCharacter)
 			mainCharacter.hasLeftEnemy = mainCharacter.hasRightEnemy =
 		mainCharacter.hasLeftPackage = mainCharacter.hasRightPackage = undefined;
+		this._edgeLeft = [];
+		this._edgeRight = [];
+		this._crowdPvp = false;
+		if((this.pvp || this.war) && mainCharacter && _len > 2) {
+			let _others = 0;
+			for(let _j = 0; _j < _len; _j++) {
+				const _e = this.enemies[_j];
+				if(!_e || _e.main || _e === mainCharacter || !_e.alp || _e.ghost || _e.isDead?.()
+					|| _e.class === __spell || _e.class === 'object' || _e.class === 'minion')
+					continue;
+				_others++;
+				if(_others > 1)
+					break;
+			}
+			this._crowdPvp = _others > 1;
+		}
 		if (_len)
 			for (var i = 0; i < _len; i++) {
 				let sprite = this.enemies[i];
@@ -1713,7 +1729,17 @@ function map(_m) {
 						(sprite.EXACTLEFT) > this.cWidth)));
 				sprite.unseen = sprite.out && !sprite.npc && sprite.dropType !== 'quest-item';
 				if(sprite.unseen && !sprite.main) {
-					if(sprite.autoTarget && !sprite.invulnerable && !sprite.friendly && 
+					if(this._crowdPvp && sprite.alp && !sprite.ghost && !sprite.isDead()
+						&& sprite.class !== __spell && sprite.class !== 'object' && sprite.class !== 'minion' && mainCharacter) {
+						const _sign = this.playerTag(sprite);
+						if(_sign && _sign !== this.meSign) {
+							if(mainCharacter.EXACTLEFT > sprite.EXACTLEFT)
+								this._edgeLeft.push(_sign);
+							else
+								this._edgeRight.push(_sign);
+						}
+					}
+					else if(sprite.autoTarget && !sprite.invulnerable && !sprite.friendly && 
 						!sprite.puppetMode && sprite.enemy && sprite.class !== __spell && 
 						sprite.class !== 'object' && !sprite.isDead() && mainCharacter &&
 						sprite.autoTarget === mainCharacter)
@@ -6576,11 +6602,55 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		ctx.drawImage(image, x, y);
 		ctx.restore();
 	}
+	this.drawEdgeSigns = function(_signs, _side) {
+		if(!_signs?.length)
+			return;
+		let _diamond = false;
+		const _mates = [];
+		for(let _i = 0; _i < _signs.length; _i++) {
+			const _s = _signs[_i];
+			if(_s === this.rivalSign)
+				_diamond = true;
+			else if(_mates.indexOf(_s) < 0)
+				_mates.push(_s);
+		}
+		const _stack = [];
+		if(_diamond)
+			_stack.push(this.rivalSign);
+		for(let _i = 0; _i < _mates.length; _i++)
+			_stack.push(_mates[_i]);
+		const _size = MathRound(this.cHeight * 0.06);
+		const _gap = MathRound(_size * 0.12);
+		const _total = (_stack.length * _size) + ((_stack.length - 1) * _gap);
+		let _y = MathRound((this.cHeight * 0.47) + (_total / 2) - _size);
+		const _x = _side === 'left' ? 0 : MathRound(this.cWidth - _size);
+		c10.save();
+		c10.imageSmoothingEnabled = true;
+		for(let _i = 0; _i < _stack.length; _i++) {
+			const _img = _stack[_i];
+			if(_img && _img.complete && _img.naturalWidth)
+				c10.drawImage(_img, _x, _y, _size, _size);
+			_y -= _size + _gap;
+		}
+		c10.restore();
+	}
 	this.checkUnseenEnemyPointer = function() {
+		if(this._crowdPvp) {
+			if(!this.enemyLeftArrow)
+				this.enemyLeftArrow = document.querySelector('.enemy-left-arrow');
+			if(!this.enemyRightArrow)
+				this.enemyRightArrow = document.querySelector('.enemy-right-arrow');
+			if(this.enemyLeftArrow)
+				addClass(this.enemyLeftArrow, 'v-none');
+			if(this.enemyRightArrow)
+				addClass(this.enemyRightArrow, 'v-none');
+			this.drawEdgeSigns(this._edgeLeft, 'left');
+			this.drawEdgeSigns(this._edgeRight, 'right');
+		}
 		if((_gameTick - 500) < this.enemyArrowsShown)
 			return;
-		const _l = mainCharacter?.hasLeftEnemy;
-		const _r = mainCharacter?.hasRightEnemy;
+		const _l = this._crowdPvp ? false : mainCharacter?.hasLeftEnemy;
+		const _r = this._crowdPvp ? false : mainCharacter?.hasRightEnemy;
 		const _lp = mainCharacter?.hasLeftPackage;
 		const _rp = mainCharacter?.hasRightPackage;
 		if(!this.enemyLeftArrow)
@@ -7370,6 +7440,8 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 				let _size = _base;
 				if(_sign !== this.meSign)
 					_size = MathRound(_base * 1.35);
+				else
+					_size = MathRound(_base * 1.25);
 				if(_sign === this.rivalSign)
 					_size = MathRound(_size * 1.26);
 				const _tx = MathRound(_item.char.EXACTLEFT + (_item.char.WIDTH / 2) - (_size / 2));

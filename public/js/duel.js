@@ -2,76 +2,7 @@
 (function() {
 	function duel() {
 	this.key = 'duel';
-	this.rooms = [
-		{ 
-			n: 'P-O-G-O',
-			s: '12345',
-			t: 0,
-			p: [
-				{ 
-					c: 'warrior', 
-					n: 'Basat', 
-					s: '1234',
-					p: 213,
-					l: 1,
-					t: 1,
-					r: 1
-				},
-				{ 
-					c: 'archer', 
-					n: 'Legolas', 
-					s: '1235',
-					p: 198,
-					t: 1,
-					r: 1
-				},
-				{ 
-					c: 'cyclops', 
-					n: 'Popeye', 
-					s: '1236',
-					p: 177,
-					t: 2,
-					r: 1
-				},
-				{ 
-					c: 'archer', 
-					n: 'Alkin', 
-					s: '1237',
-					p: 188,
-					t: 2,
-					r: 0
-				}
-			],
-			dummy: 1
-		},
-		{ 
-			n: 'Champions League', 
-			s: '54321',
-			t: 1,
-			pwd: '123456', // bu normalde sunucudan socket ile gelmeyecek t:1 veya t:0 gelecek, 1 private 0 ise public demek
-			p: [
-				{ 
-					c: 'archer', 
-					n: 'Daywalker', 
-					s: '1238',
-					p: 443,
-					l: 1,
-					t: 1,
-					r: 1
-				},
-				{ 
-					c: 'thief', 
-					n: 'Arven', 
-					s: '1239',
-					p: 567,
-					t: 2,
-					r: 0
-				}
-			],
-			dummy: 1
-		}
-	];
-	this.dummyRooms = this.rooms;
+	this.rooms = [];
 	this.serverRooms = [];
 	this.botChars = {};
 	this.render = function(_noAnimation) {
@@ -172,11 +103,8 @@
 		const _room = this.roomById(_roomId);
 		if(!_room)
 			return;
+		playClick();
 		const _password = document.querySelector('#duel-join-room-password')?.value?.trim() || '';
-		if(_room.dummy && _password !== _room.pwd) {
-			warn('<span>' + getLangData('Wrong Password') + '</span>', 'warn');
-			return;
-		}
 		closeInventoryQuestionModal();
 		this.JoinRoom(_roomId, 1, _password);
 	}
@@ -184,8 +112,7 @@
 		const _room = this.roomById(_roomId);
 		if(!_room)
 			return;
-		if(_room.dummy)
-			return this.joinDummyRoom(_room, _pass);
+		playClick();
 		if((_room.p?.length ?? 0) >= 6) {
 			warn('<span>' + getLangData('Room is full') + '</span>', 'warn');
 			return;
@@ -202,45 +129,6 @@
 			return;
 		}
 		this.joinServerRoom(_roomId, _password || '');
-	}
-	this.joinDummyRoom = function(_room, _pass) {
-		if((_room.p?.length ?? 0) >= 6 && !_room.p?.some(x => x.s === mainCharacter.socketId)) {
-			warn('<span>' + getLangData('Room is full') + '</span>', 'warn');
-			return;
-		}
-		if(_room.p?.find(x => x.s === mainCharacter.socketId)) {
-			this.renderJoinRoomUI(_room.s);
-			return;
-		}
-		if(_room.t && !_pass) {
-			askSomething(
-			`<div class="flex w-100 duel-create-room-input">
-				<input placeholder="${getLangData('Enter Room Password')}" id="duel-join-room-password" class="duel-room-input" type="text" maxlength="20" autocomplete="off" />
-			</div>`, `getRef(\'duel\')?.TryJoinRoom(\'${_room.s}\')`, 'modal_2x1');
-			return;
-		}
-		if(this.roomId && this.roomId !== _room.s) {
-			const _current = this.roomById(this.roomId);
-			if(_current && !_current.dummy) {
-				this.leaveServerRoom(() => this.joinDummyRoom(_room, _pass));
-				return;
-			}
-			this.leaveDummyLocal();
-		}
-		delete mainCharacter.leader;
-		const _bluePlayers = _room.p?.filter(x => x.t === 1) ?? [];
-		const _redPlayers = _room.p?.filter(x => x.t === 2) ?? [];
-		const _myTeam = _bluePlayers.length <= _redPlayers.length ? 1 : 2;
-		_room.p.push({
-			c: mainCharacter.class,
-			n: __account.name,
-			s: mainCharacter.socketId,
-			p: getTotalPower().total,
-			t: _myTeam,
-			r: 0
-		});
-		this.updateRoomPlayersCount(_room.s);
-		this.renderJoinRoomUI(_room.s);
 	}
 	this.updateRoomPlayersCount = function(_roomId) {
 		const _room = this.rooms.find(x => x.s === _roomId);
@@ -267,25 +155,20 @@
 		const _room = this.roomById(this.roomId);
 		if(!_room)
 			return;
+		playClick();
 		this.pickBotId = _botId || undefined;
 		const _seat = _botId ? _room.p.find(x => x.id === _botId) : _room.p.find(x => x.s === mainCharacter.socketId);
 		if(!_seat)
 			return;
 		if(!_botId && _seat.r) {
-			if(_room.dummy) {
-				_seat.r = 0;
-				this.renderJoinRoomUI(this.roomId, 1, 1);
+			this.pending = 1;
+			try {
+				const _res = await this.invoke('DuelUnready');
+				if(!this.afterInvoke(_res))
+					return;
 			}
-			else {
-				this.pending = 1;
-				try {
-					const _res = await this.invoke('DuelUnready');
-					if(!this.afterInvoke(_res))
-						return;
-				}
-				finally {
-					delete this.pending;
-				}
+			finally {
+				delete this.pending;
 			}
 		}
 		const _current = _seat.c || _selectableChars[0].class;
@@ -312,12 +195,12 @@
 		const _div = document.createElement('div');
 		_div.innerHTML = _modal;
 		(document.querySelector('#menu-ui') ?? _gameUI).appendChild(_div.firstChild);
-		playClick(1);
 	}
 	this.ConfirmClass = async function() {
 		const _class = __selectedPvPClass;
 		if(!_class || this.pending)
 			return;
+		playClick();
 		closeInventoryQuestionModal();
 		const _power = this.rollClassPower(_class);
 		if(this.pickBotId)
@@ -337,14 +220,8 @@
 		const _bot = _room?.p?.find(x => x.id === this.pickBotId);
 		if(!_bot)
 			return;
-		if(_room.dummy) {
-			_bot.c = _class;
-			_bot.p = _power;
-			_bot.r = 1;
-			this.renderJoinRoomUI(this.roomId, 1, 1);
-			return;
-		}
 		const _index = _room.p.indexOf(_bot);
+		const _slot = (_bot.i === 0 || _bot.i === 1 || _bot.i === 2) ? _bot.i : -1;
 		const _ch = _selectableChars.find(x => x.class === _class);
 		const _src = _ch ? _allEnemies['enemy' + _ch.id] : undefined;
 		if(_src) {
@@ -359,7 +236,7 @@
 		}
 		this.pending = 1;
 		try {
-			const _res = await this.invoke('DuelBot', _bot.id, _bot.n, _class, _power, _bot.t, _index);
+			const _res = await this.invoke('DuelBot', _bot.id, _bot.n, _class, _power, _bot.t, _index, _slot);
 			this.afterInvoke(_res);
 		}
 		finally {
@@ -375,35 +252,30 @@
 			return;
 		this.PickClass(_botId);
 	}
-	this.AddBot = function(_roomId, _teamNo, _specificIndex) {
+	this.AddBot = function(_roomId, _teamNo, _slot) {
 		const _room = this.roomById(_roomId);
 		if(!_room)
 			return;
-		if(!_room.dummy)
-			return this.addServerBot(_room, _teamNo, _specificIndex);
-		if(_specificIndex === undefined) {
-			const _players = _room.p.filter(x => x.team === _teamNo);
-			if(_players?.length >= 3)
-				return;
+		playClick();
+		return this.addServerBot(_room, _teamNo, undefined, undefined, _slot);
+	}
+	this.teamSlots = function(_players, _team) {
+		const _slots = [null, null, null];
+		const _list = _players?.filter(x => x.t === _team) ?? [];
+		const _loose = [];
+		for(const _p of _list) {
+			const _at = _p.i;
+			if((_at === 0 || _at === 1 || _at === 2) && !_slots[_at])
+				_slots[_at] = _p;
+			else
+				_loose.push(_p);
 		}
-		const _char = createRandomPlayer(mainCharacter.level);
-		_char.aiId = getRandomString(5);
-		_char.name = 'BOT' + getRandomValue2(1000, 9999);
-		const _bot = {
-			c: _char.class, 
-			n: _char.name, 
-			p: _char.totalPower,
-			char: _char,
-			id: _char.aiId,
-			t: _teamNo,
-			r: 1
-		};
-		if(_specificIndex === undefined)
-			_room.p.push(_bot);
-		else
-			_room.p[_specificIndex] = _bot;
-		this.updateRoomPlayersCount(_roomId);
-		this.renderJoinRoomUI(_roomId, 1);
+		for(const _p of _loose) {
+			const _free = _slots.findIndex(x => !x);
+			if(_free >= 0)
+				_slots[_free] = _p;
+		}
+		return _slots;
 	}
 	this.renderJoinRoomUI = function(_roomId, _noAnimation, _noSound) {
 		const _room = this.roomById(_roomId);
@@ -415,14 +287,23 @@
 		this.roomId = _roomId;
 		this.openRoomChat(_room);
 		if(!_noSound)
-			playClick(1);
+			playClick();
 		const _bluePlayers = _room.p?.filter(x => x.t === 1)??[];
 		const _redPlayers = _room.p?.filter(x => x.t === 2)??[];
 		const _humans = _room.p?.filter(x => x.s) ?? [];
 		const _canStart = !!mainCharacter.leader && _humans.length > 0 && _humans.every(x => x.r) && _bluePlayers.length > 0 && _redPlayers.length > 0;
 		let _blueHTML = '';
-		for (let i = 0; i < _bluePlayers.length; i++) {
-			const _p = _bluePlayers[i];
+		const _blueSlots = this.teamSlots(_room.p, 1);
+		for (let i = 0; i < 3; i++) {
+			const _p = _blueSlots[i];
+			if(!_p) {
+				_blueHTML += `<div class="flex w-100 team-player-row--blue">
+				<div onexactclick="getRef('duel')?.AddBot('${_room.s}', 1, ${i})" class="duel-add-bot-btn list-item-btn animate-me flex${mainCharacter.leader ? '' : ' d-none'}">
+					<img src="./images/ui/game/add-count.png" /> ${getLangData('Add Bot')}
+				</div>
+			</div>`;
+				continue;
+			}
 			const _isMe = _p.s === mainCharacter.socketId;
 			const _isMeOrLeader = _isMe || mainCharacter.leader;
 			const _ch = (typeof _selectableChars !== 'undefined') ? _selectableChars.find(x => x.class === _p.c) : undefined;
@@ -469,16 +350,18 @@
 				</div>
 			</div>`;
 		}
-		for(let i = 0; i < 3 - _bluePlayers.length; i++) {
-			_blueHTML += `<div class="flex w-100 team-player-row--blue">
-				<div onexactclick="getRef('duel')?.AddBot('${_room.s}', 1)" class="duel-add-bot-btn list-item-btn animate-me flex${mainCharacter.leader ? '' : ' d-none'}">
+		let _redHTML = '';
+		const _redSlots = this.teamSlots(_room.p, 2);
+		for (let i = 0; i < 3; i++) {
+			const _p = _redSlots[i];
+			if(!_p) {
+				_redHTML += `<div class="flex w-100 team-player-row--red">
+				<div onexactclick="getRef('duel')?.AddBot('${_room.s}', 2, ${i})" class="duel-add-bot-btn list-item-btn animate-me flex${mainCharacter.leader ? '' : ' d-none'}">
 					<img src="./images/ui/game/add-count.png" /> ${getLangData('Add Bot')}
 				</div>
 			</div>`;
-		}
-		let _redHTML = '';
-		for (let i = 0; i < _redPlayers.length; i++) {
-			const _p = _redPlayers[i];
+				continue;
+			}
 			const _ch = (typeof _selectableChars !== 'undefined') ? _selectableChars.find(x => x.class === _p.c) : undefined;
 			const _grade = _ch?.grade ?? 3;
 			const _isMe = _p.s === mainCharacter.socketId;
@@ -525,13 +408,6 @@
 				</div>
 			</div>`;
 		}
-		for(let i = 0; i < 3 - _redPlayers.length; i++) {
-			_redHTML += `<div class="flex w-100 team-player-row--red">
-				<div onexactclick="getRef('duel')?.AddBot('${_room.s}', 2)" class="duel-add-bot-btn list-item-btn animate-me flex${mainCharacter.leader ? '' : ' d-none'}">
-					<img src="./images/ui/game/add-count.png" /> ${getLangData('Add Bot')}
-				</div>
-			</div>`;
-		}
 		_right.innerHTML = `<div class="flex full show-ui duel-detail story-detail">
 		<div class="flex duel-join-room-container duel-create-room-container full">
 			<div class="flex w-100 duel-join-room-title duel-create-room-title">
@@ -556,7 +432,7 @@
 		if(this.roomType === _type)
 			return;
 		this.roomType = _type;
-		playClick(1);
+		playClick();
 		switch(_type) {
 			case 'public': {
 					document.querySelector('.duel-create-room-type-public').src = './images/ui/game/duel-radio-active.png';
@@ -594,9 +470,8 @@
 		if(this.pending)
 			return;
 		this.pending = 1;
+		playClick();
 		try {
-			if(this.roomId && this.roomById(this.roomId)?.dummy)
-				this.leaveDummyLocal();
 			const _res = await this.invoke('DuelCreate', _roomName, this.roomType === 'private' ? _password : '', mainCharacter?.class || '', this.myPower());
 			if(!this.afterInvoke(_res))
 				return;
@@ -610,35 +485,10 @@
 	this.SwapPlayers = function(_socketId, _upOrDown) {
 		//1 ise yukarı 2 ise aşağı. Sıra ekrandaki gibi: önce mavi takım, sonra kırmızı.
 		const _room = this.roomById(this.roomId);
-		if(!_room)
+		if(!_room || !mainCharacter.leader)
 			return;
-		if(!_room.dummy) {
-			if(!mainCharacter.leader)
-				return;
-			this.invoke('DuelSwap', _socketId, _upOrDown).then(_res => this.afterInvoke(_res));
-			return;
-		}
-		const _ordered = [
-			..._room.p.filter(x => x.t === 1),
-			..._room.p.filter(x => x.t === 2)
-		];
-		const _index = _ordered.findIndex(x => (x.s ?? x.id) === _socketId);
-		if(_index < 0)
-			return;
-		if(_index === 0 && _upOrDown === 1)
-			return;
-		if(_index === _ordered.length - 1 && _upOrDown === 2)
-			return;
-		const _player = _ordered[_index];
-		const _other = _ordered[_index + (_upOrDown === 1 ? -1 : 1)];
-		const _playerTeam = _player.t;
-		_player.t = _other.t;
-		_other.t = _playerTeam;
-		const _i1 = _room.p.indexOf(_player);
-		const _i2 = _room.p.indexOf(_other);
-		_room.p[_i1] = _other;
-		_room.p[_i2] = _player;
-		this.renderJoinRoomUI(this.roomId, 1);
+		playClick();
+		this.invoke('DuelSwap', _socketId, _upOrDown).then(_res => this.afterInvoke(_res));
 	}
 	this.AskKickPlayer = function(_socketId) {
 		const _room = this.roomById(this.roomId);
@@ -648,6 +498,7 @@
 		if(!_player)
 			return;
 		const _me = _player.s === mainCharacter.socketId;
+		playClick();
 		if(!_me){
 			const _isBot = _player.id;
 			if(_isBot)
@@ -666,37 +517,19 @@
 		if(!_player)
 			return;
 		closeInventoryQuestionModal();
-		if(!_room.dummy) {
-			if(_player.s === mainCharacter.socketId)
-				this.leaveServerRoom(() => this.backToList());
-			else if(mainCharacter.leader)
-				this.invoke('DuelKick', _socketId).then(_res => this.afterInvoke(_res));
-			return;
-		}
-		if(_player.s === mainCharacter.socketId) {
-			this.leaveDummyLocal();
-			this.render(1);
-			return;
-		}
-		_room.p = _room.p.filter(x => (x.s ?? x.id) !== _socketId);
-		this.updateRoomPlayersCount(this.roomId);
-		this.renderJoinRoomUI(this.roomId, 1);
+		if(_player.s === mainCharacter.socketId)
+			this.leaveServerRoom(() => this.backToList());
+		else if(mainCharacter.leader)
+			this.invoke('DuelKick', _socketId).then(_res => this.afterInvoke(_res));
 	}
 	this.SetReady = function(_socketId) {
 		const _room = this.roomById(this.roomId);
 		if(!_room)
 			return;
-		if(!_room.dummy) {
-			if(_socketId !== mainCharacter.socketId)
-				return;
-			this.invoke('DuelReady').then(_res => this.afterInvoke(_res));
+		playClick();
+		if(_socketId !== mainCharacter.socketId)
 			return;
-		}
-		const _player = _room.p.find(x => x.s === _socketId);
-		if(!_player)
-			return;
-		_player.r = !_player.r;
-		this.renderJoinRoomUI(this.roomId, 1);
+		this.invoke('DuelReady').then(_res => this.afterInvoke(_res));
 	}
 	this.StartDuel = function() {
 		const _room = this.roomById(this.roomId);
@@ -722,6 +555,7 @@
 		if(!_room || _room.s !== mainCharacter.socketId)
 			return;
 		this.invoke('DuelStart').then(_res => this.afterInvoke(_res));
+		playClick();
 	}
 	this.roomById = function(_roomId) {
 		return this.rooms.find(x => x.s === _roomId) || (this.liveRoom?.s === _roomId ? this.liveRoom : null);
@@ -783,7 +617,7 @@
 			addClass(document.getElementById('duel-card-' + this.roomId), 'selected');
 	}
 	this.applyServerRoom = function(_view, _open) {
-		if(!_view?.s || this.dummyRooms.some(x => x.s === _view.s))
+		if(!_view?.s)
 			return;
 		this.attachBotChars(_view);
 		const _i = this.serverRooms.findIndex(x => x.s === _view.s);
@@ -791,7 +625,7 @@
 			this.serverRooms[_i] = _view;
 		else
 			this.serverRooms.unshift(_view);
-		this.rooms = this.dummyRooms.concat(this.serverRooms);
+		this.rooms = this.serverRooms.slice();
 		const _mine = _view.p?.some(x => x.s === mainCharacter.socketId);
 		if(_mine)
 			this.liveRoom = _view;
@@ -810,32 +644,18 @@
 	}
 	this.removeServerRoom = function(_roomId) {
 		this.serverRooms = this.serverRooms.filter(x => x.s !== _roomId);
-		this.rooms = this.dummyRooms.concat(this.serverRooms);
+		this.rooms = this.serverRooms.slice();
 		if(this.liveRoom?.s === _roomId)
 			delete this.liveRoom;
-	}
-	this.leaveDummyLocal = function() {
-		this.closeRoomChat();
-		const _room = this.dummyRooms.find(x => x.s === this.roomId);
-		if(_room)
-			_room.p = _room.p.filter(x => x.s !== mainCharacter.socketId);
-		if(_room) {
-			delete this.roomId;
-			delete mainCharacter.leader;
-		}
 	}
 	this.askLeaveForMenu = async function(_order, _subOrder, _tabOrder) {
 		if(!this.roomId)
 			return;
-		this.pendingMenu = { order: _order, sub: _subOrder, tab: _tabOrder };
+		this.pendingMenu = _order === undefined ? { close: 1 } : { order: _order, sub: _subOrder, tab: _tabOrder };
 		const _room = this.roomById(this.roomId);
 		const _me = _room?.p?.find(x => x.s === mainCharacter.socketId);
 		if(_me?.r) {
-			if(_room.dummy) {
-				_me.r = 0;
-				this.renderJoinRoomUI(this.roomId, 1, 1);
-			}
-			else if(this.pending)
+			if(this.pending)
 				return;
 			else {
 				this.pending = 1;
@@ -859,13 +679,7 @@
 		delete this.pendingMenu;
 		if(!_nav)
 			return;
-		const _go = () => switchBookPage(_nav.order, _nav.sub, _nav.tab);
-		const _room = this.roomById(this.roomId);
-		if(_room?.dummy) {
-			this.leaveDummyLocal();
-			_go();
-			return;
-		}
+		const _go = _nav.close ? () => hideMyMenu() : () => switchBookPage(_nav.order, _nav.sub, _nav.tab);
 		this.leaveServerRoom(_go);
 	}
 	this.leaveServerRoom = async function(_then) {
@@ -904,8 +718,6 @@
 			return;
 		this.pending = 1;
 		try {
-			if(this.roomId && this.roomId !== _roomId && this.roomById(this.roomId)?.dummy)
-				this.leaveDummyLocal();
 			const _res = await this.invoke('DuelJoin', _roomId, _password || '', mainCharacter?.class || '', this.myPower());
 			if(!this.afterInvoke(_res))
 				return;
@@ -916,7 +728,7 @@
 			delete this.pending;
 		}
 	}
-	this.addServerBot = async function(_room, _teamNo, _specificIndex, _oldId) {
+	this.addServerBot = async function(_room, _teamNo, _specificIndex, _oldId, _slot) {
 		if(!mainCharacter.leader || this.pending)
 			return;
 		const _char = createRandomPlayer(mainCharacter.level);
@@ -924,9 +736,10 @@
 		_char.name = 'BOT' + getRandomValue2(1000, 9999);
 		this.botChars[_char.aiId] = _char;
 		const _index = _specificIndex === undefined ? -1 : _specificIndex;
+		const _place = _slot === undefined ? -1 : _slot;
 		this.pending = 1;
 		try {
-			const _res = await this.invoke('DuelBot', _char.aiId, _char.name, _char.class, _char.totalPower || 0, _teamNo, _index);
+			const _res = await this.invoke('DuelBot', _char.aiId, _char.name, _char.class, _char.totalPower || 0, _teamNo, _index, _place);
 			if(!this.afterInvoke(_res)) {
 				delete this.botChars[_char.aiId];
 				return;
@@ -948,10 +761,10 @@
 				this.hubFail(_res.error);
 			return;
 		}
-		this.serverRooms = _res.value.filter(x => !this.dummyRooms.some(d => d.s === x.s));
+		this.serverRooms = _res.value;
 		for(const _room of this.serverRooms)
 			this.attachBotChars(_room);
-		this.rooms = this.dummyRooms.concat(this.serverRooms);
+		this.rooms = this.serverRooms.slice();
 		this.paintRoomList();
 		if(this.switching || this.pending || this.roomId)
 			return;
@@ -994,9 +807,10 @@
 				duelBot: _seat.s ? undefined : 1
 			};
 		};
+		const _bySlot = function(a, b) { return (a.i ?? 0) - (b.i ?? 0); };
 		const _ops = [
-			..._view.p.filter(x => x.t === 1).map(_seatToFighter),
-			..._view.p.filter(x => x.t === 2).map(_seatToFighter)
+			..._view.p.filter(x => x.t === 1).sort(_bySlot).map(_seatToFighter),
+			..._view.p.filter(x => x.t === 2).sort(_bySlot).map(_seatToFighter)
 		];
 		createJusticeWar(_ops, _view.s);
 	}
@@ -1057,6 +871,14 @@
 			this.pushRoomChat({
 				sys: 1,
 				m: (_now[_id] || 'Player') + ' ' + getLangData('joined the room')
+			});
+		}
+		for(const _id in _prev) {
+			if(_now[_id] || _id === _view.s || _id === mainCharacter?.socketId)
+				continue;
+			this.pushRoomChat({
+				sys: 1,
+				m: (_prev[_id] || 'Player') + ' ' + getLangData('left the room')
 			});
 		}
 	}
@@ -1238,12 +1060,11 @@
 		const _text = _input.value.replace(/\r?\n/g, ' ').trim().slice(0, 200);
 		if(!_text)
 			return;
+		playClick();
 		const _seat = _room.p?.find(x => x.s === mainCharacter?.socketId);
-		if(!_room.dummy) {
-			const _res = await this.invoke('DuelChat', _text);
-			if(!this.afterInvoke(_res))
-				return;
-		}
+		const _res = await this.invoke('DuelChat', _text);
+		if(!this.afterInvoke(_res))
+			return;
 		this.pushRoomChat({
 			n: __account?.name || _seat?.n || '',
 			m: _text,
@@ -1252,7 +1073,6 @@
 		});
 		_input.value = '';
 		this.chatCursor = 0;
-		playClick();
 	}
 	return this;
 }

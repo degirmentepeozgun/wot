@@ -184,6 +184,7 @@ namespace Web.BackEnd.Api.Helper {
 		public byte T { get; set; }
 		public byte R { get; set; }
 		public byte L { get; set; }
+		public byte I { get; set; }
 	}
 
 	public class DuelRoomView {
@@ -437,8 +438,44 @@ namespace Web.BackEnd.Api.Helper {
 
 		static string SeatKey(DuelSeat seat) => seat.S ?? seat.Id ?? "";
 
+		static void NormalizeSlots(List<DuelSeat> players) {
+			foreach(var team in new byte[] { 1, 2 }) {
+				var seats = players.Where(x => x.T == team).ToList();
+				var used = new bool[3];
+				foreach(var seat in seats) {
+					if(seat.I < 3 && !used[seat.I])
+						used[seat.I] = true;
+					else
+						seat.I = 255;
+				}
+				foreach(var seat in seats) {
+					if(seat.I != 255)
+						continue;
+					for(byte i = 0; i < 3; i++) {
+						if(used[i])
+							continue;
+						seat.I = i;
+						used[i] = true;
+						break;
+					}
+				}
+			}
+		}
+
+		static byte FreeSlot(List<DuelSeat> players, byte team) {
+			var used = new bool[3];
+			foreach(var seat in players)
+				if(seat.T == team && seat.I < 3)
+					used[seat.I] = true;
+			for(byte i = 0; i < 3; i++)
+				if(!used[i])
+					return i;
+			return 0;
+		}
+
 		DuelRoomView View(DuelRoomState room) {
 			lock(room.Sync) {
+				NormalizeSlots(room.Players);
 				return new DuelRoomView {
 					S = room.Id,
 					N = room.Name,
@@ -451,7 +488,8 @@ namespace Web.BackEnd.Api.Helper {
 						P = x.P,
 						T = x.T,
 						R = x.R,
-						L = x.L
+						L = x.L,
+						I = x.I
 					}).ToList()
 				};
 			}
@@ -537,7 +575,8 @@ namespace Web.BackEnd.Api.Helper {
 				P = power,
 				T = 1,
 				R = 0,
-				L = 1
+				L = 1,
+				I = 0
 			});
 			room.Connections.Add(Context.ConnectionId);
 			_duels[room.Id] = room;
@@ -571,18 +610,21 @@ namespace Web.BackEnd.Api.Helper {
 			lock(room.Sync) {
 				if(room.Players.Count >= 6)
 					throw new HubException("Room is full");
+				NormalizeSlots(room.Players);
 				var blue = room.Players.Count(x => x.T == 1);
 				var red = room.Players.Count(x => x.T == 2);
 				if(blue >= 3 && red >= 3)
 					throw new HubException("Room is full");
+				var team = (byte)(blue <= red ? 1 : 2);
 				room.Players.Add(new DuelSeat {
 					S = me.SocketId,
 					N = me.Name,
 					C = Clip(className, 16),
 					P = power,
-					T = (byte)(blue <= red ? 1 : 2),
+					T = team,
 					R = 0,
-					L = 0
+					L = 0,
+					I = FreeSlot(room.Players, team)
 				});
 				room.Connections.Add(Context.ConnectionId);
 			}
@@ -660,26 +702,48 @@ namespace Web.BackEnd.Api.Helper {
 			var room = FindDuel(Context.ConnectionId) ?? throw new HubException("Room not found");
 			RequireLeader(room, me);
 			lock(room.Sync) {
-				var ordered = room.Players.Where(x => x.T == 1).Concat(room.Players.Where(x => x.T == 2)).ToList();
-				var index = ordered.FindIndex(x => SeatKey(x) == key);
-				if(index < 0)
+				NormalizeSlots(room.Players);
+				var player = room.Players.FirstOrDefault(x => SeatKey(x) == key);
+				if(player == null)
 					throw new HubException("missing");
-				if((index == 0 && direction == 1) || (index == ordered.Count - 1 && direction == 2))
-					return;
-				var other = ordered[index + (direction == 1 ? -1 : 1)];
-				var player = ordered[index];
 				var team = player.T;
-				player.T = other.T;
-				other.T = team;
-				var i1 = room.Players.IndexOf(player);
-				var i2 = room.Players.IndexOf(other);
-				room.Players[i1] = other;
-				room.Players[i2] = player;
+				var slot = (int)player.I;
+				if(direction == 1) {
+					if(slot > 0)
+						slot--;
+					else if(team == 2) {
+						team = 1;
+						slot = 2;
+					}
+					else
+						return;
+				}
+				else if(direction == 2) {
+					if(slot < 2)
+						slot++;
+					else if(team == 1) {
+						team = 2;
+						slot = 0;
+					}
+					else
+						return;
+				}
+				else
+					return;
+				var oldTeam = player.T;
+				var oldSlot = player.I;
+				var other = room.Players.FirstOrDefault(x => x.T == team && x.I == slot);
+				if(other != null) {
+					other.T = oldTeam;
+					other.I = oldSlot;
+				}
+				player.T = team;
+				player.I = (byte)slot;
 			}
 			await PushRoom(room);
 		}
 
-		public async Task DuelBot(string id, string name, string className, int power, byte team, int index = -1) {
+		public async Task DuelBot(string id, string name, string className, int power, byte team, int index = -1, int slot = -1) {
 			var me = Me();
 			var room = FindDuel(Context.ConnectionId) ?? throw new HubException("Room not found");
 			RequireLeader(room, me);
@@ -692,6 +756,7 @@ namespace Web.BackEnd.Api.Helper {
 				throw new HubException("missing");
 			var added = false;
 			lock(room.Sync) {
+				NormalizeSlots(room.Players);
 				if(index >= 0) {
 					if(index >= room.Players.Count)
 						throw new HubException("missing");
@@ -709,7 +774,8 @@ namespace Web.BackEnd.Api.Helper {
 						C = className,
 						P = power,
 						T = team,
-						R = 1
+						R = 1,
+						I = current.I
 					};
 				}
 				else {
@@ -717,13 +783,17 @@ namespace Web.BackEnd.Api.Helper {
 						throw new HubException("Room is full");
 					if(room.Players.Any(x => x.Id == id))
 						throw new HubException("missing");
+					var place = slot >= 0 && slot <= 2 && !room.Players.Any(x => x.T == team && x.I == slot)
+						? (byte)slot
+						: FreeSlot(room.Players, team);
 					room.Players.Add(new DuelSeat {
 						Id = id,
 						N = name,
 						C = className,
 						P = power,
 						T = team,
-						R = 1
+						R = 1,
+						I = place
 					});
 					added = true;
 				}
