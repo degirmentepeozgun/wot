@@ -1,4 +1,4 @@
-﻿"use strict" 
+﻿'use strict';
 self.onmessage = async function (e) {
 	const { bitmap, x, y, w, h, color, outputW, outputH, key } = e.data;
 
@@ -13,7 +13,5 @@ self.onmessage = async function (e) {
 
 		const result = await createImageBitmap(canvas);
 		self.postMessage({ key, result }, [result]);
-	} catch (err) {
-		// İstersen error logla
-	}
+	} catch (err) {}
 };

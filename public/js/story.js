@@ -2,225 +2,213 @@
 let __storyCheckPoint;
 function isMissionFailed(_index) {
 	const _m = __story.resultStars[_index];
-	if(_m.when)
-		return !_m.when(_m);
+	if (_m.when) return !_m.when(_m);
 	return _m.failed;
 }
 function getLobbyScene() {
 	const _x = {
-			map: 0,
-			startWith: 1,
-			start: function() {
-				closeInventoryQuestionModal(1);
-				__account.questStatus = firstQuestData();
-				if(episode.bgMusic){
-					episode.pauseBgMusic();
-					episode.bgMusic = null;
+		map: 0,
+		startWith: 1,
+		start: function () {
+			closeInventoryQuestionModal(1);
+			__account.questStatus = firstQuestData();
+			if (episode.bgMusic) {
+				episode.pauseBgMusic();
+				episode.bgMusic = null;
+			}
+
+			__storyPlaying = false;
+
+			removeCoopCharacter(1);
+			addClass(_gameUI, 'disable-ui');
+			if (mainCharacter) {
+				mainCharacter.left = MathRound(1735 * __zoom);
+				mainCharacter.direction = 'right';
+				mainCharacter.skipHealthBar = true;
+				mainCharacter.noDirection = true;
+				blurKeyboard();
+				mainCharacter.disableKeyboard = mainCharacter.immobilize = true;
+				mainCharacter.animate('idlelobby', 1);
+				if (_presentationMode) {
+					setCharacterLevel(20, mainCharacter, 1);
+					updateExperience(10000);
 				}
-				// mainCharacter.level = 2;
-				// mainCharacter.maxExperience = 2200;
-				// mainCharacter.experience = 0;
-				//__account.gold = 0;
-				__storyPlaying = false;
-				//updateExperience(__story.rewards.find(x => x.key === 'exp').count);
-				removeCoopCharacter(1);
-				addClass(_gameUI, 'disable-ui');
-				if(mainCharacter){
-					mainCharacter.left = MathRound(1735 * __zoom);
-					mainCharacter.direction = 'right';
-					mainCharacter.skipHealthBar = true;
-					mainCharacter.noDirection = true;
-					blurKeyboard();
-					mainCharacter.disableKeyboard = mainCharacter.immobilize = true;
-					mainCharacter.animate('idlelobby',1);
-					if(_presentationMode) {
-						setCharacterLevel(20, mainCharacter, 1);
-						updateExperience(10000);
-					}
-				}
-				//resetOnlineDetection();
-				//injectModule('lobby', function() {
-					__storyPlaying = false;
-					createMenu();
-					__account.lastLobbyUsage = {
-						storyId: __story.id,
-						sceneOrder: __storySceneOrder
-					}
-					_client.saveState();
-					if(_presentationMode || __account.tutorials?.indexOf('invento-item-equipt') >= 0)
-						return;
-					if(!__account.tutorials)
-						__account.tutorials = [];
-					__account.tutorials.push('invento-item-equipt');
-					setTimeout(() => {
-						focusMe('.lobby-navbar-left', function() {
+			}
+
+			__storyPlaying = false;
+			createMenu();
+			__account.lastLobbyUsage = {
+				storyId: __story.id,
+				sceneOrder: __storySceneOrder
+			};
+			_client.saveState();
+			if (_presentationMode || __account.tutorials?.indexOf('invento-item-equipt') >= 0) return;
+			if (!__account.tutorials) __account.tutorials = [];
+			__account.tutorials.push('invento-item-equipt');
+			setTimeout(() => {
+				focusMe('.lobby-navbar-left', function () {
+					removeFocus(1);
+					openSideMenu();
+					setTimeout(function () {
+						focusMe('#lobby-inventory', function () {
 							removeFocus(1);
-							openSideMenu();
-							setTimeout(function() {
-								focusMe('#lobby-inventory', function() {
+							hideSideMenu();
+							openInventoryScreen();
+							setTimeout(function () {
+								focusMe('#inventory-slots .item-slot:first-child .item-in-slot', function () {
 									removeFocus(1);
-									hideSideMenu();
-									openInventoryScreen();
-									setTimeout(function() {
-										focusMe('#inventory-slots .item-slot:first-child .item-in-slot', function() {
+									const _id = sortItemsFromBestToWorse(getItems())?.[0]?.id;
+									if (!_id) return;
+									openItemInfoModal(_id);
+									setTimeout(() => {
+										focusMe('.equipment-wear-button', function () {
+											wearItem(_id);
 											removeFocus(1);
-											const _id = sortItemsFromBestToWorse(getItems())?.[0]?.id;
-											if(!_id)
-												return;
-											openItemInfoModal(_id);
-											setTimeout(() => {
-												focusMe('.equipment-wear-button', function() {
-													wearItem(_id);
-													removeFocus(1);
-													focusMe('.main-menu-btn:nth-child(3)', function() {
+											focusMe('.main-menu-btn:nth-child(3)', function () {
+												removeFocus(1);
+												switchBookPage(3, 1);
+												setTimeout(function () {
+													focusMe('#story-2', function () {
 														removeFocus(1);
-														switchBookPage(3,1);
-														setTimeout(function() {
-															focusMe('#story-2', function() {
+														selectStoryUI(2);
+														setTimeout(() => {
+															focusMe('#new-story-start-btn', function () {
+																tryStartStoryMission(2);
 																removeFocus(1);
-																selectStoryUI(2);
-																setTimeout(() => {
-																	focusMe('#new-story-start-btn', function() {
-																		tryStartStoryMission(2);
-																		removeFocus(1);
-																		disposeFocus();
-																	});
-																}, 20);
+																disposeFocus();
 															});
-														}, 320);
+														}, 20);
 													});
-												});
-											}, 20);
+												}, 320);
+											});
 										});
-									}, 320);
+									}, 20);
 								});
 							}, 320);
 						});
-					}, 100);
-				//});
-			},
-			afterInit: function() {
-				mainCharacter.positionable = true;
-				mainCharacter.yPosition = MathRound(getGroundHeight() * 1.3);
-			},
-			save: true,
-			mobs: [
-				{
-					id: 72,
-					minX: 1175,
-					maxX: 1175,
-					count: 1,
-					do: function(_e) {
-						episode.msNow = 1;
-						_e.direction = 'right';
-						_e.noDirection = _e.positionable = true;
-						_e.swapAnimation('idle');
-					},
-					yPosition: function() {
-						return MathRound(groundheight * 1.7);
-					}
-				},
-				{
-					id: 2002,
-					minX: 1400,
-					maxX: 1400,
-					count: 1,
-					do: function(_e) {
-						_e.npc = true;
-						_e.reversed = true;
-						_e.direction = 'left';
-						_e.noDirection = _e.positionable = true;
-					},
-					yPosition: function() {
-						return MathRound(groundheight * 1.85);
-					}
-				},
-				{
-					id: 5,
-					minX: 1380,
-					maxX: 1380,
-					count: 1,
-					do: function(_e) {
-						_e.positionable = true;
-					},
-					yPosition: function() {
-						return MathRound(groundheight * 1.6);
-					}
-				},
-				{
-					id: 87,
-					minX: 1600,
-					maxX: 1600,
-					count: 1,
-					zoom: .8,
-					do: function(_e) {
-						_e.positionable = true;
-					},
-					yPosition: function() {
-						return MathRound(groundheight * 1.65);
-					}
-				},
-				{
-					id: 87,
-					minX: 1250,
-					maxX: 1250,
-					count: 1,
-					zoom: .85,
-					do: function(_e) {
-						_e.positionable = true;
-					},
-					yPosition: function() {
-						return MathRound(groundheight * 1.2);
-					}
-				}
-			]
-		};
-	const _birdVariables = [
-		{ z: .27, l: 50, yp: 4.48},
-		{ z: .28, l: 68, yp: 4.467},
-		{ z: .29, l: 92, yp: 4.484},
-		{ z: .27, l: 111, yp: 4.475},
-		{ z: .3, l: 133, yp: 4.487},
-		{ z: .29, l: 151, yp: 4.5},
-		{ z: .3, l: 173, yp: 4.51},
-		{ z: .29, l: 190, yp: 4.49},
-		{ z: .26, l: 209, yp: 4.5},
-		{ z: .21, l: 223, yp: 4.53},
-		{ z: .27, l: 232, yp: 4.475},
-		{ z: .27, l: 251, yp: 4.488},
-		{ z: .275, l: 270, yp: 4.499},
-	];
-	const _zzz = .9;
-	_birdVariables.forEach(_b => 
-		{_x.mobs.push(
+					}, 320);
+				});
+			}, 100);
+		},
+		afterInit: function () {
+			mainCharacter.positionable = true;
+			mainCharacter.yPosition = MathRound(getGroundHeight() * 1.3);
+		},
+		save: true,
+		mobs: [
 			{
-				id: 110,
-				minX: 0,
-				maxX: 0,
+				id: 72,
+				minX: 1175,
+				maxX: 1175,
 				count: 1,
-				zoom: _b.z * _zzz,
-				do: function(_e) {
-					_e.positionable = _e.puppetMode = true;
-					_e.puppetXMove = .045;
-					_e.yPosition = MathRound(groundheight * _b.yp);
-					_e.left = _e.LEFT = -(_b.l * _zzz * __zoom);
-					_e.moveDirection = _e.direction = __right;
-					_e.updateVariables();
-					_e.action =  {
-						repeat : true,
-						command: 'move',
-						y: 1,
-						to: episode.cWidth + ((330 - _b.l) * _zzz * __zoom),
-						after: function(_br) {
-							_br.left = _br.LEFT = -(_b.l * _zzz * __zoom);
-							_br.updateVariables();
-						}
-					};
-					//_e.animations.run.frames.forEach(x => x.color = '#507b82');
-					//_e.animations.run.alternateFrames[0].frames.forEach(x => x.color = '#507b82');
+				do: function (_e) {
+					episode.msNow = 1;
+					_e.direction = 'right';
+					_e.noDirection = _e.positionable = true;
+					_e.swapAnimation('idle');
+				},
+				yPosition: function () {
+					return MathRound(groundheight * 1.7);
 				}
-			})
+			},
+			{
+				id: 2002,
+				minX: 1400,
+				maxX: 1400,
+				count: 1,
+				do: function (_e) {
+					_e.npc = true;
+					_e.reversed = true;
+					_e.direction = 'left';
+					_e.noDirection = _e.positionable = true;
+				},
+				yPosition: function () {
+					return MathRound(groundheight * 1.85);
+				}
+			},
+			{
+				id: 5,
+				minX: 1380,
+				maxX: 1380,
+				count: 1,
+				do: function (_e) {
+					_e.positionable = true;
+				},
+				yPosition: function () {
+					return MathRound(groundheight * 1.6);
+				}
+			},
+			{
+				id: 87,
+				minX: 1600,
+				maxX: 1600,
+				count: 1,
+				zoom: 0.8,
+				do: function (_e) {
+					_e.positionable = true;
+				},
+				yPosition: function () {
+					return MathRound(groundheight * 1.65);
+				}
+			},
+			{
+				id: 87,
+				minX: 1250,
+				maxX: 1250,
+				count: 1,
+				zoom: 0.85,
+				do: function (_e) {
+					_e.positionable = true;
+				},
+				yPosition: function () {
+					return MathRound(groundheight * 1.2);
+				}
+			}
+		]
+	};
+	const _birdVariables = [
+		{ z: 0.27, l: 50, yp: 4.48 },
+		{ z: 0.28, l: 68, yp: 4.467 },
+		{ z: 0.29, l: 92, yp: 4.484 },
+		{ z: 0.27, l: 111, yp: 4.475 },
+		{ z: 0.3, l: 133, yp: 4.487 },
+		{ z: 0.29, l: 151, yp: 4.5 },
+		{ z: 0.3, l: 173, yp: 4.51 },
+		{ z: 0.29, l: 190, yp: 4.49 },
+		{ z: 0.26, l: 209, yp: 4.5 },
+		{ z: 0.21, l: 223, yp: 4.53 },
+		{ z: 0.27, l: 232, yp: 4.475 },
+		{ z: 0.27, l: 251, yp: 4.488 },
+		{ z: 0.275, l: 270, yp: 4.499 }
+	];
+	const _zzz = 0.9;
+	_birdVariables.forEach((_b) => {
+		_x.mobs.push({
+			id: 110,
+			minX: 0,
+			maxX: 0,
+			count: 1,
+			zoom: _b.z * _zzz,
+			do: function (_e) {
+				_e.positionable = _e.puppetMode = true;
+				_e.puppetXMove = 0.045;
+				_e.yPosition = MathRound(groundheight * _b.yp);
+				_e.left = _e.LEFT = -(_b.l * _zzz * __zoom);
+				_e.moveDirection = _e.direction = __right;
+				_e.updateVariables();
+				_e.action = {
+					repeat: true,
+					command: 'move',
+					y: 1,
+					to: episode.cWidth + (330 - _b.l) * _zzz * __zoom,
+					after: function (_br) {
+						_br.left = _br.LEFT = -(_b.l * _zzz * __zoom);
+						_br.updateVariables();
+					}
+				};
+			}
 		});
+	});
 	return _x;
 }
 const __stories = [
@@ -230,26 +218,43 @@ const __stories = [
 		disableWorldMap: true,
 		bonusAchievements: [],
 		resultStars: [
-			{ id: 1, title: 'Clear story', when: function() {
-				return !mainCharacter.isDead();
-			}},
-			{ id: 2, key: 'time', value: 20 * 60000, title: 'Finish in time',
-				when: function(_item) {
-					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
-			}},
-			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
-			}}
+			{
+				id: 1,
+				title: 'Clear story',
+				when: function () {
+					return !mainCharacter.isDead();
+				}
+			},
+			{
+				id: 2,
+				key: 'time',
+				value: 20 * 60000,
+				title: 'Finish in time',
+				when: function (_item) {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= _item.value;
+				}
+			},
+			{
+				id: 3,
+				key: 'hp',
+				value: 0.5,
+				title: 'Stay above %50 health',
+				when: function (_item) {
+					return (
+						(__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >=
+						MathFloor(mainCharacter.maxHP * _item.value)
+					);
+				}
+			}
 		],
 		ticket: 2,
-		act:1,
-		list:true,
+		act: 1,
+		list: true,
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
-			{ key: 'item', grade: 2, type: 'belt', count:1 },
-			{ key: 'fragment', name: 'king', minCount:1, maxCount:5, chance:50 },
+			{ key: 'item', grade: 2, type: 'belt', count: 1 },
+			{ key: 'fragment', name: 'king', minCount: 1, maxCount: 5, chance: 50 },
 			{ key: 'gold', count: 5000 },
 			{ key: 'exp', count: 1200 }
 		],
@@ -267,19 +272,25 @@ const __stories = [
 				},
 				owner: 'system',
 				minLevel: 1,
-				kills: [{ enemy: [51,52], limit: 48, key: 'Guard' }],
+				kills: [{ enemy: [51, 53], limit: 48, key: 'Guard' }],
 				maps: [105],
-				after: function() {
-					episode.enemies.forEach(x => x.spawnAsGroup = x.respawnAfterSeconds = x.spawn = undefined);
+				after: function () {
+					episode.enemies.forEach(
+						(x) => (x.limbs = x.spawnAsGroup = x.respawnAfterSeconds = x.spawn = undefined)
+					);
 					updateQuestArea();
 					__account.questStatus.quest = undefined;
 					_client.upgradeQuestStatus();
-					warn('<div class="flex heading toast-with-banner ink" style="position:relative;width:auto"><img style="height:20cqh;z-index:-1" src="./images/icons/txtbg.png" /><div class="full flex" style="position:absolute">' + getLangData('Quest Completed') + '</div></div>');
-					episode.playSound({ key: 'questdone', volume: .8 });
+					warn(
+						'<div class="flex heading toast-with-banner ink" style="position:relative;width:auto"><img style="height:20cqh;z-index:-1" src="./images/icons/txtbg.png" /><div class="full flex" style="position:absolute">' +
+							getLangData('Quest Completed') +
+							'</div></div>'
+					);
+					episode.playSound({ key: 'questdone', volume: 0.8 });
 					episode.showLocationHand('right');
 					episode.width *= 2;
 					episode.moveCamera();
-					episode.enemies.filter(x => !x.enemy && !x.main)?.forEach(x => x.remove = true);
+					episode.enemies.filter((x) => !x.enemy && !x.main)?.forEach((x) => (x.remove = true));
 					episode.phase = 2;
 				}
 			},
@@ -303,32 +314,33 @@ const __stories = [
 						key: 'archer',
 						type: 'quest-item',
 						chanceRate: 100,
-						command:'Save'
+						command: 'Save'
 					}
 				],
-				after: function(){
-					episode.enemies = episode.enemies.filter(x => x.class !== 'archer');
+				after: function () {
+					episode.enemies = episode.enemies.filter((x) => x.class !== 'archer');
 					removeCoopCharacter(1);
 					const _char = addCoopCharacter(null, 'arc');
 					_char.unarm();
 					const _q = __account.questStatus.quest.loots[0];
-					if(_q)
-						_q.count = 1;
+					if (_q) _q.count = 1;
 					getQuestRewards(__account.questStatus.quest);
-					episode.playSound({ key: 'questdone', volume: .8 });
+					episode.playSound({ key: 'questdone', volume: 0.8 });
 					updateQuestArea();
-					episode.dialogs = [{
-						id: 1,
-						location: { map: episode.id }, ms: 2000,
-						owner: _char.key,
-						text: "We need arms now!",
-						onend: function() {
-							//episode.sprites.forEach(x => x.disabled = false);
-							episode.phase = 1;
-							takeQuest(2, 1);
-							episode.showLocationHand('left');
+					episode.dialogs = [
+						{
+							id: 1,
+							location: { map: episode.id },
+							ms: 2000,
+							owner: _char.key,
+							text: 'We need arms now!',
+							onend: function () {
+								episode.phase = 1;
+								takeQuest(2, 1);
+								episode.showLocationHand('left');
+							}
 						}
-					}];
+					];
 				},
 				maps: [104]
 			},
@@ -365,52 +377,60 @@ const __stories = [
 					}
 				],
 				maps: [104],
-				after: function() {
-					const _chest = episode.enemies.find(x => x.id === 56);
-					if(_chest)
-						_chest.animate('dead', 1);
+				after: function () {
+					const _chest = episode.enemies.find((x) => x.id === 56);
+					if (_chest) _chest.animate('dead', 1);
 					else {
 						delete __account.questStatus.quest.after;
 						episode.playSound({ key: 'loot', volume: 1 });
-						const _dead = episode.enemies.find(x => x.id === 78);
-						if(_dead && !_dead.unarmed)
-							_dead.unarm();
-						const _q = __account.questStatus.quest.loots.find(x => x.key === 'bow');
-						if(_q) {
+						const _dead = episode.enemies.find((x) => x.id === 78);
+						if (_dead && !_dead.unarmed) _dead.unarm();
+						const _q = __account.questStatus.quest.loots.find((x) => x.key === 'bow');
+						if (_q) {
 							_q.count = 1;
 							updateQuestArea();
-							warn('<div class="flex heading toast-with-banner ink" style="position:relative;width:auto"><img style="height:20cqh;z-index:-1" src="./images/icons/txtbg.png" /><div class="full flex" style="position:absolute">' + getLangData('Quest Completed') + '</div></div>');
-							episode.playSound({ key: 'questdone', volume: .8 });
-							episode.dialogs = [{
-								id: 2,
-								location: { map: episode.id }, ms: 2000,
-								owner: mainCharacter.key,
-								text: "Here! Take it",
-								onend: function() {
-									const _archer = episode.enemies.find(x => x.class === 'archer');
-									_archer.disableUnarm();
-									episode.dialogs = [{
-										id: 3,
-										location: { map: episode.id }, ms: 2000,
-										owner: _archer.key,
-										text: "Got it! Thanks",
-										onend: function() {
-											episode.dialogs.push({
-												id: 11,
+							warn(
+								'<div class="flex heading toast-with-banner ink" style="position:relative;width:auto"><img style="height:20cqh;z-index:-1" src="./images/icons/txtbg.png" /><div class="full flex" style="position:absolute">' +
+									getLangData('Quest Completed') +
+									'</div></div>'
+							);
+							episode.playSound({ key: 'questdone', volume: 0.8 });
+							episode.dialogs = [
+								{
+									id: 2,
+									location: { map: episode.id },
+									ms: 2000,
+									owner: mainCharacter.key,
+									text: 'Here! Take it',
+									onend: function () {
+										const _archer = episode.enemies.find((x) => x.class === 'archer');
+										_archer.disableUnarm();
+										episode.dialogs = [
+											{
+												id: 3,
 												location: { map: episode.id },
-												ms: 3100,
-												delay: 100,
-												owner: mainCharacter.key,
-												text: "We need to get out of here!",
-												onend: function() {
-													episode.showLocationHand('right');
-													episode.phase = 5;
+												ms: 2000,
+												owner: _archer.key,
+												text: 'Got it! Thanks',
+												onend: function () {
+													episode.dialogs.push({
+														id: 11,
+														location: { map: episode.id },
+														ms: 3100,
+														delay: 100,
+														owner: mainCharacter.key,
+														text: 'We need to get out of here!',
+														onend: function () {
+															episode.showLocationHand('right');
+															episode.phase = 5;
+														}
+													});
 												}
-											});
-										}
-									}];
+											}
+										];
+									}
 								}
-							}];
+							];
 						}
 					}
 				}
@@ -423,27 +443,37 @@ const __stories = [
 				},
 				owner: 'system',
 				minLevel: 1,
-				kills: [{
-					enemy: [19],
-					limit: 5,
-					descriptions: {
-						en: 'Goblin Cleared',
-						tr: 'Goblin Temizlendi'
+				kills: [
+					{
+						enemy: [619],
+						limit: 5,
+						descriptions: {
+							en: 'Goblin Cleared',
+							tr: 'Goblin Temizlendi'
+						}
+					},
+					{
+						enemy: [49],
+						limit: 1,
+						descriptions: {
+							en: 'Rogue Cleared',
+							tr: 'Haydut Temizlendi'
+						}
+					},
+					{
+						enemy: [66],
+						limit: 1,
+						descriptions: {
+							en: 'Rider Cleared',
+							tr: 'Binici Temizlendi'
+						}
 					}
-				},
-				{ enemy: [49], limit: 1, descriptions: {
-					en: 'Rogue Cleared',
-					tr: 'Haydut Temizlendi'
-				} },
-				{ enemy: [66], limit: 1, descriptions: {
-					en: 'Rider Cleared',
-					tr: 'Binici Temizlendi'
-				} }],
+				],
 				maps: [3],
-				after: function() {
+				after: function () {
 					takeNextQuest();
-					episode.enemies.find(x => x.npc === 'druid').disabled = false;
-					episode.NPCS = episode.enemies.filter(x => x.npc && !x.disabled);
+					episode.enemies.find((x) => x.npc === 'druid').disabled = false;
+					episode.NPCS = episode.enemies.filter((x) => x.npc && !x.disabled);
 					episode.pauseBgMusic(1);
 				}
 			},
@@ -467,72 +497,86 @@ const __stories = [
 						key: 'druid',
 						type: 'quest-item',
 						chanceRate: 100,
-						command:'Save'
+						command: 'Save'
 					}
 				],
-				after: function() {
+				after: function () {
 					finishStory();
 					episode.pauseBgMusic(1);
-					const _druid = episode.enemies.find(x => x.id === 67);
+					const _druid = episode.enemies.find((x) => x.id === 67);
 					_druid.remove = true;
 					getQuestRewards(__account.questStatus.quest);
-					episode.playSound({ key: 'questdone', volume: .8 });
+					episode.playSound({ key: 'questdone', volume: 0.8 });
 					takeNextQuest();
-					const _princess = summonMob(58, MathRound(mainCharacter.SCREENLEFT / __zoom), mainCharacter.yPosition, mainCharacter.level);
+					const _princess = summonMob(
+						58,
+						MathRound(mainCharacter.SCREENLEFT / __zoom),
+						mainCharacter.yPosition,
+						mainCharacter.level
+					);
 					_princess.friendly = _princess.invulnerable = true;
 					_princess.still = _princess.immobilize = false;
-					if(mainCharacter.direction === 'left') {
+					if (mainCharacter.direction === 'left') {
 						_princess.direction = 'right';
 						_princess.left = MathRound(mainCharacter.SCREENLEFT - mainCharacter.WIDTH);
-					}
-					else {
+					} else {
 						_princess.direction = 'left';
-						_princess.left = MathRound(mainCharacter.SCREENLEFT + mainCharacter.WIDTH + mainCharacter.WIDTH);
+						_princess.left = MathRound(
+							mainCharacter.SCREENLEFT + mainCharacter.WIDTH + mainCharacter.WIDTH
+						);
 					}
 					_princess.updateVariables();
 					blurKeyboard();
 					mainCharacter.animate('idle', 1);
 					mainCharacter.immobilize = mainCharacter.disableKeyboard = true;
-					cssAnimations.film(null, [
-						{
-							do: function() {
-								createBubbleText({
-									id: 2,
-									location: { map: episode.id }, ms: 2000,
-									owner: _princess.key,
-									text: "Thank you my hero"
-								});
+					cssAnimations.film(
+						null,
+						[
+							{
+								do: function () {
+									createBubbleText({
+										id: 2,
+										location: { map: episode.id },
+										ms: 2000,
+										owner: _princess.key,
+										text: 'Thank you my hero'
+									});
+								},
+								ms: 0
 							},
-							ms: 0
-						},
-						{
-							do: function() {
-								createBubbleText({
-									id: 3,
-									location: { map: episode.id }, ms: 2100,
-									owner: mainCharacter.key,
-									text: "We need somewhere to hide!"
-								});
+							{
+								do: function () {
+									createBubbleText({
+										id: 3,
+										location: { map: episode.id },
+										ms: 2100,
+										owner: mainCharacter.key,
+										text: 'We need somewhere to hide!'
+									});
+								},
+								ms: 2200
 							},
-							ms: 2200
-						},
-						{
-							do: function() {
-								createBubbleText({
-									id: 4,
-									location: { map: episode.id }, ms: 2100,
-									owner: _princess.key,
-									text: "I know a place. Let's go..."
-								});
-							},
-							ms: 4500
+							{
+								do: function () {
+									createBubbleText({
+										id: 4,
+										location: { map: episode.id },
+										ms: 2100,
+										owner: _princess.key,
+										text: "I know a place. Let's go..."
+									});
+								},
+								ms: 4500
+							}
+						],
+						6800,
+						function () {
+							episode.showLocationHand('left');
+							episode.phase = 1;
+							mainCharacter.immobilize = false;
+							delete mainCharacter.disableKeyboard;
 						}
-					], 6800, function() {
-						episode.showLocationHand('left');
-						episode.phase = 1;
-						mainCharacter.immobilize = false;
-						delete mainCharacter.disableKeyboard;
-					});
+					);
 				},
 				maps: [3]
 			},
@@ -556,14 +600,14 @@ const __stories = [
 						key: 'wizard',
 						type: 'quest-item',
 						chanceRate: 100,
-						command:'Find'
+						command: 'Find'
 					}
 				],
-				after: function() {
+				after: function () {
 					takeNextQuest();
 					__account.questStatus.state = 'begin';
 					updateQuestArea();
-					const _dk = episode.enemies.find(x => x.id === 72);
+					const _dk = episode.enemies.find((x) => x.id === 72);
 					_dk.npc = true;
 					episode.resetMainQuest();
 					episode.endTime = __account.questStatus.lastStoryFinishTime ?? _gameTick;
@@ -580,7 +624,7 @@ const __stories = [
 					en: 'Elder Talked',
 					tr: 'Bilge Konuştu'
 				},
-				dialogId:6,
+				dialogId: 6,
 				loots: [
 					{
 						object: ['wizard'],
@@ -589,21 +633,18 @@ const __stories = [
 						key: 'wizard',
 						type: 'quest-item',
 						chanceRate: 100,
-						command:'Talk'
+						command: 'Talk'
 					}
 				],
-				statusChanged: function(_status) {
-					if(_status !== 'progress')
-						return;
+				statusChanged: function (_status) {
+					if (_status !== 'progress') return;
 					completeQuest();
-					const _p = episode.enemies.find(x => x.class === 'druid');
-					if(!_p)
-						return;
-					const _a = episode.enemies.find(x => x.class === 'archer');
-					if(!_a)
-						return;
+					const _p = episode.enemies.find((x) => x.class === 'druid');
+					if (!_p) return;
+					const _a = episode.enemies.find((x) => x.class === 'archer');
+					if (!_a) return;
 					episode.drawSpriteObjects2('wizard', 1);
-					const _dk = episode.enemies.find(x => x.id === 72);
+					const _dk = episode.enemies.find((x) => x.id === 72);
 					_dk.npc = true;
 					removeNPCQuestMarks();
 					_p.yPosition = groundheight;
@@ -624,32 +665,39 @@ const __stories = [
 					_p.updateVariables();
 					_a.updateVariables();
 					_a.standBy();
-					cssAnimations.film(null, [
-						{
-							do: function() {
-								createBubbleText({
-									id: 991,
-									location: { map: episode.id }, ms: 2000,
-									owner: _a.key,
-									text: "I'll try to find support for us"
-								});
+					cssAnimations.film(
+						null,
+						[
+							{
+								do: function () {
+									createBubbleText({
+										id: 991,
+										location: { map: episode.id },
+										ms: 2000,
+										owner: _a.key,
+										text: "I'll try to find support for us"
+									});
+								},
+								ms: 2000
 							},
-							ms: 2000
-						},
-						{
-							do: function() {
-								createBubbleText({
-									id: 992,
-									location: { map: episode.id }, ms: 2000,
-									owner: mainCharacter.key,
-									text: "Ok, but be careful"
-								});
-							},
-							ms: 4100
-						},
-					], 5200, function() {
-						installStoryFinish();
-					});
+							{
+								do: function () {
+									createBubbleText({
+										id: 992,
+										location: { map: episode.id },
+										ms: 2000,
+										owner: mainCharacter.key,
+										text: 'Ok, but be careful'
+									});
+								},
+								ms: 4100
+							}
+						],
+						5200,
+						function () {
+							installStoryFinish();
+						}
+					);
 				},
 				owner: 'wizard',
 				minLevel: 1,
@@ -657,316 +705,375 @@ const __stories = [
 			}
 		],
 		title: {
-			en: "Royal Massacre",
-			tr: "Kraliyet Katliyamı"
+			en: 'Royal Massacre',
+			tr: 'Kraliyet Katliyamı'
 		},
 		description: {
 			en: "Cyclops attacks a castle with goblins for fun. While they are defeated by the king's military forces, one of them manages to escape and unites with our heroes who escaped captivity and seeks to put this giant in his place with the support they receive from the people of the village where they take refuge.",
-			tr: "Tepegöz zevk için bir kaleye goblinler ile birlikte saldırıda bulunur. Kralın askeri birlikleri karşısında hezimete uğrarken içlerinden kaçmayı başaran biri, esaretten kurtulan kahramanlarımız ile birleşerek sığındıkları köyün halkından aldıkları destek ile bu deve haddini bildirme peşindedir"
+			tr: 'Tepegöz zevk için bir kaleye goblinler ile birlikte saldırıda bulunur. Kralın askeri birlikleri karşısında hezimete uğrarken içlerinden kaçmayı başaran biri, esaretten kurtulan kahramanlarımız ile birleşerek sığındıkları köyün halkından aldıkları destek ile bu deve haddini bildirme peşindedir'
 		},
-		boss: "king",
+		boss: 'king',
 		minLevel: 1,
-		//startScene: 1,
+
 		scenes: [
 			{
 				map: 105,
 				startWith: 47,
 				noArtifact: 1,
-				loadingCharacterIds: [ 51,52,19,54 ],
+				loadingCharacterIds: [51, 53, 619, 54],
 				actions: [
 					{
-						when: function() {
-							return episode.phase === 2 && !episode.enemies.find(x => x.class === 'king')
-							&& (platformX > ((4635 * episode.zoom) - (episode.cWidth / 2)));
-							//return (episode.phase ?? 0) < 3 && !episode.enemies.find(x => x.class === 'king') && (mainCharacter.LEFT + platformX) >= 0;
+						when: function () {
+							return (
+								episode.phase === 2 &&
+								!episode.enemies.find((x) => x.class === 'king') &&
+								platformX > 4635 * episode.zoom - episode.cWidth / 2
+							);
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 3;
 							__storyCutScenePlaying = true;
-							episode.enemies.filter(x => x !== mainCharacter)?.forEach(x => {
-								x.remove = true;
-							});
-							const _king = summonMob(59, MathRound((episode.width - (episode.cWidth * .4)) / __zoom), MathRound(groundheight * .5), mainCharacter.level);
-							const _princess = summonMob(58, MathRound((episode.width - (episode.cWidth * .49)) / __zoom), MathRound(groundheight * .75), mainCharacter.level);
-							//const _king = summonMob(59, MathRound((_canvas.width - (_canvas.width * .25)) / __zoom), MathRound(groundheight * .5), mainCharacter.level);
-							//const _princess = summonMob(58, MathRound((_canvas.width - (_canvas.width * .34)) / __zoom), MathRound(groundheight * .75), mainCharacter.level);
+							episode.enemies
+								.filter((x) => x !== mainCharacter)
+								?.forEach((x) => {
+									x.remove = true;
+								});
+							const _king = summonMob(
+								59,
+								MathRound((episode.width - episode.cWidth * 0.4) / __zoom),
+								MathRound(groundheight * 0.5),
+								mainCharacter.level
+							);
+							const _princess = summonMob(
+								58,
+								MathRound((episode.width - episode.cWidth * 0.49) / __zoom),
+								MathRound(groundheight * 0.75),
+								mainCharacter.level
+							);
+
 							_princess.invulnerable = true;
 							addClass(_gameUI, 'disable-ui');
 							episode.removeLocationHand();
 							mainCharacter.direction = __right;
 							mainCharacter.standBy();
-							mainCharacter.left = MathRound(episode.cWidth * .2);
+							mainCharacter.left = MathRound(episode.cWidth * 0.2);
 							_princess.direction = _king.direction = __left;
 							_king.important = _princess.important = true;
 							mainCharacter.updateVariables();
-							mainCharacter.yPosition = MathRound(groundheight * .5);
-							if(mainCharacter.rageCount > 0 || mainCharacter.ultimate) {
+							mainCharacter.yPosition = MathRound(groundheight * 0.5);
+							if (mainCharacter.rageCount > 0 || mainCharacter.ultimate) {
 								mainCharacter.rageCount = 0;
 								mainCharacter.updateRageSkillUI();
 							}
-							if(mainCharacter.finishBombs)
-								mainCharacter.finishBombs();
-								setTimeout(function() {
-									cssAnimations.vs(mainCharacter,
-										{
-											ms: 3000,
-											enemyId: 59,
-											q1: 'Get out! Smurf!',
-											q2: 'Eye for an eye!'
-										}, function() {
+							if (mainCharacter.finishBombs) mainCharacter.finishBombs();
+							setTimeout(function () {
+								cssAnimations.vs(
+									mainCharacter,
+									{
+										ms: 3000,
+										enemyId: 59,
+										q1: 'Get out! Smurf!',
+										q2: 'Eye for an eye!'
+									},
+									function () {
 										const _goblins = [];
 										__storyCutScenePlaying = 1;
 
-										cssAnimations.film(null, [
-											{
-												do: function() {
-													episode.dialogs = [];
-													for(let i = 0; i < 2; i++) {
-														const _goblin = summonMob(49, MathRound((platformX - (episode.cWidth * .25)) / __zoom), MathRound(groundheight * (.25 + (i * .5))), mainCharacter.level);
-														_goblin.enemy = false;
-														_goblin.level = _goblin.skipHealthBar = 1;
-														_goblin.immunities = [];
-														_goblin.disableSkills();
-														if(_goblin.animations.idle?.alternateFrames){
-															delete _goblin.animations.idle.alternateFrames;
-															_goblin.swapAnimation('idle');
-														}
-														if(_goblin.animations.run?.alternateFrames){
-															delete _goblin.animations.run.alternateFrames;
-															_goblin.swapAnimation('run');
-														}
-														_goblin.direction = _goblin.moveDirection = 'right';
-														_goblins.push(_goblin.key);
-														_goblin.action =  {
-															command: 'move',
-															to: 500 * __zoom,
-															after: function(_e) {
-																_e.immobilize = _e.still = true;
-																_e.animate('idle', 1);
-																createBubbleText({
-																	id: 11,
-																	location: { map: episode.id }, ms: 1500,
-																	owner: _king.key,
-																	text: "You shall not pass!"
-																});
+										cssAnimations.film(
+											null,
+											[
+												{
+													do: function () {
+														episode.dialogs = [];
+														for (let i = 0; i < 2; i++) {
+															const _goblin = summonMob(
+																619,
+																MathRound((platformX - episode.cWidth * 0.25) / __zoom),
+																MathRound(groundheight * (0.25 + i * 0.5)),
+																mainCharacter.level
+															);
+															_goblin.enemy = false;
+															_goblin.level = _goblin.skipHealthBar = 1;
+															_goblin.immunities = [];
+															_goblin.disableSkills();
+															if (_goblin.animations.idle?.alternateFrames) {
+																delete _goblin.animations.idle.alternateFrames;
+																_goblin.swapAnimation('idle');
 															}
-														}
-													}
-												},
-												ms: 500
-											},
-											{
-												do: function() {
-													createBubbleText({
-														id: 2,
-														location: { map: episode.id }, ms: 2000,
-														owner: mainCharacter.key,
-														text: "We are here for expropriation"
-													});
-												},
-												ms: 4800
-											},
-											{
-												do: function() {
-													createBubbleText({
-														id: 13,
-														location: { map: episode.id }, ms: 2000,
-														owner: _king.key,
-														text: "You freaks will pay!"
-													});
-												},
-												ms: 6900
-											},
-											{
-												do: function() {
-													createBubbleText({
-														id: 4,
-														location: { map: episode.id }, ms: 2500,
-														owner: _princess.key,
-														leftGap: -200,
-														text: "Get your strength my lord"
-													});
-												},
-												ms: 9000
-											},
-											{
-												do: function() {
-													createBubbleText({
-														id: 5,
-														location: { map: episode.id }, ms: 2000,
-														owner: _goblins[0],
-														text: "The woman is mine! Master",
-														onend: function(_e) {
-															episode.hasSolid = true;
-															_king.animate('buff1', 1);
-															_e.hp = _e.maxHP = 1;
-															_e.stepXRate = .65;
-															_e.still = false;
-															_e.action =  {
+															if (_goblin.animations.run?.alternateFrames) {
+																delete _goblin.animations.run.alternateFrames;
+																_goblin.swapAnimation('run');
+															}
+															_goblin.direction = _goblin.moveDirection = 'right';
+															_goblins.push(_goblin.key);
+															_goblin.action = {
 																command: 'move',
-																to: 1100 * __zoom,
-																y: .75,
-																after: function(_g) {
-																	_king.throwSpell({ spell: { key: 'icespike', priority: 1, smash: 1}}, null, _g);
-																	_g.immobilize = _g.still = true;
-																	_g.animate('idle', 1);
+																to: 500 * __zoom,
+																after: function (_e) {
+																	_e.immobilize = _e.still = true;
+																	_e.animate('idle', 1);
+																	createBubbleText({
+																		id: 11,
+																		location: { map: episode.id },
+																		ms: 1500,
+																		owner: _king.key,
+																		text: 'You shall not pass!'
+																	});
 																}
-															}
+															};
 														}
-													});
+													},
+													ms: 500
 												},
-												ms: 11600
-											},
-											{
-												do: function() {
-													createBubbleText({
-														id: 666,
-														leftGap: 200,
-														location: { map: episode.id }, ms: 1000,
-														owner: mainCharacter.key,
-														asap: 1,
-														text: "#sigh#"
-													});
+												{
+													do: function () {
+														createBubbleText({
+															id: 2,
+															location: { map: episode.id },
+															ms: 2000,
+															owner: mainCharacter.key,
+															text: 'We are here for expropriation'
+														});
+													},
+													ms: 4800
 												},
-												ms: 15600
-											},
-											{
-												do: function() {
-													createBubbleText({
-														id: 26,
-														location: { map: episode.id }, ms: 2000,
-														owner: _king.key,
-														text: "How dare you?",
-														onend: function(_e) {
-															_e.animate('buff2', 1);
-															_e.animations.buff2.after = function() {
+												{
+													do: function () {
+														createBubbleText({
+															id: 13,
+															location: { map: episode.id },
+															ms: 2000,
+															owner: _king.key,
+															text: 'You freaks will pay!'
+														});
+													},
+													ms: 6900
+												},
+												{
+													do: function () {
+														createBubbleText({
+															id: 4,
+															location: { map: episode.id },
+															ms: 2500,
+															owner: _princess.key,
+															leftGap: -200,
+															text: 'Get your strength my lord'
+														});
+													},
+													ms: 9000
+												},
+												{
+													do: function () {
+														createBubbleText({
+															id: 5,
+															location: { map: episode.id },
+															ms: 2000,
+															owner: _goblins[0],
+															text: 'The woman is mine! Master',
+															onend: function (_e) {
+																episode.hasSolid = true;
+																_king.animate('buff1', 1);
+																_e.hp = _e.maxHP = 1;
+																_e.stepXRate = 0.65;
 																_e.still = false;
-																_e.animate('charge', 1);
-																episode.enemies.find(x => x.key === _goblins[1]).invulnerable = 1;
+																_e.action = {
+																	command: 'move',
+																	to: 1100 * __zoom,
+																	y: 0.75,
+																	after: function (_g) {
+																		_king.throwSpell(
+																			{
+																				spell: {
+																					key: 'icespike',
+																					priority: 1,
+																					smash: 1
+																				}
+																			},
+																			null,
+																			_g
+																		);
+																		_g.immobilize = _g.still = true;
+																		_g.animate('idle', 1);
+																	}
+																};
 															}
-														}
-													});
+														});
+													},
+													ms: 11600
 												},
-												ms: 16100
+												{
+													do: function () {
+														createBubbleText({
+															id: 666,
+															leftGap: 200,
+															location: { map: episode.id },
+															ms: 1000,
+															owner: mainCharacter.key,
+															asap: 1,
+															text: '#sigh#'
+														});
+													},
+													ms: 15600
+												},
+												{
+													do: function () {
+														createBubbleText({
+															id: 26,
+															location: { map: episode.id },
+															ms: 2000,
+															owner: _king.key,
+															text: 'How dare you?',
+															onend: function (_e) {
+																_e.animate('buff2', 1);
+																_e.animations.buff2.after = function () {
+																	_e.still = false;
+																	_e.animate('charge', 1);
+																	episode.enemies.find(
+																		(x) => x.key === _goblins[1]
+																	).invulnerable = 1;
+																};
+															}
+														});
+													},
+													ms: 16100
+												},
+												{
+													do: function () {
+														delete mainCharacter.friendlyFire;
+														mainCharacter.animations.air1.coolDownLeft = 0;
+														mainCharacter.enableSkill('air1');
+														mainCharacter.animate('air1', 1);
+													},
+													ms: 22800
+												},
+												{
+													do: function () {
+														delete mainCharacter.animations.counterstun.frames[0].objects;
+														mainCharacter.animate('counterstun', 1);
+													},
+													ms: 24000
+												},
+												{
+													do: function () {
+														createBubbleText({
+															id: 7,
+															location: { map: episode.id },
+															ms: 2000,
+															owner: mainCharacter.key,
+															text: 'You fool!'
+														});
+													},
+													ms: 25100
+												},
+												{
+													do: function () {
+														const _gob = episode.enemies.find((x) => x.key === _goblins[1]);
+														_gob.still = false;
+														_gob.action = {
+															command: 'move',
+															to: 3000 * __zoom
+														};
+														createBubbleText({
+															id: 8,
+															location: { map: episode.id },
+															ms: 1200,
+															owner: _goblins[1],
+															delay: 200,
+															asap: 1,
+															text: 'Come here sweety!'
+														});
+													},
+													ms: 27100
+												},
+												{
+													do: function () {
+														createBubbleText({
+															id: 9,
+															location: { map: episode.id },
+															ms: 3000,
+															owner: _princess.key,
+															asap: 1,
+															text: '#screams#'
+														});
+													},
+													ms: 27900
+												},
+												{
+													do: function () {
+														_princess.still = false;
+														_princess.action = {
+															command: 'move',
+															to: 3000 * __zoom
+														};
+													},
+													ms: 28300
+												}
+											],
+											32000,
+											function () {
+												const _topGoblin = episode.enemies.find((x) => x.key === _goblins[1]);
+												if (_topGoblin) _topGoblin.remove = true;
+												_princess.remove = true;
+												__storyCutScenePlaying = 0;
+												episode.minPlatformX = platformX;
+												episode.still = true;
+												mainCharacter.immobilize = false;
+												mainCharacter.moveDirection = 'right';
+												delete mainCharacter.disableKeyboard;
+												episode.showLocationHand('right');
+												episode.enemies
+													.filter((x) => x !== mainCharacter)
+													?.forEach((x) => (x.remove = true));
+
+												episode.phase = 3;
 											},
-											{
-												do: function() {
-													delete mainCharacter.friendlyFire;
-													mainCharacter.animations.air1.coolDownLeft = 0;
-													mainCharacter.enableSkill('air1');
-													mainCharacter.animate('air1', 1);
-												},
-												ms: 22800
-											},
-											{
-												do: function() {
-													delete mainCharacter.animations.counterstun.frames[0].objects;
-													mainCharacter.animate('counterstun', 1);
-												},
-												ms: 24000
-											},
-											{
-												do: function() {
-													createBubbleText({
-														id: 7,
-														location: { map: episode.id }, ms: 2000,
-														owner: mainCharacter.key,
-														text: "You fool!"
-													});
-												},
-												ms: 25100
-											},
-											{
-												do: function() {
-													const _gob = episode.enemies.find(x => x.key === _goblins[1]);
-													_gob.still = false;
-													_gob.action = {
-														command: 'move',
-														to: 3000 * __zoom,
-													};
-													createBubbleText({
-														id: 8,
-														location: { map: episode.id }, ms: 1200,
-														owner: _goblins[1],
-														delay: 200,
-														asap: 1,
-														text: "Come here sweety!"
-													});
-												},
-												ms: 27100
-											},
-											{
-												do: function() {
-													createBubbleText({
-														id: 9,
-														location: { map: episode.id }, ms: 3000,
-														owner: _princess.key,
-														asap: 1,
-														text: "#screams#"
-													});
-												},
-												ms: 27900
-											},
-											{
-												do: function() {
-													_princess.still = false;
-													_princess.action = {
-														command: 'move',
-														to: 3000 * __zoom,
-													};
-												},
-												ms: 28300
+											function () {
+												episode.enemies
+													.filter((x) => x !== mainCharacter)
+													?.forEach((x) => (x.remove = true));
 											}
-										], 32000, function() {
-											const _topGoblin = episode.enemies.find(x => x.key === _goblins[1]);
-											if(_topGoblin)
-												_topGoblin.remove = true;
-											_princess.remove = true;
-											__storyCutScenePlaying = 0;
-											episode.minPlatformX = platformX;
-											episode.still = true;
-											mainCharacter.immobilize = false;
-											mainCharacter.moveDirection = 'right';
-											delete mainCharacter.disableKeyboard;
-											episode.showLocationHand('right');
-											episode.enemies.filter(x => x !== mainCharacter)?.forEach(x => x.remove = true);
-											//mainCharacter.enableSkills();
-											episode.phase = 3;
-										}, function() {
-											episode.enemies.filter(x => x !== mainCharacter)?.forEach(x => x.remove = true);
-										});
-									});
-								}, 1000);
+										);
+									}
+								);
+							}, 1000);
 						}
 					},
 					{
-						when: function() {
-							return episode.phase === 3 && !episode.enemies.find(x => x.class === 'king') && mainCharacter.ORIGINLEFT > (episode.width / 6);
+						when: function () {
+							return (
+								episode.phase === 3 &&
+								!episode.enemies.find((x) => x.class === 'king') &&
+								mainCharacter.ORIGINLEFT > episode.width / 6
+							);
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 4;
-							episode.enemies.filter(x => x !== mainCharacter)?.forEach(x => x.remove = true);
-							if(mainCharacter.ultimate) {
+							episode.enemies.filter((x) => x !== mainCharacter)?.forEach((x) => (x.remove = true));
+							if (mainCharacter.ultimate) {
 								mainCharacter.rageCount = 0;
 								mainCharacter.ultimate = false;
 							}
-							mainCharacter.yPosition = MathRound(groundheight * .5);
+							mainCharacter.yPosition = MathRound(groundheight * 0.5);
 							mainCharacter.standBy();
 							mainCharacter.still = true;
 							episode.still = true;
 							episode.width = platformX + _canvas.width;
-							mainCharacter.left = MathRound(episode.width / 6); //MathRound(_canvas.width / 2);
+							mainCharacter.left = MathRound(episode.width / 6);
 							mainCharacter.updateVariables();
 							episode.removeLocationHand();
 							mainCharacter.disableSkills();
-							const _mLeft = MathRound(mainCharacter.SCREENLEFT + (mainCharacter.WIDTH / 2));
-							for(let i = 1; i < 13; i++) {
-								let _left =  MathRound((_mLeft + platformX) - (episode.cWidth / 2) - ((140 * __zoom) * MathCeil(i / 3))); //platformX - MathRound(-1 * (200 * MathCeil(i / 3)));
-								if((i % 3) === 1)
-									_left += (50 * __zoom);
-								_left -= (350 * __zoom);
-								let _m = summonMob(51, MathRound(_left / __zoom),
-								MathRound(groundheight * (.2 + (.15 * (1 + (i % 3))))));
+							const _mLeft = MathRound(mainCharacter.SCREENLEFT + mainCharacter.WIDTH / 2);
+							for (let i = 1; i < 13; i++) {
+								let _left = MathRound(
+									_mLeft + platformX - episode.cWidth / 2 - 140 * __zoom * MathCeil(i / 3)
+								);
+								if (i % 3 === 1) _left += 50 * __zoom;
+								_left -= 350 * __zoom;
+								let _m = summonMob(
+									51,
+									MathRound(_left / __zoom),
+									MathRound(groundheight * (0.2 + 0.15 * (1 + (i % 3))))
+								);
 								_m.puppetMode = true;
 								_m.disableSkills();
 								_m.noLoot = true;
@@ -975,20 +1082,24 @@ const __stories = [
 								_m.setAutoTarget(mainCharacter);
 								_m.animations.run.imediateBreak = false;
 								_m.animations.run.maxRepeat = 2;
-								_m.animations.run.after = function() {
+								_m.animations.run.after = function () {
 									_m.still = _m.immobilize = true;
 									_m.animate('idle', 1);
 									delete _m.animations.run;
-								}
+								};
 								_m.run();
 							}
-							for(let i = 1; i < 13; i++) {
-								let _left = MathRound((_mLeft + platformX) + (_canvas.width / 2) + ((140 * __zoom) * MathCeil(i / 3)));
-								if((i % 3) === 1)
-									_left -= (50 * __zoom);
-								_left -= (50 * __zoom);
-								let _m = summonMob(51, MathRound(_left / __zoom),
-								MathRound(groundheight * (.2 + (.15 * (1 + (i % 3))))));
+							for (let i = 1; i < 13; i++) {
+								let _left = MathRound(
+									_mLeft + platformX + _canvas.width / 2 + 140 * __zoom * MathCeil(i / 3)
+								);
+								if (i % 3 === 1) _left -= 50 * __zoom;
+								_left -= 50 * __zoom;
+								let _m = summonMob(
+									51,
+									MathRound(_left / __zoom),
+									MathRound(groundheight * (0.2 + 0.15 * (1 + (i % 3))))
+								);
 								_m.puppetMode = true;
 								_m.disableSkills();
 								_m.noLoot = true;
@@ -997,35 +1108,43 @@ const __stories = [
 								_m.setAutoTarget(mainCharacter);
 								_m.animations.run.imediateBreak = false;
 								_m.animations.run.maxRepeat = 2;
-								_m.animations.run.after = function() {
+								_m.animations.run.after = function () {
 									_m.still = _m.immobilize = true;
 									_m.animate('idle', 1);
 									delete _m.animations.run;
-								}
+								};
 								_m.run();
 							}
 							createBubbleText({
 								id: 6,
 								location: { map: episode.id },
-								//delay: 1500,
+
 								ms: 3000,
 								owner: mainCharacter.key,
-								text: "You got me trapped",
-								onend: function() {
+								text: 'You got me trapped',
+								onend: function () {
 									mainCharacter.direction = 'left';
 									mainCharacter.enableSkills();
 									delete mainCharacter.animations.defense.delay;
 									mainCharacter.animations.defense.coolDownLeft = 0;
-									mainCharacter.animations.defense.do = function() {
+									mainCharacter.animations.defense.do = function () {
 										removeFocus();
-									}
+									};
 									mainCharacter.enableSkill('defense');
-									focusMe('#skill8', function() {
-										mainCharacter.animate('defense', 1);
-									},null, null, null, null, 1);
+									focusMe(
+										'#skill8',
+										function () {
+											mainCharacter.animate('defense', 1);
+										},
+										null,
+										null,
+										null,
+										null,
+										1
+									);
 									mainCharacter.enableSkill('defense');
-									mainCharacter.animations.defense.after = function() {
-										mainCharacter.animations.release.frames.forEach(x => x.buffs = undefined);
+									mainCharacter.animations.defense.after = function () {
+										mainCharacter.animations.release.frames.forEach((x) => (x.buffs = undefined));
 										mainCharacter.animations.test = mainCharacter.animations.release;
 										mainCharacter.animations.test.key = 'test';
 										mainCharacter.animate('test', 1);
@@ -1035,18 +1154,20 @@ const __stories = [
 											delay: 1500,
 											ms: 4000,
 											owner: mainCharacter.key,
-											text: "Damn! Machine in my head!",
-											onend: function() {
-												__storyTell = new storyTell(6, null, null, 'Meanwhile, the quakes created by the monster caused a prisoner in dungeon to be freed from his chains', function() {
-													//installStoryFinish();
-													switchStoryScene();
-												});
-												// cssAnimations.black(null, 3000, getLangData('Meanwhile, deep in the sewers...'), function() {
-												// 	switchStoryScene();
-												// });
+											text: 'Damn! Machine in my head!',
+											onend: function () {
+												__storyTell = new storyTell(
+													6,
+													null,
+													null,
+													'Meanwhile, the quakes created by the monster caused a prisoner in dungeon to be freed from his chains',
+													function () {
+														switchStoryScene();
+													}
+												);
 											}
 										});
-									}
+									};
 								}
 							});
 						}
@@ -1058,16 +1179,16 @@ const __stories = [
 						minX: 800,
 						maxX: 800,
 						count: 1,
-						sight:1000,
+						sight: 1000,
 						minLevel: 20,
 						groupId: 1,
 						spawnAsGroup: 1,
 						spawnTime: 3,
 						spawnDirection: 'right',
-						spawn:1,
+						spawn: 1,
 						maxLevel: 20,
-						yPosition: function() {
-							return MathRound(groundheight * .5);
+						yPosition: function () {
+							return MathRound(groundheight * 0.5);
 						},
 						props: {
 							noLoot: true,
@@ -1081,12 +1202,12 @@ const __stories = [
 						minX: 250,
 						maxX: 250,
 						count: 1,
-						sight:1000,
+						sight: 1000,
 						minLevel: 20,
 						maxLevel: 20,
 						attackAfterHit: true,
-						yPosition: function() {
-							return MathRound(groundheight * .5);
+						yPosition: function () {
+							return MathRound(groundheight * 0.5);
 						},
 						props: {
 							noLoot: true,
@@ -1101,16 +1222,16 @@ const __stories = [
 						minX: 700,
 						maxX: 700,
 						count: 1,
-						sight:1000,
+						sight: 1000,
 						groupId: 1,
 						spawnDirection: 'right',
 						spawnAsGroup: 1,
 						spawnTime: 3,
-						spawn:1,
+						spawn: 1,
 						minLevel: 20,
 						maxLevel: 20,
-						yPosition: function() {
-							return MathRound(groundheight * .75);
+						yPosition: function () {
+							return MathRound(groundheight * 0.75);
 						},
 						props: {
 							noLoot: true,
@@ -1124,16 +1245,16 @@ const __stories = [
 						minX: 700,
 						maxX: 700,
 						count: 1,
-						sight:1000,
+						sight: 1000,
 						groupId: 1,
 						spawnDirection: 'right',
 						spawnAsGroup: 1,
 						spawnTime: 3,
-						spawn:1,
+						spawn: 1,
 						minLevel: 20,
 						maxLevel: 20,
-						yPosition: function() {
-							return MathRound(groundheight * .25);
+						yPosition: function () {
+							return MathRound(groundheight * 0.25);
 						},
 						props: {
 							noLoot: true,
@@ -1147,16 +1268,16 @@ const __stories = [
 						minX: 1000,
 						maxX: 1000,
 						count: 1,
-						sight:1000,
+						sight: 1000,
 						groupId: 1,
 						spawnDirection: 'right',
 						spawnAsGroup: 1,
 						spawnTime: 3,
-						spawn:1,
+						spawn: 1,
 						minLevel: 20,
 						maxLevel: 20,
-						yPosition: function() {
-							return MathRound(groundheight * .5);
+						yPosition: function () {
+							return MathRound(groundheight * 0.5);
 						},
 						props: {
 							noLoot: true,
@@ -1174,12 +1295,12 @@ const __stories = [
 						spawnDirection: 'right',
 						spawnAsGroup: 1,
 						spawnTime: 3,
-						spawn:1,
-						sight:1000,
+						spawn: 1,
+						sight: 1000,
 						minLevel: 20,
 						maxLevel: 20,
-						yPosition: function() {
-							return MathRound(groundheight * .25);
+						yPosition: function () {
+							return MathRound(groundheight * 0.25);
 						},
 						props: {
 							noLoot: true,
@@ -1197,12 +1318,12 @@ const __stories = [
 						spawnDirection: 'right',
 						spawnAsGroup: 1,
 						spawnTime: 3,
-						spawn:1,
-						sight:1000,
+						spawn: 1,
+						sight: 1000,
 						minLevel: 20,
 						maxLevel: 20,
-						yPosition: function() {
-							return MathRound(groundheight * .75);
+						yPosition: function () {
+							return MathRound(groundheight * 0.75);
 						},
 						props: {
 							noLoot: true,
@@ -1220,12 +1341,12 @@ const __stories = [
 						spawnDirection: 'right',
 						spawnAsGroup: 1,
 						spawnTime: 3,
-						spawn:1,
-						sight:1000,
+						spawn: 1,
+						sight: 1000,
 						minLevel: 20,
 						maxLevel: 20,
-						yPosition: function() {
-							return MathRound(groundheight * .5);
+						yPosition: function () {
+							return MathRound(groundheight * 0.5);
 						},
 						props: {
 							noLoot: true,
@@ -1243,12 +1364,12 @@ const __stories = [
 						spawnDirection: 'right',
 						spawnAsGroup: 1,
 						spawnTime: 3,
-						spawn:1,
-						sight:1000,
+						spawn: 1,
+						sight: 1000,
 						minLevel: 20,
 						maxLevel: 20,
-						yPosition: function() {
-							return MathRound(groundheight * .25);
+						yPosition: function () {
+							return MathRound(groundheight * 0.25);
 						},
 						props: {
 							noLoot: true,
@@ -1266,12 +1387,12 @@ const __stories = [
 						spawnDirection: 'right',
 						spawnAsGroup: 1,
 						spawnTime: 3,
-						spawn:1,
-						sight:1000,
+						spawn: 1,
+						sight: 1000,
 						minLevel: 20,
 						maxLevel: 20,
-						yPosition: function() {
-							return MathRound(groundheight * .75);
+						yPosition: function () {
+							return MathRound(groundheight * 0.75);
 						},
 						props: {
 							noLoot: true,
@@ -1281,7 +1402,7 @@ const __stories = [
 						}
 					},
 					{
-						id: 52,
+						id: 53,
 						minX: 1400,
 						maxX: 1400,
 						count: 1,
@@ -1289,12 +1410,12 @@ const __stories = [
 						spawnDirection: 'left',
 						spawnAsGroup: 1,
 						spawnTime: 3,
-						spawn:1,
-						sight:1000,
+						spawn: 1,
+						sight: 1000,
 						minLevel: 20,
 						maxLevel: 20,
-						yPosition: function() {
-							return MathRound(groundheight * .75);
+						yPosition: function () {
+							return MathRound(groundheight * 0.75);
 						},
 						props: {
 							noLoot: true,
@@ -1304,7 +1425,7 @@ const __stories = [
 						}
 					},
 					{
-						id: 52,
+						id: 53,
 						minX: 1500,
 						maxX: 1500,
 						count: 1,
@@ -1312,12 +1433,12 @@ const __stories = [
 						spawnDirection: 'left',
 						spawnAsGroup: 1,
 						spawnTime: 3,
-						spawn:1,
-						sight:1000,
+						spawn: 1,
+						sight: 1000,
 						minLevel: 20,
 						maxLevel: 20,
-						yPosition: function() {
-							return MathRound(groundheight * .5);
+						yPosition: function () {
+							return MathRound(groundheight * 0.5);
 						},
 						props: {
 							noLoot: true,
@@ -1327,7 +1448,7 @@ const __stories = [
 						}
 					},
 					{
-						id: 52,
+						id: 53,
 						minX: 1400,
 						maxX: 1400,
 						count: 1,
@@ -1335,12 +1456,12 @@ const __stories = [
 						spawnDirection: 'left',
 						spawnAsGroup: 1,
 						spawnTime: 3,
-						spawn:1,
-						sight:1000,
+						spawn: 1,
+						sight: 1000,
 						minLevel: 20,
 						maxLevel: 20,
-						yPosition: function() {
-							return MathRound(groundheight * .25);
+						yPosition: function () {
+							return MathRound(groundheight * 0.25);
 						},
 						props: {
 							noLoot: true,
@@ -1354,11 +1475,11 @@ const __stories = [
 						minX: 1200,
 						maxX: 1200,
 						count: 1,
-						sight:1000,
+						sight: 1000,
 						minLevel: 1,
 						maxLevel: 1,
-						yPosition: function() {
-							return MathRound(groundheight * .9);
+						yPosition: function () {
+							return MathRound(groundheight * 0.9);
 						},
 						props: {
 							noLoot: true,
@@ -1372,11 +1493,11 @@ const __stories = [
 						minX: 4000,
 						maxX: 4000,
 						count: 1,
-						sight:1000,
+						sight: 1000,
 						minLevel: 1,
 						maxLevel: 1,
-						yPosition: function() {
-							return MathRound(groundheight * .9);
+						yPosition: function () {
+							return MathRound(groundheight * 0.9);
 						},
 						props: {
 							noLoot: true,
@@ -1387,143 +1508,158 @@ const __stories = [
 						}
 					}
 				],
-				start: function() {
+				start: function () {
 					__storyCutScenePlaying = 1;
 					mainCharacter.disableSkill('defense');
 					mainCharacter.updateVariables();
 					mainCharacter.ironSkin = mainCharacter.solid = true;
 					episode.width = MathRound(episode.width / 2);
-					mainCharacter.left = MathRound(-1 *(episode.cWidth * .16));
-					episode.enemies.forEach(x => {
+					mainCharacter.left = MathRound(-1 * (episode.cWidth * 0.16));
+					episode.enemies.forEach((x) => {
 						x.immobilize = true;
-						if(!x.deadFirst)
-							x.invulnerable = true;
+						if (!x.deadFirst) x.invulnerable = true;
 					});
 					setTimeout(() => {
 						let _goblinsInstalled;
-						cssAnimations.film(mainCharacter,
+						cssAnimations.film(
+							mainCharacter,
 							[
-							{
-								do: function() {
-									// const _f = mainCharacter.animations.roll.frames;
-									// _f[_f.length - 1].atk = {
-									// 	yRange: 15,
-									// 	rate: 1,
-									// 	hurt: {
-									// 		smash: true
-									// 	}
-									// };
-									mainCharacter.animations.roll.after = function() {
-										mainCharacter.animations.roll.after = undefined;
-										episode.enemies.filter(x => x.enemy && !x.deadFirst && x.class !== 'object')?.forEach(x => x.invulnerable = true);
-										const _e = episode.enemies.find(x => x.enemy && x.deadFirst);
-										if(_e.isDead())
-											return;
-										if(!_e.animations.hurtfeet)
-											_e.animations.hurtfeet = new animation(createHurtFeet(_e.zoom, _e.bloodColor, null, null, null, _e.width));
-										_e.animate('hurtfeet', 1);
-									}
-									mainCharacter.animate('roll', 1);
+								{
+									do: function () {
+										mainCharacter.animations.roll.after = function () {
+											mainCharacter.animations.roll.after = undefined;
+											episode.enemies
+												.filter((x) => x.enemy && !x.deadFirst && x.class !== 'object')
+												?.forEach((x) => (x.invulnerable = true));
+											const _e = episode.enemies.find((x) => x.enemy && x.deadFirst);
+											if (!_e || _e.isDead()) return;
+											if (!_e.animations.hurtfeet)
+												_e.animations.hurtfeet = new animation(
+													createHurtFeet(_e.zoom, _e.bloodColor, null, null, null, _e.width)
+												);
+											_e.animate('hurtfeet', 1);
+										};
+										mainCharacter.animate('roll', 1);
+									},
+									ms: 1000
 								},
-								ms: 1000
-							},
-							{
-								do: function() {
-									episode.enemies.filter(x => x !== mainCharacter && !x.isDead())
-									.forEach(x => x.direction = __left);
+								{
+									do: function () {
+										episode.enemies
+											.filter((x) => x !== mainCharacter && !x.isDead())
+											.forEach((x) => (x.direction = __left));
+									},
+									ms: 2100
 								},
-								ms: 2100
-							},
-							{
-								do: function() {
-									episode.dialogs = [{
-										id: 1,
-										width: '30cqw',
-										location: { map: episode.id }, ms: 1800,
-										owner: episode.enemies.find(x => x.id === 51 && !x.isDead()).key,
-										text: "What the hell are you?",
-									}];
+								{
+									do: function () {
+										episode.dialogs = [
+											{
+												id: 1,
+												width: '30cqw',
+												location: { map: episode.id },
+												ms: 1800,
+												owner: episode.enemies.find((x) => x.id === 51 && !x.isDead()).key,
+												text: 'What the hell are you?'
+											}
+										];
+									},
+									ms: 2200
 								},
-								ms:2200
+								{
+									do: function () {
+										for (let i = 0; i < 2; i++) {
+											const _goblin = summonMob(
+												i % 2 > 0 ? 619 : 619,
+												MathRound((platformX - _canvas.width * 0.25) / __zoom),
+												MathRound(groundheight * (getRandomValue2(1, 100) / 100)),
+												1
+											);
+											_goblin.enemy = false;
+											_goblin.friendly = true;
+											_goblin.level = _goblin.skipHealthBar = 1;
+											_goblin.atk = 1;
+											_goblin.immunities = [];
+											_goblin.direction = _goblin.moveDirection = 'right';
+											_goblin.action = {
+												command: 'move',
+												to: getRandomValue2(1, 50) * 2 * __zoom,
+												after: function (_e) {
+													_e.immobilize = true;
+													_e.animate('idle', 1);
+												}
+											};
+										}
+										_goblinsInstalled = 1;
+
+										episode.dialogs = [
+											{
+												id: 3,
+												location: { map: episode.id },
+												ms: 2000,
+												owner: mainCharacter.key,
+												leftGap: 100,
+												text: 'I will test my lasers'
+											}
+										];
+									},
+									ms: 4200
+								},
+								{
+									do: function () {
+										episode.dialogs = [
+											{
+												id: 4,
+												onend: function () {
+													episode.pauseBgMusic(1);
+													episode.createBgMusic(null, null, null, 'cyclops1');
+													episode.playBgMusic();
+													mainCharacter.friendlyFire = true;
+												},
+												location: { map: episode.id },
+												ms: 1000,
+												owner: episode.enemies.find((x) => x.id === 51 && !x.isDead()).key,
+												asap: 1,
+												text: 'Huh?'
+											}
+										];
+									},
+									ms: 6500
+								}
+							],
+							7600,
+							function () {
+								episode.enemies.forEach((x) => (x.immobilize = x.invulnerable = false));
+								__storyCutScenePlaying = 0;
+								delete mainCharacter.disableKeyboard;
+								takeQuest(0, 1, null, null, 1);
+								delete mainCharacter.animations.roll.cooldown;
+								mainCharacter.atk = 200;
+								delete mainCharacter.animations.roll.coolDownLeft;
+								episode.enemies
+									.filter((x) => x.enemy && x.class !== 'object')
+									?.forEach((x) => {
+										x.invulnerable = false;
+										if (x.deadFirst && !x.remove) x.remove = true;
+									});
 							},
-							{
-								do: function() {
-									for(let i = 0; i < 10; i++) {
-										const _goblin = summonMob((i % 2) > 0 ? 19 : 49, MathRound((platformX - (_canvas.width * .25)) / __zoom), MathRound(groundheight * (getRandomValue2(1, 100) / 100)), 1);
+							function () {
+								if (!_goblinsInstalled)
+									for (let i = 0; i < 2; i++) {
+										const _goblin = summonMob(
+											i % 2 > 0 ? 619 : 619,
+											MathRound((platformX - _canvas.width * 0.25) / __zoom),
+											MathRound(groundheight * (getRandomValue2(1, 100) / 100)),
+											1
+										);
 										_goblin.enemy = false;
 										_goblin.friendly = true;
 										_goblin.level = _goblin.skipHealthBar = 1;
-										_goblin.atk = 1;
 										_goblin.immunities = [];
 										_goblin.direction = _goblin.moveDirection = 'right';
-										_goblin.action =  {
-											command: 'move',
-											to: getRandomValue2(1, 50) * 2 * __zoom,
-											after: function(_e) {
-												_e.immobilize = true;
-												_e.animate('idle', 1);
-											}
-										}
 									}
-									_goblinsInstalled = 1;
-									// const _f = mainCharacter.animations.roll.frames;
-									// delete _f[_f.length - 1].atk;
-									episode.dialogs = [{
-										id: 3,
-										location: { map: episode.id }, ms: 2000,
-										owner: mainCharacter.key,
-										leftGap: 100,
-										text: "I will test my lasers",
-									}];
-								},
-								ms: 4200
-							},
-							{
-								do: function() {
-									episode.dialogs = [{
-										id: 4,
-										onend: function() {
-											episode.pauseBgMusic(1);
-											episode.createBgMusic(null, null, null, 'cyclops1');
-											episode.playBgMusic();
-											mainCharacter.friendlyFire = true;
-											// //episode.enemies.forEach(x => x.immobilize = false);
-											// //__storyCutScenePlaying = 0;
-											// delete mainCharacter.disableKeyboard;
-											// takeQuest(__story.quests[0], 1);
-										},
-										location: { map: episode.id }, ms: 1000,
-										owner: episode.enemies.find(x => x.id === 51 && !x.isDead()).key,
-										asap: 1,
-										text: "Huh?",
-									}];
-								},
-								ms: 6500
 							}
-						], 7600, function() {
-							episode.enemies.forEach(x => x.immobilize = x.invulnerable = false);
-							__storyCutScenePlaying = 0;
-							delete mainCharacter.disableKeyboard;
-							takeQuest(0, 1, null, null, 1);
-							delete mainCharacter.animations.roll.cooldown;
-							mainCharacter.atk = 200;
-							delete mainCharacter.animations.roll.coolDownLeft;
-							episode.enemies.filter(x => x.enemy && x.class !== 'object')?.forEach(x => {
-								x.invulnerable = false;
-								if(x.deadFirst && !x.remove)
-									x.remove = true;
-							});
-						}, function() {
-							if(!_goblinsInstalled)
-								for(let i = 0; i < 10; i++) {
-									const _goblin = summonMob((i % 2) > 0 ? 19 : 49, MathRound((platformX - (_canvas.width * .25)) / __zoom), MathRound(groundheight * (getRandomValue2(1, 100) / 100)), 1);
-									_goblin.enemy = false;
-									_goblin.friendly = true;
-									_goblin.level = _goblin.skipHealthBar = 1;
-									_goblin.immunities = [];
-									_goblin.direction = _goblin.moveDirection = 'right';
-								}
-						});
+						);
 					}, 1500);
 				}
 			},
@@ -1534,56 +1670,69 @@ const __stories = [
 				loadingCharacterIds: [1, 2, 28],
 				actions: [
 					{
-						when: function(){
-							return episode.id === 102 && episode.phase === 5 && (mainCharacter.left + mainCharacter.WIDTH) >= _canvas.width;
+						when: function () {
+							return (
+								episode.id === 102 &&
+								episode.phase === 5 &&
+								mainCharacter.left + mainCharacter.WIDTH >= _canvas.width
+							);
 						},
-						do: function() {
+						do: function () {
 							episode.phase++;
 							episode.removeLocationHand();
 							episode.repeat = false;
 							stopWeather();
-							if(episode && episode.bgMusic)
-								episode.pauseBgMusic(1);
-							if(episode && episode.bgSound)
-								episode.pauseAmbianceMusic();
+							if (episode && episode.bgMusic) episode.pauseBgMusic(1);
+							if (episode && episode.bgSound) episode.pauseAmbianceMusic();
 							removeCoopCharacter();
-							episode.enemies.filter(x => x.alp).forEach(x => {
-								x.stopStepSound();
-								x.remove = true;
-							});
-							setTimeout(() => {
-								__storyTell = new storyTell(1, null, null, 'Two prisoners waiting for death in the dungeon managed to escape among these ruins', function() {
-									//installStoryFinish();
-									switchStoryScene();
+							episode.enemies
+								.filter((x) => x.alp)
+								.forEach((x) => {
+									x.stopStepSound();
+									x.remove = true;
 								});
+							setTimeout(() => {
+								__storyTell = new storyTell(
+									1,
+									null,
+									null,
+									'Two prisoners waiting for death in the dungeon managed to escape among these ruins',
+									function () {
+										switchStoryScene();
+									}
+								);
 							}, 100);
 						}
 					},
 					{
-						when: function(){
-							return episode.id === 102 && !episode.phase && !episode.enemies.find(x => x.enemy && !x.invulnerable);
+						when: function () {
+							return (
+								episode.id === 102 &&
+								!episode.phase &&
+								!episode.enemies.find((x) => x.enemy && !x.invulnerable)
+							);
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 1;
-							const _dead = episode.enemies.find(x => x.id === 78);
+							const _dead = episode.enemies.find((x) => x.id === 78);
 							_dead.npc = 'bow';
 						}
 					},
 					{
-						when: function(){
+						when: function () {
 							return episode.id === 104 && episode.phase === 1 && mainCharacter.left <= 0;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 2;
-							switchMap(103, 1, function() {
+							switchMap(103, 1, function () {
 								removeCoopCharacter(1);
 								const _char = addCoopCharacter(null, 'arc');
 								_char.unarm();
-								_char.left = MathRound(_canvas.width * .8);
+								_char.left = MathRound(_canvas.width * 0.8);
 								_char.direction = mainCharacter.direction = 'left';
-								_char.yPosition = MathRound(groundheight * .25);
+								_char.yPosition = MathRound(groundheight * 0.25);
 								blurKeyboard();
-								mainCharacter.left = MathRound(_canvas.width * .75);
+								mainCharacter.left = MathRound(_canvas.width * 0.75);
 								mainCharacter.disableSkills();
 								mainCharacter.idle();
 								episode.removeLocationHand();
@@ -1591,86 +1740,102 @@ const __stories = [
 						}
 					},
 					{
-						when: function(){
-							return episode.id === 104 && episode.phase === 10 && (mainCharacter.left + mainCharacter.WIDTH) > _canvas.width;
+						when: function () {
+							return (
+								episode.id === 104 &&
+								episode.phase === 10 &&
+								mainCharacter.left + mainCharacter.WIDTH > _canvas.width
+							);
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 11;
 							mainCharacter.enableSkills();
-							switchMap(102, 1, function() {
+							switchMap(102, 1, function () {
 								removeCoopCharacter(1);
-								if(mainCharacter.level > 1){
-									const _e = episode.enemies.find(x => x.id === 28);
-									if(_e)
-										_e.remove = true;
+								if (mainCharacter.level > 1) {
+									const _e = episode.enemies.find((x) => x.id === 28);
+									if (_e) _e.remove = true;
 								}
 								const _char = addCoopCharacter(null, 'arc');
 								_char.unarm();
-								_char.left = MathRound(_canvas.width * .2);
+								_char.left = MathRound(_canvas.width * 0.2);
 								_char.direction = 'right';
-								_char.yPosition = MathRound(groundheight * .25);
+								_char.yPosition = MathRound(groundheight * 0.25);
 								blurKeyboard();
-								mainCharacter.left = MathRound(_canvas.width * .35);
+								mainCharacter.left = MathRound(_canvas.width * 0.35);
 								mainCharacter.idle();
 								mainCharacter.animations.attack.chargeDistance.value = 80;
 								episode.removeLocationHand();
-								//if(mainCharacter.level === 1)
+
 								mainCharacter.still = mainCharacter.immobilize = true;
 								createBubbleText({
 									id: 1,
-									location: { map: episode.id }, ms: 2000,
-									owner: (episode.enemies.find(x => x.class === 'archer')).key,
-									text: "There it is!",
-									onend: function() {
-										const _charge = function(){
-											mainCharacter.disableKeyboard = mainCharacter.still = mainCharacter.immobilize = false;
-											//mainCharacter.enableSkills();
+									location: { map: episode.id },
+									ms: 2000,
+									owner: episode.enemies.find((x) => x.class === 'archer').key,
+									text: 'There it is!',
+									onend: function () {
+										const _charge = function () {
+											mainCharacter.disableKeyboard =
+												mainCharacter.still =
+												mainCharacter.immobilize =
+													false;
+
 											mainCharacter.solid = true;
-											episode.enemies.find(x => x.id === 178).npc = 'bow';
-											episode.NPCS = episode.enemies.filter(x => x.npc);
-										}
-										if(mainCharacter.level > 1) {
+											episode.enemies.find((x) => x.id === 178).npc = 'bow';
+											episode.NPCS = episode.enemies.filter((x) => x.npc);
+										};
+										if (mainCharacter.level > 1) {
 											_charge();
 											return;
 										}
-										if(__account.tutorials?.indexOf('charge') >= 0) {
+										if (__account.tutorials?.indexOf('charge') >= 0) {
 											removeClass(_gameUI, 'disable-ui');
 											delete mainCharacter.disableKeyboard;
 											mainCharacter.enableSkill('attack');
 											return;
 										}
-										if(!__account.tutorials)
-											__account.tutorials = [];
+										if (!__account.tutorials) __account.tutorials = [];
 										__account.tutorials.push('charge');
 										removeClass(_gameUI, 'disable-ui');
 										delete mainCharacter.disableKeyboard;
-										focusMe('#skill1', function() {
-											_charge();
-											mainCharacter.enableSkill('attack');
-											mainCharacter.animate('attack', 1);
-											removeFocus();
-											disposeFocus();
-										}, false, getLangData('Press to single attack, hold to combo attack'), null, null, 1);
+										focusMe(
+											'#skill1',
+											function () {
+												_charge();
+												mainCharacter.enableSkill('attack');
+												mainCharacter.animate('attack', 1);
+												removeFocus();
+												disposeFocus();
+											},
+											false,
+											getLangData('Press to single attack, hold to combo attack'),
+											null,
+											null,
+											1
+										);
 									}
 								});
 							});
 						}
 					},
 					{
-						when: function(){
-							return episode.id === 103 && episode.phase === 1 && mainCharacter.left > (_canvas.width * .8);
+						when: function () {
+							return (
+								episode.id === 103 && episode.phase === 1 && mainCharacter.left > _canvas.width * 0.8
+							);
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 2;
-							switchMap(104, 1, function() {
+							switchMap(104, 1, function () {
 								removeCoopCharacter(1);
 								const _char = addCoopCharacter(null, 'arc');
 								_char.unarm();
 								blurKeyboard();
 								_char.left = 0;
 								_char.direction = 'right';
-								_char.yPosition = MathRound(groundheight * .25);
-								mainCharacter.left = MathRound(_canvas.width * .1);
+								_char.yPosition = MathRound(groundheight * 0.25);
+								mainCharacter.left = MathRound(_canvas.width * 0.1);
 								mainCharacter.disableSkills();
 								mainCharacter.idle();
 								episode.showLocationHand('right');
@@ -1685,13 +1850,13 @@ const __stories = [
 						minX: 1730,
 						maxX: 1730,
 						count: 1,
-						sight:1,
+						sight: 1,
 						minLevel: 1,
 						maxLevel: 1,
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						},
-						do: function(_e) {
+						do: function (_e) {
 							_e.unarm();
 							_e.noDirection = true;
 						},
@@ -1709,13 +1874,13 @@ const __stories = [
 						minX: 380,
 						maxX: 380,
 						count: 1,
-						sight:1,
+						sight: 1,
 						minLevel: 1,
 						maxLevel: 1,
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						},
-						do: function(_e) {
+						do: function (_e) {
 							_e.unarm();
 							_e.npc = 'archer';
 							_e.noDirection = true;
@@ -1730,18 +1895,18 @@ const __stories = [
 						}
 					}
 				],
-				start: function() {
-					if(mainCharacter){
+				start: function () {
+					if (mainCharacter) {
 						mainCharacter.disableKeyboard = 1;
 						delete mainCharacter.disableKeyboard;
-						episode.enemies = episode.enemies.filter(x => x !== mainCharacter);
+						episode.enemies = episode.enemies.filter((x) => x !== mainCharacter);
 						mainCharacter = undefined;
 					}
-					episode.enemies.forEach(x => x.immobilize = false);
+					episode.enemies.forEach((x) => (x.immobilize = false));
 					__storyCutScenePlaying = undefined;
 					addClass(_gameUI, 'disable-ui');
-					setTimeout(function() {
-						installCharacterSelection(function() {
+					setTimeout(function () {
+						installCharacterSelection(function () {
 							var x = new characterSelection();
 							x.createCharacterSelectionUI();
 							return x;
@@ -1756,10 +1921,12 @@ const __stories = [
 				save: true,
 				actions: [
 					{
-						when: function() {
-							if(mainCharacter.attacked && !episode.firstFly){
-								const _mob = episode.enemies.find(x => x.animations.deadfly && x.animation !== 'deadfly' && x.health < x.MAXHP)
-								if(_mob){
+						when: function () {
+							if (mainCharacter.attacked && !episode.firstFly) {
+								const _mob = episode.enemies.find(
+									(x) => x.animations.deadfly && x.animation !== 'deadfly' && x.health < x.MAXHP
+								);
+								if (_mob) {
 									_mob.health = 0;
 									_mob.animate('deadfly', 1);
 									episode.firstFly = 1;
@@ -1770,84 +1937,106 @@ const __stories = [
 						}
 					},
 					{
-						when: function() {
-							return !_game.suspended && mainCharacter.chains && !mainCharacter.attackedByObject && !mainCharacter.counterLearned;
+						when: function () {
+							return (
+								!_game.suspended &&
+								mainCharacter.chains &&
+								!mainCharacter.attackedByObject &&
+								!mainCharacter.counterLearned
+							);
 						},
-						do: function() {
-							if(__account.tutorials?.indexOf('hold-block') >= 0)
-								return;
-							if(!__account.tutorials)
-								__account.tutorials = [];
+						do: function () {
+							if (__account.tutorials?.indexOf('hold-block') >= 0) return;
+							if (!__account.tutorials) __account.tutorials = [];
 							__account.tutorials.push('hold-block');
 							let _id = 'chain-skill-2';
 							const _cs = document.getElementById(_id);
-							if(hasClass(_cs, 'v-none'))
-								_id = 'chain-skill-4';
+							if (hasClass(_cs, 'v-none')) _id = 'chain-skill-4';
 							_game.suspended = 1;
-							focusMe('#' + _id, function() {
-								removeFocus();
-								delete _game.suspended;
-								delete mainCharacter.disableKeyboard;
-								mainCharacter.still = mainCharacter.immobilize = false;
-								mainCharacter.enableSkills();
-								mainCharacter.animate(mainCharacter.chains[1].key, 1);
-								mainCharacter.counterLearned = 1;
-								disposeFocus();
-							}, null, getLangData('Hold block before attack or press here after attack to make counterattack'), null, null, 1);
+							focusMe(
+								'#' + _id,
+								function () {
+									removeFocus();
+									delete _game.suspended;
+									delete mainCharacter.disableKeyboard;
+									mainCharacter.still = mainCharacter.immobilize = false;
+									mainCharacter.enableSkills();
+									mainCharacter.animate(mainCharacter.chains[1].key, 1);
+									mainCharacter.counterLearned = 1;
+									disposeFocus();
+								},
+								null,
+								getLangData(
+									'Hold block before attack or press here after attack to make counterattack'
+								),
+								null,
+								null,
+								1
+							);
 						}
 					},
 					{
-						when: function() {
-							return !mainCharacter.curious && !_game.suspended && (mainCharacter.LEFT + platformX) < (episode.width - _canvas.width)
+						when: function () {
+							return (
+								!mainCharacter.curious &&
+								!_game.suspended &&
+								mainCharacter.LEFT + platformX < episode.width - _canvas.width
+							);
 						},
-						do: function() {
+						do: function () {
 							mainCharacter.curious = 1;
 							createBubbleText({
 								id: 998,
-								location: { map: episode.id }, ms: 2500,
+								location: { map: episode.id },
+								ms: 2500,
 								owner: mainCharacter.key,
-								text: "What's going on there?",
+								text: "What's going on there?"
 							});
 						}
 					},
 					{
-						when: function() {
+						when: function () {
 							return episode.phase === undefined && mainCharacter.targetedBy;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 0;
-							const _rider = episode.enemies.find(x => x.enemy && x.grade > 1);
-							if(_rider) {
+							const _rider = episode.enemies.find((x) => x.enemy && x.grade > 1);
+							if (_rider) {
 								createBubbleText({
 									id: 999,
-									location: { map: episode.id }, ms: 2000,
+									location: { map: episode.id },
+									ms: 2000,
 									owner: _rider.key,
-									text: "Intruder!",
+									text: 'Intruder!'
 								});
 								_rider.setAutoTarget(mainCharacter);
 								episode.removeLocationHand();
 								episode.pauseBgMusic(1);
-								episode.createBgMusic(null, null, null, 'story1-forest', .5);
+								episode.createBgMusic(null, null, null, 'story1-forest', 0.5);
 								episode.playBgMusic();
 							}
 						}
 					},
 					{
-						when: function() {
+						when: function () {
 							return episode.phase === 1 && mainCharacter.left <= 0 && platformX <= 0;
 						},
-						do: function() {
+						do: function () {
 							delete episode.phase;
 							episode.removeLocationHand();
-							__storyTell = new storyTell(2, null, null, 
-							'Our heroes take shelter in a camp, unaware that they are being followed',
-							function() {
-								switchStoryScene();
-							});
+							__storyTell = new storyTell(
+								2,
+								null,
+								null,
+								'Our heroes take shelter in a camp, unaware that they are being followed',
+								function () {
+									switchStoryScene();
+								}
+							);
 						}
 					}
 				],
-				loadingCharacterIds: [ 66,49,19 ],
+				loadingCharacterIds: [66, 49, 619],
 				mobs: [
 					{
 						id: 5,
@@ -1855,8 +2044,8 @@ const __stories = [
 						maxX: 1760,
 						sight: 0,
 						count: 1,
-						yPosition: function() {
-							return MathRound(groundheight * .7);
+						yPosition: function () {
+							return MathRound(groundheight * 0.7);
 						},
 						minLevel: 1,
 						maxLevel: 1
@@ -1867,8 +2056,8 @@ const __stories = [
 						maxX: 1900,
 						sight: 1,
 						count: 1,
-						yPosition: function() {
-							return MathRound(groundheight * .82);
+						yPosition: function () {
+							return MathRound(groundheight * 0.82);
 						},
 						minLevel: 1,
 						maxLevel: 1
@@ -1879,10 +2068,10 @@ const __stories = [
 						maxX: 1500,
 						sight: 25,
 						count: 1,
-						grade:2,
+						grade: 2,
 						groupId: 5,
-						yPosition: function() {
-							return MathRound(groundheight * (getRandomValue2(10,  70) /  100));
+						yPosition: function () {
+							return MathRound(groundheight * (getRandomValue2(10, 70) / 100));
 						}
 					},
 					{
@@ -1893,15 +2082,15 @@ const __stories = [
 						count: 1,
 						minLevel: 1,
 						experience: 0,
-						yPosition: function() {
-							return MathRound(groundheight * (getRandomValue2(10,  70) /  100));
+						yPosition: function () {
+							return MathRound(groundheight * (getRandomValue2(10, 70) / 100));
 						},
 						maxLevel: 1,
 						groupId: 5,
 						hp: 100
 					},
 					{
-						id: 19,
+						id: 619,
 						minX: 1800,
 						maxX: 1800,
 						sight: 15,
@@ -1910,8 +2099,8 @@ const __stories = [
 						maxLevel: 1,
 						groupId: 5,
 						experience: 0,
-						yPosition: function() {
-							return MathRound(groundheight * (getRandomValue2(10,  70) /  100));
+						yPosition: function () {
+							return MathRound(groundheight * (getRandomValue2(10, 70) / 100));
 						},
 						hp: 100
 					},
@@ -1921,8 +2110,8 @@ const __stories = [
 						maxX: 1050,
 						count: 1,
 						experience: 0,
-						yPosition: function() {
-							return MathRound(groundheight * .96);
+						yPosition: function () {
+							return MathRound(groundheight * 0.96);
 						}
 					},
 					{
@@ -1930,16 +2119,16 @@ const __stories = [
 						minX: 1130,
 						maxX: 1130,
 						count: 1,
-						yPosition: function() {
-							return MathRound(groundheight * .95);
+						yPosition: function () {
+							return MathRound(groundheight * 0.95);
 						}
 					},
 					{
 						id: 63,
 						minX: 860,
 						maxX: 860,
-						yPosition: function() {
-							return MathRound(groundheight * .8);
+						yPosition: function () {
+							return MathRound(groundheight * 0.8);
 						},
 						count: 1
 					},
@@ -1947,8 +2136,8 @@ const __stories = [
 						id: 62,
 						minX: 1375,
 						maxX: 1375,
-						yPosition: function() {
-							return MathRound(groundheight * .92);
+						yPosition: function () {
+							return MathRound(groundheight * 0.92);
 						},
 						count: 1
 					},
@@ -1957,8 +2146,8 @@ const __stories = [
 						minX: 2280,
 						maxX: 2280,
 						count: 1,
-						yPosition: function() {
-							return MathRound(groundheight * .71);
+						yPosition: function () {
+							return MathRound(groundheight * 0.71);
 						},
 						props: {
 							noLoot: true,
@@ -1973,9 +2162,9 @@ const __stories = [
 						minX: 550,
 						maxX: 550,
 						count: 1,
-						direction:'right',
-						yPosition: function() {
-							return MathRound(groundheight * .5);
+						direction: 'right',
+						yPosition: function () {
+							return MathRound(groundheight * 0.5);
 						},
 						props: {
 							npc: 'druid',
@@ -1991,91 +2180,95 @@ const __stories = [
 						minX: 2445,
 						maxX: 2445,
 						count: 1,
-						yPosition: function() {
-							return MathRound(groundheight * .7);
-						},
+						yPosition: function () {
+							return MathRound(groundheight * 0.7);
+						}
 					},
 					{
 						id: 65,
 						minX: 1900,
 						maxX: 1900,
 						count: 1,
-						yPosition: function() {
-							return MathRound(groundheight * .7);
+						yPosition: function () {
+							return MathRound(groundheight * 0.7);
 						}
 					}
 				],
-				// mobs: [
-				// 	{
-				// 		id: 3,
-				// 		minX: 900,
-				// 		maxX: 5900,
-				// 		count: 10,
-				// 		attackAfterHit: true
-				// 	}
-				// ],
-				start: function() {
-					//setCharacterLevel(3);
+
+				start: function () {
 					removeCoopCharacter(1);
 					const _char = addCoopCharacter(null, 'arc');
 					_char.direction = 'right';
-					_char.left = MathRound(mainCharacter.left + platformX - (1.5 * mainCharacter.WIDTH));
+					_char.left = MathRound(mainCharacter.left + platformX - 1.5 * mainCharacter.WIDTH);
 					_char.platformX = platformX;
-					_char.yPosition = MathRound(.5 * groundheight);
+					_char.yPosition = MathRound(0.5 * groundheight);
 					mainCharacter.immobilize = true;
 					blurKeyboard();
 					mainCharacter.disableKeyboard = true;
-					cssAnimations.film(null, [
-						{
-							do: function() {
-								createBubbleText({
-									id: 991,
-									location: { map: episode.id }, ms: 1000,
-									owner: mainCharacter.key,
-									text: "Are you ok?"
-								});
-							},
-							ms: 1100
-						},
-						{
-							do: function() {
-								createBubbleText({
-									id: 992,
-									location: { map: episode.id }, ms: 2000,
-									owner: _char.key,
-									text: "I'm still in one piece"
-								});
-							},
-							ms: 2300
-						},
-						{
-							do: function() {
-								episode.playSound({key:'femalepain', end: function() {
-									_char.direction = 'left';
+					cssAnimations.film(
+						null,
+						[
+							{
+								do: function () {
 									createBubbleText({
-										id: 993,
-										location: { map: episode.id }, ms: 1600,
-										owner: _char.key,
-										text: "Someone need help"
+										id: 991,
+										location: { map: episode.id },
+										ms: 1000,
+										owner: mainCharacter.key,
+										text: 'Are you ok?'
 									});
-								}});
+								},
+								ms: 1100
 							},
-							ms: 4600
-						},
-					], 5600, function() {
-						mainCharacter.immobilize = false;
-						delete mainCharacter.disableKeyboard;
-						takeQuest(3, 1, null, null, 1);
-						episode.showLocationHand('left');
-						mainCharacter.solid = true;
-						episode.enemies.filter(x => x.class === 'object' && x.id !== 5).forEach(x => x.solid = true);
-						episode.hasSolid = true;
-						const _level = mainCharacter.level;
-						if(_level === 1) {
-							setCharacterLevel(2, mainCharacter);
-							_client.saveState();
+							{
+								do: function () {
+									createBubbleText({
+										id: 992,
+										location: { map: episode.id },
+										ms: 2000,
+										owner: _char.key,
+										text: "I'm still in one piece"
+									});
+								},
+								ms: 2300
+							},
+							{
+								do: function () {
+									episode.playSound({
+										key: 'femalepain',
+										end: function () {
+											_char.direction = 'left';
+											createBubbleText({
+												id: 993,
+												location: { map: episode.id },
+												ms: 1600,
+												owner: _char.key,
+												text: 'Someone need help'
+											});
+										}
+									});
+								},
+								ms: 4600
+							}
+						],
+						5600,
+						function () {
+							mainCharacter.immobilize = false;
+							delete mainCharacter.disableKeyboard;
+							takeQuest(3, 1, null, null, 1);
+							episode.showLocationHand('left');
+							mainCharacter.solid = true;
+							episode.enemies
+								.filter((x) => x.class === 'object' && x.id !== 5)
+								.forEach((x) => (x.solid = true));
+							episode.hasSolid = true;
+							const _level = mainCharacter.level;
+							if (_level === 1) {
+								setCharacterLevel(2, mainCharacter);
+								_client.saveState();
+							}
 						}
-					});
+					);
 				}
 			},
 			{
@@ -2083,35 +2276,14 @@ const __stories = [
 				save: true,
 				from: 'right',
 				startWith: 1,
-				// actions: [
-				// 	{
-				// 		when: function(){
-				// 			return (episode.phase === 1) && document.querySelector('#map-location-106');
-				// 		},
-				// 		do: function() {
-				// 			episode.phase = 2;
-				// 			if(__account.tutorials?.indexOf('map-location') >= 0)
-				// 				return;
-				// 			if(!__account.tutorials)
-				// 				__account.tutorials = [];
-				// 			__account.tutorials.push('map-location');
-				// 			mainCharacter.still = true;
-				// 			removeFocus();
-				// 			focusMe('#map-location-106' , function() {
-				// 				removeFocus();
-				// 				switchStoryScene();
-				// 				hideMyMenu();
-				// 			});
-				// 		}
-				// 	}
-				// ],
+
 				mobs: [
 					{
 						id: 69,
 						minX: 3340,
 						maxX: 3340,
 						count: 1,
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -2120,7 +2292,7 @@ const __stories = [
 						minX: 4340,
 						maxX: 4340,
 						count: 1,
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -2129,11 +2301,11 @@ const __stories = [
 						minX: 2400,
 						maxX: 2400,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.npc = true;
 							_e.dialogs = createTrainingDialog('tank');
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -2142,7 +2314,7 @@ const __stories = [
 						minX: 4550,
 						maxX: 4550,
 						count: 1,
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -2151,45 +2323,34 @@ const __stories = [
 						minX: 1235,
 						maxX: 1235,
 						count: 1,
-						do: function(_e) {
-							if(episode.msNow < 501){
+						do: function (_e) {
+							if (episode.msNow < 501) {
 								_e.reversed = true;
 								_e.direction = 'left';
 								_e.swapAnimation('idle');
 							}
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
-					},
-					// {
-					// 	id: 58,
-					// 	minX: 1900,
-					// 	maxX: 1900,
-					// 	count: 1,
-					// 	do: function(_e) {
-					// 		_e.npc = true;
-					// 		_e.friendly = true;
-					// 		_e.enemy = false;
-					// 		_e.reversed = true;
-					// 		_e.direction = 'left';
-					// 	},
-					// 	yPosition: function() {
-					// 		return groundheight;
-					// 	}
-					// }
+					}
 				],
-				start: function() {
-					if(episode && episode.bgMusic)
-						episode.pauseBgMusic();
-					if(episode && episode.bgSound)
-						episode.pauseAmbianceMusic();
+				start: function () {
+					if (episode && episode.bgMusic) episode.pauseBgMusic();
+					if (episode && episode.bgSound) episode.pauseAmbianceMusic();
 					removeCoopCharacter(1);
 					const _char = addCoopCharacter(null, 'arc');
 					_char.direction = 'left';
 					_char.platformX = platformX;
-					_char.yPosition = MathRound(.66 * groundheight);
-					const _princess = summonMob(58, MathRound((mainCharacter.left + mainCharacter.WIDTH + platformX) / __zoom), MathRound(.33 * groundheight), mainCharacter.level, null, 1);
+					_char.yPosition = MathRound(0.66 * groundheight);
+					const _princess = summonMob(
+						58,
+						MathRound((mainCharacter.left + mainCharacter.WIDTH + platformX) / __zoom),
+						MathRound(0.33 * groundheight),
+						mainCharacter.level,
+						null,
+						1
+					);
 					_princess.friendly = _princess.invulnerable = true;
 					_princess.still = _princess.immobilize = false;
 					_princess.direction = 'left';
@@ -2199,787 +2360,81 @@ const __stories = [
 					completeQuest();
 					episode.drawSpriteObjects2('wizard', 1);
 					episode.endTime = __account.questStatus.lastStoryFinishTime ?? _gameTick;
-					if(__account.questStatus.lastStoryFinishTime)
-						delete __account.questStatus.lastStoryFinishTime;	
+					if (__account.questStatus.lastStoryFinishTime) delete __account.questStatus.lastStoryFinishTime;
 				}
 			},
 			getLobbyScene()
 		]
 	},
-	// {
-	// 	id: 2,
-	// 	order: 2,
-	// 	disableWorldMap: true,
-	// 	loadingCharacterIds: [2],
-	// 	resultStars: [
-	// 		{ id: 1, title: 'Clear story', when: function() {
-	// 			return !mainCharacter.isDead();
-	// 		}},
-	// 		{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
-	// 			when: function(_item) {
-	// 				//return !isMissionFailed(0) && !isMissionFailed(2) &&
-	// 				return (_gameTick - (__story.startTime ?? _gameTick)) <= (_item.value);
-	// 		}},
-	// 		{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-	// 			return mainCharacter.health >= MathFloor(mainCharacter.maxHP * _item.value);
-	// 		}}
-	// 	],
-	// 	ticket: 2,
-	// 	list:true,
-	// 	firstFinishRewards: [{ key: 'chest', grade: 1 }],
-	// 	perfectFinishRewards: [{ key: 'chest', grade: 1 }],
-	// 	rewards: [
-	// 		{ key: 'item', grade: 2, type: 'ring', count:1 },
-	// 		{ key: 'gem', grade: 1, type: 'random', count:1, chance:50 },
-	// 		{ key: 'gold', count: 5500 },
-	// 		{ key: 'exp', count: 1100 }
-	// 	],
-	// 	quests: [
-	// 		{
-	// 			id: 1,
-	// 			names: {
-	// 				en: 'Clear Goblins',
-	// 				tr: 'Goblinleri Temizle'
-	// 			},
-	// 			owner: 'system',
-	// 			minLevel: 1,
-	// 			kills: [{
-	// 				enemy: [19],
-	// 				limit: 5,
-	// 				descriptions: {
-	// 					en: 'Goblin Cleared',
-	// 					tr: 'Goblin Temizlendi'
-	// 				}
-	// 			},
-	// 			{ enemy: [49], limit: 1, descriptions: {
-	// 				en: 'Rogue Cleared',
-	// 				tr: 'Haydut Temizlendi'
-	// 			} },
-	// 			{ enemy: [66], limit: 1, descriptions: {
-	// 				en: 'Rider Cleared',
-	// 				tr: 'Binici Temizlendi'
-	// 			} }],
-	// 			maps: [3],
-	// 			after: function() {
-	// 				takeNextQuest();
-	// 				episode.enemies.find(x => x.npc === 'druid').disabled = false;
-	// 				episode.NPCS = episode.enemies.filter(x => x.npc && !x.disabled);
-	// 				episode.pauseBgMusic(1);
-	// 			}
-	// 		},
-	// 		{
-	// 			id: 2,
-	// 			names: {
-	// 				en: 'Save Princess',
-	// 				tr: 'Prensesi Kurtar'
-	// 			},
-	// 			descriptions: {
-	// 				en: 'Princess Saved',
-	// 				tr: 'Prenses Kurtarıldı'
-	// 			},
-	// 			owner: 'system',
-	// 			minLevel: 1,
-	// 			loots: [
-	// 				{
-	// 					object: ['druid'],
-	// 					limit: 1,
-	// 					noInfo: true,
-	// 					key: 'druid',
-	// 					type: 'quest-item',
-	// 					chanceRate: 100,
-	// 					command:'Save'
-	// 				}
-	// 			],
-	// 			after: function() {
-	// 				episode.pauseBgMusic(1);
-	// 				const _druid = episode.enemies.find(x => x.id === 67);
-	// 				_druid.remove = true;
-	// 				getQuestRewards(__account.questStatus.quest);
-	// 				episode.playSound({ key: 'questdone', volume: .8 });
-	// 				takeNextQuest();
-	// 				const _princess = summonMob(58, MathRound(mainCharacter.SCREENLEFT / __zoom), mainCharacter.yPosition, mainCharacter.level);
-	// 				_princess.friendly = _princess.invulnerable = true;
-	// 				_princess.still = _princess.immobilize = false;
-	// 				if(mainCharacter.direction === 'left') {
-	// 					_princess.direction = 'right';
-	// 					_princess.left = MathRound(mainCharacter.SCREENLEFT - mainCharacter.WIDTH);
-	// 				}
-	// 				else {
-	// 					_princess.direction = 'left';
-	// 					_princess.left = MathRound(mainCharacter.SCREENLEFT + mainCharacter.WIDTH + mainCharacter.WIDTH);
-	// 				}
-	// 				_princess.updateVariables();
-	// 				mainCharacter.keyboard.holdingKeys = [];
-	// 				mainCharacter.animate('idle', 1);
-	// 				mainCharacter.immobilize = mainCharacter.disableKeyboard = true;
-	// 				cssAnimations.film(null, [
-	// 					{
-	// 						do: function() {
-	// 							createBubbleText({
-	// 								id: 2,
-	// 								location: { map: episode.id }, ms: 2000,
-	// 								owner: _princess.key,
-	// 								text: "Thank you my hero"
-	// 							});
-	// 						},
-	// 						ms: 0
-	// 					},
-	// 					{
-	// 						do: function() {
-	// 							createBubbleText({
-	// 								id: 3,
-	// 								location: { map: episode.id }, ms: 2100,
-	// 								owner: mainCharacter.key,
-	// 								text: "We need somewhere to hide!"
-	// 							});
-	// 						},
-	// 						ms: 2200
-	// 					},
-	// 					{
-	// 						do: function() {
-	// 							createBubbleText({
-	// 								id: 4,
-	// 								location: { map: episode.id }, ms: 2100,
-	// 								owner: _princess.key,
-	// 								text: "I know a place, lets go..."
-	// 							});
-	// 						},
-	// 						ms: 4500
-	// 					}
-	// 				], 6800, function() {
-	// 					episode.showLocationHand('left');
-	// 					episode.phase = 1;
-	// 					mainCharacter.immobilize = false;
-	// 					delete mainCharacter.disableKeyboard;
-	// 				});
-	// 			},
-	// 			maps: [3]
-	// 		},
-	// 		{
-	// 			id: 3,
-	// 			names: {
-	// 				en: 'Find Safe Place',
-	// 				tr: 'Güvenli Yer Bul'
-	// 			},
-	// 			descriptions: {
-	// 				en: 'Place Found',
-	// 				tr: 'Yer Bulundu'
-	// 			},
-	// 			owner: 'system',
-	// 			minLevel: 1,
-	// 			loots: [
-	// 				{
-	// 					object: ['wizard'],
-	// 					limit: 1,
-	// 					noInfo: true,
-	// 					key: 'wizard',
-	// 					type: 'quest-item',
-	// 					chanceRate: 100,
-	// 					command:'Find'
-	// 				}
-	// 			],
-	// 			after: function() {
-	// 				takeNextQuest();
-	// 				__account.questStatus.state = 'begin';
-	// 				updateQuestArea();
-	// 				const _dk = episode.enemies.find(x => x.id === 72);
-	// 				_dk.npc = true;
-	// 				episode.resetMainQuest();
-	// 				episode.endTime = _gameTick;
-	// 			},
-	// 			maps: [1]
-	// 		},
-	// 		{
-	// 			id: 4,
-	// 			names: {
-	// 				en: 'Talk With Elder',
-	// 				tr: 'Bilge İle Konuş'
-	// 			},
-	// 			descriptions: {
-	// 				en: 'Elder Talked',
-	// 				tr: 'Bilge Konuştu'
-	// 			},
-	// 			dialogId:6,
-	// 			loots: [
-	// 				{
-	// 					object: ['wizard'],
-	// 					limit: 1,
-	// 					noInfo: true,
-	// 					key: 'wizard',
-	// 					type: 'quest-item',
-	// 					chanceRate: 100,
-	// 					command:'Talk'
-	// 				}
-	// 			],
-	// 			statusChanged: function(_status) {
-	// 				if(_status !== 'progress')
-	// 					return;
-	// 				completeQuest();
-	// 				const _p = episode.enemies.find(x => x.class === 'druid');
-	// 				if(!_p)
-	// 					return;
-	// 				const _a = episode.enemies.find(x => x.class === 'archer');
-	// 				if(!_a)
-	// 					return;
-	// 				_p.yPosition = groundheight;
-	// 				_p.still = _p.immobilize = true;
-	// 				_p.left = MathRound(1900 * __zoom);
-	// 				_p.npc = true;
-	// 				_p.platformX = platformX;
-	// 				_p.friendly = true;
-	// 				_p.enemy = false;
-	// 				_p.animate('idle', 1);
-	// 				_p.direction = 'left';
-	// 				mainCharacter.direction = 'right';
-	// 				_a.left = mainCharacter.SCREENLEFT + platformX + MathRound(1.5 * mainCharacter.WIDTH);
-	// 				_a.yPosition = mainCharacter.yPosition;
-	// 				mainCharacter.disableKeyboard = true;
-	// 				mainCharacter.keyboard.holdingKeys = [];
-	// 				mainCharacter.standBy();
-	// 				_p.updateVariables();
-	// 				_a.updateVariables();
-	// 				_a.standBy();
-	// 				cssAnimations.film(null, [
-	// 					{
-	// 						do: function() {
-	// 							createBubbleText({
-	// 								id: 991,
-	// 								location: { map: episode.id }, ms: 2000,
-	// 								owner: mainCharacter.key,
-	// 								text: "You should stay with them"
-	// 							});
-	// 						},
-	// 						ms: 2000
-	// 					},
-	// 					{
-	// 						do: function() {
-	// 							createBubbleText({
-	// 								id: 992,
-	// 								location: { map: episode.id }, ms: 2000,
-	// 								owner: _a.key,
-	// 								text: "Ok, but be careful"
-	// 							});
-	// 						},
-	// 						ms: 4100
-	// 					},
-	// 				], 5200, function() {
-	// 					installStoryFinish();
-	// 				});
-	// 			},
-	// 			owner: 'wizard',
-	// 			minLevel: 1,
-	// 			maps: [1]
-	// 		}
-	// 	],
-	// 	title: {
-	// 		en: "A Place to Refuge",
-	// 		tr: "Sığınılacak Bir Yer"
-	// 	},
-	// 	description: {
-	// 		en: "Our heroes are searching for a place to hide but goblins are all around",
-	// 		tr: "Kahramanlarımız saklanacakları bir yer ararken goblinler ortalıkta cirit atmaktadır"
-	// 	},
-	// 	boss: "tent",
-	// 	minLevel: 2,
-	// 	scenes: [
-	// 		{
-	// 			map: 3,
-	// 			from: 'right',
-	// 			startWith: 1,
-	// 			save: true,
-	// 			actions: [
-	// 				{
-	// 					when: function() {
-	// 						if(mainCharacter.attacked && !episode.firstFly){
-	// 							const _mob = episode.enemies.find(x => x.animations.deadfly && x.animation !== 'deadfly' && x.health < x.MAXHP)
-	// 							if(_mob){
-	// 								_mob.health = 0;
-	// 								_mob.animate('deadfly', 1);
-	// 								episode.firstFly = 1;
-	// 								return true;
-	// 							}
-	// 						}
-	// 						return false;
-	// 					}
-	// 				},
-	// 				{
-	// 					when: function() {
-	// 						return !_game.suspended && mainCharacter.chains && !mainCharacter.attackedByObject && !mainCharacter.counterLearned;
-	// 					},
-	// 					do: function() {
-	// 						if(__account.tutorials?.indexOf('hold-block') >= 0)
-	// 							return;
-	// 						if(!__account.tutorials)
-	// 							__account.tutorials = [];
-	// 						__account.tutorials.push('hold-block');
-	// 						let _id = 'chain-skill-2';
-	// 						const _cs = document.getElementById(_id);
-	// 						if(hasClass(_cs, 'v-none'))
-	// 							_id = 'chain-skill-4';
-	// 						_game.suspended = 1;
-	// 						focusMe('#' + _id, function() {
-	// 							removeFocus();
-	// 							delete _game.suspended;
-	// 							delete mainCharacter.disableKeyboard;
-	// 							mainCharacter.still = mainCharacter.immobilize = false;
-	// 							mainCharacter.enableSkills();
-	// 							mainCharacter.animate(mainCharacter.chains[1].key, 1);
-	// 							mainCharacter.counterLearned = 1;
-	// 							disposeFocus();
-	// 						}, null, getLangData('Hold block before attack or press here after attack to make counterattack'))
-	// 					}
-	// 				},
-	// 				{
-	// 					when: function() {
-	// 						return !mainCharacter.curious && !_game.suspended && (mainCharacter.LEFT + platformX) < (episode.width - _canvas.width)
-	// 					},
-	// 					do: function() {
-	// 						mainCharacter.curious = 1;
-	// 						createBubbleText({
-	// 							id: 998,
-	// 							location: { map: episode.id }, ms: 2500,
-	// 							owner: mainCharacter.key,
-	// 							text: "What's going on there?",
-	// 						});
-	// 					}
-	// 				},
-	// 				{
-	// 					when: function() {
-	// 						return episode.phase === undefined && mainCharacter.targetedBy;
-	// 					},
-	// 					do: function() {
-	// 						episode.phase = 0;
-	// 						const _rider = episode.enemies.find(x => x.enemy && x.grade > 1);
-	// 						if(_rider) {
-	// 							createBubbleText({
-	// 								id: 999,
-	// 								location: { map: episode.id }, ms: 2000,
-	// 								owner: _rider.key,
-	// 								text: "Intruder!",
-	// 							});
-	// 							_rider.setAutoTarget(mainCharacter);
-	// 							episode.removeLocationHand();
-	// 							episode.pauseBgMusic(1);
-	// 							episode.createBgMusic(null, null, null, 'story1-forest', .5);
-	// 							episode.playBgMusic();
-	// 						}
-	// 					}
-	// 				},
-	// 				{
-	// 					when: function() {
-	// 						return episode.phase === 1 && mainCharacter.left <= 0 && platformX <= 0;
-	// 					},
-	// 					do: function() {
-	// 						delete episode.phase;
-	// 						episode.removeLocationHand();
-	// 						__storyTell = new storyTell(2, function() {
-	// 							switchStoryScene();
-	// 						}, null, 'Our heroes take shelter in a camp, unaware that they are being followed');
-	// 					}
-	// 				}
-	// 			],
-	// 			mobs: [
-	// 				{
-	// 					id: 5,
-	// 					minX: 1760,
-	// 					maxX: 1760,
-	// 					sight: 0,
-	// 					count: 1,
-	// 					yPosition: function() {
-	// 						return MathRound(groundheight * .7);
-	// 					},
-	// 					minLevel: 1,
-	// 					maxLevel: 1
-	// 				},
-	// 				{
-	// 					id: 50,
-	// 					minX: 1900,
-	// 					maxX: 1900,
-	// 					sight: 1,
-	// 					count: 1,
-	// 					yPosition: function() {
-	// 						return MathRound(groundheight * .82);
-	// 					},
-	// 					minLevel: 1,
-	// 					maxLevel: 1
-	// 				},
-	// 				{
-	// 					id: 66,
-	// 					minX: 1500,
-	// 					maxX: 1500,
-	// 					sight: 25,
-	// 					count: 1,
-	// 					grade:2,
-	// 					groupId: 5,
-	// 					yPosition: function() {
-	// 						return MathRound(groundheight * (getRandomValue2(10,  70) /  100));
-	// 					}
-	// 				},
-	// 				{
-	// 					id: 49,
-	// 					minX: 1200,
-	// 					maxX: 1200,
-	// 					sight: 15,
-	// 					count: 1,
-	// 					minLevel: 1,
-	// 					experience: 0,
-	// 					yPosition: function() {
-	// 						return MathRound(groundheight * (getRandomValue2(10,  70) /  100));
-	// 					},
-	// 					maxLevel: 1,
-	// 					groupId: 5,
-	// 					hp: 100
-	// 				},
-	// 				{
-	// 					id: 19,
-	// 					minX: 1800,
-	// 					maxX: 1800,
-	// 					sight: 15,
-	// 					count: 1,
-	// 					minLevel: 1,
-	// 					maxLevel: 1,
-	// 					groupId: 5,
-	// 					experience: 0,
-	// 					yPosition: function() {
-	// 						return MathRound(groundheight * (getRandomValue2(10,  70) /  100));
-	// 					},
-	// 					hp: 100
-	// 				},
-	// 				{
-	// 					id: 61,
-	// 					minX: 1050,
-	// 					maxX: 1050,
-	// 					count: 1,
-	// 					experience: 0,
-	// 					yPosition: function() {
-	// 						return MathRound(groundheight * .96);
-	// 					}
-	// 				},
-	// 				{
-	// 					id: 64,
-	// 					minX: 1130,
-	// 					maxX: 1130,
-	// 					count: 1,
-	// 					yPosition: function() {
-	// 						return MathRound(groundheight * .95);
-	// 					}
-	// 				},
-	// 				{
-	// 					id: 63,
-	// 					minX: 860,
-	// 					maxX: 860,
-	// 					yPosition: function() {
-	// 						return MathRound(groundheight * .8);
-	// 					},
-	// 					count: 1
-	// 				},
-	// 				{
-	// 					id: 62,
-	// 					minX: 1375,
-	// 					maxX: 1375,
-	// 					yPosition: function() {
-	// 						return MathRound(groundheight * .92);
-	// 					},
-	// 					count: 1
-	// 				},
-	// 				{
-	// 					id: 63,
-	// 					minX: 2280,
-	// 					maxX: 2280,
-	// 					count: 1,
-	// 					yPosition: function() {
-	// 						return MathRound(groundheight * .71);
-	// 					},
-	// 					props: {
-	// 						noLoot: true,
-	// 						experience: 0,
-	// 						reversed: true,
-	// 						immobilize: true,
-	// 						direction: 'left'
-	// 					}
-	// 				},
-	// 				{
-	// 					id: 67,
-	// 					minX: 550,
-	// 					maxX: 550,
-	// 					count: 1,
-	// 					direction:'right',
-	// 					yPosition: function() {
-	// 						return MathRound(groundheight * .5);
-	// 					},
-	// 					props: {
-	// 						npc: 'druid',
-	// 						noLoot: true,
-	// 						experience: 0,
-	// 						disabled: true,
-	// 						solid: true,
-	// 						noDirection: true
-	// 					}
-	// 				},
-	// 				{
-	// 					id: 60,
-	// 					minX: 2445,
-	// 					maxX: 2445,
-	// 					count: 1,
-	// 					yPosition: function() {
-	// 						return MathRound(groundheight * .7);
-	// 					},
-	// 				},
-	// 				{
-	// 					id: 65,
-	// 					minX: 1900,
-	// 					maxX: 1900,
-	// 					count: 1,
-	// 					yPosition: function() {
-	// 						return MathRound(groundheight * .7);
-	// 					}
-	// 				}
-	// 			],
-	// 			// mobs: [
-	// 			// 	{
-	// 			// 		id: 3,
-	// 			// 		minX: 900,
-	// 			// 		maxX: 5900,
-	// 			// 		count: 10,
-	// 			// 		attackAfterHit: true
-	// 			// 	}
-	// 			// ],
-	// 			start: function() {
-	// 				//setCharacterLevel(3);
-	// 				removeCoopCharacter(1);
-	// 				const _char = addCoopCharacter(null, 'arc');
-	// 				_char.direction = 'right';
-	// 				_char.left = MathRound(mainCharacter.left + platformX - (1.5 * mainCharacter.WIDTH));
-	// 				_char.platformX = platformX;
-	// 				_char.yPosition = MathRound(.5 * groundheight);
-	// 				mainCharacter.immobilize = true;
-	// 				mainCharacter.keyboard.holdingKeys = [];
-	// 				mainCharacter.disableKeyboard = true;
-	// 				cssAnimations.film(null, [
-	// 					{
-	// 						do: function() {
-	// 							createBubbleText({
-	// 								id: 991,
-	// 								location: { map: episode.id }, ms: 1000,
-	// 								owner: mainCharacter.key,
-	// 								text: "Are you ok?"
-	// 							});
-	// 						},
-	// 						ms: 1100
-	// 					},
-	// 					{
-	// 						do: function() {
-	// 							createBubbleText({
-	// 								id: 992,
-	// 								location: { map: episode.id }, ms: 2000,
-	// 								owner: _char.key,
-	// 								text: "I'm still in one piece"
-	// 							});
-	// 						},
-	// 						ms: 2300
-	// 					},
-	// 					{
-	// 						do: function() {
-	// 							episode.playSound({key:'femalepain', end: function() {
-	// 								_char.direction = 'left';
-	// 								createBubbleText({
-	// 									id: 993,
-	// 									location: { map: episode.id }, ms: 1600,
-	// 									owner: _char.key,
-	// 									text: "Someone need help"
-	// 								});
-	// 							}});
-	// 						},
-	// 						ms: 4600
-	// 					},
-	// 				], 5600, function() {
-	// 					mainCharacter.immobilize = false;
-	// 					delete mainCharacter.disableKeyboard;
-	// 					takeQuest(0, 1, null, null, 1);
-	// 					episode.showLocationHand('left');
-	// 					mainCharacter.solid = true;
-	// 					episode.enemies.filter(x => x.class === 'object' && x.id !== 5).forEach(x => x.solid = true);
-	// 					episode.hasSolid = true;
-	// 				});
-	// 			}
-	// 		},
-	// 		{
-	// 			map: 1,
-	// 			save: true,
-	// 			from: 'right',
-	// 			startWith: 1,
-	// 			// actions: [
-	// 			// 	{
-	// 			// 		when: function(){
-	// 			// 			return (episode.phase === 1) && document.querySelector('#map-location-106');
-	// 			// 		},
-	// 			// 		do: function() {
-	// 			// 			episode.phase = 2;
-	// 			// 			if(__account.tutorials?.indexOf('map-location') >= 0)
-	// 			// 				return;
-	// 			// 			if(!__account.tutorials)
-	// 			// 				__account.tutorials = [];
-	// 			// 			__account.tutorials.push('map-location');
-	// 			// 			mainCharacter.still = true;
-	// 			// 			removeFocus();
-	// 			// 			focusMe('#map-location-106' , function() {
-	// 			// 				removeFocus();
-	// 			// 				switchStoryScene();
-	// 			// 				hideMyMenu();
-	// 			// 			});
-	// 			// 		}
-	// 			// 	}
-	// 			// ],
-	// 			mobs: [
-	// 				{
-	// 					id: 69,
-	// 					minX: 3340,
-	// 					maxX: 3340,
-	// 					count: 1,
-	// 					yPosition: function() {
-	// 						return groundheight;
-	// 					}
-	// 				},
-	// 				{
-	// 					id: 70,
-	// 					minX: 4340,
-	// 					maxX: 4340,
-	// 					count: 1,
-	// 					yPosition: function() {
-	// 						return groundheight;
-	// 					}
-	// 				},
-	// 				{
-	// 					id: 73,
-	// 					minX: 2400,
-	// 					maxX: 2400,
-	// 					count: 1,
-	// 					// do: function(_e) {
-	// 					// 	_e.npc = true;
-	// 					// 	_e.dialogs = createTrainingDialog('tank');
-	// 					// },
-	// 					yPosition: function() {
-	// 						return groundheight;
-	// 					}
-	// 				},
-	// 				{
-	// 					id: 71,
-	// 					minX: 4550,
-	// 					maxX: 4550,
-	// 					count: 1,
-	// 					yPosition: function() {
-	// 						return groundheight;
-	// 					}
-	// 				},
-	// 				{
-	// 					id: 72,
-	// 					minX: 1235,
-	// 					maxX: 1235,
-	// 					count: 1,
-	// 					do: function(_e) {
-	// 						if(episode.msNow < 501){
-	// 							_e.reversed = true;
-	// 							_e.direction = 'left';
-	// 							_e.swapAnimation('idle');
-	// 						}
-	// 					},
-	// 					yPosition: function() {
-	// 						return groundheight;
-	// 					}
-	// 				},
-	// 				// {
-	// 				// 	id: 58,
-	// 				// 	minX: 1900,
-	// 				// 	maxX: 1900,
-	// 				// 	count: 1,
-	// 				// 	do: function(_e) {
-	// 				// 		_e.npc = true;
-	// 				// 		_e.friendly = true;
-	// 				// 		_e.enemy = false;
-	// 				// 		_e.reversed = true;
-	// 				// 		_e.direction = 'left';
-	// 				// 	},
-	// 				// 	yPosition: function() {
-	// 				// 		return groundheight;
-	// 				// 	}
-	// 				// }
-	// 			],
-	// 			start: function() {
-	// 				if(episode && episode.bgMusic)
-	// 					episode.pauseBgMusic();
-	// 				if(episode && episode.bgSound)
-	// 					episode.pauseAmbianceMusic();
-	// 				const _princess = summonMob(58, MathRound((mainCharacter.left + mainCharacter.WIDTH + platformX) / __zoom), MathRound(.33 * groundheight), mainCharacter.level);
-	// 				_princess.friendly = _princess.invulnerable = true;
-	// 				_princess.still = _princess.immobilize = false;
-	// 				_princess.direction = 'left';
-	// 				//goToQuest(6);
-	// 				removeCoopCharacter(1);
-	// 				const _char = addCoopCharacter(null, 'arc');
-	// 				_char.direction = 'left';
-	// 				_princess.left = _char.left = mainCharacter.left + platformX - mainCharacter.WIDTH;
-	// 				_char.platformX = platformX;
-	// 				_char.yPosition = MathRound(.66 * groundheight);
-	// 				_char.updateVariables();
-	// 				completeQuest();
-	// 			}
-	// 		},
-	// 		getLobbyScene()
-	// 	]
-	// },
+
 	{
 		id: 2,
 		order: 2,
 		resultStars: [
-			{ id: 1, title: 'Clear story', when: function() {
-				return !mainCharacter.isDead();
-			}},
-			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
-				when: function(_item) {
-					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
-			}},
-			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
-			}}
+			{
+				id: 1,
+				title: 'Clear story',
+				when: function () {
+					return !mainCharacter.isDead();
+				}
+			},
+			{
+				id: 2,
+				key: 'time',
+				value: 10 * 60000,
+				title: 'Finish in time',
+				when: function (_item) {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= _item.value;
+				}
+			},
+			{
+				id: 3,
+				key: 'hp',
+				value: 0.5,
+				title: 'Stay above %50 health',
+				when: function (_item) {
+					return (
+						(__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >=
+						MathFloor(mainCharacter.maxHP * _item.value)
+					);
+				}
+			}
 		],
 		ticket: 2,
-		list:true,
+		list: true,
 		minLevel: 2,
-		act:1,
+		act: 1,
 		bonusAchievements: [
 			{
-				id:1,
+				id: 1,
 				minCount: 3,
 				title: {
 					en: 'Finish in 1 minute',
 					tr: '1 dakika içinde bitir'
 				},
-				when: function() {
-					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
-					<= 60000;
+				when: function () {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= 60000;
 				},
-				reward: //{ key: 'misc', type: 'ticket-gem-selection', grade:1, count:1}
-				{ key:'gold', count: 20000 }
+				reward: { key: 'gold', count: 20000 }
 			},
 			{
-				id:2,
+				id: 2,
 				minCount: 5,
 				title: {
 					en: 'Do not use skill',
 					tr: 'Yetenek kullanma'
 				},
-				when: function() {
+				when: function () {
 					return !episode.usedSkill;
 				},
-				reward: { key: 'misc', type: 'ticket-gem-selection', grade:1, count:1}
+				reward: { key: 'misc', type: 'ticket-gem-selection', grade: 1, count: 1 }
 			}
 		],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
-			{ key: 'item', grade: 2, type: 'ring', count:1 },
-			{ key: 'gem', grade: 1, type: 'random', count:1, chance:50 },
+			{ key: 'item', grade: 2, type: 'ring', count: 1 },
+			{ key: 'gem', grade: 1, type: 'random', count: 1, chance: 50 },
 			{ key: 'gold', count: 5500 },
 			{ key: 'exp', count: 1300 }
 		],
@@ -3007,76 +2462,82 @@ const __stories = [
 					}
 				],
 				maps: [106],
-				done: function() {
-					if(__account.questStatus.lastStoryFinishTime)
-						return;
-					episode.enemies.forEach(x => {
-						if(!x.main && x.stopSpawn)
-							x.stopSpawn();
+				done: function () {
+					if (__account.questStatus.lastStoryFinishTime) return;
+					episode.enemies.forEach((x) => {
+						if (!x.main && x.stopSpawn) x.stopSpawn();
 					});
-					if(episode.respawners)
-						episode.respawners = [];
-					// focusMe('#quest-status', function() {
-					// 	addClass(_gameUI, 'disable-ui');
-					// 	removeFocus();
-					// 	switchBookPage(3,1);
-					// }, 1);
+					if (episode.respawners) episode.respawners = [];
+
 					finishStory();
-					if(__account.tutorials?.indexOf('quest-world-map') >= 0)
-						return;
-					if(!__account.tutorials)
-						__account.tutorials = [];
+					if (__account.tutorials?.indexOf('quest-world-map') >= 0) return;
+					if (!__account.tutorials) __account.tutorials = [];
 					episode.disableWorldMap = 1;
 					__account.tutorials.push('quest-world-map');
-					episode.enemies.forEach(x => x.standBy());
-					focusMe('#world-mini-map-area', function() {
-						episode.phase = 1;
-						addClass(_gameUI, 'disable-ui');
-						removeFocus();
-						switchBookPage(3, 3);
-						episode.enemies.filter(x => x.standBy());
-						delete episode.disableWorldMap
-					}, null, getLangData('Great! You completed a quest. Time to get back to Village'), null, null, 1);
+					episode.enemies.forEach((x) => x.standBy());
+					focusMe(
+						'#world-mini-map-area',
+						function () {
+							episode.phase = 1;
+							addClass(_gameUI, 'disable-ui');
+							removeFocus();
+							switchBookPage(3, 3);
+							episode.enemies.filter((x) => x.standBy());
+							delete episode.disableWorldMap;
+						},
+						null,
+						getLangData('Great! You completed a quest. Time to get back to Village'),
+						null,
+						null,
+						1
+					);
 				},
-				complete: function() {
+				complete: function () {
 					installStoryFinish();
 				}
 			}
 		],
 		title: {
-			en: "Check Back",
-			tr: "Tekrar Kontrol Etmek"
+			en: 'Check Back',
+			tr: 'Tekrar Kontrol Etmek'
 		},
 		description: {
-			en: "Our heroes revisit the ruins of the destroyed castle to find one of the necessary materials.",
-			tr: "Gerekli malzemelerden birini bulabilmek için kahramanlarımız yıkılan kale enkazına tekrar ziyarette bulunur"
+			en: 'Our heroes revisit the ruins of the destroyed castle to find one of the necessary materials.',
+			tr: 'Gerekli malzemelerden birini bulabilmek için kahramanlarımız yıkılan kale enkazına tekrar ziyarette bulunur'
 		},
-		boss: "wizard",
+		boss: 'wizard',
 		scenes: [
 			{
 				map: 106,
 				from: 'left',
 				startWith: 1,
-				loadingCharacterIds: [ 28 ],
-				start: function(){
+				loadingCharacterIds: [28],
+				start: function () {
 					takeQuest(0, 1, null, null, 1);
 					removeClass(_gameUI, 'disable-ui');
 					removeCoopCharacter(1);
 				},
 				actions: [
 					{
-						when: function(){
-							return (episode.phase === 1) && document.querySelector('#map-location-1');
+						when: function () {
+							return episode.phase === 1 && document.querySelector('#map-location-1');
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 2;
 							removeFocus();
-							focusMe('#map-location-1' , function() {
-								removeFocus();
-								switchStoryScene();
-								hideMyMenu();
-								disposeFocus();
-							}, null, null, null, 1);
+							focusMe(
+								'#map-location-1',
+								function () {
+									removeFocus();
+									switchStoryScene();
+									hideMyMenu();
+									disposeFocus();
+								},
+								null,
+								null,
+								null,
+								1
+							);
 						}
 					}
 				],
@@ -3137,13 +2598,12 @@ const __stories = [
 				map: 1,
 				from: 'right',
 				startWith: 1,
-				start: function() {
+				start: function () {
 					removeClass(_gameUI, 'disable-ui');
 					takeQuest(0, 1, null, 'end', 1);
 					episode.drawSpriteObjects2('wizard', 1);
 					episode.endTime = __account.questStatus.lastStoryFinishTime ?? _gameTick;
-					if(__account.questStatus.lastStoryFinishTime)
-						delete __account.questStatus.lastStoryFinishTime;
+					if (__account.questStatus.lastStoryFinishTime) delete __account.questStatus.lastStoryFinishTime;
 				},
 				mobs: [
 					{
@@ -3151,40 +2611,23 @@ const __stories = [
 						minX: 3340,
 						maxX: 3340,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
-					// {
-					// 	id: '10002',
-					// 	minX: 2740,
-					// 	maxX: 2740,
-					// 	count: 1,
-					// 	do: function(_e) {
-					// 		_e.npc = true;
-					// 		_e.friendly = true;
-					// 		_e.enemy = false;
-					// 		_e.zoom *= .9;
-					// 		_e.still = _e.noDirection = true;
-					// 		_e.stepXRate = _e.stepX = 0;
-					// 		_e.dialogs = createPotDialog('archer');
-					// 	},
-					// 	yPosition: function() {
-					// 		return MathRound(groundheight * 1.1);
-					// 	}
-					// },
+
 					{
 						id: 70,
 						minX: 4340,
 						maxX: 4340,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -3193,13 +2636,12 @@ const __stories = [
 						minX: 2400,
 						maxX: 2400,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.dialogs = createPotDialog('tank');
-							//_e.dialogs = createTrainingDialog('tank');
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -3208,10 +2650,10 @@ const __stories = [
 						minX: 4550,
 						maxX: 4550,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -3220,14 +2662,14 @@ const __stories = [
 						minX: 1245,
 						maxX: 1245,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
-							if(episode.msNow < 501){
+							if (episode.msNow < 501) {
 								_e.reversed = true;
 								_e.direction = 'left';
 							}
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -3236,7 +2678,7 @@ const __stories = [
 						minX: 1900,
 						maxX: 1900,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.friendly = true;
@@ -3244,7 +2686,7 @@ const __stories = [
 							_e.reversed = true;
 							_e.direction = 'left';
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					}
@@ -3257,55 +2699,70 @@ const __stories = [
 		id: 3,
 		order: 3,
 		resultStars: [
-			{ id: 1, title: 'Clear story', when: function() {
-				return !mainCharacter.isDead();
-			}},
-			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
-				when: function(_item) {
-					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
-			}},
-			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
-			}}
+			{
+				id: 1,
+				title: 'Clear story',
+				when: function () {
+					return !mainCharacter.isDead();
+				}
+			},
+			{
+				id: 2,
+				key: 'time',
+				value: 10 * 60000,
+				title: 'Finish in time',
+				when: function (_item) {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= _item.value;
+				}
+			},
+			{
+				id: 3,
+				key: 'hp',
+				value: 0.5,
+				title: 'Stay above %50 health',
+				when: function (_item) {
+					return (
+						(__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >=
+						MathFloor(mainCharacter.maxHP * _item.value)
+					);
+				}
+			}
 		],
 		ticket: 2,
-		list:true,
+		list: true,
 		minLevel: 4,
-		act:1,
+		act: 1,
 		bonusAchievements: [
 			{
-				id:1,
+				id: 1,
 				minCount: 3,
 				title: {
 					en: 'Finish in 1.5 minute',
 					tr: '1.5 dakika içinde bitir'
 				},
-				when: function() {
-					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
-					<= 90000;
+				when: function () {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= 90000;
 				},
-				reward: { key:'gold', count: 20000 }
+				reward: { key: 'gold', count: 20000 }
 			},
 			{
-				id:2,
+				id: 2,
 				minCount: 5,
 				title: {
 					en: 'Kill hive in 30 seconds',
 					tr: '30 saniyede kovanı öldür'
 				},
-				when: function() {
-					return ((__story.hiveKilledTime ?? episode.endTime) - __story.startTime) 
-					<= 30000;
+				when: function () {
+					return (__story.hiveKilledTime ?? episode.endTime) - __story.startTime <= 30000;
 				},
-				reward: { key: 'misc', type: 'ticket-random', count:5 }
+				reward: { key: 'misc', type: 'ticket-random', count: 5 }
 			}
 		],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
-			{ key: 'item', grade: 2, type: 'necklace', count:1 },
-			{ key: 'gem', grade: 1, type: 'random', count:1, chance:50 },
+			{ key: 'item', grade: 2, type: 'necklace', count: 1 },
+			{ key: 'gem', grade: 1, type: 'random', count: 1, chance: 50 },
 			{ key: 'gold', count: 6000 },
 			{ key: 'exp', count: 1400 }
 		],
@@ -3313,7 +2770,7 @@ const __stories = [
 			{
 				id: 1,
 				key: 'wasp',
-				dialogId:7,
+				dialogId: 7,
 				names: {
 					en: 'Pick Lotus',
 					tr: 'Nilüfer Topla'
@@ -3334,42 +2791,44 @@ const __stories = [
 					}
 				],
 				maps: [11],
-				done: function() {
-					if(__account.questStatus.lastStoryFinishTime)
-						return;
+				done: function () {
+					if (__account.questStatus.lastStoryFinishTime) return;
 					finishStory();
 				},
-				complete: function() {
+				complete: function () {
 					installStoryFinish();
 				}
 			}
 		],
 		title: {
-			en: "Garden Of Evil",
-			tr: "İblisin Bahçesi"
+			en: 'Garden Of Evil',
+			tr: 'İblisin Bahçesi'
 		},
 		description: {
 			en: "Our heroes must gain more power before the Cyclops' attack. There's only one recipe for this power. And it's time to find the next ingredient listed in that recipe. The swamp demons will be their torment during this mission.",
 			tr: "Kahramanlarımızın, Tepegöz' ün saldırısı öncesinde daha fazla güce kavuşmaları gerekmektedir. Bu güce ulaşmak için tek bir tarif vardır. Ve bu tarifte yazılı olan malzemelerden bir sonrakini bulmaktadır sıra. Bataklık iblisleri bu görevde ızdırapları olacaktır"
 		},
-		boss: "druid",
+		boss: 'druid',
 		scenes: [
 			{
 				map: 11,
 				from: 'left',
 				startWith: 1,
-				loadingCharacterIds: [3,7,94],
+				loadingCharacterIds: [3, 7, 94],
 				actions: [
 					{
-						when: function() {
-							return !_game.suspended && mainCharacter.realAttacker && mainCharacter.health > 0 && !mainCharacter.dodgeLearned;
+						when: function () {
+							return (
+								!_game.suspended &&
+								mainCharacter.realAttacker &&
+								mainCharacter.health > 0 &&
+								!mainCharacter.dodgeLearned
+							);
 						},
 						before: true,
-						do: function() {
-							if(__account.tutorials?.indexOf('dodge-moved') >= 0)
-								return;
-							if(!__account.tutorials)
-								__account.tutorials = [];
+						do: function () {
+							if (__account.tutorials?.indexOf('dodge-moved') >= 0) return;
+							if (!__account.tutorials) __account.tutorials = [];
 							__account.tutorials.push('dodge-moved');
 							_game.suspended = 1;
 							mainCharacter.animate('idle', 1);
@@ -3378,31 +2837,38 @@ const __stories = [
 							mainCharacter.increaseHealth(mainCharacter.lastDamage);
 							mainCharacter.relatedObjects = [];
 							delete mainCharacter.hurtingStrength;
-							focusMe('#skill7', function() {
-								removeFocus();
-								delete _game.suspended;
-								delete mainCharacter.disableKeyboard;
-								mainCharacter.still = mainCharacter.immobilize = false;
-								mainCharacter.enableSkills();
-								if(mainCharacter.animations.roll.charge === 0)
-									mainCharacter.animations.roll.charge = 1;
-								mainCharacter.animate('roll', 1);
-								mainCharacter.dodgeLearned = 1;
-								disposeFocus();
-							}, null, getLangData('Roll as the enemy attacks to avoid damage'), null, null, 1);
+							focusMe(
+								'#skill7',
+								function () {
+									removeFocus();
+									delete _game.suspended;
+									delete mainCharacter.disableKeyboard;
+									mainCharacter.still = mainCharacter.immobilize = false;
+									mainCharacter.enableSkills();
+									if (mainCharacter.animations.roll.charge === 0)
+										mainCharacter.animations.roll.charge = 1;
+									mainCharacter.animate('roll', 1);
+									mainCharacter.dodgeLearned = 1;
+									disposeFocus();
+								},
+								null,
+								getLangData('Roll as the enemy attacks to avoid damage'),
+								null,
+								null,
+								1
+							);
 						}
 					},
 					{
-						when: function() {
-							return !__story.hiveKilledTime && 
-							episode.enemies?.find(x => x.id === 94)?.health <= 0;
+						when: function () {
+							return !__story.hiveKilledTime && episode.enemies?.find((x) => x.id === 94)?.health <= 0;
 						},
-						do: function() {
+						do: function () {
 							__story.hiveKilledTime = _gameTick;
 						}
 					}
 				],
-				start: function(){
+				start: function () {
 					takeQuest(0, 1, null, 'progress', 1);
 					removeClass(_gameUI, 'disable-ui');
 					removeCoopCharacter(1);
@@ -3494,23 +2960,14 @@ const __stories = [
 						atk: 10,
 						def: 10
 					},
-					// {
-					// 	id: 7,
-					// 	minX: 4500,
-					// 	maxX: 5500,
-					// 	count: 2,
-					// 	groupId: 5,
-					// 	sight: 50,
-					// 	atk: 10,
-					// 	def: 20
-					// },
+
 					{
 						id: 108,
 						minX: 5802,
 						maxX: 5802,
 						count: 1,
-						yPosition: function() {
-							return MathRound(groundheight * .61);
+						yPosition: function () {
+							return MathRound(groundheight * 0.61);
 						}
 					},
 					{
@@ -3518,74 +2975,36 @@ const __stories = [
 						minX: 5800,
 						maxX: 5800,
 						count: 1,
-						yPosition: function() {
-							return MathRound(groundheight * .66);
+						yPosition: function () {
+							return MathRound(groundheight * 0.66);
 						},
 						sight: 50,
 						atk: 10,
 						def: 20
 					},
-					// {
-					// 	id: 95,
-					// 	minX: 5990,
-					// 	maxX: 5990,
-					// 	count: 1,
-					// 	yPosition: function() {
-					// 		return MathRound(groundheight * .64);
-					// 	}
-					// },
-					// {
-					// 	id: 96,
-					// 	minX: 5880,
-					// 	maxX: 5880,
-					// 	count: 1,
-					// 	yPosition: function() {
-					// 		return MathRound(groundheight * .48);
-					// 	}
-					// },
-					// {
-					// 	id: 97,
-					// 	minX: 5766,
-					// 	maxX: 5766,
-					// 	count: 1,
-					// 	do: function(_e) {
-					// 		_e.reversed = true;
-					// 	},
-					// 	yPosition: function() {
-					// 		return MathRound(groundheight * .54);
-					// 	}
-					// },
-					// {
-					// 	id: 107,
-					// 	minX: 3400,
-					// 	maxX: 3400,
-					// 	count: 1,
-					// 	yPosition: function() {
-					// 		return MathRound(groundheight * 1.45);
-					// 	}
-					// },
+
 					{
 						id: 109,
 						minX: 3480,
 						maxX: 3480,
 						count: 1,
-						yPosition: function() {
+						yPosition: function () {
 							return MathRound(groundheight * 1.97);
-						},
+						}
 					},
 					{
 						id: 500,
 						minX: 3500,
 						maxX: 3500,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							const _fs = _e.animations.idle.frames;
-							delete _fs.forEach(x => delete x.objects);
-							_fs[0].sound = { key: 'waterfall', volume:.2, bind:true, loop: true };
+							delete _fs.forEach((x) => delete x.objects);
+							_fs[0].sound = { key: 'waterfall', volume: 0.2, bind: true, loop: true };
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
-						},
+						}
 					},
 					{
 						id: 79,
@@ -3603,13 +3022,12 @@ const __stories = [
 				save: true,
 				from: 'right',
 				startWith: 1,
-				start: function() {
+				start: function () {
 					removeClass(_gameUI, 'disable-ui');
 					takeQuest(0, 1, null, 'end', 1);
 					episode.drawSpriteObjects2('druid', 1);
 					episode.endTime = __account.questStatus.lastStoryFinishTime ?? _gameTick;
-					if(__account.questStatus.lastStoryFinishTime)
-						delete __account.questStatus.lastStoryFinishTime;
+					if (__account.questStatus.lastStoryFinishTime) delete __account.questStatus.lastStoryFinishTime;
 				},
 				mobs: [
 					{
@@ -3617,10 +3035,10 @@ const __stories = [
 						minX: 3340,
 						maxX: 3340,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -3629,10 +3047,10 @@ const __stories = [
 						minX: 4340,
 						maxX: 4340,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -3641,43 +3059,25 @@ const __stories = [
 						minX: 2400,
 						maxX: 2400,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.dialogs = createPotDialog('tank');
-							//_e.dialogs = createTrainingDialog('tank');
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
-					// {
-					// 	id: '10002',
-					// 	minX: 2740,
-					// 	maxX: 2740,
-					// 	count: 1,
-					// 	do: function(_e) {
-					// 		_e.npc = true;
-					// 		_e.friendly = true;
-					// 		_e.enemy = false;
-					// 		_e.zoom *= .9;
-					// 		_e.still = _e.noDirection = true;
-					// 		_e.stepXRate = _e.stepX = 0;
-					// 		_e.dialogs = createPotDialog('archer');
-					// 	},
-					// 	yPosition: function() {
-					// 		return MathRound(groundheight * 1.1);
-					// 	}
-					// },
+
 					{
 						id: 71,
 						minX: 4550,
 						maxX: 4550,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -3686,14 +3086,14 @@ const __stories = [
 						minX: 1245,
 						maxX: 1245,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
-							if(episode.msNow < 501){
+							if (episode.msNow < 501) {
 								_e.reversed = true;
 								_e.direction = 'left';
 							}
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -3702,7 +3102,7 @@ const __stories = [
 						minX: 1900,
 						maxX: 1900,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.friendly = true;
@@ -3710,7 +3110,7 @@ const __stories = [
 							_e.reversed = true;
 							_e.direction = 'left';
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					}
@@ -3720,69 +3120,81 @@ const __stories = [
 		]
 	},
 	{
-		id:4,
-		order:4,
-		ticket:4,
+		id: 4,
+		order: 4,
+		ticket: 4,
 		disableWorldMap: true,
 		minLevel: 5,
 		list: true,
-		act:1,
+		act: 1,
 		bonus: true,
-		boss:'wan',
+		boss: 'wan',
 		bonusAchievements: [
 			{
-				id:1,
+				id: 1,
 				minCount: 3,
 				title: {
 					en: 'Finish in 30 seconds',
 					tr: '30 saniye içinde bitir'
 				},
-				when: function() {
-					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
-					<= 30000;
+				when: function () {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= 30000;
 				},
-				reward: { key:'gold', count: 30000 }
+				reward: { key: 'gold', count: 30000 }
 			},
 			{
-				id:2,
+				id: 2,
 				minCount: 3,
 				title: {
 					en: 'Finish in 15 seconds',
 					tr: '15 saniye içinde bitir'
 				},
-				when: function() {
-					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
-					<= 15000;
+				when: function () {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= 15000;
 				},
-				reward: { key:'gold', count: 50000 }
+				reward: { key: 'gold', count: 50000 }
 			}
 		],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		resultStars: [
-			{ id: 1, title: 'Clear story', when: function() {
-				return !mainCharacter.isDead();
-			}},
-			{ id: 2, key: 'time', value: 60000, title: 'Finish in time',
-				when: function(_item) {
-					 /*!isMissionFailed(0) && !isMissionFailed(2) &&*/
-					return ((__story.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
-			}},
-			{ id: 3, key: 'combo', value: 50, title: 'Make 50x combo', when: function(_item) {
-				return episode.hitCount >= _item.value;
-			}}
+			{
+				id: 1,
+				title: 'Clear story',
+				when: function () {
+					return !mainCharacter.isDead();
+				}
+			},
+			{
+				id: 2,
+				key: 'time',
+				value: 60000,
+				title: 'Finish in time',
+				when: function (_item) {
+					return (__story.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= _item.value;
+				}
+			},
+			{
+				id: 3,
+				key: 'combo',
+				value: 50,
+				title: 'Make 50x combo',
+				when: function (_item) {
+					return episode.hitCount >= _item.value;
+				}
+			}
 		],
 		title: {
 			en: 'Gold Mine',
 			tr: 'Altın Madeni'
 		},
 		description: {
-			en: "Destroy the wan in time and gather treasure in the end. Each damage will add bonus gold reward.",
-			tr: "Aracı zamanında parçala ve hazineye sahip ol. Her verdiğin hasar bonus altın kazandıracak."
+			en: 'Destroy the wan in time and gather treasure in the end. Each damage will add bonus gold reward.',
+			tr: 'Aracı zamanında parçala ve hazineye sahip ol. Her verdiğin hasar bonus altın kazandıracak.'
 		},
 		rewards: [
-			{ key: 'item', grade: 2, type: 'helmet', count:1 },
-			{ key: 'gem', grade: 1, type: 'random', count:1, chance:50 },
+			{ key: 'item', grade: 2, type: 'helmet', count: 1 },
+			{ key: 'gem', grade: 1, type: 'random', count: 1, chance: 50 },
 			{ key: 'gold', count: 13000 },
 			{ key: 'exp', count: 1500 }
 		],
@@ -3792,11 +3204,9 @@ const __stories = [
 				noArtifact: 1,
 				startsWith: 1,
 				save: true,
-				start: function() {
-					const _wagon = episode.enemies.find(x => x.id === 2000);
-					_wagon.maxHP = _wagon.MAXHP = 300 + ((6 - __account.difficulty) * 300);
-
-					//_wagon.health = _wagon.maxHP = _wagon.MAXHP = 1;
+				start: function () {
+					const _wagon = episode.enemies.find((x) => x.id === 2000);
+					_wagon.maxHP = _wagon.MAXHP = 300 + (6 - __account.difficulty) * 300;
 
 					_wagon.setHealth(_wagon.maxHP);
 					_wagon.noDirection = _wagon.harmless = true;
@@ -3822,47 +3232,65 @@ const __stories = [
 				minLevel: 1,
 				kills: [{ enemy: [2000], limit: 1, key: 'Wan' }],
 				maps: [9999]
-			},
+			}
 		]
 	},
 	{
 		id: 5,
 		order: 5,
 		resultStars: [
-			{ id: 1, title: 'Clear story', when: function() {
-				return !mainCharacter.isDead();
-			}},
-			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
-				when: function(_item) {
-					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
-			}},
-			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
-			}}
+			{
+				id: 1,
+				title: 'Clear story',
+				when: function () {
+					return !mainCharacter.isDead();
+				}
+			},
+			{
+				id: 2,
+				key: 'time',
+				value: 10 * 60000,
+				title: 'Finish in time',
+				when: function (_item) {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= _item.value;
+				}
+			},
+			{
+				id: 3,
+				key: 'hp',
+				value: 0.5,
+				title: 'Stay above %50 health',
+				when: function (_item) {
+					return (
+						(__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >=
+						MathFloor(mainCharacter.maxHP * _item.value)
+					);
+				}
+			}
 		],
 		ticket: 2,
-		list:true,
-		act:1,
+		list: true,
+		act: 1,
 		minLevel: 6,
-		bonusAchievements: [{
-			id:1,
-			minCount: 3,
-			title: {
-				en: 'Finish in 1.5 minutes',
-				tr: '1.5 dakika içinde bitir'
-			},
-			when: function() {
-				return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
-				<= 90000;
-			},
-			reward: { key:'gold', count: 30000 }
-		}],
+		bonusAchievements: [
+			{
+				id: 1,
+				minCount: 3,
+				title: {
+					en: 'Finish in 1.5 minutes',
+					tr: '1.5 dakika içinde bitir'
+				},
+				when: function () {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= 90000;
+				},
+				reward: { key: 'gold', count: 30000 }
+			}
+		],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
-			{ key: 'item', grade: 2, type: 'leggings', count:1 },
-			{ key: 'gem', grade: 1, type: 'random', count:1, chance:50 },
+			{ key: 'item', grade: 2, type: 'leggings', count: 1 },
+			{ key: 'gem', grade: 1, type: 'random', count: 1, chance: 50 },
 			{ key: 'gold', count: 7000 },
 			{ key: 'exp', count: 1600 }
 		],
@@ -3890,60 +3318,73 @@ const __stories = [
 					}
 				],
 				maps: [36],
-				complete: function() {
+				complete: function () {
 					setTimeout(() => {
-						__storyTell = new storyTell(4, null, null, 'Everything needed for the potion recipe was ready. Our heroes hoped it would work', function() {
-							installStoryFinish();
-						});
+						__storyTell = new storyTell(
+							4,
+							null,
+							null,
+							'Everything needed for the potion recipe was ready. Our heroes hoped it would work',
+							function () {
+								installStoryFinish();
+							}
+						);
 					}, 100);
 				},
-				done: function() {
-					if(__account.questStatus.lastStoryFinishTime)
-						return;
+				done: function () {
+					if (__account.questStatus.lastStoryFinishTime) return;
 					finishStory();
-					episode.enemies.forEach(x => {
-						if(!x.main && x.stopSpawn)
-							x.stopSpawn();
+					episode.enemies.forEach((x) => {
+						if (!x.main && x.stopSpawn) x.stopSpawn();
 					});
-					if(episode.respawners)
-						episode.respawners = [];
+					if (episode.respawners) episode.respawners = [];
 				}
 			}
 		],
 		title: {
-			en: "Dark Wings",
-			tr: "Karanlık Kanatlar"
+			en: 'Dark Wings',
+			tr: 'Karanlık Kanatlar'
 		},
 		description: {
 			en: "Our heroes hunt bats in a dark cave. A substance found in the bats' wings will increase the potion's effectiveness. Let's see if our heroes can get what they want and escape this cave alive.",
-			tr: "Kahramanlarımız ışıktan yoksun bir mağarada yarasa avına çıkar, Yarasaların kanatlarında bulunan bir malzeme sayesinde güç iksiri etkisini arttıracaktır. Bakalım kahramanlarımız bu mağaradan istediklerini elde ederek canlı çıkabilecek mi"
+			tr: 'Kahramanlarımız ışıktan yoksun bir mağarada yarasa avına çıkar, Yarasaların kanatlarında bulunan bir malzeme sayesinde güç iksiri etkisini arttıracaktır. Bakalım kahramanlarımız bu mağaradan istediklerini elde ederek canlı çıkabilecek mi'
 		},
-		boss: "blacksmith",
+		boss: 'blacksmith',
 		scenes: [
 			{
 				map: 36,
 				from: 'left',
 				startWith: 1,
-				loadingCharacterIds: [ 18,10 ],
+				loadingCharacterIds: [18, 10],
 				actions: [
 					{
-						when: function() {
+						when: function () {
 							return episode.phase === 1 && __account.commonInventory.length > 3;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 2;
-							focusMe('.enemy-profile', function() {
-								playClick();
-								episode.still = false;
-								episode.enemies.filter(x => x.stop).forEach(x => {
-									x.still = x.stop = false;
-								});
-								mainCharacter.still = mainCharacter.immobilize = false;
-								delete mainCharacter.disableKeyboard;
-								mainCharacter.enableSkills();
-								disposeFocus();
-								__story.startTime = _gameTick;
-							}, false, getLangData('You can use these single-use abilities anytime. It allows you to deal with crowd'), 1);
+							focusMe(
+								'.enemy-profile',
+								function () {
+									playClick();
+									episode.still = false;
+									episode.enemies
+										.filter((x) => x.stop)
+										.forEach((x) => {
+											x.still = x.stop = false;
+										});
+									mainCharacter.still = mainCharacter.immobilize = false;
+									delete mainCharacter.disableKeyboard;
+									mainCharacter.enableSkills();
+									disposeFocus();
+									__story.startTime = _gameTick;
+								},
+								false,
+								getLangData(
+									'You can use these single-use abilities anytime. It allows you to deal with crowd'
+								),
+								1
+							);
 						}
 					}
 				],
@@ -3952,28 +3393,32 @@ const __stories = [
 						id: 4,
 						minX: 560,
 						maxX: 560,
-						yPosition: function() { return MathRound(groundheight * .5); },
+						yPosition: function () {
+							return MathRound(groundheight * 0.5);
+						},
 						count: 1,
-						do: function(_e){
-							const _lootFrameIndex = _e.animations.dead.frames.findIndex(x => x.loot || x.loots);
-							if(_lootFrameIndex !== -1) {
+						do: function (_e) {
+							const _lootFrameIndex = _e.animations.dead.frames.findIndex((x) => x.loot || x.loots);
+							if (_lootFrameIndex !== -1) {
 								const _lootFrame = _e.animations.dead.frames[_lootFrameIndex];
-								_lootFrame.loots = [{
-									key: 'electricbolt',
-									type: 'common'
-								},
-								{
-									key: 'electricbolt',
-									type: 'common'
-								},
-								{
-									key: 'electricbolt',
-									type: 'common'
-								},
-								{
-									key: 'electricbolt',
-									type: 'common'
-								}];
+								_lootFrame.loots = [
+									{
+										key: 'electricbolt',
+										type: 'common'
+									},
+									{
+										key: 'electricbolt',
+										type: 'common'
+									},
+									{
+										key: 'electricbolt',
+										type: 'common'
+									},
+									{
+										key: 'electricbolt',
+										type: 'common'
+									}
+								];
 							}
 						}
 					},
@@ -3995,7 +3440,7 @@ const __stories = [
 						minX: 2720,
 						maxX: 2720,
 						count: 1,
-						yPosition: function() {
+						yPosition: function () {
 							return MathRound(groundheight);
 						}
 					},
@@ -4006,25 +3451,33 @@ const __stories = [
 						count: 10,
 						groupId: 1,
 						sight: 15,
-						zoom: .65,
-						do: function(_e){
+						zoom: 0.65,
+						do: function (_e) {
 							_e.skipHealthBar = true;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return MathRound(groundheight * (getRandomValue2(5, 10) / 10));
 						}
 					}
 				],
-				start: function() {
+				start: function () {
 					takeQuest(0, 1, null, 'progress', 1);
 					removeClass(_gameUI, 'disable-ui');
 					removeCoopCharacter(1);
 					episode.still = true;
-					episode.enemies.filter(x => x.enemy && !x.still).forEach(x => {
-						x.still = x.stop = true;
-					});
-					const _spider = summonMob(10, MathRound((_canvas.width  * .4) * __zoom),
-						MathRound(groundheight / 5), null, null, 1);
+					episode.enemies
+						.filter((x) => x.enemy && !x.still)
+						.forEach((x) => {
+							x.still = x.stop = true;
+						});
+					const _spider = summonMob(
+						10,
+						MathRound(_canvas.width * 0.4 * __zoom),
+						MathRound(groundheight / 5),
+						null,
+						null,
+						1
+					);
 					_spider.puppetMode = true;
 					_spider.direction = 'right';
 					_spider.skipHealthBar = true;
@@ -4032,15 +3485,16 @@ const __stories = [
 					_spider.stepX *= 2;
 					_spider.action = {
 						command: 'move',
-						to: episode.width * __zoom,
+						to: episode.width * __zoom
 					};
 					mainCharacter.standBy();
 					createBubbleText({
 						id: 1,
-						location: { map: episode.id }, ms: 2500,
+						location: { map: episode.id },
+						ms: 2500,
 						owner: mainCharacter.key,
-						text: "Huh? What was that?",
-						onend: function() {
+						text: 'Huh? What was that?',
+						onend: function () {
 							_spider.remove = true;
 							mainCharacter.immobilize = false;
 							delete mainCharacter.disableKeyboard;
@@ -4049,9 +3503,9 @@ const __stories = [
 					_client.saveState();
 					episode.phase = 1;
 					cssAnimations.lightradius2(mainCharacter, 3);
-					episode.after = function() {
+					episode.after = function () {
 						delete cssAnimationProps.lightradius2;
-					}
+					};
 				}
 			},
 			{
@@ -4059,13 +3513,12 @@ const __stories = [
 				from: 'right',
 				save: true,
 				startWith: 1,
-				start: function() {
+				start: function () {
 					removeClass(_gameUI, 'disable-ui');
 					takeQuest(0, 1, null, 'end', 1);
 					episode.drawSpriteObjects2('blacksmith', 1);
 					episode.endTime = __account.questStatus.lastStoryFinishTime ?? _gameTick;
-					if(__account.questStatus.lastStoryFinishTime)
-						delete __account.questStatus.lastStoryFinishTime;
+					if (__account.questStatus.lastStoryFinishTime) delete __account.questStatus.lastStoryFinishTime;
 				},
 				mobs: [
 					{
@@ -4073,10 +3526,10 @@ const __stories = [
 						minX: 3340,
 						maxX: 3340,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -4085,10 +3538,10 @@ const __stories = [
 						minX: 4340,
 						maxX: 4340,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -4097,43 +3550,25 @@ const __stories = [
 						minX: 2400,
 						maxX: 2400,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.dialogs = createPotDialog('tank');
-							//_e.dialogs = createTrainingDialog('tank');
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
-					// {
-					// 	id: '10002',
-					// 	minX: 2740,
-					// 	maxX: 2740,
-					// 	count: 1,
-					// 	do: function(_e) {
-					// 		_e.npc = true;
-					// 		_e.friendly = true;
-					// 		_e.enemy = false;
-					// 		_e.zoom *= .9;
-					// 		_e.still = _e.noDirection = true;
-					// 		_e.stepXRate = _e.stepX = 0;
-					// 		_e.dialogs = createPotDialog('archer');
-					// 	},
-					// 	yPosition: function() {
-					// 		return MathRound(groundheight * 1.1);
-					// 	}
-					// },
+
 					{
 						id: 71,
 						minX: 4550,
 						maxX: 4550,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -4142,14 +3577,14 @@ const __stories = [
 						minX: 1245,
 						maxX: 1245,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
-							if(episode.msNow < 501){
+							if (episode.msNow < 501) {
 								_e.reversed = true;
 								_e.direction = 'left';
 							}
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -4158,7 +3593,7 @@ const __stories = [
 						minX: 1900,
 						maxX: 1900,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.friendly = true;
@@ -4166,7 +3601,7 @@ const __stories = [
 							_e.reversed = true;
 							_e.direction = 'left';
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					}
@@ -4179,40 +3614,58 @@ const __stories = [
 		id: 6,
 		order: 6,
 		resultStars: [
-			{ id: 1, title: 'Clear story', when: function() {
-				return !mainCharacter.isDead();
-			}},
-			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
-				when: function(_item) {
-					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
-			}},
-			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
-			}}
+			{
+				id: 1,
+				title: 'Clear story',
+				when: function () {
+					return !mainCharacter.isDead();
+				}
+			},
+			{
+				id: 2,
+				key: 'time',
+				value: 10 * 60000,
+				title: 'Finish in time',
+				when: function (_item) {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= _item.value;
+				}
+			},
+			{
+				id: 3,
+				key: 'hp',
+				value: 0.5,
+				title: 'Stay above %50 health',
+				when: function (_item) {
+					return (
+						(__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >=
+						MathFloor(mainCharacter.maxHP * _item.value)
+					);
+				}
+			}
 		],
 		ticket: 2,
-		list:true,
-		act:1,
+		list: true,
+		act: 1,
 		minLevel: 7,
-		bonusAchievements: [{
-			id:1,
-			minCount: 3,
-			title: {
-				en: 'Finish in 1.5 minutes',
-				tr: '1.5 dakika içinde bitir'
-			},
-			when: function() {
-				return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
-				<= 90000;
-			},
-			reward: { key:'gold', count: 30000 }
-		}],
+		bonusAchievements: [
+			{
+				id: 1,
+				minCount: 3,
+				title: {
+					en: 'Finish in 1.5 minutes',
+					tr: '1.5 dakika içinde bitir'
+				},
+				when: function () {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= 90000;
+				},
+				reward: { key: 'gold', count: 30000 }
+			}
+		],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
-			{ key: 'item', grade: 2, type: 'bracers', count:1 },
-			{ key: 'fragment', name: 'bomber', minCount:1, maxCount:5, chance:50 },
+			{ key: 'item', grade: 2, type: 'bracers', count: 1 },
+			{ key: 'fragment', name: 'bomber', minCount: 1, maxCount: 5, chance: 50 },
 			{ key: 'gold', count: 7500 },
 			{ key: 'exp', count: 1700 }
 		],
@@ -4237,98 +3690,109 @@ const __stories = [
 						key: 'receipt',
 						type: 'quest-item',
 						chanceRate: 100,
-						command:'Find'
+						command: 'Find'
 					}
 				],
 				maps: [41],
-				done: function() {
-					if(__account.questStatus.lastStoryFinishTime)
-						return;
+				done: function () {
+					if (__account.questStatus.lastStoryFinishTime) return;
 					finishStory();
 				},
-				after:function() {
-					const _bs = episode.enemies.find(x => x.class === 'blacksmith');
+				after: function () {
+					const _bs = episode.enemies.find((x) => x.class === 'blacksmith');
 					mainCharacter.yPosition = groundheight;
 					mainCharacter.standBy();
 					createBubbleText({
 						id: 1,
-						location: { map: episode.id }, ms: 2000,
+						location: { map: episode.id },
+						ms: 2000,
 						owner: _bs.key,
-						text: "Watch this!",
-						onend: function() {
+						text: 'Watch this!',
+						onend: function () {
 							createBubbleText({
 								id: 2,
-								location: { map: episode.id }, ms: 2500,
+								location: { map: episode.id },
+								ms: 2500,
 								owner: mainCharacter.key,
-								text: "This is so strange!",
-								onend: function() {
+								text: 'This is so strange!',
+								onend: function () {
 									createBubbleText({
 										id: 3,
-										location: { map: episode.id }, ms: 2500,
+										location: { map: episode.id },
+										ms: 2500,
 										owner: _bs.key,
-										text: "The time has come"
+										text: 'The time has come'
 									});
 								}
 							});
-							startQuake(1,1);
-							episode.playSound({path:'./images/sounds/bulls-run2.mp3?x=2', volume: 1 });
+							startQuake(1, 1);
+							episode.playSound({ path: './images/sounds/bulls-run2.mp3?x=2', volume: 1 });
 							mainCharacter.direction = 'right';
-							let _finishes = 0, _limit = 0;
-							const _stopBull = function(_e, _l) {
+							let _finishes = 0,
+								_limit = 0;
+							const _stopBull = function (_e, _l) {
 								_e.remove = true;
 								_finishes++;
-								if(_finishes === _l) {
+								if (_finishes === _l) {
 									stopWeather();
-									__storyTell = new storyTell(7, null, null, 'As the enemy approached, villagers fled with their carts, leaving behind a silent hero carrying only a small handmade toy', function() {
-										installStoryFinish();
-									});
-									// cssAnimations.black(null, 3000, getLangData('Village people move to a safe place'), function() {
-									// 	installStoryFinish();
-									// });
+									__storyTell = new storyTell(
+										7,
+										null,
+										null,
+										'As the enemy approached, villagers fled with their carts, leaving behind a silent hero carrying only a small handmade toy',
+										function () {
+											installStoryFinish();
+										}
+									);
 								}
-							}
-							for(let i = 0; i < 6; i++) {
+							};
+							for (let i = 0; i < 6; i++) {
 								_limit++;
-								const _bull1 = summonMob(82,
+								const _bull1 = summonMob(
+									82,
 									MathRound((_canvas.width + platformX) / __zoom),
-									MathRound(groundheight * ((i % 2) == 0 ? .3 : .2)));
+									MathRound(groundheight * (i % 2 == 0 ? 0.3 : 0.2))
+								);
 								_bull1.invulnerable = _bull1.puppetMode = _bull1.skipHealthBar = true;
 								_bull1.direction = _bull1.moveDirection = 'left';
 								_bull1.left += MathRound(i * _bull1.WIDTH * (getRandomValue2(5, 15) / 10));
-								const _bull2 = summonMob(82,
+								const _bull2 = summonMob(
+									82,
 									MathRound((_canvas.width + platformX) / __zoom),
-									MathRound(groundheight * ((i % 2) == 0 ? .7 : .5)));
+									MathRound(groundheight * (i % 2 == 0 ? 0.7 : 0.5))
+								);
 								_bull2.invulnerable = _bull2.puppetMode = _bull2.skipHealthBar = true;
 								_bull2.direction = _bull2.moveDirection = 'left';
-								_bull2.left += MathRound(i * _bull2.WIDTH* (getRandomValue2(5, 15) / 10));
+								_bull2.left += MathRound(i * _bull2.WIDTH * (getRandomValue2(5, 15) / 10));
 								_limit++;
-								_bull1.action =  {
+								_bull1.action = {
 									command: 'move',
 									to: -1 * _bull1.WIDTH,
-									after: function(_e) {
+									after: function (_e) {
 										_stopBull(_e, _limit);
 									}
 								};
-								_bull2.action =  {
+								_bull2.action = {
 									command: 'move',
 									to: -1 * _bull1.WIDTH,
-									after: function(_e) {
+									after: function (_e) {
 										_stopBull(_e, _limit);
 									}
 								};
-								if((i % 2) == 0)
-									continue;
-								const _bull3 = summonMob(82,
+								if (i % 2 == 0) continue;
+								const _bull3 = summonMob(
+									82,
 									MathRound((_canvas.width + platformX) / __zoom),
-									MathRound(groundheight * .8));
+									MathRound(groundheight * 0.8)
+								);
 								_bull3.invulnerable = _bull3.puppetMode = _bull3.skipHealthBar = true;
 								_bull3.direction = _bull3.moveDirection = 'left';
-								_bull3.left += MathRound(i * _bull3.WIDTH* (getRandomValue2(5, 15) / 10));
+								_bull3.left += MathRound(i * _bull3.WIDTH * (getRandomValue2(5, 15) / 10));
 								_limit++;
-								_bull3.action =  {
+								_bull3.action = {
 									command: 'move',
 									to: -1 * _bull1.WIDTH,
-									after: function(_e) {
+									after: function (_e) {
 										_stopBull(_e, _limit);
 									}
 								};
@@ -4339,21 +3803,21 @@ const __stories = [
 			}
 		],
 		title: {
-			en: "Genious Troll",
-			tr: "Dahi Yaratık"
+			en: 'Genious Troll',
+			tr: 'Dahi Yaratık'
 		},
 		description: {
-			en: "Our heroes need engineering to finish Cyclops, and only way is planting explosives for high damage, the genius troll in cave have some recipes which Temir Han may help how to set some traps.",
+			en: 'Our heroes need engineering to finish Cyclops, and only way is planting explosives for high damage, the genius troll in cave have some recipes which Temir Han may help how to set some traps.',
 			tr: "Kahramanlarımızın Tepegöz' e ölümcül vuruşu yapabilmesi için biraz mühendisliğe ihtiyaçları var ve bunun tek yolu yüksek hasar veren patlayıcılar kullanmak. Dahi mağara yaratığının elindeki planları bulup getirebilirlerse belki Temir Han' ın yardımı dokunabilir"
 		},
-		boss: "bomber",
+		boss: 'bomber',
 		scenes: [
 			{
 				map: 41,
 				from: 'left',
 				startWith: 1,
-				loadingCharacterIds: [ 75,76,77 ],
-				start: function() {
+				loadingCharacterIds: [75, 76, 77],
+				start: function () {
 					takeQuest(0, 1, null, 'progress', 1);
 					removeClass(_gameUI, 'disable-ui');
 					removeCoopCharacter(1);
@@ -4372,8 +3836,8 @@ const __stories = [
 						maxX: 1200,
 						count: 1,
 						sight: 100,
-						yPosition: function() {
-							return MathRound(groundheight * .75);
+						yPosition: function () {
+							return MathRound(groundheight * 0.75);
 						}
 					},
 					{
@@ -4382,8 +3846,8 @@ const __stories = [
 						maxX: 1300,
 						count: 1,
 						sight: 100,
-						yPosition: function() {
-							return MathRound(groundheight * .25);
+						yPosition: function () {
+							return MathRound(groundheight * 0.25);
 						}
 					},
 					{
@@ -4392,8 +3856,8 @@ const __stories = [
 						maxX: 2200,
 						count: 1,
 						sight: 100,
-						yPosition: function() {
-							return MathRound(groundheight * .75);
+						yPosition: function () {
+							return MathRound(groundheight * 0.75);
 						}
 					},
 					{
@@ -4402,8 +3866,8 @@ const __stories = [
 						maxX: 2300,
 						count: 1,
 						sight: 100,
-						yPosition: function() {
-							return MathRound(groundheight * .25);
+						yPosition: function () {
+							return MathRound(groundheight * 0.25);
 						}
 					},
 					{
@@ -4412,8 +3876,8 @@ const __stories = [
 						maxX: 3200,
 						count: 1,
 						sight: 100,
-						yPosition: function() {
-							return MathRound(groundheight * .75);
+						yPosition: function () {
+							return MathRound(groundheight * 0.75);
 						}
 					},
 					{
@@ -4422,8 +3886,8 @@ const __stories = [
 						maxX: 3300,
 						count: 1,
 						sight: 100,
-						yPosition: function() {
-							return MathRound(groundheight * .25);
+						yPosition: function () {
+							return MathRound(groundheight * 0.25);
 						}
 					},
 					{
@@ -4432,8 +3896,8 @@ const __stories = [
 						maxX: 4200,
 						count: 1,
 						sight: 100,
-						yPosition: function() {
-							return MathRound(groundheight * .75);
+						yPosition: function () {
+							return MathRound(groundheight * 0.75);
 						}
 					},
 					{
@@ -4442,8 +3906,8 @@ const __stories = [
 						maxX: 4300,
 						count: 1,
 						sight: 100,
-						yPosition: function() {
-							return MathRound(groundheight * .25);
+						yPosition: function () {
+							return MathRound(groundheight * 0.25);
 						}
 					},
 					{
@@ -4452,8 +3916,8 @@ const __stories = [
 						maxX: 5200,
 						count: 1,
 						sight: 100,
-						yPosition: function() {
-							return MathRound(groundheight * .75);
+						yPosition: function () {
+							return MathRound(groundheight * 0.75);
 						}
 					},
 					{
@@ -4462,8 +3926,8 @@ const __stories = [
 						maxX: 5300,
 						count: 1,
 						sight: 100,
-						yPosition: function() {
-							return MathRound(groundheight * .25);
+						yPosition: function () {
+							return MathRound(groundheight * 0.25);
 						}
 					},
 					{
@@ -4479,13 +3943,12 @@ const __stories = [
 				map: 1,
 				from: 'right',
 				startWith: 1,
-				start: function() {
+				start: function () {
 					removeClass(_gameUI, 'disable-ui');
 					takeQuest(0, 1, null, 'end', 1);
 					episode.drawSpriteObjects2('blacksmith', 1);
 					episode.endTime = __account.questStatus.lastStoryFinishTime ?? _gameTick;
-					if(__account.questStatus.lastStoryFinishTime)
-						delete __account.questStatus.lastStoryFinishTime;
+					if (__account.questStatus.lastStoryFinishTime) delete __account.questStatus.lastStoryFinishTime;
 				},
 				mobs: [
 					{
@@ -4493,10 +3956,10 @@ const __stories = [
 						minX: 3340,
 						maxX: 3340,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -4505,10 +3968,10 @@ const __stories = [
 						minX: 4340,
 						maxX: 4340,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -4517,43 +3980,25 @@ const __stories = [
 						minX: 2400,
 						maxX: 2400,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.dialogs = createPotDialog('tank');
-							//_e.dialogs = createTrainingDialog('tank');
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
-					// {
-					// 	id: '10002',
-					// 	minX: 2740,
-					// 	maxX: 2740,
-					// 	count: 1,
-					// 	do: function(_e) {
-					// 		_e.npc = true;
-					// 		_e.friendly = true;
-					// 		_e.enemy = false;
-					// 		_e.zoom *= .9;
-					// 		_e.still = _e.noDirection = true;
-					// 		_e.stepXRate = _e.stepX = 0;
-					// 		_e.dialogs = createPotDialog('archer');
-					// 	},
-					// 	yPosition: function() {
-					// 		return MathRound(groundheight * 1.1);
-					// 	}
-					// },
+
 					{
 						id: 71,
 						minX: 4550,
 						maxX: 4550,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -4562,10 +4007,10 @@ const __stories = [
 						minX: 1245,
 						maxX: 1245,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -4574,7 +4019,7 @@ const __stories = [
 						minX: 1900,
 						maxX: 1900,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.friendly = true;
@@ -4582,7 +4027,7 @@ const __stories = [
 							_e.reversed = true;
 							_e.direction = 'left';
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					}
@@ -4592,26 +4037,27 @@ const __stories = [
 		]
 	},
 	{
-		id:7,
-		order:7,
-		boss:'archer',
-		minLevel:8,
+		id: 7,
+		order: 7,
+		boss: 'archer',
+		minLevel: 8,
 		list: true,
-		act:1,
-		ticket:2,
-		bonusAchievements: [{
-			id:1,
-			minCount: 3,
-			title: {
-				en: 'Finish in 1.5 minutes',
-				tr: '1.5 dakika içinde bitir'
-			},
-			when: function() {
-				return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
-				<= 90000;
-			},
-			reward: { key:'gold', count: 30000 }
-		}],
+		act: 1,
+		ticket: 2,
+		bonusAchievements: [
+			{
+				id: 1,
+				minCount: 3,
+				title: {
+					en: 'Finish in 1.5 minutes',
+					tr: '1.5 dakika içinde bitir'
+				},
+				when: function () {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= 90000;
+				},
+				reward: { key: 'gold', count: 30000 }
+			}
+		],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		title: {
@@ -4619,25 +4065,42 @@ const __stories = [
 			tr: 'Destek Bulmak'
 		},
 		description: {
-			en: "Alkin, one of our heroes, goes to Basat and the people of the village to rescue the wolves enslaved by the giant trolls living in the Ice Land and ask for their support so that they can support them in a possible war.",
+			en: 'Alkin, one of our heroes, goes to Basat and the people of the village to rescue the wolves enslaved by the giant trolls living in the Ice Land and ask for their support so that they can support them in a possible war.',
 			tr: "Kahramanlarımızdan Alkin, Basat' a ve Köy halkına, olası savaşta destek olabilmeleri adına Buz Diyarında yaşayan dev trollerin köleleştirdiği kurtları kurtarmaya ve onların desteğini istemeye gider."
 		},
 		resultStars: [
-			{ id: 1, title: 'Clear story', when: function() {
-				return !mainCharacter.isDead();
-			}},
-			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
-				when: function(_item) {
-					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
-			}},
-			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
-			}}
+			{
+				id: 1,
+				title: 'Clear story',
+				when: function () {
+					return !mainCharacter.isDead();
+				}
+			},
+			{
+				id: 2,
+				key: 'time',
+				value: 10 * 60000,
+				title: 'Finish in time',
+				when: function (_item) {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= _item.value;
+				}
+			},
+			{
+				id: 3,
+				key: 'hp',
+				value: 0.5,
+				title: 'Stay above %50 health',
+				when: function (_item) {
+					return (
+						(__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >=
+						MathFloor(mainCharacter.maxHP * _item.value)
+					);
+				}
+			}
 		],
 		rewards: [
 			{ key: 'item', grade: 2, type: 'boots' },
-			{ key: 'gem', grade: 1, type: 'random', count:1, chance:50 },
+			{ key: 'gem', grade: 1, type: 'random', count: 1, chance: 50 },
 			{ key: 'gold', count: 8000 },
 			{ key: 'exp', count: 1800 }
 		],
@@ -4645,7 +4108,7 @@ const __stories = [
 			{
 				id: 1,
 				key: 'wolf',
-				dialogId:13,
+				dialogId: 13,
 				names: {
 					en: 'Save Wolves',
 					tr: 'Kurtları Kurtar'
@@ -4666,12 +4129,11 @@ const __stories = [
 					}
 				],
 				maps: [93],
-				done: function() {
-					if(__account.questStatus.lastStoryFinishTime)
-						return;
+				done: function () {
+					if (__account.questStatus.lastStoryFinishTime) return;
 					finishStory();
 				},
-				complete: function() {
+				complete: function () {
 					installStoryFinish();
 				}
 			}
@@ -4683,49 +4145,48 @@ const __stories = [
 				from: 'left',
 				loadingCharacterIds: [22],
 				save: true,
-				start: function() {
+				start: function () {
 					takeQuest(0, 1, null, null, 1);
 					mainCharacter.left = MathRound(_canvas.width / 5);
 					setCharacterLevel(10, mainCharacter, 1);
 					applyDefaultCharacterStats(mainCharacter);
 					mainCharacter.solid = true;
 					episode.realClass = mainCharacter.class;
-					const _cages = episode.enemies.filter(x => x.id === 42);
-					for(let i = 0; i < _cages.length; i++)
-					{
+					const _cages = episode.enemies.filter((x) => x.id === 42);
+					for (let i = 0; i < _cages.length; i++) {
 						_cages[i].noLoot = false;
-						_cages[i].checkLoot({loot:{
-							key: 'firespray',
-							type: 'common'
-						}});
+						_cages[i].checkLoot({
+							loot: {
+								key: 'firespray',
+								type: 'common'
+							}
+						});
 						_cages[i].noLoot = true;
 					}
-					episode.enemies.forEach(e => e.standBy());
+					episode.enemies.forEach((e) => e.standBy());
 					createBubbleText({
 						id: 1,
-						location: { map: episode.id }, ms: 3000,
+						location: { map: episode.id },
+						ms: 3000,
 						owner: mainCharacter.key,
-						text: "This place has never been so quiet",
-						onend: function() {
-							episode.enemies.forEach(e => {
+						text: 'This place has never been so quiet',
+						onend: function () {
+							episode.enemies.forEach((e) => {
 								e.immobilize = false;
-								if(e.main)
-									delete e.disableKeyboard;
+								if (e.main) delete e.disableKeyboard;
 							});
 						}
 					});
 				},
-				actions: [
-				
-				],
+				actions: [],
 				mobs: [
 					{
 						id: 22,
 						minX: 2200,
 						maxX: 6000,
 						count: 10,
-						sight:50,
-						do: function(_e) {
+						sight: 50,
+						do: function (_e) {
 							_e.experience = 0;
 						}
 					},
@@ -4734,13 +4195,12 @@ const __stories = [
 						minX: 2100,
 						maxX: 2600,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.noDirection = true;
 							_e.solid = true;
 							_e.npc = 'wolf';
-							_e.actionSound = {key:'unlock', volume:.7};
-							if(getRandomValue2(1,2) < 2)
-								_e.reversed = 1;
+							_e.actionSound = { key: 'unlock', volume: 0.7 };
+							if (getRandomValue2(1, 2) < 2) _e.reversed = 1;
 						}
 					},
 					{
@@ -4748,13 +4208,12 @@ const __stories = [
 						minX: 3000,
 						maxX: 3500,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.noDirection = true;
 							_e.solid = true;
 							_e.npc = 'wolf';
-							_e.actionSound = {key:'unlock', volume:.7};
-							if(getRandomValue2(1,2) < 2)
-								_e.reversed = 1;
+							_e.actionSound = { key: 'unlock', volume: 0.7 };
+							if (getRandomValue2(1, 2) < 2) _e.reversed = 1;
 						}
 					},
 					{
@@ -4762,13 +4221,12 @@ const __stories = [
 						minX: 3900,
 						maxX: 4400,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.noDirection = true;
 							_e.solid = true;
 							_e.npc = 'wolf';
-							_e.actionSound = {key:'unlock', volume:.7};
-							if(getRandomValue2(1,2) < 2)
-								_e.reversed = 1;
+							_e.actionSound = { key: 'unlock', volume: 0.7 };
+							if (getRandomValue2(1, 2) < 2) _e.reversed = 1;
 						}
 					},
 					{
@@ -4776,13 +4234,12 @@ const __stories = [
 						minX: 4800,
 						maxX: 5300,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.noDirection = true;
 							_e.solid = true;
 							_e.npc = 'wolf';
-							_e.actionSound = {key:'unlock', volume:.7};
-							if(getRandomValue2(1,2) < 2)
-								_e.reversed = 1;
+							_e.actionSound = { key: 'unlock', volume: 0.7 };
+							if (getRandomValue2(1, 2) < 2) _e.reversed = 1;
 						}
 					},
 					{
@@ -4790,13 +4247,12 @@ const __stories = [
 						minX: 5700,
 						maxX: 6200,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.noDirection = true;
 							_e.solid = true;
 							_e.npc = 'wolf';
-							_e.actionSound = {key:'unlock', volume:.7};
-							if(getRandomValue2(1,2) < 2)
-								_e.reversed = 1;
+							_e.actionSound = { key: 'unlock', volume: 0.7 };
+							if (getRandomValue2(1, 2) < 2) _e.reversed = 1;
 						}
 					}
 				]
@@ -4805,31 +4261,31 @@ const __stories = [
 				map: 1,
 				from: 'right',
 				startWith: 10002,
-				start: function() {
+				start: function () {
 					removeClass(_gameUI, 'disable-ui');
 					takeQuest(0, 1, null, 'end', 1);
 					episode.drawSpriteObjects2('stables', 1);
 					episode.mainClass = 10001;
 					episode.realClass = 'archer';
 					episode.endTime = __account.questStatus.lastStoryFinishTime ?? _gameTick;
-					if(__account.questStatus.lastStoryFinishTime)
-						delete __account.questStatus.lastStoryFinishTime;		
+					if (__account.questStatus.lastStoryFinishTime) delete __account.questStatus.lastStoryFinishTime;
 					platformX = episode.width - _canvas.width;
 					episode.phase = 1;
 					mainCharacter.left = _canvas.width - MathRound(_canvas.width / 5) - mainCharacter.getWidth();
 				},
 				actions: [
 					{
-						when: function(){
-							return episode.phase === 1 && (platformX < ((4435 * episode.zoom) - (episode.cWidth / 2)));
+						when: function () {
+							return episode.phase === 1 && platformX < 4435 * episode.zoom - episode.cWidth / 2;
 						},
-						do: function(){
+						do: function () {
 							episode.phase = 2;
 							createBubbleText({
 								id: 1,
-								location: { map: episode.id }, ms: 2000,
-								owner: episode.enemies.find(x => x.class === 'warrior').key,
-								text: "You are back!"
+								location: { map: episode.id },
+								ms: 2000,
+								owner: episode.enemies.find((x) => x.class === 'warrior').key,
+								text: 'You are back!'
 							});
 						}
 					}
@@ -4840,7 +4296,7 @@ const __stories = [
 						minX: 5600,
 						maxX: 6200,
 						count: 5,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 							_e.friendly = _e.invulnerable = true;
 							_e.enemy = false;
@@ -4851,10 +4307,10 @@ const __stories = [
 						minX: 3340,
 						maxX: 3340,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -4863,10 +4319,10 @@ const __stories = [
 						minX: 4340,
 						maxX: 4340,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -4875,13 +4331,12 @@ const __stories = [
 						minX: 2400,
 						maxX: 2400,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.dialogs = createPotDialog('tank');
-							//_e.dialogs = createTrainingDialog('tank');
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -4890,10 +4345,10 @@ const __stories = [
 						minX: 4550,
 						maxX: 4550,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -4902,10 +4357,10 @@ const __stories = [
 						minX: 1245,
 						maxX: 1245,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -4914,7 +4369,7 @@ const __stories = [
 						minX: 1900,
 						maxX: 1900,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.friendly = true;
@@ -4922,7 +4377,7 @@ const __stories = [
 							_e.reversed = true;
 							_e.direction = 'left';
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -4931,14 +4386,14 @@ const __stories = [
 						minX: 4150,
 						maxX: 4150,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.drawPriority = 999;
 							_e.npc = true;
 							_e.enemy = false;
 							_e.direction = 'right';
 						},
-						yPosition: function() {
-							return MathRound(groundheight * .85);
+						yPosition: function () {
+							return MathRound(groundheight * 0.85);
 						}
 					}
 				]
@@ -4951,41 +4406,56 @@ const __stories = [
 		order: 8,
 		disableWorldMap: true,
 		resultStars: [
-			{ id: 1, title: 'Clear story', when: function() {
-				return !mainCharacter.isDead();
-			}},
-			{ id: 2, key: 'time', value: 20 * 60000, title: 'Finish in time',
-				when: function(_item) {
-					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
-			}},
-			{ id: 3, key: 'heart', value: 1, title: 'Stay above 1 heart', when: function(_item) {
-				return mainCharacter.heartCount > _item.value;
-			}}
+			{
+				id: 1,
+				title: 'Clear story',
+				when: function () {
+					return !mainCharacter.isDead();
+				}
+			},
+			{
+				id: 2,
+				key: 'time',
+				value: 20 * 60000,
+				title: 'Finish in time',
+				when: function (_item) {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= _item.value;
+				}
+			},
+			{
+				id: 3,
+				key: 'heart',
+				value: 1,
+				title: 'Stay above 1 heart',
+				when: function (_item) {
+					return mainCharacter.heartCount > _item.value;
+				}
+			}
 		],
 		ticket: 4,
 		bonus: 'exp',
-		list:true,
+		list: true,
 		minLevel: 10,
-		act:1,
-		bonusAchievements: [{
-			id:1,
-			minCount: 2,
-			title: {
-				en: 'Finish in 4 minutes',
-				tr: '4 dakika içinde bitir'
-			},
-			when: function() {
-				return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
-				<= 240000;
-			},
-			reward: { key:'gold', count: 30000 }
-		}],
+		act: 1,
+		bonusAchievements: [
+			{
+				id: 1,
+				minCount: 2,
+				title: {
+					en: 'Finish in 4 minutes',
+					tr: '4 dakika içinde bitir'
+				},
+				when: function () {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= 240000;
+				},
+				reward: { key: 'gold', count: 30000 }
+			}
+		],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
-			{ key: 'item', grade: 2, type: 'chest', count:1 },
-			{ key: 'fragment', name: 'sisters', minCount:1, maxCount:5, chance:50 },
+			{ key: 'item', grade: 2, type: 'chest', count: 1 },
+			{ key: 'fragment', name: 'sisters', minCount: 1, maxCount: 5, chance: 50 },
 			{ key: 'gold', count: 8500 },
 			{ key: 'exp', count: 3800 }
 		],
@@ -5003,34 +4473,33 @@ const __stories = [
 				owner: 'system',
 				timer: {
 					ms: 60000,
-					after: function() {
+					after: function () {
 						episode.phase = 99;
-						episode.enemies.filter(x => !x.main && !x.tag && !x.friendly).forEach(x => {
-							x.stopSpawn();
-							x.health = x.experience = 0;
-							x.dead = x.dying = true;
-							x.animate('dead', 1);
-						});
+						episode.enemies
+							.filter((x) => !x.main && !x.tag && !x.friendly)
+							.forEach((x) => {
+								x.stopSpawn();
+								x.health = x.experience = 0;
+								x.dead = x.dying = true;
+								x.animate('dead', 1);
+							});
 						episode.mobs = [];
 						episode.respawners = [];
-						//episode.loadCharacterSprites(function() {}, [37,38], null, 1);
-						episode.playSound({key:'bossalert', volume: .5});
-						warn('<div class="flex leveling"><img style="height:22cqh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
-						// const _elm = document.getElementById('quest-status');
-						// addClass(_elm, 'mission-done');
-						// _elm.onanimationend = function(e) {
-						// 	if(e.animationName === 'mission-done')
-						// 		updateQuestArea(null,
-						// 			__storyScene.bossQuest
-						// 		);
-						// }
+
+						episode.playSound({ key: 'bossalert', volume: 0.5 });
+						warn(
+							'<div class="flex leveling"><img style="height:22cqh" src="./images/icons/boss-alert.gif" /></div>',
+							'level-up',
+							4000,
+							1
+						);
+
 						setTimeout(() => {
-							episode.playSound({key:'sistersenter', volume:1});
+							episode.playSound({ key: 'sistersenter', volume: 1 });
 							setTimeout(() => {
-								if(episode?.id !== 201)
-									return;
+								if (episode?.id !== 201) return;
 								episode.phase = 100;
-								const installBoss = function(_b, _name) {
+								const installBoss = function (_b, _name) {
 									const _boss = summonMobWithJson({
 										id: _b,
 										level: 13,
@@ -5038,37 +4507,29 @@ const __stories = [
 										atk: mainCharacter.atk,
 										grade: 4
 									});
-									//_boss.health = _boss.maxHP = 1;
+
 									_boss.class = 'boss';
 									_boss.experience = 0;
 									_boss.setDifficulty(__account.difficulty - 1);
 									_boss.acceptChanges();
 									_boss.pickNewTarget();
-								}
+								};
 								installBoss(37, 'Morya');
 								requestAnimationFrame(() => {
 									installBoss(38, 'Erlin');
 								});
-								mainCharacter.maxHP = mainCharacter.MAXHP =
-								mainCharacter.maxHP * 1;
+								mainCharacter.maxHP = mainCharacter.MAXHP = mainCharacter.maxHP * 1;
 								mainCharacter.setHealth(mainCharacter.MAXHP);
 								episode.pauseAmbianceMusic();
 								episode.pauseBgMusic(1);
-								episode.createBgMusic(null, null, null, 'cyclops-battle', .5);
+								episode.createBgMusic(null, null, null, 'cyclops-battle', 0.5);
 								episode.playBgMusic();
 							}, 1000);
 							takeQuest(1, null, null, 'progress', 1);
 						}, 4000);
 					}
 				},
-				// kills: [{
-				// 	enemy: [1,7,19,20,24,28,30,66],
-				// 	limit: 1000,
-				// 	descriptions: {
-				// 		en: 'Enemy Killed',
-				// 		tr: 'Düşman Öldürüldü'
-				// 	}
-				// }],
+
 				maps: [201]
 			},
 			{
@@ -5092,38 +4553,36 @@ const __stories = [
 							tr: 'Morya Temizlendi'
 						}
 					},
-					{ 
-						enemy: [38], 
-						limit: 1, 
+					{
+						enemy: [38],
+						limit: 1,
 						descriptions: {
 							en: 'Erlin Cleared',
 							tr: 'Erlin Temizlendi'
-						} 
+						}
 					}
 				],
 				maps: [201]
 			}
 		],
 		title: {
-			en: "More Power",
-			tr: "Fazla Güç"
+			en: 'More Power',
+			tr: 'Fazla Güç'
 		},
 		description: {
 			en: "This stage will boost our heroes' experience to become even stronger. They will test themselves against a large crowd of enemies and race against time",
-			tr: "Kahramanlarımızın daha fazla güçlenmesi için bu aşama tecrübelerini boostlayacak. Kalabalık düşman topluluğuna karşı kendilerini sınayacaklar ve bir yandan da zamana karşı yarışıyor olacaklar"
+			tr: 'Kahramanlarımızın daha fazla güçlenmesi için bu aşama tecrübelerini boostlayacak. Kalabalık düşman topluluğuna karşı kendilerini sınayacaklar ve bir yandan da zamana karşı yarışıyor olacaklar'
 		},
-		boss: "sisters",
-		heartCount : 3,
+		boss: 'sisters',
+		heartCount: 3,
 		scenes: [
 			{
 				map: 201,
-				loadingCharacterIds: [37,38],
-				loots: [
-					{type:'pot', key:'pot', chance:1}
-				],
+				loadingCharacterIds: [37, 38],
+				loots: [{ type: 'pot', key: 'pot', chance: 1 }],
 				startsWith: 1,
 				save: true,
-				start: function() {
+				start: function () {
 					clearAudioCache(loadedSounds);
 					removeCoopCharacter();
 					mainCharacter.storyVariables = {
@@ -5136,28 +4595,28 @@ const __stories = [
 					episode.createBgMusic(null, null, null, 'training');
 					episode.playBgMusic();
 					episode.phase = 1;
-					takeQuest(0, null, null, 'progress',1);
+					takeQuest(0, null, null, 'progress', 1);
 				},
 				actions: [
 					{
-						when: function() {
+						when: function () {
 							return episode.phase === 1;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 98;
-							for(let i = 0; i < 9; i++)
-								for(let x of __storyScene.mobs){
-									let y = summonMobWithJson(structuredClone2(x),0,1);
+							for (let i = 0; i < 9; i++)
+								for (let x of __storyScene.mobs) {
+									let y = summonMobWithJson(structuredClone2(x), 0, 1);
 									y.maxHP = y.MAXHP = y.health = mainCharacter.level * 30;
 									y.setHealth(y.maxHP);
 								}
 						}
 					},
 					{
-						when: function() {
-							return episode.phase === 100 && !episode.enemies.filter(x => x.class === 'boss')?.length;
+						when: function () {
+							return episode.phase === 100 && !episode.enemies.filter((x) => x.class === 'boss')?.length;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 101;
 							installStoryFinish();
 						}
@@ -5165,13 +4624,13 @@ const __stories = [
 				],
 				mobs: [
 					{
-						id: 19,
+						id: 619,
 						minX: 1580,
 						maxX: 4800,
 						count: 1,
 						sight: 1000,
 						spawn: 1,
-						hp:60
+						hp: 60
 					},
 					{
 						id: 23,
@@ -5180,7 +4639,7 @@ const __stories = [
 						count: 1,
 						sight: 1000,
 						spawn: 1,
-						hp:60
+						hp: 60
 					},
 					{
 						id: 20,
@@ -5189,17 +4648,9 @@ const __stories = [
 						count: 1,
 						sight: 1000,
 						spawn: 1,
-						hp:60
+						hp: 60
 					},
-					// {
-					// 	id: 66,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	sight: 1000,
-					// 	count: 1,
-					// 	spawn: 1,
-					// 	hp:60
-					// },
+
 					{
 						id: 28,
 						minX: 1580,
@@ -5207,7 +4658,7 @@ const __stories = [
 						count: 1,
 						spawn: 1,
 						sight: 1000,
-						hp:60
+						hp: 60
 					},
 					{
 						id: 30,
@@ -5216,7 +4667,7 @@ const __stories = [
 						count: 1,
 						spawn: 1,
 						sight: 1000,
-						hp:60
+						hp: 60
 					},
 					{
 						id: 24,
@@ -5224,7 +4675,7 @@ const __stories = [
 						maxX: 4800,
 						count: 1,
 						spawn: 1,
-						hp:60
+						hp: 60
 					},
 					{
 						id: 7,
@@ -5233,7 +4684,7 @@ const __stories = [
 						maxX: 4800,
 						count: 1,
 						spawn: 1,
-						hp:60
+						hp: 60
 					},
 					{
 						id: 1,
@@ -5242,7 +4693,7 @@ const __stories = [
 						sight: 1000,
 						count: 1,
 						spawn: 1,
-						hp:60
+						hp: 60
 					}
 				]
 			},
@@ -5254,39 +4705,57 @@ const __stories = [
 		order: 9,
 		disableWorldMap: true,
 		resultStars: [
-			{ id: 1, title: 'Clear story', when: function() {
-				return !mainCharacter.isDead();
-			}},
-			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
-				when: function(_item) {
-					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
-			}},
-			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
-			}}
+			{
+				id: 1,
+				title: 'Clear story',
+				when: function () {
+					return !mainCharacter.isDead();
+				}
+			},
+			{
+				id: 2,
+				key: 'time',
+				value: 10 * 60000,
+				title: 'Finish in time',
+				when: function (_item) {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= _item.value;
+				}
+			},
+			{
+				id: 3,
+				key: 'hp',
+				value: 0.5,
+				title: 'Stay above %50 health',
+				when: function (_item) {
+					return (
+						(__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >=
+						MathFloor(mainCharacter.maxHP * _item.value)
+					);
+				}
+			}
 		],
 		ticket: 4,
-		list:true,
-		act:1,
-		bonusAchievements: [{
-			id:1,
-			minCount: 2,
-			title: {
-				en: 'Finish in 3.5 minutes',
-				tr: '3.5 dakika içinde bitir'
-			},
-			when: function() {
-				return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
-				<= 210000;
-			},
-			reward: { key:'gold', count: 30000 }
-		}],
+		list: true,
+		act: 1,
+		bonusAchievements: [
+			{
+				id: 1,
+				minCount: 2,
+				title: {
+					en: 'Finish in 3.5 minutes',
+					tr: '3.5 dakika içinde bitir'
+				},
+				when: function () {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= 210000;
+				},
+				reward: { key: 'gold', count: 30000 }
+			}
+		],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		rewards: [
-			{ key: 'item', grade: 2, type: 'gloves', count:1 },
-			{ key: 'fragment', name: 'cyclops,werewolf', minCount:1, maxCount:5 },
+			{ key: 'item', grade: 2, type: 'gloves', count: 1 },
+			{ key: 'fragment', name: 'cyclops,werewolf', minCount: 1, maxCount: 5 },
 			{ key: 'gold', count: 9000 },
 			{ key: 'exp', count: 2000 }
 		],
@@ -5306,25 +4775,25 @@ const __stories = [
 				timer: {
 					ms: 90000,
 					iconPath: './images/main/cyclops/avatar.png',
-					after: function() {
-						const _huts = episode.enemies.filter(x => x.id === 80 || x.id === 81);
-						if(_huts?.[0]) {
-							const _deads = _huts.find(x => x.health <= 0);
-							if(!_deads?.[0]) {
-								_huts.forEach(x => x.invulnerable = x.skipHealthBar = true);
+					after: function () {
+						const _huts = episode.enemies.filter((x) => x.id === 80 || x.id === 81);
+						if (_huts?.[0]) {
+							const _deads = _huts.find((x) => x.health <= 0);
+							if (!_deads?.[0]) {
+								_huts.forEach((x) => (x.invulnerable = x.skipHealthBar = true));
 								__account.questStatus.quest.loots = [
 									{
 										object: ['hut'],
 										limit: 2,
-										count:2,
+										count: 2,
 										noInfo: true,
 										key: 'hut',
 										type: 'quest-item',
 										chanceRate: 100,
-										command:'Defend'
+										command: 'Defend'
 									}
 								];
-								//getQuestRewards(__account.questStatus.quest);
+
 								updateQuestArea();
 								episode.phase = 20;
 							}
@@ -5339,24 +4808,21 @@ const __stories = [
 					en: 'Destroy Enemy',
 					tr: 'Düşmanı Yok Et'
 				},
-				// descriptions: {
-				// 	en: 'Enemy Destroyed',
-				// 	tr: 'Düşman Yok Edildi'
-				// },
+
 				owner: 'system',
 				minLevel: 1,
 				maps: [10]
 			}
 		],
 		title: {
-			en: "Resistance",
-			tr: "Direniş"
+			en: 'Resistance',
+			tr: 'Direniş'
 		},
 		description: {
 			en: "Our heroes and the villagers team up, the collected ingredients are boiled, and the resulting potion must be used after the villagers, alerted by the forest animals scurrying around, warn them. Will this potion have a positive or negative effect? The goblin army, which has raided the village's entrance, is determined to destroy it.",
-			tr: "kahramanlarımız ve köy halkı birlik yapar, toplanan malzemeler kaynatılır ve elde edilen iksir etrafta koşuşturan orman hayvanlarını gören köylülerin uyarılarıyla artık kullanılmalıdır. Bu iksir olumlu mu yoksa olumsuz mu etki edecektir. Köyün girişine dadanan goblin ordusu köyü yerlebir etmeyi kafasına koymuştur."
+			tr: 'kahramanlarımız ve köy halkı birlik yapar, toplanan malzemeler kaynatılır ve elde edilen iksir etrafta koşuşturan orman hayvanlarını gören köylülerin uyarılarıyla artık kullanılmalıdır. Bu iksir olumlu mu yoksa olumsuz mu etki edecektir. Köyün girişine dadanan goblin ordusu köyü yerlebir etmeyi kafasına koymuştur.'
 		},
-		boss: "cyclops",
+		boss: 'cyclops',
 		minLevel: 10,
 		scenes: [
 			{
@@ -5366,24 +4832,28 @@ const __stories = [
 				save: true,
 				noArtifact: 1,
 				startWith: 1,
-				loadingCharacterIds: [27, 29, 19, 66, 47, 83, 49],
+				loadingCharacterIds: [27, 29, 619, 66, 47, 83, 49],
 				bonusRewards: [
 					{
-						when: function(_class) { return 'cyclops' === _class },
+						when: function (_class) {
+							return 'cyclops' === _class;
+						},
 						key: 'fragment',
 						type: 'cyclops',
 						description: {
-							"tr": "Tepegöz parçacığı",
-							"en": "Cyclops fragment"
+							'tr': 'Tepegöz parçacığı',
+							'en': 'Cyclops fragment'
 						}
 					},
 					{
-						when: function(_class) { return 'werewolf' === _class },
+						when: function (_class) {
+							return 'werewolf' === _class;
+						},
 						key: 'fragment',
 						type: 'werewolf',
 						description: {
-							"tr": "Gökbörü parçacığı",
-							"en": "Gökbörü fragment"
+							'tr': 'Gökbörü parçacığı',
+							'en': 'Gökbörü fragment'
 						}
 					}
 				],
@@ -5394,10 +4864,9 @@ const __stories = [
 							tr: 'Okçu kızı öldürme',
 							en: 'Do not kill the archer girl'
 						},
-						when: function(){
-							let _archer = episode.enemies.find(x => x.class === 'archer');
-							if(_archer && !_archer.isDead() && _archer.health > 0)
-								return true;
+						when: function () {
+							let _archer = episode.enemies.find((x) => x.class === 'archer');
+							if (_archer && !_archer.isDead() && _archer.health > 0) return true;
 							return false;
 						}
 					},
@@ -5407,20 +4876,19 @@ const __stories = [
 							tr: 'Bomba yeteneği ile patronu öldür',
 							en: 'Kill the boss with bomb skill'
 						},
-						when: function(){
-							let _cyc = episode.enemies.find(x => x.id === 47);
-							if(_cyc && _cyc.isDead() && (_cyc.lastHitSkill === 'defense'))
-								return true;
+						when: function () {
+							let _cyc = episode.enemies.find((x) => x.id === 47);
+							if (_cyc && _cyc.isDead() && _cyc.lastHitSkill === 'defense') return true;
 							return false;
 						}
 					}
 				],
 				actions: [
 					{
-						when: function() {
-							return episode.phase === 20;// && (mainCharacter.left + platformX) > _canvas.width;
+						when: function () {
+							return episode.phase === 20;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 21;
 							mainCharacter.direction = 'right';
 							blurKeyboard();
@@ -5428,7 +4896,7 @@ const __stories = [
 							mainCharacter.still = mainCharacter.immobilize = true;
 							mainCharacter.animate('idle');
 							mainCharacter.enableSkill('defense');
-							if(mainCharacter.rageCount > 0 || mainCharacter.ultimate) {
+							if (mainCharacter.rageCount > 0 || mainCharacter.ultimate) {
 								mainCharacter.rageCount = 0;
 								mainCharacter.updateRageSkillUI();
 							}
@@ -5436,26 +4904,36 @@ const __stories = [
 							setTimeout(() => {
 								mainCharacter.yPosition = MathRound(groundheight / 2);
 								platformX = 0;
-								mainCharacter.left = MathRound((_canvas.width * .05) + mainCharacter.ORIGINDIST);
+								mainCharacter.left = MathRound(_canvas.width * 0.05 + mainCharacter.ORIGINDIST);
 								mainCharacter.platformX = 0;
-								const _cyclops = summonMob(47, _canvas.width,
-									MathRound(groundheight / 2), mainCharacter.level);
+								const _cyclops = summonMob(
+									47,
+									_canvas.width,
+									MathRound(groundheight / 2),
+									mainCharacter.level
+								);
 								_cyclops.direction = 'left';
 								_cyclops.updateVariables();
 								_cyclops.skipHealthBar = true;
 								_cyclops.animate('idle');
 								_cyclops.setAutoMode(0);
-								_cyclops.left = MathRound(_canvas.width - (((_canvas.width * .05) + _cyclops.WIDTH) - _cyclops.ORIGINDIST));
+								_cyclops.left = MathRound(
+									_canvas.width - (_canvas.width * 0.05 + _cyclops.WIDTH - _cyclops.ORIGINDIST)
+								);
 								_cyclops.still = _cyclops.immobilize = _cyclops.ironSkin = true;
-								episode.enemies.filter(x => !x.villain && x.class !== 'archer' && x.key !== 'vtl' && x.key !== 'vtm')?.forEach(x => {
-									x.stopSpawn();
-									x.health = 0;
-									x.remove = true;
-								});
-								if(episode.respawners)
-									episode.respawners = [];
+								episode.enemies
+									.filter(
+										(x) => !x.villain && x.class !== 'archer' && x.key !== 'vtl' && x.key !== 'vtm'
+									)
+									?.forEach((x) => {
+										x.stopSpawn();
+										x.health = 0;
+										x.remove = true;
+									});
+								if (episode.respawners) episode.respawners = [];
 							}, 1000);
-							cssAnimations.vs(mainCharacter,
+							cssAnimations.vs(
+								mainCharacter,
 								{
 									ms: 3000,
 									enemyId: 47,
@@ -5463,175 +4941,252 @@ const __stories = [
 									q1: 'How do you see with one eye?',
 									q2: 'I see dead people'
 								},
-								function() {
-									installCharacterSelection(function() {
+								function () {
+									installCharacterSelection(function () {
 										mainCharacter.name = 'Gökbörü';
 										episode.width = _canvas.width;
 										delete episode.towerDefenseStart;
 										episode.still = true;
 										var x = new characterSelection();
-										x.createCharacterSelectionUI('werewolf', 'cyclops', function() {
-											episode.mobs = [];
-											summonMobWithJson({
-												id: 19,
-												minX: _canvas.width,
-												maxX: _canvas.width,
-												sight: 1000,
-												spawn: 2,
-												pick: true,
-												ownerKey: episode.enemies.find(x => x.id === 47).key,
-												props: {
-													experience: 0,
-													noLoot: true,
-													skipHealthBar: true,
-													direction: __left
-												},
-												count: 6
-											}, 1);
-											const _e19 = episode.enemies.filter(x => x.id === 19 && !x.remove && x.owner);
-											let _archer = episode.enemies.find(x => x.class === 'archer');
-											if(!_archer) {
-												removeCoopCharacter(1);
-												_archer = addCoopCharacter(null, 'arc');
-												_archer.def *= mainCharacter.level;
-											}
-											if(_archer) {
-												_archer.level = mainCharacter.level;
-												resetSkills(null, 1, _archer);
-												_archer.skipHealthBar = true;
-												_archer.direction = __right;
-												_archer.left = MathRound(.05 * _canvas.width);
-												_archer.platformX = 0;
-												_archer.standBy();
-												_archer.still = true;
-												_archer.yPosition = MathRound(.7 * groundheight);
-												_archer.setAutoMode(0, 1);
-											}
-											_e19[0].left = MathRound((_canvas.width * (.6 + (3.5 * .085))) + platformX);
-											_e19[0].yPosition = MathRound((.2 * 1) * groundheight);
-											_e19[1].left = MathRound(((_canvas.width * (.6 + (3.5 * .085))) + platformX) + (_canvas.width * .05));
-											_e19[1].yPosition = MathRound((.2 * 2) * groundheight);
-											_e19[2].left = MathRound(((_canvas.width * (.6 + (3.5 * .085))) + platformX) + (_canvas.width * .05));
-											_e19[2].yPosition = MathRound((.2 * 3) * groundheight);
-											_e19[3].left = MathRound((_canvas.width * (.6 + (3.5 * .085))) + platformX);
-											_e19[3].yPosition = MathRound((.2 * 4) * groundheight);
-											_e19[4].left = MathRound(((_canvas.width * (.6 + (1.5 * .085))) + platformX) + (_canvas.width * .05));
-											_e19[4].yPosition = MathRound((.2 * 2) * groundheight);
-											_e19[5].left = MathRound(((_canvas.width * (.6 + (1.5 * .085))) + platformX) + (_canvas.width * .05));
-											_e19[5].yPosition = MathRound((.2 * 3) * groundheight);
-											_e19.forEach(x => {
-												x.setAutoMode(0, 1);
-												x.standBy();
-												x.direction = __left;
-											});
+										x.createCharacterSelectionUI(
+											'werewolf',
+											'cyclops',
+											function () {
+												episode.mobs = [];
+												summonMobWithJson(
+													{
+														id: 619,
+														minX: _canvas.width,
+														maxX: _canvas.width,
+														sight: 1000,
+														spawn: 2,
+														pick: true,
+														ownerKey: episode.enemies.find((x) => x.id === 47).key,
+														props: {
+															experience: 0,
+															noLoot: true,
+															skipHealthBar: true,
+															direction: __left
+														},
+														count: 6
+													},
+													1
+												);
+												const _e19 = episode.enemies.filter(
+													(x) => x.id === 619 && !x.remove && x.owner
+												);
+												let _archer = episode.enemies.find((x) => x.class === 'archer');
+												if (!_archer) {
+													removeCoopCharacter(1);
+													_archer = addCoopCharacter(null, 'arc');
+													_archer.def *= mainCharacter.level;
+												}
+												if (_archer) {
+													_archer.level = mainCharacter.level;
+													resetSkills(null, 1, _archer);
+													_archer.skipHealthBar = true;
+													_archer.direction = __right;
+													_archer.left = MathRound(0.05 * _canvas.width);
+													_archer.platformX = 0;
+													_archer.standBy();
+													_archer.still = true;
+													_archer.yPosition = MathRound(0.7 * groundheight);
+													_archer.setAutoMode(0, 1);
+												}
+												_e19[0].left = MathRound(
+													_canvas.width * (0.6 + 3.5 * 0.085) + platformX
+												);
+												_e19[0].yPosition = MathRound(0.2 * 1 * groundheight);
+												_e19[1].left = MathRound(
+													_canvas.width * (0.6 + 3.5 * 0.085) +
+														platformX +
+														_canvas.width * 0.05
+												);
+												_e19[1].yPosition = MathRound(0.2 * 2 * groundheight);
+												_e19[2].left = MathRound(
+													_canvas.width * (0.6 + 3.5 * 0.085) +
+														platformX +
+														_canvas.width * 0.05
+												);
+												_e19[2].yPosition = MathRound(0.2 * 3 * groundheight);
+												_e19[3].left = MathRound(
+													_canvas.width * (0.6 + 3.5 * 0.085) + platformX
+												);
+												_e19[3].yPosition = MathRound(0.2 * 4 * groundheight);
+												_e19[4].left = MathRound(
+													_canvas.width * (0.6 + 1.5 * 0.085) +
+														platformX +
+														_canvas.width * 0.05
+												);
+												_e19[4].yPosition = MathRound(0.2 * 2 * groundheight);
+												_e19[5].left = MathRound(
+													_canvas.width * (0.6 + 1.5 * 0.085) +
+														platformX +
+														_canvas.width * 0.05
+												);
+												_e19[5].yPosition = MathRound(0.2 * 3 * groundheight);
+												_e19.forEach((x) => {
+													x.setAutoMode(0, 1);
+													x.standBy();
+													x.direction = __left;
+												});
 
-											summonMobWithJson({
-												id: 27,
-												minX: 0,
-												maxX:  0,
-												spawn: 2,
-												sight: 1000,
-												pick: true,
-												ownerKey: mainCharacter.key,
-												props: {
-													experience: 0,
-													noLoot: true,
-													skipHealthBar: true,
-													direction: 'right'
-												},
-												count: 6
-											}, 1);
-											const _e27 = episode.enemies.filter(x => x.id === 27 && x.owner);
-											_e27[0].left = MathRound((_canvas.width * (.4 - (3.5 * .085))) + platformX);
-											_e27[0].yPosition = MathRound((.2 * 1) * groundheight);
-											_e27[1].left = MathRound(((_canvas.width * (.4 - (3.5 * .085))) + platformX) - (_canvas.width * .05));
-											_e27[1].yPosition = MathRound((.2 * 2) * groundheight);
-											_e27[2].left = MathRound(((_canvas.width * (.4 - (3.5 * .085))) + platformX) - (_canvas.width * .05));
-											_e27[2].yPosition = MathRound((.2 * 3) * groundheight);
-											_e27[3].left = MathRound((_canvas.width * (.4 - (3.5 * .085))) + platformX);
-											_e27[3].yPosition = MathRound((.2 * 4) * groundheight);
-											_e27[4].left = MathRound(((_canvas.width * (.4 - (1.5 * .085))) + platformX) - (_canvas.width * .05));
-											_e27[4].yPosition = MathRound((.2 * 2) * groundheight);
-											_e27[5].left = MathRound(((_canvas.width * (.4 - (1.5 * .085))) + platformX) - (_canvas.width * .05));
-											_e27[5].yPosition = MathRound((.2 * 3) * groundheight);
-											_e27.forEach(x => {
-												x.setAutoMode(0, 1);
-												x.standBy();
-												x.direction = __right;
-											});
-											episode.enemies.filter(x => x.key !== 'vtm' && x.key !== 'vtl' &&
-												!x.alp && !x.owner && !x.villain)?.forEach(x => x.remove = true);
-										},
-										function(_another) {
-											episode.bossFightStart = _gameTick;
-											_another.level = 10;
-											_another.ironSkin = mainCharacter.ironSkin = true;
-											_another.releaseAfter = mainCharacter.releaseAfter =
-											_another.animations.air2.maxRageCount =
-											mainCharacter.animations.air2.maxRageCount = 30;
-											mainCharacter.MAXHP = mainCharacter.maxHP = mainCharacter.health = 20000;
-											_another.MAXHP = _another.maxHP = _another.health = 3000;
-											_another.setDifficulty(__account.difficulty - 1);
-											_another.grade = 5;
-											_another.gradeLeft = 4;
-											_another.updateVariables();
-											_another.skipHealthBar = false;
-											//_another.maxHP = _another.MAXHP = _another.health = 1; // TEST İÇİN
-											_another.setHealth(_another.MAXHP);
-											_another.pvp = mainCharacter.pvp = true;
-											const _archer = episode.enemies.find(x => x.class === 'archer');
-											if(_archer && (_another.class === 'werewolf')) {
-												_archer.level = mainCharacter.level;
-												resetSkills(null, 1, _archer);
-												_archer.friendly = false;
-												_archer.immobilize = _archer.still = _archer.skipHealthBar = false;
-												_archer.enemy = true;
-												const _oldAvatar = document.getElementById('char-' + _coopMembers[0].key);
-												if (_oldAvatar)
-													_oldAvatar.remove();
-												_coopMembers = [];
-												_archer.setHealth(_archer.MAXHP);
-												_archer.sight = 100;
-												_archer.setAutoMode(2);
-												_archer.pickNewTarget();
-											}
-											else if(_archer && (_another.class !== 'werewolf')) {
-												_archer.level = mainCharacter.level;
-												resetSkills(null, 1, _archer);
-												_navbar.innerHTML += avatarTemplate(_archer);
-												_archer.immobilize = false;
-												_archer.autoTarget = undefined;
-												_archer.setAutoMode(2);
-												_archer.pickNewTarget();
-												_archer.setHealth(_archer.MAXHP);
-											}
-											mainCharacter.setHealth(mainCharacter.MAXHP);
-											episode.enemies.filter(x => x.id === 27).forEach(x => {
-												x.immobilize = x.still = x.puppetMode = false;
-												x.owner = mainCharacter.class === 'cyclops' ? _another : mainCharacter;
-												x.enemy = mainCharacter.class === 'cyclops' ? true : false;
-												x.setAutoMode(2, 1);
-											});
-											episode.enemies.filter(x => x.id === 19).forEach(x => {
-												x.immobilize = x.still = x.puppetMode = false;
-												x.owner = mainCharacter.class === 'werewolf' ? _another : mainCharacter;
-												x.enemy = mainCharacter.class === 'werewolf' ? true : false;
-												x.setAutoMode(2, 1);
-											});
-											episode.pauseBgMusic(1);
-											episode.createBgMusic(null, null, null, 'story1-quest11', .65);
-											episode.playBgMusic();
-											_another.atk = mainCharacter.atk;
-											_another.def = mainCharacter.def;
-											mainCharacter.hbBars = undefined;
-											_another.class = 'boss';
-											mainCharacter.storyVariables = structuredClone2(episode.storyVariables);
-											mainCharacter.maxExperience = mainCharacter.storyVariables.maxExperience;
-											mainCharacter.experience = mainCharacter.storyVariables.experience;
-											_another.experience = 0;
-											episode.chosenFragment = mainCharacter.class;
-											delete episode.storyVariables;
-										}, getLangData('Choose Your Side'));
+												summonMobWithJson(
+													{
+														id: 27,
+														minX: 0,
+														maxX: 0,
+														spawn: 2,
+														sight: 1000,
+														pick: true,
+														ownerKey: mainCharacter.key,
+														props: {
+															experience: 0,
+															noLoot: true,
+															skipHealthBar: true,
+															direction: 'right'
+														},
+														count: 6
+													},
+													1
+												);
+												const _e27 = episode.enemies.filter((x) => x.id === 27 && x.owner);
+												_e27[0].left = MathRound(
+													_canvas.width * (0.4 - 3.5 * 0.085) + platformX
+												);
+												_e27[0].yPosition = MathRound(0.2 * 1 * groundheight);
+												_e27[1].left = MathRound(
+													_canvas.width * (0.4 - 3.5 * 0.085) +
+														platformX -
+														_canvas.width * 0.05
+												);
+												_e27[1].yPosition = MathRound(0.2 * 2 * groundheight);
+												_e27[2].left = MathRound(
+													_canvas.width * (0.4 - 3.5 * 0.085) +
+														platformX -
+														_canvas.width * 0.05
+												);
+												_e27[2].yPosition = MathRound(0.2 * 3 * groundheight);
+												_e27[3].left = MathRound(
+													_canvas.width * (0.4 - 3.5 * 0.085) + platformX
+												);
+												_e27[3].yPosition = MathRound(0.2 * 4 * groundheight);
+												_e27[4].left = MathRound(
+													_canvas.width * (0.4 - 1.5 * 0.085) +
+														platformX -
+														_canvas.width * 0.05
+												);
+												_e27[4].yPosition = MathRound(0.2 * 2 * groundheight);
+												_e27[5].left = MathRound(
+													_canvas.width * (0.4 - 1.5 * 0.085) +
+														platformX -
+														_canvas.width * 0.05
+												);
+												_e27[5].yPosition = MathRound(0.2 * 3 * groundheight);
+												_e27.forEach((x) => {
+													x.setAutoMode(0, 1);
+													x.standBy();
+													x.direction = __right;
+												});
+												episode.enemies
+													.filter(
+														(x) =>
+															x.key !== 'vtm' &&
+															x.key !== 'vtl' &&
+															!x.alp &&
+															!x.owner &&
+															!x.villain
+													)
+													?.forEach((x) => (x.remove = true));
+											},
+											function (_another) {
+												episode.bossFightStart = _gameTick;
+												_another.level = 10;
+												_another.ironSkin = mainCharacter.ironSkin = true;
+												_another.releaseAfter =
+													mainCharacter.releaseAfter =
+													_another.animations.air2.maxRageCount =
+													mainCharacter.animations.air2.maxRageCount =
+														30;
+												mainCharacter.MAXHP =
+													mainCharacter.maxHP =
+													mainCharacter.health =
+														20000;
+												_another.MAXHP = _another.maxHP = _another.health = 3000;
+												_another.setDifficulty(__account.difficulty - 1);
+												_another.grade = 5;
+												_another.gradeLeft = 4;
+												_another.updateVariables();
+												_another.skipHealthBar = false;
+
+												_another.setHealth(_another.MAXHP);
+												_another.pvp = mainCharacter.pvp = true;
+												const _archer = episode.enemies.find((x) => x.class === 'archer');
+												if (_archer && _another.class === 'werewolf') {
+													_archer.level = mainCharacter.level;
+													resetSkills(null, 1, _archer);
+													_archer.friendly = false;
+													_archer.immobilize = _archer.still = _archer.skipHealthBar = false;
+													_archer.enemy = true;
+													const _oldAvatar = document.getElementById(
+														'char-' + _coopMembers[0].key
+													);
+													if (_oldAvatar) _oldAvatar.remove();
+													_coopMembers = [];
+													_archer.setHealth(_archer.MAXHP);
+													_archer.sight = 100;
+													_archer.setAutoMode(2);
+													_archer.pickNewTarget();
+												} else if (_archer && _another.class !== 'werewolf') {
+													_archer.level = mainCharacter.level;
+													resetSkills(null, 1, _archer);
+													_navbar.innerHTML += avatarTemplate(_archer);
+													_archer.immobilize = false;
+													_archer.autoTarget = undefined;
+													_archer.setAutoMode(2);
+													_archer.pickNewTarget();
+													_archer.setHealth(_archer.MAXHP);
+												}
+												mainCharacter.setHealth(mainCharacter.MAXHP);
+												episode.enemies
+													.filter((x) => x.id === 27)
+													.forEach((x) => {
+														x.immobilize = x.still = x.puppetMode = false;
+														x.owner =
+															mainCharacter.class === 'cyclops'
+																? _another
+																: mainCharacter;
+														x.enemy = mainCharacter.class === 'cyclops' ? true : false;
+														x.setAutoMode(2, 1);
+													});
+												episode.enemies
+													.filter((x) => x.id === 619)
+													.forEach((x) => {
+														x.immobilize = x.still = x.puppetMode = false;
+														x.owner =
+															mainCharacter.class === 'werewolf'
+																? _another
+																: mainCharacter;
+														x.enemy = mainCharacter.class === 'werewolf' ? true : false;
+														x.setAutoMode(2, 1);
+													});
+												episode.pauseBgMusic(1);
+												episode.createBgMusic(null, null, null, 'story1-quest11', 0.65);
+												episode.playBgMusic();
+												_another.atk = mainCharacter.atk;
+												_another.def = mainCharacter.def;
+												mainCharacter.hbBars = undefined;
+												_another.class = 'boss';
+												mainCharacter.storyVariables = structuredClone2(episode.storyVariables);
+												mainCharacter.maxExperience =
+													mainCharacter.storyVariables.maxExperience;
+												mainCharacter.experience = mainCharacter.storyVariables.experience;
+												_another.experience = 0;
+												episode.chosenFragment = mainCharacter.class;
+												delete episode.storyVariables;
+											},
+											getLangData('Choose Your Side')
+										);
 										return x;
 									});
 								}
@@ -5639,150 +5194,146 @@ const __stories = [
 						}
 					},
 					{
-						when: function() {
+						when: function () {
 							return episode.phase === 10;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 1;
-							episode.enemies.filter(x => x.id === 58 || x.id === 72).forEach(x => x.remove = true);
+							episode.enemies.filter((x) => x.id === 58 || x.id === 72).forEach((x) => (x.remove = true));
 						}
 					},
 					{
-						when: function() {
-							return episode.phase === 1 && (mainCharacter.LEFT + platformX) >= (_canvas.width * .6);
+						when: function () {
+							return episode.phase === 1 && mainCharacter.LEFT + platformX >= _canvas.width * 0.6;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 3;
-
 						}
 					},
 					{
-						when: function() {
-							if(!episode.questStatus)
-								episode.questStatus = document.getElementById('quest-status');
+						when: function () {
+							if (!episode.questStatus) episode.questStatus = document.getElementById('quest-status');
 							return episode.phase === 2 && hasClass(episode.questStatus, 'd-none');
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 3;
 							episode.pauseBgMusic(1);
 						}
 					},
 					{
-						when: function() {
-							if(episode?.bossFightStart)
-								return false;
-							let _vtl = episode.enemies.find(x => x.key === 'vtl');
-							let _vtm = episode.enemies.find(x => x.key === 'vtm');
-							let _archer = episode.enemies.find(x => x.class === 'archer');
-							return episode.towerDefenseStart && !episode.end &&
-							(
-								(_vtl && _vtl.isDead())
-								||
-								(_vtm && _vtm.isDead())
-								||
-								(_archer && _archer.isDead())
-								||
-								(_vtl?.health??1) <= 0
-								||
-								(_vtm?.health ?? 1) <= 0
-								||
-								(_archer?.health ?? 1) <= 0
+						when: function () {
+							if (episode?.bossFightStart) return false;
+							let _vtl = episode.enemies.find((x) => x.key === 'vtl');
+							let _vtm = episode.enemies.find((x) => x.key === 'vtm');
+							let _archer = episode.enemies.find((x) => x.class === 'archer');
+							return (
+								episode.towerDefenseStart &&
+								!episode.end &&
+								((_vtl && _vtl.isDead()) ||
+									(_vtm && _vtm.isDead()) ||
+									(_archer && _archer.isDead()) ||
+									(_vtl?.health ?? 1) <= 0 ||
+									(_vtm?.health ?? 1) <= 0 ||
+									(_archer?.health ?? 1) <= 0)
 							);
 						},
-						do: function() {
+						do: function () {
 							installStoryFinish(1);
 						}
 					},
 					{
-						when: function() {
-							return episode.bossFightStart && !episode.fatalityAvailable &&
-							(episode.enemies.filter(x => (x.id === 47 || x.id === 29) && x.health <= 0)?.length === 1);
+						when: function () {
+							return (
+								episode.bossFightStart &&
+								!episode.fatalityAvailable &&
+								episode.enemies.filter((x) => (x.id === 47 || x.id === 29) && x.health <= 0)?.length ===
+									1
+							);
 						},
-						do: function() {
+						do: function () {
 							episode.fatalityAvailable = true;
 							finishStory();
-							const _b1 = episode.enemies.find(x => x.id === 47);
-							const _b2 = episode.enemies.find(x => x.id === 29);
-							if((_b1?.health ?? 1) <= 0 && _b2?.main){
+							const _b1 = episode.enemies.find((x) => x.id === 47);
+							const _b2 = episode.enemies.find((x) => x.id === 29);
+							if ((_b1?.health ?? 1) <= 0 && _b2?.main) {
 								_b1.enterFinishState(_b2);
 								_b2.removeBuffs();
 							}
-							if((_b2?.health ?? 1) <= 0 && _b1?.main){
+							if ((_b2?.health ?? 1) <= 0 && _b1?.main) {
 								_b2.enterFinishState(_b1);
 								_b1.removeBuffs();
 							}
-							episode.enemies.filter(x => x.id !== 29 && x.id !== 47 && x.key !== 'vtl' && x.key !== 'vtm')?.forEach(x => {
-								x.stopSpawn();
-								x.health = 0;
-								x.remove = true;
-							});
-							//if(!episode.respawners)
-								episode.respawners = [];
+							episode.enemies
+								.filter((x) => x.id !== 29 && x.id !== 47 && x.key !== 'vtl' && x.key !== 'vtm')
+								?.forEach((x) => {
+									x.stopSpawn();
+									x.health = 0;
+									x.remove = true;
+								});
+
+							episode.respawners = [];
 						}
 					},
 					{
-						when: function() {
-							return episode.bossFightStart && episode.fatalityAvailable &&
-							episode.phase !== 666 &&
-							episode.enemies.filter(x => x.pvp && !x.finishing && x.animation.startsWith('dead'))?.[0];
+						when: function () {
+							return (
+								episode.bossFightStart &&
+								episode.fatalityAvailable &&
+								episode.phase !== 666 &&
+								episode.enemies.filter(
+									(x) => x.pvp && !x.finishing && x.animation.startsWith('dead')
+								)?.[0]
+							);
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 666;
-							const _winner = episode.enemies.filter(x => x.pvp && !x.animation.startsWith('dead'))?.[0];
-							if(_winner)
-								_winner.standBy();
+							const _winner = episode.enemies.filter(
+								(x) => x.pvp && !x.animation.startsWith('dead')
+							)?.[0];
+							if (_winner) _winner.standBy();
 							setTimeout(() => {
-								if(_winner) {
+								if (_winner) {
 									_winner.animate('victory', 1);
-									_winner.animations.idle.after = function() {
+									_winner.animations.idle.after = function () {
 										installStoryFinish(mainCharacter !== _winner);
 										delete _winner.animations.idle.after;
-									}
+									};
 								}
 							}, 2000);
 						}
 					},
 					{
-						when: function(){
-							return episode.towerDefenseStart && (_gameTick - episode.towerDefenseStart) > 20000;
+						when: function () {
+							return episode.towerDefenseStart && _gameTick - episode.towerDefenseStart > 20000;
 						},
-						do:function(){
-							//removeCoopCharacter(1);
+						do: function () {
 							episode.towerDefenseStart = _gameTick;
-							warn('<div class="flex heading achievement-red" style="position:relative;width:auto"><img style="height:15cqh;z-index:-1" src="./images/icons/txtbg.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' + getLangData('Bomber Frog Incoming') + '</div></div>');
-							episode.playSound({ key: 'curse', volume: .5 });
-							summonMobWithJson({
-								id: 83,
-								minX: 4000,
-								maxX: 4000,
-								targetKey: 'vtm',
-								yPosition: groundheight,
-								props: {
-									onlyTarget: 'vtm',
-									experience: 0,
-									noLoot: true
+							warn(
+								'<div class="flex heading achievement-red" style="position:relative;width:auto"><img style="height:15cqh;z-index:-1" src="./images/icons/txtbg.png" /><div style="position:absolute;text-shadow:0px 0px 4px #000;color:#fff !important">' +
+									getLangData('Bomber Frog Incoming') +
+									'</div></div>'
+							);
+							episode.playSound({ key: 'curse', volume: 0.5 });
+							summonMobWithJson(
+								{
+									id: 83,
+									minX: 4000,
+									maxX: 4000,
+									targetKey: 'vtm',
+									yPosition: groundheight,
+									props: {
+										onlyTarget: 'vtm',
+										experience: 0,
+										noLoot: true
+									},
+									count: 1
 								},
-								count: 1
-							}, 1);
-							// summonMobWithJson({
-							// 	id: 83,
-							// 	minX: -1000,
-							// 	maxX: 0,
-							// 	spawn: 20,
-							// 	targetKey: 'vtl',
-							// 	props: {
-							// 		experience: 0,
-							// 		noLoot: true
-							// 	},
-							// 	count: 1
-							// }, 1);
+								1
+							);
 						}
 					}
 				],
-				start: function() {
-					// episode.bossFightStart = _gameTick;
-					// mainCharacter.ironSkin = mainCharacter.pvp = true;
-					// return;
+				start: function () {
 					episode.realClass = mainCharacter.class;
 					removeCoopCharacter(1);
 					let _char = addCoopCharacter(null, 'arc');
@@ -5791,7 +5342,7 @@ const __stories = [
 					_char.left = MathRound(1185 * __zoom);
 					_char.immobilize = true;
 					_char.platformX = platformX;
-					_char.yPosition = MathRound(.4 * groundheight);
+					_char.yPosition = MathRound(0.4 * groundheight);
 
 					episode.still = true;
 					mainCharacter.left = MathRound(1250 * __zoom);
@@ -5799,195 +5350,240 @@ const __stories = [
 					mainCharacter.immobilize = mainCharacter.still = true;
 					blurKeyboard();
 					mainCharacter.disableKeyboard = true;
-					const _princess = episode.enemies.find(x => x.id === 58);
-					const _father = episode.enemies.find(x => x.id === 72);
-					_princess.puppetMode = _father.puppetMode = _princess.still = _father.still = _princess.immobilize = _father.immobilize = true;
+					const _princess = episode.enemies.find((x) => x.id === 58);
+					const _father = episode.enemies.find((x) => x.id === 72);
+					_princess.puppetMode =
+						_father.puppetMode =
+						_princess.still =
+						_father.still =
+						_princess.immobilize =
+						_father.immobilize =
+							true;
 					_princess.direction = 'right';
-					cssAnimations.film(null, [
-						{
-							do: function() {
-								createBubbleText({
-									id: 1,
-									location: { map: episode.id }, ms: 2000,
-									owner: _princess.key,
-									text: "They are close"
-								});
+					cssAnimations.film(
+						null,
+						[
+							{
+								do: function () {
+									createBubbleText({
+										id: 1,
+										location: { map: episode.id },
+										ms: 2000,
+										owner: _princess.key,
+										text: 'They are close'
+									});
+								},
+								ms: 2000
 							},
-							ms: 2000
-						},
-						{
-							do: function() {
-								createBubbleText({
-									id: 2,
-									location: { map: episode.id }, ms: 2100,
-									owner: _father.key,
-									text: "Time to use potion"
-								});
+							{
+								do: function () {
+									createBubbleText({
+										id: 2,
+										location: { map: episode.id },
+										ms: 2100,
+										owner: _father.key,
+										text: 'Time to use potion'
+									});
+								},
+								ms: 4200
 							},
-							ms: 4200
-						},
-						{
-							do: function() {
-								createBubbleText({
-									id: 3,
-									location: { map: episode.id }, ms: 1500,
-									owner: mainCharacter.key,
-									text: "Take cover!",
-									onend: function() {
-										mainCharacter.direction = 'right';
-										_princess.direction = _princess.moveDirection =
-										_father.direction = _father.moveDirection = 'left';
-										_princess.still = _father.still = false;
-										_princess.puppetMode = _father.puppetMode = true;
-										_princess.action = {
-											command: 'move',
-											to: -500 * __zoom,
-										};
-										_father.action = {
-											command: 'move',
-											to: -500 * __zoom,
-										};
-									}
-								});
+							{
+								do: function () {
+									createBubbleText({
+										id: 3,
+										location: { map: episode.id },
+										ms: 1500,
+										owner: mainCharacter.key,
+										text: 'Take cover!',
+										onend: function () {
+											mainCharacter.direction = 'right';
+											_princess.direction =
+												_princess.moveDirection =
+												_father.direction =
+												_father.moveDirection =
+													'left';
+											_princess.still = _father.still = false;
+											_princess.puppetMode = _father.puppetMode = true;
+											_princess.action = {
+												command: 'move',
+												to: -500 * __zoom
+											};
+											_father.action = {
+												command: 'move',
+												to: -500 * __zoom
+											};
+										}
+									});
+								},
+								ms: 6500
 							},
-							ms: 6500
-						},
-						{
-							do: function() {
-								_char.friendly = true;
-								_char.direction = 'right';
-								createBubbleText({
-									id: 4,
-									location: { map: episode.id }, ms: 2000,
-									owner: _char.key,
-									text: "I'll stay for help"
-								});
+							{
+								do: function () {
+									_char.friendly = true;
+									_char.direction = 'right';
+									createBubbleText({
+										id: 4,
+										location: { map: episode.id },
+										ms: 2000,
+										owner: _char.key,
+										text: "I'll stay for help"
+									});
+								},
+								ms: 8200
 							},
-							ms: 8200
-						},
-						{
-							do: function() {
-								createBubbleText({
-									id: 5,
-									location: { map: episode.id }, ms: 1200,
-									owner: mainCharacter.key,
-									text: "Here we go...",
-									onend: function() {
-										episode.phase = 10;
-									}
-								});
-							},
-							ms: 10200
-						}
-					], 11500, function() {
-						__storyTell = new storyTell(5, function() {
-							const _var = structuredClone2({
-								level: mainCharacter.level,
-								experience: mainCharacter.experience,
-								maxExperience: mainCharacter.maxExperience
-							});
-							const _left = mainCharacter.left;
-							mainCharacter.remove = true;
-							mainCharacter.main = false;
-							startWithThisCharacter(29, _var.level);
-							mainCharacter.storyVariables = _var;
-							episode.storyVariables = structuredClone2(_var);
-							//mainCharacter.level = _var.level;
-							//setCharacterLevel(10, null, 1);
-							_char = addCoopCharacter(null, 'arc', null, mainCharacter.level);
-							resetSkills(null, 1, _char);
-							_char.direction = mainCharacter.direction = 'right';
-							_char.left = MathRound(1185 * __zoom);
-							_char.immobilize = true;
-							_char.platformX = platformX;
-							_char.yPosition = MathRound(.4 * groundheight);
-							mainCharacter.disableSkill('defense');
-							episode.playSound({ key: 'puff', volume: .4 });
-							mainCharacter.addObject({
-								key: 'invisiblesmoke',
-								position: 'middle'
-							});
-							mainCharacter.direction = 'right';
-							mainCharacter.left = _left;
-							mainCharacter.ironSkin = true;
-							episode.enemies.filter(x => x.class === 'object')?.forEach(x => x.class = x.invulnerable = x.skipHealthBar = false);
-							mainCharacter.yPosition = MathRound(groundheight / 2);
-							episode.still = false;
-							episode.width = MathRound(episode.width / 2);
-							pauseQuestTimer();
-							episode.pauseBgMusic(1);
-							episode.moveCamera(function(){
-								focusMe('#quest-status', function() {
-									playClick();
-									mainCharacter.still = mainCharacter.immobilize = false;
-									delete mainCharacter.disableKeyboard;
-									resumeQuestTimer();
-									mainCharacter.enableSkills();
-									summonMobWithJson({
-										id: 19,
-										minX: 3000,
-										maxX: 4000,
-										spawn:2,
-										targetKey: 'vtl,vtm',
-										props: {
-											skipHealthBar: true,
-											experience: 0,
-											noLoot: true
-										},
-										count: 20
-									}, 1);
-									summonMobWithJson({
-										id: 49,
-										minX: 3000,
-										maxX: 4000,
-										spawn:2,
-										targetKey: 'vtl,vtm',
-										props: {
-											skipHealthBar: true,
-											experience: 0,
-											noLoot: true
-										},
-										count: 12
-									}, 1);
-									summonMobWithJson({
-										id: 66,
-										minX: 3000,
-										maxX: 4000,
-										spawn:2,
-										targetKey: 'vtl,vtm',
-										props: {
-											skipHealthBar: true,
-											experience: 0,
-											noLoot: true
-										},
-										count: 10
-									}, 1);
+							{
+								do: function () {
+									createBubbleText({
+										id: 5,
+										location: { map: episode.id },
+										ms: 1200,
+										owner: mainCharacter.key,
+										text: 'Here we go...',
+										onend: function () {
+											episode.phase = 10;
+										}
+									});
+								},
+								ms: 10200
+							}
+						],
+						11500,
+						function () {
+							__storyTell = new storyTell(
+								5,
+								function () {
+									const _var = structuredClone2({
+										level: mainCharacter.level,
+										experience: mainCharacter.experience,
+										maxExperience: mainCharacter.maxExperience
+									});
+									const _left = mainCharacter.left;
+									mainCharacter.remove = true;
+									mainCharacter.main = false;
+									startWithThisCharacter(29, _var.level);
+									mainCharacter.storyVariables = _var;
+									episode.storyVariables = structuredClone2(_var);
+
+									_char = addCoopCharacter(null, 'arc', null, mainCharacter.level);
+									resetSkills(null, 1, _char);
+									_char.direction = mainCharacter.direction = 'right';
+									_char.left = MathRound(1185 * __zoom);
+									_char.immobilize = true;
+									_char.platformX = platformX;
+									_char.yPosition = MathRound(0.4 * groundheight);
+									mainCharacter.disableSkill('defense');
+									episode.playSound({ key: 'puff', volume: 0.4 });
+									mainCharacter.addObject({
+										key: 'invisiblesmoke',
+										position: 'middle'
+									});
+									mainCharacter.direction = 'right';
+									mainCharacter.left = _left;
+									mainCharacter.ironSkin = true;
+									episode.enemies
+										.filter((x) => x.class === 'object')
+										?.forEach((x) => (x.class = x.invulnerable = x.skipHealthBar = false));
+									mainCharacter.yPosition = MathRound(groundheight / 2);
+									episode.still = false;
+									episode.width = MathRound(episode.width / 2);
+									pauseQuestTimer();
 									episode.pauseBgMusic(1);
-									episode.createBgMusic(null, null, null, 'story1-quest10-3', .65);
-									episode.playBgMusic(1);
-									_char.immobilize = false;
-									_char.def *= mainCharacter.level;
-									_char.releaseAfter = 5;
-									episode.towerDefenseStart = _gameTick;
-									disposeFocus();
-									takeQuest(0, 1, null, null, 1);
-								}, false, getLangData('Defend the huts') + ',<br/>' + getLangData('keep your friends alive') + '<br/>' + getLangData('until that period of time'), 1);
-								createBubbleText({
-									id: 6,
-									location: { map: episode.id }, ms: 2000,
-									owner: mainCharacter.key,
-									text: "Let's Rock!"
-								});
-							});
-						}, 1);
-					}, function() {
-						if(episode.phase !== 1)
-							episode.phase = 10;
-						episode.enemies.filter(x => x !== mainCharacter && x !== _char &&
-							x.key !== 'vtl' && x.key !== 'vtm')?.forEach(x => x.remove = true);
-						episode.enemies.filter(x => !x.remove)?.forEach(x => x.direction = 'right');
-						episode.enemies.find(x => x.class === 'archer').friendly = true;
-					});
+									episode.moveCamera(function () {
+										focusMe(
+											'#quest-status',
+											function () {
+												playClick();
+												mainCharacter.still = mainCharacter.immobilize = false;
+												delete mainCharacter.disableKeyboard;
+												resumeQuestTimer();
+												mainCharacter.enableSkills();
+												summonMobWithJson(
+													{
+														id: 619,
+														minX: 3000,
+														maxX: 4000,
+														spawn: 2,
+														targetKey: 'vtl,vtm',
+														props: {
+															skipHealthBar: true,
+															experience: 0,
+															noLoot: true
+														},
+														count: 20
+													},
+													1
+												);
+												summonMobWithJson(
+													{
+														id: 619,
+														minX: 3000,
+														maxX: 4000,
+														spawn: 2,
+														targetKey: 'vtl,vtm',
+														props: {
+															skipHealthBar: true,
+															experience: 0,
+															noLoot: true
+														},
+														count: 12
+													},
+													1
+												);
+												summonMobWithJson(
+													{
+														id: 66,
+														minX: 3000,
+														maxX: 4000,
+														spawn: 2,
+														targetKey: 'vtl,vtm',
+														props: {
+															skipHealthBar: true,
+															experience: 0,
+															noLoot: true
+														},
+														count: 10
+													},
+													1
+												);
+												episode.pauseBgMusic(1);
+												episode.createBgMusic(null, null, null, 'story1-quest10-3', 0.65);
+												episode.playBgMusic(1);
+												_char.immobilize = false;
+												_char.def *= mainCharacter.level;
+												_char.releaseAfter = 5;
+												episode.towerDefenseStart = _gameTick;
+												disposeFocus();
+												takeQuest(0, 1, null, null, 1);
+											},
+											false,
+											getLangData('Defend the huts') +
+												',<br/>' +
+												getLangData('keep your friends alive') +
+												'<br/>' +
+												getLangData('until that period of time'),
+											1
+										);
+										createBubbleText({
+											id: 6,
+											location: { map: episode.id },
+											ms: 2000,
+											owner: mainCharacter.key,
+											text: "Let's Rock!"
+										});
+									});
+								},
+								1
+							);
+						},
+						function () {
+							if (episode.phase !== 1) episode.phase = 10;
+							episode.enemies
+								.filter((x) => x !== mainCharacter && x !== _char && x.key !== 'vtl' && x.key !== 'vtm')
+								?.forEach((x) => (x.remove = true));
+							episode.enemies.filter((x) => !x.remove)?.forEach((x) => (x.direction = 'right'));
+							episode.enemies.find((x) => x.class === 'archer').friendly = true;
+						}
+					);
 					mainCharacter.ironSkin = true;
 				},
 				mobs: [
@@ -5996,18 +5592,17 @@ const __stories = [
 						minX: 562,
 						maxX: 562,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.enemy = false;
 							_e.noDirection = true;
 							_e.healthBarIcon = 'target';
-							_e.healthBarWidthRate = 3,
-							_e.skipHealthBar = true;
+							((_e.healthBarWidthRate = 3), (_e.skipHealthBar = true));
 							_e.healthBarHeightRate = 1.5;
 							_e.solid = false;
 							_e.targetPriority = 1;
 							_e.harmless = true;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return groundheight;
 						}
 					},
@@ -6016,18 +5611,17 @@ const __stories = [
 						minX: 2090,
 						maxX: 2090,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.enemy = false;
 							_e.noDirection = true;
 							_e.healthBarIcon = 'target';
-							_e.healthBarWidthRate = 3,
-							_e.healthBarHeightRate = 1.5;
+							((_e.healthBarWidthRate = 3), (_e.healthBarHeightRate = 1.5));
 							_e.skipHealthBar = true;
 							_e.solid = false;
 							_e.targetPriority = 1;
 							_e.harmless = true;
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return MathRound(groundheight * 1.11);
 						}
 					},
@@ -6035,71 +5629,57 @@ const __stories = [
 						id: 58,
 						minX: 950,
 						maxX: 950,
-						do: function(_e) {
+						do: function (_e) {
 							_e.direction = 'right';
 							_e.noDirection = false;
 						},
-						yPosition: function() {
-							return MathRound(groundheight * .5);
+						yPosition: function () {
+							return MathRound(groundheight * 0.5);
 						}
 					},
 					{
 						id: 72,
 						minX: 1060,
 						maxX: 1060,
-						do: function(_e) {
+						do: function (_e) {
 							episode.msNow = 501;
 							_e.direction = 'right';
 							_e.noDirection = false;
 							_e.swapAnimation('idle');
 						},
-						yPosition: function() {
-							return MathRound(groundheight * .6);
+						yPosition: function () {
+							return MathRound(groundheight * 0.6);
 						}
 					}
-					// {
-					// 	id: 47,
-					// 	minX: 1000,
-					// 	maxX: 1000,
-					// 	count: 1,
-					// 	attackAfterHit: true,
-					// 	yPosition: function() {
-					// 		return MathRound(groundheight / 2);
-					// 	},
-					// 	props: {
-					// 		health:1,
-					// 		pvp: true,
-					// 		ironSkin: true
-					// 	}
-					// }
 				]
 			},
 			getLobbyScene()
 		]
 	},
 	{
-		id:10,
+		id: 10,
 		side: true,
 		disableWorldMap: true,
-		order:10,
-		boss:'al',
-		act:1,
-		minLevel:10,
+		order: 10,
+		boss: 'al',
+		act: 1,
+		minLevel: 10,
 		list: true,
-		ticket:2,
-		bonusAchievements: [{
-			id:1,
-			minCount: 2,
-			title: {
-				en: 'Finish in 3 minutes',
-				tr: '3 dakika içinde bitir'
-			},
-			when: function() {
-				return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) 
-				<= 180000;
-			},
-			reward: { key:'gold', count: 30000 }
-		}],
+		ticket: 2,
+		bonusAchievements: [
+			{
+				id: 1,
+				minCount: 2,
+				title: {
+					en: 'Finish in 3 minutes',
+					tr: '3 dakika içinde bitir'
+				},
+				when: function () {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= 180000;
+				},
+				reward: { key: 'gold', count: 30000 }
+			}
+		],
 		firstFinishRewards: [{ key: 'chest', grade: 1 }],
 		perfectFinishRewards: [{ key: 'chest', grade: 1 }],
 		title: {
@@ -6108,24 +5688,41 @@ const __stories = [
 		},
 		description: {
 			en: "Al Karısı kidnaps a young boy from the village at midnight and the boy's mother and the villagers get worried when they can't see him. We will all witness together if our heroes can stop this witch and save the boy.",
-			tr: "Al Karısı genç bir çocuğu köyden gece yarısı kaçırır ve çocuğun annesi ile köy halkı çocuğu göremeyince endişelenir. Kahramanlarımız bu cadıya dur diyebilip çocuğu kurtarabilecek mi hep birlikte şahit olacağız."
+			tr: 'Al Karısı genç bir çocuğu köyden gece yarısı kaçırır ve çocuğun annesi ile köy halkı çocuğu göremeyince endişelenir. Kahramanlarımız bu cadıya dur diyebilip çocuğu kurtarabilecek mi hep birlikte şahit olacağız.'
 		},
 		resultStars: [
-			{ id: 1, title: 'Clear story', when: function() {
-				return !mainCharacter.isDead();
-			}},
-			{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
-				when: function(_item) {
-					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
-			}},
-			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
-			}}
+			{
+				id: 1,
+				title: 'Clear story',
+				when: function () {
+					return !mainCharacter.isDead();
+				}
+			},
+			{
+				id: 2,
+				key: 'time',
+				value: 10 * 60000,
+				title: 'Finish in time',
+				when: function (_item) {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= _item.value;
+				}
+			},
+			{
+				id: 3,
+				key: 'hp',
+				value: 0.5,
+				title: 'Stay above %50 health',
+				when: function (_item) {
+					return (
+						(__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >=
+						MathFloor(mainCharacter.maxHP * _item.value)
+					);
+				}
+			}
 		],
 		rewards: [
 			{ key: 'item', grade: 2, type: 'weapon' },
-			{ key: 'fragment', name: 'al', minCount:1, maxCount:5, chance: 50 },
+			{ key: 'fragment', name: 'al', minCount: 1, maxCount: 5, chance: 50 },
 			{ key: 'gold', count: 9500 },
 			{ key: 'exp', count: 2100 }
 		],
@@ -6136,126 +5733,131 @@ const __stories = [
 				from: 'left',
 				loadingCharacterIds: [33, 35, 2, 1000, 46],
 				save: true,
-				start: function() {
+				start: function () {
 					mainCharacter.unarm();
-					const _princess = episode.enemies.find(x => x.npc);
+					const _princess = episode.enemies.find((x) => x.npc);
 					blurKeyboard();
 					mainCharacter.disableKeyboard = mainCharacter.immobilize = true;
-					cssAnimations.film(mainCharacter, [
-						{
-							do: function() {
-								episode.dialogs = [];
-								createBubbleText({
-									id: 2,
-									location: { map: episode.id }, ms: 2000,
-									owner: _princess.key,
-									text: "They kidnapped my child!"
-								});
+					cssAnimations.film(
+						mainCharacter,
+						[
+							{
+								do: function () {
+									episode.dialogs = [];
+									createBubbleText({
+										id: 2,
+										location: { map: episode.id },
+										ms: 2000,
+										owner: _princess.key,
+										text: 'They kidnapped my child!'
+									});
+								},
+								ms: 2000
 							},
-							ms: 2000
-						},
-						{
-							do: function() {
-								_princess.puppetMode = 1;
-								createBubbleText({
-									id: 3,
-									location: { map: episode.id }, ms: 2600,
-									owner: mainCharacter.key,
-									text: "Stay safe, i will do my best",
-									onend: function(_e) {
-										_princess.action = {
-											command: 'move',
-											to: -1 * MathRound(_canvas.width / 4),
-											after: function(x) {
-												x.remove = true;
-											}
-										};
-									}
-								});
-							},
-							ms: 4200
+							{
+								do: function () {
+									_princess.puppetMode = 1;
+									createBubbleText({
+										id: 3,
+										location: { map: episode.id },
+										ms: 2600,
+										owner: mainCharacter.key,
+										text: 'Stay safe, i will do my best',
+										onend: function (_e) {
+											_princess.action = {
+												command: 'move',
+												to: -1 * MathRound(_canvas.width / 4),
+												after: function (x) {
+													x.remove = true;
+												}
+											};
+										}
+									});
+								},
+								ms: 4200
+							}
+						],
+						7000,
+						function () {
+							mainCharacter.disableUnarm();
+							const _princess = episode.enemies.find((x) => x.id === 58 && !x.remove);
+							if (_princess) _princess.remove = true;
+							__storyCutScenePlaying = 0;
+							episode.phase = -1;
+							delete mainCharacter.disableKeyboard;
+							mainCharacter.immobilize = false;
+							for (let i = 0; i < 3; i++) {
+								const _m = summonMob(33, getRandomValue2(3000, 5000));
+								_m.experience = 0;
+								delete _m.finishableWith;
+							}
+							for (let i = 0; i < 3; i++) {
+								const _m = summonMob(2, getRandomValue2(2000, 5000));
+								_m.experience = 0;
+								delete _m.finishableWith;
+							}
+							const _rider = summonMob(35, getRandomValue2(2000, 5000));
+							_rider.experience = 0;
+							const _flower = summonMob(46, getRandomValue2(4000, 4500));
+							_flower.experience = 0;
+							_flower.direction = 'left';
+							_flower.yPosition = MathRound(getGroundHeight() / 2);
+							__story.startTime = _gameTick;
 						}
-					], 7000, function() {
-						mainCharacter.disableUnarm();
-						const _princess = episode.enemies.find(x => x.id === 58 && !x.remove);
-						if(_princess)
-							_princess.remove = true;
-						__storyCutScenePlaying = 0;
-						episode.phase = -1;
-						delete mainCharacter.disableKeyboard;
-						mainCharacter.immobilize = false;
-						for(let i = 0; i < 3; i++) {
-							const _m = summonMob(33, getRandomValue2(3000, 5000));
-							_m.experience = 0;
-							delete _m.finishableWith;
-						}
-						for(let i = 0; i < 3; i++) {
-							const _m = summonMob(2, getRandomValue2(2000, 5000));
-							_m.experience = 0;
-							delete _m.finishableWith;
-						}
-						const _rider = summonMob(35, getRandomValue2(2000, 5000));
-						_rider.experience = 0;
-						const _flower = summonMob(46, getRandomValue2(4000, 4500));
-						_flower.experience = 0;
-						_flower.direction = 'left';
-						_flower.yPosition = MathRound(getGroundHeight() / 2);
-						__story.startTime = _gameTick;
-					});
+					);
 				},
 				actions: [
 					{
-						when: function() {
-							return episode.phase === -1 && !episode.enemies.find(x => x.enemy && !x.remove);
+						when: function () {
+							return episode.phase === -1 && !episode.enemies.find((x) => x.enemy && !x.remove);
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 1;
-							episode.playSound({key:'alstart', volume:1});
-								setTimeout(() => {
-									const _boss = summonMobWithJson({
-										id: 1000,
-										level: 10,
-										minX: 2500,
-										maxX: 3500,
-										grade: 5
-									});
-									episode.phase = 2;
-									_boss.experience = 0;
-									//_boss.health = _boss.maxHP = _boss.MAXHP = 1;
-									_boss.pickNewTarget();
-								}, 1000);
+							episode.playSound({ key: 'alstart', volume: 1 });
+							setTimeout(() => {
+								const _boss = summonMobWithJson({
+									id: 1000,
+									level: 10,
+									minX: 2500,
+									maxX: 3500,
+									grade: 5
+								});
+								episode.phase = 2;
+								_boss.experience = 0;
+
+								_boss.pickNewTarget();
+							}, 1000);
 						}
 					},
 					{
-						when: function() {
-							return (episode.phase === 2 && !episode.enemies.find(x => x.class === 'boss')?.isDead?.());
+						when: function () {
+							return episode.phase === 2 && !episode.enemies.find((x) => x.class === 'boss')?.isDead?.();
 						},
-						do: function() {
-							if(mainCharacter.animation !== 'idle')
+						do: function () {
+							if (mainCharacter.animation !== 'idle') mainCharacter.idleStarted = undefined;
+							else if (!mainCharacter.idleStarted) mainCharacter.idleStarted = _gameTick;
+							if (mainCharacter.idleStarted && _gameTick - mainCharacter.idleStarted > 2999) {
 								mainCharacter.idleStarted = undefined;
-							else if(!mainCharacter.idleStarted)
-								mainCharacter.idleStarted = _gameTick;
-							if(mainCharacter.idleStarted && ((_gameTick - mainCharacter.idleStarted) > 2999)) {
-								mainCharacter.idleStarted = undefined;
-								const _hand = episode.enemies.find(x => x.id === 39);
-								if(_hand?.animation === 'idle')
-									_hand.animations.idle.next = 'dead';
-								else if(_hand)
-									return;
-								const _mob = episode.installMob({
-									id: 39,
-									minX: MathRound((mainCharacter.LEFT + platformX) / __zoom),
-									maxX: MathRound((mainCharacter.LEFT + platformX) / __zoom),
-									sight: 1000,
-									count: 1,
-									yPosition : mainCharacter.yPosition - 1,
-									minLevel: 10,
-									maxLevel: 10
-								}, null, 1);
-								const _owner = episode.enemies.find(x => x.class === 'boss');
+								const _hand = episode.enemies.find((x) => x.id === 39);
+								if (_hand?.animation === 'idle') _hand.animations.idle.next = 'dead';
+								else if (_hand) return;
+								const _mob = episode.installMob(
+									{
+										id: 39,
+										minX: MathRound((mainCharacter.LEFT + platformX) / __zoom),
+										maxX: MathRound((mainCharacter.LEFT + platformX) / __zoom),
+										sight: 1000,
+										count: 1,
+										yPosition: mainCharacter.yPosition - 1,
+										minLevel: 10,
+										maxLevel: 10
+									},
+									null,
+									1
+								);
+								const _owner = episode.enemies.find((x) => x.class === 'boss');
 								_mob.related = _mob.owner = _owner;
-								if(_owner.unseen)
-									PlaySound({key: 'alhand', volume: .2});
+								if (_owner.unseen) PlaySound({ key: 'alhand', volume: 0.2 });
 								_mob.experience = 0;
 								_mob.class = 'minion';
 								_mob.owner = _owner;
@@ -6302,24 +5904,24 @@ const __stories = [
 						}
 					},
 					{
-						when: function() {
-							return episode.phase === 2 && episode.enemies.find(x => x.class === 'boss')?.remove;
+						when: function () {
+							return episode.phase === 2 && episode.enemies.find((x) => x.class === 'boss')?.remove;
 						},
-						do: function() {
-							// episode.phase = 3;
-							// __storyPlaying = false;
-							// installStoryFinish();
+						do: function () {
 							episode.phase = 3;
-							const _boss = episode.enemies.find(x => x.class === 'boss');
-							summonMob(90, MathRound((_boss.SCREENLEFT + platformX) / __zoom), _boss.yPosition,1);
+							const _boss = episode.enemies.find((x) => x.class === 'boss');
+							summonMob(90, MathRound((_boss.SCREENLEFT + platformX) / __zoom), _boss.yPosition, 1);
 							finishStory();
 						}
 					},
 					{
-						when: function() {
-							return episode.phase === 3 && episode.enemies.find(x => x.enemy && x.class !== 'boss')?.remove;
+						when: function () {
+							return (
+								episode.phase === 3 &&
+								episode.enemies.find((x) => x.enemy && x.class !== 'boss')?.remove
+							);
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 4;
 							__storyPlaying = false;
 						}
@@ -6329,57 +5931,17 @@ const __stories = [
 					{
 						id: 58,
 						count: 1,
-						do: function(_e) {
+						do: function (_e) {
 							_e.direction = 'left';
 							_e.npc = _e.reversed = _e.invulnerable = _e.friendly = _e.noDirection = true;
 							_e.enemy = _e.still = false;
 							_e.left = (mainCharacter.left ?? 0) + MathRound(_canvas.width / 6);
 							_e.updateVariables();
 						},
-						yPosition: function() {
+						yPosition: function () {
 							return MathRound(getGroundHeight() / 2) - 1;
 						}
 					}
-					// {
-					// 	id: 33,
-					// 	minX: 2380,
-					// 	maxX: 4500,
-					// 	count: 3,
-					// 	do: function(_e) {
-					// 		_e.experience = 0;
-					// 		delete _e.finishableWith;
-					// 	}
-					// },
-					// {
-					// 	id: 2,
-					// 	minX: 1380,
-					// 	maxX: 4500,
-					// 	count: 3,
-					// 	do: function(_e) {
-					// 		_e.experience = 0;
-					// 		delete _e.finishableWith;
-					// 	}
-					// },
-					// {
-					// 	id: 35,
-					// 	minX: 1380,
-					// 	maxX: 4500,
-					// 	count: 1,
-					// 	do: function(_e) {
-					// 		_e.experience = 0;
-					// 	}
-					// },
-					// {
-					// 	id: 46,
-					// 	minX: 4500,
-					// 	maxX: 4500,
-					// 	count: 1,
-					// 	do: function(_e) {
-					// 		_e.experience = 0;
-					// 		_e.direction = 'left';
-					// 		_e.yPosition = MathRound(getGroundHeight() / 2);
-					// 	}
-					// }
 				]
 			},
 			getLobbyScene()
@@ -6400,41 +5962,37 @@ const __stories = [
 				minLevel: 7,
 				kills: [{ enemy: [1000], limit: 1, key: 'Witch' }],
 				maps: [11]
-			},
+			}
 		]
-	},	
+	},
 	{
-		id:11,
-		order:11,
+		id: 11,
+		order: 11,
 		lobby: true,
-		act:1,
+		act: 1,
 		list: false,
 		title: {
 			en: 'Lobby',
 			tr: 'Giriş'
 		},
 		ticket: 0,
-		minLevel:1,
-		scenes: [
-			getLobbyScene()
-		]
+		minLevel: 1,
+		scenes: [getLobbyScene()]
 	},
 	{
-		id:112,
+		id: 112,
 		disableWorldMap: true,
-		order:112,
-		act:1,
-		minLevel:1,
+		order: 112,
+		act: 1,
+		minLevel: 1,
 		list: false,
 		ticket: 0,
 		title: {
 			en: 'Training Ground',
 			tr: 'İdman Alanı'
 		},
-		resultStars: [
-		],
-		rewards: [
-		],
+		resultStars: [],
+		rewards: [],
 		scenes: [
 			{
 				map: 201,
@@ -6442,21 +6000,19 @@ const __stories = [
 				from: 'left',
 				loadingCharacterIds: [31],
 				back: true,
-				start: function() {
+				start: function () {
 					updateQuestArea(null, null, 1);
 				},
-				actions: [
-					
-				],
+				actions: [],
 				mobs: [
 					{
 						id: 31,
 						minX: 2380,
 						maxX: 4500,
 						count: 10,
-						spawn:1,
-						hp:1999999999,
-						do: function(_e) {
+						spawn: 1,
+						hp: 1999999999,
+						do: function (_e) {
 							_e.experience = 0;
 							_e.skipHealthBar = true;
 						}
@@ -6467,13 +6023,13 @@ const __stories = [
 		]
 	},
 	{
-		id:113,
+		id: 113,
 		disableWorldMap: true,
-		order:113,
-		act:1,
+		order: 113,
+		act: 1,
 		mission: 'ad',
-		daily:2,
-		minLevel:10,
+		daily: 2,
+		minLevel: 10,
 		ticket: 0,
 		perfectFinishRewards: [{ key: 'chest', grade: 2 }],
 		title: {
@@ -6481,25 +6037,39 @@ const __stories = [
 			tr: 'Alan Savunması'
 		},
 		description: {
-			en: "Defend the flag with your chosen supporter and try not to let it fall to the enemy. If they grab it, you must retrieve immediately. You can switch roles with your supporter with tapping on its portrait.",
-			tr: "Seçtiğiniz destekçi ile bayrağı savunun ve düşmanın almasına izin vermeyin. Eğer biri kaparsa hemen geri kazanmalısınız. Dilerseniz bu etkinlikte destekçinizin portresine basarak onu da yönetebilirsiniz."
+			en: 'Defend the flag with your chosen supporter and try not to let it fall to the enemy. If they grab it, you must retrieve immediately. You can switch roles with your supporter with tapping on its portrait.',
+			tr: 'Seçtiğiniz destekçi ile bayrağı savunun ve düşmanın almasına izin vermeyin. Eğer biri kaparsa hemen geri kazanmalısınız. Dilerseniz bu etkinlikte destekçinizin portresine basarak onu da yönetebilirsiniz.'
 		},
 		resultStars: [
-			{ id: 1, title: 'Clear mission', when: function() {
-				return !mainCharacter.isDead();
-			}},
-			{ id: 2, key: 'time', value: 3 * 60000, title: 'Finish in time',
-				when: function(_item) {
-					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
-			}},
-			{ id: 3, key: 'heart', value: 1, title: 'Supporter must be alive', when: function(_item) {
-				return episode.isSupporterAlive;
-			}}
+			{
+				id: 1,
+				title: 'Clear mission',
+				when: function () {
+					return !mainCharacter.isDead();
+				}
+			},
+			{
+				id: 2,
+				key: 'time',
+				value: 3 * 60000,
+				title: 'Finish in time',
+				when: function (_item) {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= _item.value;
+				}
+			},
+			{
+				id: 3,
+				key: 'heart',
+				value: 1,
+				title: 'Supporter must be alive',
+				when: function (_item) {
+					return episode.isSupporterAlive;
+				}
+			}
 		],
 		rewards: [
-			{ key: 'misc', type: 'ticket-random', count:1 },
-			{ key: 'gem', grade: 1, type: 'random', count:1 },
+			{ key: 'misc', type: 'ticket-random', count: 1 },
+			{ key: 'gem', grade: 1, type: 'random', count: 1 },
 			{ key: 'gold', count: 10000 },
 			{ key: 'exp', count: 2200 }
 		],
@@ -6517,13 +6087,15 @@ const __stories = [
 				owner: 'system',
 				timer: {
 					ms: 120000,
-					after: function() {
-						episode.enemies.filter(x => !x.main && !x.tag && !x.friendly && x.class !== 'object').forEach(x => {
-							x.stopSpawn();
-							x.health = x.experience = 0;
-							x.dead = x.dying = true;
-							x.animate('dead', 1);
-						});
+					after: function () {
+						episode.enemies
+							.filter((x) => !x.main && !x.tag && !x.friendly && x.class !== 'object')
+							.forEach((x) => {
+								x.stopSpawn();
+								x.health = x.experience = 0;
+								x.dead = x.dying = true;
+								x.animate('dead', 1);
+							});
 						episode.mobs = [];
 						episode.respawners = [];
 						episode.phase = 2;
@@ -6540,29 +6112,29 @@ const __stories = [
 				map: 7,
 				startsWith: 1,
 				from: 'left',
-				loadingCharacterIds: [92,93,66,49,19],
-				start: function() {
+				loadingCharacterIds: [92, 93, 66, 49, 619],
+				start: function () {
 					removeCoopCharacter();
 					episode.realClass = mainCharacter.class;
 					episode.mainClass = 10001;
 					episode.still = true;
 					rain();
 					episode.entertainment = true;
-					const _flag = episode.enemies.find(x => x.id === 93);
+					const _flag = episode.enemies.find((x) => x.id === 93);
 					_flag.enemy = false;
 					_flag.friendly = true;
 					_flag.yPosition = MathRound(getGroundHeight() / 2);
 					platformX = episode.cWidth;
-					_flag.left = _flag.LEFT = MathRound(platformX + (episode.cWidth / 2));
+					_flag.left = _flag.LEFT = MathRound(platformX + episode.cWidth / 2);
 					prevPlatformX = undefined;
 					mainCharacter.direction = 'right';
-					mainCharacter.left = mainCharacter.LEFT = MathRound((.5 * platformX) + _flag.getWidth());
+					mainCharacter.left = mainCharacter.LEFT = MathRound(0.5 * platformX + _flag.getWidth());
 					mainCharacter.yPosition = MathRound(getGroundHeight() / 2.5);
 					mainCharacter.updateVariables();
 					_flag.updateVariables();
 					addCoopCharacter(null, __ctfSupport, null, mainCharacter.level);
-					const _support = episode.enemies.find(x => x.class === __ctfSupport);
-					_support.left = _support.LEFT = MathRound((1.5 * platformX));
+					const _support = episode.enemies.find((x) => x.class === __ctfSupport);
+					_support.left = _support.LEFT = MathRound(1.5 * platformX);
 					_support.yPosition = MathRound(getGroundHeight() / 1.8);
 					setCharacterLevel(mainCharacter.level, _support, 1);
 					resetSkills(null, 1, _support);
@@ -6573,17 +6145,17 @@ const __stories = [
 					_support.updateVariables();
 					takeQuest(0, 1, null, null, 1);
 					episode.flagInCenter = true;
-					for(let i = 0; i < 2; i ++){
+					for (let i = 0; i < 2; i++) {
 						const _json = {
 							id: 92,
 							minX: i < 1 ? 4000 : 800,
 							maxX: i < 1 ? 5000 : 1800,
 							count: 1,
-							sight:1000,
+							sight: 1000,
 							groupId: 'd' + i,
 							minLevel: 10,
 							spawnDirection: i < 1 ? __right : __left,
-							spawn:5,
+							spawn: 5,
 							targetKey: 'flag',
 							props: {
 								noLoot: true,
@@ -6593,17 +6165,17 @@ const __stories = [
 						episode.mobs.push(_json);
 						episode.installMob(_json);
 					}
-					for(let i = 0; i < 20; i ++){
+					for (let i = 0; i < 20; i++) {
 						const _json = {
 							id: 66,
 							minX: i < 10 ? 4000 : 800,
 							maxX: i < 10 ? 5000 : 1800,
 							count: 1,
-							sight:1000,
+							sight: 1000,
 							groupId: 'r' + i,
 							minLevel: 10,
 							spawnDirection: i < 10 ? __right : __left,
-							spawn:5,
+							spawn: 5,
 							targetKey: 'flag',
 							props: {
 								noLoot: true,
@@ -6613,17 +6185,17 @@ const __stories = [
 						episode.mobs.push(_json);
 						episode.installMob(_json);
 					}
-					for(let i = 0; i < 40; i ++){
+					for (let i = 0; i < 40; i++) {
 						const _json = {
-							id: 19,
+							id: 619,
 							minX: i < 20 ? 4000 : 800,
 							maxX: i < 20 ? 5000 : 1800,
 							count: 1,
-							sight:1000,
+							sight: 1000,
 							minLevel: 10,
 							groupId: 'g' + i,
 							spawnDirection: i < 20 ? __right : __left,
-							spawn:3,
+							spawn: 3,
 							targetKey: 'flag',
 							props: {
 								noLoot: true,
@@ -6635,31 +6207,33 @@ const __stories = [
 					}
 				},
 				actions: [
-					{ 
-						when: function() {
+					{
+						when: function () {
 							const _char = mainCharacter.class === episode.realClass ? mainCharacter : _coopMembers?.[0];
 							return _char?.isDead?.();
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 2;
 							stopWeather();
 							installStoryFinish(1);
 						}
 					},
-					{ 
-						when: function() {
-							return !episode.end && episode.phase !== 5
-							 && episode.timedQuestCounter?.ms > 0 
-							 && episode.timedQuestCounter?.ms < (__account.questStatus.quest.timer.ms / 2000);
+					{
+						when: function () {
+							return (
+								!episode.end &&
+								episode.phase !== 5 &&
+								episode.timedQuestCounter?.ms > 0 &&
+								episode.timedQuestCounter?.ms < __account.questStatus.quest.timer.ms / 2000
+							);
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 5;
-							const _spawners = episode.mobs.filter(x => x.id === 66);
+							const _spawners = episode.mobs.filter((x) => x.id === 66);
 							let i = 1;
-							for(let _s of _spawners)
-							{
+							for (let _s of _spawners) {
 								const _json = structuredClone2(_s);
-								_json.id = 49;
+								_json.id = 619;
 								_json.groupId = 'as' + i;
 								i++;
 								episode.mobs.push(_json);
@@ -6668,48 +6242,45 @@ const __stories = [
 						}
 					},
 					{
-						when: function() {
-							if(episode.flagInCenter)
-								return false;
-							const _capturer = episode.enemies.find(x => x.flagCapturer);
-							if(_capturer && _capturer.isDead()) {
+						when: function () {
+							if (episode.flagInCenter) return false;
+							const _capturer = episode.enemies.find((x) => x.flagCapturer);
+							if (_capturer && _capturer.isDead()) {
 								_capturer.remove = true;
 								return true;
 							}
 							return false;
 						},
-						do: function() {
+						do: function () {
 							let _flag = summonMobWithJson({
 								id: 93,
 								minX: 3000,
 								maxX: 3000,
 								count: 1,
-								hp:2000,
+								hp: 2000,
 								props: {
 									key: 'flag',
 									harmless: true,
 									invulnerable: false
 								}
 							});
-							_flag.left = _flag.LEFT = MathRound(platformX + (episode.cWidth / 2));
+							_flag.left = _flag.LEFT = MathRound(platformX + episode.cWidth / 2);
 							_flag.updateVariables();
 							_flag.yPosition = MathRound(getGroundHeight() / 2);
 							episode.flagInCenter = true;
-							PlaySound({key:'flag', volume:1});
+							PlaySound({ key: 'flag', volume: 1 });
 							_flag.enemy = false;
 							_flag.friendly = true;
 						}
 					},
 					{
-						when: function() {
-							if(episode.flagInCenter || episode.phase === 2)
-								return false; 
-							const _capturer = episode.enemies.find(x => x.flagCapturer);
-							if(_capturer?.unseen && _capturer.animation === 'run' && !_capturer.isDead())
-								return true;
+						when: function () {
+							if (episode.flagInCenter || episode.phase === 2) return false;
+							const _capturer = episode.enemies.find((x) => x.flagCapturer);
+							if (_capturer?.unseen && _capturer.animation === 'run' && !_capturer.isDead()) return true;
 							return false;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 2;
 							stopWeather();
 							installStoryFinish(1);
@@ -6722,7 +6293,7 @@ const __stories = [
 						minX: 3000,
 						maxX: 3000,
 						count: 1,
-						hp:2000,
+						hp: 2000,
 						props: {
 							key: 'flag',
 							invulnerable: false,
@@ -6735,14 +6306,14 @@ const __stories = [
 		]
 	},
 	{
-		id:114,
+		id: 114,
 		disableWorldMap: true,
-		order:114,
-		act:1,
+		order: 114,
+		act: 1,
 		bgColor: '#a9f010',
 		mission: 'ph',
-		daily:2,
-		minLevel:10,
+		daily: 2,
+		minLevel: 10,
 		ticket: 0,
 		perfectFinishRewards: [{ key: 'chest', grade: 2 }],
 		title: {
@@ -6751,24 +6322,41 @@ const __stories = [
 		},
 		description: {
 			en: "With bandits all around, your goal in this section is to destroy the beehive hanging in the middle. If you do it before time runs out, you'll be rewarded with extra loot.",
-			tr: "Haydutlar ortalıkta cirit atarken bu bölümde amacın ortada asılı duran kovanı parçalamak. Vaktin dolmadan bunu yaparsan ganimet ile ödüllendirileceksin."
+			tr: 'Haydutlar ortalıkta cirit atarken bu bölümde amacın ortada asılı duran kovanı parçalamak. Vaktin dolmadan bunu yaparsan ganimet ile ödüllendirileceksin.'
 		},
 		resultStars: [
-			{ id: 1, title: 'Clear mission', when: function() {
-				return !mainCharacter.isDead();
-			}},
-			{ id: 2, key: 'time', value: 3 * 60000, title: 'Finish in time',
-				when: function(_item) {
-					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
-			}},
-			{ id: 3, key: 'hp', value: .5, title: 'Stay above %50 health', when: function(_item) {
-				return (__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >= MathFloor(mainCharacter.maxHP * _item.value);
-			}}
+			{
+				id: 1,
+				title: 'Clear mission',
+				when: function () {
+					return !mainCharacter.isDead();
+				}
+			},
+			{
+				id: 2,
+				key: 'time',
+				value: 3 * 60000,
+				title: 'Finish in time',
+				when: function (_item) {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= _item.value;
+				}
+			},
+			{
+				id: 3,
+				key: 'hp',
+				value: 0.5,
+				title: 'Stay above %50 health',
+				when: function (_item) {
+					return (
+						(__account.questStatus.lastStoryFinishHP ?? mainCharacter.health) >=
+						MathFloor(mainCharacter.maxHP * _item.value)
+					);
+				}
+			}
 		],
 		rewards: [
-			{ key: 'misc', type: 'ticket-random', count:1 },
-			{ key: 'gem', grade: 1, type: 'random', count:1 },
+			{ key: 'misc', type: 'ticket-random', count: 1 },
+			{ key: 'gem', grade: 1, type: 'random', count: 1 },
 			{ key: 'gold', count: 10000 },
 			{ key: 'exp', count: 2200 }
 		],
@@ -6788,9 +6376,8 @@ const __stories = [
 				maps: [11],
 				timer: {
 					ms: 120000,
-					after: function() {
-						if(episode.phase < 100)
-							episode.timerFailed = 1;
+					after: function () {
+						if (episode.phase < 100) episode.timerFailed = 1;
 						episode.phase = 101;
 					}
 				}
@@ -6802,50 +6389,48 @@ const __stories = [
 				startsWith: 1,
 				save: true,
 				loadingCharacterIds: [111, 33, 35, 2, 7],
-				start: function() {
+				start: function () {
 					removeCoopCharacter();
 					addClass(_gameUI, 'demo-playing');
 					mainCharacter.direction = __right;
 					takeQuest(0, 1, null, null, 1);
-					episode.boss = episode.enemies.find(x => x.id === 111);
+					episode.boss = episode.enemies.find((x) => x.id === 111);
 					episode.phase = episode.boss.grade;
 					removeClass(_gameUI, 'disable-ui');
 				},
 				actions: [
 					{
-						when: function() {
-							return (episode.boss?.gradeLeft + 1) < episode.phase && episode.phase < 100;
+						when: function () {
+							return episode.boss?.gradeLeft + 1 < episode.phase && episode.phase < 100;
 						},
-						do: function() {
-							if(episode.boss) {
+						do: function () {
+							if (episode.boss) {
 								delete episode.boss.looted;
 								episode.loot = {
 									enemy: episode.boss,
-									loots: [
-										
-									]
+									loots: []
 								};
 								episode.phase--;
-								for(let i = 0; i < (episode.boss.grade - episode.phase); i++)
-									episode.loot.loots.push({type:'gold'});
+								for (let i = 0; i < episode.boss.grade - episode.phase; i++)
+									episode.loot.loots.push({ type: 'gold' });
 							}
 						}
 					},
 					{
-						when: function() {
+						when: function () {
 							return episode.phase === 101;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 103;
 							__storyPlaying = false;
 							installStoryFinish(1);
 						}
 					},
 					{
-						when: function() {
-							return episode.phase === 102 && !(episode.enemies?.find(x => x.id === 111));
+						when: function () {
+							return episode.phase === 102 && !episode.enemies?.find((x) => x.id === 111);
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 103;
 							updateQuestArea();
 							__storyPlaying = false;
@@ -6853,27 +6438,27 @@ const __stories = [
 						}
 					},
 					{
-						when: function() {
-							return (episode.boss?.health <= 0 && episode.phase < 10);
+						when: function () {
+							return episode.boss?.health <= 0 && episode.phase < 10;
 						},
-						do: function() {
+						do: function () {
 							delete episode.boss;
-							if(__account?.questStatus?.quest?.timer)
-								delete __account.questStatus.quest.timer;
-							episode.enemies.filter(x => !x.main && !x.tag && !x.friendly).forEach(x => {
-								x.stopSpawn();
-								x.health = x.experience = 0;
-								x.dead = x.dying = true;
-								x.animate('dead', 1);
-							});
+							if (__account?.questStatus?.quest?.timer) delete __account.questStatus.quest.timer;
+							episode.enemies
+								.filter((x) => !x.main && !x.tag && !x.friendly)
+								.forEach((x) => {
+									x.stopSpawn();
+									x.health = x.experience = 0;
+									x.dead = x.dying = true;
+									x.animate('dead', 1);
+								});
 							episode.mobs = [];
 							episode.respawners = [];
 							episode.phase = 102;
 							episode.pauseBgMusic(1);
 							episode.pauseAmbianceMusic();
-							PlaySound({ key:'deepimpact', volume: 1 });
-							if(mainCharacter)
-								cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
+							PlaySound({ key: 'deepimpact', volume: 1 });
+							if (mainCharacter) cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
 						}
 					}
 				],
@@ -6886,9 +6471,9 @@ const __stories = [
 						sight: 1000,
 						grade: 11,
 						hp: 10000,
-						zoom: .34,
-						yPosition: function() {
-							return MathRound(groundheight * .5);
+						zoom: 0.34,
+						yPosition: function () {
+							return MathRound(groundheight * 0.5);
 						}
 					},
 					{
@@ -6898,7 +6483,7 @@ const __stories = [
 						count: 4,
 						sight: 1000,
 						spawn: 10,
-						hp:3000,
+						hp: 3000,
 						experience: 0
 					},
 					{
@@ -6908,7 +6493,7 @@ const __stories = [
 						count: 2,
 						sight: 1000,
 						spawn: 10,
-						hp:2000,
+						hp: 2000,
 						experience: 0
 					},
 					{
@@ -6918,7 +6503,7 @@ const __stories = [
 						count: 6,
 						sight: 1000,
 						spawn: 10,
-						hp:2500,
+						hp: 2500,
 						experience: 0
 					},
 					{
@@ -6928,7 +6513,7 @@ const __stories = [
 						count: 2,
 						sight: 1000,
 						spawn: 10,
-						hp:2200,
+						hp: 2200,
 						experience: 0
 					}
 				]
@@ -6937,11 +6522,11 @@ const __stories = [
 		]
 	},
 	{
-		id:200,
+		id: 200,
 		disableWorldMap: true,
-		order:200,
-		act:1,
-		minLevel:1,
+		order: 200,
+		act: 1,
+		minLevel: 1,
 		list: false,
 		ticket: 0,
 		mission: 'qp',
@@ -6952,26 +6537,38 @@ const __stories = [
 			tr: 'Cadı Avı'
 		},
 		description: {
-			en: "",
-			tr: ""
+			en: '',
+			tr: ''
 		},
 		resultStars: [
-			{ id: 1, title: 'Clear mission', when: function() {
-				return !mainCharacter.isDead();
-			}},
-			{ id: 2, key: 'time', value: 15 * 60000, title: 'Finish in time',
-				when: function(_item) {
-					//return !isMissionFailed(0) && !isMissionFailed(2) &&
-					return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
-			}},
-			{ id: 3, key: 'war', title: 'Win the death match', when: function(_item) {
-				//return (mainCharacter.heartCount > _item.value || (mainCharacter.groupId && mainCharacter.health > 0));
-				return episode.team1score > episode.team2score;
-			}}
+			{
+				id: 1,
+				title: 'Clear mission',
+				when: function () {
+					return !mainCharacter.isDead();
+				}
+			},
+			{
+				id: 2,
+				key: 'time',
+				value: 15 * 60000,
+				title: 'Finish in time',
+				when: function (_item) {
+					return (episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick) <= _item.value;
+				}
+			},
+			{
+				id: 3,
+				key: 'war',
+				title: 'Win the death match',
+				when: function (_item) {
+					return episode.team1score > episode.team2score;
+				}
+			}
 		],
 		rewards: [
 			{ key: 'item', grade: 2, type: 'weapon' },
-			{ key: 'gem', grade: 1, type: 'random', count:1 },
+			{ key: 'gem', grade: 1, type: 'random', count: 1 },
 			{ key: 'gold', count: 5000 },
 			{ key: 'exp', count: 1200 }
 		],
@@ -6995,9 +6592,8 @@ const __stories = [
 				},
 				timer: {
 					ms: 200000,
-					after: function() {
-						if(episode.phase > 98)
-							return;
+					after: function () {
+						if (episode.phase > 98) return;
 						episode.timerFailed = 1;
 						episode.phase = 98;
 					}
@@ -7022,10 +6618,9 @@ const __stories = [
 				},
 				timer: {
 					ms: 200000,
-					after: function() {
-						if(episode.phase > 99)
-							return;
-						if(episode.boss && !episode.boss.isDead()) {
+					after: function () {
+						if (episode.phase > 99) return;
+						if (episode.boss && !episode.boss.isDead()) {
 							episode.timerFailed = 1;
 							episode.phase = 200;
 						}
@@ -7053,118 +6648,117 @@ const __stories = [
 							tr: 'Morya Temizlendi'
 						}
 					},
-					{ 
-						enemy: [38], 
-						limit: 1, 
+					{
+						enemy: [38],
+						limit: 1,
 						descriptions: {
 							en: 'Erlin Cleared',
 							tr: 'Erlin Temizlendi'
-						} 
+						}
 					}
 				],
 				maps: [11]
 			}
 		],
-		heartCount : 3,
-		//startScene: 1,
+		heartCount: 3,
+
 		scenes: [
 			{
-				when: function() {
-						return true;
-					if(localStorage.getItem('qp-tutorial2'))
-						return false;
+				when: function () {
+					return true;
+					if (localStorage.getItem('qp-tutorial2')) return false;
 					localStorage.setItem('qp-tutorial2', '1');
 					return true;
 				},
 				noArtifact: true,
 				lang: [
 					{
-						title : {
+						title: {
 							en: 'Dodge',
 							tr: 'Kaçmak'
 						},
-						en: "You can avoid attacks by choosing a direction and roll, or by dashing backwards without direction",
-						tr: "Saldırılardan kaçmak için bir yön seçip yuvarlanabilir veya yön seçmeden geri doğru atılabilirsiniz"
+						en: 'You can avoid attacks by choosing a direction and roll, or by dashing backwards without direction',
+						tr: 'Saldırılardan kaçmak için bir yön seçip yuvarlanabilir veya yön seçmeden geri doğru atılabilirsiniz'
 					},
 					{
-						en: "Well done",
-						tr: "Aferin"
+						en: 'Well done',
+						tr: 'Aferin'
 					},
 					{
-						title : {
+						title: {
 							en: 'Counter Attack',
 							tr: 'Karşı Saldırı'
 						},
-						en: "Hold block before attack or press here after attack to make counterattack",
-						tr: "Saldırıdan önce kalkan tutarak veya saldırıdan sonra buraya basarak karşı saldırı yapabilirsiniz"
+						en: 'Hold block before attack or press here after attack to make counterattack',
+						tr: 'Saldırıdan önce kalkan tutarak veya saldırıdan sonra buraya basarak karşı saldırı yapabilirsiniz'
 					},
 					{
-						en: "Good job",
-						tr: "Tebrikler"
+						en: 'Good job',
+						tr: 'Tebrikler'
 					},
 					{
-						title : {
+						title: {
 							en: 'Combo Move',
 							tr: 'Kombin Hamle'
 						},
-						en: "Hold attack to combo your opponent until you knockback him",
-						tr: "Saldırıya basılı tutarak rakibinizin geri savrulmasına kadar kombolayabilirsiniz"
+						en: 'Hold attack to combo your opponent until you knockback him',
+						tr: 'Saldırıya basılı tutarak rakibinizin geri savrulmasına kadar kombolayabilirsiniz'
 					},
 					{
-						en: "No no no",
-						tr: "Hayır hayır hayır"
+						en: 'No no no',
+						tr: 'Hayır hayır hayır'
 					},
 					{
-						en: "Coool",
-						tr: "Harika"
+						en: 'Coool',
+						tr: 'Harika'
 					},
 					{
-						title : {
+						title: {
 							en: 'Charge Attack',
 							tr: 'Şarj Saldırısı'
 						},
-						en: "Now use your attack again to charge and getting close to your opponent",
-						tr: "Şimdi saldırınızı tekrar kullanarak şarj edin ve rakibinize yaklaşın"
+						en: 'Now use your attack again to charge and getting close to your opponent',
+						tr: 'Şimdi saldırınızı tekrar kullanarak şarj edin ve rakibinize yaklaşın'
 					},
 					{
-						en: "Superb",
-						tr: "Süper"
+						en: 'Superb',
+						tr: 'Süper'
 					},
 					{
-						title : {
+						title: {
 							en: 'Ground Attack',
 							tr: 'Yer Saldırısı'
 						},
 						en: "Last lesson! Time to break your opponent\'s powerful skill. Skill priority works for getting advantage when both sides attack",
-						tr: "Son ders! Rakibinizin güçlü yeteneğini kırma zamanı. Her iki taraf saldırdığında yetenek önceliği avantaj sağlar"
+						tr: 'Son ders! Rakibinizin güçlü yeteneğini kırma zamanı. Her iki taraf saldırdığında yetenek önceliği avantaj sağlar'
 					},
 					{
-						title : {
+						title: {
 							en: 'Air Attack',
 							tr: 'Hava Saldırısı'
 						},
 						en: "Let's continue our combo and keep enemy on air",
-						tr: "Kombinimize devam edelim ve düşmanı havada tutalım"
+						tr: 'Kombinimize devam edelim ve düşmanı havada tutalım'
 					},
 					{
-						title : {
+						title: {
 							en: 'Chain Attack',
 							tr: 'Zincir Saldırısı'
 						},
-						en: "That ability has an another phase to keep your combo up",
-						tr: "O yeteneğin kombinizi sürdürmek için başka bir aşaması var"
+						en: 'That ability has an another phase to keep your combo up',
+						tr: 'O yeteneğin kombinizi sürdürmek için başka bir aşaması var'
 					},
 					{
-						title : {
+						title: {
 							en: 'Ranged Attack',
 							tr: 'Menzilli Saldırı'
 						},
-						en: "One last move but this time enemy is far away, use your ranged attack to take this rat down!",
-						tr: "Son hamle ama bu sefer düşman uzakta, bu sıçanı indirmek için menzilli saldırınızı kullanın!"
+						en: 'One last move but this time enemy is far away, use your ranged attack to take this rat down!',
+						tr: 'Son hamle ama bu sefer düşman uzakta, bu sıçanı indirmek için menzilli saldırınızı kullanın!'
 					},
 					{
-						en: "Spot on! Now you are ready",
-						tr: "İnanılmaz! Artık hazırsın"
+						en: 'Spot on! Now you are ready',
+						tr: 'İnanılmaz! Artık hazırsın'
 					},
 					{
 						en: "Basat, one of the Alps raised on wolf's milk, sets out on a journey to defeat the demons of Erlik Han, the lord of evil, on the orders of Dede Korkut...",
@@ -7172,12 +6766,11 @@ const __stories = [
 					}
 				],
 				map: 9998,
-				loots: [
-				],
+				loots: [],
 				startsWith: 1,
 				save: true,
 				loadingCharacterIds: [622],
-				start: function() {
+				start: function () {
 					clearAudioCache(loadedSounds);
 					removeCoopCharacter();
 					mainCharacter.level = 0;
@@ -7190,20 +6783,21 @@ const __stories = [
 					episode.playBgMusic();
 					mainCharacter.direction = __right;
 					mainCharacter.left = mainCharacter.LEFT = MathRound(episode.cWidth / 3) + mainCharacter.WIDTH;
-					const _enemy = episode.enemies.find(x => x.enemy);
+					const _enemy = episode.enemies.find((x) => x.enemy);
 					_enemy.left = _enemy.LEFT = MathRound((2 * episode.cWidth) / 3);
 					_enemy.direction = __left;
 					mainCharacter.immobilize = true;
 					mainCharacter.disableKeyboard = mainCharacter.still = true;
 					blurKeyboard();
 					_enemy.atk = mainCharacter.atk = 0;
-					for(let _key of _enemy.attackKeys)
-						_enemy.animations[_key].disabled = true;
+					for (let _key of _enemy.attackKeys) _enemy.animations[_key].disabled = true;
 					_enemy.enableSkill('attack');
 					_enemy.upcomingAnimation = 'attack';
 					delete _enemy.animations.ground1.cooldown;
 					delete _enemy.animations.counterair;
-					_enemy.animations.ground1.chargingDistance = structuredClone2(_enemy.animations.ground1.chargeDistance);
+					_enemy.animations.ground1.chargingDistance = structuredClone2(
+						_enemy.animations.ground1.chargeDistance
+					);
 					delete _enemy.animations.ground1.chargeDistance;
 					blurKeyboard();
 					episode.tutorialOrder = 0;
@@ -7211,42 +6805,37 @@ const __stories = [
 					episode.noDamageFrame = true;
 					episode.boss.difficulty = 1;
 					const _idleFrames = episode.boss.animations.idle.frames;
-					const _idleFrameGoIndex = _idleFrames.findIndex(x => x.go);
-					if(_idleFrameGoIndex > -1){
-						episode.boss.animations.idle.frames =
-							_idleFrames.filter((x, i) => i <= _idleFrameGoIndex);
+					const _idleFrameGoIndex = _idleFrames.findIndex((x) => x.go);
+					if (_idleFrameGoIndex > -1) {
+						episode.boss.animations.idle.frames = _idleFrames.filter((x, i) => i <= _idleFrameGoIndex);
 						delete episode.boss.animations.idle.frames[_idleFrameGoIndex].go;
 					}
 					const _airFrames = episode.boss.animations.air2.frames;
 					episode.boss.frame = 0;
 					let _ultimateEffects;
-					_airFrames.forEach(x => {
-						if(x.objects){
-							const _obj = x.objects.find(o => o.key === 'dark');
-							if(_obj) {
+					_airFrames.forEach((x) => {
+						if (x.objects) {
+							const _obj = x.objects.find((o) => o.key === 'dark');
+							if (_obj) {
 								_ultimateEffects = structuredClone2(x.objects);
 							}
 						}
 					});
 					let _punchIndex;
-					for(let i = 0; i < _airFrames.length; i++) {
+					for (let i = 0; i < _airFrames.length; i++) {
 						const _f = _airFrames[i];
-						if(_f.atk?.hurt?.type === 'ground')
-							_punchIndex = i;
+						if (_f.atk?.hurt?.type === 'ground') _punchIndex = i;
 					}
-					episode.boss.animations.air2.frames =
-						//filter frames which index is greater than _punchIndex
-						_airFrames.filter((x, i) => i > _punchIndex);
-					
-					const _halo = _ultimateEffects?.find(x => x.key === 'halo');
-					if(_halo?.p1) {
+					episode.boss.animations.air2.frames = _airFrames.filter((x, i) => i > _punchIndex);
+
+					const _halo = _ultimateEffects?.find((x) => x.key === 'halo');
+					if (_halo?.p1) {
 						_halo.p1.y = 400;
 					}
 					episode.boss.animations.air2.frames[1].objects = _ultimateEffects;
 					delete episode.boss.animations.block;
 					episode.boss.releaseAfter = 999999999;
-					document.querySelectorAll('.top-ui-item').forEach(x => 
-						addClass(x, 'd-none'));
+					document.querySelectorAll('.top-ui-item').forEach((x) => addClass(x, 'd-none'));
 					setTimeout(() => {
 						const _div = document.createElement('div');
 						_div.className = 'flex show-ui flex-ai-start tutorial-box fade-me';
@@ -7262,169 +6851,198 @@ const __stories = [
 						_skip.className = 'wot-button flex show-ui tutorial-skip fade-me orange-action-btn';
 						_skip.innerHTML = getLangData('Skip Tutorial');
 						_skip.lang = getLang();
-						_skip.onexactclick = function() {
+						_skip.onexactclick = function () {
 							episode.tutorialEnded = true;
-						}
+						};
 						_gameUI.appendChild(_skip);
 					}, 1000);
 				},
 				actions: [
 					{
-						when: function() {
-							return !_game.suspended 
-							&& episode.tutorialOrder === 0
-							&& !mainCharacter.attackedByObject 
-							&& ((episode.boss.animation !== 'attack'
-							&& isObjectsInTouch(episode.boss, mainCharacter)?.touch) ||
-							episode.boss.animation === 'attack');
+						when: function () {
+							return (
+								!_game.suspended &&
+								episode.tutorialOrder === 0 &&
+								!mainCharacter.attackedByObject &&
+								((episode.boss.animation !== 'attack' &&
+									isObjectsInTouch(episode.boss, mainCharacter)?.touch) ||
+									episode.boss.animation === 'attack')
+							);
 						},
-						do: function() {
+						do: function () {
 							episode.tutorialOrder = 1;
-							if(episode.boss.animation !== 'attack')
-								episode.boss.animate('attack', 1);	
+							if (episode.boss.animation !== 'attack') episode.boss.animate('attack', 1);
 						}
 					},
 					{
-						when: function() {
-							return !_game.suspended 
-							&& episode.tutorialOrder === 1
-							&& !mainCharacter.attackedByObject 
-							&& episode.boss.animation === 'attack'
-							&& episode.boss.animations[episode.boss.animation]
-							.frames[episode.boss.frame + 1]?.atk
-							&& episode.boss.start > 0;
+						when: function () {
+							return (
+								!_game.suspended &&
+								episode.tutorialOrder === 1 &&
+								!mainCharacter.attackedByObject &&
+								episode.boss.animation === 'attack' &&
+								episode.boss.animations[episode.boss.animation].frames[episode.boss.frame + 1]?.atk &&
+								episode.boss.start > 0
+							);
 						},
-						do: function() {
+						do: function () {
 							_game.suspended = 1;
-							focusMe('#skill7', function() {
-								removeFocus();
-								delete _game.suspended;
-								delete mainCharacter.disableKeyboard;
-								mainCharacter.still = mainCharacter.immobilize = false;
-								//mainCharacter.enableSkills();
-								mainCharacter.animations.dash.frames.forEach(x => {
-									if(x.extraStepXRate)
-										x.extraStepXRate *= .66;
-								});
-								mainCharacter.animate('dash', 1);
-								episode.boss.disableSkill('attack');
-								episode.boss.enableSkill('ground1');
-								const _inner = document.querySelector('.tutorial-box-inner');
-								const _current = _inner.querySelector('.fire,.toxic');
-								if(_current)
-									_current.remove();
-								const _div = document.createElement('div');
-								_div.className = "w-100 pt-3 toxic wot-subtitle fade-me flex w-100 flex-jc-start";
-								_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6cqh" />&nbsp;${__storyScene.lang[1][getLang()]}!`;
-								_inner.appendChild(_div);
-								disposeFocus();
-								episode.boss.animations.ground1.chargeDistance = episode.boss.animations.ground1.chargingDistance;
-								episode.boss.animations.ground1.useExtraStepXRate = true;
-								episode.tutorialOrder = 2;
-								episode.lastTutorialTime = _gameTick;
-								mainCharacter.disableKeyboard = true;
-								blurKeyboard();
-								setTimeout(() => {
-									episode.boss.animate('ground1', 1);
-								}, 1000);
-							}, 1, null, null, 1, 1, null,1);
+							focusMe(
+								'#skill7',
+								function () {
+									removeFocus();
+									delete _game.suspended;
+									delete mainCharacter.disableKeyboard;
+									mainCharacter.still = mainCharacter.immobilize = false;
+
+									mainCharacter.animations.dash.frames.forEach((x) => {
+										if (x.extraStepXRate) x.extraStepXRate *= 0.66;
+									});
+									mainCharacter.animate('dash', 1);
+									episode.boss.disableSkill('attack');
+									episode.boss.enableSkill('ground1');
+									const _inner = document.querySelector('.tutorial-box-inner');
+									const _current = _inner.querySelector('.fire,.toxic');
+									if (_current) _current.remove();
+									const _div = document.createElement('div');
+									_div.className = 'w-100 pt-3 toxic wot-subtitle fade-me flex w-100 flex-jc-start';
+									_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6cqh" />&nbsp;${__storyScene.lang[1][getLang()]}!`;
+									_inner.appendChild(_div);
+									disposeFocus();
+									episode.boss.animations.ground1.chargeDistance =
+										episode.boss.animations.ground1.chargingDistance;
+									episode.boss.animations.ground1.useExtraStepXRate = true;
+									episode.tutorialOrder = 2;
+									episode.lastTutorialTime = _gameTick;
+									mainCharacter.disableKeyboard = true;
+									blurKeyboard();
+									setTimeout(() => {
+										episode.boss.animate('ground1', 1);
+									}, 1000);
+								},
+								1,
+								null,
+								null,
+								1,
+								1,
+								null,
+								1
+							);
 						}
 					},
 					{
-						when: function() {
-							return !_game.suspended 
-							&& episode.tutorialOrder === 2
-							&& mainCharacter.chains 
-							&& !mainCharacter.attackedByObject 
-							&& !mainCharacter.counterLearned;
+						when: function () {
+							return (
+								!_game.suspended &&
+								episode.tutorialOrder === 2 &&
+								mainCharacter.chains &&
+								!mainCharacter.attackedByObject &&
+								!mainCharacter.counterLearned
+							);
 						},
-						do: function() {
+						do: function () {
 							let _id = 'chain-skill-2';
 							const _cs = document.getElementById(_id);
-							if(hasClass(_cs, 'v-none'))
-								_id = 'chain-skill-4';
+							if (hasClass(_cs, 'v-none')) _id = 'chain-skill-4';
 							_game.suspended = 1;
 							const _inner = document.querySelector('.tutorial-box-inner');
 							_inner.innerHTML = `<b class="tutorial-title fade-me wot-title">${__storyScene.lang[2].title[getLang()]}:</b>
 							<div class="w-100 fade-me tutorial-description-text wot-description" lang="${getLang()}">
 								${__storyScene.lang[2][getLang()]}</div>`;
-							focusMe('#' + _id, function() {
-								removeFocus();
-								delete _game.suspended;
-								delete mainCharacter.disableKeyboard;
-								mainCharacter.still = mainCharacter.immobilize = false;
-								//mainCharacter.enableSkills();
-								mainCharacter.animate(mainCharacter.chains[1].key, 1);
-								mainCharacter.counterLearned = 1;
-								const _inner = document.querySelector('.tutorial-box-inner');
-								const _current = _inner.querySelector('.fire,.toxic');
-								if(_current)
-									_current.remove();
-								const _div = document.createElement('div');
-								_div.className = "w-100 pt-3 toxic wot-subtitle fade-me flex w-100 flex-jc-start";
-								_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6cqh" />&nbsp;${__storyScene.lang[3][getLang()]}!`;
-								_inner.appendChild(_div);
-								disposeFocus();
-								episode.tutorialOrder = 3;
-								episode.lastTutorialTime = _gameTick;
-								mainCharacter.disableKeyboard = mainCharacter.immobilize = true;
-								blurKeyboard();
-							}, 1, null, null, 1, 1);
+							focusMe(
+								'#' + _id,
+								function () {
+									removeFocus();
+									delete _game.suspended;
+									delete mainCharacter.disableKeyboard;
+									mainCharacter.still = mainCharacter.immobilize = false;
+
+									mainCharacter.animate(mainCharacter.chains[1].key, 1);
+									mainCharacter.counterLearned = 1;
+									const _inner = document.querySelector('.tutorial-box-inner');
+									const _current = _inner.querySelector('.fire,.toxic');
+									if (_current) _current.remove();
+									const _div = document.createElement('div');
+									_div.className = 'w-100 pt-3 toxic wot-subtitle fade-me flex w-100 flex-jc-start';
+									_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6cqh" />&nbsp;${__storyScene.lang[3][getLang()]}!`;
+									_inner.appendChild(_div);
+									disposeFocus();
+									episode.tutorialOrder = 3;
+									episode.lastTutorialTime = _gameTick;
+									mainCharacter.disableKeyboard = mainCharacter.immobilize = true;
+									blurKeyboard();
+								},
+								1,
+								null,
+								null,
+								1,
+								1
+							);
 						}
 					},
 					{
-						when: function() {
-							return !_game.suspended 
-							&& episode.tutorialOrder === 3
-							&& (_gameTick - episode.lastTutorialTime) > 900;
+						when: function () {
+							return (
+								!_game.suspended &&
+								episode.tutorialOrder === 3 &&
+								_gameTick - episode.lastTutorialTime > 900
+							);
 						},
-						do: function() {
+						do: function () {
 							_game.suspended = 1;
 							removeFocus();
 							const _inner = document.querySelector('.tutorial-box-inner');
 							_inner.innerHTML = `<b class="tutorial-title wot-title">${__storyScene.lang[4].title[getLang()]}:</b>
 							<div class="w-100 fade-me tutorial-description-text wot-description">${__storyScene.lang[4][getLang()]}</div>`;
 							delete mainCharacter.disableKeyboard;
-							focusMe('#skill1', function(_elem, _shield) {
-								delete _game.suspended;
-								delete mainCharacter.disableKeyboard;
-								mainCharacter.still = mainCharacter.immobilize = false;
-								//mainCharacter.enableSkills();
-								mainCharacter.animate('attack', 1);
-								const _kb = episode.boss.animations.knockbackair;
-								_kb.frames.forEach(f => {
-									if(f.extraStepXRate) {
-										f.oldExtraStepXRate = f.extraStepXRate;
-										f.extraStepXRate *= 1.1;
-									}
-								});
-								episode.boss.animations.ground1.disabled = true;
-								episode.tutorialOrder = 4;
-								episode.lastTutorialTime = _gameTick;
-								mainCharacter.keyboard.mouseDown(' ');
-								if(_shield) {
-									_shield.addEventListener('pointerup', function() {
-										console.log('UP');
-										mainCharacter.keyboard.mouseUp(' ');
+							focusMe(
+								'#skill1',
+								function (_elem, _shield) {
+									delete _game.suspended;
+									delete mainCharacter.disableKeyboard;
+									mainCharacter.still = mainCharacter.immobilize = false;
+
+									mainCharacter.animate('attack', 1);
+									const _kb = episode.boss.animations.knockbackair;
+									_kb.frames.forEach((f) => {
+										if (f.extraStepXRate) {
+											f.oldExtraStepXRate = f.extraStepXRate;
+											f.extraStepXRate *= 1.1;
+										}
 									});
-								}
-								disposeFocus();
-							}, 1, null, null, 1);
+									episode.boss.animations.ground1.disabled = true;
+									episode.tutorialOrder = 4;
+									episode.lastTutorialTime = _gameTick;
+									mainCharacter.keyboard.mouseDown(' ');
+									if (_shield) {
+										_shield.addEventListener('pointerup', function () {
+											console.log('UP');
+											mainCharacter.keyboard.mouseUp(' ');
+										});
+									}
+									disposeFocus();
+								},
+								1,
+								null,
+								null,
+								1
+							);
 						}
 					},
 					{
-						when: function() {
-							return episode.tutorialOrder === 4
-							&& mainCharacter.animation === 'idle'
-							&& episode.boss.animation.startsWith('hurt')
+						when: function () {
+							return (
+								episode.tutorialOrder === 4 &&
+								mainCharacter.animation === 'idle' &&
+								episode.boss.animation.startsWith('hurt')
+							);
 						},
-						do: function() {
+						do: function () {
 							const _inner = document.querySelector('.tutorial-box-inner');
 							const _div = document.createElement('div');
 							const _current = _inner.querySelector('.fire,.toxic');
-							if(_current)
-								_current.remove();
-							_div.className = "w-100 pt-3 fire wot-subtitle fade-me flex w-100 flex-jc-start";
+							if (_current) _current.remove();
+							_div.className = 'w-100 pt-3 fire wot-subtitle fade-me flex w-100 flex-jc-start';
 							_div.innerHTML = `<img src="./images/icons/cross.png" style="height:3.6cqh" />&nbsp;${__storyScene.lang[5][getLang()]}!`;
 							_inner.appendChild(_div);
 							mainCharacter.immobilize = true;
@@ -7432,22 +7050,25 @@ const __stories = [
 							blurKeyboard();
 							episode.lastTutorialTime = _gameTick;
 							episode.tutorialOrder = 3;
-							episode.boss.animations.knockbackground.frames.forEach(x => x.speed = MathRound(x.speed * 1.3));
+							episode.boss.animations.knockbackground.frames.forEach(
+								(x) => (x.speed = MathRound(x.speed * 1.3))
+							);
 						}
 					},
 					{
-						when: function() {
-							return !_game.suspended 
-							&& episode.tutorialOrder === 4
-							&& episode.boss.animation.startsWith('knockback')
+						when: function () {
+							return (
+								!_game.suspended &&
+								episode.tutorialOrder === 4 &&
+								episode.boss.animation.startsWith('knockback')
+							);
 						},
-						do: function() {
+						do: function () {
 							const _inner = document.querySelector('.tutorial-box-inner');
 							const _current = _inner.querySelector('.fire,.toxic');
-							if(_current)
-								_current.remove();
+							if (_current) _current.remove();
 							const _div = document.createElement('div');
-							_div.className = "w-100 pt-3 toxic wot-substitle fade-me flex w-100 flex-jc-start";
+							_div.className = 'w-100 pt-3 toxic wot-substitle fade-me flex w-100 flex-jc-start';
 							_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6cqh" />&nbsp;${__storyScene.lang[6][getLang()]}!`;
 							_inner.appendChild(_div);
 							mainCharacter.immobilize = true;
@@ -7459,84 +7080,93 @@ const __stories = [
 						}
 					},
 					{
-						when: function() {
-							return !_game.suspended 
-							&& episode.tutorialOrder === 5
-							&& (_gameTick - episode.lastTutorialTime) > 1250;
+						when: function () {
+							return (
+								!_game.suspended &&
+								episode.tutorialOrder === 5 &&
+								_gameTick - episode.lastTutorialTime > 1250
+							);
 						},
-						do: function() {
+						do: function () {
 							_game.suspended = 1;
 							const _inner = document.querySelector('.tutorial-box-inner');
 							_inner.innerHTML = `<b class="tutorial-title wot-title">${__storyScene.lang[7].title[getLang()]}:</b>
 							<div class="w-100 fade-me tutorial-description-text wot-description">${__storyScene.lang[7][getLang()]}</div>`;
 							delete mainCharacter.disableKeyboard;
-							focusMe('#skill1', function() {
-								removeFocus();
-								const _kb = episode.boss.animations.knockbackair;
-								_kb.frames.forEach(f => {
-									if(f.extraStepXRate)
-										f.extraStepXRate = f.oldExtraStepXRate;
-								});
-								delete _game.suspended;
-								delete mainCharacter.disableKeyboard;
-								mainCharacter.still = mainCharacter.immobilize = false;
-								//mainCharacter.enableSkills();
-								mainCharacter.animations.attack.chargeDistance.value = 100;
-								mainCharacter.animate('attack', 1);
-								mainCharacter.disableKeyboard = true;
-								blurKeyboard();
-								episode.tutorialOrder = 6;
-								episode.lastTutorialTime = _gameTick;
-								disposeFocus();
-							}, 1, null, null, 1);
+							focusMe(
+								'#skill1',
+								function () {
+									removeFocus();
+									const _kb = episode.boss.animations.knockbackair;
+									_kb.frames.forEach((f) => {
+										if (f.extraStepXRate) f.extraStepXRate = f.oldExtraStepXRate;
+									});
+									delete _game.suspended;
+									delete mainCharacter.disableKeyboard;
+									mainCharacter.still = mainCharacter.immobilize = false;
+
+									mainCharacter.animations.attack.chargeDistance.value = 100;
+									mainCharacter.animate('attack', 1);
+									mainCharacter.disableKeyboard = true;
+									blurKeyboard();
+									episode.tutorialOrder = 6;
+									episode.lastTutorialTime = _gameTick;
+									disposeFocus();
+								},
+								1,
+								null,
+								null,
+								1
+							);
 						}
 					},
 					{
-						when: function() {
-							return !_game.suspended 
-							&& episode.tutorialOrder === 6
-							&& (_gameTick - episode.lastTutorialTime) > 500;
+						when: function () {
+							return (
+								!_game.suspended &&
+								episode.tutorialOrder === 6 &&
+								_gameTick - episode.lastTutorialTime > 500
+							);
 						},
-						do: function() {
+						do: function () {
 							const _inner = document.querySelector('.tutorial-box-inner');
 							const _current = _inner.querySelector('.fire,.toxic');
-							if(_current)
-								_current.remove();
+							if (_current) _current.remove();
 							const _div = document.createElement('div');
-							_div.className = "w-100 pt-3 toxic wot-subtitle fade-me flex w-100 flex-jc-start";
+							_div.className = 'w-100 pt-3 toxic wot-subtitle fade-me flex w-100 flex-jc-start';
 							_div.innerHTML = `<img src="./images/icons/tick.png" style="height:3.6cqh" />&nbsp;${__storyScene.lang[8][getLang()]}!`;
 							_inner.appendChild(_div);
 							mainCharacter.immobilize = mainCharacter.still = true;
 							const _air2 = episode.boss.animations.air2;
 							delete _air2.disabled;
-							_air2.frames.forEach(x => x.def = undefined);
+							_air2.frames.forEach((x) => (x.def = undefined));
 							_air2.priority = 4;
 							episode.boss.rageCount = _air2.rage;
-							episode.boss.attackKeys = [ 'air2' ];
+							episode.boss.attackKeys = ['air2'];
 							episode.boss.upcomingAnimation = 'air2';
-							//episode.boss.animations.hurtair.next = 'dead';
+
 							episode.tutorialOrder = 7;
 							episode.lastTutorialTime = _gameTick;
 						}
 					},
 					{
-						when: function() {
-							return !_game.suspended 
-							&& episode.tutorialOrder === 7
-							&& episode.boss.animation === 'air2';
+						when: function () {
+							return !_game.suspended && episode.tutorialOrder === 7 && episode.boss.animation === 'air2';
 						},
-						do: function() {
+						do: function () {
 							episode.tutorialOrder = 8;
 							episode.lastTutorialTime = _gameTick;
 						}
 					},
 					{
-						when: function() {	
-							return !_game.suspended 
-							&& episode.tutorialOrder === 8 
-							&& (_gameTick - episode.lastTutorialTime) > 700;
+						when: function () {
+							return (
+								!_game.suspended &&
+								episode.tutorialOrder === 8 &&
+								_gameTick - episode.lastTutorialTime > 700
+							);
 						},
-						do: function() {
+						do: function () {
 							const _inner = document.querySelector('.tutorial-box-inner');
 							_inner.innerHTML = `<b class="tutorial-title wot-title">${__storyScene.lang[9].title[getLang()]}:</b>
 							<div class="w-100 fade-me tutorial-description-text wot-description" lang="${getLang()}">
@@ -7548,34 +7178,40 @@ const __stories = [
 							episode.lastTutorialTime = _gameTick;
 							episode.boss.animations.air2.disabled = true;
 							delete mainCharacter.disableKeyboard;
-							focusMe('#skill4', function() {
-								episode.boss.animations.air2.frames.forEach(x => {
-									if(x.objects)
-										x.objects = x.objects.filter(o => o.key !== 'dark');
-								});
-								removeFocus();
-								delete _game.suspended;
-								delete mainCharacter.disableKeyboard;
-								mainCharacter.still = mainCharacter.immobilize = false;
-								//mainCharacter.enableSkills();
-								mainCharacter.animate('ground2', 1);
-								mainCharacter.disableKeyboard = mainCharacter.immobilize = true;
-								blurKeyboard();
-								episode.tutorialOrder = 9;
-								episode.lastTutorialTime = _gameTick;
-								disposeFocus();
-							}, 1, null, null, 1);
+							focusMe(
+								'#skill4',
+								function () {
+									episode.boss.animations.air2.frames.forEach((x) => {
+										if (x.objects) x.objects = x.objects.filter((o) => o.key !== 'dark');
+									});
+									removeFocus();
+									delete _game.suspended;
+									delete mainCharacter.disableKeyboard;
+									mainCharacter.still = mainCharacter.immobilize = false;
+
+									mainCharacter.animate('ground2', 1);
+									mainCharacter.disableKeyboard = mainCharacter.immobilize = true;
+									blurKeyboard();
+									episode.tutorialOrder = 9;
+									episode.lastTutorialTime = _gameTick;
+									disposeFocus();
+								},
+								1,
+								null,
+								null,
+								1
+							);
 						}
 					},
 					{
-						when: function() {
-							return !_game.suspended 
-							&& episode.tutorialOrder === 9
-							&& mainCharacter.animation === 'idle';
+						when: function () {
+							return (
+								!_game.suspended && episode.tutorialOrder === 9 && mainCharacter.animation === 'idle'
+							);
 						},
-						do: function() {
+						do: function () {
 							const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<b class="tutorial-title wot-title">${__storyScene.lang[10].title[getLang()]}:</b>
+							_inner.innerHTML = `<b class="tutorial-title wot-title">${__storyScene.lang[10].title[getLang()]}:</b>
 									<div class="w-100 fade-me tutorial-description-text wot-description" lang="${getLang()}">
 										${__storyScene.lang[10][getLang()]}
 								</div>`;
@@ -7587,39 +7223,47 @@ const __stories = [
 						}
 					},
 					{
-						when: function() {
-							return !_game.suspended 
-							&& episode.tutorialOrder === 10
-							&& (_gameTick - episode.lastTutorialTime) > 700;
+						when: function () {
+							return (
+								!_game.suspended &&
+								episode.tutorialOrder === 10 &&
+								_gameTick - episode.lastTutorialTime > 700
+							);
 						},
-						do: function() {
+						do: function () {
 							_game.suspended = 1;
 							episode.tutorialOrder = 11;
 							episode.lastTutorialTime = _gameTick;
 							delete mainCharacter.disableKeyboard;
-							focusMe('#skill3', function() {
-								removeFocus();
-								delete _game.suspended;
-								delete mainCharacter.disableKeyboard;
-								mainCharacter.still = mainCharacter.immobilize = false;
-								mainCharacter.animate('ground1', 1);
-								episode.tutorialOrder = 11;
-								episode.lastTutorialTime = _gameTick;
-								disposeFocus();
-								//requestAnimationFrame(() => {
+							focusMe(
+								'#skill3',
+								function () {
+									removeFocus();
+									delete _game.suspended;
+									delete mainCharacter.disableKeyboard;
+									mainCharacter.still = mainCharacter.immobilize = false;
+									mainCharacter.animate('ground1', 1);
+									episode.tutorialOrder = 11;
+									episode.lastTutorialTime = _gameTick;
+									disposeFocus();
+
 									mainCharacter.disableKeyboard = true;
 									blurKeyboard();
-								//});
-							}, 1, null, null, 1);
+								},
+								1,
+								null,
+								null,
+								1
+							);
 						}
 					},
 					{
-						when: function() {
-							return !_game.suspended 
-							&& episode.tutorialOrder === 11
-							&& mainCharacter.animation === 'idle';
+						when: function () {
+							return (
+								!_game.suspended && episode.tutorialOrder === 11 && mainCharacter.animation === 'idle'
+							);
 						},
-						do: function() {
+						do: function () {
 							mainCharacter.direction = __left;
 							mainCharacter.disableKeyboard = mainCharacter.still = mainCharacter.immobilize = true;
 							blurKeyboard();
@@ -7628,14 +7272,14 @@ const __stories = [
 						}
 					},
 					{
-						when: function() {
-							return !_game.suspended 
-							&& episode.tutorialOrder === 12
-							&& mainCharacter.direction === __left;
+						when: function () {
+							return (
+								!_game.suspended && episode.tutorialOrder === 12 && mainCharacter.direction === __left
+							);
 						},
-						do: function() {
+						do: function () {
 							const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<b class="tutorial-title wot-title">${__storyScene.lang[11].title[getLang()]}:</b>
+							_inner.innerHTML = `<b class="tutorial-title wot-title">${__storyScene.lang[11].title[getLang()]}:</b>
 								<div class="w-100 fade-me tutorial-description-text wot-description" lang="${getLang()}">
 									${__storyScene.lang[11][getLang()]}
 								</div>`;
@@ -7647,50 +7291,59 @@ const __stories = [
 						}
 					},
 					{
-						when: function() {
-							return !_game.suspended 
-							&& episode.tutorialOrder === 13
-							&& (_gameTick - episode.lastTutorialTime) > 700;
+						when: function () {
+							return (
+								!_game.suspended &&
+								episode.tutorialOrder === 13 &&
+								_gameTick - episode.lastTutorialTime > 700
+							);
 						},
-						do: function() {
+						do: function () {
 							_game.suspended = 1;
 							episode.tutorialOrder = 14;
 							episode.lastTutorialTime = _gameTick;
 							delete mainCharacter.disableKeyboard;
-							focusMe('#skill3', function() {
-								removeFocus();
-								delete _game.suspended;
-								delete mainCharacter.disableKeyboard;
-								mainCharacter.still = mainCharacter.immobilize = false;
-								mainCharacter.animate('ground3', 1);
-								const g3 = mainCharacter.animations.ground3;
-								let g3LastAttackFrame;
-								for(let _frame of g3.frames) {
-									if(_frame.atk){								
-										g3LastAttackFrame = _frame;
-										_frame.atk.aoe = 1000;
+							focusMe(
+								'#skill3',
+								function () {
+									removeFocus();
+									delete _game.suspended;
+									delete mainCharacter.disableKeyboard;
+									mainCharacter.still = mainCharacter.immobilize = false;
+									mainCharacter.animate('ground3', 1);
+									const g3 = mainCharacter.animations.ground3;
+									let g3LastAttackFrame;
+									for (let _frame of g3.frames) {
+										if (_frame.atk) {
+											g3LastAttackFrame = _frame;
+											_frame.atk.aoe = 1000;
+										}
 									}
-								}
-								g3LastAttackFrame.knockback = true;
-								g3LastAttackFrame.atk.push = 5;
-								g3LastAttackFrame.atk.knockback = true;
-								mainCharacter.disableKeyboard = true;
-								blurKeyboard();
-								episode.tutorialOrder = 14;
-								episode.lastTutorialTime = _gameTick;
-								disposeFocus();
-							}, 1, null, null, 1);
+									g3LastAttackFrame.knockback = true;
+									g3LastAttackFrame.atk.push = 5;
+									g3LastAttackFrame.atk.knockback = true;
+									mainCharacter.disableKeyboard = true;
+									blurKeyboard();
+									episode.tutorialOrder = 14;
+									episode.lastTutorialTime = _gameTick;
+									disposeFocus();
+								},
+								1,
+								null,
+								null,
+								1
+							);
 						}
 					},
 					{
-						when: function() {
-							return !_game.suspended 
-							&& episode.tutorialOrder === 14
-							&& mainCharacter.animation === 'idle';
+						when: function () {
+							return (
+								!_game.suspended && episode.tutorialOrder === 14 && mainCharacter.animation === 'idle'
+							);
 						},
-						do: function() {
+						do: function () {
 							const _inner = document.querySelector('.tutorial-box-inner');
-								_inner.innerHTML = `<b class="tutorial-title wot-title">${__storyScene.lang[12].title[getLang()]}:</b><div class="w-100 fade-me tutorial-description-text wot-description" lang="${getLang()}">
+							_inner.innerHTML = `<b class="tutorial-title wot-title">${__storyScene.lang[12].title[getLang()]}:</b><div class="w-100 fade-me tutorial-description-text wot-description" lang="${getLang()}">
 										${__storyScene.lang[12][getLang()]}
 								</div>`;
 							mainCharacter.direction = __right;
@@ -7701,92 +7354,95 @@ const __stories = [
 						}
 					},
 					{
-						when: function() {
-							return !_game.suspended 
-							&& episode.tutorialOrder === 15
-							&& (_gameTick - episode.lastTutorialTime) > 700;
+						when: function () {
+							return (
+								!_game.suspended &&
+								episode.tutorialOrder === 15 &&
+								_gameTick - episode.lastTutorialTime > 700
+							);
 						},
-						do: function() {
+						do: function () {
 							_game.suspended = 1;
 							episode.tutorialOrder = 16;
 							episode.lastTutorialTime = _gameTick;
 							delete mainCharacter.disableKeyboard;
-							focusMe('#skill5', function() {
-								removeFocus();
-								delete _game.suspended;
-								delete mainCharacter.disableKeyboard;
-								mainCharacter.still = mainCharacter.immobilize = false;
-								mainCharacter.speedRate *= 1.5;
-								mainCharacter.animate('air1', 1);
-								mainCharacter.disableKeyboard = true;
-								blurKeyboard();
-								for(let anima in episode.boss.animations) {
-									if(anima.startsWith('hurt'))
-										episode.boss.animations[anima].next = 'dead';
-								}
-								episode.tutorialOrder = 16;
-								episode.lastTutorialTime = _gameTick;
-								disposeFocus();
-							}, 1, null, null, 1);
+							focusMe(
+								'#skill5',
+								function () {
+									removeFocus();
+									delete _game.suspended;
+									delete mainCharacter.disableKeyboard;
+									mainCharacter.still = mainCharacter.immobilize = false;
+									mainCharacter.speedRate *= 1.5;
+									mainCharacter.animate('air1', 1);
+									mainCharacter.disableKeyboard = true;
+									blurKeyboard();
+									for (let anima in episode.boss.animations) {
+										if (anima.startsWith('hurt')) episode.boss.animations[anima].next = 'dead';
+									}
+									episode.tutorialOrder = 16;
+									episode.lastTutorialTime = _gameTick;
+									disposeFocus();
+								},
+								1,
+								null,
+								null,
+								1
+							);
 						}
 					},
 					{
-						when: function() {
-							return !_game.suspended 
-							&& episode.tutorialOrder === 16
-							&& episode.boss.animation === 'dead';
+						when: function () {
+							return (
+								!_game.suspended && episode.tutorialOrder === 16 && episode.boss.animation === 'dead'
+							);
 						},
-						do: function() {
+						do: function () {
 							const _inner = document.querySelector('.tutorial-box-inner');
 							const _current = _inner.querySelector('.fire,.toxic');
-							if(_current)
-								_current.remove();
-								_inner.innerHTML = `<div class="w-100 pt-3 toxic wot-subtitle fade-me flex w-100 flex-jc-start flex-ai-start">
+							if (_current) _current.remove();
+							_inner.innerHTML = `<div class="w-100 pt-3 toxic wot-subtitle fade-me flex w-100 flex-jc-start flex-ai-start">
 										<img src="./images/icons/tick.png" style="height:3.6cqh" />&nbsp;${__storyScene.lang[13][getLang()]}!
 								</div>`;
 							mainCharacter.immobilize = true;
 							mainCharacter.disableKeyboard = mainCharacter.still = mainCharacter.immobilize = true;
 							blurKeyboard();
 							mainCharacter.ultimate = true;
-							mainCharacter.animate('idle',1);
+							mainCharacter.animate('idle', 1);
 							episode.tutorialOrder = 17;
 						}
 					},
 					{
-						when: function() {
-							return episode.tutorialOrder === 17
-							&& episode.boss.remove;
+						when: function () {
+							return episode.tutorialOrder === 17 && episode.boss.remove;
 						},
-						do: function() {
+						do: function () {
 							episode.tutorialEnded = true;
 							episode.tutorialOrder = 18;
 							episode.lastTutorialTime = _gameTick;
 						}
 					},
 					{
-						when: function() {
-							return episode.tutorialEnded
-							&& (_gameTick - (episode.lastTutorialTime ?? 8)) > 500;
+						when: function () {
+							return episode.tutorialEnded && _gameTick - (episode.lastTutorialTime ?? 8) > 500;
 						},
-						do: function() {
+						do: function () {
 							episode.tutorialOrder = 19;
 							episode.tutorialEnded = false;
 							episode.pauseBgMusic(1);
 							_game.suspended = true;
 							episode.pauseAmbianceMusic();
-							episode.enemies.forEach(x => x.stopStepSound());
+							episode.enemies.forEach((x) => x.stopStepSound());
 							removeFocus();
 							disposeFocus();
-							cssAnimations.blackui(null, 6000, __storyScene.lang[14][getLang()], function() {
+							cssAnimations.blackui(null, 6000, __storyScene.lang[14][getLang()], function () {
 								switchStoryScene();
 							});
-							
+
 							const _box = document.querySelector('.tutorial-box');
-							if(_box)
-								_box.remove();
+							if (_box) _box.remove();
 							const _skip = document.querySelector('.tutorial-skip');
-							if(_skip)
-								_skip.remove();
+							if (_skip) _skip.remove();
 						}
 					}
 				],
@@ -7798,13 +7454,13 @@ const __stories = [
 						count: 1,
 						sight: 1000,
 						grade: 4,
-						yPosition: function() {
-							return MathRound(groundheight * .5);
+						yPosition: function () {
+							return MathRound(groundheight * 0.5);
 						},
 						props: {
 							skipHealthBar: true
 						},
-						hp:1000000,
+						hp: 1000000,
 						experience: 0
 					}
 				]
@@ -7814,11 +7470,7 @@ const __stories = [
 				scorePerKill: 10,
 				noArtifact: true,
 				leaderBoards: {
-					calculate: function() {
-						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
-						//Kalan kalp (3 adet te) + 1000 * 3
-						//Yediği Damage ın toplam sağlığına oranı negatif bonusu (50 * 10) dmgTaken
-						
+					calculate: function () {
 						const _result = {
 							description: [
 								{
@@ -7827,8 +7479,11 @@ const __stories = [
 										tr: 'Zaman Bonusu'
 									},
 									icon: 'time',
-									value: MathRound(((10 * 60000) - 
-									((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick))) / 10)
+									value: MathRound(
+										(10 * 60000 -
+											((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick))) /
+											10
+									)
 								},
 								{
 									title: {
@@ -7844,53 +7499,40 @@ const __stories = [
 										tr: 'Hasar Alma'
 									},
 									icon: 'heart',
-									value: (-1 * MathRound(((mainCharacter.dmgTaken ?? 0) / mainCharacter.MAXHP) * 500)) -
-										((3 - (mainCharacter.heartCount ?? 0)) * 500)
+									value:
+										-1 * MathRound(((mainCharacter.dmgTaken ?? 0) / mainCharacter.MAXHP) * 500) -
+										(3 - (mainCharacter.heartCount ?? 0)) * 500
 								}
 							]
 						};
-						_result.score = _result.description.reduce(
-							(sum, item) => sum + (item.value ?? 0),
-							0
-						);
+						_result.score = _result.description.reduce((sum, item) => sum + (item.value ?? 0), 0);
 						return _result;
 					}
 				},
 				loots: [
-					{type:'pot', key:'pot', chance:1},
-					{type:'common', key:'corpseexplode', chance:1}
+					{ type: 'pot', key: 'pot', chance: 1 },
+					{ type: 'common', key: 'corpseexplode', chance: 1 }
 				],
-				getAssets: function() { 
+				getAssets: function () {
 					return [
-					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[0].id + '.png',
-					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[1].id + '.png',
-					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[2].id + '.png',
-					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[3].id + '.png',
-					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[4].id + '.png',
-					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[5].id + '.png'
-				]},
+						'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[0].id + '.png',
+						'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[1].id + '.png',
+						'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[2].id + '.png',
+						'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[3].id + '.png',
+						'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[4].id + '.png',
+						'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[5].id + '.png'
+					];
+				},
 				startsWith: 1,
 				save: true,
-				lazyLoadingCharacterIds : [621, 622, 623],
+				lazyLoadingCharacterIds: [621, 622, 623],
 				loadingCharacterIds: [619, 620],
-				before: function() {
-					if(episode?.ambiancePath){
+				before: function () {
+					if (episode?.ambiancePath) {
 						delete episode.ambiancePath;
 					}
 				},
-				start: function() {
-					// setTimeout(() => {
-					// 	const _k = summonMobWithJson({
-					// 		id: 631,
-					// 		level: 1,
-					// 		minX: MathRound((mainCharacter.HURTLEFT + platformX) / __zoom),
-					// 		maxX: MathRound((mainCharacter.HURTLEFT + platformX) / __zoom),
-					// 		sight:1000,
-					// 		count:1,
-					// 		experience: 0
-					// 	}, 0, 1, 1);
-					// 	_k.animate('start', 1);
-					// }, 5000);
+				start: function () {
 					clearAudioCache(loadedSounds);
 					removeCoopCharacter();
 					mainCharacter.storyVariables = {
@@ -7904,161 +7546,146 @@ const __stories = [
 					setCharacterLevel(1, null, 1);
 					mainCharacter.animations.tag.disabled = true;
 					resetSkills(null, 1, mainCharacter);
-					//setCharacterLevel(12, null, 1);
+
 					addClass(_gameUI, 'demo-playing');
 					episode.pauseBgMusic(1);
 					episode.createBgMusic(null, null, null, 'training');
 					episode.playBgMusic();
 					episode.phase = 1;
-					const _es = episode.enemies.filter(x => x.enemy);
-					_es.forEach(_e => 
-						{
-							_e.animations.hurtfeet = new animation(createHurtFeet(_e.zoom, _e.bloodColor, null, null, null,_e.width));
-						}
-					);
-					episode.loadCharacterSprites(function() {}, null, ['hurtfeet'],1,1);
+					const _es = episode.enemies.filter((x) => x.enemy);
+					_es.forEach((_e) => {
+						_e.animations.hurtfeet = new animation(
+							createHurtFeet(_e.zoom, _e.bloodColor, null, null, null, _e.width)
+						);
+					});
+					episode.loadCharacterSprites(function () {}, null, ['hurtfeet'], 1, 1);
 					mainCharacter.direction = __right;
-					const _tagChar = episode.enemies.find(x => x.tag);
-					if(_tagChar)
-						_tagChar.remove = true;
-					if(mainCharacter.tagContainer)
-					{
+					const _tagChar = episode.enemies.find((x) => x.tag);
+					if (_tagChar) _tagChar.remove = true;
+					if (mainCharacter.tagContainer) {
 						mainCharacter.tagContainer.remove();
 						delete mainCharacter.tagContainer;
 					}
 					const _qps = localStorage.getItem('quickplayskip');
 					let _json = [];
-					if(_qps) {
+					if (_qps) {
 						try {
 							_json = JSON.parse(_qps);
-						}
-						catch(_e) {}
+						} catch (_e) {}
 					}
 					const _skipped = _json.indexOf(1) !== -1;
-					if(!_skipped) {
+					if (!_skipped) {
 						const _desc = document.createElement('div');
 						_desc.className = 'flex show-ui full quick-play-desc-container quick-play-desc-container1';
 						let _html = '';
-						for(let i = 0; i < 6; i++) {
+						for (let i = 0; i < 6; i++) {
 							const _tip = __quickTips[i];
 							let _skillHtml = '';
-							// for(let _sk of _tip.skills) {
-							// 	if(_skillHtml !== '')
-							// 		_skillHtml += '<img src="./images/icons/swap-right.png" class="quick-play-desc-skill-swap" />';
-							// 	_skillHtml += '<div class="quick-play-desc-skill-icon" style="background-image:url(./images/main/skill-icons/warrior/' + _sk + '.png);background-size:cover"></div>';
-							// }
-							//_skillHtml = `<div class="quick-play-desc-skill-icons flex">` + _skillHtml + '</div>';
-							_html += 
-								// `<div class="quick-play-desc-item" style="background:url(./images/ui/full-border-vert.png) !important;background-size: 100% auto !important;background-repeat: no-repeat !important;overflow:visible;position:relative">
-								// 	<div class="flex" style="overflow:hidden;z-index:-1;top:0;left:0;position:absolute;inset:0"><img class="w-100" src="./images/${!isPhone() ? '_' : ''}quicktips/${_tip.id}.png" /></div>`
-								// + _skillHtml +
-								`<div class="quick-play-desc-item quick-play-desc-item${_tip.id}">
+
+							_html += `<div class="quick-play-desc-item quick-play-desc-item${_tip.id}">
 									<div class="wot-description quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>
 								</div>`;
 						}
-						_desc.innerHTML = _html +
-						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2cqh" class="w-50 h-100 flex flex-jc-start wot-title" onclick="doNotShowAgain(this,event)"  lang="${getLang()}"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2cqh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(0, 1, null, null, 1);skipQuickPlayTutorial(1)"><div class="orange-action-btn wot-button flex">${getLangData('OK')}</div></div></div>`;
+						_desc.innerHTML =
+							_html +
+							`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2cqh" class="w-50 h-100 flex flex-jc-start wot-title" onclick="doNotShowAgain(this,event)"  lang="${getLang()}"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2cqh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(0, 1, null, null, 1);skipQuickPlayTutorial(1)"><div class="orange-action-btn wot-button flex">${getLangData('OK')}</div></div></div>`;
 						_gameUI.appendChild(_desc);
 						episode.hasSkippableScreen = 1;
 						addClass(_gameUI, 'disable-ui');
 						requestAnimationFrame(() => {
 							_game.suspended = true;
 						});
-					}
-					else{
+					} else {
 						takeQuest(0, 1, null, null, 1);
 						skipQuickPlayTutorial();
 					}
-					document.querySelectorAll('.top-ui-item').forEach(x => 
-						removeClass(x, 'd-none'));
+					document.querySelectorAll('.top-ui-item').forEach((x) => removeClass(x, 'd-none'));
 					platformX = episode.cWidth;
 					mainCharacter.left = mainCharacter.LEFT = MathRound(episode.cWidth / 2);
-					// episode.mobs.push(structuredClone2(__storyScene.mobs[0]));
-					// episode.mobs[episode.mobs.length - 1].experience = 1000;
+
 					mainCharacter.maxHP = mainCharacter.MAXHP = mainCharacter.health = 150;
 					mainCharacter.setHealth(mainCharacter.health);
 					__story.lastHeroLevel = 1;
-					// episode.enemies.forEach(x => {
-					// 	const _keys = Object.keys(x.animations);
-					// 	for(let _k of _keys) {
-					// 		const _an = x.animations[_k];
-					// 		_an.frames.forEach(f => {
-					// 			if(!f.def)
-					// 				f.def = {};
-					// 			f.def.iframe = true;
-					// 		});
-					// 	}
-					// });
-					// setTimeout(() => {
-					// 		const _portal = summonMob(113, 3000, MathRound(groundheight * .5), 1);
-					// 		activatePortal(_portal);
-					// 		mainCharacter.talk();
-					// }, 3000);
 				},
 				actions: [
 					{
-						when: function() {
-							if(episode.phase >= 99)
-								return false;
+						when: function () {
+							if (episode.phase >= 99) return false;
 							const _st = episode.mobPhaseTick ?? __account?.questStatus?.quest?.timer?.startTime;
-							if(_st) {
-								return (_gameTick - _st) > 35000; 
+							if (_st) {
+								return _gameTick - _st > 35000;
 							}
 							return false;
 						},
-						do: function() {
+						do: function () {
 							episode.mobPhaseTick = _gameTick;
-							let _x = MathRound((mainCharacter.HURTLEFT + platformX + episode.cWidth + mainCharacter.HURTWIDTH) / __zoom);
-							const _mob1 = summonMobWithJson({
-								id: 623,
-								level: mainCharacter.level,
-								minX: _x,
-								groupId: 10,
-								spawn: 1,
-								sight:1000,
-								count:1,
-								maxX: _x,
-								experience: 0
-							}, 0, 1);
+							let _x = MathRound(
+								(mainCharacter.HURTLEFT + platformX + episode.cWidth + mainCharacter.HURTWIDTH) / __zoom
+							);
+							const _mob1 = summonMobWithJson(
+								{
+									id: 623,
+									level: mainCharacter.level,
+									minX: _x,
+									groupId: 10,
+									spawn: 1,
+									sight: 1000,
+									count: 1,
+									maxX: _x,
+									experience: 0
+								},
+								0,
+								1
+							);
 							_mob1.acceptChanges();
 							_mob1.pickNewTarget();
-							_x = MathRound((mainCharacter.HURTLEFT + platformX - episode.cWidth + mainCharacter.HURTWIDTH) / __zoom);
-							const _mob2 = summonMobWithJson({
-								id: 623,
-								level: mainCharacter.level,
-								minX: _x,
-								count:1,
-								groupId: 20,
-								spawn: 1,
-								sight:1000,
-								maxX: _x,
-								experience: 0
-							}, 0, 1);
+							_x = MathRound(
+								(mainCharacter.HURTLEFT + platformX - episode.cWidth + mainCharacter.HURTWIDTH) / __zoom
+							);
+							const _mob2 = summonMobWithJson(
+								{
+									id: 623,
+									level: mainCharacter.level,
+									minX: _x,
+									count: 1,
+									groupId: 20,
+									spawn: 1,
+									sight: 1000,
+									maxX: _x,
+									experience: 0
+								},
+								0,
+								1
+							);
 							_mob2.acceptChanges();
 							_mob2.pickNewTarget();
 						}
 					},
 					{
-						when: function() {
+						when: function () {
 							return episode.phase < 99 && (mainCharacter.level > 11 || episode.phase === 98);
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 99;
-							if(__account?.questStatus?.quest?.timer)
-								delete __account.questStatus.quest.timer;
-							episode.enemies.filter(x => !x.main && !x.tag && !x.friendly && x.class !== 'object').forEach(x => {
-								x.stopSpawn();
-								x.health = x.experience = 0;
-								x.dead = x.dying = true;
-								x.animate('dead', 1);
-							});
+							if (__account?.questStatus?.quest?.timer) delete __account.questStatus.quest.timer;
+							episode.enemies
+								.filter((x) => !x.main && !x.tag && !x.friendly && x.class !== 'object')
+								.forEach((x) => {
+									x.stopSpawn();
+									x.health = x.experience = 0;
+									x.dead = x.dying = true;
+									x.animate('dead', 1);
+								});
 							episode.mobs = [];
 							episode.respawners = [];
-							// setTimeout(function() {
-							// 	episode.loadCharacterSprites(function() {}, [37,38], null, 1);
-							// }, 20);
-							PlaySound({key:'bossalert', volume: .5});
-							warn('<div class="flex leveling"><img style="height:22cqh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
+
+							PlaySound({ key: 'bossalert', volume: 0.5 });
+							warn(
+								'<div class="flex leveling"><img style="height:22cqh" src="./images/icons/boss-alert.gif" /></div>',
+								'level-up',
+								4000,
+								1
+							);
 							const _elm = document.getElementById('quest-status');
 							addClass(_elm, 'mission-done');
 							__storyScene.bossQuest = {
@@ -8081,31 +7708,21 @@ const __stories = [
 											en: 'King Cleared',
 											tr: 'Kral Temizlendi'
 										}
-									},
-									// { 
-									// 	enemy: [38], 
-									// 	limit: 1, 
-									// 	descriptions: {
-									// 		en: 'Erlin Cleared',
-									// 		tr: 'Erlin Temizlendi'
-									// 	} 
-									// }
+									}
 								],
 								maps: [episode.id]
 							};
-							if(_elm)
-								_elm.onanimationend = function(e) {
-									if(e.animationName === 'mission-done')
-										updateQuestArea(null,
-											__storyScene.bossQuest
-										);
-								}
+							if (_elm)
+								_elm.onanimationend = function (e) {
+									if (e.animationName === 'mission-done')
+										updateQuestArea(null, __storyScene.bossQuest);
+								};
 							mainCharacter.realLevel = mainCharacter.level;
 							setTimeout(() => {
-							PlaySound({key:'goblinkingenter', volume: 1});
+								PlaySound({ key: 'goblinkingenter', volume: 1 });
 								setTimeout(() => {
 									episode.phase = 100;
-									const installBoss = function(_b, _name) {
+									const installBoss = function (_b, _name) {
 										const _boss = summonMobWithJson({
 											id: _b,
 											level: 12,
@@ -8113,225 +7730,200 @@ const __stories = [
 											atk: mainCharacter.atk,
 											grade: 4
 										});
-										//_boss.health = _boss.maxHP = 1;
+
 										_boss.class = 'boss';
 										_boss.experience = 0;
 										_boss.setDifficulty(__account.difficulty - 1);
 										_boss.acceptChanges();
 										_boss.pickNewTarget();
 										_boss.releaseAfter = 25;
-									}
-									// installBoss(37, 'Morya');
-									// requestAnimationFrame(() => {
-									// 	installBoss(38, 'Erlin');
-									// });
+									};
+
 									installBoss(622, 'Goblin King');
-									mainCharacter.maxHP = mainCharacter.MAXHP =
-									mainCharacter.maxHP * 1;
+									mainCharacter.maxHP = mainCharacter.MAXHP = mainCharacter.maxHP * 1;
 									mainCharacter.setHealth(mainCharacter.MAXHP);
 									episode.pauseAmbianceMusic();
 									episode.pauseBgMusic(1);
-									episode.createBgMusic(null, null, null, 'cyclops-battle', .5);
+									episode.createBgMusic(null, null, null, 'cyclops-battle', 0.5);
 									episode.playBgMusic();
 								}, 1000);
 							}, 4000);
 						}
 					},
 					{
-						when: function() {
+						when: function () {
 							return mainCharacter.level > episode.phase;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = mainCharacter.level;
 							__story.lastHeroLevel = mainCharacter.level;
-							mainCharacter.maxHP = mainCharacter.MAXHP = mainCharacter.health = mainCharacter.level * 150;
+							mainCharacter.maxHP =
+								mainCharacter.MAXHP =
+								mainCharacter.health =
+									mainCharacter.level * 150;
 							mainCharacter.setHealth(mainCharacter.health);
 							const _mainPosition = mainCharacter.HURTLEFT + platformX;
-							const _minX = _mainPosition < (episode.width / 2) ? _mainPosition + episode.cWidth : _mainPosition - (2 * episode.cWidth);
-							const _maxX = _mainPosition < (episode.width / 2) ? _mainPosition + (2 * episode.cWidth) : _mainPosition - episode.cWidth;
-							if((mainCharacter.level % 2) === 0)
-								//for(let x of __storyScene.mobs)
-								{
-									const _mob = episode.mobs[0];
-									if(_mob) {
+							const _minX =
+								_mainPosition < episode.width / 2
+									? _mainPosition + episode.cWidth
+									: _mainPosition - 2 * episode.cWidth;
+							const _maxX =
+								_mainPosition < episode.width / 2
+									? _mainPosition + 2 * episode.cWidth
+									: _mainPosition - episode.cWidth;
+							if (mainCharacter.level % 2 === 0) {
+								const _mob = episode.mobs[0];
+								if (_mob) {
+									_mob.count = 1;
+									const exp =
+										mainCharacter.level > 9
+											? mainCharacter.level * 1400
+											: mainCharacter.level > 4
+												? mainCharacter.level * 250
+												: mainCharacter.level * 350;
+									_mob.experience = exp;
+									const x = structuredClone2(_mob);
 
-										_mob.count = 1;
-										const exp =
-										mainCharacter.level > 9 ? 
-										mainCharacter.level * 1400 :
-										(mainCharacter.level > 4 ?
-											mainCharacter.level * 250 :
-											mainCharacter.level * 350);
-										_mob.experience = exp;
-										const x = structuredClone2(_mob);
-										// if(x.skipSummon)
-										// 	continue;
-										x.minX = 144;
-										x.maxX = 6000;
-										// const _smn = structuredClone2(x);
-										// _smn.count = 1;
-										// delete _smn.spawn;
-										// let y = summonMobWithJson(_smn,0,1);
-										x.experience = exp;
-										// if(y.experience < 1000)
-										// 	y.experience = 1000;
-										// const _mob = episode.mobs.find(m => m.id === y.id);
-										// if(_mob){
-										// 	_mob.experience = y.experience;
-										// 	_mob.minX = 0;
-										// 	_mob.maxX = 6000;
-										// }
-										x.count = 1;
-										x.hp = mainCharacter.level * 70;
-										summonMobWithJson(x, 1,1);
-										//y.setHealth(y.maxHP);
-									}
+									x.minX = 144;
+									x.maxX = 6000;
+
+									x.experience = exp;
+
+									x.count = 1;
+									x.hp = mainCharacter.level * 70;
+									summonMobWithJson(x, 1, 1);
 								}
-							if(mainCharacter.level === 2) {
-								//episode.mobs.push();
-								let y = summonMobWithJson(
-									{
-										id: 620,
-										minX: _minX,
-										maxX: _maxX,
-										count: 2,
-										sight: 1000,
-										spawn: 10,
-										skipSummon: true,
-										experience: mainCharacter.level * 1500
-									}
-								);
+							}
+							if (mainCharacter.level === 2) {
+								let y = summonMobWithJson({
+									id: 620,
+									minX: _minX,
+									maxX: _maxX,
+									count: 2,
+									sight: 1000,
+									spawn: 10,
+									skipSummon: true,
+									experience: mainCharacter.level * 1500
+								});
 								y.count = 1;
 								y.maxHP = y.MAXHP = mainCharacter.level * 80;
 								y.setHealth(y.maxHP);
 							}
-							if(mainCharacter.level < 12 && episode.phase === mainCharacter.level && (mainCharacter.level % 4) === 0) {
+							if (
+								mainCharacter.level < 12 &&
+								episode.phase === mainCharacter.level &&
+								mainCharacter.level % 4 === 0
+							) {
 								const _musc = {
 									id: 621,
 									minX: _minX,
 									maxX: _maxX,
 									count: 1,
 									sight: 1000,
-									grade:2,
+									grade: 2,
 									difficulty: __account.difficulty - 1,
 									experience: mainCharacter.level * 4000
 								};
-								let y = summonMobWithJson(structuredClone2(_musc),0,1);
+								let y = summonMobWithJson(structuredClone2(_musc), 0, 1);
 								y.maxHP = y.MAXHP = mainCharacter.level * 60;
 								y.name = y.displayName = '';
 								y.setHealth(y.maxHP);
 							}
-							if(__account?.questStatus?.quest?.props) {
+							if (__account?.questStatus?.quest?.props) {
 								__account.questStatus.quest.props.current++;
 								updateQuestArea();
 							}
-							// updateQuestArea(null, {
-							// 	id: 1000 + mainCharacter.level,
-							// 	descriptions: {
-							// 		en: 'Become Level ' + (mainCharacter.level + 1),
-							// 		tr: 'Seviye ' + (mainCharacter.level + 1) + ' ol'
-							// 	},
-							// 	names: {
-							// 		en: 'Power Up',
-							// 		tr: 'Güçlenme'
-							// 	},
-							// 	owner: 'system',
-							// 	minLevel: mainCharacter.level,
-							// 	maps: [201]
-							// });
-							// if(mainCharacter.level > 8 && !mainCharacter.tagSkillSet) {
-							// 	delete mainCharacter.animations.tag.disabled;
-							// 	mainCharacter.tagSkillSet = 1;
-							// 	resetSkill('tag', mainCharacter);
-							// 	//PlaySound({key:'conquer', volume:.6});
-							// 	// getImage('./images/main/avatars/cyclops.png', function(_img) {
-							// 	// 	const url = _img.toDataURL();
-							// 	// 	warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
-							// 	// });
-							// }
 						}
-					},	
+					},
 					{
-						when: function() {
-							const _boss = episode.enemies.find(x => x.class === 'boss');
-							return episode.phase === 100 && _boss && 
-							_boss.health <= 0;
+						when: function () {
+							const _boss = episode.enemies.find((x) => x.class === 'boss');
+							return episode.phase === 100 && _boss && _boss.health <= 0;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 101;
 							delete episode.mobPhaseTick;
-							episode.enemies.filter(x => !x.main && !x.tag && !x.friendly && x.class !== 'object' && x.class !== 'boss').forEach(x => {
-								x.stopSpawn();
-								x.health = x.experience = 0;
-								x.dead = x.dying = true;
-								x.animate('dead', 1);
-							});
+							episode.enemies
+								.filter(
+									(x) =>
+										!x.main && !x.tag && !x.friendly && x.class !== 'object' && x.class !== 'boss'
+								)
+								.forEach((x) => {
+									x.stopSpawn();
+									x.health = x.experience = 0;
+									x.dead = x.dying = true;
+									x.animate('dead', 1);
+								});
 							episode.mobs = [];
 							episode.respawners = [];
 							episode.pauseBgMusic(1);
 							episode.pauseAmbianceMusic();
-							PlaySound({ key:'deepimpact', volume: 1 });
-							if(mainCharacter)
-								cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
+							PlaySound({ key: 'deepimpact', volume: 1 });
+							if (mainCharacter) cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
 						}
-					},			
+					},
 					{
-						when: function() {
-							return episode.phase === 101 && !episode.enemies.filter(x => x.class === 'boss')?.length;
+						when: function () {
+							return episode.phase === 101 && !episode.enemies.filter((x) => x.class === 'boss')?.length;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 102;
-							const _counters = __storyScene.bossQuest.kills.filter(x => x.count !== 1);
-							if(_counters?.[0]) {
-								_counters.forEach(x => {
+							const _counters = __storyScene.bossQuest.kills.filter((x) => x.count !== 1);
+							if (_counters?.[0]) {
+								_counters.forEach((x) => {
 									x.count = 1;
 								});
 								updateQuestArea(null, __storyScene.bossQuest);
 							}
-							// __storyPlaying = false;
-							// installStoryFinish();
+
 							episode.pauseBgMusic(1);
-							let _x = MathRound((mainCharacter.left + platformX + (mainCharacter.WIDTH * 3 * (mainCharacter.direction === __left ? -1 : 1))) / __zoom);
-							const _maxX = MathRound((episode.width - (episode.cWidth * .5)) / __zoom);
-							if(_x > _maxX)
-								_x = _maxX;
+							let _x = MathRound(
+								(mainCharacter.left +
+									platformX +
+									mainCharacter.WIDTH * 3 * (mainCharacter.direction === __left ? -1 : 1)) /
+									__zoom
+							);
+							const _maxX = MathRound((episode.width - episode.cWidth * 0.5) / __zoom);
+							if (_x > _maxX) _x = _maxX;
 							else {
-								const _minX = MathRound((episode.cWidth * .5) / __zoom);
-								if(_x < _minX)
-									_x = _minX;
+								const _minX = MathRound((episode.cWidth * 0.5) / __zoom);
+								if (_x < _minX) _x = _minX;
 							}
-							const _portal = summonMob(113, _x, MathRound(groundheight * .5), 1);
+							const _portal = summonMob(113, _x, MathRound(groundheight * 0.5), 1);
 							activatePortal(_portal);
 						}
 					},
 					{
-						when: function() {
-							if(episode.phase !== 100)
-								return false;
+						when: function () {
+							if (episode.phase !== 100) return false;
 							const _st = episode.mobPhaseTick ?? 1;
-							if(_st) {
-								return (_gameTick - _st) > 30000; 
+							if (_st) {
+								return _gameTick - _st > 30000;
 							}
 							return false;
 						},
-						do: function() {
+						do: function () {
 							episode.mobPhaseTick = _gameTick;
 							const _mainPosition = mainCharacter.HURTLEFT + platformX;
-							const _minX = _mainPosition < (episode.width / 2) ? _mainPosition + episode.cWidth : _mainPosition - (2 * episode.cWidth);
-							const _maxX = _mainPosition < (episode.width / 2) ? _mainPosition + (2 * episode.cWidth) : _mainPosition - episode.cWidth;
+							const _minX =
+								_mainPosition < episode.width / 2
+									? _mainPosition + episode.cWidth
+									: _mainPosition - 2 * episode.cWidth;
+							const _maxX =
+								_mainPosition < episode.width / 2
+									? _mainPosition + 2 * episode.cWidth
+									: _mainPosition - episode.cWidth;
 							const _ids = [619, 620];
-							_ids.forEach(_id => {
-								let y = summonMobWithJson(
-									{
-										id: _id,
-										minX: _minX,
-										maxX: _maxX,
-										count: 2,
-										sight: 1000,
-										skipSummon: true,
-										experience: 0
-									}
-								);
+							_ids.forEach((_id) => {
+								let y = summonMobWithJson({
+									id: _id,
+									minX: _minX,
+									maxX: _maxX,
+									count: 2,
+									sight: 1000,
+									skipSummon: true,
+									experience: 0
+								});
 								y.maxHP = y.MAXHP = 800;
 								y.setHealth(y.maxHP);
 							});
@@ -8339,20 +7931,6 @@ const __stories = [
 					}
 				],
 				mobs: [
-					// {
-					// 	id: 1000,
-					// 	minX: 5000,
-					// 	maxX: 5000,
-					// 	count: 1,
-					// 	sight: 1000,
-					// 	spawn: 5,
-					// 	hp:600,
-					// 	do: function(_e)  {
-					// 		_e.rageCount = _e.getMaxRageCount();
-					// 		_e.yPosition = MathRound(getGroundHeight() / 2);
-					// 	},
-					// 	experience: 1
-					// },
 					{
 						id: 619,
 						minX: 4000,
@@ -8360,130 +7938,27 @@ const __stories = [
 						count: 2,
 						sight: 1000,
 						spawn: 3,
-						hp:60,
+						hp: 60,
 						experience: 500
-					},
-					// {
-					// 	id: 621,
-					// 	minX: 4000,
-					// 	maxX: 6000,
-					// 	count: 6,
-					// 	sight: 1000,
-					// 	spawn: 1,
-					// 	hp:160,
-					// 	experience: 500
-					// },
-					// {
-					// 	id: 620,
-					// 	minX: 4000,
-					// 	maxX: 6000,
-					// 	count: 1,
-					// 	sight: 1000,
-					// 	spawn: 1,
-					// 	hp:160,
-					// 	experience: 500
-					// },
-					// {
-					// 	id: 621,
-					// 	minX: 1100,
-					// 	maxX: 4100,
-					// 	count: 6,
-					// 	sight: 1000,
-					// 	spawn: 1,
-					// 	hp:160,
-					// 	experience: 250
-					// },
-					// {
-					// 	id: 620,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 1,
-					// 	sight: 1000,
-					// 	spawn: 1,
-					// 	hp:160,
-					// 	experience: 250
-					// },
-					// {
-					// 	id: 24,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 1,
-					// 	sight: 1000,
-					// 	spawn: 1,
-					// 	hp:60,
-					// 	experience: 250
-					// },
-					// {
-					// 	id: 20,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 1,
-					// 	sight: 1000,
-					// 	spawn: 1,
-					// 	hp:60,
-					// 	experience: 250
-					// },
-					// {
-					// 	id: 28,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 1,
-					// 	sight: 1000,
-					// 	spawn: 1,
-					// 	hp:60,
-					// 	experience: 250
-					// },
-					// {
-					// 	id: 30,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 1,
-					// 	sight: 1000,
-					// 	spawn: 1,
-					// 	hp:60,
-					// 	experience: 250
-					// },
-					// {
-					// 	id: 23,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 1,
-					// 	sight: 1000,
-					// 	spawn: 1,
-					// 	hp:60,
-					// 	experience: 250
-					// },
-					// {
-					// 	id: 7,
-					// 	minX: 1580,
-					// 	maxX: 4800,
-					// 	count: 1,
-					// 	spawn: 1,
-					// 	sight: 1000,
-					// 	hp:60,
-					// 	experience: 250
-					// }
+					}
 				]
 			},
 			{
 				map: 11,
-				getAssets: function() { 
+				getAssets: function () {
 					return [
-					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[6].id + '.png',
-					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[7].id + '.png',
-					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[8].id + '.png',
-					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[9].id + '.png',
-					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[10].id + '.png',
-					'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[11].id + '.png'
-				]},
+						'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[6].id + '.png',
+						'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[7].id + '.png',
+						'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[8].id + '.png',
+						'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[9].id + '.png',
+						'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[10].id + '.png',
+						'./images/' + (__isPC ? '_' : '') + 'quicktips/' + __quickTips[11].id + '.png'
+					];
+				},
 				noArtifact: true,
-				scorePerLoot: { key:'gold', value: 10 },
+				scorePerLoot: { key: 'gold', value: 10 },
 				leaderBoards: {
-					calculate: function() {
-						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
-						//Kalan kalp (3 adet te) + 1000 * 3
-						//Yediği Damage ın toplam sağlığına oranı negatif bonusu (50 * 10) dmgTaken
-						
+					calculate: function () {
 						const _result = {
 							description: [
 								{
@@ -8492,8 +7967,11 @@ const __stories = [
 										tr: 'Zaman Bonusu'
 									},
 									icon: 'time',
-									value: MathRound(((10 * 60000) - 
-									((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick))) / 10)
+									value: MathRound(
+										(10 * 60000 -
+											((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick))) /
+											10
+									)
 								},
 								{
 									title: {
@@ -8509,137 +7987,133 @@ const __stories = [
 										tr: 'Hasar Alma'
 									},
 									icon: 'heart',
-									value: (-1 * MathRound(((mainCharacter.dmgTaken ?? 0) / mainCharacter.MAXHP) * 500)) -
-										((3 - (mainCharacter.heartCount ?? 0)) * 500)
+									value:
+										-1 * MathRound(((mainCharacter.dmgTaken ?? 0) / mainCharacter.MAXHP) * 500) -
+										(3 - (mainCharacter.heartCount ?? 0)) * 500
 								}
 							]
 						};
-						_result.score = _result.description.reduce(
-							(sum, item) => sum + (item.value ?? 0),
-							0
-						);
+						_result.score = _result.description.reduce((sum, item) => sum + (item.value ?? 0), 0);
 						return _result;
 					}
 				},
 				loots: [
-					{type:'pot', key:'pot', chance:1},
-					{type:'common', key:'corpseexplode', chance:1},
-					{type:'common', key:'firespray', chance:1}
+					{ type: 'pot', key: 'pot', chance: 1 },
+					{ type: 'common', key: 'corpseexplode', chance: 1 },
+					{ type: 'common', key: 'firespray', chance: 1 }
 				],
 				startWith: 1,
 				save: true,
-				lazyLoadingCharacterIds: [72,73, 37, 38, 1003],
+				lazyLoadingCharacterIds: [72, 73, 37, 38, 1003],
 				loadingCharacterIds: [1, 111, 33, 35, 2, 7],
-				after: function() {
+				after: function () {
 					removeClass(document.getElementById('quest-status'), 'd-none');
 				},
-				start: function() {
+				start: function () {
 					clearAudioCache(loadedSounds);
-					episode.itemDropOrder = [ 
-						'belt', 'gloves', 'bracers', 'helmet', 'leggings',
-						'necklace', 'chest', 'ring', 'boots', 'weapon'
+					episode.itemDropOrder = [
+						'belt',
+						'gloves',
+						'bracers',
+						'helmet',
+						'leggings',
+						'necklace',
+						'chest',
+						'ring',
+						'boots',
+						'weapon'
 					];
 					removeCoopCharacter();
 					setCharacterLevel(__story.lastHeroLevel ?? 12, null, 1);
-					//setCharacterLevel(8, null, 1);
+
 					addClass(_gameUI, 'demo-playing');
-					const _es = episode.enemies.filter(x => x.enemy);
-					_es.forEach(_e => 
-						{
-							_e.animations.hurtfeet = new animation(createHurtFeet(_e.zoom, _e.bloodColor, null, null, null, _e.width));
-						}
-					);
-					episode.loadCharacterSprites(function() {}, null, ['hurtfeet'],1,1);
+					const _es = episode.enemies.filter((x) => x.enemy);
+					_es.forEach((_e) => {
+						_e.animations.hurtfeet = new animation(
+							createHurtFeet(_e.zoom, _e.bloodColor, null, null, null, _e.width)
+						);
+					});
+					episode.loadCharacterSprites(function () {}, null, ['hurtfeet'], 1, 1);
 					mainCharacter.direction = __right;
-					const _tagChar = episode.enemies.find(x => x.tag);
-					if(_tagChar)
-						_tagChar.remove = true;
-					if(mainCharacter.tagContainer)
-					{
+					const _tagChar = episode.enemies.find((x) => x.tag);
+					if (_tagChar) _tagChar.remove = true;
+					if (mainCharacter.tagContainer) {
 						mainCharacter.tagContainer.remove();
 						delete mainCharacter.tagContainer;
 					}
-					if(mainCharacter.animations.tag){
+					if (mainCharacter.animations.tag) {
 						delete mainCharacter.animations.tag.disabled;
 						mainCharacter.tagSkillSet = 1;
 						resetSkill('tag', mainCharacter);
 					}
-					
-					episode.boss = episode.enemies.find(x => x.id === 111);
+
+					episode.boss = episode.enemies.find((x) => x.id === 111);
 					episode.phase = episode.boss.grade;
 
 					removeClass(_gameUI, 'disable-ui');
 					const _qps = localStorage.getItem('quickplayskip');
 					let _json = [];
-					if(_qps) {
+					if (_qps) {
 						try {
 							_json = JSON.parse(_qps);
-						}
-						catch(_e) {}
+						} catch (_e) {}
 					}
 					episode.pauseBgMusic(1);
 					episode.createBgMusic(null, null, null, 'cyclops1');
 					episode.playBgMusic();
 					const _skipped = _json.indexOf(2) !== -1;
-					if(!_skipped) {
+					if (!_skipped) {
 						const _desc = document.createElement('div');
 						_desc.className = 'flex show-ui full quick-play-desc-container quick-play-desc-container2';
 						let _html = '';
-						for(let i = 6; i < 12; i++) {
+						for (let i = 6; i < 12; i++) {
 							const _tip = __quickTips[i];
 							_html += `<div class="quick-play-desc-item quick-play-desc-item${_tip.id}">
 										<div class="wot-description flex quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
 									</div>`;
 						}
-						_desc.innerHTML = _html +
-						`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2cqh" class="w-50 h-100 flex flex-jc-start wot-title" onclick="doNotShowAgain(this,event)" lang="${getLang()}"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2cqh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(1, 1, null, null, 1);skipQuickPlayTutorial(2)"><div class="orange-action-btn wot-button flex">${getLangData('OK')}</div></div></div>`;
+						_desc.innerHTML =
+							_html +
+							`<div class="quick-play-desc-skip flex glow"><div style="padding-left:2cqh" class="w-50 h-100 flex flex-jc-start wot-title" onclick="doNotShowAgain(this,event)" lang="${getLang()}"><span class="cb-square"></span>${getLangData("Don't show again")}</div><div style="padding-right:2cqh" class="w-50 h-100 flex flex-jc-end" onexactclick="takeQuest(1, 1, null, null, 1);skipQuickPlayTutorial(2)"><div class="orange-action-btn wot-button flex">${getLangData('OK')}</div></div></div>`;
 						addClass(_gameUI, 'disable-ui');
 						requestAnimationFrame(() => {
 							_game.suspended = true;
 						});
 						_gameUI.appendChild(_desc);
 						episode.hasSkippableScreen = 1;
-					}
-					else{
+					} else {
 						takeQuest(1, 1, null, null, 1);
 						skipQuickPlayTutorial();
 					}
 					mainCharacter.disableSkill('tag');
 					mainCharacter.maxHP = mainCharacter.MAXHP = mainCharacter.health = mainCharacter.level * 120;
 					mainCharacter.setHealth(mainCharacter.health);
-					// setTimeout(function() {
-					// 	__storyPlaying = false;
-					// 	__storyTell = new storyTell(7, null, null, 'Meanwhile, the quakes created by the monster caused a prisoner in dungeon to be freed from his chains', function() {
-					// 		//installStoryFinish();
-					// 		//switchStoryScene();
-					// 	});
-					// }, 4000);
 				},
 				actions: [
 					{
-						when: function() {
+						when: function () {
 							return episode.lockedChestLooted;
 						},
-						do: function() {
-							if(mainCharacter.rageCount > 0 || mainCharacter.ultimate) {
+						do: function () {
+							if (mainCharacter.rageCount > 0 || mainCharacter.ultimate) {
 								mainCharacter.rageCount = 0;
 								mainCharacter.updateRageSkillUI();
 							}
 							episode.lockedChestLooted = false;
 							let _div = document.querySelector('.game-status-screen');
-							if(_div)
-								_div.remove();
+							if (_div) _div.remove();
 							_div = document.createElement('div');
 							_div.className = 'flex game-status-screen';
 							_gameUI.appendChild(_div);
-							
+
 							const _icon = `<span class="item-in-slot full grade2-item" style="display:inline-block;position:relative"><img style="background:#010101" class="item-img" src="./images/icons/chest2.png"/></span>`;
 							let _title = getLangData('Strongbox');
 							const frag = document.createDocumentFragment();
 							const _subDiv = document.createElement('div');
-							_subDiv.innerHTML = `<div id='looted-strongbox' data-status-item-id="strongbox" class="flex status-item-container w-50 flex flex-ai-start">
-								<div class="status-item-icon-container">`
-									+ _icon +
+							_subDiv.innerHTML =
+								`<div id='looted-strongbox' data-status-item-id="strongbox" class="flex status-item-container w-50 flex flex-ai-start">
+								<div class="status-item-icon-container">` +
+								_icon +
 								`</div>
 								<div class="status-item-action-container flex">
 									<div class="item-title-wrapper flex flex-jc-start w-100 wot-subtitle">
@@ -8652,9 +8126,16 @@ const __stories = [
 									</div>
 								</div>
 							</div>`;
-							PlaySound({key:'questaccepted', volume: .8});
-							warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/present.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1" class="wot-title">' + getLangData('Strongbox Found') + '</span></div>', null, null, 1);
-							
+							PlaySound({ key: 'questaccepted', volume: 0.8 });
+							warn(
+								'<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/present.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1" class="wot-title">' +
+									getLangData('Strongbox Found') +
+									'</span></div>',
+								null,
+								null,
+								1
+							);
+
 							frag.appendChild(_subDiv.firstElementChild);
 							_div.prepend(frag);
 							mainCharacter.animate('idle', 1);
@@ -8662,101 +8143,102 @@ const __stories = [
 							mainCharacter.disableKeyboard = true;
 							mainCharacter.still = mainCharacter.immobilize = true;
 							requestAnimationFrame(() => {
-								focusMe('#looted-strongbox', function() {
-									removeFocus();
-									disposeFocus();
-									renderChestOpeningScreen();
-								}, true, null, null, 1, null, null, 1);
+								focusMe(
+									'#looted-strongbox',
+									function () {
+										removeFocus();
+										disposeFocus();
+										renderChestOpeningScreen();
+									},
+									true,
+									null,
+									null,
+									1,
+									null,
+									null,
+									1
+								);
 							});
-									
 						}
 					},
 					{
-						when: function() {
+						when: function () {
 							return episode.allLooted === 1 && mainCharacter.hasAdvicedItem;
 						},
-						do: function() {
-							//const _items = document.querySelectorAll('div[data-status-item-id]');
-							const _items = getItems().filter(x => !x.weared);
-							_items.forEach(x => {
+						do: function () {
+							const _items = getItems().filter((x) => !x.weared);
+							_items.forEach((x) => {
 								wearStatusItem(x.id, null, 1);
 							});
 							episode.allLooted = 2;
 						}
 					},
 					{
-						when: function() {
-							//KOVAN ÖLDÜĞÜNDE
-							return (episode.boss?.health <= 0 && !episode.allLooted);
+						when: function () {
+							return episode.boss?.health <= 0 && !episode.allLooted;
 						},
-						do: function() {
-							episode.enemies.filter(x => x.class === 'object' && !x.remove)?.forEach(x => {
-								x.yPosition = mainCharacter.yPosition;
-								x.animations.idle?.frames?.forEach(f => {
-									delete f.bottomGap;
+						do: function () {
+							episode.enemies
+								.filter((x) => x.class === 'object' && !x.remove)
+								?.forEach((x) => {
+									x.yPosition = mainCharacter.yPosition;
+									x.animations.idle?.frames?.forEach((f) => {
+										delete f.bottomGap;
+									});
+									x.left =
+										mainCharacter.HURTLEFT +
+										platformX +
+										mainCharacter._HURTBOX_half -
+										x._HURTBOX_half;
 								});
-								x.left = (mainCharacter.HURTLEFT + platformX + mainCharacter._HURTBOX_half) - x._HURTBOX_half;
-								// const _item = x.inventory?.[0];
-								// switch(_item?.type) {
-								// 	case "gold": {
-								// 		mainCharacter.grabGold();
-								// 		break;
-								// 	}
-								// 	case "item": {
-								// 		mainCharacter.grabItem(_item);
-								// 		__storyScene.actions.find(x => x.key === 'grab-item')?.do?.();
-								// 		break;	
-								// 	}
-								// }
-							});
 							const _items = document.querySelectorAll('div[data-status-item-id]');
-							_items?.forEach(x => {
+							_items?.forEach((x) => {
 								const _id = parseInt(x.getAttribute('data-status-item-id'));
 								wearStatusItem(_id, null, 1);
 							});
 							episode.allLooted = 1;
-							if(__account?.questStatus?.quest?.props) {
-								if(__account.questStatus.quest.props.limit >
-									__account.questStatus.quest.props.current) {
+							if (__account?.questStatus?.quest?.props) {
+								if (
+									__account.questStatus.quest.props.limit > __account.questStatus.quest.props.current
+								) {
 									__account.questStatus.quest.props.current++;
 									updateQuestArea();
 								}
 							}
 							clearStatusBoard();
-							//addClass(document.querySelector('.game-status-screen'), 'v-none');
 						}
 					},
 					{
-						when: function() {
+						when: function () {
 							return mainCharacter?.lastItemLootedTime === _gameTick;
 						},
-						do: function() {
+						do: function () {
 							let _div = document.querySelector('.game-status-screen');
-							if(!_div) {
+							if (!_div) {
 								_div = document.createElement('div');
 								_div.className = 'flex game-status-screen';
 								_gameUI.appendChild(_div);
 							}
 							episode.lastItemDropTime = _gameTick;
-							const _inventory = getItems().filter(x => !x.weared && x.grade === 2);
-							//const _item = _inventory[_inventory.length - 1];
-							for(let _item of _inventory) {
-								if(_item.shown)
-									continue;
+							const _inventory = getItems().filter((x) => !x.weared && x.grade === 2);
+
+							for (let _item of _inventory) {
+								if (_item.shown) continue;
 								_item.shown = true;
 								const _icon = getItemIcon(_item);
 								let _title = getLangData(_item.type);
 								const _newPower = getPowerOfItem(_item.id);
-								const _wearedItemId = _inventory.find(x => x.type === _item.type && x.weared)?.id;
+								const _wearedItemId = _inventory.find((x) => x.type === _item.type && x.weared)?.id;
 								const _oldPower = _wearedItemId ? getPowerOfItem(_wearedItemId) : 0;
 								const _powerDiff = MathRound(_newPower - _oldPower);
 								_title = _title[0].toLocaleUpperCase(getLang()) + _title.substring(1);
 
 								const frag = document.createDocumentFragment();
 								const _subDiv = document.createElement('div');
-								_subDiv.innerHTML = `<div data-status-item-id="${_item.id}" class="flex status-item-container w-50 flex flex-ai-start"${__isPC ? '' : ' ontouchstart="wearStatusItem(' + _item.id + ', ' + _powerDiff + ')"'}>
-									<div class="status-item-icon-container">`
-										+ _icon +
+								_subDiv.innerHTML =
+									`<div data-status-item-id="${_item.id}" class="flex status-item-container w-50 flex flex-ai-start"${__isPC ? '' : ' ontouchstart="wearStatusItem(' + _item.id + ', ' + _powerDiff + ')"'}>
+									<div class="status-item-icon-container">` +
+									_icon +
 									`</div>
 									<div class="status-item-action-container flex">
 										<div class="item-title-container w-100 flex">
@@ -8782,36 +8264,40 @@ const __stories = [
 						}
 					},
 					{
-						when: function() {
-							return episode.phase > 1 && 
-							(episode.boss?.gradeLeft + 1) < episode.phase && 
-							episode.phase < 100;
+						when: function () {
+							return (
+								episode.phase > 1 && episode.boss?.gradeLeft + 1 < episode.phase && episode.phase < 100
+							);
 						},
-						do: function() {
-							if(episode.boss) {
-								if(!episode.bossLootedCount)
-									episode.bossLootedCount = 0;
+						do: function () {
+							if (episode.boss) {
+								if (!episode.bossLootedCount) episode.bossLootedCount = 0;
 								episode.bossLootedCount++;
-								if(episode.bossLootedCount <= 10) {
+								if (episode.bossLootedCount <= 10) {
 									delete episode.boss.looted;
 									episode.loot = {
 										enemy: episode.boss,
 										loots: [
-											{zoom: 1.2, type:'item',key:episode.itemDropOrder[episode.boss.grade - episode.phase], grade:2},
-											{type:'gold'},
-											{type:'gold'},
-											{type:'gold'},
-											{type:'gold'},
-											{type:'gold'},
-											{type:'gold'},
-											{type:'gold'},
-											{type:'gold'},
-											{type:'gold'}
+											{
+												zoom: 1.2,
+												type: 'item',
+												key: episode.itemDropOrder[episode.boss.grade - episode.phase],
+												grade: 2
+											},
+											{ type: 'gold' },
+											{ type: 'gold' },
+											{ type: 'gold' },
+											{ type: 'gold' },
+											{ type: 'gold' },
+											{ type: 'gold' },
+											{ type: 'gold' },
+											{ type: 'gold' },
+											{ type: 'gold' }
 										]
-									}
+									};
 								}
 								episode.phase--;
-								if(__account?.questStatus?.quest?.props) {
+								if (__account?.questStatus?.quest?.props) {
 									__account.questStatus.quest.props.current++;
 									updateQuestArea();
 								}
@@ -8819,37 +8305,30 @@ const __stories = [
 						}
 					},
 					{
-						when: function() {
-							const _bosses = episode.enemies.filter(x => x.class === 'boss');
-							return episode.phase === 101 && _bosses?.[0] && 
-							_bosses.filter(x => x.health <= 0)?.length === _bosses.length;
+						when: function () {
+							const _bosses = episode.enemies.filter((x) => x.class === 'boss');
+							return (
+								episode.phase === 101 &&
+								_bosses?.[0] &&
+								_bosses.filter((x) => x.health <= 0)?.length === _bosses.length
+							);
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 102;
 							episode.pauseBgMusic(1);
 							episode.pauseAmbianceMusic();
-							PlaySound({ key:'deepimpact', volume: 1 });
-							if(mainCharacter){
+							PlaySound({ key: 'deepimpact', volume: 1 });
+							if (mainCharacter) {
 								cssAnimations.slowMotion(mainCharacter, 3000, null, null, 450, 20);
 							}
 						}
 					},
-					// {
-					// 	when: function() {
-					// 		return episode.phase === 102 && !episode.enemies.filter(x => x.class === 'boss')?.length;
-					// 	},
-					// 	do: function() {
-					// 		episode.phase = 103;
-					// 		updateQuestArea();
-					// 		__storyPlaying = false;
-					// 		installStoryFinish();
-					// 	}
-					// },
+
 					{
-						when: function() {
+						when: function () {
 							return episode.phase === 102.6;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 102.7;
 							blurKeyboard();
 							mainCharacter.disableKeyboard = true;
@@ -8857,106 +8336,115 @@ const __stories = [
 							mainCharacter.stopRage();
 							mainCharacter.swapAnimation('idle');
 							mainCharacter.animate('idle', 1);
-							const _father = episode.enemies.find(x => x.id === 72);
-							const _tank = episode.enemies.find(x => x.id === 73);
-							const _ranger = episode.enemies.find(x => x.id === 10002);
-							cssAnimations.film(null, 
+							const _father = episode.enemies.find((x) => x.id === 72);
+							const _tank = episode.enemies.find((x) => x.id === 73);
+							const _ranger = episode.enemies.find((x) => x.id === 10002);
+							cssAnimations.film(
+								null,
 								[
-								{
-									do: function() {
-										createBubbleText({
-											id: 20,
-											location: { map: episode.id }, ms: 3000,
-											owner: mainCharacter.key,
-											text: "We put them down"
-										});
+									{
+										do: function () {
+											createBubbleText({
+												id: 20,
+												location: { map: episode.id },
+												ms: 3000,
+												owner: mainCharacter.key,
+												text: 'We put them down'
+											});
+										},
+										ms: 1000
 									},
-									ms: 1000
-								},
-								{
-									do: function() {
-										createBubbleText({
-											id: 21,
-											location: { map: episode.id }, ms: 4000,
-											owner: _father.key,
-											text: "There can be more"
-										});
+									{
+										do: function () {
+											createBubbleText({
+												id: 21,
+												location: { map: episode.id },
+												ms: 4000,
+												owner: _father.key,
+												text: 'There can be more'
+											});
+										},
+										ms: 4200
 									},
-									ms: 4200
-								},
-								{
-									do: function() {
-										createBubbleText({
-											id: 22,
-											location: { map: episode.id }, ms: 2200,
-											owner: _tank.key,
-											text: "More? What exactly?",
-											onend: function() {
-												episode.openPortal = 1;
-											}
-										});
+									{
+										do: function () {
+											createBubbleText({
+												id: 22,
+												location: { map: episode.id },
+												ms: 2200,
+												owner: _tank.key,
+												text: 'More? What exactly?',
+												onend: function () {
+													episode.openPortal = 1;
+												}
+											});
+										},
+										ms: 8300
 									},
-									ms: 8300
-								},
-								{
-									do: function() {
-										createBubbleText({
-											id: 23,
-											location: { map: episode.id }, ms: 3000,
-											owner: _ranger.key,
-											text: "There! The gate of demons",
-											onend: function() {
-												mainCharacter.direction =
-												mainCharacter.direction === __left ? __right : __left;
-											}
-										});
+									{
+										do: function () {
+											createBubbleText({
+												id: 23,
+												location: { map: episode.id },
+												ms: 3000,
+												owner: _ranger.key,
+												text: 'There! The gate of demons',
+												onend: function () {
+													mainCharacter.direction =
+														mainCharacter.direction === __left ? __right : __left;
+												}
+											});
+										},
+										ms: 11100
 									},
-									ms: 11100
-								},
-								{
-									do: function() {
-										createBubbleText({
-											id: 24,
-											location: { map: episode.id }, ms: 3000,
-											owner: mainCharacter.key,
-											text: "Won't be easy this time"
-										});
+									{
+										do: function () {
+											createBubbleText({
+												id: 24,
+												location: { map: episode.id },
+												ms: 3000,
+												owner: mainCharacter.key,
+												text: "Won't be easy this time"
+											});
+										},
+										ms: 14200
 									},
-									ms: 14200
-								},
-								{
-									do: function() {
-										createBubbleText({
-											id: 25,
-											location: { map: episode.id }, ms: 3000,
-											owner: _father.key,
-											text: "Take Alkin with you"
-										});
-									},
-									ms: 17400
+									{
+										do: function () {
+											createBubbleText({
+												id: 25,
+												location: { map: episode.id },
+												ms: 3000,
+												owner: _father.key,
+												text: 'Take Alkin with you'
+											});
+										},
+										ms: 17400
+									}
+								],
+								19700,
+								function () {
+									mainCharacter.immobilize = mainCharacter.still = false;
+									delete mainCharacter.disableKeyboard;
+									const _Y = _ranger.yPosition;
+									const _L = _ranger.left;
+									_ranger.remove = true;
+									const _char = addCoopCharacter(null, 'arc');
+									_char.direction = episode.sceneAfterProps.side === __left ? __right : __left;
+									_char.yPosition = _Y;
+									_char.left = _L;
+									_char.updateVariables();
 								}
-							], 19700, function() {
-								mainCharacter.immobilize = mainCharacter.still = false;
-								delete mainCharacter.disableKeyboard;
-								const _Y = _ranger.yPosition;
-								const _L = _ranger.left;
-								_ranger.remove = true;
-								const _char = addCoopCharacter(null, 'arc');
-								_char.direction = episode.sceneAfterProps.side === __left ? __right : __left;
-								_char.yPosition = _Y;
-								_char.left = _L;
-								_char.updateVariables();
-							});
+							);
 						}
 					},
 					{
-						when: function() {
+						when: function () {
 							const _phase = episode.phase === 102.5;
-							if(_phase) {
+							if (_phase) {
 								const _left = mainCharacter.HURTLEFT + platformX;
-								if(episode.sceneAfterProps.side === __left) {
-									if(_left < episode.sceneAfterProps.x) 
-									{
+								if (episode.sceneAfterProps.side === __left) {
+									if (_left < episode.sceneAfterProps.x) {
 										platformX = 0;
 										mainCharacter.direction = __left;
 										mainCharacter.left = episode.sceneAfterProps.x;
@@ -8964,9 +8452,8 @@ const __stories = [
 										mainCharacter.updateVariables();
 										return true;
 									}
-								}
-								else {
-									if(_left > episode.sceneAfterProps.x) {
+								} else {
+									if (_left > episode.sceneAfterProps.x) {
 										platformX = episode.width - episode.cWidth;
 										mainCharacter.direction = __right;
 										mainCharacter.left = episode.sceneAfterProps.x - platformX;
@@ -8978,257 +8465,260 @@ const __stories = [
 							}
 							return false;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 102.6;
 							episode.removeLocationHand();
 						}
 					},
 					{
-						when: function() {
-							return episode.phase === 102 && !episode.enemies.filter(x => x.class === 'boss')?.length;
+						when: function () {
+							return episode.phase === 102 && !episode.enemies.filter((x) => x.class === 'boss')?.length;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 102.5;
 							mainCharacter.disableSkill('tag');
 							const _left = mainCharacter.HURTLEFT + platformX;
 							const _center = episode.cWidth * 1.5;
 							let _dir, _p1, _p2;
-							if(_left < _center){
+							if (_left < _center) {
 								episode.showLocationHand('right');
 								_dir = __left;
-								const _base = MathRound((episode.width / __zoom) * (__isPC ? .95 : .89));
+								const _base = MathRound((episode.width / __zoom) * (__isPC ? 0.95 : 0.89));
 								_p1 = _base;
 								_p2 = _base + 80;
 								episode.sceneAfterProps = {
-									x:MathRound(((episode.width)) * (__isPC ? .91 : .85)),
-									side:__right
-								}
-							}
-							else{
+									x: MathRound(episode.width * (__isPC ? 0.91 : 0.85)),
+									side: __right
+								};
+							} else {
 								episode.showLocationHand('left');
 								_dir = __right;
-								const _base = MathRound((episode.width / __zoom) * .05);
+								const _base = MathRound((episode.width / __zoom) * 0.05);
 								_p1 = _base;
 								_p2 = _base - 80;
 								episode.sceneAfterProps = {
-									x:MathRound(((episode.width)) * .09),
-									side:__left
-								}
+									x: MathRound(episode.width * 0.09),
+									side: __left
+								};
 							}
 							episode.msNow = 501;
-							const _father = summonMobWithJson({
-								id: 72,
-								minX: _p2,
-								maxX: _p2,
-								count: 1,
-								props: {
-									friendly: true,
-									noDirection: true,
-									direction: _dir,
-									invulnerable: true,
-									reversed: _dir !== __right,
-									npc: true,
-									immobilize: true
+							const _father = summonMobWithJson(
+								{
+									id: 72,
+									minX: _p2,
+									maxX: _p2,
+									count: 1,
+									props: {
+										friendly: true,
+										noDirection: true,
+										direction: _dir,
+										invulnerable: true,
+										reversed: _dir !== __right,
+										npc: true,
+										immobilize: true
+									},
+									yPosition: MathRound(getGroundHeight() / 2)
 								},
-								yPosition: MathRound(getGroundHeight() / 2),
-							}, null, null, 1);
+								null,
+								null,
+								1
+							);
 							_father.swapAnimation('idle');
-							const _tank = summonMobWithJson({
-								id: 73,
-								minX: _p1,
-								maxX: _p1,
-								count: 1,
-								zoom: .9,
-								props: {
-									friendly: true,
-									noDirection: true,
-									reversed: _dir !== __right,
-									direction: _dir,
-									invulnerable: true,
-									npc: true,
-									immobilize: true
+							const _tank = summonMobWithJson(
+								{
+									id: 73,
+									minX: _p1,
+									maxX: _p1,
+									count: 1,
+									zoom: 0.9,
+									props: {
+										friendly: true,
+										noDirection: true,
+										reversed: _dir !== __right,
+										direction: _dir,
+										invulnerable: true,
+										npc: true,
+										immobilize: true
+									},
+									yPosition: MathRound(getGroundHeight() / 1.5)
 								},
-								yPosition: MathRound(getGroundHeight() / 1.5),
-							}, null, null, 1);
-							const _archer = summonMobWithJson({
-								id: 10002,
-								minX: _p1,
-								maxX: _p1,
-								count: 1,
-								zoom: .9,
-								props: {
-									friendly: true,
-									noDirection: true,
-									reversed: _dir !== __right,
-									direction: _dir,
-									invulnerable: true,
-									npc: true,
-									immobilize: true
+								null,
+								null,
+								1
+							);
+							const _archer = summonMobWithJson(
+								{
+									id: 10002,
+									minX: _p1,
+									maxX: _p1,
+									count: 1,
+									zoom: 0.9,
+									props: {
+										friendly: true,
+										noDirection: true,
+										reversed: _dir !== __right,
+										direction: _dir,
+										invulnerable: true,
+										npc: true,
+										immobilize: true
+									},
+									yPosition: MathRound(getGroundHeight() / 2.9)
 								},
-								yPosition: MathRound(getGroundHeight() / 2.9),
-							}, null, null, 1);
+								null,
+								null,
+								1
+							);
 						}
 					},
 					{
-						when: function() {
+						when: function () {
 							return episode.openPortal;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 104;
 							delete episode.openPortal;
 							updateQuestArea();
 							episode.pauseBgMusic(1);
 							let _x;
-							if(episode.sceneAfterProps.side === __left)
-								_x = MathRound((mainCharacter.HURTLEFT + platformX + (episode.cWidth * .33)) / __zoom);
-							else
-								_x = MathRound((mainCharacter.HURTLEFT + platformX - (episode.cWidth * .33)) / __zoom);
+							if (episode.sceneAfterProps.side === __left)
+								_x = MathRound((mainCharacter.HURTLEFT + platformX + episode.cWidth * 0.33) / __zoom);
+							else _x = MathRound((mainCharacter.HURTLEFT + platformX - episode.cWidth * 0.33) / __zoom);
 
-							// let _x = MathRound((mainCharacter.left + platformX + (mainCharacter.WIDTH * 3 * (mainCharacter.direction === __left ? -1 : 1))) / __zoom);
-							// const _maxX = MathRound((episode.width - (episode.cWidth * .5)) / __zoom);
-							// if(_x > _maxX)
-							// 	_x = _maxX;
-							// else {
-							// 	const _minX = MathRound((episode.cWidth * .5) / __zoom);
-							// 	if(_x < _minX)
-							// 		_x = _minX;
-							// }
-							const _portal = summonMob(113,  _x,  MathRound(groundheight * .5), 1);
+							const _portal = summonMob(113, _x, MathRound(groundheight * 0.5), 1);
 							activatePortal(_portal);
 						}
 					},
 					{
-						when: function() {
-							//KOVAN ÖLDÜĞÜNDE
+						when: function () {
 							return (episode.boss?.health <= 0 && episode.phase < 10) || episode.phase === 200;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 100;
 							episode.pauseBgMusic(1);
 							const _e = episode.boss;
-							if(__account?.questStatus?.quest?.timer)
-								delete __account.questStatus.quest.timer;
-							episode.enemies.filter(x => !x.main && !x.tag && !x.friendly).forEach(x => {
-								if(x.class === 'object' && !x.remove) {
-									// const _item = x.inventory?.[0];
-									// switch(_item?.type) {
-									// 	case "gold":
-									// 	case "item": {
-									// 		episode.loot = { loots: [_item] };
-									// 		console.log('LOOT ' + _item.type);
-									// 		mainCharacter.checkLoot({});
-									// 		break;	
-									// 	}
-									// }
-									//x.remove = true;
-								}
-								else if(x.class !== 'object'){
-									x.stopSpawn();
-									x.health = x.experience = 0;
-									x.dead = x.dying = true;
-									x.animate('dead', 1);
-								}
-							});
+							if (__account?.questStatus?.quest?.timer) delete __account.questStatus.quest.timer;
+							episode.enemies
+								.filter((x) => !x.main && !x.tag && !x.friendly)
+								.forEach((x) => {
+									if (x.class === 'object' && !x.remove) {
+									} else if (x.class !== 'object') {
+										x.stopSpawn();
+										x.health = x.experience = 0;
+										x.dead = x.dying = true;
+										x.animate('dead', 1);
+									}
+								});
 							episode.mobs = [];
 							episode.respawners = [];
-							const _mob = episode.installMob({
-								id: 1003,
-								minX: MathRound((_e.LEFT + platformX) / __zoom),
-								maxX: MathRound((_e.LEFT + platformX) / __zoom),
-								sight: 1000,
-								count: 1,
-								spawnDirection: 'up',
-								yPosition : MathRound(getGroundHeight() / 2),
-								minLevel: 1,
-								maxLevel: 1
-							}, null, 1);
+							const _mob = episode.installMob(
+								{
+									id: 1003,
+									minX: MathRound((_e.LEFT + platformX) / __zoom),
+									maxX: MathRound((_e.LEFT + platformX) / __zoom),
+									sight: 1000,
+									count: 1,
+									spawnDirection: 'up',
+									yPosition: MathRound(getGroundHeight() / 2),
+									minLevel: 1,
+									maxLevel: 1
+								},
+								null,
+								1
+							);
 							_mob.animate('start', 1);
 							_mob.enemy = undefined;
 							_mob.updateVariables();
 							const _mobCenterX = _mob.HURTLEFT + _mob._HURTBOX_half;
 							const _mainCenterX = mainCharacter.HURTLEFT + mainCharacter._HURTBOX_half;
-							if(_mobCenterX < _mainCenterX)
-								_mob.animations.start.frames.forEach(x => {
-									if(x.extraStepXRate)
-										x.extraStepXRate *= -1;
+							if (_mobCenterX < _mainCenterX)
+								_mob.animations.start.frames.forEach((x) => {
+									if (x.extraStepXRate) x.extraStepXRate *= -1;
 								});
-							//delete episode.boss;
 						}
 					},
 					{
-						when: function() {
+						when: function () {
 							return (episode.boss?.health <= 0 && episode.phase < 10) || episode.phase === 200;
 						},
-						do: function() {
+						do: function () {
 							episode.phase = 100;
 							delete episode.boss;
-							if(__account?.questStatus?.quest?.timer)
-								delete __account.questStatus.quest.timer;
-							episode.enemies.filter(x => !x.main && !x.tag && !x.friendly && x.class !== 'object').forEach(x => {
-								x.stopSpawn();
-								x.health = x.experience = 0;
-								x.dead = x.dying = true;
-								x.animate('dead', 1);
-							});
+							if (__account?.questStatus?.quest?.timer) delete __account.questStatus.quest.timer;
+							episode.enemies
+								.filter((x) => !x.main && !x.tag && !x.friendly && x.class !== 'object')
+								.forEach((x) => {
+									x.stopSpawn();
+									x.health = x.experience = 0;
+									x.dead = x.dying = true;
+									x.animate('dead', 1);
+								});
 							episode.mobs = [];
 							episode.respawners = [];
 						}
 					},
 					{
-						when: function() {
-							if((episode.phase ?? 0) < 101 || episode.oneBossDown)
-								return false;
-							const _bosses = episode.enemies.filter(x => x.class === 'boss');
+						when: function () {
+							if ((episode.phase ?? 0) < 101 || episode.oneBossDown) return false;
+							const _bosses = episode.enemies.filter((x) => x.class === 'boss');
 							const _result = _bosses?.length === 1;
-							if(_result) {
+							if (_result) {
 								episode.oneBossDown = 1;
-								const _counter = __storyScene.bossQuest.kills.find(x => x.enemy[0] !== _bosses[0].id);
-								if(_counter && _counter.count !== 1) {
+								const _counter = __storyScene.bossQuest.kills.find((x) => x.enemy[0] !== _bosses[0].id);
+								if (_counter && _counter.count !== 1) {
 									_counter.count = 1;
 									updateQuestArea(null, __storyScene.bossQuest);
 								}
 							}
 							return _result;
 						},
-						do: function() {
-
-						}
+						do: function () {}
 					},
 					{
-						when: function() {
+						when: function () {
 							return episode.supportFound;
 						},
-						do: function() {
+						do: function () {
 							delete episode.supportFound;
-							//warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/cyclops.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Supporter found') + '!</span></div>', null, null, 1);
+
 							mainCharacter.direction = __right;
 							mainCharacter.animate('idle', 1);
 							const original = document.getElementById('skill12');
 
-							// clone (true → içeriğiyle birlikte)
 							const clone = original.cloneNode(true);
 							clone.className = 'move-to-place';
-							if(!__isPC)
-								clone.style.borderRadius = '999px';
+							if (!__isPC) clone.style.borderRadius = '999px';
 							clone.removeAttribute('id');
-							// absolute pozisyon ver
+
 							clone.style.position = 'absolute';
 							requestAnimationFrame(() => {
 								mainCharacter.still = mainCharacter.immobilize = mainCharacter.disableKeyboard = true;
 								blurKeyboard();
-								focusMe('#skill12', null, null, "<div class='full flex' style='flex-direction: column;'><div class='flex wot-subtitle' style='padding-bottom:.5cqh'>" + getLangData('You\'ve activated a support skill') + '</div><div class="flex wot-subtitle">' + getLangData('It can be used even in danger') + "</div></div>", null, null, __isPC ? null : true, 1);
+								focusMe(
+									'#skill12',
+									null,
+									null,
+									"<div class='full flex' style='flex-direction: column;'><div class='flex wot-subtitle' style='padding-bottom:.5cqh'>" +
+										getLangData("You've activated a support skill") +
+										'</div><div class="flex wot-subtitle">' +
+										getLangData('It can be used even in danger') +
+										'</div></div>',
+									null,
+									null,
+									__isPC ? null : true,
+									1
+								);
 								requestAnimationFrame(() => {
 									const _curt = document.getElementById('focus-ui');
 									_curt.appendChild(clone);
 								});
-								PlaySound({key:'skillmove3', volume:1});
+								PlaySound({ key: 'skillmove3', volume: 1 });
 							});
 							setTimeout(() => {
 								function slideToPlace(el, { x, y, w, h }, onComplete) {
-									el.getBoundingClientRect(); // reflow
+									el.getBoundingClientRect();
 
 									addClass(el, 'slide-to-place');
-									// hedef değerler
+
 									el.style.left = `${x}px`;
 									el.style.top = `${y}px`;
 									if (w) el.style.width = `${w}px`;
@@ -9247,7 +8737,6 @@ const __stories = [
 									function onEnd(e) {
 										if (e.target !== el) return;
 
-										// sadece bir property'e bak (ör: transform veya left)
 										if (e.propertyName !== 'left') return;
 
 										done();
@@ -9255,14 +8744,11 @@ const __stories = [
 
 									el.addEventListener('transitionend', onEnd);
 
-									// 🔥 fallback (çok önemli)
-									setTimeout(done, 2100); // CSS duration + küçük buffer
+									setTimeout(done, 2100);
 								}
 
 								requestAnimationFrame(() => {
 									requestAnimationFrame(() => {
-										// artık DOM kesin hazır
-
 										const _shield = document.querySelector('.focus-shield');
 
 										if (_shield) {
@@ -9275,138 +8761,158 @@ const __stories = [
 											const y = targetRect.top - wrapperRect.top;
 											const w = targetRect.width;
 											const h = targetRect.height;
-											slideToPlace(clone, {
-												x: x,
-												y: y,
-												w: w,
-												h: h,
-											}, function () {
-												mainCharacter.enableSkill('tag');
-												clone.remove();
-												PlaySound({key:'skillmove2', volume:1});
-												const _btnWrapper = document.createElement('div');
-												_btnWrapper.className = 'flex black-screen-ok-btn w-100 focus-ui-done-btn-custom';
-												const _btn = document.createElement('div');
-												_btn.style = 'color:#f7f7f7cc !important;height:5cqh !important';
-												_btn.className = "wot-button orange-action-btn flex one-line fade-me";
-												_btn.innerText = getLangData('Done');
-												_btn.onexactclick = function() {					
-													playClick();
-													//mainCharacter.still = mainCharacter.immobilize = false;
-													//delete mainCharacter.disableKeyboard;
-													disposeFocus();
-													PlaySound({ key: 'trouble', volume:1 });
-													removeFocus();
-													createBubbleText({
-														id: 2,
-														location: { map: episode.id }, ms: 4000,
-														owner: mainCharacter.key,
-														delay: 600,
-														text: 'There\'s something strange here',
-														onend: function() {
-															PlaySound({ key: 'puff5', volume:1 });
-															//episode.playSound({key:'bossalert', volume: .5});
-															//warn('<div class="flex leveling"><img style="height:22cqh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
-														
-															//setTimeout(() => {
-																//episode.playSound({key:'sistersenter', volume:1});
-																//setTimeout(() => {
-																	// if(episode?.id !== 11)
-																	// 	return;
-																	const installBoss = function(_b, _name) {
-																		const _boss = summonMobWithJson({
-																			id: _b,
-																			level: mainCharacter.level,
-																			name: _name,
-																			hp: 600,
-																			atk: mainCharacter.atk,
-																			grade: 4
-																		});
-																		//_boss.health = _boss.maxHP = 1;
-																		_boss.class = 'boss';
-																		_boss.important = 1;
-																		_boss.experience = 0;
-																		_boss.setDifficulty(__account.difficulty - 1);
-																		_boss.acceptChanges();
-																		_boss.pickNewTarget();
-																		_boss.addObject({ 
-																			key:'respawn', 
-																			position: 'middle',
-																			scale: 1.5
-																		});
-																		return _boss;
-																	}
-																	const _yec = installBoss(37, 'Morya');
-																	const _mainCenterX = mainCharacter.HURTLEFT + mainCharacter._HURTBOX_half;
-																	_yec.left = (_mainCenterX - MathRound(200 * __zoom)) + platformX;
-																	_yec.yPosition = mainCharacter.yPosition - 1;
-																	_yec.updateVariables();
-																	_yec.direction = __right;
-																	_yec.animate('ground2', 1);
-																	mainCharacter.hitTakenCount = 0;
-																	requestAnimationFrame(() => {
-																		const _mec =installBoss(38, 'Erlin');
-																		_mec.left = (_mainCenterX + MathRound(200 * __zoom)) + platformX;
-																		_mec.yPosition = mainCharacter.yPosition - 1;	
-																		_mec.updateVariables();
-																		_mec.direction = __left;
-																		_mec.animate('ground3', 1);
-																		PlaySound({key:'doggrunt', volume:1});
-																		summonMobWithJson({
-																			id: 1,
-																			minX: MathRound((_mec.left + (176 / __scale)) / __zoom),
-																			maxX: MathRound((_mec.left + (176 / __scale)) / __zoom),
-																			sight: 1000,
-																			count: 1,
-																			direction: __left,
-																			zoom: 1.1,
-																			yPosition: _yec.yPosition + MathRound(groundheight * .1),
-																			props : {
-																				immobilize: true,
-																				still: true,
-																				noDirection: true,
-																				reversed: true
-																			}
-																		});
+											slideToPlace(
+												clone,
+												{
+													x: x,
+													y: y,
+													w: w,
+													h: h
+												},
+												function () {
+													mainCharacter.enableSkill('tag');
+													clone.remove();
+													PlaySound({ key: 'skillmove2', volume: 1 });
+													const _btnWrapper = document.createElement('div');
+													_btnWrapper.className =
+														'flex black-screen-ok-btn w-100 focus-ui-done-btn-custom';
+													const _btn = document.createElement('div');
+													_btn.style = 'color:#f7f7f7cc !important;height:5cqh !important';
+													_btn.className =
+														'wot-button orange-action-btn flex one-line fade-me';
+													_btn.innerText = getLangData('Done');
+													_btn.onexactclick = function () {
+														playClick();
 
-																		
-																		summonMobWithJson({
-																			id: 1,
-																			minX: MathRound((_mec.left + 202) / __zoom),
-																			maxX: MathRound((_mec.left + 202) / __zoom),
-																			sight: 1000,
-																			count: 1,
-																			direction: __left,
-																			zoom: 1.1,
-																			yPosition: _mec.yPosition - MathRound(groundheight * .1),
-																			props : {
-																				immobilize: true,
-																				still: true,
-																				noDirection: true,
-																				reversed: true
-																			}
-																		});
+														disposeFocus();
+														PlaySound({ key: 'trouble', volume: 1 });
+														removeFocus();
+														createBubbleText({
+															id: 2,
+															location: { map: episode.id },
+															ms: 4000,
+															owner: mainCharacter.key,
+															delay: 600,
+															text: "There's something strange here",
+															onend: function () {
+																PlaySound({ key: 'puff5', volume: 1 });
 
-																		cssAnimations.slowMotion(mainCharacter, 300);
-																		createBubbleText({
-																			id: 13,
-																			location: { map: episode.id }, ms: 1550,
-																			owner: _yec.key,
-																			asap: true,
-																			delay: 100,
-																			text: 'Die!'
-																		});
+																const installBoss = function (_b, _name) {
+																	const _boss = summonMobWithJson({
+																		id: _b,
+																		level: mainCharacter.level,
+																		name: _name,
+																		hp: 600,
+																		atk: mainCharacter.atk,
+																		grade: 4
+																	});
+
+																	_boss.class = 'boss';
+																	_boss.important = 1;
+																	_boss.experience = 0;
+																	_boss.setDifficulty(__account.difficulty - 1);
+																	_boss.acceptChanges();
+																	_boss.pickNewTarget();
+																	_boss.addObject({
+																		key: 'respawn',
+																		position: 'middle',
+																		scale: 1.5
+																	});
+																	return _boss;
+																};
+																const _yec = installBoss(37, 'Morya');
+																const _mainCenterX =
+																	mainCharacter.HURTLEFT +
+																	mainCharacter._HURTBOX_half;
+																_yec.left =
+																	_mainCenterX - MathRound(200 * __zoom) + platformX;
+																_yec.yPosition = mainCharacter.yPosition - 1;
+																_yec.updateVariables();
+																_yec.direction = __right;
+																_yec.animate('ground2', 1);
+																mainCharacter.hitTakenCount = 0;
+																requestAnimationFrame(() => {
+																	const _mec = installBoss(38, 'Erlin');
+																	_mec.left =
+																		_mainCenterX +
+																		MathRound(200 * __zoom) +
+																		platformX;
+																	_mec.yPosition = mainCharacter.yPosition - 1;
+																	_mec.updateVariables();
+																	_mec.direction = __left;
+																	_mec.animate('ground3', 1);
+																	PlaySound({ key: 'doggrunt', volume: 1 });
+																	summonMobWithJson({
+																		id: 1,
+																		minX: MathRound(
+																			(_mec.left + 176 / __scale) / __zoom
+																		),
+																		maxX: MathRound(
+																			(_mec.left + 176 / __scale) / __zoom
+																		),
+																		sight: 1000,
+																		count: 1,
+																		direction: __left,
+																		zoom: 1.1,
+																		yPosition:
+																			_yec.yPosition +
+																			MathRound(groundheight * 0.1),
+																		props: {
+																			immobilize: true,
+																			still: true,
+																			noDirection: true,
+																			reversed: true
+																		}
+																	});
+
+																	summonMobWithJson({
+																		id: 1,
+																		minX: MathRound((_mec.left + 202) / __zoom),
+																		maxX: MathRound((_mec.left + 202) / __zoom),
+																		sight: 1000,
+																		count: 1,
+																		direction: __left,
+																		zoom: 1.1,
+																		yPosition:
+																			_mec.yPosition -
+																			MathRound(groundheight * 0.1),
+																		props: {
+																			immobilize: true,
+																			still: true,
+																			noDirection: true,
+																			reversed: true
+																		}
+																	});
+
+																	cssAnimations.slowMotion(mainCharacter, 300);
+																	createBubbleText({
+																		id: 13,
+																		location: { map: episode.id },
+																		ms: 1550,
+																		owner: _yec.key,
+																		asap: true,
+																		delay: 100,
+																		text: 'Die!'
+																	});
+																	setTimeout(() => {
+																		_game.suspended = true;
 																		setTimeout(() => {
-																			_game.suspended = true;
-																			setTimeout(() => {
-																				focusMe('#skill12', function() {
+																			focusMe(
+																				'#skill12',
+																				function () {
 																					removeFocus();
 																					delete _game.suspended;
 																					delete mainCharacter.disableKeyboard;
-																					mainCharacter.still = mainCharacter.immobilize = false;
-																					const _keys = Object.keys(mainCharacter.animations);
-																					for(const _key of _keys) {
-																						const _anima = mainCharacter.animations[_key];
+																					mainCharacter.still =
+																						mainCharacter.immobilize = false;
+																					const _keys = Object.keys(
+																						mainCharacter.animations
+																					);
+																					for (const _key of _keys) {
+																						const _anima =
+																							mainCharacter.animations[
+																								_key
+																							];
 																						delete _anima.alreadyDisabled;
 																					}
 																					mainCharacter.enableSkills();
@@ -9419,54 +8925,54 @@ const __stories = [
 																					setTimeout(() => {
 																						_mec.animate('hurtair', 1);
 																					}, 650);
-																					// mainCharacter.immobilize = mainCharacter.still = true;
-																					// blurKeyboard();
-																					// mainCharacter.disableKeyboard = true;
-																					// setTimeout(() => {
-																					// 		createBubbleText({
-																					// 			id: 14,
-																					// 			location: { map: episode.id }, ms: 2000,
-																					// 			owner: mainCharacter.key,
-																					// 			text: 'Woooow!'
-																					// 		});
-																					// }, 600);
-																					// mainCharacter.animations.tag.end = function() {
-																					// 	mainCharacter.immobilize = mainCharacter.still = mainCharacter.disableKeyboard = false;
-																					// }
-																					episode.enemies.forEach(x => {
+
+																					episode.enemies.forEach((x) => {
 																						x.mustDraw = true;
 																					});
 																					episode.tagSkillUsed = 1;
-																					// _yec.animate('hurtair', 1);
-																					// _mec.animate('hurtair', 1);
-																					disposeFocus();
-																				}, null, getLangData('Use support skill to save yourself'),null,1, __isPC ? null : true);
-																			}, 150);
-																		}, 1650);
-																	});
-																	mainCharacter.maxHP = mainCharacter.MAXHP =
-																	mainCharacter.maxHP * 1;
-																	mainCharacter.setHealth(mainCharacter.MAXHP);
-																	requestAnimationFrame(() => {
-																		episode.phase = 101;
-																	});
 
-																	episode.pauseAmbianceMusic();
-																	episode.pauseBgMusic(1);
-																	episode.createBgMusic(null, null, null, 'boss-fight-1', .5);
-																	episode.playBgMusic();
-																//}, 1000);
+																					disposeFocus();
+																				},
+																				null,
+																				getLangData(
+																					'Use support skill to save yourself'
+																				),
+																				null,
+																				1,
+																				__isPC ? null : true
+																			);
+																		}, 150);
+																	}, 1650);
+																});
+																mainCharacter.maxHP = mainCharacter.MAXHP =
+																	mainCharacter.maxHP * 1;
+																mainCharacter.setHealth(mainCharacter.MAXHP);
+																requestAnimationFrame(() => {
+																	episode.phase = 101;
+																});
+
+																episode.pauseAmbianceMusic();
+																episode.pauseBgMusic(1);
+																episode.createBgMusic(
+																	null,
+																	null,
+																	null,
+																	'boss-fight-1',
+																	0.5
+																);
+																episode.playBgMusic();
+
 																takeQuest(2, null, null, 'progress', 1);
 																__storyScene.bossQuest = __account.questStatus.quest;
-															//}, 4000);
-														}
-													});
-												};
-												_btnWrapper.appendChild(_btn);
-												episode.hasFocusUIDoneBtn = 1;
-												const _curt = document.getElementById('focus-ui');
-												_curt.appendChild(_btnWrapper);
-											});
+															}
+														});
+													};
+													_btnWrapper.appendChild(_btn);
+													episode.hasFocusUIDoneBtn = 1;
+													const _curt = document.getElementById('focus-ui');
+													_curt.appendChild(_btnWrapper);
+												}
+											);
 										}
 									});
 								});
@@ -9474,27 +8980,25 @@ const __stories = [
 						}
 					},
 					{
-						when: function() {
+						when: function () {
 							return episode?.tagSkillUsed;
 						},
-						do: function() {
-							const _tagChar = episode.enemies.find(x => x.id === 47);
-							if(_tagChar) {
-								const _hyennas = episode.enemies.filter(x => x.id === 1);
+						do: function () {
+							const _tagChar = episode.enemies.find((x) => x.id === 47);
+							if (_tagChar) {
+								const _hyennas = episode.enemies.filter((x) => x.id === 1);
 								const _tagCenterX = _tagChar.HURTLEFT + _tagChar._HURTBOX_half;
-								//hyennas dizisi elemanlarının HURTBOX ı Y ekseninde _tagCenterX koordinatı ile çakışıyor mu?
+
 								let i = 0;
-								for(const _h of _hyennas) {
-									if(_h.HURTLEFT < _tagCenterX) {
-										if(_h.animation !== 'hurtfeet')
-											_h.smash(mainCharacter);
+								for (const _h of _hyennas) {
+									if (_h.HURTLEFT < _tagCenterX) {
+										if (_h.animation !== 'hurtfeet') _h.smash(mainCharacter);
 									}
-									if(_h.animation === 'hurtfeet') {
+									if (_h.animation === 'hurtfeet') {
 										i++;
 									}
 								}
-								if(i === _hyennas.length) 
-									delete episode.tagSkillUsed;
+								if (i === _hyennas.length) delete episode.tagSkillUsed;
 							}
 						}
 					}
@@ -9507,31 +9011,30 @@ const __stories = [
 						count: 1,
 						sight: 1000,
 						grade: 12,
-						hp:1650,
-						zoom: .33,
+						hp: 1650,
+						zoom: 0.33,
 						experience: 0,
-						do: function(_e) {
+						do: function (_e) {
 							const _z = _e.getZoom();
 							const _h = _z * _e.height;
-							const _rest = _canvas.height - MathRound(groundheight * .5);
+							const _rest = _canvas.height - MathRound(groundheight * 0.5);
 							const _gap = MathCeil((_rest - _h) / _z);
-							if(_gap < 0)
-								return;
+							if (_gap < 0) return;
 							const _keys = Object.keys(_e.animations);
-							for(let _k of _keys) {
+							for (let _k of _keys) {
 								const _anim = _e.animations[_k];
-								_anim.frames.forEach(_f => {
+								_anim.frames.forEach((_f) => {
 									_f.bottomGap = (_f.bottomGap ?? 0) - _gap;
 								});
-								if(_anim.alternateFrames)
-									for(let _af of _anim.alternateFrames)
-										_af.frames?.forEach(_f => {
+								if (_anim.alternateFrames)
+									for (let _af of _anim.alternateFrames)
+										_af.frames?.forEach((_f) => {
 											_f.bottomGap = (_f.bottomGap ?? 0) - _gap;
 										});
 							}
 						},
-						yPosition: function() {
-							return MathRound(groundheight * .5);
+						yPosition: function () {
+							return MathRound(groundheight * 0.5);
 						}
 					},
 					{
@@ -9541,7 +9044,7 @@ const __stories = [
 						count: 1,
 						sight: 1000,
 						spawn: 10,
-						hp:300,
+						hp: 300,
 						experience: 0
 					},
 					{
@@ -9551,7 +9054,7 @@ const __stories = [
 						count: 2,
 						sight: 1000,
 						spawn: 10,
-						hp:300,
+						hp: 300,
 						experience: 0
 					},
 					{
@@ -9561,7 +9064,7 @@ const __stories = [
 						count: 2,
 						sight: 1000,
 						spawn: 10,
-						hp:300,
+						hp: 300,
 						experience: 0
 					},
 					{
@@ -9571,7 +9074,7 @@ const __stories = [
 						count: 1,
 						sight: 1000,
 						spawn: 10,
-						hp:300,
+						hp: 300,
 						experience: 0
 					}
 				]
@@ -9580,11 +9083,7 @@ const __stories = [
 				map: 42,
 				noArtifact: true,
 				leaderBoards: {
-					calculate: function() {
-						//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
-						//Kalan kalp (3 adet te) + 1000 * 3
-						//Yediği Damage ın toplam sağlığına oranı negatif bonusu (50 * 10) dmgTaken
-						
+					calculate: function () {
 						const _result = {
 							description: [
 								{
@@ -9613,40 +9112,37 @@ const __stories = [
 								}
 							]
 						};
-						_result.score = _result.description.reduce(
-							(sum, item) => sum + (item.value ?? 0),
-							0
-						);
+						_result.score = _result.description.reduce((sum, item) => sum + (item.value ?? 0), 0);
 						return _result;
 					}
 				},
 				enableCommonSkills: true,
 				loadingCharacterIds: [],
-				actions: [	
+				actions: [
 					{
-						when: function() {
+						when: function () {
 							return mainCharacter?.commonItem && !mainCharacter.commonItemRendered;
 						},
-						do: function() {
+						do: function () {
 							let _div = document.querySelector('.game-status-screen');
-							if(_div) 
-								_div.remove();
+							if (_div) _div.remove();
 							_div = document.createElement('div');
 							_div.className = 'flex game-status-screen';
 							_gameUI.appendChild(_div);
 							mainCharacter.commonItemRendered = 1;
 							const _item = mainCharacter.commonItem;
-							const _ci = commonSkills.find(x => x.key === _item.key);
+							const _ci = commonSkills.find((x) => x.key === _item.key);
 							const _title = _ci.title[getLang()];
 							const _icon = `<span class="item-in-slot full grade3-item" 
 								style="display:inline-block;position:relative">
 								<img style="background:#010101" class="item-img" src="./images/common/icons/${_ci.key}.png"/></span>`;
-    
+
 							const frag = document.createDocumentFragment();
 							const _subDiv = document.createElement('div');
-							_subDiv.innerHTML = `<div${!__isPC ? ' ontouchstart="mainCharacter.useCommonSkill(1)"' : ''} data-status-item-id="${_item.id ?? _item.key}" class="flex status-item-container w-50 flex flex-ai-start">
-								<div class="status-item-icon-container">`
-									+ _icon +
+							_subDiv.innerHTML =
+								`<div${!__isPC ? ' ontouchstart="mainCharacter.useCommonSkill(1)"' : ''} data-status-item-id="${_item.id ?? _item.key}" class="flex status-item-container w-50 flex flex-ai-start">
+								<div class="status-item-icon-container">` +
+								_icon +
 								`</div>
 								<div class="status-item-action-container flex">
 									<div class="item-title-container w-100 flex">
@@ -9670,54 +9166,50 @@ const __stories = [
 						}
 					},
 					{
-						when: function() {
-							return episode.pvpCounterValue > 10 && episode.mobPhaseTick && (_gameTick - episode.mobPhaseTick) > 60000;
+						when: function () {
+							return (
+								episode.pvpCounterValue > 10 &&
+								episode.mobPhaseTick &&
+								_gameTick - episode.mobPhaseTick > 60000
+							);
 						},
-						do: function() {
+						do: function () {
 							episode.mobPhaseTick = _gameTick;
 							const _maxW = MathRound(episode.width / __zoom);
 							const _minX = MathRound(_maxW * (1 / 6));
 							const _maxX = MathRound(_maxW * (5 / 6));
 							const _minY = MathRound(groundheight * (1 / 10));
 							const _maxY = MathRound(groundheight * (9 / 10));
-							const _parachute = summonMobWithJson({
-								id: 631,
-								level: 1,
-								minX: _minX,
-								maxX: _maxX,
-								yPosition: function() {
-									return getRandomValue2(_minY, _maxY);
+							const _parachute = summonMobWithJson(
+								{
+									id: 631,
+									level: 1,
+									minX: _minX,
+									maxX: _maxX,
+									yPosition: function () {
+										return getRandomValue2(_minY, _maxY);
+									},
+									sight: 1000,
+									count: 1,
+									experience: 0
 								},
-								sight:1000,
-								count:1,
-								experience: 0
-							}, 0, 1, 1);
+								0,
+								1,
+								1
+							);
 							_parachute.package = true;
 							_parachute.animate('start', 1);
 						}
 					},
-					// {
-					// 	when: function() {
-					// 		return episode.phase === 2 && 
-					// 		(episode.deads.filter(x => !x.remove)?.length ?? 0) === 0;
-					// 	},
-					// 	do: function() {
-					// 		__storyPlaying = false;
-					// 		episode.pvp = episode.war = false;
-					// 		mainCharacter.class = episode.mainClass;
-					// 		delete episode.mainClass;
-					// 		installStoryFinish();
-					// 		episode.phase = 3;
-					// 	}
-					// },
+
 					{
-						when: function() {
+						when: function () {
 							return episode.phase < 2 && episode.pvpEnded;
 						},
-						do: function() {
+						do: function () {
 							__storyPlaying = false;
 							episode.pvp = episode.war = false;
-							if(episode.mainClass) {
+							if (episode.mainClass) {
 								mainCharacter.class = episode.mainClass;
 								delete episode.mainClass;
 							}
@@ -9726,17 +9218,16 @@ const __stories = [
 						}
 					}
 				],
-				do: function() {
+				do: function () {
 					__account.inventory = [];
 					applyCharacterStats();
 					const _place = 0;
 					const opponents = [];
 					const _mobs = [null, '02', 47, 1000];
 					const _pvpNames = ['Berserker', 'Ranger', 'Cyclops', 'Al Karısı'];
-					// const _mobs = [null, 1000];
-					// const _pvpNames = ['Berserker','Al Karısı'];
-					for(var i = 0; i < _mobs.length; i++) {
-						if(i === _place){
+
+					for (var i = 0; i < _mobs.length; i++) {
+						if (i === _place) {
 							mainCharacter.totalPower = getTotalPower().total;
 							mainCharacter.pvpName = mainCharacter.displayName = _pvpNames[i];
 							opponents.push(mainCharacter);
@@ -9751,9 +9242,9 @@ const __stories = [
 						opponents.push(_e);
 					}
 					requestAnimationFrame(() => {
-						episode.loadCharacterSprites(function() {}, [10, 48], null, 1);
+						episode.loadCharacterSprites(function () {}, [10, 48], null, 1);
 					});
-					createWar(opponents, 42, 1, 1, 180, function() {
+					createWar(opponents, 42, 1, 1, 180, function () {
 						clearAudioCache(loadedSounds);
 						mainCharacter.startPlatformX = platformX;
 						episode.skipPvPFinalScreen = 1;
@@ -9762,477 +9253,61 @@ const __stories = [
 						episode.deathMatch = true;
 						episode.mainClass = mainCharacter.class;
 						mainCharacter.disableSkill('tag');
-						episode.beforePVPStart = function() {
+						episode.beforePVPStart = function () {
 							episode.mobPhaseTick = _gameTick;
-							episode.enemies.forEach(x => {
+							episode.enemies.forEach((x) => {
 								x.pvpRespawn = true;
 								x.maxHP = x.MAXHP = x.health = mainCharacter.maxHP = 1000;
 								x.setHealth(x.health);
 								x.immunities = [];
 							});
-						}
-						const _objects = mapSprites.find(x => x.id === __storyScene.map).objectMobs;
+						};
+						const _objects = mapSprites.find((x) => x.id === __storyScene.map).objectMobs;
 						episode.installMobs(_objects);
 					});
 				}
 			}
 		]
-	},
-	// {
-	// 	id:200,
-	// 	disableWorldMap: true,
-	// 	order:200,
-	// 	act:1,
-	// 	minLevel:1,
-	// 	list: false,
-	// 	leaderBoards: {
-	// 		calculate: function() {
-	// 			//10 dakikadan önce bitirme bonusu (her saniye başına 100 puan)
-	// 			//Kalan kalp (3 adet te) + 1000 * 3
-	// 			//Yediği Damage ın toplam sağlığına oranı negatif bonusu (50 * 10) dmgTaken
-				
-	// 			const _result = {
-	// 				description: [
-	// 					{
-	// 						title: {
-	// 							en: 'Time Bonus',
-	// 							tr: 'Zaman Bonusu'
-	// 						},
-	// 						value: MathRound(((10 * 60000) - 
-	// 						((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick))) / 10)
-	// 					},
-	// 					{
-	// 						title: {
-	// 							en: 'Heart Bonus',
-	// 							tr: 'Kalp Bonusu'
-	// 						},
-	// 						value: (mainCharacter.heartCount ?? 0) * 1000
-	// 					},
-	// 					{
-	// 						title: {
-	// 							en: 'Damage Taken',
-	// 							tr: 'Hasar Alma'
-	// 						},
-	// 						value: -1 * (((mainCharacter.dmgTaken ?? 0) / mainCharacter.MAXHP) * 1000)
-	// 					}
-	// 				]
-	// 			};
-	// 			_result.score = _result.reduce((prev, next) => prev.value + next.value);
-	// 			return _result;
-	// 		}
-	// 	},
-	// 	ticket: 0,
-	// 	mission: 'qp',
-	// 	perfectFinishRewards: [{ key: 'chest', grade: 2 }],
-	// 	title: {
-	// 		en: 'Pinata Hive',
-	// 		tr: 'Pinyata Kovanı'
-	// 	},
-	// 	description: {
-	// 		en: "",
-	// 		tr: ""
-	// 	},
-	// 	resultStars: [
-	// 		{ id: 1, title: 'Clear mission', when: function() {
-	// 			return !mainCharacter.isDead();
-	// 		}},
-	// 		{ id: 2, key: 'time', value: 10 * 60000, title: 'Finish in time',
-	// 			when: function(_item) {
-	// 				//return !isMissionFailed(0) && !isMissionFailed(2) &&
-	// 				return ((episode.endTime ?? _gameTick) - (__story.startTime ?? _gameTick)) <= (_item.value);
-	// 		}},
-	// 		{ id: 3, key: 'heart', value: 1, title: 'Stay above 1 heart', when: function(_item) {
-	// 			return mainCharacter.heartCount > _item.value;
-	// 		}}
-	// 	],
-	// 	rewards: [
-	// 		{ key: 'item', grade: 2, type: 'weapon' },
-	// 		{ key: 'gem', grade: 1, type: 'random', count:1 },
-	// 		{ key: 'gold', count: 5000 },
-	// 		{ key: 'exp', count: 1200 }
-	// 	],
-	// 	quests: [
-	// 		{
-	// 			id: 1011,
-	// 			descriptions: {
-	// 				en: 'Hive smashed',
-	// 				tr: 'Kovan parçalandı'
-	// 			},
-	// 			names: {
-	// 				en: 'Smash The Hive',
-	// 				tr: 'Kovanı Parçala'
-	// 			},
-	// 			owner: 'system',
-	// 			minLevel: 1,
-	// 			maps: [11],
-	// 			timer: {
-	// 				ms: 150000,
-	// 				after: function() {
-	// 					if(episode.boss && !episode.boss.isDead()) {
-	// 						episode.phase = 200;
-	// 					}
-	// 				}
-	// 			}
-	// 		},
-	// 		{
-	// 			id: 1012,
-	// 			names: {
-	// 				en: 'Face the giant',
-	// 				tr: 'Dev ile yüzleş'
-	// 			},
-	// 			descriptions: {
-	// 				en: 'Eliminate Cyclops',
-	// 				tr: 'Tepegöz\'ü Yok Et'
-	// 			},
-	// 			owner: 'system',
-	// 			minLevel: 1,
-	// 			kills: [
-	// 				{
-	// 					enemy: [47],
-	// 					limit: 1,
-	// 					descriptions: {
-	// 						en: 'Cyclops Cleared',
-	// 						tr: 'Tepegöz Temizlendi'
-	// 					}
-	// 				}
-	// 			],
-	// 			maps: [11]
-	// 		}
-	// 	],
-	// 	scenes: [
-	// 		{
-	// 			map: 11,
-	// 			heartCount : 3,
-	// 			loots: [
-	// 				{type:'pot', key:'pot', chance:1},
-	// 				{type:'common', key:'corpseexplode', chance:1}
-	// 			],
-	// 			startsWith: 1,
-	// 			save: true,
-	// 			loadingCharacterIds: [47],
-	// 			start: function() {
-	// 				episode.itemDropOrder = [ 
-	// 					'belt', 'gloves', 'bracers', 'helmet', 'leggings',
-	// 					'necklace', 'chest', 'ring', 'boots', 'weapon'
-	// 				];
-	// 				clearAudioCache(loadedSounds);
-	// 				removeCoopCharacter();
-	// 				setCharacterLevel(12, null, 1);
-	// 				//setCharacterLevel(8, null, 1);
-	// 				addClass(_gameUI, 'demo-playing');
-	// 				episode.pauseBgMusic(1);
-	// 				//episode.createBgMusic(null, null, null, 'training');
-	// 				//episode.playBgMusic();
-	// 				const _es = episode.enemies.filter(x => x.enemy);
-	// 				_es.forEach(_e => 
-	// 					{
-	// 						_e.animations.hurtfeet = new animation(createHurtFeet(_e.zoom, _e.bloodColor));
-	// 					}
-	// 				);
-	// 				episode.loadCharacterSprites(function() {}, null, ['hurtfeet'],1,1);
-	// 				mainCharacter.direction = __right;
-	// 				const _tagChar = episode.enemies.find(x => x.tag);
-	// 				if(_tagChar)
-	// 					_tagChar.remove = true;
-	// 				if(mainCharacter.tagContainer)
-	// 				{
-	// 					mainCharacter.tagContainer.remove();
-	// 					delete mainCharacter.tagContainer;
-	// 				}
-	// 				delete mainCharacter.animations.tag.disabled;
-	// 				mainCharacter.tagSkillSet = 1;
-	// 				resetSkill('tag', mainCharacter);
-	// 				//PlaySound({key:'conquer', volume:.6});
-	// 				//episode.lastItemDropTime = _gameTick;
-	// 				takeQuest(0, 1, null, null, 1);
-	// 				episode.boss = episode.enemies.find(x => x.id === 111);
-	// 				episode.phase = episode.boss.grade;
-	// 				// getImage('./images/main/avatars/cyclops.png', function(_img) {
-	// 				// 	const url = _img.toDataURL();
-	// 				// 	warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="' + url + '" />&nbsp;<span style="flex:1">' + getLangData('Support Activated') + '</span></div>', null, null, 1);
-	// 				// });
-	// 				// const _desc = document.createElement('div');
-	// 				// _desc.className = 'flex show-ui full quick-play-desc-container fade-me';
-	// 				// let _html = '';
-	// 				// for(let i = 0; i < 6; i++) {
-	// 				// 	const _tip = __quickTips[i];
-	// 				// 	let _skillHtml = '';
-	// 				// 	for(let _sk of _tip.skills) {
-	// 				// 		if(_skillHtml !== '')
-	// 				// 			_skillHtml += '<img src="./images/icons/swap-right.png" class="quick-play-desc-skill-swap" />';
-	// 				// 		_skillHtml += '<div class="quick-play-desc-skill-icon" style="background-image:url(./images/main/skill-icons/warrior/' + _sk + '.png);background-size:cover"></div>';
-	// 				// 	}
-	// 				// 	_skillHtml = `<div class="quick-play-desc-skill-icons flex">` + _skillHtml + '</div>';
-	// 				// 	_html += `<div class="quick-play-desc-item quick-play-desc-item${_tip.id}">`
-	// 				// 		+ _skillHtml +
-	// 				//  		`<div class="quick-play-desc-${_tip.descDir}">${_tip.desc[getLang()]}</div>  
-	// 				//    </div>`;
-	// 				// }
-	// 				// _desc.innerHTML = _html +
-	// 				//    `<div onexactclick="skipQuickPlayTutorial()" class="quick-play-desc-skip flex glow">&lt;&nbsp;${getLangData('UNDERSTOOD')}&nbsp;&gt;</div>`;
-	// 				// addClass(_gameUI, 'disable-ui');
-	// 				// requestAnimationFrame(() => {
-	// 				// 	_game.suspended = true;
-	// 				// });
-	// 				// _gameUI.appendChild(_desc);
-	// 			},
-	// 			actions: [
-	// 				{
-	// 					when: function() {
-	// 						return mainCharacter?.lastItemLootedTime === _gameTick;
-	// 					},
-	// 					do: function() {
-	// 						let _div = document.querySelector('.game-status-screen');
-	// 						if(!_div) {
-	// 							_div = document.createElement('div');
-	// 							_div.className = 'flex game-status-screen';
-	// 							_gameUI.appendChild(_div);
-	// 						}
-	// 						episode.lastItemDropTime = _gameTick;
-	// 						const _inventory = getItems().filter(x => !x.weared);
-	// 						const _item = _inventory[_inventory.length - 1];
-	// 						const _icon = getItemIcon(_item);
-	// 						let _title = getLangData(_item.type);
-	// 						const _newPower = getPowerOfItem(_item.id);
-	// 						const _wearedItemId = _inventory.find(x => x.type === _item.type && x.weared)?.id;
-	// 						const _oldPower = _wearedItemId ? getPowerOfItem(_wearedItemId) : 0;
-	// 						const _powerDiff = MathRound(_newPower - _oldPower);
-	// 						_title = _title[0].toLocaleUpperCase(getLang()) + _title.substring(1);
-
-	// 						const frag = document.createDocumentFragment();
-	// 						const _subDiv = document.createElement('div');
-	// 						_subDiv.innerHTML = `<div data-status-item-id="${_item.id}" class="flex status-item-container w-50 flex flex-ai-start">
-	// 							<div class="status-item-icon-container">`
-	// 								+ _icon +
-	// 							`</div>
-	// 							<div class="status-item-action-container flex">
-	// 								<div class="item-title-wrapper flex w-50">
-	// 									${_title}
-	// 								</div>
-	// 								<div class="item-title-wrapper flex w-50">
-	// 									<img style="height:80%;max-height:2.6cqh" src="./images/icons/power-up.png" />${_powerDiff}
-	// 								</div>
-	// 								<div class="item-action-wrapper flex flex-jc-start w-100">
-	// 									<div class="game-menu-button animate-me flex" onexactclick="wearStatusItem(${_item.id}, ${_powerDiff})">
-	// 										<div class="flex">${getLangData('WEAR')}<span class="flex">(U)</span></div>
-	// 									</div>
-	// 								</div>
-	// 							</div>
-	// 						</div>`;
-
-	// 						frag.appendChild(_subDiv.firstElementChild);
-	// 						_div.prepend(frag);
-	// 						mainCharacter.hasAdvicedItem = 1;
-	// 					}
-	// 				},
-	// 				{
-	// 					when: function() {
-	// 						return (episode.boss?.gradeLeft + 1) < episode.phase;
-	// 					},
-	// 					do: function() {
-	// 						if(episode.boss) {
-	// 							delete episode.boss.looted;
-	// 							episode.loot = {
-	// 								enemy: episode.boss,
-	// 								loots: [
-	// 									{type:'item',key:episode.itemDropOrder[episode.boss.grade - episode.phase], grade:2},
-	// 									// {type:'gold'},
-	// 									// {type:'gold'},
-	// 									// {type:'gold'},
-	// 									// {type:'gold'},
-	// 									// {type:'gold'},
-	// 									// {type:'gold'},
-	// 									// {type:'gold'},
-	// 									// {type:'gold'},
-	// 									// {type:'gold'}
-	// 								]
-	// 							}
-	// 							episode.phase--;
-	// 						}
-	// 					}
-	// 				},
-	// 				{
-	// 					when: function() {
-	// 						return episode.phase === 101 && !episode.enemies.filter(x => x.class === 'boss')?.length;
-	// 					},
-	// 					do: function() {
-	// 						episode.phase = 102;
-	// 						updateQuestArea();
-	// 						__storyPlaying = false;
-	// 						installStoryFinish();
-	// 					}
-	// 				},
-	// 				{
-	// 					when: function() {
-	// 						return (episode.boss?.health <= 0 && episode.phase < 10) || episode.phase === 200;
-	// 					},
-	// 					do: function() {
-	// 						episode.phase = 100;
-	// 						delete episode.boss;
-	// 						episode.enemies.filter(x => !x.main && !x.friendly).forEach(x => {
-	// 								x.stopSpawn();
-	// 							x.health = x.experience = 0;
-	// 							x.dead = x.dying = true;
-	// 							x.animate('dead', 1);
-	// 						});
-	// 						episode.mobs = episode.respawners = [];
-	// 						episode.playSound({key:'bossalert', volume: .5});
-	// 						warn('<div class="flex leveling"><img style="height:22cqh" src="./images/icons/boss-alert.gif" /></div>', 'level-up', 4000, 1);
-						
-	// 						setTimeout(() => {
-	// 							//episode.playSound({key:'sistersenter', volume:1});
-	// 							setTimeout(() => {
-	// 								if(episode?.id !== 11)
-	// 									return;
-	// 								const installBoss = function(_b) {
-	// 									const _boss = summonMobWithJson({
-	// 										id: _b,
-	// 										level: 13,
-	// 										atk: mainCharacter.atk,
-	// 										zoom: .66,
-	// 										grade: 5
-	// 									});
-	// 									//_boss.health = _boss.maxHP = 1;
-	// 									_boss.class = 'boss';
-	// 									_boss.experience = 0;
-	// 									_boss.setDifficulty(__account.difficulty - 1);
-	// 									_boss.acceptChanges();
-	// 									_boss.pickNewTarget();
-	// 								}
-	// 								installBoss(47);
-	// 								mainCharacter.maxHP = mainCharacter.MAXHP =
-	// 								mainCharacter.maxHP * 1;
-	// 								mainCharacter.setHealth(mainCharacter.MAXHP);
-	// 								requestAnimationFrame(() => {
-	// 									episode.phase = 101;
-	// 								});
-	// 								// episode.pauseAmbianceMusic();
-	// 								// episode.pauseBgMusic(1);
-	// 								// episode.createBgMusic(null, null, null, 'cyclops-battle', .5);
-	// 								// episode.playBgMusic();
-	// 							}, 1000);
-	// 							takeQuest(1, null, null, 'progress', 1);
-	// 						}, 4000);
-	// 						// __storyScene.bossQuest.kills[0].count = 1;
-	// 						// updateQuestArea(null, __storyScene.bossQuest);
-	// 						// __storyPlaying = false;
-	// 						// installStoryFinish();
-	// 					}
-	// 				}
-	// 			],
-	// 			mobs: [
-	// 				{
-	// 					id: 111,
-	// 					minX: 2580,
-	// 					maxX: 2580,
-	// 					count: 1,
-	// 					sight: 1000,
-	// 					grade: 11,
-	// 					hp: 2000,
-	// 					zoom: .34,
-	// 					yPosition: function() {
-	// 						return MathRound(groundheight * .5);
-	// 					}
-	// 				},
-	// 				// {
-	// 				// 	id: 112,
-	// 				// 	minX: 3580,
-	// 				// 	maxX: 3580,
-	// 				// 	count: 1,
-	// 				// 	yPosition: function() {
-	// 				// 		return MathRound(groundheight * .5);
-	// 				// 	}
-	// 				// },
-	// 				{
-	// 					id: 35,
-	// 					minX: 1580,
-	// 					maxX: 4800,
-	// 					count: 4,
-	// 					sight: 1000,
-	// 					spawn: 10,
-	// 					hp:300,
-	// 					experience: 0
-	// 				},
-	// 				{
-	// 					id: 7,
-	// 					minX: 2000,
-	// 					maxX: 3200,
-	// 					count: 2,
-	// 					sight: 1000,
-	// 					spawn: 10,
-	// 					hp:300,
-	// 					experience: 0
-	// 				},
-	// 				{
-	// 					id: 2,
-	// 					minX: 1580,
-	// 					maxX: 4800,
-	// 					count: 6,
-	// 					sight: 1000,
-	// 					spawn: 10,
-	// 					hp:300,
-	// 					experience: 0
-	// 				},
-	// 				{
-	// 					id: 33,
-	// 					minX: 1580,
-	// 					maxX: 4800,
-	// 					count: 1,
-	// 					sight: 1000,
-	// 					spawn: 10,
-	// 					hp:300,
-	// 					experience: 0
-	// 				}
-	// 			]
-	// 		}
-	// 	]
-	// }
+	}
 ];
 function doNotShowAgain(elem, event) {
 	event.preventDefault();
 	event.stopPropagation();
 	const _cb = elem.querySelector('.cb-square');
 	playClick();
-	if(hasClass(_cb, 'checked'))
-		removeClass(_cb, 'checked');
-	else
-		addClass(_cb, 'checked');
+	if (hasClass(_cb, 'checked')) removeClass(_cb, 'checked');
+	else addClass(_cb, 'checked');
 }
 function closeChestOpeningScreen() {
 	const _scr = document.querySelector('.chest-open-scene-wrapper');
-	if(!_scr || hasClass(_scr, 'fade-out'))
-		return;
+	if (!_scr || hasClass(_scr, 'fade-out')) return;
 	playClick(1);
 	removeClass(_scr, 'fade-me');
 	addClass(_scr, 'fade-out');
 	removeClass(_gameUI, 'disable-ui');
-	_scr.onanimationend = function(event) {
-		if(event.animationName === 'fade-out-me') {
+	_scr.onanimationend = function (event) {
+		if (event.animationName === 'fade-out-me') {
 			event.target.remove();
 			_game.suspended = false;
 			episode.supportFound = 1;
 		}
-	}
+	};
 }
 function renderChestOpeningScreen(_gift) {
 	const _ex = document.getElementById('chest-open-wrapper');
-	if(_ex)
-		return;
+	if (_ex) return;
 	playClick(1);
 	episode.pauseBgMusic(1);
 	episode.pauseAmbianceMusic();
-	if(episode.enemies?.length)
-		episode.enemies.forEach(x => x.stopStepSound());
+	if (episode.enemies?.length) episode.enemies.forEach((x) => x.stopStepSound());
 	const _sb = document.getElementById('looted-strongbox');
-	if(_sb)
-		_sb.remove();
+	if (_sb) _sb.remove();
 	const _reward = getRewardIcon(1, 'fragment', 'tank');
 
 	const _wrapper = document.createElement('div');
 	_wrapper.onexactclick = openGiftChestWithAnimation;
 	_wrapper.className = 'flex show-ui full chest-open-scene-wrapper fade-me';
-	_wrapper.innerHTML =
-	`<div class="chest-open-scene">
+	_wrapper.innerHTML = `<div class="chest-open-scene">
 		<div class="chest-open-bg-glow"></div>
 
 		<div class="chest-open-chest-wrapper" id="chest-open-wrapper">
@@ -10248,7 +9323,6 @@ function renderChestOpeningScreen(_gift) {
 				draggable="false"
 			>
 
-			<!-- GIFT -->
 			<img
 				src="${_reward.src}"
 				class="chest-open-gift"
@@ -10271,61 +9345,49 @@ function renderChestOpeningScreen(_gift) {
 		<div class="chest-open-flash" id="chest-open-flash"></div>
 
 	</div>`;
-	//`<div onexactclick="takeQuest(1, 1, null, null, 1);skipQuickPlayTutorial()" class="quick-play-desc-skip flex glow">&lt;&nbsp;${getLangData('UNDERSTOOD')}&nbsp;&gt;</div>`;
+
 	addClass(_gameUI, 'disable-ui');
 	requestAnimationFrame(() => {
 		_game.suspended = true;
 	});
 	_gameUI.appendChild(_wrapper);
-	//episode.hasSkippableScreen = 1;
-	_gameUI.sound = PlaySound({key:'chestbg', volume:.8, loop: true});
+
+	_gameUI.sound = PlaySound({ key: 'chestbg', volume: 0.8, loop: true });
 }
-function openGiftChestWithAnimation(){
-	const chestWrapper = document.getElementById("chest-open-wrapper");
-    if(hasClass(chestWrapper,'opening')) 
-		return;
-	const chest = document.getElementById("chest-open-chest");
-	if(!chest)
-		return;
+function openGiftChestWithAnimation() {
+	const chestWrapper = document.getElementById('chest-open-wrapper');
+	if (hasClass(chestWrapper, 'opening')) return;
+	const chest = document.getElementById('chest-open-chest');
+	if (!chest) return;
 	SoundManager.stopAll();
 	delete _gameUI.sound;
-	const flash = document.getElementById("chest-open-flash");
-	const gift = document.getElementById("chest-open-gift");
-	const rewardText = document.getElementById("reward-text");
-	const tapText = document.getElementById("tap-text");
+	const flash = document.getElementById('chest-open-flash');
+	const gift = document.getElementById('chest-open-gift');
+	const rewardText = document.getElementById('reward-text');
+	const tapText = document.getElementById('tap-text');
 	tapText.remove();
-	PlaySound({key:'chime', volume:1});
-    addClass(chestWrapper, "opening");
+	PlaySound({ key: 'chime', volume: 1 });
+	addClass(chestWrapper, 'opening');
 
-    setTimeout(() => {
+	setTimeout(() => {
+		addClass(flash, 'active');
+	}, 250);
 
-        addClass(flash, "active");
+	setTimeout(() => {
+		if (chest) chest.src = './images/sprites/ep56/open.png';
+	}, 520);
 
-    }, 250);
-
-    setTimeout(() => {
-		if(chest)
-        	chest.src = "./images/sprites/ep56/open.png";
-
-    }, 520);
-
-    /*
-        beyazlık fadeout olurken
-        gift ortaya çıkıyor
-    */
-    setTimeout(() => {
-
-        addClass(gift, "show");
-        addClass(rewardText, "show");
+	setTimeout(() => {
+		addClass(gift, 'show');
+		addClass(rewardText, 'show');
 		setTimeout(() => {
-			PlaySound({key:'ding', volume:1});
+			PlaySound({ key: 'ding', volume: 1 });
 			removeClass(_btn, 'd-none');
 			addClass(_btn, 'fade-me');
-		},600);
-		addClass(chestWrapper, "opened");
+		}, 600);
+		addClass(chestWrapper, 'opened');
 		const _btn = document.getElementById('chest-open-ok-button');
-    }, 1050);
-
+	}, 1050);
 }
 function finishStory() {
 	__account.questStatus.lastStoryFinishTime = _gameTick;
@@ -10333,117 +9395,103 @@ function finishStory() {
 }
 let __story, __storySceneOrder, __storyScene, __storyCutScenePlaying, __storyPlaying;
 function resetStoryVariables() {
-	__story = __stories.find(x => x.lobby);
+	__story = __stories.find((x) => x.lobby);
 	__storySceneOrder = 0;
 	__storyScene = __storyCutScenePlaying = __storyPlaying = undefined;
 }
 function continueStoryAnyway() {
 	playClick();
 	playStory(
-		__storyLastUsedSettings.id, 
-		__storyLastUsedSettings.step, 
+		__storyLastUsedSettings.id,
+		__storyLastUsedSettings.step,
 		__storyLastUsedSettings.func,
-		__storyLastUsedSettings.first, 
+		__storyLastUsedSettings.first,
 		1
 	);
 	__storyLastUsedSettings = undefined;
 }
-var __storyBonusItemCount = 0, __storyLastUsedSettings;
-function playStory(_id, _step, _func, _isFirstStart, _continueAnyway){
+var __storyBonusItemCount = 0,
+	__storyLastUsedSettings;
+function playStory(_id, _step, _func, _isFirstStart, _continueAnyway) {
 	resetQuestLine(3);
-	if(_client.quickPlay){
+	if (_client.quickPlay) {
 		_client = new dataOperations(1);
 		_client.loadState();
 		_id = 200;
 	}
-	const _s = __stories.find(x => x.id === _id);
-	if(_s.passive) {
+	const _s = __stories.find((x) => x.id === _id);
+	if (_s.passive) {
 		warn('<span>' + getLangData('Story is passive for now') + '</span>', 'warn');
 		return;
 	}
-	if(!_continueAnyway && mainCharacter?.level && _s.minLevel > mainCharacter.level) {
-		//warn('<span>' + getLangData('Character level is too low') + '</span>', 'warn');
+	if (!_continueAnyway && mainCharacter?.level && _s.minLevel > mainCharacter.level) {
 		__storyLastUsedSettings = {
-			id:_id,
-			step:_step,
-			func:_func,
-			first:_isFirstStart
+			id: _id,
+			step: _step,
+			func: _func,
+			first: _isFirstStart
 		};
-    	askSomething(`<div class="w-100 flex" style="padding-top:2cqh;color:#f3f4f5cc"><span>${getLangData('Minium adviced level is')}:&nbsp;<b>${_s.minLevel}</b></span></div><div class="w-100 flex p-2" style="color:#ff6c00">${'It might be hard for you'}</div><div style="color:#f3f4f5cc" class="w-100 flex">${getLangData('Continue Anyway')}?</div>`, `continueStoryAnyway()`, 'modal_2x1');
+		askSomething(
+			`<div class="w-100 flex" style="padding-top:2cqh;color:#f3f4f5cc"><span>${getLangData('Minium adviced level is')}:&nbsp;<b>${_s.minLevel}</b></span></div><div class="w-100 flex p-2" style="color:#ff6c00">${'It might be hard for you'}</div><div style="color:#f3f4f5cc" class="w-100 flex">${getLangData('Continue Anyway')}?</div>`,
+			`continueStoryAnyway()`,
+			'modal_2x1'
+		);
 		return;
 	}
 	hideMyMenu();
 	hideMenu();
 	removeClass(_gameUI, 'disable-ui');
 	__story = _s;
-	if(!_isFirstStart)
-		__storySceneOrder = __story.startScene ?? _step ?? 0;
+	if (!_isFirstStart) __storySceneOrder = __story.startScene ?? _step ?? 0;
 	else {
-		if(__storySceneOrder === undefined)
-			__storySceneOrder = 1;
+		if (__storySceneOrder === undefined) __storySceneOrder = 1;
 		__storySceneOrder--;
 	}
 	episodeGold = episodePot = 0;
-	if(__story.point !== undefined) {
+	if (__story.point !== undefined) {
 		__story.point = 0;
 		__story.leaderBoards = new leaderboards();
 		__story.leaderBoards.createToken();
 	}
 	_client.loadPots();
 	__storyBonusItemCount = 0;
-	switchStoryScene(function() {
-		if(_func)
-			_func();
-		if(__story) {
+	switchStoryScene(function () {
+		if (_func) _func();
+		if (__story) {
 			__story.startTime = _gameTick;
 			__story.endTime = undefined;
 		}
 	});
 	mainCharacter.heartCount = __story?.heartCount ?? 1;
-	if(_client.quickPlay) {
-		const _char = __account.characters.find(x => x.class === mainCharacter.class);
-		_char.tag = {id:7, grade:1};
+	if (_client.quickPlay) {
+		const _char = __account.characters.find((x) => x.class === mainCharacter.class);
+		_char.tag = { id: 7, grade: 1 };
 		resetSkills(null, 1, mainCharacter);
 		delete mainCharacter.animations.tag.delay;
-		mainCharacter.animations.tag.modify = function(_e) {
+		mainCharacter.animations.tag.modify = function (_e) {
 			_e.animations.attack.priority = 1;
-			//delete _e.animations.idle.alternateFrames;
-			// _e.animations.attack.frames.forEach(x => {
-			// 	if(x.atk){
-			// 		x.atk.ignoreDef = true;
-			// 		x.atk.rate = 2;
-			// 		if(x.atk.hurt)
-			// 			x.atk.hurt.smash = true;
-			// 	}
-			// });
-		}
+		};
 		mainCharacter.animations.tag.disabled = true;
 		resetSkills(null, 1, mainCharacter);
-		const warmupAll = async function() {
-			await warmupSpriteSheet("./images/related/boom.png");
-			await warmupSpriteSheet("./images/related/boomgreen.png");
-			//await warmupSpriteSheet("./images/sprites/ep47/attack1.png");
-			//await warmupSpriteSheet("./images/sprites/ep47/sprite.png");
-		}
+		const warmupAll = async function () {
+			await warmupSpriteSheet('./images/related/boom.png');
+			await warmupSpriteSheet('./images/related/boomgreen.png');
+		};
 		warmupAll();
 		mainCharacter.direction = __left;
 		episodeVisibilityHidden = 1;
 		mainCharacter.animations.tag.disabled = false;
-		//mainCharacter.animate('tag', 1);
-		//mainCharacter.animations.tag.frames[0].do(mainCharacter);
+
 		mainCharacter.animations.tag.disabled = true;
 		episodeVisibilityHidden = false;
 	}
 }
 var _storySceneSwitching;
 function switchStoryScene(_func, _newOrder) {
-	if(_storySceneSwitching)
-		return;
+	if (_storySceneSwitching) return;
 	_storySceneSwitching = 1;
-	if(_newOrder)
-		__storySceneOrder = _newOrder;
-	else if(__storySceneOrder >= 0)
-		__storySceneOrder++;
+	if (_newOrder) __storySceneOrder = _newOrder;
+	else if (__storySceneOrder >= 0) __storySceneOrder++;
 	const _splash = document.getElementById('splash');
 	_splash.style.opacity = '.99';
 	removeClass(_splash, 'd-none');
@@ -10452,117 +9500,90 @@ function switchStoryScene(_func, _newOrder) {
 	detachModule();
 	stopWeather();
 	const _extraModals = document.querySelectorAll('.show-ui:not(.my-pop-up-wrapper)');
-	if(_extraModals?.[0])
-		_extraModals.forEach(x => x.remove());
+	if (_extraModals?.[0]) _extraModals.forEach((x) => x.remove());
 	__storyScene = __story.scenes[__storySceneOrder - 1];
-	if(__storyScene?.do)
-	{
-		if(episode)
-			__storyScene.do();
-		else 
-			switchMap(__storyScene.map, null, null, null, __storyScene, function() {
+	if (__storyScene?.do) {
+		if (episode) __storyScene.do();
+		else
+			switchMap(__storyScene.map, null, null, null, __storyScene, function () {
 				__storyScene.do();
 			});
 		return;
 	}
-	if(__storyScene?.when && !__storyScene.when()) {
+	if (__storyScene?.when && !__storyScene.when()) {
 		__storySceneOrder++;
 		__storyScene = __story.scenes[__storySceneOrder - 1];
 	}
 	__storyPlaying = 1;
 	let _oldHeartCount = mainCharacter?.heartCount;
-	if(__storyScene?.save && __storyCheckPoint?.sceneOrder !== (__storySceneOrder - 1)) {
-		// __storyCheckPoint = JSON.parse(JSON.stringify(__account));
-		// __storyCheckPoint.warn = 1;
-		// __storyCheckPoint.sceneOrder = __storySceneOrder - 1;
+	if (__storyScene?.save && __storyCheckPoint?.sceneOrder !== __storySceneOrder - 1) {
 	}
 
-	const _afterStart = function() {
-		if(__storyScene?.before)
-			__storyScene.before();
-		if(__storyScene.tiles?.[0])
-			episode.loadLayers(__storyScene.tiles);
-		if(__storyScene.mobs?.[0])
-			episode.installMobs(__storyScene.mobs);
-		if(__storyScene.objects?.[0])
-			__storyScene.objects.forEach(x => episode.loadObject(x));
+	const _afterStart = function () {
+		if (__storyScene?.before) __storyScene.before();
+		if (__storyScene.tiles?.[0]) episode.loadLayers(__storyScene.tiles);
+		if (__storyScene.mobs?.[0]) episode.installMobs(__storyScene.mobs);
+		if (__storyScene.objects?.[0]) __storyScene.objects.forEach((x) => episode.loadObject(x));
 		setTimeout(() => {
-			const _loc = __locations.find(x => x.mapId === episode.id);
-			if(_loc) {
+			const _loc = __locations.find((x) => x.mapId === episode.id);
+			if (_loc) {
 				document.querySelector('#world-mini-map .world-mini-map-img').style.background =
-				'url(./images/icons/act' + _loc.act + '-map.jpg)';
-				document.querySelector('#world-mini-map .world-mini-map-img').style.
-				setProperty('background-position', _loc.left + ' ' + _loc.top, 'important');
+					'url(./images/icons/act' + _loc.act + '-map.jpg)';
+				document
+					.querySelector('#world-mini-map .world-mini-map-img')
+					.style.setProperty('background-position', _loc.left + ' ' + _loc.top, 'important');
 			}
-			if(_oldHeartCount && __story.heartCount && !episode.war && !episode.pvp)
-			{
+			if (_oldHeartCount && __story.heartCount && !episode.war && !episode.pvp) {
 				mainCharacter.heartCount = _oldHeartCount;
 				_navbar.innerHTML = avatarTemplate(mainCharacter);
 			}
-			//if(__storyScene.leaderBoards)
-			Promise.all(
-				(__storyScene.getAssets?.() ?? []).map(getImagePromise)
-			).then(images => {
+
+			Promise.all((__storyScene.getAssets?.() ?? []).map(getImagePromise)).then((images) => {
 				episode.assets = images;
 
-				episode.loadCharacterSprites(function() {
-					if(__storyCheckPoint?.warn) {
-						//warn('<div class="flex heading achievement achievement-system" style="position:relative"><img src="./images/icons/loader.gif" /><span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Checkpoint Marked') + '</span></div>', 'level-up',null, 1);
+				episode.loadCharacterSprites(function () {
+					if (__storyCheckPoint?.warn) {
 						delete __storyCheckPoint.warn;
 					}
 					removeFocus();
 					__account.commonInventory = [];
-					if(mainCharacter && !__storyScene?.enableCommonSkills)
-						mainCharacter.disableCommonInventory();
+					if (mainCharacter && !__storyScene?.enableCommonSkills) mainCharacter.disableCommonInventory();
 					removeClass(_gameUI, 'demo-playing');
-					if(__storyScene.start)
-						__storyScene.start();
+					if (__storyScene.start) __storyScene.start();
 					_splash.style.opacity = '.99';
-					//addClass(_splash, 'd-none');
-					
+
 					_storySceneSwitching = false;
 					_game.suspended = false;
-					setTimeout(function() {
+					setTimeout(function () {
 						episode.splash = document.getElementById('splash');
 						const _ts = document.getElementById('tip-screen');
-						if(_ts)
-							_ts.remove();
+						if (_ts) _ts.remove();
 					}, 100);
 					const _ps = document.querySelectorAll('.placed-skill');
-					_ps?.forEach(x => addClass(x, 'v-none'));
+					_ps?.forEach((x) => addClass(x, 'v-none'));
 					blurKeyboard();
-					if(mainCharacter)
-						mainCharacter.hbBars = undefined;
-					// if(__storyScene.lazyLoadingCharacterIds)
-					// 	requestIdleCallback(() => {
-					// 		episode.loadCharacterSprites(function(){}, __storyScene.lazyLoadingCharacterIds);
-					// 	});
+					if (mainCharacter) mainCharacter.hbBars = undefined;
+
 					if (__storyScene.lazyLoadingCharacterIds) {
 						requestIdleCallback(() => {
-							episode.loadCharacterSprites(
-								function(){},
-								__storyScene.lazyLoadingCharacterIds
-							);
+							episode.loadCharacterSprites(function () {}, __storyScene.lazyLoadingCharacterIds);
 						});
 					}
 				}, __storyScene.loadingCharacterIds);
-
 			});
 		}, 1000);
-		if(_func)
-			_func();
-	}
-	if(__storyScene)
-		switchMap(__storyScene.map, null, null, null, __storyScene, function() {
+		if (_func) _func();
+	};
+	if (__storyScene)
+		switchMap(__storyScene.map, null, null, null, __storyScene, function () {
 			_afterStart();
 		});
 }
-function checkPC () {
+function checkPC() {
 	removeClass(document.body, 'pc-mission');
 	removeClass(document.body, 'pc-mission-without-skillui');
-	if(__isPC && (episode?.id > 1 || episode?.war || episode?.pvp))
-		addClass(document.body, 'pc-mission');
-	else if(__isPC && episode?.id <= 1 && !episode?.war && !episode?.pvp)
+	if (__isPC && (episode?.id > 1 || episode?.war || episode?.pvp)) addClass(document.body, 'pc-mission');
+	else if (__isPC && episode?.id <= 1 && !episode?.war && !episode?.pvp)
 		addClass(document.body, 'pc-mission-without-skillui');
 }
 function restartStory() {
@@ -10570,65 +9591,73 @@ function restartStory() {
 	playStory(__story.id);
 }
 function warmupSpriteSheet(src) {
-  return new Promise(resolve => {
-    const img = new Image();
-    img.src = src;
-    img.onload = () => {
-      const c = document.createElement("canvas");
-      const ctx = c.getContext("2d");
-      c.width = img.width;
-      c.height = img.height;
-      // sadece 1 defa çizmek bile GPU’ya bind etmeye yeter
-      ctx.drawImage(img, 0, 0);
-      resolve();
-    };
-  });
+	return new Promise((resolve) => {
+		const img = new Image();
+		img.src = src;
+		img.onload = () => {
+			const c = document.createElement('canvas');
+			const ctx = c.getContext('2d');
+			c.width = img.width;
+			c.height = img.height;
+
+			ctx.drawImage(img, 0, 0);
+			resolve();
+		};
+	});
 }
-function clearChainSkills(){
-	for (var i = 1; i <= Object.keys(chainSkills).length; i++){
+function clearChainSkills() {
+	for (var i = 1; i <= Object.keys(chainSkills).length; i++) {
 		addClass(chainSkills['skill' + i], 'v-none');
 		chainSkills['skill' + i].firstChild.removeAttribute('src');
 	}
 }
-function startStory(_order, _func, _isFirstStart,  _goldSelected, _expSelected, _itemSelected) {
-	installStory(_order, function () {
-		clearChainSkills();
-		addClass(document.getElementById('first-splash'), 'v-none');
-		removeClass(document.getElementById('game-start-loading-wrapper'), 'd-none');
-		if(_func)
-			_func();
-	}, _isFirstStart,  _goldSelected, _expSelected, _itemSelected);
+function startStory(_order, _func, _isFirstStart, _goldSelected, _expSelected, _itemSelected) {
+	installStory(
+		_order,
+		function () {
+			clearChainSkills();
+			addClass(document.getElementById('first-splash'), 'v-none');
+			removeClass(document.getElementById('game-start-loading-wrapper'), 'd-none');
+			if (_func) _func();
+		},
+		_isFirstStart,
+		_goldSelected,
+		_expSelected,
+		_itemSelected
+	);
 }
-function installStory(_order, _func, _isFirstStart,  _goldSelected, _expSelected, _itemSelected) {
-	//const _so = __storySceneOrder ?? 0;
+function installStory(_order, _func, _isFirstStart, _goldSelected, _expSelected, _itemSelected) {
 	tryStartStoryMission(_order, _goldSelected, _expSelected, _itemSelected, _func, _isFirstStart);
-	//playStory(_order, _so, _func, _isFirstStart,);
-	// if(_so > 0) {
-	// 	if(__storyScene.onCheckpoint)
-	// 		__storyScene.onCheckpoint();
-	// }
 }
 var __storyTell;
 function story(_id, _func, _noBlack, _desc, _after) {
 	this.data = {
 		st1: [
 			{ text: '', ms: 0, w: '37%' },
-			{ text: 'SPLASH!', ms: 600, marginLeft:'2%', class: 'talk', order: 3, w: '34.5%', position: 'top center' },
-			{ text: '', ms: 1200, imgSize: '117%', order: 4, marginLeft:'2%', w: '31%', position: 'top center' },
+			{ text: 'SPLASH!', ms: 600, marginLeft: '2%', class: 'talk', order: 3, w: '34.5%', position: 'top center' },
+			{ text: '', ms: 1200, imgSize: '117%', order: 4, marginLeft: '2%', w: '31%', position: 'top center' },
 			{ finish: 1, ms: 5000 }
 		],
 		st2: [
 			{ text: '', ms: 0, w: '40%', position: 'center left' },
-			{ text: {
-				en:'Over there!',
-				tr: 'İşte orada!'
-			}, ms: 600, marginLeft:'2%', class: 'talk', order: 3, w: '34.5%', position: 'top center' },
-			{ text: '', ms: 1200, imgSize: '125%', order: 4, marginLeft:'2%', w: '28%', position: 'top center' },
+			{
+				text: {
+					en: 'Over there!',
+					tr: 'İşte orada!'
+				},
+				ms: 600,
+				marginLeft: '2%',
+				class: 'talk',
+				order: 3,
+				w: '34.5%',
+				position: 'top center'
+			},
+			{ text: '', ms: 1200, imgSize: '125%', order: 4, marginLeft: '2%', w: '28%', position: 'top center' },
 			{ finish: 1, ms: 5000 }
 		],
 		st3: [
 			{ text: 'MEANWHILE...', ms: 0, class: 'desc', w: '26%' },
-			{ text: 'CLUNK!', ms: 350, class: 'desc-vert',  w: '19.5%' },
+			{ text: 'CLUNK!', ms: 350, class: 'desc-vert', w: '19.5%' },
 			{ text: 'WHAT?', ms: 700, class: 'talk', w: '39%' },
 			{ text: '', ms: 1050, w: '25.5%' },
 			{ finish: 1, ms: 4000 }
@@ -10648,7 +9677,7 @@ function story(_id, _func, _noBlack, _desc, _after) {
 		st6: [
 			{ text: '', ms: 0, w: '44%', position: 'top center' },
 			{ text: '', ms: 600, order: 35, w: '34.5%', position: 'top center' },
-			{ text: '', ms: 1200, imgSize: '125%', order: 4, marginLeft:'2%', w: '28%', position: 'center center' },
+			{ text: '', ms: 1200, imgSize: '125%', order: 4, marginLeft: '2%', w: '28%', position: 'center center' },
 			{ finish: 1, ms: 5000 }
 		],
 		st7: [
@@ -10657,31 +9686,27 @@ function story(_id, _func, _noBlack, _desc, _after) {
 			{ text: '', ms: 1200, imgSize: '120%', order: 4, w: '31%', position: 'bottom right' },
 			{ finish: 1, ms: 5000 }
 		]
-	}
+	};
 	this.id = _id;
 	this.order = 1;
 	const _s = this;
-	this.skip = function() {
+	this.skip = function () {
 		playClick();
 		delete this.firstSeen;
 		this.skipped = 1;
 		this.order = this.data['st' + this.id].length;
 		this.render(this.order);
-		// if(_after)
-		// 	_after();
-	}
-	this.init = function() {
-		if(mainCharacter)
-			mainCharacter.animate('idle', 1);
+	};
+	this.init = function () {
+		if (mainCharacter) mainCharacter.animate('idle', 1);
 		blurKeyboard();
 		const _wrapper = document.createElement('div');
 		_wrapper.className = 'story-wrapper fade-in' + (_desc ? ' story-with-description' : '');
 		const _skp = document.createElement('div');
 		_skp.className = 'story-skip w-100 flex flex-jc-end';
-		if(!_noBlack){
-			if(!__account.storyTell)
-				__account.storyTell = [];
-			if(__account.storyTell.indexOf(this.id) === -1) {
+		if (!_noBlack) {
+			if (!__account.storyTell) __account.storyTell = [];
+			if (__account.storyTell.indexOf(this.id) === -1) {
 				__account.storyTell.push(this.id);
 				this.firstSeen = 1;
 				_skp.innerHTML = `<div onexactclick="__storyTell.skip()" class="flex flex-jc-end w-50" style="height:100%"><div class="story-skip-inner flex wot-title">${getLangData('SKIP')}</div></div>`;
@@ -10691,11 +9716,10 @@ function story(_id, _func, _noBlack, _desc, _after) {
 		const _sin = document.createElement('div');
 		_sin.className = 'full story-inner';
 		const _inner = document.createElement('div');
-		_inner.style.width = 'calc(36cqh * ' + (this.data['st' + this.id].filter(x => !x.finish).length) + ')';
+		_inner.style.width = 'calc(36cqh * ' + this.data['st' + this.id].filter((x) => !x.finish).length + ')';
 		_inner.className = 'inner-wrapper flex flex-jc-start';
 		_wrapper.appendChild(_sin);
-		if(_desc)
-		{
+		if (_desc) {
 			const _descDiv = document.createElement('div');
 			_descDiv.className = 'story-inner-description flex';
 			_descDiv.innerHTML = getLangData(_desc);
@@ -10705,62 +9729,52 @@ function story(_id, _func, _noBlack, _desc, _after) {
 		document.body.appendChild(_wrapper);
 		this.container = _inner;
 		this.wrapper = _wrapper;
-		if(!_noBlack)
-			cssAnimations.black(null, (this.data['st' + this.id].find(x => x.finish).ms - 400) , '', _func);
-	}
-	this.render = function(_realOrder) {
+		if (!_noBlack) cssAnimations.black(null, this.data['st' + this.id].find((x) => x.finish).ms - 400, '', _func);
+	};
+	this.render = function (_realOrder) {
 		const i = _realOrder ?? this.order;
-		if(i > _s.data.length)
-			return;
+		if (i > _s.data.length) return;
 		const item = _s.data['st' + this.id][i - 1];
-		if(!item)
-			return;
-		if(this.skipped || ((_gameTick - this.start) > item?.ms))
-		{
-			if(this.order === 1) {
-				PlaySound({key:'story', volume: .5});
+		if (!item) return;
+		if (this.skipped || _gameTick - this.start > item?.ms) {
+			if (this.order === 1) {
+				PlaySound({ key: 'story', volume: 0.5 });
 			}
-			if(!item.finish) {
+			if (!item.finish) {
 				const _box = document.createElement('div');
-				if(item.marginLeft)
-					_box.style.left = item.marginLeft;
+				if (item.marginLeft) _box.style.left = item.marginLeft;
 				_box.className = 'box box' + (item.order ?? i);
-				if(item.w)
-					_box.style.width = item.w;
+				if (item.w) _box.style.width = item.w;
 				const _boxInner = document.createElement('div');
 				_boxInner.className = 'full flex';
-				if(item.position){
+				if (item.position) {
 					_boxInner.style.setProperty('background-position', item.position, 'important');
 					_boxInner.style.setProperty('transform-origin', item.position, 'important');
 					_boxInner.style.setProperty('-webkit-transform-origin', item.position, 'important');
 				}
-				_boxInner.style.background =`url(./images/story/${this.id}/${i}.jpg)`;
+				_boxInner.style.background = `url(./images/story/${this.id}/${i}.jpg)`;
 				_boxInner.style.setProperty('background-size', (item.imgSize ?? '100%') + ' auto', 'important');
 
 				this.container.appendChild(_box);
 				_box.appendChild(_boxInner);
 				_boxInner.innerHTML = `<div class="${item.class ?? 'full'}">${item.text?.[getLang()] ?? item.text ?? ''}</div>`;
-			}
-			else {
-				if(this.firstSeen)
-					return;
+			} else {
+				if (this.firstSeen) return;
 				removeClass(this.wrapper, 'fade-in');
 				addClass(this.wrapper, 'fade-out');
 				this.closing = 1;
-				if(_after)
-					_after();
-				this.wrapper.onanimationend = function(event) {
-					if(event.animationName === 'fade-out-me'){
+				if (_after) _after();
+				this.wrapper.onanimationend = function (event) {
+					if (event.animationName === 'fade-out-me') {
 						this.remove();
 						__storyTell = undefined;
-						if(_noBlack && _func)
-							_func();
+						if (_noBlack && _func) _func();
 					}
-				}
+				};
 			}
 			this.order++;
 		}
-	}
+	};
 	this.start = _gameTick;
 	this.init();
 }
@@ -10768,22 +9782,30 @@ function storyTell(_id, _func, _noBlack, _desc, _after) {
 	this.data = {
 		st1: [
 			{ text: '', ms: 0, w: '37%' },
-			{ text: 'SPLASH!', ms: 600, marginLeft:'2%', class: 'talk', order: 3, w: '34.5%', position: 'top center' },
-			{ text: '', ms: 1200, imgSize: '117%', order: 4, marginLeft:'2%', w: '31%', position: 'top center' },
+			{ text: 'SPLASH!', ms: 600, marginLeft: '2%', class: 'talk', order: 3, w: '34.5%', position: 'top center' },
+			{ text: '', ms: 1200, imgSize: '117%', order: 4, marginLeft: '2%', w: '31%', position: 'top center' },
 			{ finish: 1, ms: 5000 }
 		],
 		st2: [
 			{ text: '', ms: 0, w: '40%', position: 'center left' },
-			{ text: {
-				en:'Over there!',
-				tr: 'İşte orada!'
-			}, ms: 600, marginLeft:'2%', class: 'talk', order: 3, w: '34.5%', position: 'top center' },
-			{ text: '', ms: 1200, imgSize: '125%', order: 4, marginLeft:'2%', w: '28%', position: 'top center' },
+			{
+				text: {
+					en: 'Over there!',
+					tr: 'İşte orada!'
+				},
+				ms: 600,
+				marginLeft: '2%',
+				class: 'talk',
+				order: 3,
+				w: '34.5%',
+				position: 'top center'
+			},
+			{ text: '', ms: 1200, imgSize: '125%', order: 4, marginLeft: '2%', w: '28%', position: 'top center' },
 			{ finish: 1, ms: 5000 }
 		],
 		st3: [
 			{ text: 'MEANWHILE...', ms: 0, class: 'desc', w: '26%' },
-			{ text: 'CLUNK!', ms: 350, class: 'desc-vert',  w: '19.5%' },
+			{ text: 'CLUNK!', ms: 350, class: 'desc-vert', w: '19.5%' },
 			{ text: 'WHAT?', ms: 700, class: 'talk', w: '39%' },
 			{ finish: 1, ms: 4000 }
 		],
@@ -10802,7 +9824,7 @@ function storyTell(_id, _func, _noBlack, _desc, _after) {
 		st6: [
 			{ text: '', ms: 0, w: '44%', position: 'top center' },
 			{ text: '', ms: 600, order: 35, w: '34.5%', position: 'top center' },
-			{ text: '', ms: 1200, imgSize: '125%', order: 4, marginLeft:'2%', w: '28%', position: 'center center' },
+			{ text: '', ms: 1200, imgSize: '125%', order: 4, marginLeft: '2%', w: '28%', position: 'center center' },
 			{ finish: 1, ms: 5000 }
 		],
 		st7: [
@@ -10811,31 +9833,27 @@ function storyTell(_id, _func, _noBlack, _desc, _after) {
 			{ text: '', ms: 1200, imgSize: '120%', order: 4, w: '31%', position: 'bottom right' },
 			{ finish: 1, ms: 5000 }
 		]
-	}
+	};
 	this.id = _id;
 	this.order = 1;
 	const _s = this;
-	this.skip = function() {
+	this.skip = function () {
 		playClick();
 		delete this.firstSeen;
 		this.skipped = 1;
 		this.order = this.data['st' + this.id].length;
 		this.render(this.order);
-		// if(_after)
-		// 	_after();
-	}
-	this.init = function() {
-		if(mainCharacter)
-			mainCharacter.animate('idle', 1);
+	};
+	this.init = function () {
+		if (mainCharacter) mainCharacter.animate('idle', 1);
 		blurKeyboard();
 		const _wrapper = document.createElement('div');
 		_wrapper.className = 'story-wrapper fade-in' + (_desc ? ' story-with-description' : '');
 		const _skp = document.createElement('div');
 		_skp.className = 'story-skip w-100 flex flex-jc-end';
-		if(!_noBlack){
-			if(!__account.storyTell)
-				__account.storyTell = [];
-			if(__account.storyTell.indexOf(this.id) === -1) {
+		if (!_noBlack) {
+			if (!__account.storyTell) __account.storyTell = [];
+			if (__account.storyTell.indexOf(this.id) === -1) {
 				__account.storyTell.push(this.id);
 				this.firstSeen = 1;
 				_skp.innerHTML = `<div onexactclick="__storyTell.skip()" class="flex flex-jc-end w-50" style="height:100%"><div class="story-skip-inner flex wot-title">${getLangData('SKIP')}</div></div>`;
@@ -10845,11 +9863,10 @@ function storyTell(_id, _func, _noBlack, _desc, _after) {
 		const _sin = document.createElement('div');
 		_sin.className = 'full story-inner flex story-inner' + this.id;
 		const _inner = document.createElement('div');
-		_inner.style.width = 'calc(36cqh * ' + (this.data['st' + this.id].filter(x => !x.finish).length) + ')';
+		_inner.style.width = 'calc(36cqh * ' + this.data['st' + this.id].filter((x) => !x.finish).length + ')';
 		_inner.className = 'inner-wrapper flex flex-jc-start';
 		_wrapper.appendChild(_sin);
-		if(_desc)
-		{
+		if (_desc) {
 			const _descDiv = document.createElement('div');
 			_descDiv.className = 'story-inner-description flex';
 			_descDiv.innerHTML = getLangData(_desc);
@@ -10860,65 +9877,52 @@ function storyTell(_id, _func, _noBlack, _desc, _after) {
 		(_wp ?? document.body).appendChild(_wrapper);
 		this.container = _inner;
 		this.wrapper = _wrapper;
-		if(!_noBlack)
-			cssAnimations.black(null, (this.data['st' + this.id].find(x => x.finish).ms - 400) , '', _func);
-	}
-	this.render = function(_realOrder) {
+		if (!_noBlack) cssAnimations.black(null, this.data['st' + this.id].find((x) => x.finish).ms - 400, '', _func);
+	};
+	this.render = function (_realOrder) {
 		const i = _realOrder ?? this.order;
-		if(i > _s.data.length)
-			return;
+		if (i > _s.data.length) return;
 		const item = _s.data['st' + this.id][i - 1];
-		if(!item)
-			return;
-		if(this.skipped || ((_gameTick - this.start) > item?.ms))
-		{
-			if(this.order === 1) {
-				PlaySound({key:'story', volume: .5});
+		if (!item) return;
+		if (this.skipped || _gameTick - this.start > item?.ms) {
+			if (this.order === 1) {
+				PlaySound({ key: 'story', volume: 0.5 });
 			}
-			if(!item.finish) {
+			if (!item.finish) {
 				const _box = document.createElement('div');
-				if(item.marginLeft)
-					_box.style.left = item.marginLeft;
+				if (item.marginLeft) _box.style.left = item.marginLeft;
 				_box.className = 'story-box story-box' + i;
 				_box.innerHTML = `<img src="./images/story/s${this.id}-${i}.png" />`;
 				this.container.appendChild(_box);
-			}
-			else {
-				if(this.firstSeen)
-					return;
+			} else {
+				if (this.firstSeen) return;
 				removeClass(this.wrapper, 'fade-in');
 				addClass(this.wrapper, 'fade-out');
 				this.closing = 1;
-				if(_after)
-					_after();
-				this.wrapper.onanimationend = function(event) {
-					if(event.animationName === 'fade-out-me'){
+				if (_after) _after();
+				this.wrapper.onanimationend = function (event) {
+					if (event.animationName === 'fade-out-me') {
 						this.remove();
 						__storyTell = undefined;
-						if(_noBlack && _func)
-							_func();
+						if (_noBlack && _func) _func();
 					}
-				}
+				};
 			}
 			this.order++;
 		}
-	}
+	};
 	this.start = _gameTick;
 	this.init();
 }
 function storyBonus(_func, _instant, _container) {
 	const _s = this;
-	if(!_instant && !_container && episode.cardFlipped) {
-		if(_func)
-			_func();
+	if (!_instant && !_container && episode.cardFlipped) {
+		if (_func) _func();
 		return;
-	}
-	else
-		episode.cardFlipped = 1;
-	this.init = function() {
+	} else episode.cardFlipped = 1;
+	this.init = function () {
 		const _sgw = document.querySelector('.story-gift-wrapper');
-		if(_sgw)
-			return;
+		if (_sgw) return;
 		const _wrapper = document.createElement('div');
 		_wrapper.className = 'story-wrapper story-gift-wrapper fade-in';
 		const _sin = document.createElement('div');
@@ -10934,13 +9938,11 @@ function storyBonus(_func, _instant, _container) {
 		const _btn = document.createElement('div');
 		_btn.className = 'flex game-btn2 disabled';
 		_btn.innerText = getLangData('CONTINUE');
-		_btn.onexactclick = function(){
+		_btn.onexactclick = function () {
 			_s.close();
-			if(_func)
-				_func();
+			if (_func) _func();
 		};
-		if(!_container)
-			_btnW.appendChild(_btn);
+		if (!_container) _btnW.appendChild(_btn);
 		_wrapper.appendChild(_title);
 		_wrapper.appendChild(_sin);
 		_wrapper.appendChild(_btnW);
@@ -10950,36 +9952,36 @@ function storyBonus(_func, _instant, _container) {
 		this.wrapper = _wrapper;
 		this.btn = _btn;
 		this.render();
-	}
-	this.close = function() {
-		if(this.closing)
-			return;
+	};
+	this.close = function () {
+		if (this.closing) return;
 		this.closing = 1;
 		removeClass(this.wrapper, 'fade-in');
 		addClass(this.wrapper, 'fade-out');
-		this.wrapper.onanimationend = function(event) {
-			if(event.animationName === 'fade-out-me')
-				this.remove();
-		}
-	}
-	let _possibilities = [ 'exp', 'gold', 'gold*2', 'item' ];
-	this.render = function() {
+		this.wrapper.onanimationend = function (event) {
+			if (event.animationName === 'fade-out-me') this.remove();
+		};
+	};
+	let _possibilities = ['exp', 'gold', 'gold*2', 'item'];
+	this.render = function () {
 		_possibilities = _possibilities.sort(() => Math.random() - 0.5);
 		for (var i = 0; i < 4; i++) {
 			let _iconPath;
-			if(_possibilities[i] === 'item'){
-				const _item = __story?.rewards ? __story.rewards.find(x => x.key === 'item') : 
-					getRandomItem(1, null, mainCharacter.class);
-				_iconPath = './images/items/icons/' +
-				(_item.type === 'weapon' ? mainCharacter.class + '/' : '')
-				+ _item.type + (_item.grade ?? 1) + '.png';
-			}
-			else
-				_iconPath = './images/icons/' + _possibilities[i].split('*')[0] + '.png';
+			if (_possibilities[i] === 'item') {
+				const _item = __story?.rewards
+					? __story.rewards.find((x) => x.key === 'item')
+					: getRandomItem(1, null, mainCharacter.class);
+				_iconPath =
+					'./images/items/icons/' +
+					(_item.type === 'weapon' ? mainCharacter.class + '/' : '') +
+					_item.type +
+					(_item.grade ?? 1) +
+					'.png';
+			} else _iconPath = './images/icons/' + _possibilities[i].split('*')[0] + '.png';
 			const _item = document.createElement('div');
 			_item.className = 'card-item flex';
 			const _wrapper = document.createElement('div');
-			_item.appendChild(_wrapper)
+			_item.appendChild(_wrapper);
 			const _front = document.createElement('div');
 			const _back = document.createElement('div');
 			const _inner = document.createElement('div');
@@ -10999,33 +10001,35 @@ function storyBonus(_func, _instant, _container) {
 			_s.container.appendChild(_item);
 			_front.setAttribute('data-key', _possibilities[i]);
 			_front.onexactclick = function () {
-				if(_s.turning)
-					return;
+				if (_s.turning) return;
 				const _dk = this.getAttribute('data-key');
 				let _cardTitle;
-				if(_dk === 'item'){
-					const r = __story?.rewards ? __story.rewards.find(x => x.key === 'item') : getRandomItem(1,null,mainCharacter.class);
+				if (_dk === 'item') {
+					const r = __story?.rewards
+						? __story.rewards.find((x) => x.key === 'item')
+						: getRandomItem(1, null, mainCharacter.class);
 					_cardTitle = 'x1';
 					warnChestReward(getChestReward(r.grade ?? 1, 'item', { key: r.type }));
-				}
-				else{
-					const _reward = getChestReward(_dk.split('*')?.[1] ? parseInt(_dk.split('*')[1]) : __account.act ?? 1, _dk.split('*')[0]);
+				} else {
+					const _reward = getChestReward(
+						_dk.split('*')?.[1] ? parseInt(_dk.split('*')[1]) : (__account.act ?? 1),
+						_dk.split('*')[0]
+					);
 					_cardTitle = _reward.count.formatWithDots();
 					warnChestReward(_reward);
 				}
 				_title.innerHTML = '';
 				_title.innerText = _cardTitle;
 				removeClass(_s.btn, 'disabled');
-				PlaySound({key:'select2', volume:.5});
+				PlaySound({ key: 'select2', volume: 0.5 });
 				_wrapper.classList.add('selected');
-				document.querySelectorAll('.story-gift .match-card').forEach(x =>
-					x.classList.add('flip-card'));
+				document.querySelectorAll('.story-gift .match-card').forEach((x) => x.classList.add('flip-card'));
 				_s.turning = true;
 				_s.timer = setTimeout(function () {
-					_img.setAttribute("data-opened", 'y');
+					_img.setAttribute('data-opened', 'y');
 					_s.turning = false;
 				}, 1000);
-			}
+			};
 			_wrapper.appendChild(_inner);
 			_inner.appendChild(_back);
 			_inner.appendChild(_front);
@@ -11033,33 +10037,28 @@ function storyBonus(_func, _instant, _container) {
 			_back.appendChild(_itemImage);
 			_back.appendChild(_title);
 		}
-	}
+	};
 	this.start = _gameTick;
-	if(!_instant)
-		this.init();
-	this.get = function() {
+	if (!_instant) this.init();
+	this.get = function () {
 		return _possibilities[getRandomValue2(0, _possibilities.length - 1)];
-	}
+	};
 }
 
-
-// setTimeout(() => {
-// 	const asd = new storyBonus();
-// }, 12000);
-
-// setInterval(() => {
-// 	if(!mainCharacter)
-// 		return;
-// 	dmgFrames.push({
-// 		text: '',
-// 		x: mainCharacter.LEFT,
-// 		y: _canvas.height - mainCharacter.yPosition - mainCharacter.getHeight()
-// 	});
-// }, 2000);
-
 function focusMe(_selector, _func, _transparent, _text, _doneBtn, _fingerFade, _circle, _noFinger, _fingerUp) {
-	new cssAnimations.focusui(_selector, _func, _transparent, _text, _doneBtn, null, _fingerFade, _circle, _noFinger, _fingerUp);
-	if(!_transparent) {
+	new cssAnimations.focusui(
+		_selector,
+		_func,
+		_transparent,
+		_text,
+		_doneBtn,
+		null,
+		_fingerFade,
+		_circle,
+		_noFinger,
+		_fingerUp
+	);
+	if (!_transparent) {
 		mainCharacter.disableSkills(1);
 		mainCharacter.immobilize = mainCharacter.still = true;
 		blurKeyboard();
@@ -11068,55 +10067,44 @@ function focusMe(_selector, _func, _transparent, _text, _doneBtn, _fingerFade, _
 }
 function removeFocus(_reUse) {
 	const _ui = document.querySelectorAll('#focus-ui');
-	if(_ui?.[0])
-		_ui.forEach(x => x.remove());
+	if (_ui?.[0]) _ui.forEach((x) => x.remove());
 	const _push = document.querySelector('.push-me-finger');
-	if(_push)
-		_push.remove();
+	if (_push) _push.remove();
 	const _focuses = document.querySelectorAll('.focus-me');
-	if(_focuses?.[0])
-		_focuses.forEach(x => removeClass(x, 'focus-me'));
+	if (_focuses?.[0]) _focuses.forEach((x) => removeClass(x, 'focus-me'));
 	_focusMode = undefined;
-	if(episode?.hasFocusUIDoneBtn)
-		delete episode.hasFocusUIDoneBtn;
+	if (episode?.hasFocusUIDoneBtn) delete episode.hasFocusUIDoneBtn;
 	removeClass(_gameUI, 'focus-ui-activated');
 }
 function disposeFocus() {
 	setTimeout(() => {
 		const _elems = document.querySelectorAll('.focus-clicked');
-		if(_elems?.[0])
-			_elems.forEach(x => removeClass(x, 'focus-clicked'));
+		if (_elems?.[0]) _elems.forEach((x) => removeClass(x, 'focus-clicked'));
 	}, 20);
 }
 function portTo(_id) {
-	if(!_id)
-		return;
+	if (!_id) return;
 	hideMyMenu();
-	if(!__story)
-		switchMap(_id);
+	if (!__story) switchMap(_id);
 	else {
-		if(__story.scenes[__storySceneOrder]?.map === _id)
-			switchStoryScene();
-		else
-			switchMap(_id);
+		if (__story.scenes[__storySceneOrder]?.map === _id) switchStoryScene();
+		else switchMap(_id);
 	}
 }
 function skipQuickPlayTutorial(_order) {
 	delete episode.hasSkippableScreen;
 	const _cont = document.querySelector('.quick-play-desc-container');
-	if(_cont) {
+	if (_cont) {
 		const _dns = _cont.querySelector('.cb-square.checked');
-		if(_dns) {
+		if (_dns) {
 			const _qps = localStorage.getItem('quickplayskip');
 			let _json;
-			if(_qps) {
+			if (_qps) {
 				try {
 					_json = JSON.parse(_qps);
-				}
-				catch(_e) {}
+				} catch (_e) {}
 			}
-			if(!_json)
-				_json = [];
+			if (!_json) _json = [];
 			_json.push(_order);
 			localStorage.setItem('quickplayskip', JSON.stringify(_json));
 		}
@@ -11132,265 +10120,237 @@ function skipQuickPlayTutorial(_order) {
 }
 
 function createStoryResultScreen(_failed) {
-		if(episode.pvpResult)
-			return;
-		if(mainCharacter.storyVariables)
-		{
-			mainCharacter.setProps(mainCharacter.storyVariables);
-			delete mainCharacter.storyVariables;
-		}
-		if(mainCharacter.isDead() || _failed)
-			__story.resultStars.forEach(x => x.failed = 1);
-		// if (!pvpResult)
-		// 	pvpResult = document.getElementById('pvp-result');
-		// if (!pvpStatus)
-		// 	pvpStatus = document.getElementById('pvp-status');
-		showMyModalPopUp('pvp-result');
-		episode.pauseBgMusic(1);
-		episode.pauseAmbianceMusic();
-		mainCharacter.stopHeartBeatSound();
-		mainCharacter.stopStepSound();
-		// for(let i = 0; i < __story.resultStars.length; i++)
-		// 	if(isMissionFailed(i))
-		// 		__story.resultStars[i].failed = true;
-		const _fail = !__story.resultStars.filter(x => !x.failed)?.length;
-		if(!_fail)
-			PlaySound({ key: 'victory', volume: .3 });
-		else{
-			PlaySound({ key: 'failure', volume: .3 });
-			episode.enemies.forEach(x => x.standBy());
-		}
-		let _table = '<div class="flex full pvp-result-table story-result"><div class="flex" style="width:100%;height:16cqh;position:relative"><img src="./images/ui/wood.png" style="height:30%;margin-top:5cqh;z-index:2;filter:drop-shadow(.5cqh 1cqh 1.5cqh black);-webkit-filter:drop-shadow(.5cqh 1cqh 1.5cqh black);position:absolute' + (_fail ? ';-webkit-filter:grayscale(66%);filter:grayscale(66%)': '') + '"' + (_fail ? ' class="gray"': '') + ' /><span style="z-index:2;margin-top:4.5cqh;font-size:3.5cqh!important;font-weight:600;text-shadow:0px 0px 1cqh #000;color:' + (_fail ? 'crimson' : '#F4BB44') + ' !important">' + getLangData('Story' + (_fail ? ' Failed' : ' Cleared')) + '</span></div><div class="game-over-results"><div style="width:100%" class="flex"><span>';
-		for(let _star of __story.resultStars)
-			_table += `<div class="flex" style="padding:2cqh 2cqh 0 2cqh;width:100%;height:6cqh">
+	if (episode.pvpResult) return;
+	if (mainCharacter.storyVariables) {
+		mainCharacter.setProps(mainCharacter.storyVariables);
+		delete mainCharacter.storyVariables;
+	}
+	if (mainCharacter.isDead() || _failed) __story.resultStars.forEach((x) => (x.failed = 1));
+
+	showMyModalPopUp('pvp-result');
+	episode.pauseBgMusic(1);
+	episode.pauseAmbianceMusic();
+	mainCharacter.stopHeartBeatSound();
+	mainCharacter.stopStepSound();
+
+	const _fail = !__story.resultStars.filter((x) => !x.failed)?.length;
+	if (!_fail) PlaySound({ key: 'victory', volume: 0.3 });
+	else {
+		PlaySound({ key: 'failure', volume: 0.3 });
+		episode.enemies.forEach((x) => x.standBy());
+	}
+	let _table =
+		'<div class="flex full pvp-result-table story-result"><div class="flex" style="width:100%;height:16cqh;position:relative"><img src="./images/ui/wood.png" style="height:30%;margin-top:5cqh;z-index:2;filter:drop-shadow(.5cqh 1cqh 1.5cqh black);-webkit-filter:drop-shadow(.5cqh 1cqh 1.5cqh black);position:absolute' +
+		(_fail ? ';-webkit-filter:grayscale(66%);filter:grayscale(66%)' : '') +
+		'"' +
+		(_fail ? ' class="gray"' : '') +
+		' /><span style="z-index:2;margin-top:4.5cqh;font-size:3.5cqh!important;font-weight:600;text-shadow:0px 0px 1cqh #000;color:' +
+		(_fail ? 'crimson' : '#F4BB44') +
+		' !important">' +
+		getLangData('Story' + (_fail ? ' Failed' : ' Cleared')) +
+		'</span></div><div class="game-over-results"><div style="width:100%" class="flex"><span>';
+	for (let _star of __story.resultStars)
+		_table += `<div class="flex" style="padding:2cqh 2cqh 0 2cqh;width:100%;height:6cqh">
 				<img src="./images/ui/star-${_star.failed ? 'off' : 'on'}.png" style="height:4cqh"${_star.failed ? '' : ' class="glow"'} />
 				<div class="flex flex-jc-start one-line game-over-result" style="${_star.failed ? 'color:#f7f7f799 !important;text-decoration: line-through' : 'color:#F4BB44 !important'}">
 					${getLangData(_star.title)}
 				</div>
 			</div>`;
-		_table += `</span></div>`;
-		const _gain = _fail ? [] : JSON.parse(JSON.stringify(__story.rewards));
-		if(_fail) {
-			if(__story?.bonus === 'exp') {
-				if(episode?.killCount > 0)
-					_gain.push({key:'exp', count:episode.killCount * __account.act, bonus:1});
-			}
+	_table += `</span></div>`;
+	const _gain = _fail ? [] : JSON.parse(JSON.stringify(__story.rewards));
+	if (_fail) {
+		if (__story?.bonus === 'exp') {
+			if (episode?.killCount > 0) _gain.push({ key: 'exp', count: episode.killCount * __account.act, bonus: 1 });
 		}
+	} else {
+		const _bonuses = __storyScene.bonus?.filter((x) => x.owner === mainCharacter.class);
+		if (_bonuses?.[0]) {
+			let _warn;
+			for (const _bon of _bonuses) {
+				if (_bon.when()) {
+					getChestReward(__account.grade ?? 1, 'misc', 'chest');
+					_warn = 1;
+				}
+			}
+			if (_warn)
+				warn(
+					'<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/chest.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' +
+						getLangData('Bonus Reward') +
+						'</span></div>',
+					null,
+					null,
+					1
+				);
+		}
+		if (__story.perfectFinishRewards && (__story.resultStars.filter((x) => !x.failed)?.length ?? 0) === 3)
+			for (const _r of __story.perfectFinishRewards) _gain.push(JSON.parse(JSON.stringify(_r)));
+		if (episodeGold > 0) {
+			_gain.push({ key: 'gold', count: episodeGold, bonus: 1 });
+			episodeGold = 0;
+		}
+		if (__storyBonusItemCount > 0) {
+			_gain.push({
+				key: 'item',
+				count: __storyBonusItemCount,
+				grade: __story.equipmentGrade,
+				type: __story.equipmentType,
+				bonus: 1
+			});
+			__storyBonusItemCount = 0;
+		}
+	}
+	const _rewards = [];
+	for (const _g of _gain) {
+		if (!_g.count && _g.minCount && _g.maxCount) _g.count = getRandomValue2(_g.minCount, _g.maxCount);
+		if (_g.key === 'chest')
+			for (let _i = 0; _i < (_g.count ?? 1); _i++) _rewards.push(getChestReward(_g.grade ?? 1));
 		else {
-			const _bonuses = __storyScene.bonus?.filter(x => x.owner === mainCharacter.class);
-			if(_bonuses?.[0])
-			{
-				let _warn;
-				for(const _bon of _bonuses) {
-					if(_bon.when()){
-						getChestReward(__account.grade ?? 1, 'misc', 'chest');
-						_warn = 1;
-					}
-				}
-				if(_warn)
-					warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/chest.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Bonus Reward') + '</span></div>', null, null, 1);
+			if (_g.chance > 0 && !checkChanceIfOk(_g.chance)) continue;
+			if (_g.key === 'gold') updateGold(_g.count);
+			else if (_g.key === 'fragment') updateFragment(_g.name, _g.count);
+			else if (_g.key === 'exp') updateExperience(_g.count);
+			else if (_g.key === 'pot') updatePot(_g.count);
+			else if (_g.key === 'item') {
+				for (let i = 0; i < _g.count; i++) getChestReward(_g.grade ?? 1, 'item', { key: _g.type }, 1);
+				_g.src = './images/items/icons/' + _g.type + (_g.grade ?? 1) + '.png';
 			}
-			if(__story.perfectFinishRewards && (__story.resultStars.filter(x => !x.failed)?.length ?? 0) === 3)
-				for(const _r of __story.perfectFinishRewards)
-					_gain.push(JSON.parse(JSON.stringify(_r)));
-			if(episodeGold > 0){
-				_gain.push({key:'gold', count:episodeGold, bonus:1});
-				episodeGold = 0;
-			}
-			if(__storyBonusItemCount > 0) {
-				_gain.push({key:'item', count: __storyBonusItemCount, grade:__story.equipmentGrade, type: __story.equipmentType, bonus:1});
-				__storyBonusItemCount = 0;
-			}
+			_rewards.push(JSON.parse(JSON.stringify(_g)));
 		}
-		const _rewards = [];
-		for(const _g of _gain){
-			if(!_g.count && _g.minCount && _g.maxCount)
-				_g.count = getRandomValue2(_g.minCount, _g.maxCount);
-			if(_g.key === 'chest')
-				for(let _i = 0; _i < (_g.count ?? 1); _i++)
-					_rewards.push(getChestReward(_g.grade ?? 1));
-			else{
-				if(_g.chance > 0 && !checkChanceIfOk(_g.chance))
-					continue;
-				if (_g.key === 'gold')
-					updateGold(_g.count);
-				else if(_g.key === 'fragment')
-					updateFragment(_g.name, _g.count);
-				else if (_g.key === 'exp')
-					updateExperience(_g.count);
-				else if (_g.key === 'pot')
-					updatePot(_g.count);
-				else if(_g.key === 'item'){
-					for(let i = 0; i < _g.count; i++)
-						getChestReward(_g.grade ?? 1, 'item', { key: _g.type }, 1);
-					_g.src = './images/items/icons/' + _g.type + (_g.grade ?? 1) + '.png';
-				}
-				_rewards.push(JSON.parse(JSON.stringify(_g)));
-			}
-		}
-		_table += `<div class="flex" style="width:100%;padding:2cqh 0 1cqh 0;color:#F4BB44 !important; font-size:2.6cqh !important; font-weight: 600">${getLangData('Clear Rewards')}</div>`;
-		for(let _reward of _rewards)
-			_table += `<div class="flex flex-jc-start" style="width:100%;height:5cqh"><div style="height:100%" class="flex flex-jc-start"><img style="width:4cqh;margin-left:2cqh" src="${_reward.src ?? './images/icons/' + _reward.key + '.png'}" /><div class="flex one-line" style="flex:1;height:100%;font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">${(_reward.count ?? 1).formatWithDots()} x ${getLangData(_reward.title ?? _reward.type ?? _reward.key).toProperCase()}${_reward.bonus ? ' (bonus)' : ''}</div></div></div>`;
-			//_table += `<div class="flex" style="width:100%;padding:2cqh 0 1cqh 0;color:#F4BB44 !important; font-size:2.6cqh !important; font-weight: 600">${getLangData('Mission Rewards')}</div>
-			//<div class="flex" style="width:100%;height:5cqh"><div style="height:100%" class="flex"><img style="width:5cqh" src="./images/icons/coin.png" /><div class="flex" style="height:100%;font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">${_missionGain} ${getLangData('Gold')} (+Bonus)</div></div></div>`;
+	}
+	_table += `<div class="flex" style="width:100%;padding:2cqh 0 1cqh 0;color:#F4BB44 !important; font-size:2.6cqh !important; font-weight: 600">${getLangData('Clear Rewards')}</div>`;
+	for (let _reward of _rewards)
+		_table += `<div class="flex flex-jc-start" style="width:100%;height:5cqh"><div style="height:100%" class="flex flex-jc-start"><img style="width:4cqh;margin-left:2cqh" src="${_reward.src ?? './images/icons/' + _reward.key + '.png'}" /><div class="flex one-line" style="flex:1;height:100%;font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">${(_reward.count ?? 1).formatWithDots()} x ${getLangData(_reward.title ?? _reward.type ?? _reward.key).toProperCase()}${_reward.bonus ? ' (bonus)' : ''}</div></div></div>`;
 
-		_table += `</div><div class="flex" style="width:100%;height:7.5cqh;position:relative;z-index:2">
+	_table +=
+		`</div><div class="flex" style="width:100%;height:7.5cqh;position:relative;z-index:2">
 			<div class="flex" style="width:calc(50% - 1cqh);margin-right:1cqh;overflow:hidden;position:relative;height:100%">
 				<div class="framed-btn full flex animate-me" style="border:.2cqh solid #B8860Bab;right:unset;top:unset;cursor:pointer;color:#B8860Bcc !important;font-size:3cqh !important;line-height:6.5cqh !important;height:6.5cqh !important" onexactclick="quitFromStory()">${getLangData('QUIT')}</div>
-			</div>`
-			// <div class="${_fail ? 'd-none' : 'flex'}" style="width:calc(50% - 1cqh);margin-left:1cqh;overflow:hidden;position:relative;height:100%">
-			// 	<div class="game-menu-button btn-info full flex animate-me" style="border:.2cqh solid #B8860Bab;right:unset;top:unset;cursor:pointer;color:#B8860Bcc !important;font-size:3cqh !important;line-height:3cqh !important" onexactclick="trySwitchMap(${episode.id})">${getLangData('NEXT')}</div>
-			// </div>
-			+`<div class="${_fail ? 'flex' : 'd-none'}" style="width:calc(50% - 1cqh);margin-left:1cqh;overflow:hidden;position:relative;height:100%">
+			</div>` +
+		`<div class="${_fail ? 'flex' : 'd-none'}" style="width:calc(50% - 1cqh);margin-left:1cqh;overflow:hidden;position:relative;height:100%">
 				<div class="framed-btn full flex animate-me" style="border:.2cqh solid #B8860Bab;height:6.5cqh !important;right:unset;top:unset;cursor:pointer;color:#B8860Bcc !important;font-size:3cqh !important;line-height:6.5cqh !important" onexactclick="loadLastStoryCheckPoint(null,${episode.goldSelected ? 1 : 0}, ${episode.expSelected ? 1 : 0}, ${episode.itemSelected ? 1 : 0})">${getLangData('RETRY')}</div>
 			</div>
 		</div>`;
-		//pvpStatus.innerHTML = _table + '</div>';
-		const _parent = document.createElement('div');
-		_parent.innerHTML = `<div class="flex my-pop-up-wrapper show" id="pvp-result">
+
+	const _parent = document.createElement('div');
+	_parent.innerHTML =
+		`<div class="flex my-pop-up-wrapper show" id="pvp-result">
 				<div id="game-over-pvp-content" class="flex" style="padding: 2%; width: 50%; height: 80%; border: 2px solid #b8860bcc; border-radius: 4cqh; box-shadow: 0px 0px 2cqh #000; background: linear-gradient(180deg, #000000cc, #00000099), url(./images/icons/battle.png); background-size:cover">
 					<div style="width:100%" class="flex full">
-						<div class="full" style="width:80%;color:#fff;text-align:center" id="pvp-status">`
-							+ _table + '</div>' +
-						`</div>
+						<div class="full" style="width:80%;color:#fff;text-align:center" id="pvp-status">` +
+		_table +
+		'</div>' +
+		`</div>
 					</div>
 				</div>
 			</div>`;
-		episode.pvpResult = _parent.firstChild;
-		_gameUI.appendChild(episode.pvpResult);
-		switchAutoMode(1);
-		episode.enemies.forEach(x => {
-			if(x.health > 0)
-				x.animate('idle',1);
-			if (x.heartbeat) {
-				x.heartbeat.pause();
-				x.heartbeat = undefined;
-			}
-		});
-		if (mainCharacter?.heartbeat) {
-			mainCharacter.heartbeat.pause();
-			mainCharacter.heartbeat = undefined;
+	episode.pvpResult = _parent.firstChild;
+	_gameUI.appendChild(episode.pvpResult);
+	switchAutoMode(1);
+	episode.enemies.forEach((x) => {
+		if (x.health > 0) x.animate('idle', 1);
+		if (x.heartbeat) {
+			x.heartbeat.pause();
+			x.heartbeat = undefined;
 		}
-		_game.suspended = true;
+	});
+	if (mainCharacter?.heartbeat) {
+		mainCharacter.heartbeat.pause();
+		mainCharacter.heartbeat = undefined;
+	}
+	_game.suspended = true;
 }
 function killStory() {
 	resetQuestLine(4);
 	quitFromStory();
 }
 function askQuitFromStory() {
-	askSomething(getLangData('Proceed To Lobby'), "quitFromStory()", 'modal_2x1');
+	askSomething(getLangData('Proceed To Lobby'), 'quitFromStory()', 'modal_2x1');
 }
 function quitFromStory() {
-	if(!episode?.menu && __account.storyResults.find(x => x.id === 1)?.stars?.[0]) {
-		const _index = __story.scenes.findIndex(x => x.map === 0);
-		if(_index >= 0)
-			switchStoryScene(null, _index + 1);
-		else
-			switchStoryScene();
-	}
-	else
-		askExitApp();
+	if (!episode?.menu && __account.storyResults.find((x) => x.id === 1)?.stars?.[0]) {
+		const _index = __story.scenes.findIndex((x) => x.map === 0);
+		if (_index >= 0) switchStoryScene(null, _index + 1);
+		else switchStoryScene();
+	} else askExitApp();
 }
 function checkStoryFinish(_success, _retryId, _goldSelected, _expSelected, _itemSelected) {
-	const _after = function() {
-		if(!_retryId){
-			if(!_success) {
+	const _after = function () {
+		if (!_retryId) {
+			if (!_success) {
 				resetQuestLine(1);
 				quitFromStory();
-			}
-			else
-				switchStoryScene();
-		}
-		else {
+			} else switchStoryScene();
+		} else {
 			resetQuestLine(2);
 			tryStartStoryMission(_retryId, _goldSelected, _expSelected, _itemSelected);
 		}
-	}
-	if(_success && !__story?.mission)
-		new storyBonus(function() {
+	};
+	if (_success && !__story?.mission)
+		new storyBonus(function () {
 			_after();
 		});
-	else
-		_after();
+	else _after();
 }
 
 function loadLastStoryCheckPoint(_func, _goldSelected, _expSelected, _itemSelected) {
 	prevPlatformX = __storySceneOrder = undefined;
-	//if(__storyCheckPoint){
-		// hideMyModalPopUp();
-		// __storySceneOrder = __storyCheckPoint.sceneOrder;
-		// delete __storyCheckPoint.sceneOrder;
-		// __account = JSON.parse(JSON.stringify(__storyCheckPoint));
-		// startStory(__story.id, _func);
-	//}
-	//else
-		startStory(__story.id, _func, null, _goldSelected, _expSelected, _itemSelected);
+
+	startStory(__story.id, _func, null, _goldSelected, _expSelected, _itemSelected);
 }
 
 function createStoryUI(_id) {
-		if(__story && __account.questStatus?.quest) {
-			renderMainQuests();
-			return;
-		}
-		let _tutorial = {
-			tr: {
-				title: 'Hikaye Modu',
-				desc: 'Kahramanlarımız, 4 perdeden ve her perde 10 görevden oluşan bir hikayeyi deneyimler. Görevler sırasında başarıya ulaştıkça ödüller kazanılır ve biletler kullanılarak bu ödüller ikiye katlanabilir. Bazı düşmanlar parçacık, bazı bölümler ise ekipman güçlendirmeye yarayan mücevherler sunar. Bölümler tekrar oynanabilir veya hızlı geçiş için otomatik tamamlama biletleri kullanılabilir. Her görev “Geçit” malzemesi gerektirir; oyun başlangıçta 100 adet verir ve stok azaldığında sistem düzenli olarak yeniler.'
-			},
-			en: {
-				title: 'Story Mode',
-				desc: 'Our heroes navigate a sequential storyline consisting of quests. This story consists of four acts, each with 10 quests. You can double your rewards by completing the required achievements and using tickets. Some enemies encountered during the quests reward you with fragments, while others reward you with gems that you can use to enhance your equipment. You can replay the quests or speed through them using auto-complete tickets. Each quest requires a certain amount of "Pass" materials. The game initially gives you 100 of these materials, but if you fall below 100, the system periodically rewards you with them.'
-			}
-		};
-		if(!tryShowMenuTutorial('story'))
-			_tutorial = undefined;
-		updateMenuBottom(2);
-		const _container = selectMenuContainer();
-		let _content = showMenuTutorial(_tutorial, 'story');
-		if(!_id)
-			_id = __stories.find(x => x.list).id;
-		_container.innerHTML =
-					'<div class="menu-ui-left fade-me">' +
-						'<div class="menu-modal-left menu-modal-left-content">' +
-							'<div class="stories-content-left skills-content-left menu-modal-left-container">' +
-								'<div style="overflow-y:auto" class="full">' +
-									createStoriesUI(_id ?? 1) +
-								'</div>' +
-							'</div>' +
-						'</div>' +
-					'</div>' +
-					'<div class="menu-ui-right fade-me">' +
-						'<div class="menu-modal-right menu-modal-right-content">' +
-							'<div class="stories-content-right skills-content-right">' +
-								'<div class="skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">' +
-									(_content !== '' ? _content : createStoryDetailUI(_id ?? 1, 1, 1)) +
-								'<div id="shine"></div>' +
-							'</div>' +
-						'</div>' +
-					'</div>' +
-				'</div>';
+	if (__story && __account.questStatus?.quest) {
+		renderMainQuests();
+		return;
 	}
+	let _tutorial = {
+		tr: {
+			title: 'Hikaye Modu',
+			desc: 'Kahramanlarımız, 4 perdeden ve her perde 10 görevden oluşan bir hikayeyi deneyimler. Görevler sırasında başarıya ulaştıkça ödüller kazanılır ve biletler kullanılarak bu ödüller ikiye katlanabilir. Bazı düşmanlar parçacık, bazı bölümler ise ekipman güçlendirmeye yarayan mücevherler sunar. Bölümler tekrar oynanabilir veya hızlı geçiş için otomatik tamamlama biletleri kullanılabilir. Her görev “Geçit” malzemesi gerektirir; oyun başlangıçta 100 adet verir ve stok azaldığında sistem düzenli olarak yeniler.'
+		},
+		en: {
+			title: 'Story Mode',
+			desc: 'Our heroes navigate a sequential storyline consisting of quests. This story consists of four acts, each with 10 quests. You can double your rewards by completing the required achievements and using tickets. Some enemies encountered during the quests reward you with fragments, while others reward you with gems that you can use to enhance your equipment. You can replay the quests or speed through them using auto-complete tickets. Each quest requires a certain amount of "Pass" materials. The game initially gives you 100 of these materials, but if you fall below 100, the system periodically rewards you with them.'
+		}
+	};
+	if (!tryShowMenuTutorial('story')) _tutorial = undefined;
+	updateMenuBottom(2);
+	const _container = selectMenuContainer();
+	let _content = showMenuTutorial(_tutorial, 'story');
+	if (!_id) _id = __stories.find((x) => x.list).id;
+	_container.innerHTML =
+		'<div class="menu-ui-left fade-me">' +
+		'<div class="menu-modal-left menu-modal-left-content">' +
+		'<div class="stories-content-left skills-content-left menu-modal-left-container">' +
+		'<div style="overflow-y:auto" class="full">' +
+		createStoriesUI(_id ?? 1) +
+		'</div>' +
+		'</div>' +
+		'</div>' +
+		'</div>' +
+		'<div class="menu-ui-right fade-me">' +
+		'<div class="menu-modal-right menu-modal-right-content">' +
+		'<div class="stories-content-right skills-content-right">' +
+		'<div class="skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">' +
+		(_content !== '' ? _content : createStoryDetailUI(_id ?? 1, 1, 1)) +
+		'<div id="shine"></div>' +
+		'</div>' +
+		'</div>' +
+		'</div>' +
+		'</div>';
+}
 function createStoriesUI(_id) {
 	let _html = '';
-	if(!_id)
-		_id = 1;
+	if (!_id) _id = 1;
 	_uiSelectedStoryId = _id;
 	unselectStoryTickets();
 	const _noSelect = tryShowMenuTutorial('story');
 	for (var _s of __stories) {
-		if(!_s.list)
-			continue;
-		const _ss = __account.storyResults.find(x => x.id === _s.id);
-		// html += '<div data-key="'+_skill.key+'" onexactclick="skill.selectSkill(\'' + _skill.key + '\', ' + _i + ')" class="skill-card animate-me flex' + ((_i + 1) === _order ? ' selected' : '') + '">' +
-		// 			'<div class="skill-icon-wrapper flex"><img src="./images/main/skill-icons/' + _class + '/' + _skill.key + '.png" /></div>' +
-		// 			'<div style="flex:1;height:100%">' +
-		// 			'<div class="flex flex-jc-start skill-card-title" style="height:50%;width:100%">' + _skill.names[getLang()] + '</div>' +
-		// 			(_level > 0 ?
-		// 				'<div class="flex flex-jc-start skill-card-level"><span id="skill-' + _skill.key + '-level">' + _level + '</span>&nbsp;/&nbsp;' + _skill.props.length + '</div>' :
-		// 				'<div class="flex flex-jc-start skill-card-state">' + getLangData('Unlock') + ':&nbsp;<span style="color:#ff6c00 !important">' + getLangData('Level') + ' ' + _skill.unlockLevel + '</span></div>') +
-		// 			'</div>' +
-		// 			'</div>';
-		_html += `<div id="story-${_s.id}" onexactclick="selectStoryUI(${_s.id})" class="skill-card flex animate-me${(_s.id === _id && !_noSelect) ? ' selected' : ''}">
+		if (!_s.list) continue;
+		const _ss = __account.storyResults.find((x) => x.id === _s.id);
+
+		_html +=
+			`<div id="story-${_s.id}" onexactclick="selectStoryUI(${_s.id})" class="skill-card flex animate-me${_s.id === _id && !_noSelect ? ' selected' : ''}">
 			<div class="skill-icon-wrapper flex">
 				<img src="./images/main/${_s.boss}/concept.png" />
 			</div>
@@ -11399,14 +10359,17 @@ function createStoriesUI(_id) {
 				<div class="story-level flex flex-jc-start w-100" style="height:30%">${getLangData('Lvl')}&nbsp;${_s.minLevel}&nbsp;${getLangData('required')}</div>
 				<div class="story-consume flex flex-jc-start w-50" style="height:30%">${_s.ticket}&nbsp;<img src="./images/icons/key.png" style="height:100%" /></div>
 				<div class="story-stars flex flex-jc-end w-50" style="height:30%">
-					<img src="./images/ui/star-${(!_s.locked && _ss?.stars) ? 'on' : 'off'}.png"  />
-					<img src="./images/ui/star-${(!_s.locked && (_ss?.stars?.length >= 2)) ? 'on' : 'off'}.png" />
-					<img src="./images/ui/star-${(!_s.locked && _ss?.perfect) ? 'on' : 'off'}.png" />
+					<img src="./images/ui/star-${!_s.locked && _ss?.stars ? 'on' : 'off'}.png"  />
+					<img src="./images/ui/star-${!_s.locked && _ss?.stars?.length >= 2 ? 'on' : 'off'}.png" />
+					<img src="./images/ui/star-${!_s.locked && _ss?.perfect ? 'on' : 'off'}.png" />
 				</div>
-			</div>`
-			+ (_s.bonus ?
-				`<div class="story-bonus-mark">BONUS</div>` : (_s.side ? `<div class="story-bonus-mark story-side-bonus-mark">${getLangData('SIDE QUEST')}</div>` :'')) +
-		`</div>`;
+			</div>` +
+			(_s.bonus
+				? `<div class="story-bonus-mark">BONUS</div>`
+				: _s.side
+					? `<div class="story-bonus-mark story-side-bonus-mark">${getLangData('SIDE QUEST')}</div>`
+					: '') +
+			`</div>`;
 	}
 	return _html;
 }
@@ -11418,32 +10381,28 @@ function selectStoryUI(_id) {
 	for (var _sc of _skillCards) {
 		if (_i === _id) {
 			addClass(_sc, 'selected');
-			//const _skill = this.allSkills.filter(x => x.class === mainCharacter.class  && x.list !== false)?.sort((a, b) => a.order - b.order)[_index];
-			//_container.innerHTML = this.getSkillDetailUI(mainCharacter.class, _skill.order) + '<div id="shine"></div>';
+
 			_uiSelectedStoryId = _id;
-			_container.innerHTML =createStoryDetailUI(_id);
-		}
-		else
-			removeClass(_sc, 'selected');
+			_container.innerHTML = createStoryDetailUI(_id);
+		} else removeClass(_sc, 'selected');
 		_i++;
 	}
 }
 function createStoryDetailUI(_id, _noSound, _noAnimation) {
-	if(!_noSound)
-		playClick();
-	const _s = __stories.find(x => x.id === _id);
-	if(_s?.locked) {
+	if (!_noSound) playClick();
+	const _s = __stories.find((x) => x.id === _id);
+	if (_s?.locked) {
 		warn('<span>' + getLangData('Story is locked for now') + '</span>', 'warn');
 		return;
 	}
 	const _cards = document.querySelectorAll('.stories-content-left .skill-card');
-	for(let _card of _cards)
-		removeClass(_card, 'selected');
+	for (let _card of _cards) removeClass(_card, 'selected');
 	addClass(document.getElementById('story-' + _id), 'selected');
-	let _goals = '', _goali = 0;
-	const _ss = __account.storyResults.find(x => x.id === _s.id);
-	if(_s.resultStars)
-		for(let _rs of _s.resultStars){
+	let _goals = '',
+		_goali = 0;
+	const _ss = __account.storyResults.find((x) => x.id === _s.id);
+	if (_s.resultStars)
+		for (let _rs of _s.resultStars) {
 			const _done = _ss?.stars?.indexOf(parseInt(Math.pow(2, _goali))) >= 0;
 			_goals += `<div class="w-100 story-goal-item flex">
 				<div class="flex story-goal-icon">
@@ -11455,53 +10414,53 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 			</div>`;
 			_goali++;
 		}
-	//const _div = document.createElement('div');
-	//_div.className = 'flex show-ui story-detail fade-in';
-	let _html = `<div class="flex full show-ui story-detail${_noAnimation ? '' : ' fade-me'}"><div class="flex flex-jc-end story-detail-close"><div class="page-detail-header">${__account.act}-${_s.order}&nbsp;${_s.title[getLang()]}</div></div><div class="page-detail-splitter-thin"></div>
-		<div class="story-detail-wrapper">`
-		+ _goals +
+
+	let _html =
+		`<div class="flex full show-ui story-detail${_noAnimation ? '' : ' fade-me'}"><div class="flex flex-jc-end story-detail-close"><div class="page-detail-header">${__account.act}-${_s.order}&nbsp;${_s.title[getLang()]}</div></div><div class="page-detail-splitter-thin"></div>
+		<div class="story-detail-wrapper">` +
+		_goals +
 		`<div class="page-detail-splitter"></div>
 		<div class="flex flex-jc-start page-detail-header story-detail-heading">${getLangData('Rewards')}</div>
 		<div class="page-detail-splitter-thin"></div>
 		<div class="story-rewards w-100 flex flex-jc-start">`;
-	for(const _r of _s.rewards) {
-		if(_r.key === 'fragment'){
+	for (const _r of _s.rewards) {
+		if (_r.key === 'fragment') {
 			let _img = '';
 			const _arr = _r.name?.split(',') ?? ['random'];
-			for(let i = 0; i < _arr.length; i++)
+			for (let i = 0; i < _arr.length; i++)
 				_img += `<img style="left:${i * 5}cqh;position:absolute;top:0" src="./images/fragments/${_arr[i]}.png" />`;
-			_html += `<div class="flex flex-jc-start w-50 story-reward story-reward-fragment">
-						<div style="position:relative;height:8cqh;width:calc(8cqh + ${((_arr.length - 1) * 5)}cqh)">`
-						+ _img +
-						`</div>
+			_html +=
+				`<div class="flex flex-jc-start w-50 story-reward story-reward-fragment">
+						<div style="position:relative;height:8cqh;width:calc(8cqh + ${(_arr.length - 1) * 5}cqh)">` +
+				_img +
+				`</div>
 						<div style="flex:1" class="flex">
 							<div class="w-100 flex flex-jc-start page-detail-desc">
-								${(_r.count ? _r.count.formatWithDots() : ((_r.minCount && _r.maxCount) ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1))}
+								${_r.count ? _r.count.formatWithDots() : _r.minCount && _r.maxCount ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1}
 							</div>
 							<div style="color:#ff6c00 !important" class="w-100 page-detail-desc flex-jc-start flex${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
 						</div>
 					</div>`;
-		}
-		else if(_r.key === 'gem')
-				_html += `<div class="flex flex-jc-start w-50 story-reward">
+		} else if (_r.key === 'gem')
+			_html += `<div class="flex flex-jc-start w-50 story-reward">
 						<span class="${_r.type === 'random' ? '' : 'story-reward-item grade' + (_r.grade ?? 1) + '-item'}" style="display:inline-block;position:relative">
 							<img class="item-img" src="./images/gems/${_r.type}${_r.grade ?? 1}.png" />
 						</span>
 						<div style="flex:1;padding-left:1cqh" class="flex">
 							<div class="w-100 flex flex-jc-start page-detail-desc">
-								${(_r.count ? _r.count.formatWithDots() : ((_r.minCount && _r.maxCount) ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1))}
+								${_r.count ? _r.count.formatWithDots() : _r.minCount && _r.maxCount ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1}
 							</div>
 							<div style="color:#ff6c00 !important" class="flex page-detail-desc flex-jc-start w-100${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
 						</div>
 					</div>`;
-		else if(_r.key === 'item')
+		else if (_r.key === 'item')
 			_html += `<div class="flex flex-jc-start w-50 story-reward">
 						<span class="story-reward-item grade${_r.grade ?? 1}-item" style="display:inline-block;position:relative">
 							<img class="item-img" src="./images/items/icons/${(_r.type ?? _r.key) === 'weapon' ? mainCharacter.class + '/' : ''}${_r.type ?? _r.key}${_r.grade ?? 1}.png" />
 						</span>
 						<div style="flex:1;padding-left:1cqh" class="flex">
 							<div class="w-100 flex flex-jc-start page-detail-desc">
-								${(_r.count ? _r.count.formatWithDots() : ((_r.minCount && _r.maxCount) ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1))}
+								${_r.count ? _r.count.formatWithDots() : _r.minCount && _r.maxCount ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1}
 							</div>
 							<div style="color:#ff6c00 !important" class="flex page-detail-desc flex-jc-start w-100${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
 						</div>
@@ -11511,23 +10470,23 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 							<img src="./images/${_r.key === 'item' ? 'items/' : ''}icons/${_r.type ?? _r.key}${_r.grade ?? ''}.png" />
 							<div style="flex:1" class="flex">
 								<div class="w-100 flex flex-jc-start page-detail-desc">
-									${(_r.count ? _r.count.formatWithDots() : ((_r.minCount && _r.maxCount) ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1))}
+									${_r.count ? _r.count.formatWithDots() : _r.minCount && _r.maxCount ? _r.minCount.formatWithDots() + ' - ' + _r.maxCount.formatWithDots() : 1}
 								</div>
 								<div style="color:#ff6c00 !important" class="flex page-detail-desc flex-jc-start w-100${_r.chance ? '' : ' d-none'}">%${_r.chance}&nbsp;${getLangData('chance')}</div>
 							</div>
 						</div>`;
 	}
 	let _bonusAchHTML = '';
-	for(let _ba of _s.bonusAchievements) {
-		const _rs = __account.storyResults?.find(x => x.id === _id);
+	for (let _ba of _s.bonusAchievements) {
+		const _rs = __account.storyResults?.find((x) => x.id === _id);
 		const _myba = _rs?.bonusAchievements ?? [];
-		const _stat = _myba?.find(x => x.id === _ba.id);
+		const _stat = _myba?.find((x) => x.id === _ba.id);
 		const _active = _stat && !_stat.done;
 		const _done = _stat?.done;
 		const _reward = getRewardIcon(_ba.reward?.grade ?? 1, _ba.reward.key, _ba.reward.type);
-		_bonusAchHTML += `<div class="w-100 story-bonus-achievement-item flex${_active ? ' ba-active' : ''}${_done ? ' ba-done' : ''}${(!_active && !_done) ? ' ba-locked' : ''}">
+		_bonusAchHTML += `<div class="w-100 story-bonus-achievement-item flex${_active ? ' ba-active' : ''}${_done ? ' ba-done' : ''}${!_active && !_done ? ' ba-locked' : ''}">
 				<div class="flex story-bonus-achievement-icon">
-					<img src="./images/ui/${_done ? 'circle-on' : (_active ? 'circle-off' : 'lock')}.png" />
+					<img src="./images/ui/${_done ? 'circle-on' : _active ? 'circle-off' : 'lock'}.png" />
 				</div>
 				<div class="flex flex-jc-start story-bonus-achievement-title">
 					<div class="w-100 flex flex-jc-start ba-requirement">
@@ -11535,7 +10494,7 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 							${getLangData('Story Finish Count')}
 						</div>
 						<div class="flex flex-jc-end">
-							<span class="page-detail-desc ba-current-count">${_rs?.count > _ba.minCount ? _ba.minCount : _rs?.count ?? 0}</span>/<span class="ba-min-count page-detail-desc">${_ba.minCount}</span>
+							<span class="page-detail-desc ba-current-count">${_rs?.count > _ba.minCount ? _ba.minCount : (_rs?.count ?? 0)}</span>/<span class="ba-min-count page-detail-desc">${_ba.minCount}</span>
 						</div>
 					</div>
 					<div class="w-100 flex story-bonus-achievement-desc flex-jc-start page-detail-desc">
@@ -11563,7 +10522,9 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 		<div class="page-detail-splitter${_hasBonusAch ? '' : ' d-none'}"></div>
 		<div class="flex flex-jc-start story-detail-heading page-detail-header${_hasBonusAch ? '' : ' d-none'}">${getLangData('Bonus Achievements')}</div>
 		<div class="page-detail-splitter-thin${_hasBonusAch ? '' : ' d-none'}"></div>
-		<div class="story-description${_hasBonusAch ? '' : ' d-none'}">` + _bonusAchHTML + `</div>
+		<div class="story-description${_hasBonusAch ? '' : ' d-none'}">` +
+		_bonusAchHTML +
+		`</div>
 		</div>
 		<div class="w-100 flex action-button-container">
 			<div class="page-detail-splitter w-100"></div>
@@ -11572,92 +10533,88 @@ function createStoryDetailUI(_id, _noSound, _noAnimation) {
 			</div>
 		</div>
 	</div>`;
-	//_gameUI.appendChild(_div);
+
 	return _html;
 }
 function checkStoryBonusAchievement(_story, _isRealPlay) {
-	let _rs = __account.storyResults.find(x => x.id === _story.id);
-	if(!_rs)
-		return;
+	let _rs = __account.storyResults.find((x) => x.id === _story.id);
+	if (!_rs) return;
 	_rs.count = _rs.count > 0 ? _rs.count + 1 : 1;
-	if(!_rs.bonusAchievements)
-		_rs.bonusAchievements = [];
+	if (!_rs.bonusAchievements) _rs.bonusAchievements = [];
 	const _myBonusStats = _rs.bonusAchievements;
 	const _storyBonus = _story.bonusAchievements ?? [];
-	for(let _sb of _storyBonus) {
-		const _myStat = _myBonusStats?.find(x => x.id === _sb.id);
-		if(_myStat && !_myStat.done) {
-			//ach açık ama henüz yapılmamış
-			if(_sb.when())
-			{
+	for (let _sb of _storyBonus) {
+		const _myStat = _myBonusStats?.find((x) => x.id === _sb.id);
+		if (_myStat && !_myStat.done) {
+			if (_sb.when()) {
 				_myStat.done = 1;
 				updateGlobalQuest('complete-act-side');
-				warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/ui/menu-icons/cup.png" />&nbsp;<span style="flex:1">' + getLangData('Bonus Achievement Completed') + '</span></div>', null, null, 1);
-				PlaySound({key:'bonusdone', volume:1});
-				warnChestReward(getChestReward(_sb.reward.grade ?? 1, _sb.reward.key, _sb.reward.type, _sb.reward.count ?? 1));
+				warn(
+					'<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/ui/menu-icons/cup.png" />&nbsp;<span style="flex:1">' +
+						getLangData('Bonus Achievement Completed') +
+						'</span></div>',
+					null,
+					null,
+					1
+				);
+				PlaySound({ key: 'bonusdone', volume: 1 });
+				warnChestReward(
+					getChestReward(_sb.reward.grade ?? 1, _sb.reward.key, _sb.reward.type, _sb.reward.count ?? 1)
+				);
 			}
-		}
-		else if(!_myStat) {
-			if(_sb.minCount === _rs.count) {
-				_myBonusStats.push({id:_sb.id});
-				warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/ui/menu-icons/cup.png" />&nbsp;<span style="flex:1">' + getLangData('Bonus Achievement Unlocked') + '</span></div>', null, null, 1);
-				PlaySound({key:'bonusactive', volume:1});
+		} else if (!_myStat) {
+			if (_sb.minCount === _rs.count) {
+				_myBonusStats.push({ id: _sb.id });
+				warn(
+					'<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/ui/menu-icons/cup.png" />&nbsp;<span style="flex:1">' +
+						getLangData('Bonus Achievement Unlocked') +
+						'</span></div>',
+					null,
+					null,
+					1
+				);
+				PlaySound({ key: 'bonusactive', volume: 1 });
 			}
 		}
 	}
-	//bonus achievementlara bak eğer açık fakat yapılmamış varsa story özelinde +
-	//varsa when fonksyonundan tamamlanmış mı diye bak ve tamamlandıysa bildir +
-	//eğer tamamlandıysa tamamlandı olarak işaretle +
-	//bonus achievement count u 1 arttır +
-	//Bonus Achievement açıldı mı bak açıldı ise bildir +
 }
 function getStoryRewardsResultHtml(_story, _bonus, _pass, _looseGain, _isRealPlay, _isSuccess) {
-	if(_isSuccess)
-		checkStoryBonusAchievement(_story, _isRealPlay);	
+	if (_isSuccess) checkStoryBonusAchievement(_story, _isRealPlay);
 	let _rewardsHtml = '';
-	if(_bonus){
-		if(_bonus === 'item') {
-			const r = __stories.find(x => x.id === _uiSelectedStoryId).rewards.find(x => x.key === 'item');
+	if (_bonus) {
+		if (_bonus === 'item') {
+			const r = __stories.find((x) => x.id === _uiSelectedStoryId).rewards.find((x) => x.key === 'item');
 			_bonus = getChestReward(r.grade ?? 1, 'item', { key: r.type });
-		}
-		else
-			_bonus = getChestReward(_bonus.split('*')?.[1] ?
-		parseInt(_bonus.split('*')[1]) : __account.act ?? 1, _bonus.split('*')[0]);
+		} else
+			_bonus = getChestReward(
+				_bonus.split('*')?.[1] ? parseInt(_bonus.split('*')[1]) : (__account.act ?? 1),
+				_bonus.split('*')[0]
+			);
 	}
-	const _arr = _looseGain ? (Array.isArray(_looseGain) ? _looseGain : [_looseGain]) : _story.rewards ?? [];
-	if(episodeGold > 0) {
-		const _goldItem = _arr.find(x => x.key === 'gold');
-		if(_goldItem)
-			_goldItem.count += episodeGold;
-		else
-			_arr.push({key:'gold', count:episodeGold});
+	const _arr = _looseGain ? (Array.isArray(_looseGain) ? _looseGain : [_looseGain]) : (_story.rewards ?? []);
+	if (episodeGold > 0) {
+		const _goldItem = _arr.find((x) => x.key === 'gold');
+		if (_goldItem) _goldItem.count += episodeGold;
+		else _arr.push({ key: 'gold', count: episodeGold });
 		episodeGold = 0;
 	}
-	for(let r of _arr)
-	{
-		if(r.chance && getRandomValue2(1, 100) > r.chance)
-			continue;
+	for (let r of _arr) {
+		if (r.chance && getRandomValue2(1, 100) > r.chance) continue;
 		let _count = r.count ?? 1;
-		if(r.minCount >= 0 && r.maxCount >= 0)
-			_count = getRandomValue2(r.minCount, r.maxCount);
-		if(r.key === 'gold' && episode.goldSelected)
-			_count *= 2;
-		else if(r.key === 'exp' && episode.expSelected)
-			_count *= 2;
-		else if(r.key === 'item' && episode.itemSelected)
-			_count *= 2;
-		if(r.key === 'item'){
-			_count =  _count + (_bonus?.type === r.type ? 1 : 0);
-			for(let i = 0; i < _count; i++)
-				getChestReward(r.grade, 'item', { key: r.type });
+		if (r.minCount >= 0 && r.maxCount >= 0) _count = getRandomValue2(r.minCount, r.maxCount);
+		if (r.key === 'gold' && episode.goldSelected) _count *= 2;
+		else if (r.key === 'exp' && episode.expSelected) _count *= 2;
+		else if (r.key === 'item' && episode.itemSelected) _count *= 2;
+		if (r.key === 'item') {
+			_count = _count + (_bonus?.type === r.type ? 1 : 0);
+			for (let i = 0; i < _count; i++) getChestReward(r.grade, 'item', { key: r.type });
 			updateGlobalQuest('loot-item', _count);
 			_rewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 50%${episode.itemSelected ? ';color:#F4BB44 !important' : ''}">
 				<span class="auto-pass-result-item-icon-wrapper story-reward-item grade${r.grade}-item" style="display:inline-block;position:relative">
 					<img class="item-img" src="./images/items/icons/${r.type === 'weapon' ? mainCharacter.class + '/' : ''}${r.type}${r.grade}.png" />
 				</span> x ${_count}
 			</div>`;
-		}
-		else if(r.key === 'fragment'){
+		} else if (r.key === 'fragment') {
 			const _names = r.name?.split(',') ?? ['random'];
 			const _name = episode.chosenFragment ?? _names[getRandomValue2(0, _names.length - 1)];
 			updateFragment(_name, _count);
@@ -11666,54 +10623,51 @@ function getStoryRewardsResultHtml(_story, _bonus, _pass, _looseGain, _isRealPla
 				<img style="filter:drop-shadow(0 0 1px #f3f4f5);height: 70%;margin-right: 5%;" src="./images/fragments/${_name}.png">
 				</span> x ${_count}
 			</div>`;
-		}
-		else if(r.key === 'gem'){
+		} else if (r.key === 'gem') {
 			const _gem = updateGem(r.type, r.grade, _count);
 			_rewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 50%">
 				<span class="auto-pass-result-item-icon-wrapper">
 				<img style="filter:drop-shadow(0 0 1px #f3f4f5);height: 70%;margin-right: 5%;" src="./images/gems/${_gem.type}${_gem.grade}.png">
 				</span> x ${_count}
 				</div>`;
-		}
-		else if(r.key === 'misc'){
-			const _misc = misc.find(x => x.type === r.type);
+		} else if (r.key === 'misc') {
+			const _misc = misc.find((x) => x.type === r.type);
 			const _val = _count ?? 1;
-			if(_misc.graded)
-				updateMisc({ type: _misc.type, count: _val, grade: r.grade ?? 1 });
-			else
-				updateMisc({ type: _misc.type, count: _val });
+			if (_misc.graded) updateMisc({ type: _misc.type, count: _val, grade: r.grade ?? 1 });
+			else updateMisc({ type: _misc.type, count: _val });
 			_rewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 50%">
 				<span class="auto-pass-result-item-icon-wrapper">
 				<img style="filter:drop-shadow(0 0 1px #f3f4f5);height: 70%;margin-right: 5%;" src="./images/icons/${r.type}.png">
 				</span> x ${_count}
 				</div>`;
-		}
-		else if(r.key === 'gold'){
+		} else if (r.key === 'gold') {
 			updateGold(_count);
-			if(_bonus?.type === 'gold')
-				_count += _bonus.count;
+			if (_bonus?.type === 'gold') _count += _bonus.count;
 			_rewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 50%${episode.goldSelected ? ';color:#F4BB44 !important' : ''}">
 				<span class="auto-pass-result-item-icon-wrapper">
 				<img style="height: 70%;margin-right: 5%;" src="./images/icons/coin.png">
 				</span> x ${_count.formatWithDots()}
 				</div>`;
-		}
-		else if(r.key === 'exp'){
+		} else if (r.key === 'exp') {
 			const _oldLevel = mainCharacter.level;
 			updateExperience(_count, null, null, 1);
 			const _newLevel = mainCharacter.level;
 			let _lastLevelStatus = '';
-			if(_pass && _newLevel > _oldLevel)
-				_lastLevelStatus = '<div class="flex flex-jc-start" style="color:#f3f4f5 !important;padding-left:1cqh">' + getLangData('Lvl') + `&nbsp;${_oldLevel}<img style="height:2cqh !important;width:auto !important" class="level-increment" src="./images/icons/power-up.png" />${_newLevel}`;
-			if(_bonus?.type === 'exp')
-				_count += _bonus.count;
-			_rewardsHtml += `<div class="w-50 flex" style="padding: 1%; height: 50%${episode.expSelected ? ';color:#F4BB44 !important' : ''}">
+			if (_pass && _newLevel > _oldLevel)
+				_lastLevelStatus =
+					'<div class="flex flex-jc-start" style="color:#f3f4f5 !important;padding-left:1cqh">' +
+					getLangData('Lvl') +
+					`&nbsp;${_oldLevel}<img style="height:2cqh !important;width:auto !important" class="level-increment" src="./images/icons/power-up.png" />${_newLevel}`;
+			if (_bonus?.type === 'exp') _count += _bonus.count;
+			_rewardsHtml +=
+				`<div class="w-50 flex" style="padding: 1%; height: 50%${episode.expSelected ? ';color:#F4BB44 !important' : ''}">
 				<span class="auto-pass-result-item-icon-wrapper">
 				<img style="height: 70%;margin-right: 5%;" src="./images/icons/exp.png">
-				</span><div><div class="w-100">&nbsp;x&nbsp;${_count.formatWithDots()}</div>` + _lastLevelStatus + `</div>
+				</span><div><div class="w-100">&nbsp;x&nbsp;${_count.formatWithDots()}</div>` +
+				_lastLevelStatus +
+				`</div>
 				</div>`;
-		}
-		else if(r.key === 'honor'){
+		} else if (r.key === 'honor') {
 			__account.pvp.honor += _count;
 			_rewardsHtml += `<div class="w-100 flex flex-jc-start" style="padding: 1%; height: 50%">
 				<span class="auto-pass-result-item-icon-wrapper">
@@ -11725,13 +10679,17 @@ function getStoryRewardsResultHtml(_story, _bonus, _pass, _looseGain, _isRealPla
 	return _rewardsHtml;
 }
 function tryStartStoryMission(_id, _golds, _exps, _items, _func, _isFirstStart) {
-	const _s = __stories.find(x => x.id === _id);
-	if(_s?.passive) {
+	const _s = __stories.find((x) => x.id === _id);
+	if (_s?.passive) {
 		warn('<span>' + getLangData('Story is passive for now') + '</span>', 'warn');
 		return;
 	}
-	if(!_s.lobby && !_s.mission && _s.order > 1 && !__account.storyResults.find(x => x.id ===
-		__stories.find(y => y.order === (_s.order - 1)).id)){
+	if (
+		!_s.lobby &&
+		!_s.mission &&
+		_s.order > 1 &&
+		!__account.storyResults.find((x) => x.id === __stories.find((y) => y.order === _s.order - 1).id)
+	) {
 		warn('<span>' + getLangData('Complete previous story first') + '</span>', 'warn');
 		return;
 	}
@@ -11739,63 +10697,58 @@ function tryStartStoryMission(_id, _golds, _exps, _items, _func, _isFirstStart) 
 	const _itemSelected = _items ?? document.querySelector('.menu-right .menu-sub-button.selected[data-index="4"]');
 	const _goldSelected = _golds ?? document.querySelector('.menu-right .menu-sub-button.selected[data-index="3"]');
 	const _expSelected = _exps ?? document.querySelector('.menu-right .menu-sub-button.selected[data-index="2"]');
-	if(_passSelected)
-		askPassStory(_itemSelected, _goldSelected, _expSelected);
-	else{
-		if(_s.mission){
-			let _am = __account.missions.find(x => x.key === _s.mission);
-			if(_am?.current >= _s.daily){
+	if (_passSelected) askPassStory(_itemSelected, _goldSelected, _expSelected);
+	else {
+		if (_s.mission) {
+			let _am = __account.missions.find((x) => x.key === _s.mission);
+			if (_am?.current >= _s.daily) {
 				warn('<span>' + getLangData('Daily limit reached') + '</span>', 'warn');
 				return;
 			}
-		}
-		else if(!_isFirstStart && _s.ticket > 0){
-			if(__account.storyTicket >= _s.ticket){
-				//_client.saveState(1);
-			}
-			else {
+		} else if (!_isFirstStart && _s.ticket > 0) {
+			if (__account.storyTicket >= _s.ticket) {
+			} else {
 				warn('<span>' + getLangData('Not enough story portal') + '</span>', 'warn');
 				return;
 			}
 		}
-		playStory(_id, null, function() {
-			if(_s.mission) {
-				let _am = __account.missions.find(x => x.key === _s.mission);
-				if(_am) {
-					_am.current++;
-					_am.lastActivity = _gameTick;
-					_client.saveState(1);
-				}
-			}
-			else
-				tryConsumeTickets(_goldSelected, _expSelected, _itemSelected, _s.ticket);
-			if(_func)
-				_func();
-		},_isFirstStart);
+		playStory(
+			_id,
+			null,
+			function () {
+				if (_s.mission) {
+					let _am = __account.missions.find((x) => x.key === _s.mission);
+					if (_am) {
+						_am.current++;
+						_am.lastActivity = _gameTick;
+						_client.saveState(1);
+					}
+				} else tryConsumeTickets(_goldSelected, _expSelected, _itemSelected, _s.ticket);
+				if (_func) _func();
+			},
+			_isFirstStart
+		);
 	}
 }
 function tryConsumeTickets(_goldSelected, _expSelected, _itemSelected, _portal) {
 	__account.storyTicket -= _portal;
-	if(_itemSelected)
-	{
-		const _tix = __account.misc.find(x => x.type === 'ticket-item');
-		if(_tix?.count > 0){
+	if (_itemSelected) {
+		const _tix = __account.misc.find((x) => x.type === 'ticket-item');
+		if (_tix?.count > 0) {
 			_tix.count--;
 			episode.itemSelected = true;
 		}
 	}
-	if(_goldSelected)
-	{
-		const _tix = __account.misc.find(x => x.type === 'ticket-gold');
-		if(_tix?.count > 0){
+	if (_goldSelected) {
+		const _tix = __account.misc.find((x) => x.type === 'ticket-gold');
+		if (_tix?.count > 0) {
 			_tix.count--;
 			episode.goldSelected = true;
 		}
 	}
-	if(_expSelected)
-	{
-		const _tix = __account.misc.find(x => x.type === 'ticket-exp');
-		if(_tix?.count > 0){
+	if (_expSelected) {
+		const _tix = __account.misc.find((x) => x.type === 'ticket-exp');
+		if (_tix?.count > 0) {
 			_tix.count--;
 			episode.expSelected = true;
 		}
@@ -11803,9 +10756,9 @@ function tryConsumeTickets(_goldSelected, _expSelected, _itemSelected, _portal) 
 	_client.saveState(1);
 }
 function askPassStory(_itemSelected, _goldSelected, _expSelected) {
-    playClick();
-    const _limit = __account.misc.find(x => x.type === 'ticket-pass')?.count ?? 0;
-    let _modal = `<div class="full fade-me flex inventory-question inventory-question-redeem-pass-ticket inventory-question-add-slot">
+	playClick();
+	const _limit = __account.misc.find((x) => x.type === 'ticket-pass')?.count ?? 0;
+	let _modal = `<div class="full fade-me flex inventory-question inventory-question-redeem-pass-ticket inventory-question-add-slot">
         <div class="inventory-modal">
             <div class="flex inventory-modal-title">
                 ${getLangData('Auto-Pass Story Mission')}
@@ -11833,76 +10786,60 @@ function askPassStory(_itemSelected, _goldSelected, _expSelected) {
             </div>
         </div>
     </div>`;
-    const _div = document.createElement('div');
-    _div.innerHTML = _modal;
-    document.querySelector('#menu-ui').appendChild(_div.firstChild);
+	const _div = document.createElement('div');
+	_div.innerHTML = _modal;
+	document.querySelector('#menu-ui').appendChild(_div.firstChild);
 }
 function useMaxPassAmount() {
-    playClick();
-    const _limit = __account.misc.find(x => x.type === 'ticket-pass')?.count ?? 0;
-    const _sa = document.getElementById('pass-amount');
-    let _amount = parseInt(_sa.innerText);
-    _amount = _limit;
-    addClass(document.getElementById('increase-pass-btn'), 'disabled');
-    addClass(document.getElementById('use-max-pass-btn'), 'disabled');
-    removeClass(document.getElementById('decrease-pass-btn'), 'disabled');
-    _sa.innerText = _amount;
+	playClick();
+	const _limit = __account.misc.find((x) => x.type === 'ticket-pass')?.count ?? 0;
+	const _sa = document.getElementById('pass-amount');
+	let _amount = parseInt(_sa.innerText);
+	_amount = _limit;
+	addClass(document.getElementById('increase-pass-btn'), 'disabled');
+	addClass(document.getElementById('use-max-pass-btn'), 'disabled');
+	removeClass(document.getElementById('decrease-pass-btn'), 'disabled');
+	_sa.innerText = _amount;
 }
 function increasePassAmount() {
-    playClick();
-    const _limit = __account.misc.find(x => x.type === 'ticket-pass')?.count ?? 0;
-    const _sa = document.getElementById('pass-amount');
-    let _amount = parseInt(_sa.innerText);
-    _amount++;
-    if(_amount >= _limit) {
-        addClass(document.getElementById('increase-pass-btn'), 'disabled');
-    	addClass(document.getElementById('use-max-pass-btn'), 'disabled');
+	playClick();
+	const _limit = __account.misc.find((x) => x.type === 'ticket-pass')?.count ?? 0;
+	const _sa = document.getElementById('pass-amount');
+	let _amount = parseInt(_sa.innerText);
+	_amount++;
+	if (_amount >= _limit) {
+		addClass(document.getElementById('increase-pass-btn'), 'disabled');
+		addClass(document.getElementById('use-max-pass-btn'), 'disabled');
 	}
-    removeClass(document.getElementById('decrease-pass-btn'), 'disabled');
-    _sa.innerText = _amount;
+	removeClass(document.getElementById('decrease-pass-btn'), 'disabled');
+	_sa.innerText = _amount;
 }
 function decreasePassAmount() {
-    playClick();
-    const _sa = document.getElementById('pass-amount');
-    let _amount = parseInt(_sa.innerText);
-    _amount--;
-    if(_amount <= 1)
-        addClass(document.getElementById('decrease-pass-btn'), 'disabled');
-    removeClass(document.getElementById('increase-pass-btn'), 'disabled');
-    removeClass(document.getElementById('use-max-pass-btn'), 'disabled');
-    _sa.innerText = _amount;
+	playClick();
+	const _sa = document.getElementById('pass-amount');
+	let _amount = parseInt(_sa.innerText);
+	_amount--;
+	if (_amount <= 1) addClass(document.getElementById('decrease-pass-btn'), 'disabled');
+	removeClass(document.getElementById('increase-pass-btn'), 'disabled');
+	removeClass(document.getElementById('use-max-pass-btn'), 'disabled');
+	_sa.innerText = _amount;
 }
 function acceptStoryPass(_itemSelected, _goldSelected, _expSelected) {
-	// warn('<span>' + getLangData('Not available in demo') + '</span>', 'warn');
-	// return;
-    playClick();
-    const _sa = document.getElementById('pass-amount');
-    let _amount = parseInt(_sa.innerText);
-    if(_amount > 0) {
+	playClick();
+	const _sa = document.getElementById('pass-amount');
+	let _amount = parseInt(_sa.innerText);
+	if (_amount > 0) {
 		closeInventoryQuestionModal();
 		createStoryPassScreen(_amount);
 	}
 }
 function redeemPassTicket(_id) {
-	//bölüm 3 yıldız bitirilmiş mi bak
-	//_id sinden bölümü bul
-	//bölümün anahtar costunu al
-	//anahtar yeterli mi bak
-	//yetmiyorsa return false
-	//yetiyorsa düş
-	//bölümün rewardlarına bak
-	//item + gold + exp ödülü ver
-	//ticketlar seçili ise 1 tane daha ver
-	//pass ticket ı 1 düş
-	//client state i kaydet
-	//true değeri dön
 	return true;
 }
 var __storyAutoPassSkip;
 function skipStoryPass() {
 	playClick();
 	__storyAutoPassSkip = 1;
-	//üstteki algoritmayı hızlı çalıştır
 }
 async function createStoryPassScreen(_amount) {
 	const _itemSelected = document.querySelector('.menu-right .menu-sub-button.selected[data-index="4"]');
@@ -11912,7 +10849,7 @@ async function createStoryPassScreen(_amount) {
 	episode.goldSelected = _goldSelected;
 	episode.expSelected = _expSelected;
 
-	const _s = __stories.find(x => x.id === _uiSelectedStoryId);
+	const _s = __stories.find((x) => x.id === _uiSelectedStoryId);
 
 	const _results = [];
 	let _allTickets = __account.storyTicket;
@@ -11926,27 +10863,26 @@ async function createStoryPassScreen(_amount) {
 		_allTickets -= _s.ticket;
 
 		if (episode.goldSelected) {
-			const _tix = __account.misc.find(x => x.type === 'ticket-gold');
+			const _tix = __account.misc.find((x) => x.type === 'ticket-gold');
 			if (_tix?.count > 0) _tix.count--;
 		}
 		if (episode.expSelected) {
-			const _tix = __account.misc.find(x => x.type === 'ticket-exp');
+			const _tix = __account.misc.find((x) => x.type === 'ticket-exp');
 			if (_tix?.count > 0) _tix.count--;
 		}
 		if (episode.itemSelected) {
-			const _tix = __account.misc.find(x => x.type === 'ticket-item');
+			const _tix = __account.misc.find((x) => x.type === 'ticket-item');
 			if (_tix?.count > 0) _tix.count--;
 		}
-		const _tix = __account.misc.find(x => x.type === 'ticket-pass');
+		const _tix = __account.misc.find((x) => x.type === 'ticket-pass');
 		if (_tix?.count > 0) _tix.count--;
-		const _bonus = (new storyBonus(null, 1)).get();
+		const _bonus = new storyBonus(null, 1).get();
 		_results.push(getStoryRewardsResultHtml(_s, _bonus, 1, null, false, true));
 	}
 	updateTicket(_allTickets - _startTicketCount);
 	updateRightMenuTemplate();
 	_client.saveState();
 
-	// modal HTML'ini kur
 	let _modal = `<div data-singleton-key="modal_middle" class="full fade-me flex inventory-question inventory-question-add-slot inventory-question-auto-pass-results">
 		<div class="inventory-modal">
 			<div class="flex w-100 flex-ai-end question-modal-title">
@@ -11969,41 +10905,31 @@ async function createStoryPassScreen(_amount) {
 	const _leveledUp = _newLevel > _oldLevel;
 	const _container = document.querySelector('.auto-pass-results');
 	__storyAutoPassSkip = false;
-	// satır satır ekle
+
 	for (let i = 0; i < _results.length; i++) {
-		if(!__storyAutoPassSkip)
-			PlaySound({key:'autopass', volume:.4});
+		if (!__storyAutoPassSkip) PlaySound({ key: 'autopass', volume: 0.4 });
 		const row = document.createElement('div');
 		row.className = 'w-100 flex flex-jc-start auto-pass-result-item fade-me';
 		row.innerHTML = _results[i];
 		_container.appendChild(row);
 		const _splitter = document.createElement('div');
-		_splitter.className = "page-detail-splitter";
+		_splitter.className = 'page-detail-splitter';
 		_container.appendChild(row);
 		_container.appendChild(_splitter);
 		_container.scrollTo({
 			top: _container.scrollHeight,
 			behavior: 'smooth'
 		});
-		if(!__storyAutoPassSkip)
-			await delay(750);
+		if (!__storyAutoPassSkip) await delay(750);
 	}
 	removeClass(document.getElementById('auto-pass-close'), 'disabled');
 	addClass(document.getElementById('auto-pass-skip'), 'disabled');
 	__storyAutoPassSkip = false;
 }
 
-// yardımcı delay fonksiyonu
 function delay(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
+	return new Promise((resolve) => setTimeout(resolve, ms));
 }
-// setTimeout(() => {
-// 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/' + _giftOrder[2].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
-// 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/' + _giftOrder[3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
-// 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/' + _giftOrder[3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
-// 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/' + _giftOrder[3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
-// 		warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/' + _giftOrder[3].key + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Enjoy Your Gift!') + '</span></div>', null, 990000, 1);
-// }, 15000);
 
 function createPromoScreen(_fromMenu) {
 	playClick();
@@ -12011,33 +10937,33 @@ function createPromoScreen(_fromMenu) {
 	const _data = [
 		{
 			section: 1,
-			title: { 
+			title: {
 				tr: 'Demo Aynı Zamanda Şunları İçerir',
 				en: 'Demo Also Includes'
 			},
 			titlePosition: 'top',
 			contents: [
-				{ 
+				{
 					en: 'Fatalities',
 					tr: 'Ölüm Vuruşları'
 				},
-				{ 
+				{
 					en: 'Real-time PvP',
 					tr: 'Eş-zamanlı PvP'
 				},
-				{ 
+				{
 					en: '3v3 PvP (War)',
 					tr: '3v3 PvP (Savaş)'
 				},
-				{ 
+				{
 					en: 'Area Defense (Co-op)',
 					tr: 'Bölge Savunması (Co-op)'
 				},
-				{ 
+				{
 					en: 'NPC Characters and Quests',
 					tr: 'NPC Karakterler ve Görevler'
 				},
-				{ 
+				{
 					en: 'Play The Boss',
 					tr: 'Patronu Sen Yönet'
 				}
@@ -12046,32 +10972,32 @@ function createPromoScreen(_fromMenu) {
 		{
 			section: 2,
 			titlePosition: 'top',
-			title: { 
+			title: {
 				tr: 'Demodaki Kullanıcı Arayüzü İçerikleri',
 				en: 'User Interface Contents In Demo'
 			},
 			contents: [
-				{ 
+				{
 					en: 'Inventory System',
 					tr: 'Ekipman Sistemi'
 				},
-				{ 
+				{
 					en: 'Skill and Talent Tree System',
 					tr: 'Yetenek ve Beceri Ağacı Sistemi'
 				},
-				{ 
+				{
 					en: 'Gem and Socket System',
 					tr: 'Yakut ve Yuva Sistemi'
 				},
-				{ 
+				{
 					en: 'Mailbox System',
 					tr: 'Posta Kutusu Sistemi'
 				},
-				{ 
+				{
 					en: 'Fragment & Tag Skill System',
 					tr: 'Parçacık ve Destekçi Sistemi'
 				},
-				{ 
+				{
 					en: 'Daily Reward System',
 					tr: 'Günlük Ödül Sistemi'
 				}
@@ -12079,16 +11005,16 @@ function createPromoScreen(_fromMenu) {
 		},
 		{
 			section: 3,
-			title: { 
+			title: {
 				tr: 'Gelecek Planlarımız Neler?',
 				en: 'What Are Our Future Plans?'
 			},
 			titlePosition: 'top',
 			contents: [
-				{ 
+				{
 					en: 'About PvP Content',
 					tr: 'PvP İçeriği Hakkında',
-					details: [ 
+					details: [
 						{
 							en: 'Free for all',
 							tr: 'Herkes tek'
@@ -12115,10 +11041,10 @@ function createPromoScreen(_fromMenu) {
 						}
 					]
 				},
-				{ 
+				{
 					en: 'About Story and Acts',
 					tr: 'Hikaye ve Bölümler Hakkında',
-					details: [ 
+					details: [
 						{
 							en: 'More acts',
 							tr: 'Daha fazla bölüm'
@@ -12145,10 +11071,10 @@ function createPromoScreen(_fromMenu) {
 						}
 					]
 				},
-				{ 
+				{
 					en: 'About Dungeons and Co-op',
 					tr: 'Zindanlar ve Co-op Hakkında',
-					details: [ 
+					details: [
 						{
 							en: 'Real-time raids and dungeons',
 							tr: 'Eş-zamanlı baskın ve zindanlar'
@@ -12175,10 +11101,10 @@ function createPromoScreen(_fromMenu) {
 						}
 					]
 				},
-				{ 
+				{
 					en: 'About Social Functions',
 					tr: 'Sosyal Fonksyonlar Hakkında',
-					details: [ 
+					details: [
 						{
 							en: 'Creating blacklist',
 							tr: 'Karaliste oluşturmak'
@@ -12205,10 +11131,10 @@ function createPromoScreen(_fromMenu) {
 						}
 					]
 				},
-				{ 
+				{
 					en: 'About Mechanics and Effects',
 					tr: 'Mekanikler ve Efektler Hakkında',
-					details: [ 
+					details: [
 						{
 							en: 'VFX visual effects',
 							tr: 'VFX görsel efektler'
@@ -12235,10 +11161,10 @@ function createPromoScreen(_fromMenu) {
 						}
 					]
 				},
-				{ 
+				{
 					en: 'About Us',
 					tr: 'Bizim Hakkımızda',
-					details: [ 
+					details: [
 						{
 							en: 'Follow us on youtube',
 							tr: 'Youtube kanalımızı takip edin'
@@ -12273,30 +11199,38 @@ function createPromoScreen(_fromMenu) {
 	];
 	const _desc = document.createElement('div');
 	_desc.className = 'show-ui full quick-play-desc-container fade-me';
-	_desc.style = "overflow:hidden;position:absolute;z-index:9999999";
+	_desc.style = 'overflow:hidden;position:absolute;z-index:9999999';
 	_desc.setAttribute('data-order', 1);
-	let _html = '<div class="flex" style="width:100%;height:91%;flex-wrap: nowrap;will-change:transform;transition: transform 0.3s ease;transform:translateX(0);align-items:stretch;justify-content:flex-start">';
+	let _html =
+		'<div class="flex" style="width:100%;height:91%;flex-wrap: nowrap;will-change:transform;transition: transform 0.3s ease;transform:translateX(0);align-items:stretch;justify-content:flex-start">';
 	let j = 1;
-	for (let _d of _data){
+	for (let _d of _data) {
 		_html += `<div data-baslik="${encodeURIComponent(_d.title[getLang()])}" class="flex quick-play-slide" style="flex:0 0 100%;height:100%">`;
-		for(let i = 0; i < _d.contents.length; i++) {
+		for (let i = 0; i < _d.contents.length; i++) {
 			const _tip = _d.contents[i];
 			let _content;
-			if(_tip.details) {
+			if (_tip.details) {
 				_content = '<div class="full">';
-				for(let row of _tip.details)
-					_content += `<div class="w-100 p-02 flex flex-jc-start quick-play-desc-content-item">` + (row.noIcon ? `&nbsp;&nbsp;-&nbsp;` : `<img src='./images/icons/swap-right.png' />`) + `${row[getLang()]}</div>`;
+				for (let row of _tip.details)
+					_content +=
+						`<div class="w-100 p-02 flex flex-jc-start quick-play-desc-content-item">` +
+						(row.noIcon ? `&nbsp;&nbsp;-&nbsp;` : `<img src='./images/icons/swap-right.png' />`) +
+						`${row[getLang()]}</div>`;
 				_content += '</div>';
 			}
-			_html += `<div class="quick-play-desc-item flex" style="background:#000 !important">
-			<div class="w-100 flex quick-play-desc-item-title${_content ? ' flex-jc-start' : ''}" style="height:5cqh">${_tip[getLang()]}</div>`+
-				(_content ?? `<img style="max-height:calc(100% - 5cqh);max-width:100%" src="./images/quickplay/${j.toString() + '-' + (i + 1).toString()}.png" />`) +
-			`</div>`;
+			_html +=
+				`<div class="quick-play-desc-item flex" style="background:#000 !important">
+			<div class="w-100 flex quick-play-desc-item-title${_content ? ' flex-jc-start' : ''}" style="height:5cqh">${_tip[getLang()]}</div>` +
+				(_content ??
+					`<img style="max-height:calc(100% - 5cqh);max-width:100%" src="./images/quickplay/${j.toString() + '-' + (i + 1).toString()}.png" />`) +
+				`</div>`;
 		}
 		_html += `</div>`;
 		j++;
 	}
-	_desc.innerHTML = _html + '</div>' +
+	_desc.innerHTML =
+		_html +
+		'</div>' +
 		`<div class="quick-play-desc-skip flex w-100">
 			<div onexactclick="prevPromoSection(${_data.length})" id="quick-play-prev" style="height:100%;width:auto" class="flex p-02 v-none">
 				&lt;&nbsp;${getLangData('BACK')}
@@ -12316,66 +11250,64 @@ function createPromoScreen(_fromMenu) {
 
 function prevPromoSection(_max) {
 	const _qp = document.querySelector('.quick-play-desc-container');
-	if(!_qp)
-		return;
+	if (!_qp) return;
 	const _order = parseInt(_qp.getAttribute('data-order'));
-	if(_order === 1)
-		return;
-	PlaySound({ key: 'page', volume: .3, reset: true });
+	if (_order === 1) return;
+	PlaySound({ key: 'page', volume: 0.3, reset: true });
 	_qp.setAttribute('data-order', _order - 1);
 	_qp.firstChild.style.transform = `translateX(-${(_order - 2) * 100}%)`;
-	//_qp.firstChild.style.left = ((_order - 2) * -33.3).toString() + '%';
-	if(_order === _max)
-	{
+
+	if (_order === _max) {
 		const _next = document.getElementById('quick-play-next');
 		_next.innerHTML = getLangData('NEXT') + '&nbsp;&gt;';
 	}
-	if(_order === 2) {
+	if (_order === 2) {
 		const _prev = document.getElementById('quick-play-prev');
 		addClass(_prev, 'v-none');
 	}
-	document.getElementById('quick-play-title').innerText = decodeURIComponent(_qp.querySelectorAll('.quick-play-slide')[_order - 2].getAttribute('data-baslik'));
+	document.getElementById('quick-play-title').innerText = decodeURIComponent(
+		_qp.querySelectorAll('.quick-play-slide')[_order - 2].getAttribute('data-baslik')
+	);
 }
 function nextPromoSection(_max) {
 	const _qp = document.querySelector('.quick-play-desc-container');
-	if(!_qp)
-		return;
+	if (!_qp) return;
 	const _order = parseInt(_qp.getAttribute('data-order'));
 	const _prev = document.getElementById('quick-play-prev');
 	removeClass(_prev, 'v-none');
-	if(_order === _max) {
+	if (_order === _max) {
 		playClick();
 		_qp.remove();
-		//resetOpeningScreen();
+
 		return;
-	}
-	else {
-		PlaySound({ key: 'page', volume: .3, reset: true });
+	} else {
+		PlaySound({ key: 'page', volume: 0.3, reset: true });
 		_qp.setAttribute('data-order', _order + 1);
 		_qp.firstChild.style.transform = `translateX(-${_order * 100}%)`;
-		//_qp.firstChild.style.left = (_order * -33.3).toString() + '%';
-		if(_order === (_max-1))
-		{
+
+		if (_order === _max - 1) {
 			const _next = document.getElementById('quick-play-next');
 			_next.innerHTML = getLangData('CLOSE') + '&nbsp;&times;';
 		}
 	}
-	document.getElementById('quick-play-title').innerText = decodeURIComponent(_qp.querySelectorAll('.quick-play-slide')[_order].getAttribute('data-baslik'));
+	document.getElementById('quick-play-title').innerText = decodeURIComponent(
+		_qp.querySelectorAll('.quick-play-slide')[_order].getAttribute('data-baslik')
+	);
 }
 function activatePortal(_portal) {
 	setTimeout(() => {
 		_portal.important = 1;
-		_portal.animations.after.frames.forEach(x => {
-			x.do = function(_e) {
-				_e.animations.after.frames.forEach(y => delete y.do);
+		_portal.animations.after.frames.forEach((x) => {
+			x.do = function (_e) {
+				_e.animations.after.frames.forEach((y) => delete y.do);
 				x.zoom = 1.1;
 				_e.health = 0;
 				_e.class = 'portal';
 				x.bottomGap += MathRound(x.spriteHeight / 20);
-				PlaySound({key:'portalclose', volume:.3 });
-				if(_e.toucher) {
+				PlaySound({ key: 'portalclose', volume: 0.3 });
+				if (_e.toucher) {
 					const _et = _e.toucher;
-					_et.yPosition = _e.yPosition - MathRound(groundheight * .06);
+					_et.yPosition = _e.yPosition - MathRound(groundheight * 0.06);
 					_et.stopRage();
 					_et.swapAnimation('idle');
 					_et.standBy();
@@ -12383,28 +11315,28 @@ function activatePortal(_portal) {
 					requestAnimationFrame(() => {
 						const _oldLeft = _et.left;
 						_et.left = _e.left - MathRound((_et.WIDTH - _e.WIDTH) / 2) - platformX;
-						if(_et.left < _oldLeft && _et.direction === __right)
-							_et.direction = __left;
-						else if(_et.left > _oldLeft && _et.direction === __left)
-							_et.direction = __right;
-						if(_et.relatedObjects)
-							_et.relatedObjects.length = 0;
-						_et.drawPriority = .1;
-						_et.addObject(
-						{ 
-							key: 'zoom2x', 
-							position: 'css', 
-							p1: 1.3, 
+						if (_et.left < _oldLeft && _et.direction === __right) _et.direction = __left;
+						else if (_et.left > _oldLeft && _et.direction === __left) _et.direction = __right;
+						if (_et.relatedObjects) _et.relatedObjects.length = 0;
+						_et.drawPriority = 0.1;
+						_et.addObject({
+							key: 'zoom2x',
+							position: 'css',
+							p1: 1.3,
 							p2: 10000
 						});
 						addClass(_gameUI, 'disable-ui');
-						episode.moveCamera(function() {
-							__storyPlaying = false;
-							installStoryFinish();
-						}, 1, 1);
+						episode.moveCamera(
+							function () {
+								__storyPlaying = false;
+								installStoryFinish();
+							},
+							1,
+							1
+						);
 					});
 				}
-			}
+			};
 		});
 	}, 100);
 }

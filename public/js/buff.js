@@ -2,42 +2,44 @@
 const _allBuffs = {
 	nocc: {
 		id: 1,
-		objects: [
-			{ key: 'nocc', position: 'middle' }
-		],
-		gain: [{
-			level: 1,
-			props: {
-				noCC: true
+		objects: [{ key: 'nocc', position: 'middle' }],
+		gain: [
+			{
+				level: 1,
+				props: {
+					noCC: true
+				},
+				ms: 5000
 			},
-			ms: 5000
-		}, {
-			level: 2,
-			props: {
-				noCC: true
-			},
-			ms: 10000
-		}]
+			{
+				level: 2,
+				props: {
+					noCC: true
+				},
+				ms: 10000
+			}
+		]
 	},
 	reflect: {
 		id: 2,
 		sound: { key: 'reflect', volume: 1 },
-		objects: [
-			{ key: 'reflect', position: 'middle' }
-		],
-		gain: [{
-			level: 1,
-			props: {
-				reflect: true
+		objects: [{ key: 'reflect', position: 'middle' }],
+		gain: [
+			{
+				level: 1,
+				props: {
+					reflect: true
+				},
+				ms: 5000
 			},
-			ms: 5000
-		}, {
-			level: 2,
-			props: {
-				reflect: true
-			},
-			ms: 10000
-		}]
+			{
+				level: 2,
+				props: {
+					reflect: true
+				},
+				ms: 10000
+			}
+		]
 	},
 	hps: {
 		id: 3,
@@ -67,7 +69,7 @@ const _allBuffs = {
 			{
 				level: 4,
 				props: {
-					hpRegenRate: .2
+					hpRegenRate: 0.2
 				},
 				ms: 10000
 			}
@@ -95,9 +97,7 @@ const _allBuffs = {
 	},
 	atk: {
 		id: 5,
-		objects: [
-			{ key: 'atkbuff', position: 'over-head',  type: 'buff', still: false, repeat: true, bind: 'atk' }
-		],
+		objects: [{ key: 'atkbuff', position: 'over-head', type: 'buff', still: false, repeat: true, bind: 'atk' }],
 		gain: [
 			{
 				level: 1,
@@ -165,7 +165,16 @@ const _allBuffs = {
 		id: 8,
 		stack: 3,
 		objects: [
-			{ key: 'weakness', position: 'middle', type: 'buff', still: false, scale: .8, singleton: true, bind: 'weakness', repeat: true }
+			{
+				key: 'weakness',
+				position: 'middle',
+				type: 'buff',
+				still: false,
+				scale: 0.8,
+				singleton: true,
+				bind: 'weakness',
+				repeat: true
+			}
 		],
 		loss: [
 			{
@@ -225,11 +234,9 @@ const _allBuffs = {
 		]
 	},
 	curse: {
-		after: function(_e) {
-			if(!_e.animations.idle)
-				return;
-			if(_e.animation !== 'idle')
-				_e.animate('idle', 1);
+		after: function (_e) {
+			if (!_e.animations.idle) return;
+			if (_e.animation !== 'idle') _e.animate('idle', 1);
 			_e.swapAnimation('idle');
 		},
 		id: 11,
@@ -258,7 +265,16 @@ const _allBuffs = {
 	poison: {
 		id: 12,
 		objects: [
-			{ key: 'disease', position: 'middle', type: 'buff', still: false, scale: .8, singleton: true, bind: 'poison', repeat: true }
+			{
+				key: 'disease',
+				position: 'middle',
+				type: 'buff',
+				still: false,
+				scale: 0.8,
+				singleton: true,
+				bind: 'poison',
+				repeat: true
+			}
 		],
 		stack: 3,
 		append: true,
@@ -322,17 +338,14 @@ const _allBuffs = {
 	},
 	ice: {
 		id: 15,
-		// objects: [
-		// 	{ key: 'cold', position: 'middle-head', type: 'buff', still: false, singleton: true, bind: 'ice', repeat: true }
-		// ],
-		//stack: 3,
+
 		append: true,
 		loss: [
 			{
 				level: 1,
 				props: {
-					hpRegenRate: -.5,
-					fps: .25,
+					hpRegenRate: -0.5,
+					fps: 0.25,
 					freeze: true
 				},
 				ms: 3000
@@ -349,17 +362,13 @@ const _allBuffs = {
 		]
 	},
 	sleep: {
-		after: function(_e) {
-			if(!_e.animations.idle)
-				return;
-			if(_e.animation !== 'idle')
-				_e.animate('idle', 1);
+		after: function (_e) {
+			if (!_e.animations.idle) return;
+			if (_e.animation !== 'idle') _e.animate('idle', 1);
 			_e.swapAnimation('idle');
 		},
 		id: 16,
-		objects: [
-			{ key: 'sleep', position: 'middle-head' }
-		],
+		objects: [{ key: 'sleep', position: 'middle-head' }],
 		loss: [
 			{
 				level: 1,
@@ -524,21 +533,21 @@ const _allBuffs = {
 			{
 				level: 1,
 				props: {
-					smart: true,
+					smart: true
 				},
 				ms: 3000
 			},
 			{
 				level: 2,
 				props: {
-					smart: true,
+					smart: true
 				},
 				ms: 4000
 			},
 			{
 				level: 3,
 				props: {
-					smart: true,
+					smart: true
 				},
 				ms: 5000
 			}
@@ -547,10 +556,9 @@ const _allBuffs = {
 };
 
 function getBuffKeyById(_id) {
-	for(let key in _allBuffs) {
+	for (let key in _allBuffs) {
 		const b = _allBuffs[key];
-		if(b.id === _id)
-			return key;
+		if (b.id === _id) return key;
 	}
 	return null;
 }

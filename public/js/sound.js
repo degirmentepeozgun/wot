@@ -1,467 +1,316 @@
 ﻿window.SoundManager = (function () {
+	const ctx = new (window.AudioContext || window.webkitAudioContext)();
 
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+	const soundBuffers = {};
+	const preloaded = new Set();
 
-  const soundBuffers = {};
-  const preloaded = new Set();
+	const COOLDOWN_MS = 200;
 
-  const COOLDOWN_MS = 200;
+	const playing = {};
 
-  // aktif sesler
-  // key -> playback object
-  const playing = {};
+	const audioNormalizeCache = {};
 
-  // normalize cache
-  const audioNormalizeCache = {};
+	function computePeak(buffer) {
+		const data = buffer.getChannelData(0);
 
-  // ---------------------------------------------------
-  // PEAK ANALYZE
-  // ---------------------------------------------------
+		let peak = 0;
 
-  function computePeak(buffer) {
-    const data = buffer.getChannelData(0);
+		for (let i = 0; i < data.length; i++) {
+			const v = Math.abs(data[i]);
+			if (v > peak) peak = v;
+		}
 
-    let peak = 0;
+		return peak;
+	}
 
-    for (let i = 0; i < data.length; i++) {
-      const v = Math.abs(data[i]);
-      if (v > peak) peak = v;
-    }
+	function getNormalizedGain(id, buffer) {
+		if (audioNormalizeCache[id]) return audioNormalizeCache[id].normGain;
 
-    return peak;
-  }
+		const peak = computePeak(buffer);
 
-  function getNormalizedGain(id, buffer) {
+		const reference = 0.7;
 
-    if (audioNormalizeCache[id])
-      return audioNormalizeCache[id].normGain;
+		let normGain = peak > 0 ? reference / peak : 1;
 
-    const peak = computePeak(buffer);
+		if (normGain > 4) normGain = 4;
 
-    const reference = 0.7;
+		audioNormalizeCache[id] = {
+			peak,
+			normGain
+		};
 
-    let normGain = peak > 0
-      ? reference / peak
-      : 1;
+		return normGain;
+	}
 
-    if (normGain > 4)
-      normGain = 4;
+	async function loadBuffer(id, url) {
+		const response = await fetch(url);
 
-    audioNormalizeCache[id] = {
-      peak,
-      normGain
-    };
+		const arrayBuffer = await response.arrayBuffer();
 
-    return normGain;
-  }
+		const buffer = await ctx.decodeAudioData(arrayBuffer);
 
-  // ---------------------------------------------------
-  // BUFFER LOAD
-  // ---------------------------------------------------
+		soundBuffers[id] = buffer;
+	}
 
-  async function loadBuffer(id, url) {
+	function cleanupPlayback(id, playback) {
+		if (!playback) return;
 
-    const response = await fetch(url);
+		try {
+			playback.source.onended = null;
+		} catch (_) {}
 
-    const arrayBuffer = await response.arrayBuffer();
+		try {
+			playback.source.stop(0);
+		} catch (_) {}
 
-    const buffer = await ctx.decodeAudioData(arrayBuffer);
+		try {
+			playback.source.disconnect();
+		} catch (_) {}
 
-    soundBuffers[id] = buffer;
-  }
+		try {
+			playback.panner?.disconnect();
+		} catch (_) {}
 
-  // ---------------------------------------------------
-  // NODE CLEANUP
-  // ---------------------------------------------------
+		try {
+			playback.gain?.disconnect();
+		} catch (_) {}
 
-  function cleanupPlayback(id, playback) {
+		delete playing[id];
 
-    if (!playback) return;
+		playback.end?.();
+	}
 
-    try {
-      playback.source.onended = null;
-    } catch (_) {}
+	function fadeCut(id, playback) {
+		if (!playback) return;
 
-    try {
-      playback.source.stop(0);
-    } catch (_) {}
+		delete playing[id];
 
-    try {
-      playback.source.disconnect();
-    } catch (_) {}
+		const end = playback.end;
+		playback.end = null;
 
-    try {
-      playback.panner?.disconnect();
-    } catch (_) {}
+		let faded = false;
+		const gainParam = playback.gain?.gain;
 
-    try {
-      playback.gain?.disconnect();
-    } catch (_) {}
+		if (gainParam) {
+			const t = ctx.currentTime;
+			try {
+				gainParam.cancelScheduledValues(t);
+				gainParam.setValueAtTime(gainParam.value, t);
+				gainParam.linearRampToValueAtTime(0, t + 0.01);
+				playback.source.onended = () => {
+					try {
+						playback.source.disconnect();
+					} catch (_) {}
+					try {
+						playback.panner?.disconnect();
+					} catch (_) {}
+					try {
+						playback.gain?.disconnect();
+					} catch (_) {}
+				};
+				playback.source.stop(t + 0.01);
+				faded = true;
+			} catch (_) {}
+		}
 
-    delete playing[id];
+		if (!faded) cleanupPlayback(id, playback);
 
-    playback.end?.();
-  }
+		if (end) end();
+	}
 
-  function fadeCut(id, playback) {
+	return {
+		warmAudio() {
+			ctx.resume().then(() => {
+				const osc = ctx.createOscillator();
 
-    if (!playback) return;
+				const gain = ctx.createGain();
 
-    delete playing[id];
+				gain.gain.value = 0;
 
-    const end = playback.end;
-    playback.end = null;
+				osc.connect(gain).connect(ctx.destination);
 
-    let faded = false;
-    const gainParam = playback.gain?.gain;
+				osc.start();
 
-    if (gainParam) {
-      const t = ctx.currentTime;
-      try {
-        gainParam.cancelScheduledValues(t);
-        gainParam.setValueAtTime(gainParam.value, t);
-        gainParam.linearRampToValueAtTime(0, t + 0.01);
-        playback.source.onended = () => {
-          try { playback.source.disconnect(); } catch (_) {}
-          try { playback.panner?.disconnect(); } catch (_) {}
-          try { playback.gain?.disconnect(); } catch (_) {}
-        };
-        playback.source.stop(t + 0.01);
-        faded = true;
-      } catch (_) {}
-    }
+				osc.stop(ctx.currentTime + 0.01);
+			});
+		},
 
-    if (!faded)
-      cleanupPlayback(id, playback);
+		async preload(id, url) {
+			if (!id) id = url;
 
-    if (end)
-      end();
-  }
+			if (preloaded.has(id)) return;
 
-  // ---------------------------------------------------
-  // API
-  // ---------------------------------------------------
+			await loadBuffer(id, url);
 
-  return {
+			preloaded.add(id);
+		},
 
-    // -----------------------------------------
-    // audio warmup
-    // -----------------------------------------
+		async play(
+			id,
+			url = null,
+			volume = 1,
+			loop = false,
+			rate = 1,
+			reset = false,
+			force = false,
+			end = null,
+			bind = false,
+			pan = 0,
+			thick = false
+		) {
+			if (!id) id = url;
 
-    warmAudio() {
+			if (!url) url = soundFiles?.[id];
 
-      ctx.resume().then(() => {
+			if (!id || !url) return undefined;
 
-        const osc = ctx.createOscillator();
+			if (!soundBuffers[id]) {
+				await this.preload(id, url);
+			}
 
-        const gain = ctx.createGain();
+			const buffer = soundBuffers[id];
 
-        gain.gain.value = 0;
+			if (!buffer) return undefined;
 
-        osc.connect(gain).connect(ctx.destination);
+			if (thick) rate = (rate || 1) * 0.94;
 
-        osc.start();
+			const now = performance.now();
 
-        osc.stop(ctx.currentTime + 0.01);
+			const durationMs = loop ? Infinity : (buffer.duration / rate) * 1000;
 
-      });
+			const prev = playing[id];
 
-    },
+			if (prev) {
+				const elapsed = now - prev.startedAt;
 
-    // -----------------------------------------
-    // preload
-    // -----------------------------------------
+				const stillPlaying = elapsed < prev.durationMs;
 
-    async preload(id, url) {
+				if (stillPlaying) {
+					if (!reset) return undefined;
 
-      if (!id)
-        id = url;
+					if (reset && !force && !end && elapsed < COOLDOWN_MS) {
+						return undefined;
+					}
 
-      if (preloaded.has(id))
-        return;
+					fadeCut(id, prev);
+				}
+			}
 
-      await loadBuffer(id, url);
+			const source = ctx.createBufferSource();
 
-      preloaded.add(id);
-    },
+			source.buffer = buffer;
 
-    // -----------------------------------------
-    // play
-    // -----------------------------------------
+			source.loop = loop;
 
-    async play(
-      id,
-      url = null,
-      volume = 1,
-      loop = false,
-      rate = 1,
-      reset = false,
-      force = false,
-      end = null,
-      bind = false,
-      pan = 0,
-      thick = false
-    ) {
+			source.playbackRate.value = rate;
 
-      // -----------------------------
-      // resolve id
-      // -----------------------------
+			const gain = ctx.createGain();
 
-      if (!id)
-        id = url;
+			const normGain = getNormalizedGain(id, buffer);
 
-      if (!url)
-        url = soundFiles?.[id];
+			gain.gain.value = volume * normGain;
 
-      if (!id || !url)
-        return undefined;
+			const panner = ctx.createStereoPanner();
 
-      // -----------------------------
-      // preload
-      // -----------------------------
+			let _pan = 0;
+			if (!loop && Number.isFinite(pan)) _pan = pan < -1 ? -1 : pan > 1 ? 1 : pan;
+			panner.pan.value = _pan;
 
-      if (!soundBuffers[id]) {
-        await this.preload(id, url);
-      }
+			source.connect(panner);
 
-      const buffer = soundBuffers[id];
+			panner.connect(gain);
 
-      if (!buffer)
-        return undefined;
+			gain.connect(ctx.destination);
 
-      if (thick)
-        rate = (rate || 1) * 0.94;
+			const playback = {
+				id,
+				source,
+				gain,
+				panner,
+				startedAt: now,
+				durationMs,
+				end
+			};
 
-      const now = performance.now();
+			playing[id] = playback;
 
-      const durationMs = loop
-        ? Infinity
-        : (buffer.duration / rate) * 1000;
+			source.onended = () => {
+				if (playing[id]?.source === source) {
+					cleanupPlayback(id, playback);
+				}
+			};
 
-      // -----------------------------
-      // previous playback
-      // -----------------------------
+			source.start(0);
 
-      const prev = playing[id];
+			source.volume = gain.gain.value;
 
-      if (prev) {
+			source.gain = gain.gain;
 
-        const elapsed = now - prev.startedAt;
+			source.pannerNode = panner;
 
-        const stillPlaying = elapsed < prev.durationMs;
+			return bind ? Promise.resolve(source) : undefined;
+		},
 
-        if (stillPlaying) {
+		stop(id) {
+			if (!id) return;
 
-          // reset false → ignore
-          if (!reset)
-            return undefined;
+			const playback = playing[id];
 
-          // cooldown
-          if (
-            reset &&
-            !force &&
-            !end &&
-            elapsed < COOLDOWN_MS
-          ) {
-            return undefined;
-          }
+			if (!playback) return;
 
-          fadeCut(id, prev);
-        }
-      }
+			cleanupPlayback(id, playback);
+		},
 
-      // -----------------------------
-      // create source
-      // -----------------------------
+		stopAll() {
+			const ids = Object.keys(playing);
 
-      const source = ctx.createBufferSource();
+			for (const id of ids) {
+				const playback = playing[id];
 
-      source.buffer = buffer;
+				if (playback) {
+					cleanupPlayback(id, playback);
+				}
+			}
+		},
 
-      source.loop = loop;
+		suspend() {
+			ctx.suspend();
+		},
 
-      source.playbackRate.value = rate;
+		resume() {
+			ctx.resume();
+		},
 
-      // -----------------------------
-      // gain
-      // -----------------------------
+		clearLoops() {
+			const ids = Object.keys(playing);
 
-      const gain = ctx.createGain();
+			for (const id of ids) {
+				const p = playing[id];
 
-      const normGain = getNormalizedGain(id, buffer);
+				if (p?.source?.loop) {
+					cleanupPlayback(id, p);
 
-      gain.gain.value = volume * normGain;
+					delete soundBuffers[id];
 
-      // -----------------------------
-      // stereo panner
-      // -----------------------------
+					delete audioNormalizeCache[id];
 
-      const panner = ctx.createStereoPanner();
+					preloaded.delete(id);
+				}
+			}
+		},
 
-      let _pan = 0;
-      if (!loop && Number.isFinite(pan))
-        _pan = pan < -1 ? -1 : (pan > 1 ? 1 : pan);
-      panner.pan.value = _pan;
+		clearAll() {
+			this.stopAll();
 
-      // -----------------------------
-      // chain
-      // -----------------------------
+			for (const k in soundBuffers) delete soundBuffers[k];
 
-      source.connect(panner);
+			for (const k in audioNormalizeCache) delete audioNormalizeCache[k];
 
-      panner.connect(gain);
+			preloaded.clear();
+		},
 
-      gain.connect(ctx.destination);
-
-      // -----------------------------
-      // playback object
-      // -----------------------------
-
-      const playback = {
-        id,
-        source,
-        gain,
-        panner,
-        startedAt: now,
-        durationMs,
-        end
-      };
-
-      playing[id] = playback;
-
-      // -----------------------------
-      // ended
-      // -----------------------------
-
-      source.onended = () => {
-
-        if (playing[id]?.source === source) {
-          cleanupPlayback(id, playback);
-        }
-
-      };
-
-      // -----------------------------
-      // start
-      // -----------------------------
-
-      source.start(0);
-
-      // helper refs
-
-      source.volume = gain.gain.value;
-
-      source.gain = gain.gain;
-
-      source.pannerNode = panner;
-
-      return bind
-        ? Promise.resolve(source)
-        : undefined;
-    },
-
-    // -----------------------------------------
-    // stop
-    // -----------------------------------------
-
-    stop(id) {
-
-      if (!id)
-        return;
-
-      const playback = playing[id];
-
-      if (!playback)
-        return;
-
-      cleanupPlayback(id, playback);
-    },
-
-    // -----------------------------------------
-    // stop all
-    // -----------------------------------------
-
-    stopAll() {
-
-      const ids = Object.keys(playing);
-
-      for (const id of ids) {
-
-        const playback = playing[id];
-
-        if (playback) {
-          cleanupPlayback(id, playback);
-        }
-
-      }
-    },
-
-    // -----------------------------------------
-    // suspend
-    // -----------------------------------------
-
-    suspend() {
-      ctx.suspend();
-    },
-
-    // -----------------------------------------
-    // resume
-    // -----------------------------------------
-
-    resume() {
-      ctx.resume();
-    },
-
-    // -----------------------------------------
-    // clear loops
-    // -----------------------------------------
-
-    clearLoops() {
-
-      const ids = Object.keys(playing);
-
-      for (const id of ids) {
-
-        const p = playing[id];
-
-        if (p?.source?.loop) {
-
-          cleanupPlayback(id, p);
-
-          delete soundBuffers[id];
-
-          delete audioNormalizeCache[id];
-
-          preloaded.delete(id);
-        }
-      }
-    },
-
-    // -----------------------------------------
-    // clear all
-    // -----------------------------------------
-
-    clearAll() {
-
-      this.stopAll();
-
-      for (const k in soundBuffers)
-        delete soundBuffers[k];
-
-      for (const k in audioNormalizeCache)
-        delete audioNormalizeCache[k];
-
-      preloaded.clear();
-    },
-
-    // -----------------------------------------
-    // get playing
-    // -----------------------------------------
-
-    getPlaying(id) {
-      return playing[id] || null;
-    }
-
-  };
-
+		getPlaying(id) {
+			return playing[id] || null;
+		}
+	};
 })();

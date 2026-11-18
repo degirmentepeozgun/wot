@@ -22,23 +22,18 @@ function animation(_a) {
 	this.frames = _a.frames;
 	this.do = _a.do;
 	this.primary = _a.primary;
-	if(this.frames?.[0])
-		this.frames.forEach(x => x.frameKey = 'l' + x.spriteLeft + 't' + x.spriteTop + 'w' + x.spriteWidth + 'h' + x.spriteHeight);
-	if(_a.alternateFrames)
-		this.alternateFrames = _a.alternateFrames;
-	if(_a.finishType)
-		this.finishType = _a.finishType;
-	if(this.speed)
-		this.frames.forEach(x => x.speed = MathCeil(x.speed / this.speed));
-	if(_a.useInCC)
-		this.useInCC = _a.useInCC;
+	if (this.frames?.[0])
+		this.frames.forEach(
+			(x) => (x.frameKey = 'l' + x.spriteLeft + 't' + x.spriteTop + 'w' + x.spriteWidth + 'h' + x.spriteHeight)
+		);
+	if (_a.alternateFrames) this.alternateFrames = _a.alternateFrames;
+	if (_a.finishType) this.finishType = _a.finishType;
+	if (this.speed) this.frames.forEach((x) => (x.speed = MathCeil(x.speed / this.speed)));
+	if (_a.useInCC) this.useInCC = _a.useInCC;
 	this.passive = _a.passive;
-	if(_a.maxAttackedCount)
-		this.maxAttackedCount = _a.maxAttackedCount;
-	if(_a.shake)
-		this.shake = _a.shake;
-	if(_a.rotateRate)
-		this.rotateRate = _a.rotateRate;
+	if (_a.maxAttackedCount) this.maxAttackedCount = _a.maxAttackedCount;
+	if (_a.shake) this.shake = _a.shake;
+	if (_a.rotateRate) this.rotateRate = _a.rotateRate;
 	this.ultimate = _a.ultimate;
 	this.rage = _a.rage;
 	this.hitStop = _a.hitStop;
@@ -98,15 +93,9 @@ function animation(_a) {
 	this.reset = _a.reset;
 	this.skipHealthBar = _a.skipHealthBar;
 	this.once = _a.once;
-	if (_a.src)
-		this.sprite = getImage(_a.src);
-	this.resetImage = function() {
-		if(this.src)
-			this.sprite = getImage(this.src);
-		else
-			this.sprite = undefined;
-	}
-	//this.soundSrc = _a.soundSrc;
-	//if (this.soundSrc)
-	//	this.sound = new Audio(this.soundSrc);
+	if (_a.src) this.sprite = getImage(_a.src);
+	this.resetImage = function () {
+		if (this.src) this.sprite = getImage(this.src);
+		else this.sprite = undefined;
+	};
 }

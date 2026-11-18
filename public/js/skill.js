@@ -1,9 +1,9 @@
 ﻿'use strict';
-console.log('skill')
+console.log('skill');
 function characterSkill() {
 	this.allSkills = [
 		{
-			names: { 
+			names: {
 				en: 'Normal Attack',
 				tr: 'Basit Saldırı'
 			},
@@ -32,12 +32,11 @@ function characterSkill() {
 			]
 		},
 		{
-			names: { 
+			names: {
 				en: 'Meditation',
 				tr: 'Meditasyon'
 			},
-			descriptions:
-			{ 
+			descriptions: {
 				en: 'A channeling skill which increase some of your HP per second, interrupts when opponents make an attack on you or when you move',
 				tr: 'Engel olunmadığı taktirde geçen her saniye boyunca sağlığınızı arttırır. Saldırıya uğradığınızda veya kımıldadığınızda iptal olur'
 			},
@@ -141,7 +140,7 @@ function characterSkill() {
 			]
 		},
 		{
-			names: { 
+			names: {
 				en: 'Ranged Attack',
 				tr: 'Uzaktan Saldırı'
 			},
@@ -365,7 +364,8 @@ function characterSkill() {
 		},
 		{
 			name: 'Rage Skill',
-			description: 'When you have enough rage, pulls nearby enemies and summons lightning spheres, throwing opponents into air and summon a decoy which is immune all attacks for suppor next 10 seconds',
+			description:
+				'When you have enough rage, pulls nearby enemies and summons lightning spheres, throwing opponents into air and summon a decoy which is immune all attacks for suppor next 10 seconds',
 			key: 'air2',
 			class: 'thief',
 			dmgType: 'Lightning',
@@ -449,7 +449,8 @@ function characterSkill() {
 		},
 		{
 			name: 'Storm Attack',
-			description: 'A long ranged atack with summoning thunder bolts through ground which throws opponents into air',
+			description:
+				'A long ranged atack with summoning thunder bolts through ground which throws opponents into air',
 			key: 'ground2',
 			class: 'archer',
 			skillClass: 'Air',
@@ -495,7 +496,8 @@ function characterSkill() {
 		},
 		{
 			name: 'Rage Skill',
-			description: 'When you have enough rage, you summon electric circles which moves around you and throws opponent into air, buffs you up with attack speed',
+			description:
+				'When you have enough rage, you summon electric circles which moves around you and throws opponent into air, buffs you up with attack speed',
 			key: 'air2',
 			class: 'archer',
 			dmgType: 'Lightning',
@@ -525,9 +527,7 @@ function characterSkill() {
 			dmgType: 'Common',
 			order: 1,
 			unlockLevel: 1,
-			props: [
-				{ level: 1, type: 'Attack', value: 110 }
-			]
+			props: [{ level: 1, type: 'Attack', value: 110 }]
 		},
 		{
 			name: 'Revive',
@@ -536,9 +536,7 @@ function characterSkill() {
 			type: 'skill',
 			order: 8,
 			unlockLevel: 1,
-			props: [
-				{ level: 1, type: 'Rejuvenation Duration', value: 100 }
-			]
+			props: [{ level: 1, type: 'Rejuvenation Duration', value: 100 }]
 		},
 		{
 			name: 'Ground1 Attack',
@@ -549,9 +547,7 @@ function characterSkill() {
 			type: 'skill',
 			order: 3,
 			unlockLevel: 1,
-			props: [
-				{ level: 1, type: 'Attack', value: 110 }
-			]
+			props: [{ level: 1, type: 'Attack', value: 110 }]
 		},
 		{
 			name: 'Ground2 Attack',
@@ -562,9 +558,7 @@ function characterSkill() {
 			type: 'skill',
 			order: 4,
 			unlockLevel: 1,
-			props: [
-				{ level: 1, type: 'Attack', value: 110 }
-			]
+			props: [{ level: 1, type: 'Attack', value: 110 }]
 		},
 		{
 			name: 'Air Attack',
@@ -575,9 +569,7 @@ function characterSkill() {
 			type: 'skill',
 			order: 5,
 			unlockLevel: 1,
-			props: [
-				{ level: 1, type: 'Attack', value: 110 }
-			]
+			props: [{ level: 1, type: 'Attack', value: 110 }]
 		},
 		{
 			name: 'Rage Skill',
@@ -588,9 +580,7 @@ function characterSkill() {
 			type: 'skill',
 			order: 6,
 			unlockLevel: 1,
-			props: [
-				{ level: 1, type: 'Attack', value: 110 }
-			]
+			props: [{ level: 1, type: 'Attack', value: 110 }]
 		},
 		{
 			name: 'Normal Attack',
@@ -601,9 +591,7 @@ function characterSkill() {
 			dmgType: 'Common',
 			order: 1,
 			unlockLevel: 1,
-			props: [
-				{ level: 1, type: 'Attack', value: 110 }
-			]
+			props: [{ level: 1, type: 'Attack', value: 110 }]
 		},
 		{
 			name: 'Explosive Attack',
@@ -612,9 +600,7 @@ function characterSkill() {
 			type: 'skill',
 			order: 8,
 			unlockLevel: 1,
-			props: [
-				{ level: 1, type: 'Attack', value: 110 }
-			]
+			props: [{ level: 1, type: 'Attack', value: 110 }]
 		},
 		{
 			name: 'Ground1 Attack',
@@ -625,9 +611,7 @@ function characterSkill() {
 			type: 'skill',
 			order: 3,
 			unlockLevel: 1,
-			props: [
-				{ level: 1, type: 'Attack', value: 110 }
-			]
+			props: [{ level: 1, type: 'Attack', value: 110 }]
 		},
 		{
 			name: 'Ground2 Attack',
@@ -638,9 +622,7 @@ function characterSkill() {
 			type: 'skill',
 			order: 4,
 			unlockLevel: 1,
-			props: [
-				{ level: 1, type: 'Attack', value: 110 }
-			]
+			props: [{ level: 1, type: 'Attack', value: 110 }]
 		},
 		{
 			name: 'Summon',
@@ -651,9 +633,7 @@ function characterSkill() {
 			type: 'skill',
 			order: 5,
 			unlockLevel: 1,
-			props: [
-				{ level: 1, type: 'Attack', value: 110 }
-			]
+			props: [{ level: 1, type: 'Attack', value: 110 }]
 		},
 		{
 			name: 'Rage Skill',
@@ -664,78 +644,81 @@ function characterSkill() {
 			type: 'skill',
 			order: 6,
 			unlockLevel: 1,
-			props: [
-				{ level: 1, type: 'Attack', value: 110 }
-			]
+			props: [{ level: 1, type: 'Attack', value: 110 }]
 		}
 	];
-	this.passiveSkills = [{
-		key: 'passive-hp',
-		name: 'More HP',
-		description: 'Additional HP for keeping yourself alive much longer',
-		unlockLevel: 1,
-		gain: ['%20 more health point'],
-		price: 50000
-	}, {
-		key: 'passive-counter',
-		name: 'Clever And Strong',
-		description: 'When you time your block move within attack of your opponent, your hero makes a counter attack move against opponent',
-		unlockLevel: 1,
-		price: 15000,
-		chanceRate: 50,
-		gain: ['%10 atk and %10 defense increased after counter-attack for 5 seconds']
-	}, {
-		key: 'passive-run',
-		name: 'Run Rabbit Run',
-		description: 'You become a faster runner and move quickly against your oponents',
-		unlockLevel: 5,
-		gain: ['%25 faster run and walk'],
-		price: 20000
-	}, {
-		key: 'passive-def',
-		name: 'Last Man Standing',
-		description: 'Your defense increase when your HP decrease under %20',
-		gain: ['%20 defense increased'],
-		unlockLevel: 5,
-		price: 5000
-	}, {
-		key: 'passive-roll',
-		name: 'Lightning Reflexes',
-		description: 'Decrease cooldown of dodge skill',
-		gain: ['%25 dodge cooldown descreased'],
-		unlockLevel: 10,
-		price: 15000
-	}, {
-		key: 'passive-parry',
-		name: 'Timing Is Precious',
-		description: 'If you time your block well and activate counter-attack, you gain some HP',
-		gain: ['Level 1 health per second buff applies'],
-		unlockLevel: 10,
-		chanceRate: 20,
-		price: 10000
-	}, {
-		key: 'passive-crit',
-		name: 'Hit Me More',
-		description: 'When you crit your opponent well, you may gain an attack speed buff for next moves',
-		gain: ['Level 1 attack speed buff applies'],
-		unlockLevel: 10,
-		chanceRate: 20,
-		price: 10000
-		}];
-	//if (unlockAll)
-		//this.allSkills.forEach(x => x.unlockLevel = 1);
+	this.passiveSkills = [
+		{
+			key: 'passive-hp',
+			name: 'More HP',
+			description: 'Additional HP for keeping yourself alive much longer',
+			unlockLevel: 1,
+			gain: ['%20 more health point'],
+			price: 50000
+		},
+		{
+			key: 'passive-counter',
+			name: 'Clever And Strong',
+			description:
+				'When you time your block move within attack of your opponent, your hero makes a counter attack move against opponent',
+			unlockLevel: 1,
+			price: 15000,
+			chanceRate: 50,
+			gain: ['%10 atk and %10 defense increased after counter-attack for 5 seconds']
+		},
+		{
+			key: 'passive-run',
+			name: 'Run Rabbit Run',
+			description: 'You become a faster runner and move quickly against your oponents',
+			unlockLevel: 5,
+			gain: ['%25 faster run and walk'],
+			price: 20000
+		},
+		{
+			key: 'passive-def',
+			name: 'Last Man Standing',
+			description: 'Your defense increase when your HP decrease under %20',
+			gain: ['%20 defense increased'],
+			unlockLevel: 5,
+			price: 5000
+		},
+		{
+			key: 'passive-roll',
+			name: 'Lightning Reflexes',
+			description: 'Decrease cooldown of dodge skill',
+			gain: ['%25 dodge cooldown descreased'],
+			unlockLevel: 10,
+			price: 15000
+		},
+		{
+			key: 'passive-parry',
+			name: 'Timing Is Precious',
+			description: 'If you time your block well and activate counter-attack, you gain some HP',
+			gain: ['Level 1 health per second buff applies'],
+			unlockLevel: 10,
+			chanceRate: 20,
+			price: 10000
+		},
+		{
+			key: 'passive-crit',
+			name: 'Hit Me More',
+			description: 'When you crit your opponent well, you may gain an attack speed buff for next moves',
+			gain: ['Level 1 attack speed buff applies'],
+			unlockLevel: 10,
+			chanceRate: 20,
+			price: 10000
+		}
+	];
+
 	this.calculateSkillPrice = function (_key) {
-		const _skill = this.allSkills.find(x => x.key === _key && x.class === mainCharacter.class);
-		if (_skill)
-			return 1000 * (_skill.level ?? 1);
+		const _skill = this.allSkills.find((x) => x.key === _key && x.class === mainCharacter.class);
+		if (_skill) return 1000 * (_skill.level ?? 1);
 		return 1000;
-	}
+	};
 	this.getSkillTab = function (_order) {
-		if (_order === 0)
-			this.getSkillUI(mainCharacter.class);
-		else
-			this.getPassiveSkillUI(1);
-	}
+		if (_order === 0) this.getSkillUI(mainCharacter.class);
+		else this.getPassiveSkillUI(1);
+	};
 	this.getSkillUI = function (_class) {
 		let _tutorial = {
 			tr: {
@@ -744,58 +727,86 @@ function characterSkill() {
 			},
 			en: {
 				title: 'Skills',
-				desc: 'Abilities vary depending on the character you choose, and are activated based on your character\'s level. Abilities that are developed based on your character\'s level are also enhanced for a certain gold cost. You can track the strength of the ability you select from the list on the left, its damage rating, and the damage it will inflict at the next level. You can build your development strategy based on this information.'
+				desc: "Abilities vary depending on the character you choose, and are activated based on your character's level. Abilities that are developed based on your character's level are also enhanced for a certain gold cost. You can track the strength of the ability you select from the list on the left, its damage rating, and the damage it will inflict at the next level. You can build your development strategy based on this information."
 			}
 		};
-		if(!tryShowMenuTutorial('skill'))
-			_tutorial = undefined;
+		if (!tryShowMenuTutorial('skill')) _tutorial = undefined;
 		let _content = showMenuTutorial(_tutorial, 'skill');
 		updateMenuBottom(1);
 		const _container = selectMenuContainer();
-		_container.innerHTML = 
-					'<div class="menu-ui-left fade-me">' +
-						'<div class="menu-modal-left menu-modal-left-content page-container-wrapper">' +
-							'<div class="skills-content-left menu-modal-left-container">' +
-								'<div class="full skill-content-inner">' +
-									this.getSkillsUI(_class, 1) +
-								'</div>' +
-							'</div>' +
-						'</div>' +
-					'</div>' +
-					'<div class="menu-ui-right fade-me">' + 
-						'<div class="menu-modal-right menu-modal-right-content page-container-wrapper">' +
-							'<div class="skills-content-right">' +
-								'<div class="skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">' +
-									(_content !== '' ? _content : this.getSkillDetailUI(_class, 1, 1)) +
-							'</div>' +
-							'<div class="shine-area"></div>' +
-						'</div>' +
-					'</div>' +
-				'</div>';
-	}
+		_container.innerHTML =
+			'<div class="menu-ui-left fade-me">' +
+			'<div class="menu-modal-left menu-modal-left-content page-container-wrapper">' +
+			'<div class="skills-content-left menu-modal-left-container">' +
+			'<div class="full skill-content-inner">' +
+			this.getSkillsUI(_class, 1) +
+			'</div>' +
+			'</div>' +
+			'</div>' +
+			'</div>' +
+			'<div class="menu-ui-right fade-me">' +
+			'<div class="menu-modal-right menu-modal-right-content page-container-wrapper">' +
+			'<div class="skills-content-right">' +
+			'<div class="skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">' +
+			(_content !== '' ? _content : this.getSkillDetailUI(_class, 1, 1)) +
+			'</div>' +
+			'<div class="shine-area"></div>' +
+			'</div>' +
+			'</div>' +
+			'</div>';
+	};
 	this.getSkillsUI = function (_class, _order) {
-		const _skills = this.allSkills.filter(x => x.class === _class && x.list !== false)?.sort((a, b) => a.order - b.order);
+		const _skills = this.allSkills
+			.filter((x) => x.class === _class && x.list !== false)
+			?.sort((a, b) => a.order - b.order);
 		let html = '';
 		const _noSelect = tryShowMenuTutorial('skill');
 		if (_skills) {
 			let _i = 0;
 			for (var _skill of _skills) {
 				const _active = _skill.unlockLevel <= mainCharacter.level;
-				let _level = !_active ? 0 : _skill.level ?? 1;
-				html += '<div data-key="'+_skill.key+'" onexactclick="skill.selectSkill(\'' + _skill.key + '\', ' + _i + ')" class="skill-card animate-me flex' + (((_i + 1) === _order && !_noSelect) ? ' selected' : '') + '">' +
-					'<div class="skill-icon-wrapper flex"><img src="./images/main/skill-icons/' + _class + '/' + _skill.key + '.png" /></div>' +
+				let _level = !_active ? 0 : (_skill.level ?? 1);
+				html +=
+					'<div data-key="' +
+					_skill.key +
+					'" onexactclick="skill.selectSkill(\'' +
+					_skill.key +
+					"', " +
+					_i +
+					')" class="skill-card animate-me flex' +
+					(_i + 1 === _order && !_noSelect ? ' selected' : '') +
+					'">' +
+					'<div class="skill-icon-wrapper flex"><img src="./images/main/skill-icons/' +
+					_class +
+					'/' +
+					_skill.key +
+					'.png" /></div>' +
 					'<div style="flex:1;height:100%">' +
-					'<div class="flex flex-jc-start skill-card-title" style="height:50%;width:100%">' + _skill.names[getLang()] + '</div>' +
-					(_level > 0 ?
-						'<div class="flex flex-jc-start skill-card-level"><span id="skill-' + _skill.key + '-level">' + _level + '</span>&nbsp;/&nbsp;' + _skill.props.length + '</div>' :
-						'<div class="flex flex-jc-start skill-card-state">' + getLangData('Unlocked') + ':&nbsp;<span style="color:#ff6c00 !important">' + getLangData('Level') + ' ' + _skill.unlockLevel + '</span></div>') +
+					'<div class="flex flex-jc-start skill-card-title" style="height:50%;width:100%">' +
+					_skill.names[getLang()] +
+					'</div>' +
+					(_level > 0
+						? '<div class="flex flex-jc-start skill-card-level"><span id="skill-' +
+							_skill.key +
+							'-level">' +
+							_level +
+							'</span>&nbsp;/&nbsp;' +
+							_skill.props.length +
+							'</div>'
+						: '<div class="flex flex-jc-start skill-card-state">' +
+							getLangData('Unlocked') +
+							':&nbsp;<span style="color:#ff6c00 !important">' +
+							getLangData('Level') +
+							' ' +
+							_skill.unlockLevel +
+							'</span></div>') +
 					'</div>' +
 					'</div>';
 				_i++;
 			}
 		}
 		return html;
-	}
+	};
 	this.selectSkill = function (_key, _index) {
 		const _skillCards = document.querySelectorAll('#menu-ui .skill-card');
 		const _container = document.querySelector('#menu-ui .skills-content-detail-wrapper');
@@ -803,78 +814,157 @@ function characterSkill() {
 		for (var _sc of _skillCards) {
 			if (_i === _index) {
 				addClass(_sc, 'selected');
-				const _skill = this.allSkills.filter(x => x.class === mainCharacter.class  && x.list !== false)?.sort((a, b) => a.order - b.order)[_index];
-				_container.innerHTML = this.getSkillDetailUI(mainCharacter.class, _skill.order) + '<div id="shine"></div>';
-			}
-			else
-				removeClass(_sc, 'selected');
+				const _skill = this.allSkills
+					.filter((x) => x.class === mainCharacter.class && x.list !== false)
+					?.sort((a, b) => a.order - b.order)[_index];
+				_container.innerHTML =
+					this.getSkillDetailUI(mainCharacter.class, _skill.order) + '<div id="shine"></div>';
+			} else removeClass(_sc, 'selected');
 			_i++;
 		}
-	}
+	};
 	this.getSkillDetailUI = function (_class, _order, _noSound) {
-		if(!_noSound)
-			playClick();
-		const _skill = this.allSkills.find(x => x.class === _class && x.order === _order);
+		if (!_noSound) playClick();
+		const _skill = this.allSkills.find((x) => x.class === _class && x.order === _order);
 		if (_skill) {
 			const _animation = mainCharacter.animations[_skill.key];
-			const _currentProps = _skill.props.find(x => x.level === (_skill.level ?? 1));
+			const _currentProps = _skill.props.find((x) => x.level === (_skill.level ?? 1));
 			const _active = _skill.unlockLevel <= mainCharacter.level;
-			let _level = !_active ? 0 : _skill.level ?? 1;
-			let _nextProps = _skill.props.find(x => x.level === ((_skill.level ?? 1) + 1));
-			let html = '<div style="padding:5% 7% 1% 7%;overflow-y:auto" class="full fade-me skill-detail-container">' +
+			let _level = !_active ? 0 : (_skill.level ?? 1);
+			let _nextProps = _skill.props.find((x) => x.level === (_skill.level ?? 1) + 1);
+			let html =
+				'<div style="padding:5% 7% 1% 7%;overflow-y:auto" class="full fade-me skill-detail-container">' +
 				'<div class="item-detail-wrapper">' +
-				'<div class="skill-content-header flex w-100">' + _skill.names[getLang()]  + '</div>' +
-				'<div class="skill-content-level flex w-100">' + getLangData('Lvl') + '. ' + _level + ' / ' + _skill.props.length + '</div>' +
+				'<div class="skill-content-header flex w-100">' +
+				_skill.names[getLang()] +
+				'</div>' +
+				'<div class="skill-content-level flex w-100">' +
+				getLangData('Lvl') +
+				'. ' +
+				_level +
+				' / ' +
+				_skill.props.length +
+				'</div>' +
 				'<div class="skill-splitter flex w-100"><img src="./images/ui/game/stats-line.png" /></div>' +
-				'<div class="skill-content-desc">' + _skill.descriptions[getLang()] + (_skill.key.endsWith('modified') ? '<br/><span style="color:#ff6c00 !important">(' + getLangData('Rage mode only') + ')</span>' : '') + '</div>' +
+				'<div class="skill-content-desc">' +
+				_skill.descriptions[getLang()] +
+				(_skill.key.endsWith('modified')
+					? '<br/><span style="color:#ff6c00 !important">(' + getLangData('Rage mode only') + ')</span>'
+					: '') +
+				'</div>' +
 				'<div class="skill-props-container">' +
-				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Upgrade Cost') + '</div>' +
-				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end"><span id="skill-cost">' + this.calculateSkillPrice(_skill.key) + '</span>&nbsp;<img src="./images/icons/coin.png" style="height:2.6cqh" /></div></div>' +
-				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Skill Break') + '</div>' +
-				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">' + getLangData(this.getSkillPriority(_animation.priority)) + '</div></div>' +
-				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Skill Type') + '</div>' +
-				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">' + getLangData(_skill.skillClass ?? 'Common') + '</div></div>' +
-				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Cooldown') + '</div>' +
-				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">' + this.getSkillCooldown(_animation.cooldown) + '</div></div>' +
-				(_skill.dmgType ?
-					'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Damage Type') + '</div>' +
-					'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end"><img style="height:3cqh;margin-right:1cqh" src="./images/elemental/' + _skill.dmgType.toLowerCase() + '.png" />' + getLangData(_skill.dmgType) + '</div></div>' : '') +
-				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Affected Target') + '</div>' +
-				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">' + (_animation.maxAttackedCount ?? __maxAttackedCount) + '</div></div>' +
-				'<div id="skill-current-props"><div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Current Level') + '</div>' +
-				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">+ %' + _currentProps.value + ' ' + getLangData(_currentProps.type) + '</div></div></div>' +
-				(_nextProps ? '<div id="skill-next-props"><div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Next Level') + '</div>' +
-					'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">+ %' + _nextProps.value + ' ' + getLangData(_nextProps.type) + '</div></div></div>' : '') +
+				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' +
+				getLangData('Upgrade Cost') +
+				'</div>' +
+				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end"><span id="skill-cost">' +
+				this.calculateSkillPrice(_skill.key) +
+				'</span>&nbsp;<img src="./images/icons/coin.png" style="height:2.6cqh" /></div></div>' +
+				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' +
+				getLangData('Skill Break') +
+				'</div>' +
+				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">' +
+				getLangData(this.getSkillPriority(_animation.priority)) +
+				'</div></div>' +
+				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' +
+				getLangData('Skill Type') +
+				'</div>' +
+				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">' +
+				getLangData(_skill.skillClass ?? 'Common') +
+				'</div></div>' +
+				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' +
+				getLangData('Cooldown') +
+				'</div>' +
+				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">' +
+				this.getSkillCooldown(_animation.cooldown) +
+				'</div></div>' +
+				(_skill.dmgType
+					? '<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' +
+						getLangData('Damage Type') +
+						'</div>' +
+						'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end"><img style="height:3cqh;margin-right:1cqh" src="./images/elemental/' +
+						_skill.dmgType.toLowerCase() +
+						'.png" />' +
+						getLangData(_skill.dmgType) +
+						'</div></div>'
+					: '') +
+				'<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' +
+				getLangData('Affected Target') +
+				'</div>' +
+				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">' +
+				(_animation.maxAttackedCount ?? __maxAttackedCount) +
+				'</div></div>' +
+				'<div id="skill-current-props"><div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' +
+				getLangData('Current Level') +
+				'</div>' +
+				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">+ %' +
+				_currentProps.value +
+				' ' +
+				getLangData(_currentProps.type) +
+				'</div></div></div>' +
+				(_nextProps
+					? '<div id="skill-next-props"><div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' +
+						getLangData('Next Level') +
+						'</div>' +
+						'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">+ %' +
+						_nextProps.value +
+						' ' +
+						getLangData(_nextProps.type) +
+						'</div></div></div>'
+					: '') +
 				'</div>' +
 				'</div>' +
-				'<div class="flex action-button-container"><div class="game-btn3 animate-me flex' + ((_nextProps && _skill.unlockLevel <= mainCharacter.level) ? '' : ' gray disabled') + '" onexactclick="skill.upgradeSkill(' + _order + ')" style="height:65%"><div class="flex">' + getLangData('UPGRADE') + '</div></div></div></div>';
+				'<div class="flex action-button-container"><div class="game-btn3 animate-me flex' +
+				(_nextProps && _skill.unlockLevel <= mainCharacter.level ? '' : ' gray disabled') +
+				'" onexactclick="skill.upgradeSkill(' +
+				_order +
+				')" style="height:65%"><div class="flex">' +
+				getLangData('UPGRADE') +
+				'</div></div></div></div>';
 			return html;
 		}
 		return '';
-	}
+	};
 	this.getPassiveSkillUI = function () {
 		const _skillTabs = document.querySelectorAll('#menu-ui .skill-tab');
 		addClass(_skillTabs[1], 'selected');
 		removeClass(_skillTabs[0], 'selected');
 		document.querySelector('#menu-ui .skills-content-left').innerHTML = this.getPassiveSkillsUI(1);
 		document.querySelector('#menu-ui .skills-content-detail-wrapper').innerHTML = this.getPassiveSkillDetailUI(0);
-	}
+	};
 	this.getPassiveSkillsUI = function (_order) {
 		let html = '';
 		let _i = 0;
 		for (var _skill of this.passiveSkills) {
 			const _active = _skill.unlockLevel <= mainCharacter.level;
-			html += '<div onexactclick="skill.selectPassiveSkill(' + _i + ')" class="skill-card flex' + ((_i + 1) === _order ? ' selected' : '') + '">' +
-				'<div class="skill-icon-wrapper flex"><img src="./images/skills/' + _skill.key + '.png" /></div>' +
+			html +=
+				'<div onexactclick="skill.selectPassiveSkill(' +
+				_i +
+				')" class="skill-card flex' +
+				(_i + 1 === _order ? ' selected' : '') +
+				'">' +
+				'<div class="skill-icon-wrapper flex"><img src="./images/skills/' +
+				_skill.key +
+				'.png" /></div>' +
 				'<div style="flex:1;height:100%">' +
-				'<div class="flex flex-jc-start" style="height:50%;width:100%">' + _skill.names[getLang()] + '</div>' +
-				'<div class="flex flex-jc-start" style="height:50%;width:100%">' + (!_active ? getLangData('Unlocked') + ':&nbsp;<span style="color:#ff6c00 !important">' + getLangData('Level') + ' ' + _skill.unlockLevel  + '</span>': '') + '</div>' +
+				'<div class="flex flex-jc-start" style="height:50%;width:100%">' +
+				_skill.names[getLang()] +
+				'</div>' +
+				'<div class="flex flex-jc-start" style="height:50%;width:100%">' +
+				(!_active
+					? getLangData('Unlocked') +
+						':&nbsp;<span style="color:#ff6c00 !important">' +
+						getLangData('Level') +
+						' ' +
+						_skill.unlockLevel +
+						'</span>'
+					: '') +
+				'</div>' +
 				'</div>' +
 				'</div>';
 			_i++;
 		}
 		return html;
-	}
+	};
 	this.selectPassiveSkill = function (_index) {
 		const _skillCards = document.querySelectorAll('#menu-ui .skill-card');
 		const _container = document.querySelector('#menu-ui .skills-content-detail-wrapper');
@@ -883,12 +973,10 @@ function characterSkill() {
 			if (_i === _index) {
 				addClass(_sc, 'selected');
 				_container.innerHTML = this.getPassiveSkillDetailUI(_index);
-			}
-			else
-				removeClass(_sc, 'selected');
+			} else removeClass(_sc, 'selected');
 			_i++;
 		}
-	}
+	};
 	this.getSkillPriority = function (_p) {
 		switch (_p) {
 			case 4:
@@ -902,12 +990,11 @@ function characterSkill() {
 			default:
 				return 'None';
 		}
-	}
+	};
 	this.getSkillCooldown = function (_cd) {
-		if (!_cd)
-			return getLangData('No Cooldown');
+		if (!_cd) return getLangData('No Cooldown');
 		return (_cd / 1000).toFixed(1) + ' ' + getLangData('seconds');
-	}
+	};
 	this.playSkillVideo = function (_skillKey) {
 		const _video = document.querySelector('#menu-ui video');
 		const _preloader = document.querySelector('#menu-ui .skill-video-preloader');
@@ -916,21 +1003,34 @@ function characterSkill() {
 		setTimeout(function () {
 			removeClass(_preloader, 'd-none');
 		}, 4000);
-	}
+	};
 	this.getPassiveSkillDetailUI = function (_index) {
-		const _skill = this.passiveSkills[_index??0];
-		let html = '<div style="height:90%;overflow-y:auto">' +
-			'<div style="padding:4cqh 5cqh 1cqh 5cqh">' + _skill.descriptions[getLang()] + '</div>' +
-			'<div class="skill-content-title">Gain</div>' +
-			'<div style="padding:1cqh 5cqh">' + _skill.gain[0] + '</div>' +
-			'<div class="skill-content-title">Chance Rate</div>' +
-			'<div style="padding:1cqh 5cqh">%' + (_skill.chanceRate ?? 100) + '</div>' +
+		const _skill = this.passiveSkills[_index ?? 0];
+		let html =
+			'<div style="height:90%;overflow-y:auto">' +
+			'<div style="padding:4cqh 5cqh 1cqh 5cqh">' +
+			_skill.descriptions[getLang()] +
 			'</div>' +
-			'<div style="height:10%" class="flex"><div class="game-btn flex' + (_skill.unlockLevel <= mainCharacter.level ? '' : ' gray disabled') + '" onexactclick="skill.activatePassiveSkill(' + _index + ')"><div class="flex">ACTIVATE&nbsp;<img src="./images/icons/coin.png" style="height:2.6cqh" />&nbsp;' + _skill.price + '</div></div></div>';
+			'<div class="skill-content-title">Gain</div>' +
+			'<div style="padding:1cqh 5cqh">' +
+			_skill.gain[0] +
+			'</div>' +
+			'<div class="skill-content-title">Chance Rate</div>' +
+			'<div style="padding:1cqh 5cqh">%' +
+			(_skill.chanceRate ?? 100) +
+			'</div>' +
+			'</div>' +
+			'<div style="height:10%" class="flex"><div class="game-btn flex' +
+			(_skill.unlockLevel <= mainCharacter.level ? '' : ' gray disabled') +
+			'" onexactclick="skill.activatePassiveSkill(' +
+			_index +
+			')"><div class="flex">ACTIVATE&nbsp;<img src="./images/icons/coin.png" style="height:2.6cqh" />&nbsp;' +
+			_skill.price +
+			'</div></div></div>';
 		return html;
-	}
+	};
 	this.upgradeSkill = function (_order) {
-		const _skill = this.allSkills.find(x => x.class === mainCharacter.class && x.order === _order);
+		const _skill = this.allSkills.find((x) => x.class === mainCharacter.class && x.order === _order);
 		if (_skill.level >= _skill.props.length) {
 			warn('<span>' + getLangData('You can not update anymore') + '</span>', 'warn');
 			return;
@@ -944,46 +1044,60 @@ function characterSkill() {
 			warn('<span>' + getLangData('Not enough gold') + '</span>', 'warn');
 			return;
 		}
-		if(!shine(1000, document.querySelector('.skills-content-detail-wrapper')))
-			return;
+		if (!shine(1000, document.querySelector('.skills-content-detail-wrapper'))) return;
 		updateGold(-1 * _price, mainCharacter);
-		if (!_skill.level)
-			_skill.level = 1;
+		if (!_skill.level) _skill.level = 1;
 		_skill.level++;
-		const _currentProps = _skill.props.find(x => x.level === _skill.level);
-		document.getElementById('skill-current-props').innerHTML =
-			(_currentProps ? '<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Current Level') + '</div>' +
-				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">+ %' + _currentProps.value + ' ' + getLangData(_currentProps.type) + '</div></div>' : '');
-		
-		const _nextProps = _skill.props.find(x => x.level === (_skill.level + 1));
-		document.getElementById('skill-next-props').innerHTML =
-			(_nextProps ? '<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' + getLangData('Next Level') + '</div>' +
-				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">+ %' + _nextProps.value + ' ' + getLangData(_nextProps.type) + '</div></div>' : '');
+		const _currentProps = _skill.props.find((x) => x.level === _skill.level);
+		document.getElementById('skill-current-props').innerHTML = _currentProps
+			? '<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' +
+				getLangData('Current Level') +
+				'</div>' +
+				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">+ %' +
+				_currentProps.value +
+				' ' +
+				getLangData(_currentProps.type) +
+				'</div></div>'
+			: '';
+
+		const _nextProps = _skill.props.find((x) => x.level === _skill.level + 1);
+		document.getElementById('skill-next-props').innerHTML = _nextProps
+			? '<div class="flex w-100"><div class="skill-content-title flex w-50 flex-jc-start">' +
+				getLangData('Next Level') +
+				'</div>' +
+				'<div style="padding:1cqh 0" class="w-50 flex flex-jc-end">+ %' +
+				_nextProps.value +
+				' ' +
+				getLangData(_nextProps.type) +
+				'</div></div>'
+			: '';
 		document.getElementById('skill-' + _skill.key + '-level').innerText = _skill.level;
 		document.getElementById('skill-cost').innerText = this.calculateSkillPrice(_skill.key);
 		const _cl = document.querySelector('.skill-content-level');
-		if(_cl)
-			_cl.innerText = _skill.level + ' / ' + _skill.props.length;
+		if (_cl) _cl.innerText = _skill.level + ' / ' + _skill.props.length;
 		_client.upgradeSkill(mainCharacter, _skill);
 		checkUpdateAvailable2(2);
-	}
+	};
 	this.getSkills = function (_char) {
-		return this.allSkills.filter(x => x.class === (_char ?? mainCharacter).class);
-	}
+		return this.allSkills.filter((x) => x.class === (_char ?? mainCharacter).class);
+	};
 	this.getPassiveSkills = function () {
 		return JSON.parse(JSON.stringify(this.passiveSkills));
-	}
+	};
 	this.getSkillByKey = function (_class, _key, _arr, _includeAffected) {
-		return (_arr ?? this.allSkills).find(x => (x.key === _key || (_includeAffected && x.affectedKeys?.indexOf(_key) >= 0)) && x.class === (_class ?? mainCharacter.class));
-	}
+		return (_arr ?? this.allSkills).find(
+			(x) =>
+				(x.key === _key || (_includeAffected && x.affectedKeys?.indexOf(_key) >= 0)) &&
+				x.class === (_class ?? mainCharacter.class)
+		);
+	};
 	this.getAvailableSkills = function (_char) {
 		const _c = _char ?? mainCharacter;
-		if(!_c)
-			return undefined;
-		return this.allSkills.filter(x => x.class === _c.class && x.unlockLevel <= _c.level);
-	}
+		if (!_c) return undefined;
+		return this.allSkills.filter((x) => x.class === _c.class && x.unlockLevel <= _c.level);
+	};
 	this.isActive = function (_key) {
-		return this.getAvailableSkills()?.find(x => x.key === _key);
-	}
+		return this.getAvailableSkills()?.find((x) => x.key === _key);
+	};
 }
 const skill = new characterSkill();

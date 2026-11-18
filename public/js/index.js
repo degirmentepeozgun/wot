@@ -1,63 +1,68 @@
-﻿"use strict"
-document.addEventListener('keydown', function(e) {
-	const _t = e.target;
-	if(!_t || _t.classList?.contains('key-combination-item'))
-		return;
-	const _tag = _t.tagName;
-	if(_tag !== 'INPUT' && _tag !== 'TEXTAREA')
-		return;
-	if(_tag === 'INPUT') {
-		const _type = (_t.type || 'text').toLowerCase();
-		if(_type !== 'text' && _type !== 'search' && _type !== 'password' && _type !== 'email' && _type !== 'tel' && _type !== 'url')
-			return;
-	}
-	if(e.key === '<' || e.key === '>')
+﻿'use strict';
+document.addEventListener(
+	'keydown',
+	function (e) {
+		const _t = e.target;
+		if (!_t || _t.classList?.contains('key-combination-item')) return;
+		const _tag = _t.tagName;
+		if (_tag !== 'INPUT' && _tag !== 'TEXTAREA') return;
+		if (_tag === 'INPUT') {
+			const _type = (_t.type || 'text').toLowerCase();
+			if (
+				_type !== 'text' &&
+				_type !== 'search' &&
+				_type !== 'password' &&
+				_type !== 'email' &&
+				_type !== 'tel' &&
+				_type !== 'url'
+			)
+				return;
+		}
+		if (e.key === '<' || e.key === '>') e.preventDefault();
+	},
+	true
+);
+document.addEventListener(
+	'beforeinput',
+	function (e) {
+		const _t = e.target;
+		if (!_t || _t.classList?.contains('key-combination-item')) return;
+		const _tag = _t.tagName;
+		if (_tag !== 'INPUT' && _tag !== 'TEXTAREA') return;
+		if (!e.data || (e.data.indexOf('<') < 0 && e.data.indexOf('>') < 0)) return;
 		e.preventDefault();
-}, true);
-document.addEventListener('beforeinput', function(e) {
-	const _t = e.target;
-	if(!_t || _t.classList?.contains('key-combination-item'))
-		return;
-	const _tag = _t.tagName;
-	if(_tag !== 'INPUT' && _tag !== 'TEXTAREA')
-		return;
-	if(!e.data || (e.data.indexOf('<') < 0 && e.data.indexOf('>') < 0))
-		return;
-	e.preventDefault();
-	const _clean = e.data.replace(/[<>]/g, '');
-	if(!_clean)
-		return;
-	const _start = _t.selectionStart ?? _t.value.length;
-	const _end = _t.selectionEnd ?? _start;
-	const _max = _t.maxLength > 0 ? _t.maxLength : _t.value.length + _clean.length;
-	const _next = (_t.value.slice(0, _start) + _clean + _t.value.slice(_end)).slice(0, _max);
-	_t.value = _next;
-	const _caret = Math.min(_next.length, _start + _clean.length);
-	if(_t.setSelectionRange)
-		_t.setSelectionRange(_caret, _caret);
-}, true);
-document.addEventListener('input', function(e) {
-	const _t = e.target;
-	if(!_t || typeof _t.value !== 'string')
-		return;
-	if(_t.value.indexOf('<') < 0 && _t.value.indexOf('>') < 0)
-		return;
-	const _tag = _t.tagName;
-	if(_tag !== 'INPUT' && _tag !== 'TEXTAREA')
-		return;
-	const _start = _t.selectionStart ?? _t.value.length;
-	const _before = _t.value.slice(0, _start).replace(/[<>]/g, '').length;
-	_t.value = _t.value.replace(/[<>]/g, '');
-	const _caret = Math.min(_t.value.length, _before);
-	if(_t.setSelectionRange)
-		_t.setSelectionRange(_caret, _caret);
-}, true);
+		const _clean = e.data.replace(/[<>]/g, '');
+		if (!_clean) return;
+		const _start = _t.selectionStart ?? _t.value.length;
+		const _end = _t.selectionEnd ?? _start;
+		const _max = _t.maxLength > 0 ? _t.maxLength : _t.value.length + _clean.length;
+		const _next = (_t.value.slice(0, _start) + _clean + _t.value.slice(_end)).slice(0, _max);
+		_t.value = _next;
+		const _caret = Math.min(_next.length, _start + _clean.length);
+		if (_t.setSelectionRange) _t.setSelectionRange(_caret, _caret);
+	},
+	true
+);
+document.addEventListener(
+	'input',
+	function (e) {
+		const _t = e.target;
+		if (!_t || typeof _t.value !== 'string') return;
+		if (_t.value.indexOf('<') < 0 && _t.value.indexOf('>') < 0) return;
+		const _tag = _t.tagName;
+		if (_tag !== 'INPUT' && _tag !== 'TEXTAREA') return;
+		const _start = _t.selectionStart ?? _t.value.length;
+		const _before = _t.value.slice(0, _start).replace(/[<>]/g, '').length;
+		_t.value = _t.value.replace(/[<>]/g, '');
+		const _caret = Math.min(_t.value.length, _before);
+		if (_t.setSelectionRange) _t.setSelectionRange(_caret, _caret);
+	},
+	true
+);
 const setFps = (function () {
-
 	let _timer = null;
 
 	return function (_val, _step) {
-
 		if (_timer) {
 			clearTimeout(_timer);
 			_timer = null;
@@ -70,51 +75,84 @@ const setFps = (function () {
 
 		msPerFrame = 900 / fps;
 
-		if (fps === _defaultFPS)
-			return;
+		if (fps === _defaultFPS) return;
 
 		_timer = setTimeout(function () {
-			setFps(MathRound(fps + (_defaultFPS / (_step ?? 15))), _step);
+			setFps(MathRound(fps + _defaultFPS / (_step ?? 15)), _step);
 		}, 200);
 	};
-
 })();
-var _gameTick, _extraTick = 0;
+const checkPerformance = (function () {
+	const WINDOW_MS = 1500;
+	const ENTER_FPS = 15;
+	const EXIT_FPS = 20;
+	const STREAK_NEEDED = 2;
+	const MAX_GAP_MS = 1000;
+	let _low = false;
+	let _last = 0;
+	let _start = 0;
+	let _frames = 0;
+	let _streak = 0;
+
+	return function (_now) {
+		const _gap = _now - _last;
+		_last = _now;
+		if (_gap > MAX_GAP_MS || document.hidden || __switchingMap || fps < _defaultFPS) {
+			_start = _now;
+			_frames = 0;
+			_streak = 0;
+			return _low;
+		}
+		_frames++;
+		const _elapsed = _now - _start;
+		if (_elapsed < WINDOW_MS) return _low;
+		const _rate = (_frames * 1000) / _elapsed;
+		_start = _now;
+		_frames = 0;
+		if (_low ? _rate >= EXIT_FPS : _rate < ENTER_FPS) {
+			if (++_streak >= STREAK_NEEDED) {
+				_low = !_low;
+				_streak = 0;
+			}
+		} else _streak = 0;
+		return _low;
+	};
+})();
+var _gameTick,
+	_extraTick = 0;
 function animate(_tick) {
 	if (!_startAnimate) {
 		requestAnimationFrame(animate);
 		return;
 	}
 	msNow = Date.now();
-	_gameTick = msNow; //MathFloor(_tick) - _extraTick;
+	_gameTick = msNow;
 	const msPassed = msNow - msPrev;
 	if (msPassed < msPerFrame) {
 		requestAnimationFrame(animate);
 		return;
 	}
-	if(_closeOpeningMusic && _openingSound?.volume > 0)
-	{
-		const _vol = _openingSound.volume - (.025 * __volume);
-		if(_vol <=0) {
+	if (_closeOpeningMusic && _openingSound?.volume > 0) {
+		const _vol = _openingSound.volume - 0.025 * __volume;
+		if (_vol <= 0) {
 			_openingSound.volume = 0;
-			if(!_openingSound.paused) {
+			if (!_openingSound.paused) {
 				_openingSound.pause();
-				_openingSound = _closeOpeningMusic =null;
+				_openingSound = _closeOpeningMusic = null;
 			}
-		}
-		else 
-			_openingSound.volume = _vol;
+		} else _openingSound.volume = _vol;
 	}
 	const excessTime = msPassed % msPerFrame;
 	msPrev = msNow - excessTime;
+	episode.LowPerformance = checkPerformance(msNow);
 	episode.check = true;
 	__queue.length = 0;
 	_cNPC.clearRect(0, 0, _canvasS.width, _canvasS.height);
-	if(mainCharacter){
+	if (mainCharacter) {
 		episode.tryMoveMainCamera();
 		mainCharacter.draw(__queue);
 	}
-	const _sameCoords = (platformX === prevPlatformX);
+	const _sameCoords = platformX === prevPlatformX;
 	episode.checkWeatherEffect();
 	episode.checkForgeDone();
 	if (!_sameCoords || episode?.effect) {
@@ -123,44 +161,41 @@ function animate(_tick) {
 		episode.drawSpriteObjects();
 	}
 	episode.drawEnemies(__queue);
-	if (mainCharacter?.lastHitDate)
-		if ((_gameTick - mainCharacter.lastHitDate) > 2499)
-			removeHitCount();
-	if (!_sameCoords)
-		prevPlatformX = platformX;
-	
+	if (mainCharacter?.lastHitDate) if (_gameTick - mainCharacter.lastHitDate > 2499) removeHitCount();
+	if (!_sameCoords) prevPlatformX = platformX;
+
 	episode.drawCharacterQueue(__queue);
-	//if (!_renderDmgFrame)
-		drawDmgFrames();
-	//else
-	//	_renderDmgFrame--;
-	if(__storyTell)
-		__storyTell.render();
-	
-	const _moved =  episode.tinyMoveCamera();
-	if(_moved)
-		prevPlatformX = undefined;
+
+	drawDmgFrames();
+
+	if (__storyTell) __storyTell.render();
+
+	const _moved = episode.tinyMoveCamera();
+	if (_moved) prevPlatformX = undefined;
 	requestAnimationFrame(animate);
 }
 function stepDuelBotsHidden() {
-	if(!document.hidden || !episode?.duelLeader || !episode.realTime || episode.pvpEnded || episode.disposing || __switchingMap)
+	if (
+		!document.hidden ||
+		!episode?.duelLeader ||
+		!episode.realTime ||
+		episode.pvpEnded ||
+		episode.disposing ||
+		__switchingMap
+	)
 		return;
 	const now = Date.now();
 	const prev = window.__duelBgAt || now;
 	window.__duelBgAt = now;
 	let elapsed = now - prev;
 	const frame = msPerFrame || 16;
-	if(elapsed < frame)
-		elapsed = frame;
-	if(elapsed > 1000)
-		elapsed = 1000;
+	if (elapsed < frame) elapsed = frame;
+	if (elapsed > 1000) elapsed = 1000;
 	let steps = Math.floor(elapsed / frame);
-	if(steps < 1)
-		steps = 1;
-	if(steps > 60)
-		steps = 60;
+	if (steps < 1) steps = 1;
+	if (steps > 60) steps = 60;
 	let tick = now - steps * frame;
-	for(let i = 0; i < steps; i++) {
+	for (let i = 0; i < steps; i++) {
 		tick += frame;
 		msNow = _gameTick = tick;
 		episode._duelHoldSend = i < steps - 1;
@@ -168,145 +203,137 @@ function stepDuelBotsHidden() {
 	}
 	episode._duelHoldSend = false;
 }
-//animate();
+
 requestAnimationFrame(animate);
-//setInterval(animate, __globalMS);
+
 function drawBg() {
 	c2.clearRect(0, 0, _canvas.width, _canvas.height);
-	const _bg = mapSprites.find(x => x.id === episode.id).background;
-	if(_bg) 
-		 c2.drawImage(getImage('./images/texture/' + episode.assetPath + '-' + _bg.key + '.png'), 
-			0, 0, _bg.width, _bg.height, 0, 0, _canvas.width, MathCeil(_bg.height * (_canvas.width / _bg.width)));
+	const _bg = mapSprites.find((x) => x.id === episode.id).background;
+	if (_bg)
+		c2.drawImage(
+			getImage('./images/texture/' + episode.assetPath + '-' + _bg.key + '.png'),
+			0,
+			0,
+			_bg.width,
+			_bg.height,
+			0,
+			0,
+			_canvas.width,
+			MathCeil(_bg.height * (_canvas.width / _bg.width))
+		);
 }
 function getMapAssets(_ep, _callback) {
 	_startAnimate = false;
 	const _assets = [];
-	if(_firstOpening) {
-		//loadSounds();
-		//loadRelatedImages();
+	if (_firstOpening) {
 	}
 	loadSceneSounds();
-	const _map = mapSprites.find(x => x.id === _ep.id);
-	const _enemies = []; //['01', '02', '03'];
-	for(let _mob of _map.mobs ?? [])
-		if(_enemies.indexOf(_mob.id.toString()) === -1)
-			_enemies.push(_mob.id.toString());
-	for(let _e of _enemies) {
+	const _map = mapSprites.find((x) => x.id === _ep.id);
+	const _enemies = [];
+	for (let _mob of _map.mobs ?? [])
+		if (_enemies.indexOf(_mob.id.toString()) === -1) _enemies.push(_mob.id.toString());
+	for (let _e of _enemies) {
 		const _mob = _allEnemies['enemy' + _e]();
 		const _mobAssets = [_mob.src + 'sprite.png'];
-		for(let _ass of _map.assets ?? [])
-			_mobAssets.push(_ass);
-		for(let _key of Object.keys(_mob.animations)) {
+		for (let _ass of _map.assets ?? []) _mobAssets.push(_ass);
+		for (let _key of Object.keys(_mob.animations)) {
 			const _anima = _mob.animations[_key];
-			if(_anima.src && _mobAssets.indexOf(_anima.src) === -1)
-				_mobAssets.push(_anima.src);
-			if(_anima.alternateFrames)
-				for(let _af of _anima.alternateFrames)
-					for(let _f of _af.frames)
-						if(_f.src)
-							_mobAssets.push(_f.src);
-			for(let _frame of _anima.frames) {
-				if(_frame.src && _mobAssets.indexOf(_frame.src) === -1)
-					_mobAssets.push(_frame.src);
-				if(_frame.spell || _frame.atk?.spell) {
+			if (_anima.src && _mobAssets.indexOf(_anima.src) === -1) _mobAssets.push(_anima.src);
+			if (_anima.alternateFrames)
+				for (let _af of _anima.alternateFrames) for (let _f of _af.frames) if (_f.src) _mobAssets.push(_f.src);
+			for (let _frame of _anima.frames) {
+				if (_frame.src && _mobAssets.indexOf(_frame.src) === -1) _mobAssets.push(_frame.src);
+				if (_frame.spell || _frame.atk?.spell) {
 					const _spell = _frame.atk?.spell ?? _frame.spell;
-					if(spells[_spell.key]?.src && _mobAssets.indexOf(spells[_spell.key].src) === -1)
+					if (spells[_spell.key]?.src && _mobAssets.indexOf(spells[_spell.key].src) === -1)
 						_mobAssets.push(spells[_spell.key].src);
 				}
 			}
 		}
-		for(let _ass of _mobAssets)
-			_assets.push({episodes: [_ep.id], path: _ass});
+		for (let _ass of _mobAssets) _assets.push({ episodes: [_ep.id], path: _ass });
 	}
 	if (_ep.layers)
 		for (var _lay of _ep.layers)
-			_assets.push({episodes: [_ep.id], path: './images/texture/' + (_lay.theme ?? _ep.assetPath) + '-' + _lay.name + '.png?z=' + _lay.zoom});
+			_assets.push({
+				episodes: [_ep.id],
+				path: './images/texture/' + (_lay.theme ?? _ep.assetPath) + '-' + _lay.name + '.png?z=' + _lay.zoom
+			});
 	if (_ep.sprites)
 		for (var _obj of _ep.sprites)
-			if (!_obj.text)
-				_assets.push({episodes: [_ep.id], path: createSpritePath(_obj, _ep)});
-	//const _distinctAssets = [...new Set(_assets)];
+			if (!_obj.text) _assets.push({ episodes: [_ep.id], path: createSpritePath(_obj, _ep) });
+
 	const _distinctAssets = distinctEpisodeAssets(_assets, _ep.id);
 	let _assetCount = _distinctAssets.length + (_firstOpening ? __globalAssets.length : 0);
-	for(let _key of Object.keys(loadedEpisodeImages)) {
-		if(loadedEpisodeImages[_key]) {
-			if(loadedEpisodeImages[_key].remove)
-				loadedEpisodeImages[_key].remove();
+	for (let _key of Object.keys(loadedEpisodeImages)) {
+		if (loadedEpisodeImages[_key]) {
+			if (loadedEpisodeImages[_key].remove) loadedEpisodeImages[_key].remove();
 			delete loadedEpisodeImages[_key];
 		}
 	}
-	for(let _key of Object.keys(loadedImages)) {
-		if(loadedImages[_key]){
-			if(loadedImages[_key].remove)
-				loadedImages[_key].remove();
+	for (let _key of Object.keys(loadedImages)) {
+		if (loadedImages[_key]) {
+			if (loadedImages[_key].remove) loadedImages[_key].remove();
 			delete loadedImages[_key];
 		}
 	}
 	const _checkObj = { limit: _assetCount, order: 0 };
-	if(_firstOpening){
+	if (_firstOpening) {
 		_firstOpening = false;
-		// __globalAssets.push('./images/main/warrior/concept.png');
-		// __globalAssets.push('./images/main/wizard/concept.png');
-		// __globalAssets.push('./images/main/blacksmith/concept.png');
-		// __globalAssets.push('./images/main/druid/concept.png');
-		// __globalAssets.push('./images/main/tank/concept.png');
-		// __globalAssets.push('./images/main/archer/concept.png');
-		for (let _asset of __globalAssets)
-			loadAsset(_asset, _checkObj, _callback, 1);
+
+		for (let _asset of __globalAssets) loadAsset(_asset, _checkObj, _callback, 1);
 	}
-	for (let _asset of _distinctAssets)
-		loadAsset(_asset, _checkObj, _callback);
+	for (let _asset of _distinctAssets) loadAsset(_asset, _checkObj, _callback);
 }
 function createSpritePath(_obj, _ep) {
-	if(_obj.src)
-		return _obj.src;
-	else if(_obj.artifactId)
-		return './images/artifacts/' + _obj.artifactId + '.png';
+	if (_obj.src) return _obj.src;
+	else if (_obj.artifactId) return './images/artifacts/' + _obj.artifactId + '.png';
 	else
-		return './images/texture/' + (_obj.animation.theme ?? _ep.assetPath) + (_obj.totalFrames > 1 ? '-' + _obj.animation.key + '.gif' : _obj.animation.key + '.png')
+		return (
+			'./images/texture/' +
+			(_obj.animation.theme ?? _ep.assetPath) +
+			(_obj.totalFrames > 1 ? '-' + _obj.animation.key + '.gif' : _obj.animation.key + '.png')
+		);
 }
 function distinctEpisodeAssets(_assets, _id) {
 	const _arr = [];
-	for(let _ass of _assets)
-		if(_ass.episodes.indexOf(_id) !== -1)
-			if(_arr.indexOf(_ass.path) === -1)
-				_arr.push(_ass.path);
+	for (let _ass of _assets)
+		if (_ass.episodes.indexOf(_id) !== -1) if (_arr.indexOf(_ass.path) === -1) _arr.push(_ass.path);
 	return _arr;
 }
 function loadAsset(src, _checkObj, _callback, _global, _zoom) {
 	const _assetsProgress = document.getElementById('assets-progress');
 	if (getExistingImage(src)) {
-		if(_checkObj) {
+		if (_checkObj) {
 			_checkObj.order++;
 			_assetsProgress.innerText = _checkObj.order + ' / ' + _checkObj.limit;
-			document.getElementById('assets-progressbar-inner').style.width = (_checkObj.order / _checkObj.limit * 100) + '%';
-			if (_checkObj.order === _checkObj.limit)
-				_callback();
+			document.getElementById('assets-progressbar-inner').style.width =
+				(_checkObj.order / _checkObj.limit) * 100 + '%';
+			if (_checkObj.order === _checkObj.limit) _callback();
 		}
 		return;
 	}
-	getImage(src, function () {
-		if(_checkObj) {
-			_checkObj.order++;
-			document.getElementById('assets-progressbar-inner').style.width = (_checkObj.order / _checkObj.limit * 100) + '%';
-			_assetsProgress.innerText = _checkObj.order + ' / ' + _checkObj.limit;
-			if (_checkObj.order === _checkObj.limit)
-				_callback();
-		}
-	}, _global, _zoom);
+	getImage(
+		src,
+		function () {
+			if (_checkObj) {
+				_checkObj.order++;
+				document.getElementById('assets-progressbar-inner').style.width =
+					(_checkObj.order / _checkObj.limit) * 100 + '%';
+				_assetsProgress.innerText = _checkObj.order + ' / ' + _checkObj.limit;
+				if (_checkObj.order === _checkObj.limit) _callback();
+			}
+		},
+		_global,
+		_zoom
+	);
 }
 function launchIntoFullscreen(element) {
 	return;
-	//_gamePad.style.setProperty('width', MathRound(_gamePad.clientWidth) + 'px', 'important');
-	//_gamePad.style.setProperty('height', MathRound(_gamePad.clientHeight) + 'px', 'important');
-	if (element.requestFullscreen)
-		element.requestFullscreen();
-	else if (element.mozRequestFullScreen)
-		element.mozRequestFullScreen();
-	else if (element.webkitRequestFullscreen)
-		element.webkitRequestFullscreen();
-	else if (element.msRequestFullscreen)
-		element.msRequestFullscreen();
+
+	if (element.requestFullscreen) element.requestFullscreen();
+	else if (element.mozRequestFullScreen) element.mozRequestFullScreen();
+	else if (element.webkitRequestFullscreen) element.webkitRequestFullscreen();
+	else if (element.msRequestFullscreen) element.msRequestFullscreen();
 }
 function startGame(_callback) {
 	if (!__isPC)
@@ -314,9 +341,7 @@ function startGame(_callback) {
 			addClass(document.body, 'mobile-device');
 			activateTouchPad();
 		}, 500);
-	//let _openingSong = new Audio('./images/sounds/opening.mpeg');
-	//openingSong.type = 'audio/mpeg';
-	//_openingSong.play();
+
 	const _loading = document.getElementById('game-start-loading');
 	let _loadCounter = 0;
 	prevPlatformX = -1;
@@ -330,41 +355,34 @@ function startGame(_callback) {
 			setTimeout(function () {
 				_startAnimate = true;
 				_gamePad.style.display = 'block';
-				//addClass(document.getElementById('splash'), 'd-none');
-				if (_callback)
-					_callback(1);
+
+				if (_callback) _callback(1);
 			}, 30);
 		}
-		//else
-		//	_loading.style.width = ((10 * _loadCounter) > 100 ? 100 : (10 * _loadCounter)) + '%';
 	}, 100);
 }
 function removeCoopCharacter(_force) {
 	if (_coopMembers?.[0] && (!episode.pvp || _force)) {
 		const _oldAvatar = document.getElementById('char-' + _coopMembers[0].key);
-		if (_oldAvatar)
-			_oldAvatar.remove();
-		episode.enemies = episode.enemies.filter(x => !x.friendly);
+		if (_oldAvatar) _oldAvatar.remove();
+		episode.enemies = episode.enemies.filter((x) => !x.friendly);
 		const _class = _coopMembers[0].class;
 		_coopMembers = [];
 		episode.drawSpriteObjects(_class);
-		//removeClass(addPlayer, 'd-none');
 	}
 }
 function startWithThisCharacter(_id, _level, _select, _noSound) {
 	removeCoopCharacter(1);
 	let _clone = _allEnemies['enemy' + _id]?.();
-	if(!_clone)
-		_clone = _allEnemies['enemy' + getCharacterJSON(_id).realId]?.();
+	if (!_clone) _clone = _allEnemies['enemy' + getCharacterJSON(_id).realId]?.();
 	addCoopCharacter(null, _clone.class, 1, _level, 1, _select);
 	_squadMemberKey = _clone.class;
 	switchCharacter(1, 1, _noSound);
-	if(_level && mainCharacter.level !== _level)
-		mainCharacter.level = _level;
+	if (_level && mainCharacter.level !== _level) mainCharacter.level = _level;
 	removeCoopCharacter(1);
-	const _friendlyChars = episode.enemies?.filter(x => x.friendly);
-	if(_friendlyChars?.[0])
-		_friendlyChars.forEach(x => {
+	const _friendlyChars = episode.enemies?.filter((x) => x.friendly);
+	if (_friendlyChars?.[0])
+		_friendlyChars.forEach((x) => {
 			x.friendly = x.main = false;
 			x.enemy = true;
 			x.setAutoMode(0);
@@ -374,59 +392,95 @@ function startWithThisCharacter(_id, _level, _select, _noSound) {
 	mainCharacter.hp = mainCharacter.maxHP = _clone.hp;
 	mainCharacter.setHealth(mainCharacter.MAXHP);
 	mainCharacter.def = _clone.def;
-	if(mainCharacter.coopWith)
-		delete mainCharacter.coopWith;
+	if (mainCharacter.coopWith) delete mainCharacter.coopWith;
+	if ((episode?.battleGround || episode?.pvp) && (!episode.pvpStarted || episode.missionCountDown))
+		mainCharacter.immobilize = true;
 }
 function addArcherCoopCharacter(_noSound, _append) {
-	if(mainCharacter && mainCharacter.isDead())
-		return;
-	if (!_append)
-		removeCoopCharacter();
+	if (mainCharacter && mainCharacter.isDead()) return;
+	if (!_append) removeCoopCharacter();
 	const _c = addCoopCharacter(null, 'arc', _append);
 	_squadMemberKey = 'archer';
-	if (!_noSound)
-		PlaySound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
+	if (!_noSound) PlaySound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: 0.5 });
 	return _c;
 }
 function addWarriorCoopCharacter(_noSound, _append) {
-	if (!_append)
-		removeCoopCharacter();
+	if (!_append) removeCoopCharacter();
 	removeCoopCharacter();
 	const _c = addCoopCharacter(null, 'wrr', _append);
 	_squadMemberKey = 'warrior';
-	if (!_noSound)
-		PlaySound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
+	if (!_noSound) PlaySound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: 0.5 });
 	return _c;
 }
 function addThiefCoopCharacter(_noSound, _append) {
-	if (!_append)
-		removeCoopCharacter();
+	if (!_append) removeCoopCharacter();
 	removeCoopCharacter();
 	const _c = addCoopCharacter(null, 'thf', _append);
 	_squadMemberKey = 'thief';
-	if (!_noSound)
-		PlaySound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: .5 });
+	if (!_noSound) PlaySound({ key: _squadMemberKey + 'select' + getRandomValue(1, 2), volume: 0.5 });
 	return _c;
 }
 function getCharacterJSON(_prefix) {
 	switch (_prefix ?? _squadMemberKey) {
 		case 'arc':
 		case 'archer':
-			return { realId: '02', key: '2212' + Math.random().toString().replace(/[.]/g, ''), name: _conceptArts.archer.title, class: 'archer', width: 132, height: 191 };
+			return {
+				realId: '02',
+				key: '2212' + Math.random().toString().replace(/[.]/g, ''),
+				name: _conceptArts.archer.title,
+				class: 'archer',
+				width: 132,
+				height: 191
+			};
 		case 'thf':
 		case 'thief':
-			return { realId: '03', key: '3212' + Math.random().toString().replace(/[.]/g, ''), name: _conceptArts.thief.title, class: 'thief', width: 275, height: 155 };
+			return {
+				realId: '03',
+				key: '3212' + Math.random().toString().replace(/[.]/g, ''),
+				name: _conceptArts.thief.title,
+				class: 'thief',
+				width: 275,
+				height: 155
+			};
 		case 'wrr':
 		case 'warrior':
-			return { realId: '01', key: '1212' + Math.random().toString().replace(/[.]/g, ''), name: _conceptArts.warrior.title, class: 'warrior', width: 122, height: 212 };
+			return {
+				realId: '01',
+				key: '1212' + Math.random().toString().replace(/[.]/g, ''),
+				name: _conceptArts.warrior.title,
+				class: 'warrior',
+				width: 122,
+				height: 212
+			};
 		case 'cyc':
 		case 'cyclops':
-			return { realId: '47', key: '4212' + Math.random().toString().replace(/[.]/g, ''), name: 'Cyclops', class: 'cyclops', width: 400, height: 422 };
+			return {
+				realId: '47',
+				key: '4212' + Math.random().toString().replace(/[.]/g, ''),
+				name: 'Cyclops',
+				class: 'cyclops',
+				width: 400,
+				height: 422
+			};
 		case 'wwf':
 		case 'werewolf':
-			return { realId: '29', key: '5212' + Math.random().toString().replace(/[.]/g, ''), name: 'Werewolf', class: 'werewolf', width: 226, height: 172 };
+			return {
+				realId: '29',
+				key: '5212' + Math.random().toString().replace(/[.]/g, ''),
+				name: 'Werewolf',
+				class: 'werewolf',
+				width: 226,
+				height: 172
+			};
 		case 'al':
-			return { realId: '1000', key: '6212' + Math.random().toString().replace(/[.]/g, ''), name: 'Al Karısı', class: 'al', width: 297, height: 426 };
+			return {
+				realId: '1000',
+				key: '6212' + Math.random().toString().replace(/[.]/g, ''),
+				name: 'Al Karısı',
+				class: 'al',
+				width: 297,
+				height: 426
+			};
 		default:
 			return false;
 	}
@@ -448,19 +502,16 @@ function addCharacterAsEnemy(_prefix, _name) {
 }
 
 function addCoopCharacter(_char, _prefix, _append, _level, _nowarn, _select) {
-	if(mainCharacter && mainCharacter.deadTime)
-		return;
+	if (mainCharacter && mainCharacter.deadTime) return;
 	if ((episode?.pvp && !episode.realTime) || episode?.dungeon) {
 		warn('<span>' + getLangData('Unable to use in that zone') + '</span>', 'warn');
 		return;
 	}
-	if (_coopMembers?.length >= 2)
-		return;
+	if (_coopMembers?.length >= 2) return;
 	if (!_char) {
 		_char = getCharacterJSON(_prefix);
 		if (!_char) {
-			if(!_nowarn)
-				warn('<span>' + getLangData('Recruit member first') + '</span>', 'warn');
+			if (!_nowarn) warn('<span>' + getLangData('Recruit member first') + '</span>', 'warn');
 			return;
 		}
 	}
@@ -468,9 +519,7 @@ function addCoopCharacter(_char, _prefix, _append, _level, _nowarn, _select) {
 	if (_coopMembers.length < 1 || _append) {
 		_coopMember = createCharacter(_char);
 		_addNew = true;
-	}
-	else
-		_coopMember = _coopMembers.find(x => x.key === _char.key);
+	} else _coopMember = _coopMembers.find((x) => x.key === _char.key);
 	if (_addNew) {
 		_coopMember = _store.getMainCharacter(_coopMember);
 		_store.setCharacterStats(_coopMember);
@@ -487,19 +536,17 @@ function addCoopCharacter(_char, _prefix, _append, _level, _nowarn, _select) {
 	_coopMember.coopWith = mainCharacter;
 	_coopMember.autoTarget = undefined;
 	_coopMember.animate('idle', 1);
-	if(_level)
-		_coopMember.level = _level;
+	if (_level) _coopMember.level = _level;
 	_client.setCharacterValues(_coopMember, _select, _level);
 	setCharacterDefaults(_coopMember);
-	_coopMember.yPosition = getRandomValue(MathRound(getGroundHeight() * .1), MathRound(getGroundHeight() * .9));
+	_coopMember.yPosition = getRandomValue(MathRound(getGroundHeight() * 0.1), MathRound(getGroundHeight() * 0.9));
 	episode.enemies.push(_coopMember);
 	_navbar.innerHTML += avatarTemplate(_coopMember);
 	addClass(addPlayer, 'd-none');
 	_coopMember.left = mainCharacter.SCREENLEFT + (platformX ?? 0);
 	let _randomLeft = getRandomValue(0, MathRound(_canvas.width / 20)) - MathRound(_canvas.width / 10);
 	_coopMember.left += _randomLeft;
-	if (_coopMember.left < minLeft)
-		_coopMember.left = minLeft;
+	if (_coopMember.left < minLeft) _coopMember.left = minLeft;
 	return _coopMember;
 }
 
@@ -511,9 +558,8 @@ function reviveAtLobby(_char, _func) {
 	const _c = _char ?? mainCharacter;
 	_c.deadTime = _c.dead = _c.remove = _c.dying = _c.immobilize = undefined;
 	_c.revived = true;
-	switchMap(1, null, function() {
-		if(_func)
-			_func();
+	switchMap(1, null, function () {
+		if (_func) _func();
 	});
 	_c.immobilize = undefined;
 }
@@ -524,10 +570,14 @@ function reviveHere() {
 	resetSkills(null);
 	mainCharacter.idle();
 	mainCharacter.reviveTime = _gameTick;
-	mainCharacter.deadTime = mainCharacter.dead = mainCharacter.remove = mainCharacter.dying = mainCharacter.immobilize = undefined;
+	mainCharacter.deadTime =
+		mainCharacter.dead =
+		mainCharacter.remove =
+		mainCharacter.dying =
+		mainCharacter.immobilize =
+			undefined;
 	hideMyModalPopUp();
-	if(!episode.enemies.find(x => x === mainCharacter))
-		episode.enemies.push(mainCharacter);
+	if (!episode.enemies.find((x) => x === mainCharacter)) episode.enemies.push(mainCharacter);
 }
 function reviveAsGhost() {
 	return;
@@ -539,31 +589,24 @@ function reviveAsGhost() {
 	mainCharacter.deadTime = mainCharacter.remove = mainCharacter.immobilize = undefined;
 }
 function switchCharacter(_force, _nowarn, _noSound, _checkCooldown) {
-	if(!episode?.entertainment) {
-		if (!_force)
-			return;
-		if (episode.pvp && !episode.realTime)
-			return;
+	if (!episode?.entertainment) {
+		if (!_force) return;
+		if (episode.pvp && !episode.realTime) return;
 	}
-	//3 sn geçmeden tekrar karakter değiştirilemez,
-	//karakter interactive animasyonda ise
+
 	let _x = _coopMembers?.[0];
-	if (!_x && !_nowarn)
-		warn('<span>' + getLangData('No teammate right now') + '</span>', 'warn');
-	if (!_x || _x.isDead())
-		return;
+	if (!_x && !_nowarn) warn('<span>' + getLangData('No teammate right now') + '</span>', 'warn');
+	if (!_x || _x.isDead()) return;
 	const _xAnima = _x.animation;
 	const _mainAnima = mainCharacter.animation;
 	const _availableAnimations = ['walk', 'run', 'idle'];
-	if (_checkCooldown && (mainCharacter.switchTime && ((_gameTick - mainCharacter.switchTime) < 3000))) {
+	if (_checkCooldown && mainCharacter.switchTime && _gameTick - mainCharacter.switchTime < 3000) {
 		warn('<span>' + getLangData('Can not switch right now') + '</span>', 'warn');
 		return;
 	}
-	// else {
-		// mainCharacter.animate('idle', 1);
-		// _x.animate('idle', 1);
-		_startAnimate = false;
-	//}
+
+	_startAnimate = false;
+
 	const _coopLeft = MathRound(_x.left);
 	setKeyBoard(_x);
 	_x.main = true;
@@ -581,44 +624,32 @@ function switchCharacter(_force, _nowarn, _noSound, _checkCooldown) {
 	_navbar.innerHTML += avatarTemplate(_coopMembers[0]);
 	mainCharacter.main = true;
 	mainCharacter.friendly = false;
-	if(!episode.still) {
+	if (!episode.still) {
 		const _scrLeft = _coopLeft - platformX;
-		const _scrDiff = MathRound(_scrLeft - (_canvas.width / 2));
-		//platformX += _scrDiff;
+		const _scrDiff = MathRound(_scrLeft - _canvas.width / 2);
+
 		const _centerOfScreen = MathRound(_canvas.width / 2);
 		_coopMembers[0].left += platformX;
-		if(!episode.still)
-			platformX = _coopLeft - _centerOfScreen;
+		if (!episode.still) platformX = _coopLeft - _centerOfScreen;
 		mainCharacter.left = _centerOfScreen;
-		if(platformX < 0)
-		{
+		if (platformX < 0) {
 			mainCharacter.left += platformX;
 			platformX = 0;
-		}
-		else if(platformX > (episode.width - _canvas.width)){
-			mainCharacter.left += (platformX - (episode.width - _canvas.width));
-			platformX = (episode.width - _canvas.width);
+		} else if (platformX > episode.width - _canvas.width) {
+			mainCharacter.left += platformX - (episode.width - _canvas.width);
+			platformX = episode.width - _canvas.width;
 		}
 		prevPlatformX = undefined;
-	}
-	else {
+	} else {
 		_coopMembers[0].left += platformX;
 		mainCharacter.left -= platformX;
 	}
 	mainCharacter.unseen = false;
 	_coopMembers[0].setAutoMode(2);
-	// mainCharacter.main = true;
-	// mainCharacter.friendly = false;
-	// const _scrLeft = mainCharacter.getExactLeft();
-	// const _leftDiff = _scrLeft - (_canvas.width / 2);
-	// const _oldPlatformX = platformX;
-	// platformX += MathRound(_leftDiff);
-	// _coopMembers[0].left += _oldPlatformX;
-	// mainCharacter.left -= platformX;
+
 	_client.setCharacterValues(mainCharacter, null);
 	_squadMemberKey = _coopMembers[0].class;
-	if(!_noSound)
-		PlaySound({ key: mainCharacter.class + 'select' + getRandomValue(1, 2), volume: .5 });
+	if (!_noSound) PlaySound({ key: mainCharacter.class + 'select' + getRandomValue(1, 2), volume: 0.5 });
 	_startAnimate = true;
 	_client.loadItems();
 	clearChainSkills();
@@ -628,15 +659,14 @@ function createTipsUI(_tipOrder, _showCurrent) {
 	const _count = _tips.length;
 	const _current = _tipOrder + 1;
 	let _images = '';
-	// for(let i = 1; i <= (_tips[_tipOrder].imageCount ?? 1); i++)
-	// 	_images += `<img class="tip-img" style="height:100%" src="./images/tips/${_tipOrder}-${i}.png" onerror="this.remove()" />`;
-	let _html = 
-	`<div id="tip-screen" class="full" style="background:url(./images/loading/${getRandomValue2(1, 7)}.png);background-size:contain;background-position:center;background-repeat:no-repeat"><div class="flex" style="padding:0 2cqw;width:100%;height:40%">
+
+	let _html =
+		`<div id="tip-screen" class="full" style="background:url(./images/loading/${getRandomValue2(1, 7)}.png);background-size:contain;background-position:center;background-repeat:no-repeat"><div class="flex" style="padding:0 2cqw;width:100%;height:40%">
 		
 	</div>
-	<div class="flex tip-bg-image" style="width:100%;height:60%">`
-		+ _images +
-	`</div></div>`;
+	<div class="flex tip-bg-image" style="width:100%;height:60%">` +
+		_images +
+		`</div></div>`;
 	setTimeout(() => {
 		document.getElementById('loading-tip').innerHTML = `<div class="tip-wrapper flex flex-ai-start">
 			<div class="tip-label flex flex-ai-start flex-jc-end wot-subtitle" lang="${getLang()}"> 
@@ -649,22 +679,22 @@ function createTipsUI(_tipOrder, _showCurrent) {
 	}, 20);
 	return _html;
 }
-setTimeout(function(){ createTipsUI(5)}, 6000);
+setTimeout(function () {
+	createTipsUI(5);
+}, 6000);
 function initMainCharacter() {
 	const _mh = mainCharacter?.health;
 	const _me = mainCharacter?.experience;
 	const _mme = mainCharacter?.maxExperience;
 	mainCharacter = _store.getMainCharacter();
-	if(_mh) {
+	if (_mh) {
 		mainCharacter.health = _mh;
 		mainCharacter.experience = _me;
 		mainCharacter.maxExperience = _mme;
 	}
 	_store.setCharacterStats();
-	if (!mainCharacter.keyboard)
-		setKeyBoard(mainCharacter);
-	else
-		mainCharacter.keyboard.holdingKeys = [];
+	if (!mainCharacter.keyboard) setKeyBoard(mainCharacter);
+	else mainCharacter.keyboard.holdingKeys = [];
 	return _mh;
 }
 function setTip() {
@@ -673,11 +703,10 @@ function setTip() {
 		_splash.style.display = 'flex';
 		_splash.style.opacity = '.99';
 		let _tipOrder;
-		while(true) {
+		while (true) {
 			_tipOrder = getRandomValue2(0, _tips.length - 1);
-			if(_tipChoices.length === _tips.length)
-				break;
-			else if(_tipChoices.indexOf(_tipOrder + 1) === -1) {
+			if (_tipChoices.length === _tips.length) break;
+			else if (_tipChoices.indexOf(_tipOrder + 1) === -1) {
 				_tipChoices.push(_tipOrder + 1);
 				break;
 			}
@@ -688,20 +717,18 @@ function setTip() {
 	return _splash;
 }
 function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
-	if(__switchingMap)
-		return;
+	if (__switchingMap) return;
 	_game.suspended = 1;
-	if(mainCharacter) {
-		const _maph = mapSprites.find(x => x.id === _x);
-		if(mainCharacter.level < _maph.minLevel) {
+	if (mainCharacter) {
+		const _maph = mapSprites.find((x) => x.id === _x);
+		if (mainCharacter.level < _maph.minLevel) {
 			warn('<span>' + getLangData('Your level is too low') + '</span>', 'warn');
 			return;
 		}
 	}
 	closeInventoryQuestionModal(1);
-	const _map = mapSprites.find(x => x.id === _x);
-	if(episode)
-		episode.dispose();
+	const _map = mapSprites.find((x) => x.id === _x);
+	if (episode) episode.dispose();
 	__switchingMap = true;
 	hideMyModalPopUp();
 	removeClass(_gamePad, 'ghost-mode');
@@ -716,8 +743,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 	}
 	const _dungeonFloor = episode?.currentFloor;
 	const _oldSeason = episode?.season ?? 0;
-	if(mainCharacter)
-		mainCharacter.platformX;
+	if (mainCharacter) mainCharacter.platformX;
 	platformX = 0;
 	const _eps = new map({
 		loadObjects: true,
@@ -726,21 +752,18 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 		height: _canvas.height,
 		sprites: []
 	});
-	if(episode && _effect){
+	if (episode && _effect) {
 		episode.nextEpisode = _eps;
 		episode.effect = _effect;
 		return;
-	}
-	else
-		episode = _eps;
+	} else episode = _eps;
 	episode.msNow = getRandomValue(1, 1000);
 	const _hasLead = mainCharacter?.leader;
 	const _unarmed = mainCharacter?.unarmed;
 	let hasMainCharacter = initMainCharacter();
 	_store.minPosX = -1 * MathRound((mainCharacter.width / 2) * __zoom);
 	_store.maxPosX = _canvas.width - MathRound((mainCharacter.width / 2) * __zoom);
-	if (_dungeonFloor && episode.dungeon && episode.floors > _dungeonFloor)
-		episode.currentFloor = _dungeonFloor + 1;
+	if (_dungeonFloor && episode.dungeon && episode.floors > _dungeonFloor) episode.currentFloor = _dungeonFloor + 1;
 	const _isBattleGround = _map?.battleGround || _map?.pvp;
 	const _isTower = _map?.tower;
 	const _isMission = _map?.tower || _map?.gold;
@@ -751,41 +774,43 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 			_navbar.innerHTML = avatarTemplate(mainCharacter);
 			loadUI();
 			warmUpDmgFrames();
-			if(episode.still) {
+			if (episode.still) {
 				mainCharacter.left = MathRound(_canvas.width / (_map.enterDirection === __left ? 5 : 2));
 				mainCharacter.direction = __right;
-				mainCharacter.platformX = platformX = MathRound(episode.width / 2) - mainCharacter.left - (_map.enterDirection === 'left' ? MathRound((_canvas.width / 2) - (_canvas.width / 5)) : 0);
-			}
-			else if(_ss?.from === __right && _ss?.from !== __left) {
-				mainCharacter.left = MathRound((_canvas.width * .8) - mainCharacter.getWidth());
+				mainCharacter.platformX = platformX =
+					MathRound(episode.width / 2) -
+					mainCharacter.left -
+					(_map.enterDirection === 'left' ? MathRound(_canvas.width / 2 - _canvas.width / 5) : 0);
+			} else if (_ss?.from === __right && _ss?.from !== __left) {
+				mainCharacter.left = MathRound(_canvas.width * 0.8 - mainCharacter.getWidth());
 				mainCharacter.direction = __left;
 				mainCharacter.platformX = platformX = MathRound(episode.width - _canvas.width);
-			}
-			else
-			{
+			} else {
 				mainCharacter.left = MathRound(_canvas.width / 5);
 				mainCharacter.direction = __right;
 				mainCharacter.platformX = platformX = 0;
 			}
 			_client.setCharacterValues(mainCharacter, 1);
 			setCharacterDefaults(mainCharacter);
-			if (_hasLead && (episode.dungeon ||episode.pvp))
-				mainCharacter.leader = 1;
+			if (_hasLead && (episode.dungeon || episode.pvp)) mainCharacter.leader = 1;
 			if (_isBattleGround) {
 				createBattleGround(_map);
 			} else {
 				removeClass(document.getElementById('quest-status'), 'd-none');
 				episode.drawQuestNavIcon();
 				if (_coopMembers?.[0])
-					for (let cm of _coopMembers){
+					for (let cm of _coopMembers) {
 						const _ua = cm.unarmed;
-						let cc = addCoopCharacter({ key: cm.key, name: cm.name, class: cm.class, width: cm.width, height: cm.height }, null, 1);
-						if(cc && _ua)
-							cc.unarm();
+						let cc = addCoopCharacter(
+							{ key: cm.key, name: cm.name, class: cm.class, width: cm.width, height: cm.height },
+							null,
+							1
+						);
+						if (cc && _ua) cc.unarm();
 					}
 			}
 			episode.enemies.push(mainCharacter);
-			//eskiden liderliği burada veriyorduk
+
 			episode.installMobs();
 			episode.status = 'loaded';
 			mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
@@ -794,14 +819,18 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 			mainCharacter.lastActivity = _gameTick;
 			mainCharacter.enableSkillUI();
 			let _mapDiscovered;
-			if (!_isBattleGround && !episode.dungeon && !_isMission && __account.visitedMaps.indexOf(episode.subMap ?? episode.id) === -1) {
+			if (
+				!_isBattleGround &&
+				!episode.dungeon &&
+				!_isMission &&
+				__account.visitedMaps.indexOf(episode.subMap ?? episode.id) === -1
+			) {
 				_client.upgradeVisitedMaps(episode.id);
 				_mapDiscovered = 1;
 			}
-			if (_func)
-				_func();
+			if (_func) _func();
 			if (_isBattleGround)
-				episode.enemies?.forEach(x => {
+				episode.enemies?.forEach((x) => {
 					x.immobilize = true;
 					x.killCount = 0;
 					x.setHealth(x.MAXHP, null, null, 8);
@@ -809,72 +838,55 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 					x.grayAvatar = false;
 				});
 			const _activeCoolDowns = document.querySelectorAll('.skill .counter');
-			if(_activeCoolDowns?.[0])
-				for(let _acd of _activeCoolDowns)
-					_acd.remove();
+			if (_activeCoolDowns?.[0]) for (let _acd of _activeCoolDowns) _acd.remove();
 			let _startWith = _ss?.startWith;
-			if(_startWith && (mainCharacter?.id % 10000) !== _startWith)
+			if (_startWith && mainCharacter?.id % 10000 !== _startWith)
 				startWithThisCharacter(_startWith, null, null, 1);
-			setTimeout(function() {
+			setTimeout(function () {
 				addClass(document.getElementById('game-opening-screen-menu'), 'd-none');
-				if(_onEnd)
-					_onEnd();
-				else if(!episode.pvp && !episode.war){
-					//addClass(_splash, 'd-none');
+				if (_onEnd) _onEnd();
+				else if (!episode.pvp && !episode.war) {
 					const _ts = document.getElementById('tip-screen');
-					if(_ts)
-						_ts.remove();
+					if (_ts) _ts.remove();
 				}
 				const _loading = document.getElementById('game-start-loading');
 				episode.drawSpriteObjects2();
-				if(!episode.realTime)
-					_client.loadItems(hasMainCharacter);
+				if (!episode.realTime) _client.loadItems(hasMainCharacter);
 				updateQuestArea();
 				__account.questStatus.dialogOrder = __account.questStatus.dialogArr = undefined;
 				__switchingMap = false;
-				if(!episode.pvp)
-					episode.pvp = _isMission;
-				if(episode.pvp){
+				if (!episode.pvp) episode.pvp = _isMission;
+				if (episode.pvp) {
 					addClass(document.getElementById('pot-btn'), 'not-allowed');
-					if(!episode.gold)
-						addClass(document.getElementById('world-mini-map'), 'd-none');
-				}
-				else {
+					if (!episode.gold) addClass(document.getElementById('world-mini-map'), 'd-none');
+				} else {
 					removeClass(document.getElementById('pot-btn'), 'not-allowed');
 					removeClass(document.getElementById('world-mini-map'), 'd-none');
 				}
 				closeUserActionsModal();
-				if(_isTower)
-					setTowerMobsByLevel();
-				else if(_isMission) {
-					episode.enemies?.forEach(x => x.immobilize = true);
-					if(episode.gold) {
-						const _e = episode.enemies.find(x => x.enemy);
-						if(_e)
-							mainCharacter.yPosition = _e.yPosition;
+				if (_isTower) setTowerMobsByLevel();
+				else if (_isMission) {
+					episode.enemies?.forEach((x) => (x.immobilize = true));
+					if (episode.gold) {
+						const _e = episode.enemies.find((x) => x.enemy);
+						if (_e) mainCharacter.yPosition = _e.yPosition;
 						removeCoopCharacter(1);
-						const _gm = __account.missions.find(x => x.key === 'gold');
+						const _gm = __account.missions.find((x) => x.key === 'gold');
 						_gm.current++;
 						_gm.lastActivity = _gameTick;
 						_client.saveState(1);
 					}
 				}
-				if(_unarmed)
-					mainCharacter.unarm();
-				if(_startWith)
+				if (_unarmed) mainCharacter.unarm();
+				if (_startWith) mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
+				else if (_startWith === 0) mainCharacter = undefined;
+				if (_afterInit) _afterInit();
+				else if (__storyScene?.afterInit) __storyScene.afterInit();
+				if (!_storySceneSwitching) _game.suspended = false;
+				if (!episode?.menu && mainCharacter?.yPosition > getGroundHeight() && !episode?.pvp)
 					mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
-				else if(_startWith === 0)
-					mainCharacter = undefined;
-				if(_afterInit)
-					_afterInit();
-				else if(__storyScene?.afterInit)
-					__storyScene.afterInit();
-				if(!_storySceneSwitching)
-					_game.suspended = false;
-				if(!episode?.menu && mainCharacter?.yPosition > getGroundHeight() && !episode?.pvp)
-					mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
-				if(episode && !episode.menu) {
-					episode.enemies?.forEach(x => {
+				if (episode && !episode.menu) {
+					episode.enemies?.forEach((x) => {
 						resetSkills(null, null, x);
 						x.hbBars = undefined;
 						x.maxHP = x.MAXHP = x.health;
@@ -884,21 +896,15 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 				}
 				removeClass(_gameUI, 'ghost');
 				disposeFocus();
-				// if(__particles)
-				// 	__particles.cancel();
-				if(episode.war || episode.pvp){
+
+				if (episode.war || episode.pvp) {
 					addClass(_gameUI, 'war-map');
-					//document.querySelector('.enemy-profile').style.setProperty('width', '40cqw', 'important');
-					//document.getElementById('top-nav').style.setProperty('width', '40cqw', 'important');
-				}
-				else {
+				} else {
 					removeClass(_gameUI, 'war-map');
-				//	document.querySelector('.enemy-profile').style.removeProperty('width');
-				//	document.getElementById('top-nav').style.removeProperty('width');
 				}
-				for(let i = 1; i < 5; i++) {
+				for (let i = 1; i < 5; i++) {
 					const cfc = chainSkills['skill' + i].firstChild;
-					cfc.removeAttribute("src");
+					cfc.removeAttribute('src');
 				}
 				blurKeyboard();
 				resetTouchPad();
@@ -908,10 +914,10 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 			}, 2000);
 		});
 	});
- }
- function warmUpDmgFrames() {
+}
+function warmUpDmgFrames() {
 	const _types = ['common', 'hurt', 'fire', 'shadow', 'lightning', 'ice', 'toxic'];
-	for(let _type of _types)
+	for (let _type of _types)
 		addDmgFrame({
 			atkType: _type,
 			val: 1234567890,
@@ -919,7 +925,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 			y: 0
 		});
 	const _texts = ['1234567890', 'plus-hp', 'minus-hp', 'immune', 'block', 'miss', 'level-up'];
-	for(let _text of _texts)
+	for (let _text of _texts)
 		addDmgFrame({
 			text: _text,
 			x: -1000,
@@ -927,26 +933,34 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 		});
 	drawDmgFrames();
 	dmgFrames.length = 0;
- }
-_allEnemies.enemy10001 = function () { return createCharacter(getCharacterJSON('wrr')); };
-_allEnemies.enemy10002 = function () { return createCharacter(getCharacterJSON('arc')); };
-_allEnemies.enemy10003 = function () { return createCharacter(getCharacterJSON('thf')); };
+}
+_allEnemies.enemy10001 = function () {
+	return createCharacter(getCharacterJSON('wrr'));
+};
+_allEnemies.enemy10002 = function () {
+	return createCharacter(getCharacterJSON('arc'));
+};
+_allEnemies.enemy10003 = function () {
+	return createCharacter(getCharacterJSON('thf'));
+};
 function requestVideo(_order, _again) {
-	loadVideo('./images/cutscenes/cs' + _order + '.mp4', function() {
-		addClass(document.getElementById('splash'), 'd-none');
-		const _ts = document.getElementById('tip-screen');
-		if(_ts)
-			_ts.remove();
-	}, _again);
+	loadVideo(
+		'./images/cutscenes/cs' + _order + '.mp4',
+		function () {
+			addClass(document.getElementById('splash'), 'd-none');
+			const _ts = document.getElementById('tip-screen');
+			if (_ts) _ts.remove();
+		},
+		_again
+	);
 }
 function clearStatusBoard() {
 	const _board = document.querySelector('.game-status-screen');
-	if(_board)
-		_board.remove();
+	if (_board) _board.remove();
 }
 function loadVideo(_url, _after, _again) {
 	var r = new XMLHttpRequest();
-	r.onload = function() {
+	r.onload = function () {
 		const _videoWrapper = document.createElement('div');
 		_videoWrapper.className = 'full flex video-loader';
 		const _myVid = document.createElement('video');
@@ -956,34 +970,33 @@ function loadVideo(_url, _after, _again) {
 		_myVid.controls = false;
 		_myVid.className = 'd-none';
 		_myVid.play();
-		_myVid.addEventListener('ended', function() {
+		_myVid.addEventListener('ended', function () {
 			skipVideo(_myVid, _again);
 		});
-		_myVid.addEventListener('canplaythrough', function() {
+		_myVid.addEventListener('canplaythrough', function () {
 			removeClass(_myVid, 'd-none');
 		});
 		const _videoTouch = document.createElement('div');
 		_videoTouch.className = 'full video-touch';
 		_videoTouch.innerHTML = '<span>' + getLangData('Touch to skip') + '</span>';
-		_videoTouch.onexactclick = function() {
-			askSkipVideo(_myVid, _again)
-		}
+		_videoTouch.onexactclick = function () {
+			askSkipVideo(_myVid, _again);
+		};
 		_videoWrapper.appendChild(_videoTouch);
-		if(_after)
-			_after();
+		if (_after) _after();
 	};
-	r.open("GET", _url);
-	r.responseType = "blob";
+	r.open('GET', _url);
+	r.responseType = 'blob';
 	r.send();
 }
 let _playingVideo;
 function askSkipVideo(_video, _again) {
-    playClick();
+	playClick();
 	_playingVideo = _video;
-    let _modal = document.createElement('div');
-	_modal.className = "full flex inventory-question";
+	let _modal = document.createElement('div');
+	_modal.className = 'full flex inventory-question';
 	_modal.style.zIndex = 9999;
-    _modal.innerHTML = `<div class="inventory-modal">
+	_modal.innerHTML = `<div class="inventory-modal">
             <div style="padding:6cqh 4cqh 4cqh 4cqh" class="flex">
                 <span style="color:#f7f7f7dd !important;font-size:3cqh !important">${getLangData('Skip Story')}?</span></div>
             <div style="padding:4cqh 2cqh" class="flex">
@@ -991,22 +1004,19 @@ function askSkipVideo(_video, _again) {
                 <div class="game-menu-button flex animate-me" style="cursor:pointer;color:#F4BB44 !important;font-size:3cqh !important" onexactclick="closeInventoryQuestionModal()">${getLangData('NO')}</div>
             </div>
         </div>`;
-    _gameUI.appendChild(_modal);
+	_gameUI.appendChild(_modal);
 }
 function skipVideo(_video, _again) {
 	const _v = _playingVideo ?? _video;
 	_v.pause();
 	_v.remove();
 	const _loader = document.querySelector('.video-loader');
-	if(_loader)
-		_loader.remove();
+	if (_loader) _loader.remove();
 	closeInventoryQuestionModal();
-	if(!_again)
-		playCutScene(1);
+	if (!_again) playCutScene(1);
 }
 function getGroundHeight() {
-	if(isNaN(groundheight) && episode)
-	{
+	if (isNaN(groundheight) && episode) {
 		const _gh = MathRound(idealground_height * (episode.ground.yRate ?? 1));
 		groundheight = _gh;
 		return groundheight;
@@ -1014,64 +1024,51 @@ function getGroundHeight() {
 	return groundheight;
 }
 function isPhone() {
-    return (
-        navigator.maxTouchPoints > 0 &&
-        Math.min(window.innerWidth, window.innerHeight) < 600
-    );
+	return navigator.maxTouchPoints > 0 && Math.min(window.innerWidth, window.innerHeight) < 600;
 }
-var _closeOpeningMusic, gameopening, __isHEDevice, gameIsReady = false;
+var _closeOpeningMusic,
+	gameopening,
+	__isHEDevice,
+	gameIsReady = false;
 function openGame() {
-	if(gameopening || !gameIsReady)
-		return;
+	if (gameopening || !gameIsReady) return;
 	gameopening = 1;
 	removeClass(document.getElementById('assets-progressbar'), 'd-none');
-	//launchIntoFullscreen(document.documentElement);
+
 	setTimeout(async function () {
 		__isHEDevice = await isHighEndDevice();
-		if(!__isHEDevice)
-			__scale = 2;
-		if(_openingSound)
-			_closeOpeningMusic = 1;
-		//alert((__scale === 2 ? 'Low' : 'High') + '-end device detected');
+		if (!__isHEDevice) __scale = 2;
+		if (_openingSound) _closeOpeningMusic = 1;
+
 		setWindowVariables();
-		// switchMap(testMap ?? 1, null, function () {
-		// 	for (var i = 1; i <= Object.keys(chainSkills).length; i++)
-		// 		addClass(chainSkills['skill' + i], 'd-none');
-		// 	addClass(document.getElementById('first-splash'), 'd-none');
-		// 	removeClass(document.getElementById('game-start-loading-wrapper'), 'd-none');
-		// });
-		if(!__account.lastLobbyUsage)
-			startStory(1);
+
+		if (!__account.lastLobbyUsage) startStory(1);
 		else {
-			//__storySceneOrder = __account.lastLobbyUsage.sceneOrder;
 			__storySceneOrder = 1;
-			startStory(__stories.find(x => x.act === __account.act && x.lobby).id, null, 1);
+			startStory(__stories.find((x) => x.act === __account.act && x.lobby).id, null, 1);
 		}
 		_client.loadGold();
 		_client.loadPots();
 		__account.onlineStart = Date.now();
-		if(__account.name !== '')
-			connectSocket();
+		if (__account.name !== '') connectSocket();
 		_client.saveState();
 		updateQuestArea();
 		setNewKeyCombinations();
 	}, 2000);
 }
 function setTowerMobsByLevel() {
-	const _towerProps = _missions.find(x => x.key === 'tower').props;
-	const _t = __account.missions.find(x => x.key === 'tower');
-	const _mobs = _towerProps.find(x => x.level === _t.level).floors.find(x => x.floor === _t.current).mobs;
+	const _towerProps = _missions.find((x) => x.key === 'tower').props;
+	const _t = __account.missions.find((x) => x.key === 'tower');
+	const _mobs = _towerProps.find((x) => x.level === _t.level).floors.find((x) => x.floor === _t.current).mobs;
 	let _mobIds = [];
-	for(let _mob of _mobs)
-		for(var i = 0; i < _mob.count; i++)
-			_mobIds.push(_mob.id);
+	for (let _mob of _mobs) for (var i = 0; i < _mob.count; i++) _mobIds.push(_mob.id);
 	_mobIds = _mobIds.sort(() => Math.random() - 0.5);
 	var _len = MathRound(_mobIds.length / 2);
 	episode.mobs = [];
-	episode.centerLeft = MathRound(((mainCharacter.platformX + mainCharacter.SCREENLEFT) / __zoom));
-	var minX = episode.centerLeft - MathRound(_canvas.width * .4);
-	var maxX = episode.centerLeft + MathRound(_canvas.width * .4);
-	for(var i = 0; i < _mobIds.length; i++) {
+	episode.centerLeft = MathRound((mainCharacter.platformX + mainCharacter.SCREENLEFT) / __zoom);
+	var minX = episode.centerLeft - MathRound(_canvas.width * 0.4);
+	var maxX = episode.centerLeft + MathRound(_canvas.width * 0.4);
+	for (var i = 0; i < _mobIds.length; i++) {
 		const _rate = MathCeil(_t.current / 3);
 		episode.mobs.push({
 			id: _mobIds[i],
@@ -1085,24 +1082,21 @@ function setTowerMobsByLevel() {
 			minX: i < _len ? maxX : minX,
 			maxX: i < _len ? maxX : minX,
 			yPosition: MathRound((((i % _len) + 1) / (_len + 1)) * getGroundHeight()),
-			// yPosition: function() {
-			// 	return getRandomValue(MathRound(getGroundHeight() * .25), MathRound(getGroundHeight() * .75));
-			// },
-			sight: 200,
+
+			sight: 200
 		});
 	}
 	episode.installMobs();
-	if(_mobIds.length === 1) {
+	if (_mobIds.length === 1) {
 		mainCharacter.direction = 'right';
-		mainCharacter.left = MathRound(_canvas.width * .2);
-		const _boss = episode.enemies.find(x => x.enemy);
+		mainCharacter.left = MathRound(_canvas.width * 0.2);
+		const _boss = episode.enemies.find((x) => x.enemy);
 		_boss.left += _boss.getWidth();
 	}
-	episode.enemies?.forEach(x => {
+	episode.enemies?.forEach((x) => {
 		x.immobilize = true;
 		x.killCount = 0;
-		x.direction = x.getLeft() <= mainCharacter.getLeft() ? 'right' : 'left',
-		x.setHealth(x.MAXHP);
+		((x.direction = x.getLeft() <= mainCharacter.getLeft() ? 'right' : 'left'), x.setHealth(x.MAXHP));
 		x.killedBy = undefined;
 		x.grayAvatar = false;
 	});
@@ -1115,53 +1109,52 @@ function setTowerMobsByLevel() {
 }
 function setKeyBoard(_c) {
 	_c.keyboard = new keyboard(_c, [
-		__account.keyboard?.[0]?.toLowerCase() ?? 'a', 
-		__account.keyboard?.[5]?.toLowerCase() ?? 'g', 
-		__account.keyboard?.[1]?.toLowerCase() ?? 'd', 
-		__account.keyboard?.[6]?.toLowerCase() ?? ' ', 
-		__account.keyboard?.[4]?.toLowerCase() ?? 'h', 
-		__account.keyboard?.[7]?.toLowerCase() ?? 'j', 
-		__account.keyboard?.[8]?.toLowerCase() ?? 'k', 
-		__account.keyboard?.[9]?.toLowerCase() ?? 'l', 
-		__account.keyboard?.[10]?.toLowerCase() ?? 'e', 
-		__account.keyboard?.[11]?.toLowerCase() ?? 'q', 
-		__account.keyboard?.[14]?.toLowerCase() ?? 'r', 
-		__account.keyboard?.[13]?.toLowerCase() ?? 'f', 
-		'arrowleft', 
-		'arrowup', 
-		'arrowright', 
-		'arrowdown', 
-		__account.keyboard?.[2]?.toLowerCase() ?? 'w', 
-		__account.keyboard?.[3]?.toLowerCase() ?? 's', 
-		__account.keyboard?.[15]?.toLowerCase() ?? 'u', 
-		__account.keyboard?.[17]?.toLowerCase() ?? '1', 
-		__account.keyboard?.[18]?.toLowerCase() ?? '2', 
-		__account.keyboard?.[19]?.toLowerCase() ?? '3', 
-		__account.keyboard?.[20]?.toLowerCase() ?? '4', 
-		__account.keyboard?.[16]?.toLowerCase() ?? 'p', 
+		__account.keyboard?.[0]?.toLowerCase() ?? 'a',
+		__account.keyboard?.[5]?.toLowerCase() ?? 'g',
+		__account.keyboard?.[1]?.toLowerCase() ?? 'd',
+		__account.keyboard?.[6]?.toLowerCase() ?? ' ',
+		__account.keyboard?.[4]?.toLowerCase() ?? 'h',
+		__account.keyboard?.[7]?.toLowerCase() ?? 'j',
+		__account.keyboard?.[8]?.toLowerCase() ?? 'k',
+		__account.keyboard?.[9]?.toLowerCase() ?? 'l',
+		__account.keyboard?.[10]?.toLowerCase() ?? 'e',
+		__account.keyboard?.[11]?.toLowerCase() ?? 'q',
+		__account.keyboard?.[14]?.toLowerCase() ?? 'r',
+		__account.keyboard?.[13]?.toLowerCase() ?? 'f',
+		'arrowleft',
+		'arrowup',
+		'arrowright',
+		'arrowdown',
+		__account.keyboard?.[2]?.toLowerCase() ?? 'w',
+		__account.keyboard?.[3]?.toLowerCase() ?? 's',
+		__account.keyboard?.[15]?.toLowerCase() ?? 'u',
+		__account.keyboard?.[17]?.toLowerCase() ?? '1',
+		__account.keyboard?.[18]?.toLowerCase() ?? '2',
+		__account.keyboard?.[19]?.toLowerCase() ?? '3',
+		__account.keyboard?.[20]?.toLowerCase() ?? '4',
+		__account.keyboard?.[16]?.toLowerCase() ?? 'p',
 		__account.keyboard?.[12]?.toLowerCase() ?? 't'
 	]);
 }
 function addEvent(_id, _char) {
 	const _skillbtn = document.getElementById(_id);
-	if(!_skillbtn)
-		return;
-	_skillbtn.addEventListener("mousedown", function() {
+	if (!_skillbtn) return;
+	_skillbtn.addEventListener('mousedown', function () {
 		mainCharacter.keyboard.mouseDown(_char);
 	});
-	_skillbtn.addEventListener("mouseup", function() {
+	_skillbtn.addEventListener('mouseup', function () {
 		mainCharacter.keyboard.mouseUp(_char);
 	});
-	_skillbtn.addEventListener("mouseout", function() {
+	_skillbtn.addEventListener('mouseout', function () {
 		mainCharacter.keyboard.mouseUp(_char);
 	});
-	_skillbtn.addEventListener("touchcancel", function() {
+	_skillbtn.addEventListener('touchcancel', function () {
 		mainCharacter.keyboard.mouseUp(_char);
 	});
-	_skillbtn.addEventListener("touchend", function() {
+	_skillbtn.addEventListener('touchend', function () {
 		mainCharacter.keyboard.mouseUp(_char);
 	});
-	_skillbtn.addEventListener("touchstart", function() {
+	_skillbtn.addEventListener('touchstart', function () {
 		mainCharacter.keyboard.mouseDown(_char);
 	});
 }
@@ -1171,8 +1164,7 @@ function enableCommonSkills(_char) {
 			<div data-key="3" id='common-skill-3' data-new-key="${document.getElementById('common-skill-3')?.getAttribute?.('data-new-key')}" class="flex common"></div>
 			<div data-key="4" id='common-skill-4' data-new-key="${document.getElementById('common-skill-4')?.getAttribute?.('data-new-key')}" class="flex common"></div>`;
 	_enemyProfile.innerHTML = _html;
-	if(!episode?.pvp)
-		removeClass(_enemyProfile, 'pvp');
+	if (!episode?.pvp) removeClass(_enemyProfile, 'pvp');
 	_commons = document.querySelectorAll('.common');
 	_char.checkCommonInventory();
 	setTimeout(() => {
@@ -1183,8 +1175,7 @@ function enableCommonSkills(_char) {
 	}, 20);
 }
 function setCharacterDefaults(_char, _swap) {
-	if (_char.stepSound && !_char.stepSound.paused)
-		_char.stepSound.pause();
+	if (_char.stepSound && !_char.stepSound.paused) _char.stepSound.pause();
 	_char.stepSound = undefined;
 	removeHitCount(_char);
 	if (!_swap) {
@@ -1193,52 +1184,42 @@ function setCharacterDefaults(_char, _swap) {
 		_char.removeBuffs();
 	}
 	if (_char.main) {
-		if (!_char.updateRageSkillUI(_swap))
-			resetSkills(null, 1, _char);
+		if (!_char.updateRageSkillUI(_swap)) resetSkills(null, 1, _char);
 		const _bar = document.querySelector('#char-' + _char.key + ' .defbar-value');
-		if (_bar)
-			_bar.style.width = ((_char.fatique / _char.maxFatique) * 100) + '%';
-		if(!episode.pvp || __storyScene?.enableCommonSkills) {
+		if (_bar) _bar.style.width = (_char.fatique / _char.maxFatique) * 100 + '%';
+		if (!episode.pvp || __storyScene?.enableCommonSkills) {
 			enableCommonSkills(_char);
-		}
-		else
-			_char.disableCommonInventory();
-	}
-	else if (!_swap) {
+		} else _char.disableCommonInventory();
+	} else if (!_swap) {
 		_char.left = mainCharacter.left + mainCharacter.platformX;
 		_char.direction = mainCharacter.direction;
 	}
 	let _footStepEffectKey = 'defaultfootsteps';
-	if (relatedObjectImages[((episode.pvp || episode.dungeon) ? 'dungeon' : episode.theme) + 'footsteps'])
-		_footStepEffectKey = ((episode.pvp || episode.dungeon) ? 'dungeon' : episode.theme) + 'footsteps';
-	_char.animations.run.frames[1].objects = [{
-		key: _footStepEffectKey,
-		position: 'behind-feet',
-		yGap: -5,
-		scale: .35
-	}];
+	if (relatedObjectImages[(episode.pvp || episode.dungeon ? 'dungeon' : episode.theme) + 'footsteps'])
+		_footStepEffectKey = (episode.pvp || episode.dungeon ? 'dungeon' : episode.theme) + 'footsteps';
+	_char.animations.run.frames[1].objects = [
+		{
+			key: _footStepEffectKey,
+			position: 'behind-feet',
+			yGap: -5,
+			scale: 0.35
+		}
+	];
 	if (_char.health === undefined || _char.revived) {
-		if (_char.revived)
-			_char.setHealth(_char.MAXHP, 0, 0, 10);
-		else
-			if (!_client.loadHP(_char))
-				_char.setHealth(_char.MAXHP, 0, 0, 9);
+		if (_char.revived) _char.setHealth(_char.MAXHP, 0, 0, 10);
+		else if (!_client.loadHP(_char)) _char.setHealth(_char.MAXHP, 0, 0, 9);
 		_char.remove = _char.revived = undefined;
 	}
 }
 function showMyModalPopUp(_id) {
-	if(_id === 'game-menu' && mainCharacter && mainCharacter.deadTime)
-		return;
-	if(_id && hasClass(document.getElementById(_id), 'loaded'))
-		return;
+	if (_id === 'game-menu' && mainCharacter && mainCharacter.deadTime) return;
+	if (_id && hasClass(document.getElementById(_id), 'loaded')) return;
 	__account.questStatus.dialogOrder = __account.questStatus.dialogArr;
 	_dialogAppeared = 1;
-	if(mainCharacter?.keyboard?.holdingKeys)
-		mainCharacter.keyboard.holdingKeys = [];
+	if (mainCharacter?.keyboard?.holdingKeys) mainCharacter.keyboard.holdingKeys = [];
 	addClass(document.getElementById('quest-dialog'), 'd-none');
-	if(_id === 'game-menu') {
-		if(document.getElementById('menu-ui'))
-			return;
+	if (_id === 'game-menu') {
+		if (document.getElementById('menu-ui')) return;
 		let _menuBD = document.createElement('div');
 		_menuBD.className = 'menu-backdrop full flex show-ui';
 		let _menu = document.createElement('div');
@@ -1257,38 +1238,33 @@ function showMyModalPopUp(_id) {
 }
 
 function hideMenu() {
-	const _upperDiv= document.querySelector('.lobby-navbar');
-	if(_upperDiv)
-		_upperDiv.remove();
+	const _upperDiv = document.querySelector('.lobby-navbar');
+	if (_upperDiv) _upperDiv.remove();
 }
 function hideMyMenu(_noSound) {
-	if(_warMatchInProgress)
-		return;
+	if (_warMatchInProgress) return;
 	_dialogAppeared = false;
-	if(!__switchingMap && !_storySceneSwitching)
-		_game.suspended = false;
-	if(episode && !_noSound)
-		playClick();
+	if (!__switchingMap && !_storySceneSwitching) _game.suspended = false;
+	if (episode && !_noSound) playClick();
 	const _mbd = document.querySelector('.menu-backdrop');
-	if(_mbd)
-		_mbd.remove();
-	if(episode?.oldBGSoundVolume){
+	if (_mbd) _mbd.remove();
+	if (episode?.oldBGSoundVolume) {
 		episode.bgSound.volume = episode.oldBGSoundVolume;
-		delete  episode.oldBGSoundVolume;
+		delete episode.oldBGSoundVolume;
 	}
 }
 function closeGameMenu() {
 	const _duel = getRef('duel');
-	if(_duel?.roomId && document.querySelector("[data-module='duel']")) {
+	if (_duel?.roomId && document.querySelector("[data-module='duel']")) {
 		_duel.askLeaveForMenu();
 		return;
 	}
 	hideMyMenu();
 }
-function hideMyModalPopUp(_asap) { 
+function hideMyModalPopUp(_asap) {
 	_dialogAppeared = 0;
 	const _modal = document.querySelector('.my-pop-up-wrapper.loaded');
-	if(_asap) {
+	if (_asap) {
 		removeClass(_modal, 'loaded');
 		return;
 	}
@@ -1297,116 +1273,68 @@ function hideMyModalPopUp(_asap) {
 		removeClass(_modal, 'loaded');
 		removeClass(_modal, 'hide');
 		const _removals = document.querySelectorAll('#game-menu .remove-me');
-		for(let _r of _removals ?? [])
-			_r.innerHTML = '';
+		for (let _r of _removals ?? []) _r.innerHTML = '';
 	}, 250);
 }
 function switchBookPage(_order, _subOrder, _tabOrder) {
-	if(!(_order === 3 && _subOrder === 3) && !episode?.menu)
-	{
+	if (!(_order === 3 && _subOrder === 3) && !episode?.menu) {
 		warn('<span>' + getLangData('Unreachable in story mode') + '</span>', 'warn');
 		return;
 	}
-	if(_warMatchInProgress)
-	{
+	if (_warMatchInProgress) {
 		warn('<span>' + getLangData('War match in progress') + '</span>', 'warn');
 		return;
 	}
-	if(!(_order === 5 && _subOrder === 4)) {
+	if (!(_order === 5 && _subOrder === 4)) {
 		const _duel = getRef('duel');
-		if(_duel?.roomId && document.querySelector("[data-module='duel']")) {
+		if (_duel?.roomId && document.querySelector("[data-module='duel']")) {
 			_duel.askLeaveForMenu(_order, _subOrder, _tabOrder);
 			return;
 		}
 	}
-	// if(_order === 3 && _subOrder === 1 && __story && !__account.questStatus?.quest){
-	// 	warn('<span>' + getLangData('No quest for now') + '</span>', 'warn');
-	// 	return false;
-	// }
+
 	_game.suspended = true;
 	const _removals = document.querySelectorAll('#game-menu .remove-me');
-	for(let _r of _removals ?? [])
-		_r.innerHTML = '';
-	PlaySound({ key: 'page', volume: .3, reset: true });
+	for (let _r of _removals ?? []) _r.innerHTML = '';
+	PlaySound({ key: 'page', volume: 0.3, reset: true });
 	detachModule();
 	for (var i = 0; i < 9; i++) {
-		if ((i + 1) === _order) {
+		if (i + 1 === _order) {
 			addClass(document.getElementById('book-sign-' + _order), 'selected');
 			addClass(document.getElementById('book-content-' + _order), 'selected');
-			// if (_order === 4)
-			// 	organizeMapCoordinates();
-			// else 
-			if (_order === 3 && _subOrder === 2)
-				renderGlobalQuestList();
-			else if (_order === 3 && _subOrder === 3)
-				installWorldMap();
-			else if (_order === 3)
-				createStoryUI();
-			else if(_order === 4 && _subOrder === 2)
-				installMailbox();
-			else if(_order === 4 && _subOrder === 3)
-				installOnlineUsers();
-			// else if(_order === 4 && _subOrder === 2)
-			// {
-			// 	//online friends / blacklist / add friend / remove friend / pm
-			// }
-			else if(_order === 4)
-			{
+
+			if (_order === 3 && _subOrder === 2) renderGlobalQuestList();
+			else if (_order === 3 && _subOrder === 3) installWorldMap();
+			else if (_order === 3) createStoryUI();
+			else if (_order === 4 && _subOrder === 2) installMailbox();
+			else if (_order === 4 && _subOrder === 3) installOnlineUsers();
+			else if (_order === 4) {
 				installChat();
-			}
-			else if (_order === 2 && _subOrder === 2)
-				installTalents();
+			} else if (_order === 2 && _subOrder === 2) installTalents();
 			else if (_order === 2) {
 				skill.getSkillUI(mainCharacter.class);
 				checkUpdateAvailable2(_order);
-			}
-			else if (_order === 1 && _subOrder === 2)
-				createArtifactsUI();
-			else if (_order === 9 && _subOrder === 2)
-				installTips();
-			else if(_order === 9)
-				getOptionsUI();
-			// else if (_order === 5) {
-			// 	//getOnlineUsersUI();
-			// 	checkIfLotteryAvailable();
-			// }
-			else if (_order === 7)
-				getFragmentUI();
-			else if(_order === 8 && _subOrder === 2)
-				renderDailyLottery();
-			else if (_order === 8 && _subOrder === 3)
-				installDailyLogin();
-			else if (_order === 8)
-				createStoreUI();
-			// else if (_order === 9) {
-			// 	document.getElementById('book-content-9')
-			// 	.innerHTML = renderTipsUI();
-			// }
-			else if (_order === 5 && _subOrder === 2)
-				getHonorStoreUI();
-			else if (_order === 5 && _subOrder === 3)
-				installWarUI();
-			else if (_order === 5 && _subOrder === 4)
-				installDuelUI();
-			else if (_order === 5)
-				__pvp.render();
-			else if (_order === 6)
-				installDungeonUI();
-			else if (_order === 12)
-				getOnlineUsersUI();
-			else if(_order === 1) {
+			} else if (_order === 1 && _subOrder === 2) createArtifactsUI();
+			else if (_order === 9 && _subOrder === 2) installTips();
+			else if (_order === 9) getOptionsUI();
+			else if (_order === 7) getFragmentUI();
+			else if (_order === 8 && _subOrder === 2) renderDailyLottery();
+			else if (_order === 8 && _subOrder === 3) installDailyLogin();
+			else if (_order === 8) createStoreUI();
+			else if (_order === 5 && _subOrder === 2) getHonorStoreUI();
+			else if (_order === 5 && _subOrder === 3) installWarUI();
+			else if (_order === 5 && _subOrder === 4) installDuelUI();
+			else if (_order === 5) __pvp.render();
+			else if (_order === 6) installDungeonUI();
+			else if (_order === 12) getOnlineUsersUI();
+			else if (_order === 1) {
 				renderInventory(null, _tabOrder ?? 1);
 				checkUpdateAvailable2(_order);
 			}
-		}
-		else {
-			//removeClass(document.getElementById('book-sign-' + (i + 1)), 'selected');
-			//removeClass(document.getElementById('book-content-' + (i + 1)), 'selected');
-			// removeClass(_elems[i], 'selected');
-			// removeClass(_elems[i + _step], 'selected');
+		} else {
 		}
 	}
-	if(episode?.bgSound?.volume > 0 && episode.oldBGSoundVolume === undefined){
+	if (episode?.bgSound?.volume > 0 && episode.oldBGSoundVolume === undefined) {
 		episode.oldBGSoundVolume = episode.bgSound.volume;
 		episode.bgSound.volume = episode.bgSound.volume / 2;
 	}
@@ -1415,28 +1343,24 @@ function switchBookPage(_order, _subOrder, _tabOrder) {
 }
 function checkIfMailItemAvailable() {
 	const _ma = _client.getMails();
-	for(const _m of _ma)
-	{
-		const _mail = __account.mailbox?.find(x => x.id === _m.id);
-		if(!_mail || (_m.attachment && !_mail.looted))
-			return true;
+	for (const _m of _ma) {
+		const _mail = __account.mailbox?.find((x) => x.id === _m.id);
+		if (!_mail || (_m.attachment && !_mail.looted)) return true;
 	}
 	return false;
 }
 function checkIfLotteryAvailable() {
 	const _btn = document.getElementById('spinner-btn');
-	if(_btn)
-		_btn.innerText = getLangData('SPIN');
-	const _lot = __account.missions.find(x => x.key === 'lottery');
-	if(_lot.lastActivity && ((_lot.lastActivity + (1000 * 60 * 60 * 24)) > Date.now()))
-	{
-		if(_btn) {
+	if (_btn) _btn.innerText = getLangData('SPIN');
+	const _lot = __account.missions.find((x) => x.key === 'lottery');
+	if (_lot.lastActivity && _lot.lastActivity + 1000 * 60 * 60 * 24 > Date.now()) {
+		if (_btn) {
 			let _scr = selectMenuContainer();
 			let _block = document.getElementById('lottery-block');
-			if(!_block){
+			if (!_block) {
 				_block = document.createElement('div');
-				_block.id = "lottery-block";
-				_block.className = "full flex event-block";
+				_block.id = 'lottery-block';
+				_block.className = 'full flex event-block';
 				_block.innerHTML = `<div class="spin-block flex">
 										<div class="flex w-100 next-spin">${getLangData('Next Spin')}</div>
 										<div class="flex w-100 next-spin-until">${getTimeDiffUntilReset()}</div>
@@ -1450,27 +1374,27 @@ function checkIfLotteryAvailable() {
 }
 function checkIfDailyLoginGiftAvailable() {
 	const _date = new Date();
-	if(_date.getDate() > 28)
-		return false;
+	if (_date.getDate() > 28) return false;
 	const _key = _date.getDate().toString() + '-' + (_date.getMonth() + 1).toString() + '-' + _date.getFullYear();
 	return __account.monthlyLogins.indexOf(_key) === -1;
 }
 function checkTalentPointsAvailable() {
-	const _char = __account.characters.find(x => x.class === mainCharacter.class);
-	const _currentTotalTalents = _char.talents?.reduce((x, {count}) => x + count, 0);
+	const _char = __account.characters.find((x) => x.class === mainCharacter.class);
+	const _currentTotalTalents = _char.talents?.reduce((x, { count }) => x + count, 0);
 	const _currentTalentsLimit = MathFloor(mainCharacter.level / 2);
 	return _currentTalentsLimit > _currentTotalTalents;
 }
 function checkIfDungeonUpdate() {
-	const _stories = __stories.filter(x => x.mission);
+	const _stories = __stories.filter((x) => x.mission);
 	const _resetTime = getTodayResetTimestamp();
-	for(let item of _stories) {
-		const _mission = __account.missions?.find(x => x.key === item.mission);
-		if((_mission?.current ?? 0) < item.daily)
-			return true;
-		if(item.daily && _mission?.current === item.daily) {
-			if((_gameTick > _resetTime || ((_resetTime - _mission.lastActivity) > (24 * 60 * 60 * 1000))) 
-				&& _resetTime > _mission.lastActivity){
+	for (let item of _stories) {
+		const _mission = __account.missions?.find((x) => x.key === item.mission);
+		if ((_mission?.current ?? 0) < item.daily) return true;
+		if (item.daily && _mission?.current === item.daily) {
+			if (
+				(_gameTick > _resetTime || _resetTime - _mission.lastActivity > 24 * 60 * 60 * 1000) &&
+				_resetTime > _mission.lastActivity
+			) {
 				return true;
 			}
 		}
@@ -1478,72 +1402,52 @@ function checkIfDungeonUpdate() {
 	return false;
 }
 function checkUpdateAvailable2(_order) {
-	if(!episode?.menu)
-		return;
+	if (!episode?.menu) return;
 	const _badges = document.querySelectorAll('.my-badge');
-	if(_badges?.[0])
-		_badges.forEach(x => removeClass(x, 'my-badge'));
+	if (_badges?.[0]) _badges.forEach((x) => removeClass(x, 'my-badge'));
 	const _skills = skill.getAvailableSkills();
 	const availables = [];
-	for(let _skill of _skills){
-		if(_skill.unlockLevel > mainCharacter.level)
-			continue;
-		if(_skill.level >= mainCharacter.level)
-			continue;
-		if(_skill.props[_skill.props.length - 1].level <= _skill.level)
-			continue;
-		if(_skill.list !== false && skill.calculateSkillPrice(_skill.key) <= __account.gold)
-			availables.push({index:1, subIndex:0});
+	for (let _skill of _skills) {
+		if (_skill.unlockLevel > mainCharacter.level) continue;
+		if (_skill.level >= mainCharacter.level) continue;
+		if (_skill.props[_skill.props.length - 1].level <= _skill.level) continue;
+		if (_skill.list !== false && skill.calculateSkillPrice(_skill.key) <= __account.gold)
+			availables.push({ index: 1, subIndex: 0 });
 	}
 	var _items = allPowerDiffOrItemUpgrades();
-	for(const _item of _items)
-			availables.push({index:0, subIndex:0});
-	if(checkTalentPointsAvailable())
-			availables.push({index:1, subIndex:1});
-	if(checkIfGlobalQuestDone())
-			availables.push({index:2, subIndex:1});
-	if(__account.storyTicket > 1)
-			availables.push({index:2, subIndex:0});
-	if(checkIfDungeonUpdate())
-			availables.push({index:5, subIndex:0});
-	if(checkIfFragmentUpdate())
-			availables.push({index:6, subIndex:0});
-	if(checkIfStoreFreeItemAvailable())
-			availables.push({index:7, subIndex:0});
-	if(__lastChatCheck < __lastChatAppend || (!__lastChatCheck && __lastChatAppend))
-			availables.push({index:3, subIndex:0});
-	if(checkIfMailItemAvailable())
-			availables.push({index:3, subIndex:1});
-	if(checkIfLotteryAvailable())
-			availables.push({index:7, subIndex:1});
-	if(checkIfDailyLoginGiftAvailable())
-			availables.push({index:7, subIndex:2});
-	if(__account.pvp.duelCount > 0 && mainCharacter.level >= __pvp.unlockLevel)
-			availables.push({index:4, subIndex:0});
-	if(__account.forges?.find(x => x.warned))
-			availables.push({index:4, subIndex:1});
-	if(availables?.[0]) {
+	for (const _item of _items) availables.push({ index: 0, subIndex: 0 });
+	if (checkTalentPointsAvailable()) availables.push({ index: 1, subIndex: 1 });
+	if (checkIfGlobalQuestDone()) availables.push({ index: 2, subIndex: 1 });
+	if (__account.storyTicket > 1) availables.push({ index: 2, subIndex: 0 });
+	if (checkIfDungeonUpdate()) availables.push({ index: 5, subIndex: 0 });
+	if (checkIfFragmentUpdate()) availables.push({ index: 6, subIndex: 0 });
+	if (checkIfStoreFreeItemAvailable()) availables.push({ index: 7, subIndex: 0 });
+	if (__lastChatCheck < __lastChatAppend || (!__lastChatCheck && __lastChatAppend))
+		availables.push({ index: 3, subIndex: 0 });
+	if (checkIfMailItemAvailable()) availables.push({ index: 3, subIndex: 1 });
+	if (checkIfLotteryAvailable()) availables.push({ index: 7, subIndex: 1 });
+	if (checkIfDailyLoginGiftAvailable()) availables.push({ index: 7, subIndex: 2 });
+	if (__account.pvp.duelCount > 0 && mainCharacter.level >= __pvp.unlockLevel)
+		availables.push({ index: 4, subIndex: 0 });
+	if (__account.forges?.find((x) => x.warned)) availables.push({ index: 4, subIndex: 1 });
+	if (availables?.[0]) {
 		const _btns = document.querySelectorAll('.main-menu-btn');
-		for(let i = 0; i < _btns.length; i++)
-		{
-			const _a = availables.find(x=> x.index === i);
-			if(_a)
-				addClass(_btns[i], 'my-badge');
+		for (let i = 0; i < _btns.length; i++) {
+			const _a = availables.find((x) => x.index === i);
+			if (_a) addClass(_btns[i], 'my-badge');
 		}
-		const _a = availables.filter(x=> (x.index + 1) === _order);
-		if(_a?.[0]) {
-			for(const a of _a) {
+		const _a = availables.filter((x) => x.index + 1 === _order);
+		if (_a?.[0]) {
+			for (const a of _a) {
 				const _b = document.querySelectorAll('.menu-sub-button-' + _order)?.[a.subIndex];
-					if(_b)
-						addClass(_b, 'my-badge');
+				if (_b) addClass(_b, 'my-badge');
 			}
 		}
 	}
 }
 function checkIfFragmentUpdate() {
-	for(let _f of __fragments) {
-		if(hasFragmentUpdate(_f.key))
-			return true;
+	for (let _f of __fragments) {
+		if (hasFragmentUpdate(_f.key)) return true;
 	}
 	return false;
 }
@@ -1582,26 +1486,24 @@ function getBottomMenuTemplate(_index) {
 }
 function switchBookPageTabs(_order, _subOrder) {
 	let _btns = document.querySelectorAll('.menu-left .menu-sub-button');
-	_btns.forEach(x => {
+	_btns.forEach((x) => {
 		removeClass(x, 'selected');
 		removeClass(x, 'active');
 	});
 	let _tabs = document.querySelectorAll('.menu-left .menu-sub-button-' + _order);
-	if(_tabs?.[0])
-		_tabs.forEach(x => addClass(x, 'active'));
-	if(_subOrder)
-		addClass(_tabs[_subOrder - 1], 'selected');
+	if (_tabs?.[0]) _tabs.forEach((x) => addClass(x, 'active'));
+	if (_subOrder) addClass(_tabs[_subOrder - 1], 'selected');
 
 	_btns = document.querySelectorAll('.menu-right .menu-sub-button');
-	_btns.forEach(x => {
+	_btns.forEach((x) => {
 		removeClass(x, 'active');
 	});
 	_tabs = document.querySelectorAll('.menu-right .menu-sub-button-' + _order + '-' + _subOrder);
-	if(_tabs?.[0])
-		_tabs.forEach(x => addClass(x, 'active'));
+	if (_tabs?.[0]) _tabs.forEach((x) => addClass(x, 'active'));
 }
 function getLeftMenuTemplate(_index) {
-	return `<div class="menu-left">
+	return (
+		`<div class="menu-left">
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-1" data-index="1"><img onexactclick="switchBookPage(1, 1)" src="./images/ui/menu/item.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-1" data-index="2"><img onexactclick="switchBookPage(1, 2)" src="./images/ui/menu/relics1.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-2" data-index="1"><img onexactclick="switchBookPage(2, 1)" src="./images/ui/menu/skill-1.png"/></div>
@@ -1609,9 +1511,7 @@ function getLeftMenuTemplate(_index) {
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-3" data-index="1"><img onexactclick="switchBookPage(3, 1)" src="./images/ui/menu/puzzle.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-3" data-index="2"><img onexactclick="switchBookPage(3, 2)" src="./images/ui/menu/achievement.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-3" data-index="3"><img onexactclick="switchBookPage(3, 3)" src="./images/ui/menu/world.png"></div>
-		<div class="w-100 menu-sub-button animate-me menu-sub-button-4" data-index="1"><img onexactclick="switchBookPage(4, 1)" src="./images/ui/menu/chat.png"></div>`
-		//<div class="w-100 menu-sub-button animate-me menu-sub-button-4" data-index="2"><img onexactclick="switchBookPage(4, 2)" src="./images/ui/menu/social2.png"></div>
-		+
+		<div class="w-100 menu-sub-button animate-me menu-sub-button-4" data-index="1"><img onexactclick="switchBookPage(4, 1)" src="./images/ui/menu/chat.png"></div>` +
 		`<div class="w-100 menu-sub-button animate-me menu-sub-button-4" data-index="2"><img onexactclick="switchBookPage(4, 2)" src="./images/ui/menu/mailbox.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-4" data-index="3"><img onexactclick="switchBookPage(4, 3)" src="./images/ui/menu/social2.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-5" data-index="1"><img onexactclick="switchBookPage(5, 1)" src="./images/ui/menu/pvp-1.png"></div>
@@ -1626,13 +1526,14 @@ function getLeftMenuTemplate(_index) {
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-8" data-index="3"><img onexactclick="switchBookPage(8, 3)" src="./images/ui/menu/calendar.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-9" data-index="1"><img onexactclick="switchBookPage(9, 1)" src="./images/ui/menu/tools.png"></div>
 		<div class="w-100 menu-sub-button animate-me menu-sub-button-9" data-index="2"><img onexactclick="switchBookPage(9, 2)" src="./images/ui/menu/question.png"></div>
-	</div>`;	
+	</div>`
+	);
 }
 function getRightMenuTemplate(_index) {
-	const _gc = __account.misc?.find(x => x.type === 'ticket-gold')?.count ?? 0;
-	const _ec = __account.misc?.find(x => x.type === 'ticket-exp')?.count ?? 0;
-	const _ic = __account.misc?.find(x => x.type === 'ticket-item')?.count ?? 0;
-	const _pc = __account.misc?.find(x => x.type === 'ticket-pass')?.count ?? 0;
+	const _gc = __account.misc?.find((x) => x.type === 'ticket-gold')?.count ?? 0;
+	const _ec = __account.misc?.find((x) => x.type === 'ticket-exp')?.count ?? 0;
+	const _ic = __account.misc?.find((x) => x.type === 'ticket-item')?.count ?? 0;
+	const _pc = __account.misc?.find((x) => x.type === 'ticket-pass')?.count ?? 0;
 	return `<div class="menu-right flex-ai-end flex">
 		<div onexactclick="tryUseStoryTicket(3,1,2,'exp')" class="w-100 menu-sub-button${_ec > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="2"><img src="./images/ui/game/story-ticket-btn.png"><img class="story-ticket-img" src="./images/icons/ticket-exp.png" /><div class="story-ticket-count story-exp-ticket-count${_ec > 0 ? '' : ' no-ticket'}">${_ec > 999 ? '999+' : _ec}</div></div>
 		<div onexactclick="tryUseStoryTicket(3,1,3,'gold')" class="w-100 menu-sub-button${_gc > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="3"><img src="./images/ui/game/story-ticket-btn.png"><img class="story-ticket-img" src="./images/icons/ticket-gold.png" /><div class="story-ticket-count story-gold-ticket-count${_gc > 0 ? '' : ' no-ticket'}">${_gc > 999 ? '999+' : _gc}</div></div>
@@ -1640,12 +1541,12 @@ function getRightMenuTemplate(_index) {
 		<div onexactclick="tryUseStoryTicket(3,1,5,'pass')" class="w-100 menu-sub-button${_pc > 0 ? '' : ' msb-no-ticket'} animate-me menu-sub-button-3-1" data-index="5"><img src="./images/ui/game/story-ticket-btn.png"><img class="story-ticket-img" src="./images/icons/ticket-pass.png" /><div class="story-ticket-count story-pass-ticket-count${_pc > 0 ? '' : ' no-ticket'}">${_pc > 999 ? '999+' : _pc}</div></div>
 		<div onexactclick="zoomInWorldMap()" class="w-100 zoom-in menu-sub-button animate-me menu-sub-button-3-3${__storyPlaying ? ' disabled gray' : ''}" data-index="4"><img src="./images/ui/menu/plus.png"></div>
 		<div onexactclick="zoomOutWorldMap()" class="w-100 zoom-out menu-sub-button animate-me menu-sub-button-3-3${__storyPlaying ? '' : ' disabled gray'}" data-index="5"><img src="./images/ui/menu/minus.png"></div>
-	</div>`;	
+	</div>`;
 }
 function zoomInWorldMap(_act) {
 	const _ref = getRef('world');
 	const _btns = document.querySelectorAll('.menu-sub-button-3-3');
-	if(_ref) {
+	if (_ref) {
 		_ref.render(null, true);
 		const _zi = _btns[0];
 		const _zo = _btns[1];
@@ -1657,14 +1558,13 @@ function zoomInWorldMap(_act) {
 	playClick();
 }
 function zoomOutWorldMap() {
-	if(!episode?.menu)
-	{
+	if (!episode?.menu) {
 		warn('<span>' + getLangData('Unreachable in story mode') + '</span>', 'warn');
 		return;
 	}
 	const _ref = getRef('world');
 	const _btns = document.querySelectorAll('.menu-sub-button-3-3');
-	if(_ref) {
+	if (_ref) {
 		_ref.render(null, false);
 		const _zi = _btns[0];
 		const _zo = _btns[1];
@@ -1676,94 +1576,86 @@ function zoomOutWorldMap() {
 	playClick();
 }
 function updateRightMenuTemplate(_index) {
-	const _ec = __account.misc?.find(x => x.type === 'ticket-exp')?.count ?? 0;
-	const _gc = __account.misc?.find(x => x.type === 'ticket-gold')?.count ?? 0;
-	const _ic = __account.misc?.find(x => x.type === 'ticket-item')?.count ?? 0;
-	const _pc = __account.misc?.find(x => x.type === 'ticket-pass')?.count ?? 0;
+	const _ec = __account.misc?.find((x) => x.type === 'ticket-exp')?.count ?? 0;
+	const _gc = __account.misc?.find((x) => x.type === 'ticket-gold')?.count ?? 0;
+	const _ic = __account.misc?.find((x) => x.type === 'ticket-item')?.count ?? 0;
+	const _pc = __account.misc?.find((x) => x.type === 'ticket-pass')?.count ?? 0;
 	const _exp = document.querySelector('.menu-right .story-exp-ticket-count');
 	_exp.innerText = _ec > 999 ? '999+' : _ec;
-	if(_ec < 1){
+	if (_ec < 1) {
 		addClass(_exp, 'no-ticket');
 		const _elem = document.querySelector('.menu-sub-button[data-index="2"]');
 		addClass(_elem, 'msb-no-ticket');
 		removeClass(_elem, 'selected');
-	}
-	else{
+	} else {
 		removeClass(_exp, 'no-ticket');
 		removeClass(document.querySelector('.menu-sub-button[data-index="2"]'), 'msb-no-ticket');
 	}
 	const _gold = document.querySelector('.menu-right .story-gold-ticket-count');
 	_gold.innerText = _gc > 999 ? '999+' : _gc;
-	if(_gc < 1){
+	if (_gc < 1) {
 		addClass(_gold, 'no-ticket');
 		const _elem = document.querySelector('.menu-sub-button[data-index="3"]');
 		addClass(_elem, 'msb-no-ticket');
 		removeClass(_elem, 'selected');
-	}
-	else {
+	} else {
 		removeClass(_gold, 'no-ticket');
 		removeClass(document.querySelector('.menu-sub-button[data-index="3"]'), 'msb-no-ticket');
 	}
 	const _item = document.querySelector('.menu-right .story-item-ticket-count');
 	_item.innerText = _ic > 999 ? '999+' : _ic;
-	if(_ic < 1){
+	if (_ic < 1) {
 		addClass(_item, 'no-ticket');
 		const _elem = document.querySelector('.menu-sub-button[data-index="4"]');
 		addClass(_elem, 'msb-no-ticket');
 		removeClass(_elem, 'selected');
-	}
-	else{
+	} else {
 		removeClass(_item, 'no-ticket');
 		removeClass(document.querySelector('.menu-sub-button[data-index="4"]'), 'msb-no-ticket');
 	}
 	const _pass = document.querySelector('.menu-right .story-pass-ticket-count');
 	_pass.innerText = _pc > 999 ? '999+' : _pc;
-	if(_pc < 1){
+	if (_pc < 1) {
 		addClass(_pass, 'no-ticket');
 		const _elem = document.querySelector('.menu-sub-button[data-index="5"]');
 		addClass(_elem, 'msb-no-ticket');
 		removeClass(_elem, 'selected');
-	}
-	else{
+	} else {
 		removeClass(_pass, 'no-ticket');
 		removeClass(document.querySelector('.menu-sub-button[data-index="5"]'), 'msb-no-ticket');
 	}
 }
 
-function unselectStoryTickets(){
+function unselectStoryTickets() {
 	const _tix = document.querySelectorAll('.menu-right .menu-sub-button.menu-sub-button-3-1');
-	for(const _m of _tix)
-		if(hasClass(_m, 'selected'))
-			removeClass(_m, 'selected');
+	for (const _m of _tix) if (hasClass(_m, 'selected')) removeClass(_m, 'selected');
 }
 var _uiSelectedStoryId;
 function tryUseStoryTicket(_x, _y, _z, _key) {
 	const _elm = document.querySelector('.skill-card.selected');
-	if(!_elm) {
+	if (!_elm) {
 		warn('<span>' + getLangData('Select a story first') + '</span>', 'warn');
 		return;
 	}
-	if(_key === 'pass') {
-		const _s = __stories.find(x => x.id === _uiSelectedStoryId);
-		const _ss = __account.storyResults.find(x => x.id === _uiSelectedStoryId);
-		if(!_ss?.perfect) {
+	if (_key === 'pass') {
+		const _s = __stories.find((x) => x.id === _uiSelectedStoryId);
+		const _ss = __account.storyResults.find((x) => x.id === _uiSelectedStoryId);
+		if (!_ss?.perfect) {
 			warn('<span>' + getLangData('Finish story with 3 stars first') + '</span>', 'warn');
 			return;
 		}
 	}
-	const _t = __account.misc?.find(x => x.type === 'ticket-' + _key)?.count ?? 0;
-	if(_t > 0)
-		selectRightMenuSubItem(_x, _y, _z);
-	else
-		warn('<span>' + getLangData('No ticket to use') + '</span>', 'warn');
+	const _t = __account.misc?.find((x) => x.type === 'ticket-' + _key)?.count ?? 0;
+	if (_t > 0) selectRightMenuSubItem(_x, _y, _z);
+	else warn('<span>' + getLangData('No ticket to use') + '</span>', 'warn');
 }
 
 function selectRightMenuSubItem(_x, _y, _z) {
-	const _m = document.querySelector('.menu-right .menu-sub-button.menu-sub-button-' + _x + '-' + _y + '[data-index="' + _z + '"]');
-	if(hasClass(_m, 'selected'))
-		removeClass(_m, 'selected');
-	else
-		addClass(_m, 'selected');
+	const _m = document.querySelector(
+		'.menu-right .menu-sub-button.menu-sub-button-' + _x + '-' + _y + '[data-index="' + _z + '"]'
+	);
+	if (hasClass(_m, 'selected')) removeClass(_m, 'selected');
+	else addClass(_m, 'selected');
 }
 function howToGainGold() {
 	showInfo({
@@ -1772,36 +1664,52 @@ function howToGainGold() {
 			tr: 'Nasıl Altın Kazanılır'
 		},
 		navigations: [
-			{ icon:'quest', titles: {
-				en: 'Playing Story',
-				tr: 'Hikaye Oynamak'
-			}, func: function() {
-				closeInventoryQuestionModal();
-				switchBookPage(3, 1);
-			}},
-			{ icon:'achievement', titles: {
-				en: 'Daily Event',
-				tr: 'Günlük Etklinlik'
-			}, func: function() {
-				closeInventoryQuestionModal();
-				switchBookPage(3, 2);
-			}},
-			{ icon:'lottery', titles: {
-				en: 'Daily Lottery',
-				tr: 'Günlük Çekiliş'
-			}, func: function() {
-				closeInventoryQuestionModal();
-				switchBookPage(8, 2);
-			}},
-			{ icon:'inventory', titles: {
-				en: 'Selling Items',
-				tr: 'Ekipman Satma'
-			}, func: function() {
-				closeInventoryQuestionModal();
-				switchBookPage(1, 1);
-			}}
+			{
+				icon: 'quest',
+				titles: {
+					en: 'Playing Story',
+					tr: 'Hikaye Oynamak'
+				},
+				func: function () {
+					closeInventoryQuestionModal();
+					switchBookPage(3, 1);
+				}
+			},
+			{
+				icon: 'achievement',
+				titles: {
+					en: 'Daily Event',
+					tr: 'Günlük Etklinlik'
+				},
+				func: function () {
+					closeInventoryQuestionModal();
+					switchBookPage(3, 2);
+				}
+			},
+			{
+				icon: 'lottery',
+				titles: {
+					en: 'Daily Lottery',
+					tr: 'Günlük Çekiliş'
+				},
+				func: function () {
+					closeInventoryQuestionModal();
+					switchBookPage(8, 2);
+				}
+			},
+			{
+				icon: 'inventory',
+				titles: {
+					en: 'Selling Items',
+					tr: 'Ekipman Satma'
+				},
+				func: function () {
+					closeInventoryQuestionModal();
+					switchBookPage(1, 1);
+				}
+			}
 		]
-	})
+	});
 }
 function howToGainTickets() {
 	showInfo({
@@ -1810,27 +1718,39 @@ function howToGainTickets() {
 			tr: 'Hikaye Portalı Kazanmak'
 		},
 		navigations: [
-			{ icon:'calendar', titles: {
-				en: 'Daily Login',
-				tr: 'Günlük Ödül'
-			}, func: function() {
-				closeInventoryQuestionModal();
-				switchBookPage(8, 3);
-			}},
-			{ icon:'achievement', titles: {
-				en: 'Global Quests',
-				tr: 'Global Görevler'
-			}, func: function() {
-				closeInventoryQuestionModal();
-				switchBookPage(3, 2);
-			}},
-			{ icon:'shop', titles: {
-				en: 'Shop',
-				tr: 'Dükkan'
-			}, func: function() {
-				closeInventoryQuestionModal();
-				switchBookPage(8, 1);
-			}}
+			{
+				icon: 'calendar',
+				titles: {
+					en: 'Daily Login',
+					tr: 'Günlük Ödül'
+				},
+				func: function () {
+					closeInventoryQuestionModal();
+					switchBookPage(8, 3);
+				}
+			},
+			{
+				icon: 'achievement',
+				titles: {
+					en: 'Global Quests',
+					tr: 'Global Görevler'
+				},
+				func: function () {
+					closeInventoryQuestionModal();
+					switchBookPage(3, 2);
+				}
+			},
+			{
+				icon: 'shop',
+				titles: {
+					en: 'Shop',
+					tr: 'Dükkan'
+				},
+				func: function () {
+					closeInventoryQuestionModal();
+					switchBookPage(8, 1);
+				}
+			}
 		]
 	});
 }
@@ -1841,29 +1761,41 @@ function howToGainHonor() {
 			tr: 'Onur Puanı Kazanmak'
 		},
 		navigations: [
-			{ icon:'achievement', titles: {
-				en: 'Global Quests',
-				tr: 'Global Görevler'
-			}, func: function() {
-				closeInventoryQuestionModal();
-				switchBookPage(3, 2);
-			}},
-			{ icon:'pvp', titles: {
-				en: 'PVP Duel',
-				tr: 'Düello'
-			}, func: function() {
-				closeInventoryQuestionModal();
-				switchBookPage(5, 1);
-			}},
-			{ icon:'war', titles: {
-				en: 'PVP War',
-				tr: 'Savaş'
-			}, func: function() {
-				closeInventoryQuestionModal();
-				switchBookPage(5, 3);
-			}}
+			{
+				icon: 'achievement',
+				titles: {
+					en: 'Global Quests',
+					tr: 'Global Görevler'
+				},
+				func: function () {
+					closeInventoryQuestionModal();
+					switchBookPage(3, 2);
+				}
+			},
+			{
+				icon: 'pvp',
+				titles: {
+					en: 'PVP Duel',
+					tr: 'Düello'
+				},
+				func: function () {
+					closeInventoryQuestionModal();
+					switchBookPage(5, 1);
+				}
+			},
+			{
+				icon: 'war',
+				titles: {
+					en: 'PVP War',
+					tr: 'Savaş'
+				},
+				func: function () {
+					closeInventoryQuestionModal();
+					switchBookPage(5, 3);
+				}
+			}
 		]
-	})
+	});
 }
 function howToGetStronger() {
 	showInfo({
@@ -1872,43 +1804,63 @@ function howToGetStronger() {
 			tr: 'Nasıl Güçlenirim'
 		},
 		navigations: [
-			{ icon:'quest', titles: {
-				en: 'Playing Story',
-				tr: 'Hikaye Oynamak'
-			}, func: function() {
-				closeInventoryQuestionModal();
-				switchBookPage(3, 1);
-			}},
-			{ icon:'skill', titles: {
-				en: 'Upgrade Skill',
-				tr: 'Yetenek Yükselt'
-			}, func: function() {
-				closeInventoryQuestionModal();
-				switchBookPage(1, 1);
-			}},
-			{ icon:'talent', titles: {
-				en: 'Upgrade Talent',
-				tr: 'Beceri Yükselt'
-			}, func: function() {
-				closeInventoryQuestionModal();
-				switchBookPage(1, 2);
-			}},
-			{ icon:'inventory', titles: {
-				en: 'Upgrade Items',
-				tr: 'Ekipman Yükselt'
-			}, func: function() {
-				closeInventoryQuestionModal();
-				switchBookPage(1, 1);
-			}},
-			{ icon:'fragment', titles: {
-				en: 'Gather Fragment',
-				tr: 'Parçacık Topla'
-			}, func: function() {
-				closeInventoryQuestionModal();
-				switchBookPage(7, 1);
-			}}
+			{
+				icon: 'quest',
+				titles: {
+					en: 'Playing Story',
+					tr: 'Hikaye Oynamak'
+				},
+				func: function () {
+					closeInventoryQuestionModal();
+					switchBookPage(3, 1);
+				}
+			},
+			{
+				icon: 'skill',
+				titles: {
+					en: 'Upgrade Skill',
+					tr: 'Yetenek Yükselt'
+				},
+				func: function () {
+					closeInventoryQuestionModal();
+					switchBookPage(1, 1);
+				}
+			},
+			{
+				icon: 'talent',
+				titles: {
+					en: 'Upgrade Talent',
+					tr: 'Beceri Yükselt'
+				},
+				func: function () {
+					closeInventoryQuestionModal();
+					switchBookPage(1, 2);
+				}
+			},
+			{
+				icon: 'inventory',
+				titles: {
+					en: 'Upgrade Items',
+					tr: 'Ekipman Yükselt'
+				},
+				func: function () {
+					closeInventoryQuestionModal();
+					switchBookPage(1, 1);
+				}
+			},
+			{
+				icon: 'fragment',
+				titles: {
+					en: 'Gather Fragment',
+					tr: 'Parçacık Topla'
+				},
+				func: function () {
+					closeInventoryQuestionModal();
+					switchBookPage(7, 1);
+				}
+			}
 		]
-	})
+	});
 }
 function getTopMenuTemplate(_index) {
 	return `<div class="menu-top flex w-100">
@@ -1938,67 +1890,64 @@ function getTopMenuTemplate(_index) {
 			<img src="./images/ui/game/potion.png" style="max-width:100% !important" />
 		</div>
 		<div class="menu-top-item flex flex-jc-start" id="main-pot-count-menu">
-			${(__account.pots?.find(x => x.key === 'pot')?.value ?? 0).formatWithDots()}
+			${(__account.pots?.find((x) => x.key === 'pot')?.value ?? 0).formatWithDots()}
 		</div>
 		<div class="menu-top-item flex">
 		</div>
 		<img onexactclick="closeGameMenu()" src="./images/ui/game/kapat.png" class="top-menu-close animate-me" />
-	</div>`;	
+	</div>`;
 }
 function updateMenuBottom(_order) {
 	let _mmb = document.querySelectorAll('.main-menu-btn');
-	if(!_mmb?.[0]) {
+	if (!_mmb?.[0]) {
 		const _div = document.createElement('div');
 		_div.innerHTML = getBottomMenuTemplate(_order);
 		let _menuUI = document.querySelector('#menu-ui');
-		if(!_menuUI){
+		if (!_menuUI) {
 			showMyModalPopUp('game-menu');
 			_menuUI = document.querySelector('#menu-ui');
 		}
-		_menuUI.appendChild(_div.firstChild); 
+		_menuUI.appendChild(_div.firstChild);
 		const _div1 = document.createElement('div');
 		_div1.innerHTML = getRightMenuTemplate(_order);
-		document.querySelector('#menu-ui').appendChild(_div1.firstChild); 
+		document.querySelector('#menu-ui').appendChild(_div1.firstChild);
 		const _div2 = document.createElement('div');
 		_div2.innerHTML = getLeftMenuTemplate(_order);
-		document.querySelector('#menu-ui').appendChild(_div2.firstChild); 
+		document.querySelector('#menu-ui').appendChild(_div2.firstChild);
 		const _div3 = document.createElement('div');
 		_div3.innerHTML = getTopMenuTemplate();
-		document.querySelector('#menu-ui').appendChild(_div3.firstChild); 
+		document.querySelector('#menu-ui').appendChild(_div3.firstChild);
 		_mmb = document.querySelectorAll('.main-menu-btn');
-	}
-	else {
+	} else {
 		const _old = document.querySelector('.menu-right');
-		if(_old)
-			updateRightMenuTemplate(_order);
+		if (_old) updateRightMenuTemplate(_order);
 	}
-	_mmb.forEach(x => removeClass(x, 'selected'));
+	_mmb.forEach((x) => removeClass(x, 'selected'));
 	addClass(_mmb[_order], 'selected');
 }
 let _chatTickerX = 0;
 let _chatTickerLast = 0;
 let _chatTickerRun = false;
 function showChatTicker(_cmd) {
-	if(!episode?.menu || document.querySelector("[data-module='chat']"))
-		return;
+	if (!episode?.menu || document.querySelector("[data-module='chat']")) return;
 	const _wrap = document.getElementById('wrapper');
-	if(!_wrap)
-		return;
+	if (!_wrap) return;
 	let _bar = document.getElementById('chat-ticker');
-	if(!_bar) {
+	if (!_bar) {
 		_bar = document.createElement('div');
 		_bar.id = 'chat-ticker';
 		_bar.innerHTML = '<div class="chat-ticker-track"></div>';
-		_bar.onclick = function() {
+		_bar.onclick = function () {
 			switchBookPage(4, 1);
 		};
 		_wrap.appendChild(_bar);
 	}
-	let _text = String(_cmd?.m || '').replace(/[<>]/g, '').replace(/\s+/g, ' ').trim();
-	if(!_text)
-		return;
-	if(_text.length > 100)
-		_text = _text.slice(0, 100) + '...';
+	let _text = String(_cmd?.m || '')
+		.replace(/[<>]/g, '')
+		.replace(/\s+/g, ' ')
+		.trim();
+	if (!_text) return;
+	if (_text.length > 100) _text = _text.slice(0, 100) + '...';
 	const _name = String(_cmd?.n || '').replace(/[<>]/g, '');
 	const _item = document.createElement('span');
 	_item.className = 'chat-ticker-item';
@@ -2011,21 +1960,19 @@ function showChatTicker(_cmd) {
 	_item.appendChild(_who);
 	_item.appendChild(_msg);
 	const _track = _bar.querySelector('.chat-ticker-track');
-	if(_chatTickerRun && _track.children.length) {
+	if (_chatTickerRun && _track.children.length) {
 		const _viewRight = _bar.clientWidth - _chatTickerX;
 		const _end = _track.scrollWidth;
-		if(_end < _viewRight - 1) {
+		if (_end < _viewRight - 1) {
 			const _gap = document.createElement('span');
 			_gap.className = 'chat-ticker-gap';
-			_gap.style.width = (_viewRight - _end) + 'px';
+			_gap.style.width = _viewRight - _end + 'px';
 			_track.appendChild(_gap);
 		}
-	}
-	else if(_chatTickerRun)
-		_chatTickerX = _bar.clientWidth;
+	} else if (_chatTickerRun) _chatTickerX = _bar.clientWidth;
 	_track.appendChild(_item);
 	_bar.classList.add('on');
-	if(!_chatTickerRun) {
+	if (!_chatTickerRun) {
 		_chatTickerX = _bar.clientWidth;
 		_chatTickerLast = 0;
 		_chatTickerRun = true;
@@ -2034,11 +1981,10 @@ function showChatTicker(_cmd) {
 }
 function closeChatTicker() {
 	const _bar = document.getElementById('chat-ticker');
-	if(_bar) {
+	if (_bar) {
 		_bar.classList.remove('on');
 		const _track = _bar.querySelector('.chat-ticker-track');
-		if(_track)
-			_track.innerHTML = '';
+		if (_track) _track.innerHTML = '';
 	}
 	_chatTickerRun = false;
 	_chatTickerLast = 0;
@@ -2046,15 +1992,14 @@ function closeChatTicker() {
 function stepChatTicker(now) {
 	const _bar = document.getElementById('chat-ticker');
 	const _track = _bar?.querySelector('.chat-ticker-track');
-	if(!_bar || !_track || !episode?.menu || document.querySelector("[data-module='chat']")) {
+	if (!_bar || !_track || !episode?.menu || document.querySelector("[data-module='chat']")) {
 		closeChatTicker();
 		return;
 	}
-	if(!_chatTickerLast)
-		_chatTickerLast = now;
+	if (!_chatTickerLast) _chatTickerLast = now;
 	const _dt = Math.min(0.05, (now - _chatTickerLast) / 1000);
 	_chatTickerLast = now;
-	if(!_track.children.length) {
+	if (!_track.children.length) {
 		_bar.classList.remove('on');
 		_chatTickerRun = false;
 		_chatTickerLast = 0;
@@ -2062,18 +2007,16 @@ function stepChatTicker(now) {
 	}
 	const _boost = Math.min(2.4, 1 + Math.max(0, _track.children.length - 1) * 0.28);
 	_chatTickerX -= _bar.clientWidth * 0.11 * _boost * _dt;
-	while(_track.firstChild) {
+	while (_track.firstChild) {
 		const _el = _track.firstChild;
-		if(_chatTickerX + _el.offsetLeft + _el.offsetWidth <= 0) {
+		if (_chatTickerX + _el.offsetLeft + _el.offsetWidth <= 0) {
 			const _span = _el.offsetWidth;
 			_el.remove();
 			_chatTickerX += _span;
-		}
-		else
-			break;
+		} else break;
 	}
 	_track.style.transform = 'translateX(' + _chatTickerX + 'px)';
-	if(!_track.children.length) {
+	if (!_track.children.length) {
 		_bar.classList.remove('on');
 		_chatTickerRun = false;
 		_chatTickerLast = 0;
@@ -2084,13 +2027,11 @@ function stepChatTicker(now) {
 function selectMenuContainer(_order) {
 	const _has = document.querySelector('#menu-ui .menu-bottom');
 	let _container;
-	if(_has)
-		_container = document.getElementById('menu-ui');
-	if(_container)
-		_container = _container.firstChild;
+	if (_has) _container = document.getElementById('menu-ui');
+	if (_container) _container = _container.firstChild;
 	else {
 		_container = document.getElementById('menu-ui');
-		if(!_container){
+		if (!_container) {
 			showMyModalPopUp('game-menu');
 			_container = document.getElementById('menu-ui');
 		}
@@ -2098,14 +2039,14 @@ function selectMenuContainer(_order) {
 	return _container;
 }
 function trySwitchMap(_id) {
-	playClick(); 
-	const _map = mapSprites.find(x => x.id === _id);
-	if(mainCharacter.level < _map.minLevel) {
+	playClick();
+	const _map = mapSprites.find((x) => x.id === _id);
+	if (mainCharacter.level < _map.minLevel) {
 		warn('<span>' + getLangData('Your level is too low') + '</span>', 'warn');
 		return;
 	}
-	hideMyModalPopUp(1); 
-	//closeMapInfoModal();
+	hideMyModalPopUp(1);
+
 	switchMap(_id);
 }
 function restartPVPMatch() {
@@ -2113,7 +2054,7 @@ function restartPVPMatch() {
 }
 function createBattleGround(_map) {
 	_coopMembers = [];
-	if(_map && !_map.pvp) {
+	if (_map && !_map.pvp) {
 		if (_map.mobs?.length > 1) {
 			const p1 = addThiefCoopCharacter(1, 1);
 			p1.yPosition = MathRound((getGroundHeight() / 6) * 5);
@@ -2137,25 +2078,21 @@ function createBattleGround(_map) {
 	mainCharacter.dead = false;
 	prevPlatformX = undefined;
 	mainCharacter.yPosition = MathRound(getGroundHeight() / 2);
-	if(mainCharacter.leader || episode.id === 8) {
+	if (mainCharacter.leader || episode.id === 8) {
 		platformX = 0;
 		mainCharacter.left = MathRound(_canvas.width / 5);
 		mainCharacter.direction = 'right';
-	}
-	else {
+	} else {
 		platformX = episode.width - _canvas.width;
 		mainCharacter.left = _canvas.width - MathRound(_canvas.width / 5) - mainCharacter.getWidth();
 		mainCharacter.direction = 'left';
 	}
 	resetSkills(null);
-	//__account.commonInventory = [];
 }
 function normalizeSkills(_char) {
-	//_char.skills?.forEach(x => delete x.locked);
-	if(_char.animations['attack'])
-		_char.animations['attack'].priority = 4;
+	if (_char.animations['attack']) _char.animations['attack'].priority = 4;
 	let i = 2;
-	while(_char.animations['attack' + i]) {
+	while (_char.animations['attack' + i]) {
 		_char.animations['attack' + i].priority = 4;
 		i++;
 	}
@@ -2164,68 +2101,65 @@ function normalizeSkills(_char) {
 function createArena(_opponent, _realTime) {
 	delete window.__duelClock;
 	resetStoryVariables();
-	const _map = mapSprites.find(x => x.id === 500);
-	const _ms = mapSprites.filter(x => x.pvp);
+	const _map = mapSprites.find((x) => x.id === 500);
+	const _ms = mapSprites.filter((x) => x.pvp);
 	const _assetMap = _ms[getRandomValue(0, _ms.length - 1)];
 	_map.assetPath = _assetMap.theme;
 	const _doFunc = _assetMap.do;
-	_map.do = function() { 
-		if(_doFunc) 
-			_doFunc(); 
+	_map.do = function () {
+		if (_doFunc) _doFunc();
 	};
 	const _afterFunc = _assetMap.after;
-	_map.after = function() { 
-		if(_afterFunc) 
-			_afterFunc();
+	_map.after = function () {
+		if (_afterFunc) _afterFunc();
 	};
 	_map.ambiancePath = './images/music/' + getRandomValue(1, 14) + '.mp3';
 	_map.tiles = JSON.parse(JSON.stringify(_assetMap.tiles ?? []));
 	_map.ground = JSON.parse(JSON.stringify(_assetMap.ground));
-	if(_assetMap.background)
-		_map.background = JSON.parse(JSON.stringify(_assetMap.background));
-	else
-		delete _map.background;
-	_map.objects = []; //JSON.parse(JSON.stringify(_assetMap.objects ?? []));
-	if(_map.pvp) {
-		_map.mobs = [{
-			id: _opponent.cl ? _selectableChars.find(x => x.class === _opponent.cl).id : _opponent.id,
-			minX: 5800,
-			maxX: 5800,
-			sight: 1000,
-			count: 1,
-			inventory: _opponent.inventory ? JSON.parse(JSON.stringify(_opponent.inventory)) : undefined,
-			minLevel: _opponent.l ?? _opponent.level,
-			maxLevel: _opponent.l ?? _opponent.level,
-			name: _opponent.n ?? 'Player',
-			difficulty: 0,
-			props: {
-				alp: true
-			},
-			yPosition: MathRound(getGroundHeight() / 2)
-		}];
+	if (_assetMap.background) _map.background = JSON.parse(JSON.stringify(_assetMap.background));
+	else delete _map.background;
+	_map.objects = [];
+	if (_map.pvp) {
+		_map.mobs = [
+			{
+				id: _opponent.cl ? _selectableChars.find((x) => x.class === _opponent.cl).id : _opponent.id,
+				minX: 5800,
+				maxX: 5800,
+				sight: 1000,
+				count: 1,
+				inventory: _opponent.inventory ? JSON.parse(JSON.stringify(_opponent.inventory)) : undefined,
+				minLevel: _opponent.l ?? _opponent.level,
+				maxLevel: _opponent.l ?? _opponent.level,
+				name: _opponent.n ?? 'Player',
+				difficulty: 0,
+				props: {
+					alp: true
+				},
+				yPosition: MathRound(getGroundHeight() / 2)
+			}
+		];
 		hideMyModalPopUp(1);
-		switchMap(500, 1, function() {
-			if(_opponent.pvpOrder)
-				episode.pvpOrder = _opponent.pvpOrder;
+		switchMap(500, 1, function () {
+			if (_opponent.pvpOrder) episode.pvpOrder = _opponent.pvpOrder;
 			else {
 				episode.realTime = mainCharacter.realTime = true;
 				episode.roomId = _opponent.e;
 			}
-			if(_realTime) {
-				startWithThisCharacter(_selectableChars.find(x => x.class === __selectedPvPClass).id, 10);
+			if (_realTime) {
+				startWithThisCharacter(_selectableChars.find((x) => x.class === __selectedPvPClass).id, 10);
 				__selectedPvPClass = undefined;
 			}
 			mainCharacter.dead = false;
 			prevPlatformX = undefined;
-			if(_opponent.d >= 0) {
-				if(_opponent.d === 0)//rakip sağa bakıyorsa en soldadır
-					platformX = episode.width - episode.cWidth;
-				else
-					platformX = 0;
+			if (_opponent.d >= 0) {
+				if (_opponent.d === 0) platformX = episode.width - episode.cWidth;
+				else platformX = 0;
 				mainCharacter.direction = _opponent.d === 1 ? __right : __left;
-				mainCharacter.left = _opponent.d === 1 ? MathRound(_canvas.width / 5) : (episode.cWidth - MathRound(episode.cWidth / 5) - mainCharacter.getWidth());
-			}
-			else {
+				mainCharacter.left =
+					_opponent.d === 1
+						? MathRound(_canvas.width / 5)
+						: episode.cWidth - MathRound(episode.cWidth / 5) - mainCharacter.getWidth();
+			} else {
 				platformX = 0;
 				mainCharacter.direction = __right;
 				mainCharacter.left = MathRound(_canvas.width / 5);
@@ -2239,75 +2173,78 @@ function createArena(_opponent, _realTime) {
 			mainCharacter.alp = true;
 			mainCharacter.villain = false;
 			applyDefaultCharacterStats(mainCharacter);
-			episode.enemies?.filter(x => x.enemy)?.forEach(x => {
-				x.level = 10;
-				//applyCharacterStats(1, x);
-				resetSkills(null, null, x);
-				x.teamId = x.alp = 1;
-				x.villain = false;
-				//x.setHealth(x.MAXHP);
-				_enemyProfile.innerHTML = avatarTemplate(x);
-				x.yPosition = mainCharacter.yPosition;
-				//x.hbBars = undefined;
-				addClass(_enemyProfile, 'pvp');
-				if(episode.realTime){
-					x.realTime = true;
-					x.autoMode = undefined;
-					x.socketId = _opponent.s;
-					if(_opponent.d === 1)// bu arkadaş sola bakıyosa
-						x.left = (episode.cWidth - MathRound(episode.cWidth / 5) - x.getWidth()) + (episode.width - episode.cWidth);
-					else
-						x.left = MathRound(episode.cWidth / 5);
-					x.direction = _opponent.d === 1 ? __left : __right;
-				}
-				else {
-					x.left = (episode.cWidth - MathRound(episode.cWidth / 5) - x.getWidth()) + (episode.width - episode.cWidth);
-					x.direction = __left;
-				}
-				normalizeSkills(x);
-				applyDefaultCharacterStats(x);
-			});
+			episode.enemies
+				?.filter((x) => x.enemy)
+				?.forEach((x) => {
+					x.level = 10;
+
+					resetSkills(null, null, x);
+					x.teamId = x.alp = 1;
+					x.villain = false;
+
+					_enemyProfile.innerHTML = avatarTemplate(x);
+					x.yPosition = mainCharacter.yPosition;
+
+					addClass(_enemyProfile, 'pvp');
+					if (episode.realTime) {
+						x.realTime = true;
+						x.autoMode = undefined;
+						x.socketId = _opponent.s;
+						if (_opponent.d === 1)
+							x.left =
+								episode.cWidth -
+								MathRound(episode.cWidth / 5) -
+								x.getWidth() +
+								(episode.width - episode.cWidth);
+						else x.left = MathRound(episode.cWidth / 5);
+						x.direction = _opponent.d === 1 ? __left : __right;
+					} else {
+						x.left =
+							episode.cWidth -
+							MathRound(episode.cWidth / 5) -
+							x.getWidth() +
+							(episode.width - episode.cWidth);
+						x.direction = __left;
+					}
+					normalizeSkills(x);
+					applyDefaultCharacterStats(x);
+				});
 			delete episode.war;
 		});
 	}
 }
 function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _after) {
-	if(!_continueStory)
-		resetStoryVariables();
+	if (!_continueStory) resetStoryVariables();
 	const _mapId = _id ?? 500;
-	const _map = mapSprites.find(x => x.id === _mapId);
-	const _ms = _id ? [_map] : mapSprites.filter(x => x.pvp);
+	const _map = mapSprites.find((x) => x.id === _mapId);
+	const _ms = _id ? [_map] : mapSprites.filter((x) => x.pvp);
 	const _assetMap = _ms[getRandomValue(0, _ms.length - 1)];
 	_map.assetPath = _assetMap.theme;
 	const _doFunc = _assetMap.do;
-	_map.do = function() { 
-		if(_doFunc) 
-			_doFunc(); 
+	_map.do = function () {
+		if (_doFunc) _doFunc();
 	};
 	const _afterFunc = _assetMap.after;
-	_map.after = function() { 
-		if(_afterFunc) 
-			_afterFunc();
+	_map.after = function () {
+		if (_afterFunc) _afterFunc();
 	};
 	_map.ambiancePath = './images/music/' + getRandomValue(1, 14) + '.mp3';
 	_map.tiles = JSON.parse(JSON.stringify(_assetMap.tiles ?? []));
 	_map.ground = JSON.parse(JSON.stringify(_assetMap.ground));
-	if(_assetMap.background)
-		_map.background = JSON.parse(JSON.stringify(_assetMap.background));
-	else
-		delete _map.background;
-	_map.objects = []; //JSON.parse(JSON.stringify(_assetMap.objects ?? []));
+	if (_assetMap.background) _map.background = JSON.parse(JSON.stringify(_assetMap.background));
+	else delete _map.background;
+	_map.objects = [];
 	const _oldPvPValue = _map.pvp;
-	if(!_oldPvPValue)
-		_map.pvp = true;
-	if(_map.pvp) {
-		let _place = _opponents.findIndex(x => x === mainCharacter) + 1, i = 0;
+	if (!_oldPvPValue) _map.pvp = true;
+	if (_map.pvp) {
+		let _place = _opponents.findIndex((x) => x === mainCharacter) + 1,
+			i = 0;
 		let _halfPlace = MathFloor(_opponents.length / 2);
 		const _myTeam = _place <= _halfPlace ? 1 : 2;
 		_map.mobs = [];
-		for(let _opponent of _opponents){
+		for (let _opponent of _opponents) {
 			i++;
-			if(_opponent === mainCharacter){
+			if (_opponent === mainCharacter) {
 				__account.name = mainCharacter.displayName = mainCharacter.pvpName = _opponent.pvpName;
 				continue;
 			}
@@ -2323,27 +2260,24 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 				minLevel: _opponent.level,
 				maxLevel: _opponent.level,
 				direction: i <= _halfPlace ? __right : __left,
-				name: _opponent.pvpName ?? ('Player' + i),
+				name: _opponent.pvpName ?? 'Player' + i,
 				difficulty: _difficulty ?? 0,
 				enemy: _team !== _myTeam,
 				props: {
 					alp: true
-				},
+				}
 			});
 		}
 		hideMyModalPopUp(1);
-		const _setMapVariables = function() {
+		const _setMapVariables = function () {
 			episode.war = true;
 			mainCharacter.dead = false;
 			prevPlatformX = undefined;
-			if(_myTeam <= 1)
-				platformX = 0;
-			else
-				platformX = episode.width - episode.cWidth;
+			if (_myTeam <= 1) platformX = 0;
+			else platformX = episode.width - episode.cWidth;
 			resetSkills(null);
-			if(_baseTime)
-				episode.baseTime = _baseTime;
-			//episode.pvpOrder = _opponent.pvpOrder;
+			if (_baseTime) episode.baseTime = _baseTime;
+
 			hideMyMenu();
 			hideMenu();
 			removeClass(_gameUI, 'disable-ui');
@@ -2351,61 +2285,69 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 			mainCharacter.teamId = _myTeam;
 			mainCharacter.maxHP = mainCharacter.MAXHP = mainCharacter.health = mainCharacter.maxHP * 5;
 			_navbar.innerHTML = pvpAvatarTemplate(mainCharacter);
-			episode.enemies.filter(x => !x.main).forEach(x => {
-				applyCharacterStats(1, x);
-				resetSkills(null, null, x);
-				x.alp = 1;
-				x.important = true;
-				if(x.teamId === _myTeam)
-					x.skipHealthBar = true;
-				x.health = x.maxHP = x.MAXHP = x.maxHP * 5;
-				if(x.teamId === _myTeam)
-					_navbar.innerHTML += pvpAvatarTemplate(x);
-				else
-					_enemyProfile.innerHTML += pvpAvatarTemplate(x);
-			});
+			episode.enemies
+				.filter((x) => !x.main)
+				.forEach((x) => {
+					applyCharacterStats(1, x);
+					resetSkills(null, null, x);
+					x.alp = 1;
+					x.important = true;
+					if (x.teamId === _myTeam) x.skipHealthBar = true;
+					x.health = x.maxHP = x.MAXHP = x.maxHP * 5;
+					if (x.teamId === _myTeam) _navbar.innerHTML += pvpAvatarTemplate(x);
+					else _enemyProfile.innerHTML += pvpAvatarTemplate(x);
+				});
 			addClass(_enemyProfile, 'pvp');
-			for(let i = 1; i <= _opponents.length; i++) {
+			for (let i = 1; i <= _opponents.length; i++) {
 				const _op = _opponents[i - 1];
-				const _opponent = episode.enemies.find(x => x.displayName === (_op.pvpName ?? ('Player' + i)));
+				const _opponent = episode.enemies.find((x) => x.displayName === (_op.pvpName ?? 'Player' + i));
 				const x = _opponent ?? mainCharacter;
 				let _y;
-				let _step = .25;
-				switch(_halfPlace) {
+				let _step = 0.25;
+				switch (_halfPlace) {
 					case 1:
-						_step = .5;
+						_step = 0.5;
 						break;
 					case 2:
-						_step = .33;
+						_step = 0.33;
 						break;
 					case 3:
-						_step = .25;
+						_step = 0.25;
 						break;
 				}
-				switch(i) {
+				switch (i) {
 					case 1:
-					case (_halfPlace + 1):
+					case _halfPlace + 1:
 						_y = MathRound(getGroundHeight() * _step);
-						if(i === 1)
-							x.left = MathRound(episode.cWidth / 5);
+						if (i === 1) x.left = MathRound(episode.cWidth / 5);
 						else
-							x.left = (episode.cWidth - MathRound(episode.cWidth / 5) - x.getWidth()) + (x.main ? 0 : episode.width - episode.cWidth);
+							x.left =
+								episode.cWidth -
+								MathRound(episode.cWidth / 5) -
+								x.getWidth() +
+								(x.main ? 0 : episode.width - episode.cWidth);
 						break;
 					case 2:
-					case (_halfPlace + 2):
+					case _halfPlace + 2:
 						_y = MathRound(getGroundHeight() * (_step * 2));
-						if(i === 2)
-							x.left = MathRound(episode.cWidth / 4);
+						if (i === 2) x.left = MathRound(episode.cWidth / 4);
 						else
-							x.left = (episode.cWidth - MathRound(episode.cWidth / 4) - x.getWidth()) + (x.main ? 0 : episode.width - episode.cWidth);
+							x.left =
+								episode.cWidth -
+								MathRound(episode.cWidth / 4) -
+								x.getWidth() +
+								(x.main ? 0 : episode.width - episode.cWidth);
 						break;
 					case 3:
-					case (_halfPlace + 3):
+					case _halfPlace + 3:
 						_y = MathRound(getGroundHeight() * (_step * 3));
-						if(i === 3)
-							x.left = MathRound(episode.cWidth / 5);
+						if (i === 3) x.left = MathRound(episode.cWidth / 5);
 						else
-							x.left = (episode.cWidth - MathRound(episode.cWidth / 5) - x.getWidth()) + (x.main ? 0 : episode.width - episode.cWidth);
+							x.left =
+								episode.cWidth -
+								MathRound(episode.cWidth / 5) -
+								x.getWidth() +
+								(x.main ? 0 : episode.width - episode.cWidth);
 						break;
 				}
 				x.startLeft = x.left;
@@ -2414,107 +2356,90 @@ function createWar(_opponents, _id, _continueStory, _difficulty, _baseTime, _aft
 				x.updateVariables();
 			}
 			_map.pvp = _oldPvPValue;
-		}
-		//if(episode?.id !== _mapId)
-			switchMap(_mapId, 1, function() {
-				const _ids = _opponents.map(x => x.id);
-				const _firstIds = [];
-				const _lastIds = [];
-				for(let i = 0; i < _ids.length; i++) {
-					if(i < (_ids.length / 2))
-						_firstIds.push(_ids[i]);
-					else
-						_lastIds.push(_ids[i]);
-				}
-				episode.loadCharacterSprites(function() {
-					_setMapVariables();
-					// const _splash = document.getElementById('splash');
-					// addClass(_splash, 'd-none');
-					// const _ts = document.getElementById('tip-screen');
-					// if(_ts)
-					// 	_ts.remove();
-					if(__storyCheckPoint?.warn)
-						delete __storyCheckPoint.warn;
-					removeFocus();
-					__account.commonInventory = [];
-					if(mainCharacter && !__storyScene?.enableCommonSkills)
-						mainCharacter.disableCommonInventory();
-					removeClass(_gameUI, 'demo-playing');
-					_storySceneSwitching = _game.suspended = false;
-					const _ps = document.querySelectorAll('.placed-skill');
-					_ps?.forEach(x => addClass(x, 'v-none'));
-					blurKeyboard();
-					removeClass(_gameUI, 'disable-ui');
-					episode.beforePVPStart = function() {
-						episode.enemies.forEach(x => {
-							x.health = x.maxHP = x.MAXHP = 1000;
-							x.setHealth(x.health);
-							x.atk = x.def = 10;
-						});
-					}
-					if(_after)
-						_after();
-					requestIdleCallback(() => {
-						episode.loadCharacterSprites(function() {
-						}, _lastIds);
+		};
+
+		switchMap(_mapId, 1, function () {
+			const _ids = _opponents.map((x) => x.id);
+			const _firstIds = [];
+			const _lastIds = [];
+			for (let i = 0; i < _ids.length; i++) {
+				if (i < _ids.length / 2) _firstIds.push(_ids[i]);
+				else _lastIds.push(_ids[i]);
+			}
+			episode.loadCharacterSprites(function () {
+				_setMapVariables();
+
+				if (__storyCheckPoint?.warn) delete __storyCheckPoint.warn;
+				removeFocus();
+				__account.commonInventory = [];
+				if (mainCharacter && !__storyScene?.enableCommonSkills) mainCharacter.disableCommonInventory();
+				removeClass(_gameUI, 'demo-playing');
+				_storySceneSwitching = _game.suspended = false;
+				const _ps = document.querySelectorAll('.placed-skill');
+				_ps?.forEach((x) => addClass(x, 'v-none'));
+				blurKeyboard();
+				removeClass(_gameUI, 'disable-ui');
+				episode.beforePVPStart = function () {
+					episode.enemies.forEach((x) => {
+						x.health = x.maxHP = x.MAXHP = 1000;
+						x.setHealth(x.health);
+						x.atk = x.def = 10;
+						x.immobilize = true;
+						x.villan = false;
 					});
-				}, _firstIds);
-			});
-		//else
-		//	_setMapVariables();
+				};
+				if (_after) _after();
+				requestIdleCallback(() => {
+					episode.loadCharacterSprites(function () {}, _lastIds);
+				});
+			}, _firstIds);
+		});
 	}
 }
 function createJusticeWar(_opponents, _roomId) {
 	resetStoryVariables();
 	const _mapId = 500;
-	const _map = mapSprites.find(x => x.id === _mapId);
-	const _ms = mapSprites.filter(x => x.pvp);
+	const _map = mapSprites.find((x) => x.id === _mapId);
+	const _ms = mapSprites.filter((x) => x.pvp);
 	let _pick = 0;
 	const _seed = String(_roomId ?? '');
-	for(let i = 0; i < _seed.length; i++)
-		_pick = (_pick + _seed.charCodeAt(i)) % Math.max(_ms.length, 1);
+	for (let i = 0; i < _seed.length; i++) _pick = (_pick + _seed.charCodeAt(i)) % Math.max(_ms.length, 1);
 	const _assetMap = _ms[_pick] ?? _map;
 	_map.assetPath = _assetMap.theme;
 	const _doFunc = _assetMap.do;
-	_map.do = function() {
-		if(_doFunc)
-			_doFunc();
+	_map.do = function () {
+		if (_doFunc) _doFunc();
 	};
 	const _afterFunc = _assetMap.after;
-	_map.after = function() {
-		if(_afterFunc)
-			_afterFunc();
+	_map.after = function () {
+		if (_afterFunc) _afterFunc();
 	};
 	_map.ambiancePath = './images/music/' + getRandomValue(1, 14) + '.mp3';
 	_map.tiles = JSON.parse(JSON.stringify(_assetMap.tiles ?? []));
 	_map.ground = JSON.parse(JSON.stringify(_assetMap.ground));
-	if(_assetMap.background)
-		_map.background = JSON.parse(JSON.stringify(_assetMap.background));
-	else
-		delete _map.background;
+	if (_assetMap.background) _map.background = JSON.parse(JSON.stringify(_assetMap.background));
+	else delete _map.background;
 	_map.objects = [];
 	const _oldPvPValue = _map.pvp;
-	if(!_oldPvPValue)
-		_map.pvp = true;
+	if (!_oldPvPValue) _map.pvp = true;
 	const _myTeam = mainCharacter.duelTeam;
-	const _myClassId = _selectableChars.find(x => x.class === mainCharacter.duelClass)?.id;
-	const _teamOf = function(_op) {
+	const _myClassId = _selectableChars.find((x) => x.class === mainCharacter.duelClass)?.id;
+	const _teamOf = function (_op) {
 		return _op === mainCharacter ? mainCharacter.duelTeam : _op.duelTeam;
 	};
-	const _placeTeam = function(_list, _team) {
+	const _placeTeam = function (_list, _team) {
 		const _two = _list.length === 2;
-		const _step = _list.length <= 1 ? .5 : .25;
-		for(let i = 0; i < _list.length; i++) {
+		const _step = _list.length <= 1 ? 0.5 : 0.25;
+		for (let i = 0; i < _list.length; i++) {
 			const x = _list[i];
-			x.yPosition = MathRound(getGroundHeight() * (_two ? (i === 0 ? .25 : .75) : _step * (i + 1)));
-			const _div = (!_two && i === 1) ? 4 : 5;
-			if(_team === 1) {
+			x.yPosition = MathRound(getGroundHeight() * (_two ? (i === 0 ? 0.25 : 0.75) : _step * (i + 1)));
+			const _div = !_two && i === 1 ? 4 : 5;
+			if (_team === 1) {
 				x.left = MathRound(episode.cWidth / _div);
 				x.direction = __right;
-			}
-			else {
+			} else {
 				const _base = MathRound(episode.cWidth / _div);
-				x.left = (episode.cWidth - _base - x.getWidth()) + (x.main ? 0 : episode.width - episode.cWidth);
+				x.left = episode.cWidth - _base - x.getWidth() + (x.main ? 0 : episode.width - episode.cWidth);
 				x.direction = __left;
 			}
 			x.startLeft = x.left;
@@ -2522,8 +2447,8 @@ function createJusticeWar(_opponents, _roomId) {
 		}
 	};
 	_map.mobs = [];
-	for(const _opponent of _opponents) {
-		if(_opponent === mainCharacter) {
+	for (const _opponent of _opponents) {
+		if (_opponent === mainCharacter) {
 			mainCharacter.displayName = mainCharacter.pvpName = __account.name;
 			continue;
 		}
@@ -2543,20 +2468,18 @@ function createJusticeWar(_opponents, _roomId) {
 			difficulty: 0,
 			enemy: _team !== _myTeam,
 			props: { alp: true },
-			do: function(_enemy) {
+			do: function (_enemy) {
 				_enemy.duelSocket = _opponent.socketId;
-				if(_opponent.duelBot)
-					_enemy.duelBot = 1;
-				else
-					_enemy.duelHuman = 1;
+				if (_opponent.duelBot) _enemy.duelBot = 1;
+				else _enemy.duelHuman = 1;
 			}
 		});
 	}
 	hideMyModalPopUp(1);
-	const _setMapVariables = function() {
+	const _setMapVariables = function () {
 		episode.war = true;
 		episode.realTime = true;
-		if(window.duel?.startedAt) {
+		if (window.duel?.startedAt) {
 			episode.duelStartedAt = window.duel.startedAt;
 			delete window.duel.startedAt;
 		}
@@ -2570,10 +2493,8 @@ function createJusticeWar(_opponents, _roomId) {
 		delete mainCharacter.firstTransferDone;
 		delete mainCharacter.lastRealTimePack;
 		prevPlatformX = undefined;
-		if(_myTeam <= 1)
-			platformX = 0;
-		else
-			platformX = episode.width - episode.cWidth;
+		if (_myTeam <= 1) platformX = 0;
+		else platformX = episode.width - episode.cWidth;
 		resetSkills(null);
 		hideMyMenu();
 		hideMenu();
@@ -2582,210 +2503,161 @@ function createJusticeWar(_opponents, _roomId) {
 		mainCharacter.teamId = _myTeam;
 		applyDefaultCharacterStats(mainCharacter);
 		_navbar.innerHTML = pvpAvatarTemplate(mainCharacter);
-		episode.enemies.filter(x => !x.main).forEach(x => {
-			applyDefaultCharacterStats(x);
-			resetSkills(null, null, x);
-			x.alp = 1;
-			x.important = true;
-			if(x.teamId === _myTeam)
-				x.skipHealthBar = true;
-			if(x.duelSocket) {
-				x.socketId = x.duelSocket;
-				if(x.duelBot && episode.duelLeader)
-					delete x.realTime;
-				else {
-					x.realTime = true;
-					x.autoMode = undefined;
-					if(!episode.duelLeader)
-						delete x.duelBot;
+		episode.enemies
+			.filter((x) => !x.main)
+			.forEach((x) => {
+				applyDefaultCharacterStats(x);
+				resetSkills(null, null, x);
+				x.alp = 1;
+				x.important = true;
+				if (x.teamId === _myTeam) x.skipHealthBar = true;
+				if (x.duelSocket) {
+					x.socketId = x.duelSocket;
+					if (x.duelBot && episode.duelLeader) delete x.realTime;
+					else {
+						x.realTime = true;
+						x.autoMode = undefined;
+						if (!episode.duelLeader) delete x.duelBot;
+					}
 				}
-			}
-			if(x.teamId === _myTeam)
-				_navbar.innerHTML += pvpAvatarTemplate(x);
-			else
-				_enemyProfile.innerHTML += pvpAvatarTemplate(x);
-		});
+				if (x.teamId === _myTeam) _navbar.innerHTML += pvpAvatarTemplate(x);
+				else _enemyProfile.innerHTML += pvpAvatarTemplate(x);
+			});
 		addClass(_enemyProfile, 'pvp');
-		const _spawned = episode.enemies.filter(x => !x.main);
+		const _spawned = episode.enemies.filter((x) => !x.main);
 		const _left = [];
 		const _right = [];
-		for(const _op of _opponents) {
-			const _isMain = _op === mainCharacter || (!!_op.socketId && (_op.socketId === mainCharacter.socketId || _op.socketId === __socketId));
-			const _fighter = _isMain ? mainCharacter : _spawned.find(x => x.duelSocket === _op.socketId);
-			if(!_fighter)
-				continue;
-			if(_isMain)
-				mainCharacter.duelTeam = _op.duelTeam ?? _myTeam;
-			if(_teamOf(_op) === 1)
-				_left.push(_fighter);
-			else
-				_right.push(_fighter);
+		for (const _op of _opponents) {
+			const _isMain =
+				_op === mainCharacter ||
+				(!!_op.socketId && (_op.socketId === mainCharacter.socketId || _op.socketId === __socketId));
+			const _fighter = _isMain ? mainCharacter : _spawned.find((x) => x.duelSocket === _op.socketId);
+			if (!_fighter) continue;
+			if (_isMain) mainCharacter.duelTeam = _op.duelTeam ?? _myTeam;
+			if (_teamOf(_op) === 1) _left.push(_fighter);
+			else _right.push(_fighter);
 		}
 		_placeTeam(_left, 1);
 		_placeTeam(_right, 2);
 		_map.pvp = _oldPvPValue;
 	};
-	switchMap(_mapId, 1, function() {
-		if(window.__duelClock)
-			episode.duelStartedAt = window.__duelClock;
-		const _firstIds = _opponents.filter(x => _teamOf(x) === 1).map(x => x === mainCharacter ? mainCharacter.id : x.id);
-		const _lastIds = _opponents.filter(x => _teamOf(x) === 2).map(x => x === mainCharacter ? mainCharacter.id : x.id);
-		episode.loadCharacterSprites(function() {
-			if(_myClassId && mainCharacter.class !== _selectableChars.find(x => x.id === _myClassId)?.class) {
+	switchMap(_mapId, 1, function () {
+		if (window.__duelClock) episode.duelStartedAt = window.__duelClock;
+		const _firstIds = _opponents
+			.filter((x) => _teamOf(x) === 1)
+			.map((x) => (x === mainCharacter ? mainCharacter.id : x.id));
+		const _lastIds = _opponents
+			.filter((x) => _teamOf(x) === 2)
+			.map((x) => (x === mainCharacter ? mainCharacter.id : x.id));
+		episode.loadCharacterSprites(function () {
+			if (_myClassId && mainCharacter.class !== _selectableChars.find((x) => x.id === _myClassId)?.class) {
 				const _socket = mainCharacter.socketId || __socketId;
 				const _leader = mainCharacter.leader;
 				episode.realTime = true;
 				startWithThisCharacter(_myClassId, 10, null, 1);
 				mainCharacter.socketId = __socketId = _socket;
-				if(_leader)
-					mainCharacter.leader = _leader;
+				if (_leader) mainCharacter.leader = _leader;
 				mainCharacter.duelTeam = _myTeam;
-				mainCharacter.duelClass = _selectableChars.find(x => x.id === _myClassId)?.class;
+				mainCharacter.duelClass = _selectableChars.find((x) => x.id === _myClassId)?.class;
 			}
 			_setMapVariables();
-			if(__storyCheckPoint?.warn)
-				delete __storyCheckPoint.warn;
+			if (__storyCheckPoint?.warn) delete __storyCheckPoint.warn;
 			removeFocus();
 			__account.commonInventory = [];
-			if(mainCharacter && !__storyScene?.enableCommonSkills)
-				mainCharacter.disableCommonInventory();
+			if (mainCharacter && !__storyScene?.enableCommonSkills) mainCharacter.disableCommonInventory();
 			removeClass(_gameUI, 'demo-playing');
 			_storySceneSwitching = _game.suspended = false;
 			const _ps = document.querySelectorAll('.placed-skill');
-			_ps?.forEach(x => addClass(x, 'v-none'));
+			_ps?.forEach((x) => addClass(x, 'v-none'));
 			blurKeyboard();
 			removeClass(_gameUI, 'disable-ui');
-			episode.beforePVPStart = function() {
-				episode.enemies.forEach(x => {
-					if(!x || x.class === 'object' || x.class === __spell)
-						return;
+			episode.beforePVPStart = function () {
+				episode.enemies.forEach((x) => {
+					if (!x || x.class === 'object' || x.class === __spell) return;
 					applyDefaultCharacterStats(x);
 					x.setHealth(x.MAXHP);
+					x.immobilize = true;
+					x.villan = false;
 				});
 			};
 			requestIdleCallback(() => {
-				episode.loadCharacterSprites(function() {
-				}, _lastIds);
+				episode.loadCharacterSprites(function () {}, _lastIds);
 			});
 		}, _firstIds);
 	});
 }
-document.addEventListener("deviceready", onDeviceReady, false);
+document.addEventListener('deviceready', onDeviceReady, false);
 let _socialSharing = null;
 function getDeviceId() {
-    // mobile
-    if (window.device?.uuid) {
-        return device.uuid;
-    }
+	if (window.device?.uuid) {
+		return device.uuid;
+	}
 
-    // electron / fallback
-    let id = localStorage.getItem("device_id");
+	let id = localStorage.getItem('device_id');
 
-    if (!id) {
-        id = crypto.randomUUID(); // modern ve güvenli
-        localStorage.setItem("device_id", id);
-    }
+	if (!id) {
+		id = crypto.randomUUID();
+		localStorage.setItem('device_id', id);
+	}
 
-    return id;
+	return id;
 }
 function onDeviceReady() {
+	try {
+		_socialSharing = window.plugins?.socialsharing ?? null;
 
-    try {
+		const isElectron = navigator.userAgent.includes('Electron');
 
-        _socialSharing = window.plugins?.socialsharing ?? null;
+		if (!isElectron && window.plugins?.insomnia) {
+			window.plugins.insomnia.keepAwake();
+		}
 
-        const isElectron = navigator.userAgent.includes("Electron");
+		if (!isElectron && window.StatusBar) {
+			try {
+				StatusBar.overlaysWebView(false);
+			} catch (e) {}
 
-        if (!isElectron && window.plugins?.insomnia) {
-            window.plugins.insomnia.keepAwake();
-        }
+			try {
+				StatusBar.backgroundColorByHexString('#000000');
+			} catch (e) {}
 
-        if (!isElectron && window.StatusBar) {
+			try {
+				StatusBar.hide();
+			} catch (e) {}
+		}
 
-            try {
-                StatusBar.overlaysWebView(false);
-            } catch (e) {}
+		if (screen?.orientation?.lock) {
+			screen.orientation.lock('landscape').catch(() => {});
+		}
 
-            try {
-                StatusBar.backgroundColorByHexString("#000000");
-            } catch (e) {}
+		__deviceId = getDeviceId();
 
-            try {
-                StatusBar.hide();
-            } catch (e) {}
-        }
+		_client = new dataOperations();
+		_client.loadState();
+	} catch (ex) {
+		console.error(ex);
 
-        if (screen?.orientation?.lock) {
-            screen.orientation.lock("landscape").catch(() => {});
-        }
+		__deviceId = getDeviceId();
 
-        __deviceId = getDeviceId();
+		_client = new dataOperations();
+		_client.loadState();
+	}
 
-        _client = new dataOperations();
-        _client.loadState();
-
-    } catch (ex) {
-
-        console.error(ex);
-
-        __deviceId = getDeviceId();
-
-        _client = new dataOperations();
-        _client.loadState();
-    }
-
-    if (window.cordova) {
-        const s = document.createElement('script');
-        s.src = './js/html2canvas.js';
-        document.head.appendChild(s);
-    }
+	if (window.cordova) {
+		const s = document.createElement('script');
+		s.src = './js/html2canvas.js';
+		document.head.appendChild(s);
+	}
 }
-// function onDeviceReady() {
-//     try {
-// 		 _socialSharing = window.plugins?.socialsharing ?? null;
-//         const isElectron = navigator.userAgent.includes("Electron");
 
-//         // if (!isElectron && window.StatusBar) {
-//         //     StatusBar.hide();
-//         // }
-
-//         if (!isElectron && window.plugins?.insomnia) {
-//             window.plugins.insomnia.keepAwake();
-//         }
-
-//         if (!isElectron && window.NavigationBar) {
-//             window.NavigationBar.backgroundColorByHexString("#000000");
-// 			NavigationBar.backgroundColorByHexString("#000000");
-// 			NavigationBar.navigationBarVisibility("hide");
-//         }
-// 		if(screen?.orientation?.lock)
-// 			screen.orientation.lock("landscape").catch(() => {});
-//         __deviceId = getDeviceId();
-
-//         _client = new dataOperations();
-//         _client.loadState();
-//     } catch (ex) {
-//         console.error(ex);
-//         __deviceId = getDeviceId();
-
-//         _client = new dataOperations();
-//         _client.loadState();
-//     }
-// 	if (window.cordova) {
-// 		const s = document.createElement('script');
-// 		s.src = './js/html2canvas.js';
-// 		document.head.appendChild(s);
-// 	}
-// }
 function floatDusts() {
 	return;
 	var speed = 400;
 	function twinkle(id, duration) {
-		const top = (Math.floor(Math.random() * 85) + 0) + '%';
-		const left = (Math.floor(Math.random() * 85) + 0) + '%';
+		const top = Math.floor(Math.random() * 85) + 0 + '%';
+		const left = Math.floor(Math.random() * 85) + 0 + '%';
 		const _rem = document.getElementById('speck' + id);
-		if(_rem)
-			_rem.remove();
+		if (_rem) _rem.remove();
 		const _div = document.createElement('div');
 		_div.className = 'speck';
 		_div.id = 'speck' + id;
@@ -2797,40 +2669,36 @@ function floatDusts() {
 		_spck.style.animationTimingFunction = 'cubic-bezier(0.250, 0.250, 0.750, 0.750)';
 		_spck.style.animationName = 'twinkle';
 	}
-	const twinkleLoop = function(i) {
-		var duration = ((Math.random() * 5) + 3);
-		duration = duration - ((495 - speed)/100);
+	const twinkleLoop = function (i) {
+		var duration = Math.random() * 5 + 3;
+		duration = duration - (495 - speed) / 100;
 		twinkle(i, duration);
-		setTimeout(function() {
-			twinkleLoop(i)
+		setTimeout(function () {
+			twinkleLoop(i);
 		}, duration * 1000);
-	}
-	for (let i = 1; i < 6; i++)
-		twinkleLoop(i);
+	};
+	for (let i = 1; i < 6; i++) twinkleLoop(i);
 }
 var _openingSound;
 function playOpeningMusic(_path, _volume) {
-	if(episodeVisibilityHidden || document.hidden)
-		return;
-	_openingSound = document.createElement("audio");
+	if (episodeVisibilityHidden || document.hidden) return;
+	_openingSound = document.createElement('audio');
 	_openingSound.crossOrigin = 'anonymous';
-	if ("src" in _openingSound)
-		_openingSound.autoPlay = false;
-	else
-		_openingSound.preload = 'auto';
-	_openingSound.oldVolume = _volume ?? .5;
+	if ('src' in _openingSound) _openingSound.autoPlay = false;
+	else _openingSound.preload = 'auto';
+	_openingSound.oldVolume = _volume ?? 0.5;
 	_openingSound.volume = _openingSound.oldVolume * __volume;
 	_openingSound.loop = true;
 	_openingSound.currentTime = 0;
-	_openingSound.src = _path ?? "./images/sounds/wind-menu.mp3"; // "./images/sounds/opening3.mp3";
+	_openingSound.src = _path ?? './images/sounds/wind-menu.mp3';
 	_openingSound.play();
-	_openingSound.onended = function() {
+	_openingSound.onended = function () {
 		_openingSound = _closeOpeningMusic = null;
-	}
+	};
 }
 function switchOpeningMusic(_path, _volume) {
-	if(_openingSound || _path) {
-		if(_openingSound) {
+	if (_openingSound || _path) {
+		if (_openingSound) {
 			_openingSound.pause();
 			_openingSound.currentTime = 0;
 		}
@@ -2840,22 +2708,24 @@ function switchOpeningMusic(_path, _volume) {
 }
 function activateGameStart(_quickPlay, _force) {
 	__story = undefined;
-	if(_quickPlay){
-		if(!_force) {
-			askSomething(`<div class="question-area">${getLangData('This section is designed solely to provide a quick overview of our game mechanics and gameplay. It doesn\'t award any rewards or impact your demo progress. Still want to play?')}</div>`, 
-				'activateGameStart(1, 1)', 'modal_2x1', document.getElementById('first-splash'));
+	if (_quickPlay) {
+		if (!_force) {
+			askSomething(
+				`<div class="question-area">${getLangData("This section is designed solely to provide a quick overview of our game mechanics and gameplay. It doesn't award any rewards or impact your demo progress. Still want to play?")}</div>`,
+				'activateGameStart(1, 1)',
+				'modal_2x1',
+				document.getElementById('first-splash')
+			);
 			return;
 		}
 		closeInventoryQuestionModal(1);
 		_client = new dataOperations(1);
 		_client.loadState();
-	}
-	else
-	{
+	} else {
 		_client = new dataOperations();
 		_client.loadState();
 	}
-	PlaySound({key:'enter', volume:.5});
+	PlaySound({ key: 'enter', volume: 0.5 });
 	addClass(document.querySelector('.opening-controls-icon'), 'd-none');
 	addClass(document.querySelector('.volume-panel'), 'd-none');
 	addClass(document.querySelector('.opening-lang-icon'), 'd-none');
@@ -2863,53 +2733,60 @@ function activateGameStart(_quickPlay, _force) {
 	addClass(document.getElementById('game-difficulty-up'), 'disabled');
 	localStorage.setItem(__difficultyKey, __account.difficulty);
 	__account.difficulty = 6 - __account.difficulty;
-	addClass(document.getElementById('connect-btn'), 'disabled2'); 
-	addClass(document.getElementById('qp-btn'), 'disabled2'); 
-	addClass(document.getElementById('pak-btn'), 'disabled2'); 
-	document.getElementById('mini-menu').innerHTML = '<div onexactclick="askExitApp()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/pause2.png);background-size: cover"></div>'; // '<div onexactclick="activatePowerSaveMode()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/power-save.png);background-size: cover"></div>';
+	addClass(document.getElementById('connect-btn'), 'disabled2');
+	addClass(document.getElementById('qp-btn'), 'disabled2');
+	addClass(document.getElementById('pak-btn'), 'disabled2');
+	document.getElementById('mini-menu').innerHTML =
+		'<div onexactclick="askExitApp()" id="b-s-m-btn" class="mini-menu-icon" style="aspect-ratio: 128/100;background:url(./images/icons/pause2.png);background-size: cover"></div>';
 	openGame();
 }
 const __difficulties = [
-	{ text: {
-		en: 'Sugar Teddy',
-		tr: 'Minnoş'
-	}},
-	{ text: {
-		en: 'Easy',
-		tr: 'Kolay'
-	}},
-	{ text: {
-		en: 'Normal',
-		tr: 'Normal'
-	}},
-	{ text: {
-		en: 'Hard',
-		tr: 'Zor'
-	}},
-	{ text: {
-		en: 'Inferno',
-		tr: 'Cehennem'
-	}}
+	{
+		text: {
+			en: 'Sugar Teddy',
+			tr: 'Minnoş'
+		}
+	},
+	{
+		text: {
+			en: 'Easy',
+			tr: 'Kolay'
+		}
+	},
+	{
+		text: {
+			en: 'Normal',
+			tr: 'Normal'
+		}
+	},
+	{
+		text: {
+			en: 'Hard',
+			tr: 'Zor'
+		}
+	},
+	{
+		text: {
+			en: 'Inferno',
+			tr: 'Cehennem'
+		}
+	}
 ];
 const __difficultyKey = 'WOT-Warriors-of-Tengri-Difficulty';
-function changeDifficulty(_step){
+function changeDifficulty(_step) {
 	const _val = document.querySelector('.game-difficulty-value');
-	PlaySound({key:'switch', volume:.3});
+	PlaySound({ key: 'switch', volume: 0.3 });
 	__account.difficulty += _step;
-	if(__account.difficulty > 1)
-		removeClass(document.getElementById('game-difficulty-down'), 'disabled');
-	else
-		addClass(document.getElementById('game-difficulty-down'), 'disabled');
-	if(__account.difficulty < 5)
-		removeClass(document.getElementById('game-difficulty-up'), 'disabled');
-	else
-		addClass(document.getElementById('game-difficulty-up'), 'disabled');
+	if (__account.difficulty > 1) removeClass(document.getElementById('game-difficulty-down'), 'disabled');
+	else addClass(document.getElementById('game-difficulty-down'), 'disabled');
+	if (__account.difficulty < 5) removeClass(document.getElementById('game-difficulty-up'), 'disabled');
+	else addClass(document.getElementById('game-difficulty-up'), 'disabled');
 	_val.innerText = __difficulties[__account.difficulty - 1].text[getLang()];
 }
 function resetOpeningScreen() {
-	if(_openingSound){
+	if (_openingSound) {
 		_openingSound.pause();
-		_openingSound.currentTime= 0;
+		_openingSound.currentTime = 0;
 	}
 	_game.suspended = 1;
 	removeClass(_gamePad, 'ghost-mode');
@@ -2930,8 +2807,7 @@ function resetOpeningScreen() {
 }
 function approveSelectedLanguage() {
 	const _lang = document.querySelector('.opening-lang-item.selected').getAttribute('data-lang');
-	if(__account.lang === _lang)
-	{
+	if (__account.lang === _lang) {
 		closeInventoryQuestionModal();
 		return;
 	}
@@ -2944,11 +2820,11 @@ function getOpeningLanguages(_selected) {
 	_selected = _selected ?? getLang();
 	return `<div class="full flex fade-me"><div data-lang="en" onexactclick="selectOpeningLanguage('en')" class="opening-lang-item w-100 flex flex-jc-start${_selected === 'en' ? ' selected' : ''}" style="padding:2cqh 0 1cqh 0">
 		<img style="height:4.5cqh" src="./images/ui/circle-${_selected === 'en' ? 'on' : 'off'}.png" />
-		<div class="question-modal-item wot-subtitle" style="margin-left:2cqh;color:#f3f4f5${_selected === 'en' ? '' : 'cc'}">${getLangData("English")}</div>
+		<div class="question-modal-item wot-subtitle" style="margin-left:2cqh;color:#f3f4f5${_selected === 'en' ? '' : 'cc'}">${getLangData('English')}</div>
 	</div>
 	<div data-lang="tr" onexactclick="selectOpeningLanguage('tr')" class="opening-lang-item w-100 flex flex-jc-start${_selected === 'tr' ? ' selected' : ''}" style="padding:1cqh 0 2cqh 0">
 		<img style="height:4.5cqh" src="./images/ui/circle-${_selected === 'tr' ? 'on' : 'off'}.png" />
-		<div class="question-modal-item wot-subtitle" style="margin-left:2cqh;color:#f3f4f5${_selected === 'tr' ? '' : 'cc'}">${getLangData("Turkish")}</div>
+		<div class="question-modal-item wot-subtitle" style="margin-left:2cqh;color:#f3f4f5${_selected === 'tr' ? '' : 'cc'}">${getLangData('Turkish')}</div>
 	</div></div>`;
 }
 function selectOpeningLanguage(_key) {
@@ -2957,15 +2833,15 @@ function selectOpeningLanguage(_key) {
 }
 function askChangeLanguage() {
 	playClick();
-	let _modal = `<div data-singleton-key="modal_1x1" class="full fade-me show-ui language-change-modal flex inventory-question settings-before-play">
-		<div class="inventory-modal flex">`
-			+
-			`<div style="padding:6cqh 4cqh 2cqh 4cqh" class="flex w-100">
+	let _modal =
+		`<div data-singleton-key="modal_1x1" class="full fade-me show-ui language-change-modal flex inventory-question settings-before-play">
+		<div class="inventory-modal flex">` +
+		`<div style="padding:6cqh 4cqh 2cqh 4cqh" class="flex w-100">
 				<span class="question-modal-title wot-title">${getLangData('CHOOSE LANGUAGE')}</span>
 			</div>
-			<div id="opening-languages" class="flex w-50" style="padding:0 4%;flex:1">`
-				+ getOpeningLanguages() +
-			`</div>
+			<div id="opening-languages" class="flex w-50" style="padding:0 4%;flex:1">` +
+		getOpeningLanguages() +
+		`</div>
 			<div class="flex w-100 language-change-action-buttons">
 				<div class="orange-action-btn flex animate-me wot-button"  onexactclick="closeInventoryQuestionModal()">${getLangData('BACK')}</div>
 				<div id="item-selection-approve-btn" class="orange-action-btn flex animate-me wot-button" onexactclick="approveSelectedLanguage()">${getLangData('OK')}</div>
@@ -2980,12 +2856,17 @@ function askResetKeyboardConfig() {
 	const _fs = document.getElementById('first-splash');
 	const _isActive = _fs && !hasClass(_fs, 'v-none');
 	playClick();
-	askSomething(getLangData('Reset to default settings'), "resetKeyboardConfig()", "modal_2x1", _isActive ? _fs : undefined);
+	askSomething(
+		getLangData('Reset to default settings'),
+		'resetKeyboardConfig()',
+		'modal_2x1',
+		_isActive ? _fs : undefined
+	);
 	return;
-	let _modal = `<div class="full fade-me show-ui flex inventory-question modal_2x1">
-		<div class="inventory-modal flex">`
-			+
-			`<div style="padding:6cqh 4cqh 2cqh 4cqh" class="flex w-100">
+	let _modal =
+		`<div class="full fade-me show-ui flex inventory-question modal_2x1">
+		<div class="inventory-modal flex">` +
+		`<div style="padding:6cqh 4cqh 2cqh 4cqh" class="flex w-100">
 				<span style="color:#F4BB44 !important" class="wot-title">${getLangData('Reset to default settings')}?</span>
 			</div>
 			<div style="padding:2cqh 2cqh 6cqh 2cqh" class="flex w-100">
@@ -2997,14 +2878,13 @@ function askResetKeyboardConfig() {
 	const _div = document.createElement('div');
 	_div.innerHTML = _modal;
 	let _parent = document.getElementById('first-splash');
-	if(hasClass(_parent, 'v-none'))
-		_parent = document.querySelector('#menu-ui') ?? _gameUI;
+	if (hasClass(_parent, 'v-none')) _parent = document.querySelector('#menu-ui') ?? _gameUI;
 	_parent.appendChild(_div.firstChild);
 }
 function resetKeyboardConfig() {
 	const _coms = document.querySelectorAll('.key-combination-item');
 	let i = 0;
-	for(let kc of _keyCombinations) {
+	for (let kc of _keyCombinations) {
 		_coms[i].value = kc.baseKey === ' ' ? 'SPACE' : kc.baseKey;
 		i++;
 	}
@@ -3016,110 +2896,106 @@ function cancelKeyboardConfig() {
 function approveKeyboardConfig() {
 	__account.keyboard = [];
 	const _coms = document.querySelectorAll('.key-combination-item');
-	_coms?.forEach(x => __account.keyboard.push(x.value === 'SPACE' ? ' ' : x.value));
+	_coms?.forEach((x) => __account.keyboard.push(x.value === 'SPACE' ? ' ' : x.value));
 	_client.saveState();
 	setNewKeyCombinations();
 	approveKeyboardPromo();
 }
 function setNewKeyCombinations() {
 	const dk = document.querySelectorAll('#game-ui div[data-key]');
-	for(let _item of dk) {
+	for (let _item of dk) {
 		const _key = _item.getAttribute('data-key');
-		const _index = _keyCombinations.findIndex(x => (x.baseKey === ' ' ? 'space' : x.baseKey).toLowerCase() === _key);
-		_item.setAttribute('data-new-key', (__account.keyboard?.[_index] === ' ' ? 'space' : __account.keyboard?.[_index]?.toLowerCase?.()) ?? _key);
+		const _index = _keyCombinations.findIndex(
+			(x) => (x.baseKey === ' ' ? 'space' : x.baseKey).toLowerCase() === _key
+		);
+		_item.setAttribute(
+			'data-new-key',
+			(__account.keyboard?.[_index] === ' ' ? 'space' : __account.keyboard?.[_index]?.toLowerCase?.()) ?? _key
+		);
 	}
 }
 function approveKeyboardPromo() {
 	const _container = document.querySelector('.keyboard-promo-container');
-	if(hasClass(_container, 'fade-out-99'))
-		return;
+	if (hasClass(_container, 'fade-out-99')) return;
 	playClick();
 	removeClass(_container, 'fade-me-99');
 	const _elem = document.getElementById('key-promo-skip');
-	if(hasClass(_elem, 'selected'))
-		localStorage.setItem('keyboard-promo-skip', 1);
+	if (hasClass(_elem, 'selected')) localStorage.setItem('keyboard-promo-skip', 1);
 	addClass(_container, 'fade-out-99');
-	_container.onanimationend = function(_e) {
-		if(_e.animationName === 'fade-out-me99')
-			_container?.remove?.();
-	}
+	_container.onanimationend = function (_e) {
+		if (_e.animationName === 'fade-out-me99') _container?.remove?.();
+	};
 }
 function skipKeyboardPromo() {
 	const _elem = document.getElementById('key-promo-skip');
 	const _img = _elem.querySelector('img');
 	playClick();
-	if(hasClass(_elem, 'selected')) {
+	if (hasClass(_elem, 'selected')) {
 		removeClass(_elem, 'selected');
 		_img.src = './images/ui/star-off.png';
-	}
-	else {
+	} else {
 		addClass(_elem, 'selected');
 		_img.src = './images/ui/star-on.png';
 	}
 }
 function getNewKeyboardKey(_baseKey) {
-	const i = _keyCombinations.findIndex(x => x.baseKey === _baseKey);
-	return{ title: _keyCombinations[i].title, baseKey: __account.keyboard?.[i] ?? _keyCombinations[i].baseKey };
+	const i = _keyCombinations.findIndex((x) => x.baseKey === _baseKey);
+	return { title: _keyCombinations[i].title, baseKey: __account.keyboard?.[i] ?? _keyCombinations[i].baseKey };
 }
 function getBaseKeyboardKey(_newKey) {
-	if(!__account.keyboard?.[0])
-		return _newKey;
-	const i = __account.keyboard.findIndex(x => x.toLowerCase() === _newKey.toLowerCase());
-	if(i !== -1)
-		return{ title: _keyCombinations[i].title, baseKey: _keyCombinations[i].baseKey };
+	if (!__account.keyboard?.[0]) return _newKey;
+	const i = __account.keyboard.findIndex((x) => x.toLowerCase() === _newKey.toLowerCase());
+	if (i !== -1) return { title: _keyCombinations[i].title, baseKey: _keyCombinations[i].baseKey };
 }
 function getKeyboardPromo(_force, _fromInGame) {
-	if((__switchingMap || gameopening) && !_fromInGame)
-		return;
+	if ((__switchingMap || gameopening) && !_fromInGame) return;
 	const _seenBefore = localStorage.getItem('keyboard-promo-skip');
-	if(_seenBefore && !_force)
-		return;
-	if(_force)
-		playClick();
+	if (_seenBefore && !_force) return;
+	if (_force) playClick();
 	let _parent = document.getElementById('first-splash');
 	let _bringToFront = false;
-	if(hasClass(_parent, 'v-none')){
+	if (hasClass(_parent, 'v-none')) {
 		_parent = _gameUI;
 		_bringToFront = true;
 	}
 	const _desc = document.createElement('div');
-	_desc.className = 'flex show-ui full keyboard-promo-container quick-play-desc-container fade-me-99 animate-me settings-before-play';
+	_desc.className =
+		'flex show-ui full keyboard-promo-container quick-play-desc-container fade-me-99 animate-me settings-before-play';
 	_desc.style = 'position:absolute;top:0;left:0;overflow:hidden;z-index:' + (_bringToFront ? 9999 : 1499);
-	//let _html = '<div style="height:calc(100% - 9cqh);position:relative" class="w-100 flex"><img src="./images/icons/keys.png" style="border:.2cqh solid #F3F4F599;border-top:0;position:absolute;object-fit:cover;max-width:100%;max-height:100%" /></div>';
-	// _desc.innerHTML = _html +
-	// 		`<div class="quick-play-desc-skip flex" style="padding:0 5cqh;width:91% !important">
-	// 			<div id="key-promo-skip" onexactclick="skipKeyboardPromo()" class="flex flex-jc-start w-50${_seenBefore ? ' v-none' : ''}" style="height:100%">
-	// 				<div class="flex" style="height:100%">
-	// 					<img src="./images/ui/star-off.png" style="height:5cqh;transform:rotate(44deg);-webkit-transform:rotate(44deg)" />
-	// 					<div class="flex" style="margin:0 2cqh">${getLangData("Don't show again")}</div>
-	// 				</div>
-	// 			</div>
-	// 			<div onexactclick="approveKeyboardPromo()" class="flex flex-jc-end w-50" style="height:100%">
-	// 				${getLangData('UNDERSTOOD')}
-	// 			</div>
-	// 		</div>`;
-	let _html = '<div style="height:calc(100% - 9cqh);position:relative;background:radial-gradient(#00000080, #000000cc), linear-gradient(180deg, #000, transparent, transparent, #00000080, #000), url(./images/icons/kb-bg.png);background-size:contain;background-position:center;background-repeat:no-repeat" class="w-100 flex key-combinations"><div class="w-50" style="height:100%">';
-	for(let i = 0; i < 11; i++) {
-		const _item = { title: _keyCombinations[i].title, baseKey: __account.keyboard?.[i] ?? _keyCombinations[i].baseKey };
-		_html += `<div class="w-100 flex" style="height:9%">
+
+	let _html =
+		'<div style="height:calc(100% - 9cqh);position:relative;background:radial-gradient(#00000080, #000000cc), linear-gradient(180deg, #000, transparent, transparent, #00000080, #000), url(./images/icons/kb-bg.png);background-size:contain;background-position:center;background-repeat:no-repeat" class="w-100 flex key-combinations"><div class="w-50" style="height:100%">';
+	for (let i = 0; i < 11; i++) {
+		const _item = {
+			title: _keyCombinations[i].title,
+			baseKey: __account.keyboard?.[i] ?? _keyCombinations[i].baseKey
+		};
+		_html +=
+			`<div class="w-100 flex" style="height:9%">
 			<div class="w-50 flex flex-jc-end wot-subtitle" style="height:100%">${_item.title[getLang()]}</div>
-			<div class="w-50 flex flex-jc-start wot-description" style="height:100%"><input onkeydown="setBindKey(this, event)" data-key="${_item.baseKey}" onfocus="readyToBindKey(this)" onblur="tryResetBindKey(this)" class="key-combination-item" type="text" style="height:100%;aspect-ratio:5/1" value="${_item.baseKey === ' ' ? 'SPACE' : _item.baseKey}" />` 
-			+ (_keyCombinations[i].desc ?? '') +
+			<div class="w-50 flex flex-jc-start wot-description" style="height:100%"><input onkeydown="setBindKey(this, event)" data-key="${_item.baseKey}" onfocus="readyToBindKey(this)" onblur="tryResetBindKey(this)" class="key-combination-item" type="text" style="height:100%;aspect-ratio:5/1" value="${_item.baseKey === ' ' ? 'SPACE' : _item.baseKey}" />` +
+			(_keyCombinations[i].desc ?? '') +
 			`</div>
 		</div>`;
 	}
 	_html += '</div><div class="w-50" style="height:100%">';
-	for(let i = 11; i < 21; i++) {
-		const _item = { title: _keyCombinations[i].title, baseKey: __account.keyboard?.[i] ?? _keyCombinations[i].baseKey };
-		_html += `<div class="w-100 flex" style="height:9%">
-			<div class="w-50 flex flex-jc-end wot-description" style="height:100%">` 
-			+ (_keyCombinations[i].desc ?? '') +
+	for (let i = 11; i < 21; i++) {
+		const _item = {
+			title: _keyCombinations[i].title,
+			baseKey: __account.keyboard?.[i] ?? _keyCombinations[i].baseKey
+		};
+		_html +=
+			`<div class="w-100 flex" style="height:9%">
+			<div class="w-50 flex flex-jc-end wot-description" style="height:100%">` +
+			(_keyCombinations[i].desc ?? '') +
 			`<input onkeydown="setBindKey(this, event)" data-key="${_item.baseKey}" onfocus="readyToBindKey(this)" onblur="tryResetBindKey(this)" class="key-combination-item" type="text" style="height:100%;aspect-ratio:5/1" value="${_item.baseKey === ' ' ? 'SPACE' : _item.baseKey}" /></div>
 			<div class="w-50 flex flex-jc-start wot-subtitle" style="height:100%">${_item.title[getLang()]}</div>
 		</div>`;
 	}
-	_desc.innerHTML = _html + '</div></div>' +
-			`<div class="quick-play-desc-skip flex" style="padding:0 10cqh">
+	_desc.innerHTML =
+		_html +
+		'</div></div>' +
+		`<div class="quick-play-desc-skip flex" style="padding:0 10cqh">
 				<div onexactclick="cancelKeyboardConfig()" class="orange-action-btn flex wot-button">
 					${getLangData('CANCEL')}
 				</div>
@@ -3132,79 +3008,72 @@ function getKeyboardPromo(_force, _fromInGame) {
 			</div>`;
 	_parent.appendChild(_desc);
 }
-function isElectron(){
-    return !!window._cdvElectronIpc;
+function isElectron() {
+	return !!window._cdvElectronIpc;
 }
 let generatedImage = null;
-async function takePhotoOfScreen(_fromMenu){
- 	const _wrapper = document.body;
-	if(hasClass(_wrapper, 'share-capture-mode'))
-		return;
+async function takePhotoOfScreen(_fromMenu) {
+	const _wrapper = document.body;
+	if (hasClass(_wrapper, 'share-capture-mode')) return;
 	addClass(_wrapper, 'share-capture-mode');
-    try{
-        await new Promise(resolve=>{
-            requestAnimationFrame(()=>{
-                requestAnimationFrame(resolve);
-            });
-        });
-		// if(__isPC)
-		// 	generatedImage = await window._cdvElectronIpc.capturePage();
-		// else
-		// 	generatedImage = 
+	try {
+		await new Promise((resolve) => {
+			requestAnimationFrame(() => {
+				requestAnimationFrame(resolve);
+			});
+		});
+
 		await takePhotoOfScreenForMobile();
-        //document.getElementById('sharePreviewImage').src = generatedImage;
-    }
-	catch(err){
-        console.log(err.message ?? err);
-    }
-    addClass(document.getElementById('shareOverlay'), 'show');
+	} catch (err) {
+		console.log(err.message ?? err);
+	}
+	addClass(document.getElementById('shareOverlay'), 'show');
 	removeClass(_wrapper, 'share-capture-mode');
 }
 let isSharing = false;
 async function shareGeneratedImage(base64, _fromMenu) {
-    if (isSharing) return;
-    isSharing = true;
+	if (isSharing) return;
+	isSharing = true;
 
-    try {
-
-        if (__isPC) {
-			if(window._cdvElectronIpc) {
+	try {
+		if (__isPC) {
+			if (window._cdvElectronIpc) {
 				window._cdvElectronIpc.copyImage(base64);
-				warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/film.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Photo copied to clipboard') + '!</span></div>', null, null, 1, null, null, _fromMenu ? document.getElementById('shareOverlay') : null);
+				warn(
+					'<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/film.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' +
+						getLangData('Photo copied to clipboard') +
+						'!</span></div>',
+					null,
+					null,
+					1,
+					null,
+					null,
+					_fromMenu ? document.getElementById('shareOverlay') : null
+				);
 			}
-        } else {
+		} else {
+			const _base64 = base64.replace(/^data:image\/png;base64,/, '');
 
-            const _base64 = base64.replace(
-                /^data:image\/png;base64,/,
-                ''
-            );
-
-            AndroidBridge.share(
-                "Warriors Of Tengri",
-                _base64
-            );
-        }
-
-    } catch (e) {
-        alert(e?.message ?? e);
-    } finally {
-        setTimeout(() => {
-            isSharing = false;
-        }, 1500);
-    }
+			AndroidBridge.share('Warriors Of Tengri', _base64);
+		}
+	} catch (e) {
+		alert(e?.message ?? e);
+	} finally {
+		setTimeout(() => {
+			isSharing = false;
+		}, 1500);
+	}
 }
-async function takePhotoOfScreenForMobile(){
-	PlaySound({key:'photo', volume:1});
-	const _img = document.getElementById(
-		'sharePreviewImage'
-	);
+async function takePhotoOfScreenForMobile() {
+	PlaySound({ key: 'photo', volume: 1 });
+	const _img = document.getElementById('sharePreviewImage');
 	const _st = document.querySelector('.share-text');
 	_img.imageLoaded = false;
 	addClass(_img, 'v-none');
 	addClass(_st, 'v-none');
 	removeClass(_img, 'fade-me');
-	getCreditsScreenLightBase64().then(async base64 => {
-		if(_img){
+	getCreditsScreenLightBase64().then(async (base64) => {
+		if (_img) {
 			removeClass(_img, 'v-none');
 			_img.src = base64;
 			addClass(_img, 'fade-me');
@@ -3213,74 +3082,34 @@ async function takePhotoOfScreenForMobile(){
 		}
 	});
 }
-// function shareToWithPlugin() {
-// 	try{
-// 		window.plugins.socialsharing.share(
-// 			getLangData('My legendary moment'),
-// 			'Warriors of Tengri',
-// 			generatedImage,
-// 			null
-// 		);
-// 	} 
-// 	catch(_){
-// 		alert(_?.message ?? _);
-// 	}
-// }
+
 function shareToWithPlugin(_fromMenu) {
 	shareGeneratedImage(generatedImage, _fromMenu);
 }
-// async function shareToWithPlugin() {
-//     try {
-//         const result =
-//             await _cdvElectronIpc.share({
 
-//                 text:
-//                     getLangData(
-//                         'My legendary moment'
-//                     ),
-
-//                 title:
-//                     'Warriors of Tengri',
-
-//                 image:
-//                     generatedImage,
-
-//                 url:
-//                     null
-//             });
-//     }
-//     catch(e){
-//         console.log('HATA: '+ (e.message ?? e));
-//     }
-// }
-function closeShareUI(){
-    removeClass(document.getElementById('shareOverlay'), 'show');
+function closeShareUI() {
+	removeClass(document.getElementById('shareOverlay'), 'show');
 }
-function closeCredits(_fromMenu){
+function closeCredits(_fromMenu) {
 	const _wrapper = document.querySelector('.credits-bg-wrapper');
-	if(_wrapper)
-		_wrapper.remove();
-	if(_fromMenu)
-		switchOpeningMusic();
+	if (_wrapper) _wrapper.remove();
+	if (_fromMenu) switchOpeningMusic();
 	generatedImage = null;
 }
 function getCreditsScreenLightHtml() {
 	let _w, _h;
-	if(_gameUI.clientWidth > 800) {
+	if (_gameUI.clientWidth > 800) {
 		const _rate = 800 / _gameUI.clientWidth;
 		_w = 800;
 		_h = MathRound(_gameUI.clientHeight * _rate);
-	}
-	else
-	{
+	} else {
 		_w = _gameUI.clientWidth;
 		_h = _gameUI.clientHeight;
 	}
 	let _scr = document.createElement('div');
-	_scr.style = 'z-index:999999;position:absolute;overflow:hidden;width:' + _w
-	+ 'px;height:' + _h + 'px;background-color:#000';
-	_scr.innerHTML = 
-	`<img style='width:100%;left:0;top:0;position:absolute' 
+	_scr.style =
+		'z-index:999999;position:absolute;overflow:hidden;width:' + _w + 'px;height:' + _h + 'px;background-color:#000';
+	_scr.innerHTML = `<img style='width:100%;left:0;top:0;position:absolute' 
 	crossorigin="anonymous" src="./images/texture/lobbymobile-ground.png" />
 	<img style='width:8.5%;
 	right:30.5%;
@@ -3365,73 +3194,49 @@ function getCreditsScreenLightHtml() {
 	return _scr;
 }
 async function getCreditsScreenLightBase64() {
+	const el = getCreditsScreenLightHtml();
 
-    const el = getCreditsScreenLightHtml();
+	document.body.appendChild(el);
 
-    document.body.appendChild(el);
+	try {
+		await Promise.all(
+			[...el.querySelectorAll('img')].map((img) => {
+				if (img.complete) {
+					return Promise.resolve();
+				}
 
-    try {
+				return new Promise((resolve, reject) => {
+					img.onload = resolve;
+					img.onerror = reject;
+				});
+			})
+		);
 
-        // bütün img'lerin yüklenmesini bekle
-        await Promise.all(
-            [...el.querySelectorAll('img')].map(img => {
+		const canvas = await html2canvas(el, {
+			backgroundColor: '#000000',
+			useCORS: true,
+			scale: 1
+		});
 
-                if (img.complete) {
-                    return Promise.resolve();
-                }
-
-                return new Promise((resolve, reject) => {
-                    img.onload = resolve;
-                    img.onerror = reject;
-                });
-
-            })
-        );
-
-        const canvas = await html2canvas(el, {
-            backgroundColor: '#000000',
-            useCORS: true,
-            scale: 1
-        });
-
-        generatedImage = canvas.toDataURL('image/png');
+		generatedImage = canvas.toDataURL('image/png');
 		return generatedImage;
-
-    }
-    finally {
-
-        el.remove();
-
-    }
-
+	} finally {
+		el.remove();
+	}
 }
 function openCredits(_fromMenu) {
-	if(__switchingMap || (_fromMenu && gameopening))
-		return;
+	if (__switchingMap || (_fromMenu && gameopening)) return;
 	playClick();
-	switchOpeningMusic('./images/music/lobby.mp3', .3);
-	//switchMap(-1, 1, null, null, null, function() {
-		// if(mainCharacter){
-		// 	mainCharacter.left = MathRound(1735 * __zoom);
-		// 	mainCharacter.direction = __right;
-		// 	mainCharacter.skipHealthBar = true;
-		// 	mainCharacter.noDirection = true;
-		// 	blurKeyboard();
-		// 	mainCharacter.disableKeyboard = mainCharacter.immobilize = true;
-		// 	mainCharacter.animate('idlelobby',1);
-		// }
-		// const _fire = episode.enemies.find(x => x.id === 5);
-		// _fire.animations.idle.frames.forEach(x => delete x.sound);
-		// _fire.animations.idle.frames[0].sound = { key: 'bonefire', volume:.1, bind: true, loop: true };
-		let _scr = document.createElement('div');
-		_scr.className = 'full flex show-ui fade-me credits-bg-wrapper';
-		let _parent = document.getElementById('first-splash');
-		if(hasClass(_parent, 'v-none'))
-			_parent = document.querySelector('#menu-ui') ?? _gameUI;
-		const _wrapper = document.createElement('div');
-		_wrapper.className = 'full flex credits-bg';
-		_wrapper.id = "shareMomentWrapper";
-		_wrapper.innerHTML = `<img crossorigin="anonymous" id="credits-fire-gif" src="./images/gifs/source.gif" />
+	switchOpeningMusic('./images/music/lobby.mp3', 0.3);
+
+	let _scr = document.createElement('div');
+	_scr.className = 'full flex show-ui fade-me credits-bg-wrapper';
+	let _parent = document.getElementById('first-splash');
+	if (hasClass(_parent, 'v-none')) _parent = document.querySelector('#menu-ui') ?? _gameUI;
+	const _wrapper = document.createElement('div');
+	_wrapper.className = 'full flex credits-bg';
+	_wrapper.id = 'shareMomentWrapper';
+	_wrapper.innerHTML = `<img crossorigin="anonymous" id="credits-fire-gif" src="./images/gifs/source.gif" />
 		<div class="credits-fire-glow"></div>
 		<img crossorigin="anonymous" id="credits-seat1" src="./images/sprites/ep87/sprite.png" />
 		<img crossorigin="anonymous" id="credits-seat2" src="./images/sprites/ep87/dark.png" />
@@ -3477,13 +3282,13 @@ function openCredits(_fromMenu) {
 				</div>
 			</div>
 		</div>`;
-		const _splash = document.getElementById('splash');
-		addClass(_splash, 'd-none');
-		addClass(_gameUI, 'disable-ui');
-		const _btn = document.createElement('div');
-		_btn.className = 'flex share-moment-overlay';
-		_btn.id = 'shareOverlay';
-		_btn.innerHTML = `<div>
+	const _splash = document.getElementById('splash');
+	addClass(_splash, 'd-none');
+	addClass(_gameUI, 'disable-ui');
+	const _btn = document.createElement('div');
+	_btn.className = 'flex share-moment-overlay';
+	_btn.id = 'shareOverlay';
+	_btn.innerHTML = `<div>
 			<div class="share-moment-photo-card" onclick="shareToWithPlugin(${_fromMenu ? 1 : 0})">
 				<div id="sharePreviewImage-parent">
 					<img class="share-moment-photo-image" id="sharePreviewImage">
@@ -3494,9 +3299,9 @@ function openCredits(_fromMenu) {
 				</div>
 			</div>
 		</div>`;
-		const _div = document.createElement('div');
-		_div.className = 'flex credits-screen';
-		_div.innerHTML = `<div class="credits-scroll${__isPC ? '': ' credits-scroll-mobile'}">
+	const _div = document.createElement('div');
+	_div.className = 'flex credits-screen';
+	_div.innerHTML = `<div class="credits-scroll${__isPC ? '' : ' credits-scroll-mobile'}">
 				<div class="credits-title">
 					${getLangData('CREDITS', __creditsLangData)}
 				</div>
@@ -3823,7 +3628,6 @@ function openCredits(_fromMenu) {
 
 				<div class="credits-divider"></div>
 
-				<!-- SPECIAL THANKS -->
 
 				<div class="credits-section">
 					<div class="credits-subtitle" lang="${getLang()}">
@@ -3870,32 +3674,23 @@ function openCredits(_fromMenu) {
 				</div>
 				
 			</div>`;
-		// const _share = document.createElement('div');
-		// _share.className = 'take-photo-button share-button';
-		// _share.onexactclick = function() {
-		// 	takePhotoOfScreen(_fromMenu);
-		// }
-		// _share.innerText = getLangData('Capture Moment');
-		const _back = document.createElement('div');
-		_back.className = 'share-back-button share-button secondary';
-		_back.onexactclick = function() {
-			playClick();
-			if(!_fromMenu)
-				resetOpeningScreen();
-			else
-				closeCredits(_fromMenu);
-		}
-		_back.innerHTML = '<img src="./images/ui/game/back.png" />';
-		_scr.appendChild(_wrapper);
-		// if(!_fromMenu)
-		// 	_scr.appendChild(_share);
-		_scr.appendChild(_back);
-		_scr.appendChild(_btn);
-		_scr.appendChild(_div);
-		_parent.appendChild(_scr);
-	//});
+
+	const _back = document.createElement('div');
+	_back.className = 'share-back-button share-button secondary';
+	_back.onexactclick = function () {
+		playClick();
+		if (!_fromMenu) resetOpeningScreen();
+		else closeCredits(_fromMenu);
+	};
+	_back.innerHTML = '<img src="./images/ui/game/back.png" />';
+	_scr.appendChild(_wrapper);
+
+	_scr.appendChild(_back);
+	_scr.appendChild(_btn);
+	_scr.appendChild(_div);
+	_parent.appendChild(_scr);
 }
-//let __particles;
+
 function installOpeningScreen(_instant, _lateOpening) {
 	const _current = parseInt(localStorage.getItem(__difficultyKey) ?? 3);
 	__account.difficulty = _current;
@@ -3903,7 +3698,7 @@ function installOpeningScreen(_instant, _lateOpening) {
 	var _img = new Image();
 	var _bg = document.getElementById('splash');
 	var _opening = document.getElementById('first-splash');
-	if(_opening)
+	if (_opening)
 		_opening.innerHTML = `<canvas id="particles"></canvas>
 				<div onexactclick="getKeyboardPromo(1)" class="d-none opening-controls-icon flex${__isPC ? '' : ' d-none'}">
 				<img src="./images/icons/controls.png" />
@@ -3936,9 +3731,9 @@ function installOpeningScreen(_instant, _lateOpening) {
 					<div class="game-difficulty-content flex">
 						<div class="flex">
 							<div class="game-difficulty-title">${getLangData('Difficulty')}:</div>
-							<img${_current <= 1 ? ' class="disabled"':''} id="game-difficulty-down" onexactclick="changeDifficulty(-1)" style="margin:2cqh;height:4cqh;transform:rotate(-90deg)" src="./images/ui/arrow-up.png" />
-							<div class="game-difficulty-value one-line">${__difficulties[_current-1].text[getLang()]}</div>
-							<img${_current >= 5 ? ' class="disabled"':''} id="game-difficulty-up" onexactclick="changeDifficulty(1)" style="margin:2cqh;height:4cqh;transform:rotate(90deg) scale(-1,1)" src="./images/ui/arrow-up.png" />
+							<img${_current <= 1 ? ' class="disabled"' : ''} id="game-difficulty-down" onexactclick="changeDifficulty(-1)" style="margin:2cqh;height:4cqh;transform:rotate(-90deg)" src="./images/ui/arrow-up.png" />
+							<div class="game-difficulty-value one-line">${__difficulties[_current - 1].text[getLang()]}</div>
+							<img${_current >= 5 ? ' class="disabled"' : ''} id="game-difficulty-up" onexactclick="changeDifficulty(1)" style="margin:2cqh;height:4cqh;transform:rotate(90deg) scale(-1,1)" src="./images/ui/arrow-up.png" />
 						</div>
 					</div>
 				</div>
@@ -3977,7 +3772,7 @@ function installOpeningScreen(_instant, _lateOpening) {
 					</div>
 				</div>
 			</div>`;
-	if(!_opening) {
+	if (!_opening) {
 		setTimeout(() => {
 			installOpeningScreen();
 		}, 1000);
@@ -3986,38 +3781,31 @@ function installOpeningScreen(_instant, _lateOpening) {
 	var _wrapper = document.getElementById('wrapper');
 	_opening.style.width = MathRound(_wrapper.clientWidth) + 'px';
 	_opening.style.height = '100cqh';
-	if(!_instant) {
-		_bg.style.background = 'url(./images/icons/logo-rect.png), linear-gradient(0deg, #000, #000)'
+	if (!_instant) {
+		_bg.style.background = 'url(./images/icons/logo-rect.png), linear-gradient(0deg, #000, #000)';
 		_bg.style.backgroundSize = '25%, cover';
 		_bg.style.backgroundRepeat = 'no-repeat, repeat';
 		_bg.style.backgroundPosition = 'center, center';
-	}
-	else if(_openingSound){
+	} else if (_openingSound) {
 		_openingSound.pause();
-		_openingSound.currentTime= 0;
+		_openingSound.currentTime = 0;
 	}
-	_img.onload = function() {
-		const renderOpeningUI = function() {
-			// if(__particles)
-			// 	__particles.cancel();
-			// __particles = new dustParticles();
+	_img.onload = function () {
+		const renderOpeningUI = function () {
 			_opening.style.opacity = 0;
 			document.getElementById('connect-btn').innerText = getLangData('DEMO PLAY');
 			document.getElementById('qp-btn').innerText = getLangData('QUICK PLAY');
 			document.getElementById('pak-btn').innerText = getLangData('PRESS ANY KEY');
 			removeClass(_opening, 'd-none');
 			removeClass(_opening, 'v-none');
-			// _opening.style.background = 'url(./images/loading/00.png), linear-gradient(0deg, #000, #000)'
-			// _opening.style.backgroundSize = 'contain, cover';
-			// _opening.style.backgroundRepeat = 'no-repeat, repeat';
-			// _opening.style.backgroundPosition = 'center, center';
+
 			const _cover = document.createElement('div');
 			_cover.className = 'opening-cover';
 			_cover.innerHTML = '<img src="./images/ui/game/intro.gif" />';
-			_opening.appendChild(_cover)
+			_opening.appendChild(_cover);
 			addClass(_opening, 'fade-start');
-			if(!_instant)
-				setTimeout(function() {
+			if (!_instant)
+				setTimeout(function () {
 					_opening.style.opacity = 1;
 					_bg.style.background = '#000';
 					document.getElementById('play-os').click();
@@ -4028,337 +3816,293 @@ function installOpeningScreen(_instant, _lateOpening) {
 				document.getElementById('play-os').click();
 				gameIsReady = true;
 			}
-		}
-		if(!_instant)
+		};
+		if (!_instant)
 			setTimeout(() => {
 				renderOpeningUI();
 			}, 1000);
-		else
-			renderOpeningUI();
-	}
+		else renderOpeningUI();
+	};
 	_img.src = './images/ui/game/intro.gif';
-	// if(__isPC && !_lateOpening && !_instant)
-	// 	setTimeout(() => {
-	// 		getKeyboardPromo();
-	// 	}, 100);
 }
-setTimeout(function() {
-	if ('ontouchstart' in window ||
+setTimeout(function () {
+	if (
+		'ontouchstart' in window ||
 		(window.DocumentTouch && document instanceof window.DocumentTouch) ||
 		navigator.maxTouchPoints > 0 ||
-		window.navigator.msMaxTouchPoints > 0)
+		window.navigator.msMaxTouchPoints > 0
+	)
 		__isPC = false;
-	else
-		__isPC = true;
+	else __isPC = true;
 	installOpeningScreen();
-	const _stopOpeningSound = function() {
-		if(_openingSound)
-			_openingSound.pause();
-	}
-	document.addEventListener("visibilitychange", () => {
-		if (document.hidden)
-			_stopOpeningSound();
+	const _stopOpeningSound = function () {
+		if (_openingSound) _openingSound.pause();
+	};
+	document.addEventListener('visibilitychange', () => {
+		if (document.hidden) _stopOpeningSound();
 	});
-	document.addEventListener("pause", () => {
+	document.addEventListener('pause', () => {
 		_stopOpeningSound();
 	});
-	document.addEventListener('keyup', function(e) {
-		if (e.key === "Escape" && __isPC !== undefined)
-			askExitApp();
-	}, false);
+	document.addEventListener(
+		'keyup',
+		function (e) {
+			if (e.key === 'Escape' && __isPC !== undefined) askExitApp();
+		},
+		false
+	);
 }, 2000);
 function setGameVolume(elm) {
 	playClick();
-	const bars = document.querySelectorAll(".volume-panel .bar");
-	const volumeValue = document.getElementById("volumeValue");
+	const bars = document.querySelectorAll('.volume-panel .bar');
+	const volumeValue = document.getElementById('volumeValue');
 	const level = Number(elm.dataset.level);
-	bars.forEach((b,index)=>{
-		if(index < level)
-			b.classList.add("active");
-		else
-			b.classList.remove("active");
+	bars.forEach((b, index) => {
+		if (index < level) b.classList.add('active');
+		else b.classList.remove('active');
 	});
 	volumeValue.textContent = level;
 	__volume = level / 10;
-	if(_openingSound)
-		_openingSound.volume = _openingSound.oldVolume *__volume;
+	if (_openingSound) _openingSound.volume = _openingSound.oldVolume * __volume;
 }
 function dustParticles() {
-	const c = document.getElementById("particles");
-    const ctx = c.getContext("2d");
+	const c = document.getElementById('particles');
+	const ctx = c.getContext('2d');
 	this.clock;
-	this.rand = function(min, max) {
-      return Math.random() * (max - min) + min;
-    }
+	this.rand = function (min, max) {
+		return Math.random() * (max - min) + min;
+	};
 	const _self = this;
-    let particles = [];
+	let particles = [];
 	c.width = c.clientWidth;
 	c.height = c.clientHeight;
-const randomAshColor = function() {
-    const base = { r: 157, g: 152, b: 127 }; // kül rengi
-    const variation = 20;
-    return {
-        r: Math.floor(_self.rand(base.r - variation, base.r + variation)),
-        g: Math.floor(_self.rand(base.g - variation, base.g + variation)),
-        b: Math.floor(_self.rand(base.b - variation, base.b + variation))
-    };
-};
-	const randomFireflyColor = function() {
-    // köz / kor kırmızısı tonları
-	if(getRandomValue2(1,2) > 1)
-		return randomFireflyColor2();
-    const colors = [
-        { r: 255, g: 80,  b: 60 },   // parlak kor kırmızı
-        { r: 220, g: 50,  b: 40 },   // koyu kırmızı
-        { r: 200, g: 30,  b: 20 },   // koyu kor
-        { r: 255, g: 120, b: 80 }    // hafif turuncu yansıma (çok az)
-    ];
-    return colors[Math.floor(Math.random() * colors.length)];
-};
-const randomFireflyColor2 = function() {
-		// ateş böceği/alev tonları: sarı, turuncu, kırmızı
+	const randomAshColor = function () {
+		const base = { r: 157, g: 152, b: 127 };
+		const variation = 20;
+		return {
+			r: Math.floor(_self.rand(base.r - variation, base.r + variation)),
+			g: Math.floor(_self.rand(base.g - variation, base.g + variation)),
+			b: Math.floor(_self.rand(base.b - variation, base.b + variation))
+		};
+	};
+	const randomFireflyColor = function () {
+		if (getRandomValue2(1, 2) > 1) return randomFireflyColor2();
 		const colors = [
-			{ r: 255, g: 200, b: 80 },   // sarı-turuncu
-			{ r: 255, g: 150, b: 50 },   // turuncu
-			{ r: 220, g: 80,  b: 40 }    // kırmızımsı
+			{ r: 255, g: 80, b: 60 },
+			{ r: 220, g: 50, b: 40 },
+			{ r: 200, g: 30, b: 20 },
+			{ r: 255, g: 120, b: 80 }
 		];
 		return colors[Math.floor(Math.random() * colors.length)];
 	};
-   const createParticle = function(initial = false) {
-    const minSize = 0.55 * c.height / 100;
-    const maxSize = 0.95 * c.height / 100;
-    const size = _self.rand(minSize, maxSize);
+	const randomFireflyColor2 = function () {
+		const colors = [
+			{ r: 255, g: 200, b: 80 },
+			{ r: 255, g: 150, b: 50 },
+			{ r: 220, g: 80, b: 40 }
+		];
+		return colors[Math.floor(Math.random() * colors.length)];
+	};
+	const createParticle = function (initial = false) {
+		const minSize = (0.55 * c.height) / 100;
+		const maxSize = (0.95 * c.height) / 100;
+		const size = _self.rand(minSize, maxSize);
 
-    const ratio = (size - minSize) / (maxSize - minSize);
-    const alpha = 0.1 + ratio * 0.5;
-    const speed = 0.005 + ratio * 0.1;
+		const ratio = (size - minSize) / (maxSize - minSize);
+		const alpha = 0.1 + ratio * 0.5;
+		const speed = 0.005 + ratio * 0.1;
 
-    const isFirefly = Math.random() < 0.1; // %10 alev rengi
+		const isFirefly = Math.random() < 0.1;
 
-    return {
-        x: _self.rand(0, c.width),
-        y: initial ? _self.rand(0, c.height) : c.height + 10,
-        size,
-        speed,
-        angle: _self.rand(-15, 15) * Math.PI / 180,
-        driftChange: _self.rand(0.001, 0.004),
+		return {
+			x: _self.rand(0, c.width),
+			y: initial ? _self.rand(0, c.height) : c.height + 10,
+			size,
+			speed,
+			angle: (_self.rand(-15, 15) * Math.PI) / 180,
+			driftChange: _self.rand(0.001, 0.004),
 
-        baseAlpha: alpha,
-        alpha: alpha,
-        color: isFirefly ? randomFireflyColor() : randomAshColor(),
-        firefly: isFirefly, // bayrak koyduk
+			baseAlpha: alpha,
+			alpha: alpha,
+			color: isFirefly ? randomFireflyColor() : randomAshColor(),
+			firefly: isFirefly,
 
-        // yansıma
-        canReflect: isFirefly ? true : Math.random() < 0.1,
-        reflectTimer: _self.rand(300, 900),
-        reflecting: false,
-        reflectPhase: 0,
+			canReflect: isFirefly ? true : Math.random() < 0.1,
+			reflectTimer: _self.rand(300, 900),
+			reflecting: false,
+			reflectPhase: 0,
 
-        // fade
-        fadePhase: 0,
-        fadeTimer: _self.rand(300, 900),
-    };
-};
+			fadePhase: 0,
+			fadeTimer: _self.rand(300, 900)
+		};
+	};
 
-
-    const animateParticles = function() {
-	  if(c.width === 0) {
-		c.width = c.clientWidth;
-		c.height = c.clientHeight;
-	  }
-	  if(c.width > 0 && !particles?.[0])
-		for (let i = 0; i < 150; i++)
-			particles.push(createParticle(true));
-      ctx.clearRect(0, 0, c.width, c.height);
-
-      for (let p of particles) {
-        // yansıma
-        if (p.canReflect) {
-          if (!p.reflecting) {
-            p.reflectTimer--;
-            if (p.reflectTimer <= 0) {
-              p.reflecting = true;
-              p.reflectPhase = 1;
-              p.reflectStrength = _self.rand(0.4, 0.8);
-            }
-          } else {
-            if (p.reflectPhase === 1) {
-              p.alpha += 0.01;
-              if (p.alpha >= p.baseAlpha + p.reflectStrength) {
-                p.alpha = p.baseAlpha + p.reflectStrength;
-                p.reflectPhase = 2;
-              }
-            } else if (p.reflectPhase === 2) {
-              p.alpha -= 0.005;
-              if (p.alpha <= p.baseAlpha) {
-                p.alpha = p.baseAlpha;
-                p.reflecting = false;
-                p.reflectPhase = 0;
-                p.reflectTimer = _self.rand(300, 900);
-              }
-            }
-          }
-        }
-		if (!p.reflecting) { // parlayanlar hariç
-			p.fadeTimer--;
-			if (p.fadeTimer <= 0 && p.fadePhase === 0) {
-				p.fadePhase = 1; // fade out başla
-			}
-
-			if (p.fadePhase === 1) {
-				p.alpha -= 0.005; // fade out
-				if (p.alpha <= 0) {
-					p.alpha = 0;
-					p.fadePhase = 3; // fade in başla
-					p.fadeUp = _self.rand(30,60);
-				}
-			}
-			else if(p.fadeUp) {
-				p.fadePhase++;
-				if(p.fadePhase >= p.fadeUp)
-				{
-					delete p.fadeUp;
-					p.fadePhase = 2;
-				}
-			} else if (p.fadePhase === 2) {
-				p.alpha += 0.003; // fade in
-				if (p.alpha >= p.baseAlpha) {
-					p.alpha = p.baseAlpha;
-					p.fadePhase = 0;
-					p.fadeTimer = _self.rand(600, 1200); // bir sonraki fade için bekle
-				}
-			}
+	const animateParticles = function () {
+		if (c.width === 0) {
+			c.width = c.clientWidth;
+			c.height = c.clientHeight;
 		}
-        // partikül çiz
-		if (p.firefly) {
-			ctx.shadowBlur = p.size * 6; // ateş böceği için daha güçlü glow
+		if (c.width > 0 && !particles?.[0]) for (let i = 0; i < 150; i++) particles.push(createParticle(true));
+		ctx.clearRect(0, 0, c.width, c.height);
+
+		for (let p of particles) {
+			if (p.canReflect) {
+				if (!p.reflecting) {
+					p.reflectTimer--;
+					if (p.reflectTimer <= 0) {
+						p.reflecting = true;
+						p.reflectPhase = 1;
+						p.reflectStrength = _self.rand(0.4, 0.8);
+					}
+				} else {
+					if (p.reflectPhase === 1) {
+						p.alpha += 0.01;
+						if (p.alpha >= p.baseAlpha + p.reflectStrength) {
+							p.alpha = p.baseAlpha + p.reflectStrength;
+							p.reflectPhase = 2;
+						}
+					} else if (p.reflectPhase === 2) {
+						p.alpha -= 0.005;
+						if (p.alpha <= p.baseAlpha) {
+							p.alpha = p.baseAlpha;
+							p.reflecting = false;
+							p.reflectPhase = 0;
+							p.reflectTimer = _self.rand(300, 900);
+						}
+					}
+				}
+			}
+			if (!p.reflecting) {
+				p.fadeTimer--;
+				if (p.fadeTimer <= 0 && p.fadePhase === 0) {
+					p.fadePhase = 1;
+				}
+
+				if (p.fadePhase === 1) {
+					p.alpha -= 0.005;
+					if (p.alpha <= 0) {
+						p.alpha = 0;
+						p.fadePhase = 3;
+						p.fadeUp = _self.rand(30, 60);
+					}
+				} else if (p.fadeUp) {
+					p.fadePhase++;
+					if (p.fadePhase >= p.fadeUp) {
+						delete p.fadeUp;
+						p.fadePhase = 2;
+					}
+				} else if (p.fadePhase === 2) {
+					p.alpha += 0.003;
+					if (p.alpha >= p.baseAlpha) {
+						p.alpha = p.baseAlpha;
+						p.fadePhase = 0;
+						p.fadeTimer = _self.rand(600, 1200);
+					}
+				}
+			}
+
+			if (p.firefly) {
+				ctx.shadowBlur = p.size * 6;
+				ctx.shadowColor = `rgba(${p.color.r},${p.color.g},${p.color.b},${p.alpha})`;
+			} else {
+				ctx.shadowBlur = p.size * 3;
+				ctx.shadowColor = `rgba(${p.color.r},${p.color.g},${p.color.b},${p.alpha * 0.5})`;
+			}
+
+			ctx.save();
+
 			ctx.shadowColor = `rgba(${p.color.r},${p.color.g},${p.color.b},${p.alpha})`;
-		} else {
-			ctx.shadowBlur = p.size * 3;
-			ctx.shadowColor = `rgba(${p.color.r},${p.color.g},${p.color.b},${p.alpha * 0.5})`;
+			ctx.shadowBlur = p.size * 2;
+
+			const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+			gradient.addColorStop(0, `rgba(${p.color.r},${p.color.g},${p.color.b},${p.alpha})`);
+			gradient.addColorStop(1, `rgba(${p.color.r},${p.color.g},${p.color.b},0)`);
+
+			ctx.fillStyle = gradient;
+			ctx.beginPath();
+			ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+			ctx.fill();
+
+			ctx.restore();
+
+			p.x += Math.sin(p.angle) * p.speed;
+			p.y -= Math.cos(p.angle) * p.speed;
+
+			p.angle += _self.rand(-p.driftChange, p.driftChange);
+			p.angle += Math.sin(Date.now() * 0.001 + p.x) * 0.002;
+
+			if (p.y < -20 || p.x < -50 || p.x > c.width + 50) {
+				Object.assign(p, createParticle());
+			}
 		}
 
-		// partikül çiz
-		ctx.save(); // ayarları kaydet
+		_self.clock = requestAnimationFrame(animateParticles);
+	};
 
-		// gölge/blur ayarı
-		ctx.shadowColor = `rgba(${p.color.r},${p.color.g},${p.color.b},${p.alpha})`;
-		ctx.shadowBlur = p.size * 2; // boyuta göre blur (oranı değiştirebilirsin)
+	this.start = function () {
+		if (!_self.clock) animateParticles();
+	};
 
-		// gölgeli gradient
-		const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
-		gradient.addColorStop(0, `rgba(${p.color.r},${p.color.g},${p.color.b},${p.alpha})`);
-		gradient.addColorStop(1, `rgba(${p.color.r},${p.color.g},${p.color.b},0)`);
-
-		ctx.fillStyle = gradient;
-		ctx.beginPath();
-		ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-		ctx.fill();
-
-		ctx.restore(); // ayarları sıfırla
-
-        // hareket
-        p.x += Math.sin(p.angle) * p.speed;
-        p.y -= Math.cos(p.angle) * p.speed;
-
-        // açı değişimi
-        p.angle += _self.rand(-p.driftChange, p.driftChange);
-        p.angle += Math.sin(Date.now() * 0.001 + p.x) * 0.002;
-
-        // ekran dışına çıkarsa yeniden oluştur
-        if (p.y < -20 || p.x < -50 || p.x > c.width + 50) {
-          Object.assign(p, createParticle());
-        }
-      }
-
-      _self.clock = requestAnimationFrame(animateParticles);
-    }
-
-    this.start = function() {
-        if (!_self.clock) animateParticles();
-    };
-
-    this.cancel = function() {
-        if (_self.clock) {
-            cancelAnimationFrame(_self.clock);
-            _self.clock = null;
+	this.cancel = function () {
+		if (_self.clock) {
+			cancelAnimationFrame(_self.clock);
+			_self.clock = null;
 			particles = [];
 			ctx.clearRect(0, 0, c.width, c.height);
-        }
-    };
+		}
+	};
 
-    // otomatik başlatmak istersen:
-    this.start();
+	this.start();
 }
 
-const hideModal = function() {
-	PlaySound({ key: 'page', volume:.3 });
+const hideModal = function () {
+	PlaySound({ key: 'page', volume: 0.3 });
 	hideMyModalPopUp();
-}
+};
 
-// const __types = ['fire', 'toxic', 'common', 'lightning', 'ice'];
-// let __typeIndex = 0;
-// setInterval(function() {
-// 	try	{
-// 		const _dmg = getRandomValue(100, 999);
-// 		if(getRandomValue(1, 5) === 1)
-// 			dmgFrames.push({
-// 				dmg: _dmg,
-// 				atkType: 'critical',
-// 				x: mainCharacter.getLeft() - __dmgFrameDistance,
-// 				y: _canvas.height - mainCharacter.yPosition - mainCharacter.getHeight() - __dmgFrameDistance
-// 			});
-// 		else
-// 			dmgFrames.push({
-// 				atkType: __types[(++__typeIndex % 5)],
-// 				dmg: _dmg,
-// 				x: mainCharacter.getLeft(),
-// 				y: _canvas.height - mainCharacter.yPosition - mainCharacter.getHeight()
-// 			});
-// 	}
-// 	catch(e) {
-
-// 	}
-// }, 2000)
 function spawnMob(_json, _func, _noAnimation, _noSund) {
-		let _respawner = episode.installMob(_json, _func, 1, 1);
-		if(!_respawner.animations.respawn)
-			_respawner.animations.respawn = {
-				key: 'respawn',
-				type: 'skill',
-				frames: [
-					{
-						spriteLeft: 0,
-						spriteTop: 0,
-						spriteWidth: 0,
-						spriteOrigin: 0,
-						spriteHeight: _respawner.getHeight(),
-						objects: _noAnimation ? undefined : [{ 
-							key:'respawn', 
-							position: 'middle',
-							scale: (_respawner.zoom * _respawner.height) / 100
-						}],
-						sound: (_noAnimation || _noSund) ? undefined : { key: 'puff', volume: .3, reset: true },
-						speed: _noAnimation ? 1 : 20,
-						def: { iframe: true }
-					}
-				]
-			};
-		_respawner.animate('respawn', 1);
-		return _respawner;
+	let _respawner = episode.installMob(_json, _func, 1, 1);
+	if (!_respawner.animations.respawn)
+		_respawner.animations.respawn = {
+			key: 'respawn',
+			type: 'skill',
+			frames: [
+				{
+					spriteLeft: 0,
+					spriteTop: 0,
+					spriteWidth: 0,
+					spriteOrigin: 0,
+					spriteHeight: _respawner.getHeight(),
+					objects: _noAnimation
+						? undefined
+						: [
+								{
+									key: 'respawn',
+									position: 'middle',
+									scale: (_respawner.zoom * _respawner.height) / 100
+								}
+							],
+					sound: _noAnimation || _noSund ? undefined : { key: 'puff', volume: 0.3, reset: true },
+					speed: _noAnimation ? 1 : 20,
+					def: { iframe: true }
+				}
+			]
+		};
+	_respawner.animate('respawn', 1);
+	return _respawner;
 }
 var __latestUIModule = {};
 function getRef(_name) {
 	return __latestUIModule[_name]?.ref;
 }
 function installCharacterSelection(_func) {
-	injectModule('character-selection', function(_arr, _name) {
+	injectModule('character-selection', function (_arr, _name) {
 		const x = _func();
 		__latestUIModule[_name] = { data: _arr, ref: x };
-	})
+	});
 }
 function installWorldMap() {
-	injectModule('world', function(_arr, _name) {
+	injectModule('world', function (_arr, _name) {
 		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(3, 3);
@@ -4367,7 +4111,7 @@ function installWorldMap() {
 	});
 }
 function installWarUI() {
-	injectModule('war', function(_arr, _name) {
+	injectModule('war', function (_arr, _name) {
 		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(5, 3);
@@ -4376,7 +4120,7 @@ function installWarUI() {
 	});
 }
 function installDuelUI() {
-	injectModule('duel', function(_arr, _name) {
+	injectModule('duel', function (_arr, _name) {
 		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(5, 4);
@@ -4385,7 +4129,7 @@ function installDuelUI() {
 	});
 }
 function installDungeonUI() {
-	injectModule('dungeon', function(_arr, _name) {
+	injectModule('dungeon', function (_arr, _name) {
 		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(6, 1);
@@ -4395,8 +4139,7 @@ function installDungeonUI() {
 }
 function installStoryFinish(_failed, _extraGain, _content) {
 	window.SoundManager.clearLoops();
-	if(__storyScene?.leaderBoards)
-	{
+	if (__storyScene?.leaderBoards) {
 		installQuickPlayStageFinish(_failed);
 		return;
 	}
@@ -4405,9 +4148,9 @@ function installStoryFinish(_failed, _extraGain, _content) {
 	addClass(_gameUI, 'disable-ui');
 	mainCharacter.disableKeyboard = true;
 	blurKeyboard();
-	episode.enemies?.forEach(x=> x.standBy());
+	episode.enemies?.forEach((x) => x.standBy());
 	episode.pauseBgMusic(1);
-	injectModule('storyfinish', function(_arr, _name) {
+	injectModule('storyfinish', function (_arr, _name) {
 		__latestUIModule[_name] = { data: _arr };
 		window.storyfinish.animateStart(_failed, _extraGain, _content);
 	});
@@ -4418,16 +4161,16 @@ function installQuickPlayStageFinish(_failed) {
 	addClass(_gameUI, 'disable-ui');
 	mainCharacter.disableKeyboard = true;
 	blurKeyboard();
-	episode.enemies?.forEach(x=> x.standBy());
+	episode.enemies?.forEach((x) => x.standBy());
 	episode.pauseBgMusic(1);
-	injectModule('stagefinish', function(_arr, _name) {
+	injectModule('stagefinish', function (_arr, _name) {
 		__latestUIModule[_name] = { data: _arr };
-		//animateStart(_failed);
+
 		window.stagefinish.animateStart(_failed);
 	});
 }
 function installTalents() {
-	injectModule('talent', function(_arr, _name) {
+	injectModule('talent', function (_arr, _name) {
 		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(2, 2);
@@ -4436,8 +4179,8 @@ function installTalents() {
 	});
 }
 function installDailyLogin() {
-	injectModule('dailylogin', function(_arr, _name) {
-		var x =new window[_name]();
+	injectModule('dailylogin', function (_arr, _name) {
+		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(8, 3);
 		checkUpdateAvailable2(8);
@@ -4445,7 +4188,7 @@ function installDailyLogin() {
 	});
 }
 function installMailbox() {
-	injectModule('mailbox', function(_arr, _name) {
+	injectModule('mailbox', function (_arr, _name) {
 		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(4, 2);
@@ -4454,7 +4197,7 @@ function installMailbox() {
 	});
 }
 function installOnlineUsers() {
-	injectModule('onlineusers', function(_arr, _name) {
+	injectModule('onlineusers', function (_arr, _name) {
 		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(4, 3);
@@ -4463,7 +4206,7 @@ function installOnlineUsers() {
 	});
 }
 function installTips() {
-	injectModule('tips', function(_arr, _name) {
+	injectModule('tips', function (_arr, _name) {
 		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(9, 2);
@@ -4472,7 +4215,7 @@ function installTips() {
 	});
 }
 function installChat() {
-	injectModule('chat', function(_arr, _name) {
+	injectModule('chat', function (_arr, _name) {
 		var x = new window[_name]();
 		x.render();
 		switchBookPageTabs(4, 1);
@@ -4482,46 +4225,32 @@ function installChat() {
 }
 
 async function measureFps(frames = 60) {
-  return new Promise(resolve => {
-    let count = 0;
-    const start = performance.now();
+	return new Promise((resolve) => {
+		let count = 0;
+		const start = performance.now();
 
-    function frame() {
-      count++;
-      if (count >= frames) {
-        const duration = performance.now() - start;
-        const fps = frames / (duration / 1000);
-        resolve(fps);
-      } else {
-        requestAnimationFrame(frame);
-      }
-    }
+		function frame() {
+			count++;
+			if (count >= frames) {
+				const duration = performance.now() - start;
+				const fps = frames / (duration / 1000);
+				resolve(fps);
+			} else {
+				requestAnimationFrame(frame);
+			}
+		}
 
-    requestAnimationFrame(frame);
-  });
+		requestAnimationFrame(frame);
+	});
 }
 
 async function isHighEndDevice() {
-  const isDesktop = matchMedia('(hover: hover) and (pointer: fine)').matches;
+	const isDesktop = matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-  if (isDesktop)
-    return true;
-  const cores = navigator.hardwareConcurrency || 1;
-  const dpr = window.devicePixelRatio || 1;
-  const fps = await measureFps();
+	if (isDesktop) return true;
+	const cores = navigator.hardwareConcurrency || 1;
+	const dpr = window.devicePixelRatio || 1;
+	const fps = await measureFps();
 
-  return (
-    cores >= 6 &&
-    dpr >= 2 &&
-    fps >= 50
-  );
+	return cores >= 6 && dpr >= 2 && fps >= 50;
 }
-
-// setTimeout(() => {
-//     if (window.AndroidBridge) {
-//         AndroidBridge.test();
-//     }
-//     else {
-//         alert("bridge yok");
-//     }
-// }, 3000);

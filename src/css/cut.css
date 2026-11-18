@@ -1,202 +1,215 @@
 :root {
 	--dur: 10s;
 	--ease: cubic-bezier(0.165, 0.84, 0.44, 1);
-  }
-  
-  * {
+}
+
+* {
 	box-sizing: border-box;
-  }
-  
-  @property --a{
-	syntax: '<percentage>'; /* its type */
+}
+
+@property --a {
+	syntax: "<percentage>";
 	inherits: false;
-	initial-value: 10%; /* the initial value */
-  }
- .cut-bg {
+	initial-value: 10%;
+}
+.cut-bg {
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
 	align-content: flex-start;
 	height: 100%;
-	background:#000;
+	background: #000;
 	display: grid;
 	place-items: center;
 	overflow: hidden;
 	-webkit-animation: bg-color var(--dur) var(--ease) infinite;
-			animation: bg-color var(--dur) var(--ease) infinite;
-  }
-  
-  
-  .square {
+	animation: bg-color var(--dur) var(--ease) infinite;
+}
+
+.square {
 	position: absolute;
 	width: 100%;
 	height: 100%;
 	perspective: 100%;
 	-webkit-animation: shake var(--dur) linear infinite;
-			animation: shake var(--dur) linear infinite;
-  }
-  .square:before,
-  .square:after {
+	animation: shake var(--dur) linear infinite;
+}
+.square:before,
+.square:after {
 	content: "";
 	position: absolute;
 	top: 0;
-	left:0;
-	background-image: url('./../images/cutscenes/cs1-5.png');
+	left: 0;
+	background-image: url("./../images/cutscenes/cs1-5.png");
 	background-size: 100% auto !important;
 	width: 100%;
-	height: 100%
-  }
-  
-  .square:before {
+	height: 100%;
+}
+
+.square:before {
 	-webkit-clip-path: polygon(26% 0, 76% 100%, 0 100%, 0 0);
 	clip-path: polygon(26% 0, 76% 100%, 0 100%, 0 0);
 	z-index: 1499;
-	-webkit-animation: square-left var(--dur) var(--ease) infinite, fade-out var(--dur) var(--ease) infinite;
-	animation: square-left var(--dur) var(--ease) infinite, fade-out var(--dur) var(--ease) infinite;
-  }
-  
-  .square:after {
+	-webkit-animation:
+		square-left var(--dur) var(--ease) infinite,
+		fade-out var(--dur) var(--ease) infinite;
+	animation:
+		square-left var(--dur) var(--ease) infinite,
+		fade-out var(--dur) var(--ease) infinite;
+}
+
+.square:after {
 	-webkit-clip-path: polygon(100% 0, 100% 100%, 75% 100%, 25% 0);
 	clip-path: polygon(100% 0, 100% 100%, 75% 100%, 25% 0);
 	z-index: 1499;
-	-webkit-animation: square-right var(--dur) var(--ease) infinite, fade-out var(--dur) var(--ease) infinite;
-	animation: square-right var(--dur) var(--ease) infinite, fade-out var(--dur) var(--ease) infinite;
-  }
-  
-  @-webkit-keyframes square-left {
+	-webkit-animation:
+		square-right var(--dur) var(--ease) infinite,
+		fade-out var(--dur) var(--ease) infinite;
+	animation:
+		square-right var(--dur) var(--ease) infinite,
+		fade-out var(--dur) var(--ease) infinite;
+}
+
+@-webkit-keyframes square-left {
 	26% {
-	  transform: translateX(0);
+		transform: translateX(0);
 	}
 	100% {
-	  transform: translate(-5%, -5%) rotate(-1deg);
+		transform: translate(-5%, -5%) rotate(-1deg);
 	}
-  }
-  
-  @keyframes square-left {
+}
+
+@keyframes square-left {
 	26% {
-	  transform: translateX(0);
+		transform: translateX(0);
 	}
 	100% {
-	  transform: translate(-5%, -5%) rotate(-1deg);
+		transform: translate(-5%, -5%) rotate(-1deg);
 	}
-  }
-  @-webkit-keyframes square-right {
+}
+@-webkit-keyframes square-right {
 	26% {
-	  transform: translateX(0);
+		transform: translateX(0);
 	}
 	100% {
-	  transform: translate(5%, 5%) rotate(2deg);
+		transform: translate(5%, 5%) rotate(2deg);
 	}
-  }
-  @keyframes square-right {
+}
+@keyframes square-right {
 	26% {
-	  transform: translateX(0);
+		transform: translateX(0);
 	}
 	100% {
-	  transform: translate(5%, 5%) rotate(2deg);
+		transform: translate(5%, 5%) rotate(2deg);
 	}
-  }
-  @-webkit-keyframes fade-out {
+}
+@-webkit-keyframes fade-out {
 	88% {
-	  opacity: 1;
+		opacity: 1;
 	}
-	94%, 100% {
-	  opacity: 0;
+	94%,
+	100% {
+		opacity: 0;
 	}
-  }
-  @keyframes fade-out {
+}
+@keyframes fade-out {
 	88% {
-	  opacity: 1;
+		opacity: 1;
 	}
-	94%, 100% {
-	  opacity: 0;
+	94%,
+	100% {
+		opacity: 0;
 	}
-  }
-  @keyframes bg-color {
+}
+@keyframes bg-color {
 	26% {
-	  background:#000
+		background: #000;
 	}
 	30% {
-	  background:#fff
+		background: #fff;
 	}
 	88% {
-	  background: #4E0E04;
-	  box-shadow:inset 0 0 50vh #000
+		background: #4e0e04;
+		box-shadow: inset 0 0 50vh #000;
 	}
-  }
-  @-webkit-keyframes bg-color {
+}
+@-webkit-keyframes bg-color {
 	26% {
-	  background:#000
+		background: #000;
 	}
 	30% {
-	  background:#fff
+		background: #fff;
 	}
 	88% {
-	  background: #4E0E04;
-	  box-shadow:inset 0 0 50vh #000
+		background: #4e0e04;
+		box-shadow: inset 0 0 50vh #000;
 	}
-  }
-  @-webkit-keyframes square-color {
+}
+@-webkit-keyframes square-color {
 	25.25% {
-	  background-color: dodgerblue;
+		background-color: dodgerblue;
 	}
-	25.251%, 100% {
-	  background-color: crimson;
+	25.251%,
+	100% {
+		background-color: crimson;
 	}
-  }
-  @keyframes square-color {
+}
+@keyframes square-color {
 	25.25% {
-	  background-color: dodgerblue;
+		background-color: dodgerblue;
 	}
-	25.251%, 100% {
-	  background-color: crimson;
+	25.251%,
+	100% {
+		background-color: crimson;
 	}
-  }
-  @-webkit-keyframes shake {
-	0%, 25% {
-	  filter: blur(0);
+}
+@-webkit-keyframes shake {
+	0%,
+	25% {
+		filter: blur(0);
 	}
 	25.5% {
-	  filter: blur(1vmin);
+		filter: blur(1vmin);
 	}
 	26% {
-	  transform: translateX(-2%);
-	  filter: blur(0);
+		transform: translateX(-2%);
+		filter: blur(0);
 	}
 	28% {
-	  transform: translateX(2%) scale(0.98);
+		transform: translateX(2%) scale(0.98);
 	}
 	29% {
-	  transform: translateX(-3%);
+		transform: translateX(-3%);
 	}
 	30% {
-	  transform: translateX(1%);
+		transform: translateX(1%);
 	}
 	31% {
-	  transform: translateX(0);
+		transform: translateX(0);
 	}
-  }
-  @keyframes shake {
-	0%, 25% {
-	  filter: blur(0);
+}
+@keyframes shake {
+	0%,
+	25% {
+		filter: blur(0);
 	}
 	25.5% {
-	  filter: blur(1vmin);
+		filter: blur(1vmin);
 	}
 	26% {
-	  transform: translateX(-2%);
-	  filter: blur(0);
+		transform: translateX(-2%);
+		filter: blur(0);
 	}
 	28% {
-	  transform: translateX(2%) scale(0.98);
+		transform: translateX(2%) scale(0.98);
 	}
 	29% {
-	  transform: translateX(-3%);
+		transform: translateX(-3%);
 	}
 	30% {
-	  transform: translateX(1%);
+		transform: translateX(1%);
 	}
 	31% {
-	  transform: translateX(0);
+		transform: translateX(0);
 	}
-  }
+}

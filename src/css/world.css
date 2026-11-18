@@ -5,68 +5,71 @@
 	font-weight: 600;
 	text-transform: uppercase;
 	color: #262626 !important;
-	font-size: 2vh !important
+	font-size: 2vh !important;
 }
 .waypoint-title {
 	position: absolute;
 	display: inline-block;
 	color: #d1cb84 !important;
 	font-size: 2.8vh !important;
-	text-shadow: .4vh .4vh .8vh #000;
+	text-shadow: 0.4vh 0.4vh 0.8vh #000;
 	line-height: 3vh !important;
 	max-width: 12% !important;
 	text-align: center !important;
 	z-index: 2;
-    transform: translate(-50%,-50%)!important;
+	transform: translate(-50%, -50%) !important;
 }
 .waypoint-title-small {
 	font-size: 2.4vh !important;
 	max-width: 10% !important;
 	line-height: 2.6vh !important;
-	opacity: .85 !important;
+	opacity: 0.85 !important;
 }
 .waypoint-title.waypoint-locked {
-	opacity: .8
+	opacity: 0.8;
 }
 .waypoint-title.waypoint-quest {
-	text-shadow: .4vh .4vh .8vh #F4BB44;
+	text-shadow: 0.4vh 0.4vh 0.8vh #f4bb44;
 }
 .waypoint-title {
-	text-shadow:0 0 .8vh #000, 0 0 .8vh #000, 0 0 .8vh #000;
+	text-shadow:
+		0 0 0.8vh #000,
+		0 0 0.8vh #000,
+		0 0 0.8vh #000;
 }
 .waypoint-title.waypoint-current {
-	color: #F3F4F5 !important;
-	font-size:2.8vh !important
+	color: #f3f4f5 !important;
+	font-size: 2.8vh !important;
 }
 .waypoint-title img {
-	display:none !important
+	display: none !important;
 }
 .waypoint-title .map-lock {
 	position: absolute;
 	width: 3vh;
 	left: -2vh;
-	bottom: 0
+	bottom: 0;
 }
 
-		.waypoint-title .map-lock.map-icon {
-			width: 4vh;
-		}
+.waypoint-title .map-lock.map-icon {
+	width: 4vh;
+}
 
-	.waypoint-title .map-current-location {
-		position: absolute;
-		width: 3vh;
-		right: -1.4vh;
-		bottom: 2.6vh;
-		filter: drop-shadow(0 0 .2vh #fff) drop-shadow(1vh .5vh .25vh #262626bb);
-		-webkit-filter: drop-shadow(0 0 .2vh #fff) drop-shadow(1vh .5vh .25vh #262626bb)
-	}
+.waypoint-title .map-current-location {
+	position: absolute;
+	width: 3vh;
+	right: -1.4vh;
+	bottom: 2.6vh;
+	filter: drop-shadow(0 0 0.2vh #fff) drop-shadow(1vh 0.5vh 0.25vh #262626bb);
+	-webkit-filter: drop-shadow(0 0 0.2vh #fff) drop-shadow(1vh 0.5vh 0.25vh #262626bb);
+}
 
 .map-compass {
 	height: 14vh;
 	margin: 1vh 2vh;
 	top: 0;
 	right: 0;
-	position: absolute
+	position: absolute;
 }
 
 .map-clouds {
@@ -79,76 +82,48 @@
 	animation: travel 120s infinite;
 	-webkit-animation: travel 120s infinite;
 }
-#game-map-img{
+#game-map-img {
 	width: 100%;
 	height: auto;
 }
-/* #map-coords {
-	background: radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 29% 69%/2vh 2vh, 
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 31% 74%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 29% 79%/2vh 2vh,
-
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 16.5% 79%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 13.5% 76.5%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 11.5% 73%/2vh 2vh,
-
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 12.5% 62.5%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 13.5% 58%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 15.5% 54%/2vh 2vh,
-
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 23.5% 50.5%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 26.5% 49.5%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 29.5% 48%/2vh 2vh,
-
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 26.5% 43%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 23% 41.5%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 20% 39%/2vh 2vh,
-
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 28% 34%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 31% 32.5%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 33.5% 29.5%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 33% 18%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 31.75% 14%/2vh 2vh,
-	radial-gradient(farthest-side, #EDEADE 20%, #A0522D 80% ,#000 81%, #000 99%,transparent) 29.5% 11%/2vh 2vh;
-
-	background-repeat: no-repeat;
-} */
 @keyframes travel {
 	0% {
 		top: 100%;
-		left: 100%
+		left: 100%;
 	}
 
 	100% {
 		left: -100%;
-		top: -100%
+		top: -100%;
 	}
 }
 #world-map {
 	height: 96% !important;
-	box-shadow: 5vh 0 7vh #00000080, -5vh 0 7vh #00000080;
-	position:relative;
-	aspect-ratio:983 / 500
+	box-shadow:
+		5vh 0 7vh #00000080,
+		-5vh 0 7vh #00000080;
+	position: relative;
+	aspect-ratio: 983 / 500;
 }
 .world-map-container .book-page-bg {
-    position: relative;
+	position: relative;
 }
-#map-detail-modal{
+#map-detail-modal {
 	position: absolute;
 	height: 95%;
 	aspect-ratio: 770 / 770;
-    background-size: cover, cover !important;
-    background-repeat: no-repeat,no-repeat !important;
+	background-size: cover, cover !important;
+	background-repeat: no-repeat, no-repeat !important;
 	box-shadow: 0 0 2vh #000;
 	overflow: hidden;
 	padding: 2.5% 3.5% 1.5% 3.5%;
 	z-index: 2;
-	animation-duration: .3s !important;
-	-webkit-animation-duration: .3s !important
+	animation-duration: 0.3s !important;
+	-webkit-animation-duration: 0.3s !important;
 }
 .world-map-container .book-page-bg:has(#map-detail-modal:not(.fade-out)) #world-map {
-	filter:blur(.5vh);
-	-webkit-filter:blur(.5vh) !important
+	filter: blur(0.5vh);
+	-webkit-filter: blur(0.5vh) !important;
 }
 .map-detail-modal-inner {
 	overflow-y: auto;
@@ -158,43 +133,43 @@
 	font-size: 2.8vh !important;
 }
 .map-detail-modal-title {
-	color:#F4BB44 !important;
+	color: #f4bb44 !important;
 	font-size: 3vh !important;
 	line-height: 3vh !important;
-	padding:0 0 1.5vh 0;
-	margin:1vh 0 1.5vh 0;
+	padding: 0 0 1.5vh 0;
+	margin: 1vh 0 1.5vh 0;
 	border-bottom: 1px solid #9d987f40;
 	height: calc(4.5vh + 1px);
 }
 .map-detail-modal-inner .w-50.flex-jc-start {
-	color:#9d987f !important;
+	color: #9d987f !important;
 }
 .map-detail-modal-inner .w-50.flex-jc-end {
-	color:#f3f4f5cc !important;
+	color: #f3f4f5cc !important;
 }
 .mission-desc-title {
-	color:#F4BB44 !important;
-	padding:1.5vh 0 1.5vh 0;
-	margin:1vh 0 1.5vh 0;
+	color: #f4bb44 !important;
+	padding: 1.5vh 0 1.5vh 0;
+	margin: 1vh 0 1.5vh 0;
 	border-bottom: 1px solid #9d987f40;
 }
 .map-detail-modal-inner img {
 	max-height: 5vh !important;
 	max-width: 5vh !important;
-	margin:0 1vh 0 .5vh
+	margin: 0 1vh 0 0.5vh;
 }
 .mission-reward-item {
-	width:100%;
-	color:#f3f4f5cc !important;
+	width: 100%;
+	color: #f3f4f5cc !important;
 	margin-bottom: 1vh;
 }
 .mission-desc-text {
-	color:#f3f4f5ab !important;
+	color: #f3f4f5ab !important;
 	text-indent: 4vh;
 }
 .map-detail-modal-content {
-	height:calc(86% - 1px - 7vh) !important;
-	overflow-y:auto !important
+	height: calc(86% - 1px - 7vh) !important;
+	overflow-y: auto !important;
 }
 .map-detail-modal-btn {
 	height: 14% !important;
@@ -207,10 +182,10 @@
 }
 .map-detail-modal-btn .game-menu-button {
 	width: 90%;
-	background:linear-gradient(90deg, #ffffff10, #ffffff20, #ffffff20, #ffffff20, #ffffff20, #ffffff10) !important
+	background: linear-gradient(90deg, #ffffff10, #ffffff20, #ffffff20, #ffffff20, #ffffff20, #ffffff10) !important;
 }
 .map-detail-modal-inner .item-info-modal-close {
-	margin:0 !important;
+	margin: 0 !important;
 	padding: 0 !important;
 	font-size: 4vh !important;
 }
@@ -218,41 +193,41 @@
 	margin-right: 0 !important;
 }
 .act-map-part {
-	height:50%;
-	width:50%;
+	height: 50%;
+	width: 50%;
 	font-size: 6vh !important;
 	color: #d1cb84 !important;
-	text-shadow: .4vh .4vh .8vh #000;
+	text-shadow: 0.4vh 0.4vh 0.8vh #000;
 	backdrop-filter: grayscale(80%) brightness(100%) contrast(150%);
 }
-.act-map-part.active{
+.act-map-part.active {
 	backdrop-filter: none;
-	background:none
+	background: none;
 }
-.act-map-part:not(.active){
-	filter:grayscale(.5) !important
+.act-map-part:not(.active) {
+	filter: grayscale(0.5) !important;
 }
 .world-map-frame {
 	position: absolute;
-	left:0;
-	top:0;
-	background:url(./../images/icons/map-frame.png);
+	left: 0;
+	top: 0;
+	background: url(./../images/icons/map-frame.png);
 	background-size: 100% 100% !important;
 }
 .act-map-whole img {
 	position: absolute;
 	width: 13%;
-	top:9%;
-	right:4%
+	top: 9%;
+	right: 4%;
 }
 .act-map-whole-outer {
 	position: absolute;
-	top:0;
-	left:0
+	top: 0;
+	left: 0;
 }
 .act-map-part-outer {
-	height:50%;
-	width:50%;
+	height: 50%;
+	width: 50%;
 	cursor: pointer;
-	z-index: 3
+	z-index: 3;
 }

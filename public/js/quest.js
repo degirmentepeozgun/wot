@@ -1,257 +1,293 @@
 ﻿const _globalQuests = [
-	{ 
-		id: 1, key: 'kill-enemy', names: { 
-			tr: '100 düşman öldür (PVE)', 
+	{
+		id: 1,
+		key: 'kill-enemy',
+		names: {
+			tr: '100 düşman öldür (PVE)',
 			en: 'Kill 100 enemies (PVE)'
 		},
 		limit: 100,
-		use: function() {
+		use: function () {
 			warnChestReward(getChestReward(1));
 		}
 	},
 	{
-		id: 2, key: 'loot-item', names: { 
-			tr: '100 ekipman topla (PVE)', 
+		id: 2,
+		key: 'loot-item',
+		names: {
+			tr: '100 ekipman topla (PVE)',
 			en: 'Find 100 equipments (PVE)'
 		},
 		limit: 100,
-		use: function() {
+		use: function () {
 			warnChestReward(getChestReward(1));
 		}
 	},
 	{
-		id: 3, key: 'gain-gold', names: { 
-			tr: '10000 altın topla (PVE)', 
+		id: 3,
+		key: 'gain-gold',
+		names: {
+			tr: '10000 altın topla (PVE)',
 			en: 'Gain 10000 golds (PVE)'
 		},
 		limit: 10000,
-		use: function() {
+		use: function () {
 			warnChestReward(getChestReward(1));
 		}
 	},
 	{
-		id: 4, key: 'update-item', names: { 
-			tr: '25 ekipman yükseltme yap', 
+		id: 4,
+		key: 'update-item',
+		names: {
+			tr: '25 ekipman yükseltme yap',
 			en: 'Update items 25 times'
 		},
 		limit: 25,
-		use: function() {
+		use: function () {
 			warnChestReward(getChestReward(1));
 		}
 	},
 	{
-		id: 5, key: 'level-up', names: { 
-			tr: 'Bir karakterini 10. seviyeye yükselt', 
+		id: 5,
+		key: 'level-up',
+		names: {
+			tr: 'Bir karakterini 10. seviyeye yükselt',
 			en: 'Level up a character until 10'
 		},
 		limit: 9,
-		use: function() {
+		use: function () {
 			warnChestReward(getChestReward(1));
 		}
 	},
 	{
-		id: 6, key: 'pvp-win', names: { 
-			tr: '25 düello maçı kazan', 
+		id: 6,
+		key: 'pvp-win',
+		names: {
+			tr: '25 düello maçı kazan',
 			en: 'Win 25 duel match'
 		},
 		limit: 25,
 		reward: { key: 'honor', value: 25 },
-		use: function() {
+		use: function () {
 			warnHonorReward(this.reward.value);
 		}
 	},
 	{
-		id: 7, key: 'pvp-league-silver', names: { 
-			tr: 'Düelloda gümüş lige yüksel', 
+		id: 7,
+		key: 'pvp-league-silver',
+		names: {
+			tr: 'Düelloda gümüş lige yüksel',
 			en: 'Rank up to silver league in duel'
 		},
 		limit: 1,
 		reward: { key: 'honor', value: 500 },
-		use: function() {
+		use: function () {
 			warnHonorReward(this.reward.value);
 		}
 	},
-	{ 
-		id: 11, key: 'kill-enemy', names: { 
-			tr: '1000 düşman öldür (PVE)', 
+	{
+		id: 11,
+		key: 'kill-enemy',
+		names: {
+			tr: '1000 düşman öldür (PVE)',
 			en: 'Kill 1000 enemies (PVE)'
 		},
 		limit: 1000,
-		use: function() {
+		use: function () {
 			warnChestReward(getChestReward(2));
 		}
 	},
 	{
-		id: 12, key: 'loot-item', names: { 
-			tr: '1000 ekipman topla (PVE)', 
+		id: 12,
+		key: 'loot-item',
+		names: {
+			tr: '1000 ekipman topla (PVE)',
 			en: 'Find 1000 equipments (PVE)'
 		},
 		limit: 1000,
-		use: function() {
+		use: function () {
 			warnChestReward(getChestReward(2));
 		}
 	},
 	{
-		id: 13, key: 'gain-gold', names: { 
-			tr: '100000 altın topla (PVE)', 
+		id: 13,
+		key: 'gain-gold',
+		names: {
+			tr: '100000 altın topla (PVE)',
 			en: 'Gain 100000 golds (PVE)'
 		},
 		limit: 100000,
-		use: function() {
+		use: function () {
 			warnChestReward(getChestReward(2));
 		}
 	},
 	{
-		id: 14, key: 'update-item', names: { 
-			tr: '50 ekipman yükseltme yap', 
+		id: 14,
+		key: 'update-item',
+		names: {
+			tr: '50 ekipman yükseltme yap',
 			en: 'Update items 50 times'
 		},
 		limit: 50,
-		use: function() {
+		use: function () {
 			warnChestReward(getChestReward(2));
 		}
 	},
 	{
-		id: 15, key: 'level-up', names: { 
-			tr: 'Bir karakterini 20. seviyeye yükselt', 
+		id: 15,
+		key: 'level-up',
+		names: {
+			tr: 'Bir karakterini 20. seviyeye yükselt',
 			en: 'Level up a character until 20'
 		},
 		limit: 19,
-		use: function() {
+		use: function () {
 			warnChestReward(getChestReward(2));
 		}
 	},
 	{
-		id: 16, key: 'pvp-win', names: { 
-			tr: '50 düello maçı kazan', 
+		id: 16,
+		key: 'pvp-win',
+		names: {
+			tr: '50 düello maçı kazan',
 			en: 'Win 50 duel match'
 		},
 		limit: 50,
 		reward: { key: 'honor', value: 50 },
-		use: function() {
+		use: function () {
 			warnHonorReward(this.reward.value);
 		}
 	},
 	{
-		id: 17, key: 'pvp-league-gold', names: { 
-			tr: 'Düelloda altın lige yüksel', 
+		id: 17,
+		key: 'pvp-league-gold',
+		names: {
+			tr: 'Düelloda altın lige yüksel',
 			en: 'Rank up to gold league in duel'
 		},
 		limit: 1,
 		reward: { key: 'honor', value: 1000 },
-		use: function() {
+		use: function () {
 			warnHonorReward(this.reward.value);
 		}
 	},
 	{
-		id: 18, key: 'complete-act', names: { 
-			tr: '10 bölüm bitir', 
+		id: 18,
+		key: 'complete-act',
+		names: {
+			tr: '10 bölüm bitir',
 			en: 'Complete 10 missions'
 		},
-		limit:10,
-		when: function(_current) {
+		limit: 10,
+		when: function (_current) {
 			return __account.storyResults?.length > _current ? 1 : 0;
 		},
 		reward: { key: 'ticket-random', value: 10, type: 'misc' },
-		use: function() {
+		use: function () {
 			warnChestReward(getChestReward(this.reward.grade ?? 1, 'misc', this.reward.key, this.reward.value));
 		}
 	},
 	{
-		id: 19, key: 'complete-act-perfect', names: { 
-			tr: '10 bölümü 3 yıldızla bitir', 
+		id: 19,
+		key: 'complete-act-perfect',
+		names: {
+			tr: '10 bölümü 3 yıldızla bitir',
 			en: 'Perfectly finish 10 missions'
 		},
-		limit:10,
-		when: function(_current) {
-			return __account.storyResults?.filter(x => x.perfect)?.length > _current ? 1 : 0;
+		limit: 10,
+		when: function (_current) {
+			return __account.storyResults?.filter((x) => x.perfect)?.length > _current ? 1 : 0;
 		},
 		reward: { key: 'ticket-gem-selection', value: 10, grade: 1, type: 'misc' },
-		use: function() {
+		use: function () {
 			warnChestReward(getChestReward(this.reward.grade ?? 1, 'misc', this.reward.key, this.reward.value));
 		}
 	},
 	{
-		id: 20, key: 'melt-gem', names: { 
-			tr: '10 ziynet erit', 
+		id: 20,
+		key: 'melt-gem',
+		names: {
+			tr: '10 ziynet erit',
 			en: 'Melt 10 gems'
 		},
-		limit:10,
+		limit: 10,
 		reward: { key: 'ticket', value: 100 },
-		use: function() {
+		use: function () {
 			warnChestReward(getChestReward(1, this.reward.key, null, this.reward.value));
 		}
 	},
 	{
-		id: 21, key: 'summon-character', names: { 
-			tr: 'Bir karakter çağır', 
+		id: 21,
+		key: 'summon-character',
+		names: {
+			tr: 'Bir karakter çağır',
 			en: 'Summon a character'
 		},
-		limit:1,
+		limit: 1,
 		reward: { type: 'fragment', key: 'random' },
-		use: function() {
-			for(let i = 0; i < __fragments.length; i++)
+		use: function () {
+			for (let i = 0; i < __fragments.length; i++)
 				warnChestReward(getChestReward(1, 'fragment', __fragments[i], 20));
 		}
 	},
 	{
-		id: 22, key: 'complete-dungeon', names: { 
-			tr: '10 Zindan Bitir', 
+		id: 22,
+		key: 'complete-dungeon',
+		names: {
+			tr: '10 Zindan Bitir',
 			en: 'Complete 10 Dungeons'
 		},
-		limit:10,
-		reward: { type: 'misc', key: 'ticket-pass', value:10 },
-		use: function() {
+		limit: 10,
+		reward: { type: 'misc', key: 'ticket-pass', value: 10 },
+		use: function () {
 			warnChestReward(getChestReward(1, this.reward.type, this.reward.key, this.reward.value));
 		}
 	},
 	{
-		id: 23, key: 'complete-act-side', names: { 
-			tr: 'Perde 1 yan hedefleri bitir', 
+		id: 23,
+		key: 'complete-act-side',
+		names: {
+			tr: 'Perde 1 yan hedefleri bitir',
 			en: 'Act I Bonus Achievements Done'
 		},
-		limit:__stories.filter(x => x.act === 1).reduce((sum, x) => sum + (x.bonusAchievements?.length || 0), 0),
-		// when: function(_current) {
-		// 	const _act1Stories = __stories.filter(x => x.act === 1);
-		// 	for(let _s of _act1Stories) {
-		// 		const _sr = __account.storyResults?.find(x => x.id === _s.id);
-		// 		const _sbal = _s.bonusAchievements?.length ?? 0;
-		// 		const _srbal = _sr?.bonusAchievements?.filter(x => x.done)?.length ?? 0;
-		// 		if(_sbal !== _srbal)
-		// 			return false;
-		// 	}
-		// 	return true;
-		// },
+		limit: __stories.filter((x) => x.act === 1).reduce((sum, x) => sum + (x.bonusAchievements?.length || 0), 0),
+
 		reward: { key: 'ticket-item-selection', value: 10, grade: 3, type: 'misc' },
-		use: function() {
+		use: function () {
 			warnChestReward(getChestReward(this.reward.grade ?? 1, 'misc', this.reward.key, this.reward.value));
 		}
-	},
+	}
 ];
 function warnHonorReward(_val) {
 	__account.pvp.honor += _val;
 	_client.saveState();
 	const _h = document.getElementById('main-honor-count');
-	if(_h)
-		_h.innerText = __account.pvp.honor.formatWithDots();
-    PlaySound({key: 'chestreward', volume: .3, reset: true });
-    warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/honor.png" />&nbsp;' + _val + 'x&nbsp;<span style="flex:1">' + getLangData('Honor Point') + '</span></div>', null, null, 1);
+	if (_h) _h.innerText = __account.pvp.honor.formatWithDots();
+	PlaySound({ key: 'chestreward', volume: 0.3, reset: true });
+	warn(
+		'<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/honor.png" />&nbsp;' +
+			_val +
+			'x&nbsp;<span style="flex:1">' +
+			getLangData('Honor Point') +
+			'</span></div>',
+		null,
+		null,
+		1
+	);
 }
 function syncGlobalQuests() {
 	let _sync;
-	for(let _gQ of _globalQuests) {
-		if(!__account.globalQuests.find(x => x.id === _gQ.id)) {
+	for (let _gQ of _globalQuests) {
+		if (!__account.globalQuests.find((x) => x.id === _gQ.id)) {
 			_sync = 1;
-			__account.globalQuests.push({id:_gQ.id, current: 0});
+			__account.globalQuests.push({ id: _gQ.id, current: 0 });
 		}
 	}
-	if(_sync)
-		_client.saveState();
+	if (_sync) _client.saveState();
 }
 function installGlobalQuests() {
 	let _arr = [];
-	for(let gq of _globalQuests)
-		_arr.push({id: gq.id, current: 0});
+	for (let gq of _globalQuests) _arr.push({ id: gq.id, current: 0 });
 	return _arr;
 }
 function firstQuestData() {
@@ -260,217 +296,227 @@ function firstQuestData() {
 		isStaticDialog: null,
 		dialogArr: null,
 		order: 1,
-		side: { }
+		side: {}
 	};
 }
 
 function updateGlobalQuest(_key, _val) {
-	if(_client.quickPlay)
-		return;
+	if (_client.quickPlay) return;
 	syncGlobalQuests();
-	var _gQuestIds = _globalQuests.filter(x => x.key === _key);
+	var _gQuestIds = _globalQuests.filter((x) => x.key === _key);
 	let _updated, _finished;
-	for(let _quest of _gQuestIds) {
-		const _gQ = __account.globalQuests.find(x => x.id === _quest.id && 
-			x.current < _quest.limit);
-		if(!_gQ)
-			continue;
-		if(_gQ.current < _quest.limit) {
+	for (let _quest of _gQuestIds) {
+		const _gQ = __account.globalQuests.find((x) => x.id === _quest.id && x.current < _quest.limit);
+		if (!_gQ) continue;
+		if (_gQ.current < _quest.limit) {
 			_gQ.current += _quest.when ? (_quest.when(_gQ.current) ? (_val ?? 1) : 0) : (_val ?? 1);
 			_updated = 1;
-			if(_gQ.current > _quest.limit)
-				_gQ.current = _quest.limit;
-			if(_gQ.current === _quest.limit)
-				_finished = 1;
+			if (_gQ.current > _quest.limit) _gQ.current = _quest.limit;
+			if (_gQ.current === _quest.limit) _finished = 1;
 		}
 	}
-	if(_updated)
-		_client.saveState();
-	if(_finished)
-		warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/quest.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Achievement Completed') + '</span></div>');
+	if (_updated) _client.saveState();
+	if (_finished)
+		warn(
+			'<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/quest.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' +
+				getLangData('Achievement Completed') +
+				'</span></div>'
+		);
 }
 
 function renderMainQuests() {
 	updateMenuBottom(2);
 	const _container = selectMenuContainer();
-	const _quest = __story.quests.find(x => x.id === __account.questStatus.order);
-	let _html = '<div class="menu-ui-left fade-me">' +
-					'<div class="menu-modal-left menu-modal-left-content">' +
-						'<div class="stories-content-left skills-content-left menu-modal-left-container">' +
-							'<div style="overflow-y:auto" class="full">';
+	const _quest = __story.quests.find((x) => x.id === __account.questStatus.order);
+	let _html =
+		'<div class="menu-ui-left fade-me">' +
+		'<div class="menu-modal-left menu-modal-left-content">' +
+		'<div class="stories-content-left skills-content-left menu-modal-left-container">' +
+		'<div style="overflow-y:auto" class="full">';
 	const _total = __story.quests.length;
-	for(let _i = _quest.id; _i >= 1; _i--) {
-		const _q = __story.quests.find(x => x.id === _i);
-		_html += 
-		`<div id="main-quest-${_i}" class="global-quest-item skill-card animate-me main-quest-item flex${_i === _quest.id ? ' current selected' : ''}" onexactclick="openMainQuestDescription(${_q.id})">
+	for (let _i = _quest.id; _i >= 1; _i--) {
+		const _q = __story.quests.find((x) => x.id === _i);
+		_html += `<div id="main-quest-${_i}" class="global-quest-item skill-card animate-me main-quest-item flex${_i === _quest.id ? ' current selected' : ''}" onexactclick="openMainQuestDescription(${_q.id})">
 			<div class="global-quest-item-left flex flex-jc-start">
 				${getLangData(_q.names[getLang()])}	
 				<div class="global-quest-item-status">${_i} / ${_total}</div>		
 			</div>
 		</div>`;
 	}
-	_container.innerHTML = _html + 
+	_container.innerHTML =
+		_html +
 		'</div></div></div></div>' +
-		'<div class="menu-ui-right fade-me">' + 
-			'<div class="menu-modal-right menu-modal-right-content">' +
-				'<div class="stories-content-right skills-content-right">' +
-					'<div class="quests-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">' +
-						getMainQuestDescription(_quest.id) + 
-						'</div>' +
-			'</div>' +
+		'<div class="menu-ui-right fade-me">' +
+		'<div class="menu-modal-right menu-modal-right-content">' +
+		'<div class="stories-content-right skills-content-right">' +
+		'<div class="quests-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">' +
+		getMainQuestDescription(_quest.id) +
 		'</div>' +
-	'</div>';
+		'</div>' +
+		'</div>' +
+		'</div>';
 }
 function getMainQuestDescription(_id) {
-	const _quest = __story.quests.find(x => x.id === _id);
+	const _quest = __story.quests.find((x) => x.id === _id);
 	const _current = __account.questStatus.quest;
-	const _backDisplay = _quest.owner?.toLowerCase() !== 'system' && __account.questStatus.state === 'end' && episode.id !== 1;
+	const _backDisplay =
+		_quest.owner?.toLowerCase() !== 'system' && __account.questStatus.state === 'end' && episode.id !== 1;
 	let _rewards = '<div class="w-100 flex flex-jc-start">';
-	if(!_quest.gain?.[0])
-		_rewards = '<div class="w-100 quest-description-text flex flex-jc-start">-</div>';
+	if (!_quest.gain?.[0]) _rewards = '<div class="w-100 quest-description-text flex flex-jc-start">-</div>';
 	else
-		for(let _g of _quest.gain) 
+		for (let _g of _quest.gain)
 			_rewards += `<div class="w-50 quest-description-text quest-reward-info-item flex flex-jc-start"><div class="flex">
 				<img style="height:5cqh" src="./images/icons/${_g.key}.png" />&nbsp;${_g.value.formatWithDots()}</div></div>`;
 	_rewards += '</div>';
 	let _locations = '';
-	for(let _m of _quest.maps) {
-		const _locDisplay =  __account.questStatus.quest.id === _id && __account.questStatus.state === 'progress' && episode.id !== _m;
-		const _map = mapSprites.find(x => x.id === _m);
-		_locations += `<div class="quest-description-text flex flex-jc-start">${getLangData(_map.coords.title)}${_map.coords.dir ? ' (' + getLangData(_map.coords.dir) + ')' : ''}` + (_locDisplay ? `<div id='quest-area-nav-btn' onexactclick='portTo(${_m})' class='game-menu-button d-none'>${getLangData('Go')}</div>` : '') + `</div>`;
+	for (let _m of _quest.maps) {
+		const _locDisplay =
+			__account.questStatus.quest.id === _id && __account.questStatus.state === 'progress' && episode.id !== _m;
+		const _map = mapSprites.find((x) => x.id === _m);
+		_locations +=
+			`<div class="quest-description-text flex flex-jc-start">${getLangData(_map.coords.title)}${_map.coords.dir ? ' (' + getLangData(_map.coords.dir) + ')' : ''}` +
+			(_locDisplay
+				? `<div id='quest-area-nav-btn' onexactclick='portTo(${_m})' class='game-menu-button d-none'>${getLangData('Go')}</div>`
+				: '') +
+			`</div>`;
 	}
-	let _conversation = '<div class="quest-description-text flex flex-jc-start">'+ getLangData('No conversation') + '</div>';
+	let _conversation =
+		'<div class="quest-description-text flex flex-jc-start">' + getLangData('No conversation') + '</div>';
 	const _dialog = __dialogs[getLang()]['quest' + _quest.id]?.begin ?? [];
-	if(_dialog?.[0])
-		_conversation = '';
-	for(let _d of _dialog)
-		_conversation += `<div class="quest-description-text flex flex-jc-start"><span class="quest-conversation-item-title">${_d.owner === "main" ? getLangData('You') : _conceptArts[_d.owner === 'owner' ? _quest.owner : _d.owner].title}:</span>&nbsp;${replaceDialogText(_d.text)}</div>`;
+	if (_dialog?.[0]) _conversation = '';
+	for (let _d of _dialog)
+		_conversation += `<div class="quest-description-text flex flex-jc-start"><span class="quest-conversation-item-title">${_d.owner === 'main' ? getLangData('You') : _conceptArts[_d.owner === 'owner' ? _quest.owner : _d.owner].title}:</span>&nbsp;${replaceDialogText(_d.text)}</div>`;
 	let _needs = '';
 	const _loots = _quest.loots ?? [];
-	for(let _l of _loots)
-		_needs += `<div class="quest-description-text flex flex-jc-start quest-need-item"><img onerror='this.parentNode.remove(); document.querySelector(".quest-needs").remove()' src='./images/quest-item/icons/${_l.key}.png' style='height:5cqh' />&nbsp;${_current.loots.find(x => x.key === _l.key)?.count ?? 0}/${_l.limit}</div>`;
+	for (let _l of _loots)
+		_needs += `<div class="quest-description-text flex flex-jc-start quest-need-item"><img onerror='this.parentNode.remove(); document.querySelector(".quest-needs").remove()' src='./images/quest-item/icons/${_l.key}.png' style='height:5cqh' />&nbsp;${_current.loots.find((x) => x.key === _l.key)?.count ?? 0}/${_l.limit}</div>`;
 
-	return `<div class="quest-desc-container">
+	return (
+		`<div class="quest-desc-container">
 		<div class="w-100 quest-desc-container-title flex flex-jc-start">${getLangData(__story.title[getLang()])} - ${_quest.names[getLang()]}</div>
 		<div class="w-100 flex">
 		<div class="w-50 flex flex-jc-start quest-description-title">${getLangData('Quest Owner')}</div>
-		<div class="w-50 flex flex-jc-end quest-description-text">${_conceptArts[_quest.owner]?.title ?? getLangData('System')}` + (_backDisplay ? `<div id='quest-area-nav-btn' onexactclick='portTo(1)' class='d-none game-menu-button'>${getLangData('Go')}</div>` : '') + `</div>` +
+		<div class="w-50 flex flex-jc-end quest-description-text">${_conceptArts[_quest.owner]?.title ?? getLangData('System')}` +
+		(_backDisplay
+			? `<div id='quest-area-nav-btn' onexactclick='portTo(1)' class='d-none game-menu-button'>${getLangData('Go')}</div>`
+			: '') +
+		`</div>` +
 		`</div>
-		<div class="w-100 flex"><div class="w-50 flex flex-jc-start quest-description-title">${getLangData('Location')}</div>`
-		+ '<div class="w-50 flex flex-jc-end">'	+ _locations + '</div></div>' +
+		<div class="w-100 flex"><div class="w-50 flex flex-jc-start quest-description-title">${getLangData('Location')}</div>` +
+		'<div class="w-50 flex flex-jc-end">' +
+		_locations +
+		'</div></div>' +
 		`<div class="w-100 flex"><div class="w-50 flex flex-jc-start quest-description-title">${getLangData('Min Level')}</div>
 		<div class="w-50 flex flex-jc-end quest-description-text">${_quest.minLevel}</div></div>
 		<div class="w-100 flex"><div class="w-50 flex flex-jc-start quest-description-title">${getLangData('Quest Status')}</div>
 		<div class="w-50 flex flex-jc-end quest-description-text">${getQuestStatus(_id)}</div></div>
-		<div class="quest-desc-title w-100">${getLangData('Finish Rewards')}</div>`
-			+ _rewards +
-		(_needs === '' ? '' :`<div class="quest-desc-title w-100 quest-needs">${getLangData('Quest Needs')}</div>`
-			+ _needs) +
-		`<div class="quest-conversation-title quest-desc-title w-100">${getLangData('Conversation')}</div>` + _conversation +
-		(_quest.video ? 
-			`<div onexactclick="requestVideo(${_quest.video}, 1)" class="quest-description-title">${getLangData('Watch Video')}</div>` : '') +
-		`</div></div>`;
+		<div class="quest-desc-title w-100">${getLangData('Finish Rewards')}</div>` +
+		_rewards +
+		(_needs === ''
+			? ''
+			: `<div class="quest-desc-title w-100 quest-needs">${getLangData('Quest Needs')}</div>` + _needs) +
+		`<div class="quest-conversation-title quest-desc-title w-100">${getLangData('Conversation')}</div>` +
+		_conversation +
+		(_quest.video
+			? `<div onexactclick="requestVideo(${_quest.video}, 1)" class="quest-description-title">${getLangData('Watch Video')}</div>`
+			: '') +
+		`</div></div>`
+	);
 }
 function getQuestStatus(_id) {
-	const _quest = _npcQuests.find(x => x.id === _id);
-	if(_quest.id < __account.questStatus.order)
-		return getLangData('Reward received');
-	else if(__account.questStatus.state === 'progress')
-		return getLangData('In progress');
-	else if(__account.questStatus.state === 'end')
-		return getLangData('Finished');
+	const _quest = _npcQuests.find((x) => x.id === _id);
+	if (_quest.id < __account.questStatus.order) return getLangData('Reward received');
+	else if (__account.questStatus.state === 'progress') return getLangData('In progress');
+	else if (__account.questStatus.state === 'end') return getLangData('Finished');
 	return getLangData('Not started yet');
 }
 function openMainQuestDescription(_id) {
-	document.querySelectorAll('.main-quest-item').forEach(x => removeClass(x, 'selected'));
+	document.querySelectorAll('.main-quest-item').forEach((x) => removeClass(x, 'selected'));
 	addClass(document.querySelector('#main-quest-' + _id), 'selected');
 	document.querySelector('.quest-desc-container').parentNode.innerHTML = getMainQuestDescription(_id);
 }
 function switchQuestTab(_elem, _order) {
-    if(!_elem)
-        _elem = document.querySelector('.quest-tab.selected');
-    else if(hasClass(_elem, 'selected'))
-        return;
-    else
-        PlaySound({ key: 'switch' });
-    const _tabs = document.querySelectorAll('.quest-tab');
-    for(let _tab of _tabs){
-        removeClass(_tab, 'selected');
-        if(_tab === _elem)
-            addClass(_tab, 'selected');
-    }
-    const _slots = document.getElementById('global-quests');
-    switch(_order) {
-        case 1:
-            _slots.innerHTML = renderMainQuests();
-            break;
-        case 2:
-            _slots.innerHTML = renderGlobalQuests();
-            break;
-    }
+	if (!_elem) _elem = document.querySelector('.quest-tab.selected');
+	else if (hasClass(_elem, 'selected')) return;
+	else PlaySound({ key: 'switch' });
+	const _tabs = document.querySelectorAll('.quest-tab');
+	for (let _tab of _tabs) {
+		removeClass(_tab, 'selected');
+		if (_tab === _elem) addClass(_tab, 'selected');
+	}
+	const _slots = document.getElementById('global-quests');
+	switch (_order) {
+		case 1:
+			_slots.innerHTML = renderMainQuests();
+			break;
+		case 2:
+			_slots.innerHTML = renderGlobalQuests();
+			break;
+	}
 }
 function renderGlobalQuestList() {
 	updateMenuBottom(2);
-		const _container = selectMenuContainer();
-		_container.innerHTML = 
-					'<div class="menu-ui-left fade-me">' +
-						'<div class="menu-modal-left menu-modal-left-content">' +
-							'<div class="skills-content-left global-quests-left menu-modal-left-container">' +
-								'<div style="overflow-y:auto" class="full">' +
-									renderGlobalQuests() +
-								'</div>' +
-							'</div>' +
-						'</div>' +
-					'</div>' +
-					'<div class="menu-ui-right fade-me">' + 
-						'<div class="menu-modal-right menu-modal-right-content">' +
-							'<div class="skills-content-right">' +
-								'<div class="event-content-wrapper skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">' +
-									renderEvent() +
-								'<div id="shine"></div>' +
-							'</div>' +
-						'</div>' +
-					'</div>' +
-				'</div>';
+	const _container = selectMenuContainer();
+	_container.innerHTML =
+		'<div class="menu-ui-left fade-me">' +
+		'<div class="menu-modal-left menu-modal-left-content">' +
+		'<div class="skills-content-left global-quests-left menu-modal-left-container">' +
+		'<div style="overflow-y:auto" class="full">' +
+		renderGlobalQuests() +
+		'</div>' +
+		'</div>' +
+		'</div>' +
+		'</div>' +
+		'<div class="menu-ui-right fade-me">' +
+		'<div class="menu-modal-right menu-modal-right-content">' +
+		'<div class="skills-content-right">' +
+		'<div class="event-content-wrapper skills-content-detail-wrapper menu-modal-right-container" style="position:relative !important;overflow:hidden !important">' +
+		renderEvent() +
+		'<div id="shine"></div>' +
+		'</div>' +
+		'</div>' +
+		'</div>' +
+		'</div>';
 }
 function getEventReward(_index) {
 	const _chests = document.querySelectorAll('.event-gifts img');
 	const _chest = _chests[_index];
-	if(_chest) {
+	if (_chest) {
 		const _order = parseInt(_chest.getAttribute('data-event-id'));
-		if(_order > 1 && !__account.eventsDone.find(x => x === (_order - 1)))
-		{
+		if (_order > 1 && !__account.eventsDone.find((x) => x === _order - 1)) {
 			warn('<span>' + getLangData('Get previous reward first') + '</span>', 'warn');
 			return;
 		}
-		if(!hasClass(_chest, 'glow-yellow'))
-			return;
+		if (!hasClass(_chest, 'glow-yellow')) return;
 		removeClass(_chest, 'glow-yellow');
 		addClass(_chest, 'gray');
 		__account.eventsDone.push(_order);
 		const _gold = (_index + 1) * 10000;
 		updateGold(_gold);
-		warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/coin.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + _gold.formatWithDots() + '</span></div>', null, null, 1);
+		warn(
+			'<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/coin.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' +
+				_gold.formatWithDots() +
+				'</span></div>',
+			null,
+			null,
+			1
+		);
 		_client.saveState();
 		checkUpdateAvailable2(3);
 	}
 }
 function renderEvent() {
 	const _mm = 15;
-	let _before = ((__account.eventsDone?.length ?? 0) * _mm * 60 * 1000);
-	if(__account.eventsDone.indexOf(4) !== -1)
-		_before = 60 * 1000 * (4 * _mm);
-	else if(__account.eventsDone.indexOf(3) !== -1)
-		_before = 60 * 1000 * (3 * _mm);
-	else if(__account.eventsDone.indexOf(2) !== -1)
-		_before = 60 * 1000 * (2 * _mm);
-	else if(__account.eventsDone.indexOf(1) !== -1)
-		_before = 60 * 1000 * (1 * _mm);
+	let _before = (__account.eventsDone?.length ?? 0) * _mm * 60 * 1000;
+	if (__account.eventsDone.indexOf(4) !== -1) _before = 60 * 1000 * (4 * _mm);
+	else if (__account.eventsDone.indexOf(3) !== -1) _before = 60 * 1000 * (3 * _mm);
+	else if (__account.eventsDone.indexOf(2) !== -1) _before = 60 * 1000 * (2 * _mm);
+	else if (__account.eventsDone.indexOf(1) !== -1) _before = 60 * 1000 * (1 * _mm);
 	const _diff = Date.now() - (__account.onlineStart - _before);
 	return `<div class="full flex event-container">
-		<div class="event-item w-100 flex flex-jc-start${_diff > ((1 * _mm) * 60 * 1000) ? ' completed' : ''}">
+		<div class="event-item w-100 flex flex-jc-start${_diff > 1 * _mm * 60 * 1000 ? ' completed' : ''}">
 			<div class="flex event-item-icon">
-				<img src="./images/ui/${_diff > ((1 * _mm) * 60 * 1000) ? 'star-on' : 'game/event-clock'}.png" />
+				<img src="./images/ui/${_diff > 1 * _mm * 60 * 1000 ? 'star-on' : 'game/event-clock'}.png" />
 			</div>
 			<div style="flex:1;overflow:hidden">
 				<div class="one-line">${getLangData('Stay online for')}&nbsp;${_mm * 1}&nbsp;${getLangData('minutes')}</div>
@@ -480,22 +526,22 @@ function renderEvent() {
 			</div>
 		</div>	
 		<div class="page-detail-splitter"></div>
-		<div class="event-item w-100 flex flex-jc-start${_diff > ((2 * _mm) * 60 * 1000) ? ' completed' : ''}">
-			<div class="flex event-item-icon"><img src="./images/ui/${_diff > ((2 * _mm) * 60 * 1000) ? 'star-on' : 'game/event-clock'}.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">${getLangData('Stay online for')}&nbsp;${_mm * 2}&nbsp;${getLangData('minutes')}</div></div>
+		<div class="event-item w-100 flex flex-jc-start${_diff > 2 * _mm * 60 * 1000 ? ' completed' : ''}">
+			<div class="flex event-item-icon"><img src="./images/ui/${_diff > 2 * _mm * 60 * 1000 ? 'star-on' : 'game/event-clock'}.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">${getLangData('Stay online for')}&nbsp;${_mm * 2}&nbsp;${getLangData('minutes')}</div></div>
 			<div class="flex event-tick" style="padding:0 2cqh">
 				<img src="./images/icons/tick-orange.png" />
 			</div>
 		</div>	
 		<div class="page-detail-splitter"></div>
-		<div class="event-item w-100 flex flex-jc-start${_diff > ((3 * _mm) * 60 * 1000) ? ' completed' : ''}">
-			<div class="flex event-item-icon"><img src="./images/ui/${_diff > ((3 * _mm) * 60 * 1000) ? 'star-on' : 'game/event-clock'}.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">${getLangData('Stay online for')}&nbsp;${_mm * 3}&nbsp;${getLangData('minutes')}</div></div>
+		<div class="event-item w-100 flex flex-jc-start${_diff > 3 * _mm * 60 * 1000 ? ' completed' : ''}">
+			<div class="flex event-item-icon"><img src="./images/ui/${_diff > 3 * _mm * 60 * 1000 ? 'star-on' : 'game/event-clock'}.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">${getLangData('Stay online for')}&nbsp;${_mm * 3}&nbsp;${getLangData('minutes')}</div></div>
 			<div class="flex event-tick" style="padding:0 2cqh">
 				<img src="./images/icons/tick-orange.png" />
 			</div>
 		</div>
 		<div class="page-detail-splitter"></div>
-		<div class="event-item w-100 flex flex-jc-start${_diff > ((4 * _mm) * 60 * 1000) ? ' completed' : ''}">
-			<div class="flex event-item-icon"><img src="./images/ui/${_diff > ((4 * _mm) * 60 * 1000) ? 'star-on' : 'game/event-clock'}.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">${getLangData('Stay online for')}&nbsp;${_mm * 4}&nbsp;${getLangData('minutes')}</div></div>
+		<div class="event-item w-100 flex flex-jc-start${_diff > 4 * _mm * 60 * 1000 ? ' completed' : ''}">
+			<div class="flex event-item-icon"><img src="./images/ui/${_diff > 4 * _mm * 60 * 1000 ? 'star-on' : 'game/event-clock'}.png" /></div><div style="flex:1;overflow:hidden"><div class="one-line">${getLangData('Stay online for')}&nbsp;${_mm * 4}&nbsp;${getLangData('minutes')}</div></div>
 			<div class="flex event-tick" style="padding:0 2cqh">
 				<img src="./images/icons/tick-orange.png" />
 			</div>
@@ -503,57 +549,55 @@ function renderEvent() {
 		<div class="page-detail-splitter"></div>
 		<div class="w-100 flex flex-ai-end event-gifts" style="height:20%">
 			<div class="quest-reward-1 flex flex-jc-start">
-				<img${__account.eventsDone.indexOf(1) === -1 ? (_diff > ((1 * _mm) * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="1" onexactclick="getEventReward(0)" src="./images/icons/reward${_diff > ((1 * _mm) * 60 * 1000) ? '2' : '3'}.png" style="height:5cqh" />
+				<img${__account.eventsDone.indexOf(1) === -1 ? (_diff > 1 * _mm * 60 * 1000 ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="1" onexactclick="getEventReward(0)" src="./images/icons/reward${_diff > 1 * _mm * 60 * 1000 ? '2' : '3'}.png" style="height:5cqh" />
 			</div>
 			<div class="quest-reward-2 flex">
-				<img${__account.eventsDone.indexOf(2) === -1 ? (_diff > ((2 * _mm) * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="2" onexactclick="getEventReward(1)" src="./images/icons/reward${_diff > ((2 * _mm) * 60 * 1000) ? '2' : '3'}.png" style="height:5cqh" />
+				<img${__account.eventsDone.indexOf(2) === -1 ? (_diff > 2 * _mm * 60 * 1000 ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="2" onexactclick="getEventReward(1)" src="./images/icons/reward${_diff > 2 * _mm * 60 * 1000 ? '2' : '3'}.png" style="height:5cqh" />
 			</div>
 			<div class="quest-reward-3 flex">
-				<img${__account.eventsDone.indexOf(3) === -1 ? (_diff > ((3 * _mm) * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="3" onexactclick="getEventReward(2)" src="./images/icons/reward${_diff > ((3 * _mm) * 60 * 1000) ? '2' : '3'}.png" style="height:5cqh" />
+				<img${__account.eventsDone.indexOf(3) === -1 ? (_diff > 3 * _mm * 60 * 1000 ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="3" onexactclick="getEventReward(2)" src="./images/icons/reward${_diff > 3 * _mm * 60 * 1000 ? '2' : '3'}.png" style="height:5cqh" />
 			</div>
 			<div class="quest-reward-4 flex flex-jc-end">
-				<img${__account.eventsDone.indexOf(4) === -1 ? (_diff > ((4 * _mm) * 60 * 1000) ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="4" onexactclick="getEventReward(3)" src="./images/icons/reward${_diff > ((4 * _mm) * 60 * 1000) ? '2' : '3'}.png" style="height:5cqh" />
+				<img${__account.eventsDone.indexOf(4) === -1 ? (_diff > 4 * _mm * 60 * 1000 ? ' class="glow-yellow"' : '') : ' class="gray'} data-event-id="4" onexactclick="getEventReward(3)" src="./images/icons/reward${_diff > 4 * _mm * 60 * 1000 ? '2' : '3'}.png" style="height:5cqh" />
 			</div>
 		</div>
 		<div class="event-path w-100 flex">
 			<div class="w-100 flex" style="padding:0 2cqh">
-				<img src="./images/ui/game/bar-${_diff > ((2 * _mm) * 60 * 1000) ? 'shine' : 'gray'}.png" style="width:11.1%" />
-				<img src="./images/ui/game/bar-${_diff > ((2 * _mm) * 60 * 1000) ? 'shine' : 'gray'}.png" style="width:11.1%" />
-				<img src="./images/ui/game/bar-${_diff > ((2 * _mm) * 60 * 1000) ? 'shine' : 'gray'}.png" style="width:11.1%" />
-				<img src="./images/ui/game/bar-${_diff > ((3 * _mm) * 60 * 1000) ? 'shine' : 'gray'}.png" style="width:11.1%" />
-				<img src="./images/ui/game/bar-${_diff > ((3 * _mm) * 60 * 1000) ? 'shine' : 'gray'}.png" style="width:11.1%" />
-				<img src="./images/ui/game/bar-${_diff > ((3 * _mm) * 60 * 1000) ? 'shine' : 'gray'}.png" style="width:11.1%" />
-				<img src="./images/ui/game/bar-${_diff > ((4 * _mm) * 60 * 1000) ? 'shine' : 'gray'}.png" style="width:11.1%" />
-				<img src="./images/ui/game/bar-${_diff > ((4 * _mm) * 60 * 1000) ? 'shine' : 'gray'}.png" style="width:11.1%" />
-				<img src="./images/ui/game/bar-${_diff > ((4 * _mm) * 60 * 1000) ? 'shine' : 'gray'}.png" style="width:11.1%" />
+				<img src="./images/ui/game/bar-${_diff > 2 * _mm * 60 * 1000 ? 'shine' : 'gray'}.png" style="width:11.1%" />
+				<img src="./images/ui/game/bar-${_diff > 2 * _mm * 60 * 1000 ? 'shine' : 'gray'}.png" style="width:11.1%" />
+				<img src="./images/ui/game/bar-${_diff > 2 * _mm * 60 * 1000 ? 'shine' : 'gray'}.png" style="width:11.1%" />
+				<img src="./images/ui/game/bar-${_diff > 3 * _mm * 60 * 1000 ? 'shine' : 'gray'}.png" style="width:11.1%" />
+				<img src="./images/ui/game/bar-${_diff > 3 * _mm * 60 * 1000 ? 'shine' : 'gray'}.png" style="width:11.1%" />
+				<img src="./images/ui/game/bar-${_diff > 3 * _mm * 60 * 1000 ? 'shine' : 'gray'}.png" style="width:11.1%" />
+				<img src="./images/ui/game/bar-${_diff > 4 * _mm * 60 * 1000 ? 'shine' : 'gray'}.png" style="width:11.1%" />
+				<img src="./images/ui/game/bar-${_diff > 4 * _mm * 60 * 1000 ? 'shine' : 'gray'}.png" style="width:11.1%" />
+				<img src="./images/ui/game/bar-${_diff > 4 * _mm * 60 * 1000 ? 'shine' : 'gray'}.png" style="width:11.1%" />
 			</div>
 			<div class="w-100 flex event-dots">
-				<img style="margin-left:1cqh" src="./images/ui/game/${_diff > ((1 * _mm) * 60 * 1000) ? 'baklavagold' : 'event-badge'}.png" />
-				<img src="./images/ui/game/${_diff > ((2 * _mm) * 60 * 1000) ? 'baklavagold' : 'event-badge'}.png" />
-				<img src="./images/ui/game/${_diff > ((3 * _mm) * 60 * 1000) ? 'baklavagold' : 'event-badge'}.png" />
-				<img style="margin-right:1cqh" src="./images/ui/game/${_diff > ((4 * _mm) * 60 * 1000) ? 'baklavagold' : 'event-badge'}.png" />
+				<img style="margin-left:1cqh" src="./images/ui/game/${_diff > 1 * _mm * 60 * 1000 ? 'baklavagold' : 'event-badge'}.png" />
+				<img src="./images/ui/game/${_diff > 2 * _mm * 60 * 1000 ? 'baklavagold' : 'event-badge'}.png" />
+				<img src="./images/ui/game/${_diff > 3 * _mm * 60 * 1000 ? 'baklavagold' : 'event-badge'}.png" />
+				<img style="margin-right:1cqh" src="./images/ui/game/${_diff > 4 * _mm * 60 * 1000 ? 'baklavagold' : 'event-badge'}.png" />
 			</div>
 		</div>
 	</div>`;
 }
 function renderGlobalQuests() {
 	let _html = '';
-	for(let _q of _globalQuests) 
-		_html += renderGlobalQuest(_q);
+	for (let _q of _globalQuests) _html += renderGlobalQuest(_q);
 	return _html;
 }
 function renderGlobalQuest(_q) {
 	syncGlobalQuests();
-	const _gQ = __account.globalQuests.find(x => x.id === _q.id);
-	if(_gQ.current === undefined)
-		_gQ.current = 0;
+	const _gQ = __account.globalQuests.find((x) => x.id === _q.id);
+	if (_gQ.current === undefined) _gQ.current = 0;
 	return `<div data-global-quest="${_q.id}" class="skill-card animate-me flex" onexactclick="collectGlobalQuestReward(${_q.id})">
 			<div class="global-quest-item-left flex flex-jc-start">
 				${replaceQuestTitle(getLangData(_q.names[getLang()]))}	
 				<div class="global-quest-item-status">${_gQ.current.formatWithDots()} / ${_q.limit.formatWithDots()}</div>		
 			</div>
 			<div class="global-quest-item-right flex">
-				<img class="${_gQ.rewarded || (_gQ.current < _q.limit) ? 'gray' : 'glow'}" src="${getRewardIcon(1,_q.reward?.type ?? _q.reward?.key ?? 'chest',_q.reward?.key).src}" />
+				<img class="${_gQ.rewarded || _gQ.current < _q.limit ? 'gray' : 'glow'}" src="${getRewardIcon(1, _q.reward?.type ?? _q.reward?.key ?? 'chest', _q.reward?.key).src}" />
 				<div class="full global-quest-item-reward-value flex${_q.reward?.value ? '' : ' d-none'}">
 					${_q.reward?.value ?? ''}
 				</div>
@@ -566,30 +610,26 @@ function renderGlobalQuest(_q) {
 		</div>`;
 }
 function checkIfGlobalQuestDone() {
-	for(let _q of __account.globalQuests) {
-		var _quest = _globalQuests.find(x => x.id === _q.id);
-		if(_quest.limit <= _q.current && !_q.rewarded)
-			return true;
+	for (let _q of __account.globalQuests) {
+		var _quest = _globalQuests.find((x) => x.id === _q.id);
+		if (_quest.limit <= _q.current && !_q.rewarded) return true;
 	}
 	return false;
 }
 function collectGlobalQuestReward(_id) {
-	var _current = __account.globalQuests.find(x => x.id === _id);
-	if(_current.rewarded)
-		return;
-	var _quest = _globalQuests.find(x => x.id === _id);
-	if(_quest.limit > _current.current)
-		return;
-	else if(_current.rewarded)
-		return;
+	var _current = __account.globalQuests.find((x) => x.id === _id);
+	if (_current.rewarded) return;
+	var _quest = _globalQuests.find((x) => x.id === _id);
+	if (_quest.limit > _current.current) return;
+	else if (_current.rewarded) return;
 	_quest.use();
 	_current.rewarded = 1;
 	_client.saveState();
 	const gcitem = document.querySelector('.skill-card[data-global-quest="' + _id + '"]');
 	const _div = document.createElement('div');
-	_div.innerHTML = renderGlobalQuest(_globalQuests.find(x => x.id === _id));
+	_div.innerHTML = renderGlobalQuest(_globalQuests.find((x) => x.id === _id));
 	gcitem.replaceWith(_div.firstChild);
-	//switchQuestTab(null, 2);
+
 	checkUpdateAvailable2(3);
 }
 

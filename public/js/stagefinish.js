@@ -1,22 +1,21 @@
 ﻿'use strict';
-(function(){
+(function () {
 	console.log('stage-finish');
 	function animateStart(_failed) {
 		_game.suspended = true;
 		clearChainSkills();
-		if(episode.mainClass && mainCharacter.id !== episode.mainClass) {
+		if (episode.mainClass && mainCharacter.id !== episode.mainClass) {
 			let _oldES = episode.still;
 			episode.still = true;
 			startWithThisCharacter(episode.mainClass, null, 1, 1);
 			episode.still = _oldES;
 		}
 		const _id = __story.id;
-		const _story = __stories.find(x => x.id === _id);
+		const _story = __stories.find((x) => x.id === _id);
 		const _endTime = __story.endTime ?? _gameTick;
 		const _passedTime = _endTime - __story.startTime;
 		let _isPerfect;
-		if(mainCharacter.storyVariables)
-			mainCharacter.setProps(mainCharacter.storyVariables);
+		if (mainCharacter.storyVariables) mainCharacter.setProps(mainCharacter.storyVariables);
 		delete mainCharacter.storyVariables;
 		mainCharacter.stopHeartBeatSound();
 		mainCharacter.stopStepSound();
@@ -25,20 +24,22 @@
 		const _minute = MathFloor(_passedTime / 60000);
 		const _second = MathFloor((_passedTime % 60000) / 1000);
 		let _elapsedTime;
-		if(_hour > 0)
-			_elapsedTime = getLangData('over 1 hour');
+		if (_hour > 0) _elapsedTime = getLangData('over 1 hour');
 		else
-			_elapsedTime = ((_minute > 0 ? (_minute + getLangData('m')) : '') + ' ' +
-		(_second > 0 ? (_second + getLangData('s')) : '')).trim();
+			_elapsedTime = (
+				(_minute > 0 ? _minute + getLangData('m') : '') +
+				' ' +
+				(_second > 0 ? _second + getLangData('s') : '')
+			).trim();
 		const _calc = __storyScene.leaderBoards.calculate();
 		const _achievements = _calc.description;
-		let _achievementsHtml = '', _totalAchScore = _calc.score;
-		if(_totalAchScore < 0)
-			_totalAchScore = 0;
+		let _achievementsHtml = '',
+			_totalAchScore = _calc.score;
+		if (_totalAchScore < 0) _totalAchScore = 0;
 		const _oldScore = __story.point ?? 0;
 		__story.point += _totalAchScore;
 		let _achMS = 250;
-		for(let _rs of _achievements) {
+		for (let _rs of _achievements) {
 			_achMS += 250;
 			_achievementsHtml += `<div class="w-100 flex flex-jc-start stage-achievement-item op-none ms${_achMS}">
 									<div class="flex flex-jc-start stage-achievement-item-left">
@@ -58,16 +59,17 @@
 		}
 		let _leaderboardsHTML = '';
 		let _hasNext = _failed ? false : __storySceneOrder < __story.scenes.length;
-		if(!_hasNext) {
-			__story.leaderBoards.set(function() {
-				const _stageResult = __story.leaderBoards.get(function(_leadersData) {
+		if (!_hasNext) {
+			__story.leaderBoards.set(function () {
+				const _stageResult = __story.leaderBoards.get(function (_leadersData) {
 					const _leadersList = document.querySelector('.leaderboards-list');
-					if(!_leadersList)
-						return;
+					if (!_leadersList) return;
 					_leaderboardsHTML = `<div class="w-100 fade-me flex flex-ai-end victory-header d-none"></div>
 						<div class="quickplay-leaderboards flex fade-me flex-ai-start"><div class="full char slide-right">`;
-					let _order = 1, player_order, player_score;
-					for(let _player of _leadersData) {
+					let _order = 1,
+						player_order,
+						player_score;
+					for (let _player of _leadersData) {
 						_leaderboardsHTML += `<div class="flex leaderboard-item${_player.me ? ' selected' : ''}">
 							<div class="flex flex-jc-start w-50 leaderboard-item-left wot-subtitle">
 								${_player.me ? 'You' : _player.name}
@@ -76,82 +78,84 @@
 								${_player.point.formatWithDots()}
 							</div>
 						</div>`;
-						if(_player.me) {
+						if (_player.me) {
 							player_order = _order;
 							player_score = _player.point;
 						}
 						_order++;
 					}
-					if(mainCharacter)
-					{
+					if (mainCharacter) {
 						mainCharacter.storyScore = player_score;
 						mainCharacter.storyOrder = player_order;
 					}
 					_leaderboardsHTML += '</div></div>';
 					_leadersList.innerHTML = _leaderboardsHTML;
 				});
-				if(!_stageResult) 
+				if (!_stageResult)
 					_leaderboardsHTML = `<div class="w-100 flex op-none defeat-header ms250 wot-subtitle">${getLangData(_failed ? 'DEFEAT' : 'VICTORY')}</div>
 				<img src="./images/main/${(episode.realClass ?? mainCharacter.class) + '/' + (_failed ? 'loose' : 'finish') + '-concept.png'}" class="char slide-right"/>`;
 			});
 		}
-		let _orderHTML = '', btnId, action;
-		if(_hasNext) {
+		let _orderHTML = '',
+			btnId,
+			action;
+		if (_hasNext) {
 			btnId = 'next-stage-btn';
 			action = 1;
 			_orderHTML = `<div class="stage-finish-informer flex w-100" style="padding-top:3%">
 							<div class="flex w-100 wot-description">${getLangData('Next stage in')}</div><span id="next-stage-counter" class="wot-title">8</span>
 						</div>`;
-		}
-		else {
+		} else {
 			btnId = 'quit-stage-btn';
 			_orderHTML = `<div class="stage-finish-informer flex w-100" style="padding-top:3%">
 							<div class="flex w-100 wot-description">${getLangData('Action will be active in')}</div><span id="next-stage-counter" class="wot-title">8</span>
 						</div>`;
 		}
-		let _nextStageTimer, _nextStageCounter = 0, _playTicks;
+		let _nextStageTimer,
+			_nextStageCounter = 0,
+			_playTicks;
 		_nextStageTimer = setInterval(() => {
 			const _cd = document.getElementById('next-stage-counter');
-			if(!_cd){
+			if (!_cd) {
 				clearInterval(_nextStageTimer);
 				return;
-			}
-			else {
-				if(_cd.innerText === '0') {
+			} else {
+				if (_cd.innerText === '0') {
 					clearInterval(_nextStageTimer);
 					const _child = document.getElementById(btnId);
-					if(action && _child?.onexactclick)
-						_child.onexactclick();
-					else if(!action){
+					if (action && _child?.onexactclick) _child.onexactclick();
+					else if (!action) {
 						removeClass(_child, 'inactivated');
 						removeClass(_child, 'gray');
 						const _elem = document.getElementById('stage-result-order');
-						if(_elem)
-							_elem.innerHTML = '';
+						if (_elem) _elem.innerHTML = '';
 					}
 					return;
 				}
-				if((_playTicks || _hasNext) && _nextStageCounter > 2)
-					PlaySound({key:'tiktak', volume:.5, reset: true});
+				if ((_playTicks || _hasNext) && _nextStageCounter > 2)
+					PlaySound({ key: 'tiktak', volume: 0.5, reset: true });
 				_nextStageCounter++;
 				_cd.innerText = parseInt(_cd.innerText) - 1;
 			}
 		}, 1000);
 
 		let _missionTitle = getLangData('Stage') + ' ' + __storySceneOrder;
-		const _template = `<div data-module='stagefinish' id="story-finish" class="finish flex d-none${_hasNext ? ' bg-none' : ''}">
-			<div class="w-50 side-left flex flex-jc-start flex-ai-start leaderboards-list op-none ms250" style="height:100% !important;width:55%;flex-direction:column">`
-				+ _leaderboardsHTML +
+		const _template =
+			`<div data-module='stagefinish' id="story-finish" class="finish flex d-none${_hasNext ? ' bg-none' : ''}">
+			<div class="w-50 side-left flex flex-jc-start flex-ai-start leaderboards-list op-none ms250" style="height:100% !important;width:55%;flex-direction:column">` +
+			_leaderboardsHTML +
 			`</div>
 			<div class="w-50 container side-right flex flex-ai-start${_hasNext ? ' has-next' : ''}">
 				<div class="full stage-results-screen-middle${_hasNext ? ' final-screen-before-next' : ''}" style="position:relative;z-index:2;margin: 0 13.5% 0 1.5%;width:85%">
 					<div class="stars flex w-100 flex-ai-end" style="height: 20%;position:relative;background: url(./images/ui/header.png);background-size: contain;background-repeat: no-repeat;background-position: center;">
-						<div class="w-50 flex one-line stars-title wot-header stage-final-stars-title">` + _missionTitle + `</div>
+						<div class="w-50 flex one-line stars-title wot-header stage-final-stars-title">` +
+			_missionTitle +
+			`</div>
 					</div>
 					<div class="flex flex-ai-start w-100 stage-finish-body">
-						<div class="header-content w-100 flex flex-jc-start" style="height: 55%">`
-						+ _achievementsHtml +
-						`</div>
+						<div class="header-content w-100 flex flex-jc-start" style="height: 55%">` +
+			_achievementsHtml +
+			`</div>
 						<div class="stage-finish-splitter ms1500 op-none"></div>
 						<div class="w-100 stage-finish-total-score flex header flex-jc-start ms1500 op-none" style="height:24%">
 							<div class="w-100 flex flex-jc-start stage-achievement-item" style="height:50%">
@@ -171,22 +175,22 @@
 								</div>
 							</div>
 						</div>
-						<div id="stage-result-order" class="header-content w-100 flex ms${_hasNext ? '2000' : '4000'} op-none" style="height:15%">`
-							+ _orderHTML +
-						'</div>'
-						+ //_firstFinishRewardsHtml +
-					`</div>
-					<div class="flex w-100 ms2000 op-none" style="height: 10%">`
-						+ (_hasNext ? '' :
-						`<div class="w-50 flex" style="padding: 1%;height: 100%">
+						<div id="stage-result-order" class="header-content w-100 flex ms${_hasNext ? '2000' : '4000'} op-none" style="height:15%">` +
+			_orderHTML +
+			'</div>' +
+			`</div>
+					<div class="flex w-100 ms2000 op-none" style="height: 10%">` +
+			(_hasNext
+				? ''
+				: `<div class="w-50 flex" style="padding: 1%;height: 100%">
 							<div onexactclick="openCredits()" id="quit-stage-btn" style="height:74%!important" class="orange-action-btn wot-button quick-space-btn inactivated gray animate-me-500 flex ">${getLangData('CONTINUE')}</div>
-						</div>`)
-						+ (_hasNext ?
-						`<div id="next-stage-btn" class="quick-space-btn w-50 flex" style="padding: 1%;height: 100%" onexactclick="playClick();hideMyModalPopUp(1);checkStoryFinish(1, ${__stories.find(x => !x.passive && x.order > __story.order)?.id}, null, null, null, 1)">
+						</div>`) +
+			(_hasNext
+				? `<div id="next-stage-btn" class="quick-space-btn w-50 flex" style="padding: 1%;height: 100%" onexactclick="playClick();hideMyModalPopUp(1);checkStoryFinish(1, ${__stories.find((x) => !x.passive && x.order > __story.order)?.id}, null, null, null, 1)">
 							<div style="height:74%!important" class="orange-action-btn wot-button animate-me-500 flex">${getLangData('NEXT')}</div>
-						</div>` : '')
-						+
-					`</div>
+						</div>`
+				: '') +
+			`</div>
 				</div>
 			</div>
 		</div>`;
@@ -195,57 +199,49 @@
 		_gameUI.appendChild(_a.firstChild);
 		setTimeout(function () {
 			const _sf = document.querySelector('#story-finish.finish');
-			removeClass(_sf,'d-none');
-			addClass(_sf,'animate');
-			addClass(_sf,'fade-me');
-			addClass(_sf,'show-ui');
-			if(mainCharacter && _hasNext) {
-				if(mainCharacter.HURTLEFT > (episode.cWidth / 2))
-					_sf.style.flexDirection = 'row-reverse';
+			removeClass(_sf, 'd-none');
+			addClass(_sf, 'animate');
+			addClass(_sf, 'fade-me');
+			addClass(_sf, 'show-ui');
+			if (mainCharacter && _hasNext) {
+				if (mainCharacter.HURTLEFT > episode.cWidth / 2) _sf.style.flexDirection = 'row-reverse';
 			}
 			episode.pauseAmbianceMusic();
-			PlaySound({key:'storyfinish', volume:1});
-			if(_failed)
-				PlaySound({key:'defeat', volume:1});
-			const fade = function(_selector, _ms, _play, _func) {
+			PlaySound({ key: 'storyfinish', volume: 1 });
+			if (_failed) PlaySound({ key: 'defeat', volume: 1 });
+			const fade = function (_selector, _ms, _play, _func) {
 				setTimeout(function () {
 					const _elems = document.querySelectorAll(_selector);
-					_elems?.forEach(x => {
-						if(!_play)
-							addClass(x,'fade-me');
-						removeClass(x,'op-none');
+					_elems?.forEach((x) => {
+						if (!_play) addClass(x, 'fade-me');
+						removeClass(x, 'op-none');
 					});
-					if(_play)
-						PlaySound({key:'ironx1', volume:1, reset: true});
-					if(_func)
-						_func();
+					if (_play) PlaySound({ key: 'ironx1', volume: 1, reset: true });
+					if (_func) _func();
 				}, _ms ?? 0);
-			}
+			};
 			fade('#story-finish .ms250', 500);
 			fade('#story-finish .ms500', 750, 1);
 			fade('#story-finish .ms750', 1000, 1);
-			fade('#story-finish .ms1000', 1250,1);
-			fade('#story-finish .ms1500', 2000, null, function() {
-				if(!_hasNext)
-					animateScore('final-quickplay-score', _oldScore, __story.point, 2000);
+			fade('#story-finish .ms1000', 1250, 1);
+			fade('#story-finish .ms1500', 2000, null, function () {
+				if (!_hasNext) animateScore('final-quickplay-score', _oldScore, __story.point, 2000);
 			});
 			fade('#story-finish .ms2000', 2500);
 			fade('#story-finish .ms2500', 3000);
-			fade('#story-finish .ms4000', 4500, null, function() { _playTicks = 1; });
+			fade('#story-finish .ms4000', 4500, null, function () {
+				_playTicks = 1;
+			});
 		}, 100);
 	}
 
 	function animateScore(containerId, currentScore, targetScore, duration) {
-
 		let el = document.getElementById(containerId);
 		if (!el) return;
 
 		targetScore = Math.max(0, Math.floor(targetScore));
 
-		PlaySound({key:'bonusscore', loop:true, volume:1});
-		//const endSound = new Audio("final_chime.mp3");
-
-		//endSound.volume = 0.9;
+		PlaySound({ key: 'bonusscore', loop: true, volume: 1 });
 
 		let startTime = null;
 		let lastValue = 0;
@@ -254,25 +250,18 @@
 
 		el.textContent = (currentScore ?? 0).formatWithDots();
 
-		//tickSound.play().catch(()=>{});
-
 		function stopAll() {
-
 			cancelled = true;
 
 			if (rafId) {
 				cancelAnimationFrame(rafId);
 				rafId = null;
 			}
-			
+
 			window.SoundManager.stop('bonusscore');
-			// tickSound.pause();
-			// tickSound.currentTime = 0;
 		}
 
 		function update(timestamp) {
-
-			// 🔥 DOM silindiyse otomatik stop
 			el = document.getElementById(containerId);
 			if (!el) {
 				stopAll();
@@ -298,26 +287,19 @@
 			if (progress < 1) {
 				rafId = requestAnimationFrame(update);
 			} else {
-
-				//tickSound.pause();
-				//tickSound.currentTime = 0;
 				window.SoundManager.stop('bonusscore');
 				el.textContent = targetScore.formatWithDots();
-				PlaySound({key:'cash', volume:.66});
-				//endSound.currentTime = 0;
-				//endSound.play().catch(()=>{});
+				PlaySound({ key: 'cash', volume: 0.66 });
 			}
 		}
 
 		rafId = requestAnimationFrame(update);
 
-		// ⛔ dışarıdan manuel iptal için geri dönüş
 		return {
 			stop: stopAll
 		};
 	}
 
-// 🔥 EXPORT
 	window.stagefinish = window.stagefinish || {};
 	window.stagefinish.animateStart = animateStart;
 	window.stagefinish.animateScore = animateScore;

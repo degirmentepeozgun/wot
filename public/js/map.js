@@ -1,34 +1,26 @@
 ﻿'use strict';
 const _borderRates = [
-	1.06, 1.06, 1.06, 
-	1.05, 1.05, 1.05, 1.05,
-	1.04, 1.04, 1.04, 1.04,
-	1.025, 1.025, 1.025, 1.025, 1.025,
-	1.025, 1.025, 1.025, 1.025, 1.025,
-	1.025, 1.025, 1.025, 1.025, 1.025,
-	1.025, 1.025, 1.025, 1.025, 1.025,
-	1.025, 1.025, 1.025, 1.025, 1.025,
-	1.025, 1.025, 1.025, 1.025, 1.025,
-	1.04, 1.04, 1.04, 1.04, 
-	1.05, 1.05, 1.05, 1.05,
-	1.06, 1.06, 1.06,
+	1.06, 1.06, 1.06, 1.05, 1.05, 1.05, 1.05, 1.04, 1.04, 1.04, 1.04, 1.025, 1.025, 1.025, 1.025, 1.025, 1.025, 1.025,
+	1.025, 1.025, 1.025, 1.025, 1.025, 1.025, 1.025, 1.025, 1.025, 1.025, 1.025, 1.025, 1.025, 1.025, 1.025, 1.025,
+	1.025, 1.025, 1.025, 1.025, 1.025, 1.025, 1.025, 1.04, 1.04, 1.04, 1.04, 1.05, 1.05, 1.05, 1.05, 1.06, 1.06, 1.06
 ];
 console.log('map');
 function duelActorMine(_actor) {
-	if (!_actor)
-		return false;
-	if (_actor.main || _actor.socketId === __socketId || _actor.duelSocket === __socketId)
-		return true;
+	if (!_actor) return false;
+	if (_actor.main || _actor.socketId === __socketId || _actor.duelSocket === __socketId) return true;
 	return !!(episode?.duelLeader && _actor.duelBot && !_actor.realTime);
 }
 function applyDuelKill(_victim, _killerSocket) {
-	if (!_victim || _victim.grayAvatar || !_killerSocket || !episode?.war || !episode.realTime)
-		return;
-	if (_victim.class === __spell || _victim.class === 'minion' || _victim.class === 'object')
-		return;
-	const _killer = episode.enemies.find(y => y && (y.socketId === _killerSocket || y.duelSocket === _killerSocket || (y.main && (__socketId === _killerSocket || y.socketId === _killerSocket))));
-	if (!_killer)
-		return;
+	if (!_victim || _victim.grayAvatar || !_killerSocket || !episode?.war || !episode.realTime) return;
+	if (_victim.class === __spell || _victim.class === 'minion' || _victim.class === 'object') return;
+	const _killer = episode.enemies.find(
+		(y) =>
+			y &&
+			(y.socketId === _killerSocket ||
+				y.duelSocket === _killerSocket ||
+				(y.main && (__socketId === _killerSocket || y.socketId === _killerSocket)))
+	);
+	if (!_killer) return;
 	_victim.grayAvatar = true;
 	_victim.killedBy = _killer.key;
 	_killer.killCount++;
@@ -36,8 +28,7 @@ function applyDuelKill(_victim, _killerSocket) {
 	if (_gsb) {
 		const _teamScore = parseInt(_gsb.innerText) + 1;
 		episode['team' + _killer.teamId + 'score'] = _teamScore;
-		if (_teamScore > 9)
-			episode.pvpStarted = 1;
+		if (_teamScore > 9) episode.pvpStarted = 1;
 		if (_teamScore > episode['team' + _victim.teamId + 'score']) {
 			if (episode.winningTeam && episode.winningTeam !== _killer.teamId) {
 				const isMain = mainCharacter.teamId === _killer.teamId;
@@ -50,45 +41,55 @@ function applyDuelKill(_victim, _killerSocket) {
 	let _msg = '';
 	if (_killer.killCount > 1) {
 		episode.playSound({ key: _killer.gender + 'laugh', reset: true });
-		_msg = '<div class="flex" style="color:#FD1C03;font-weight:600;font-size:larger !important">' + _killer.killCount + ' x Killing Spree!</div>';
+		_msg =
+			'<div class="flex" style="color:#FD1C03;font-weight:600;font-size:larger !important">' +
+			_killer.killCount +
+			' x Killing Spree!</div>';
 	}
-	if (_victim.pvpRespawn)
-		_victim.addPVPRespawnFrame();
-	warn('<div class="pvp-kill">' + _msg + (_killer.main ? __account.name : _killer.displayName ?? _killer.name) + '&nbsp;<span class="' + (_killer.enemy ? 'red' : 'blue') + '-kill">' + getLangData('killed') + '</span>&nbsp;' + (_victim.main ? __account.name : _victim.displayName ?? _victim.name) + '</div>', 'level-up', null, null, 1);
+	if (_victim.pvpRespawn) _victim.addPVPRespawnFrame();
+	warn(
+		'<div class="pvp-kill">' +
+			_msg +
+			(_killer.main ? __account.name : (_killer.displayName ?? _killer.name)) +
+			'&nbsp;<span class="' +
+			(_killer.enemy ? 'red' : 'blue') +
+			'-kill">' +
+			getLangData('killed') +
+			'</span>&nbsp;' +
+			(_victim.main ? __account.name : (_victim.displayName ?? _victim.name)) +
+			'</div>',
+		'level-up',
+		null,
+		null,
+		1
+	);
 	if (!_victim.enemy) {
 		const _avatar = document.getElementById('char-' + _victim.key);
-		if (_avatar)
-			addClass(_avatar, 'gray');
+		if (_avatar) addClass(_avatar, 'gray');
 	}
 }
 function map(_m) {
-	
 	if (!window._distortFX) {
 		const distc = document.createElement('canvas');
 		const dctx = distc.getContext('2d', { willReadFrequently: true });
 		window._distortFX = { distc, dctx };
 	}
 	this.season = _m.season;
-	const _mapSprite = mapSprites.find(x => x.id == this.season);
+	const _mapSprite = mapSprites.find((x) => x.id == this.season);
 	this.backgroundLayerLighting = _mapSprite.backgroundLayerLighting ?? [];
-	this.backgroundLayerLighting.forEach(x => {
+	this.backgroundLayerLighting.forEach((x) => {
 		x.x = Number(x.xBase) * __zoom;
 		x.y = Number(x.yBase) * __zoom;
 		x.radius = Number(x.radiusBase) * __zoom;
 	});
 	this.groundLayerLighting = _mapSprite.groundLayerLighting ?? [];
-	this.groundLayerLighting.forEach(x => {
+	this.groundLayerLighting.forEach((x) => {
 		x.x = Number(x.xBase) * __zoom;
 		x.y = Number(x.yBase) * __zoom;
 		x.radius = Number(x.radiusBase) * __zoom;
 	});
 	this.still = _mapSprite.still;
-	// this.width = MathRound((_mapSprite.width ?? _m.width) * __zoom);
-	// if(this.width < _canvas.width)
-	// 	this.width = _canvas.width;
-	// _canvasR.width = _canvasS.width = (this.width);
-	//_canvasR.style.width = _canvasS.style.width = (this.width) + 'px';
-	//_canvasS.style.width = (this.width * __scale) + 'px';
+
 	this.missionRoadRate = 1;
 	cc = document.getElementById('constant-obj');
 	c3 = document.getElementById('droad');
@@ -104,10 +105,9 @@ function map(_m) {
 	this.p2Sign = getImage('./images/icons/p2-sign.png');
 	this.rivalSign = getImage('./images/icons/rival-sign.png');
 	let _sb = document.getElementById('score-board');
-	if(_sb)
-		_sb.remove();
+	if (_sb) _sb.remove();
 	const _cArr = [c3, c9, c50, c85, c90, cc];
-	for(let _c of _cArr) {
+	for (let _c of _cArr) {
 		_c.innerHTML = '';
 		_c.style.transform = 'translateX(0)';
 		_c.style.setProperty('-webkit-transform', 'translateX(0)');
@@ -115,11 +115,11 @@ function map(_m) {
 	}
 	this.after = _mapSprite.after;
 	this.menu = _mapSprite.menu;
-	//this.height = _m.height;
+
 	this.hitCount = 0;
 	this.limitedEffects = [];
 	this.lastSortedTime = 0;
-	//this.distance = (__globalDistance ? parseFloat(__globalDistance) / 100 : undefined) ?? (_mapSprite.distance ?? .5);
+
 	this.sprites = _m.sprites;
 	this.status = _m.status ?? 'loading';
 	this.loadObjects = _m.loadObjects;
@@ -140,238 +140,88 @@ function map(_m) {
 	this.gold = _mapSprite.gold;
 	this.dungeon = _mapSprite.dungeon;
 	__maxRageCount = this.pvp ? 40 : 20;
-	this.theme = _mapSprite.theme + ((_mapSprite.hasMobile && isPhone() && __isHEDevice) ? 'mobile' : '');
+	this.theme = _mapSprite.theme + (_mapSprite.hasMobile && isPhone() && __isHEDevice ? 'mobile' : '');
 	this.assetPath = _mapSprite.assetPath ?? this.theme;
 	this.assets = [];
 	this.lobby = _mapSprite.lobby;
 	this.floors = _mapSprite.floors;
 	this.ambianceVolume = _mapSprite.ambianceVolume;
 	this.ambiancePath = _mapSprite.ambiancePath;
-	if (this.floors)
-		this.currentFloor = _m.currentFloor ?? 1;
+	if (this.floors) this.currentFloor = _m.currentFloor ?? 1;
 	this.backgroundSrc = this.assetPath;
 	this.totalObjectCount = _m.totalObjectCount;
 	this.ground = _mapSprite.ground;
-	//this.zoom = __zoom * (this.ground.zoom ?? 1);
+
 	this.id = _mapSprite.id;
 	this.mobs = [..._mapSprite.mobs];
-	if(_mapSprite.objectMobs)
-		this.objectMobs = [..._mapSprite.objectMobs];
-	this.mobs.forEach(x => {
+	if (_mapSprite.objectMobs) this.objectMobs = [..._mapSprite.objectMobs];
+	this.mobs.forEach((x) => {
 		x.listed = 1;
-		if(x.spawnMinX !== undefined)
-			delete x.spawnMinX;
-		if(x.spawnMaxX !== undefined)
-			delete x.spawnMaxX;
+		if (x.spawnMinX !== undefined) delete x.spawnMinX;
+		if (x.spawnMaxX !== undefined) delete x.spawnMaxX;
 	});
 	this.itemGrade = _mapSprite.itemGrade ?? 0;
 	this.equipmentDropRates = _mapSprite.equipmentDropRates;
 	this.artifacts = [];
-	// this.cHeight = _canvas.height;
-	// this.cUIHeight = _canvas.height * __scale;
+
 	this.cWidth = _canvas.width;
-	// this.cUIWidth = _canvas.width * __scale;
-	// this.dmgFrameHeight = this.cHeight / 20;
-	// this.dmgFrameTopBoundary = MathRound(this.cHeight * .15);
-	// this.RECT = { 
-	// 	left: 0, 
-	// 	right: this.cWidth,
-	// 	top: 0, 
-	// 	bottom: this.cHeight, 
-	// 	width: this.cWidth, 
-	// 	realWidth: this.cWidth 
-	// };
-	// this.damages = [];
-	// for(let i = 0; i < 5; i++){
-	// 	const _textElem = document.createElement('div');
-	// 	_textElem.className = 'dmg';
-	// 	_gamePad.appendChild(_textElem);
-	// 	this.damages.push(_textElem);
-	// }
-	// setTimeout(function() {
-	// 	initDmgFrames();
-	// }, 100);
-	if(this.id < 107 && this.id > 1 && !this.lobby && !_mapSprite.menu && !this.entertainment && !__storyScene?.noArtifact)
-	{
-		//artifact ekleyelim
-		const _minArtifactGrade = __artifacts.map(x => x.group).sort()[0];
-		const _maxArtifactGrade = __artifacts.map(x => x.group).sort().reverse()[0];
+
+	if (
+		this.id < 107 &&
+		this.id > 1 &&
+		!this.lobby &&
+		!_mapSprite.menu &&
+		!this.entertainment &&
+		!__storyScene?.noArtifact
+	) {
+		const _minArtifactGrade = __artifacts.map((x) => x.group).sort()[0];
+		const _maxArtifactGrade = __artifacts
+			.map((x) => x.group)
+			.sort()
+			.reverse()[0];
 		const _artifactGrade = getRandomValue2(_minArtifactGrade, _maxArtifactGrade);
 		let _artifact;
-		if(getRandomValue2(1, _artifactGrade * 100) === 1)
-		{
-			const _artifactOrder = getRandomValue2(1, __artifacts.filter(x => x.group === _artifactGrade).length);
-			const _art = __artifacts.filter(x => x.group === _artifactGrade)[_artifactOrder - 1];
-			if(!__account.artifacts.find(x => x.id === _art.id))
-				_artifact = _art;
+		if (getRandomValue2(1, _artifactGrade * 100) === 1) {
+			const _artifactOrder = getRandomValue2(1, __artifacts.filter((x) => x.group === _artifactGrade).length);
+			const _art = __artifacts.filter((x) => x.group === _artifactGrade)[_artifactOrder - 1];
+			if (!__account.artifacts.find((x) => x.id === _art.id)) _artifact = _art;
 		}
-		if(_artifact)
+		if (_artifact)
 			this.artifacts.push({
-				id: 'artifact', 
+				id: 'artifact',
 				artifactId: _artifact.id,
 				frames: [
-					{ 
-						top: 0, 
-						left: 0, 
-						width: 128, 
-						height: 128, 
-						speed: 120 
+					{
+						top: 0,
+						left: 0,
+						width: 128,
+						height: 128,
+						speed: 120
 					}
-				], 
-				npc: true, 
-				width: 128, 
+				],
+				npc: true,
+				width: 128,
 				height: 128,
-				zoom: 1, 
-				locate: { left: getRandomValue2(256, _mapSprite.width - 256), bottom: -10 },
+				zoom: 1,
+				locate: { left: getRandomValue2(256, _mapSprite.width - 256), bottom: -10 }
 			});
 	}
-// 	this.croppedSprites = new Map();
-// 	this.getCroppedSprite = function(_x, _y, _w,  _h, _char, _src, _fKey) {
-// 		const _key = _fKey ?? ('l' + _x + 't' + _y +'w' + _w  + 'h'+ _h);
-// 		if(_char.lastSpriteKey === _key)
-// 			return _char.lastSprite;
-// 		// let _map = this.croppedSprites.get(_src);
-// 		// if (_map) {
-// 		// 	let sprite = _map[_key];
-// 		// 	_char.lastSprite = sprite;
-// 		// 	_char.lastSpriteKey = _key;
-// 		// 	return sprite;
-// 		// }
-// 		let srcMap = this.croppedSprites.get(_src);
-// 		if (srcMap) {
-// 			let sprite = srcMap.get(_key);
-// 			_char.lastSprite = sprite;
-// 			_char.lastSpriteKey = _key;
-// 			return sprite;
-// 		}
-// 		if(_char.lastSprite)
-// 			_char.lastSprite = _char.lastSpriteKey = undefined;
-// 		if(_char.class !== 'object')
-// 			console.log(_key + ' sprite bulunamadı');
-// 		return undefined;
-// 	}
-// 	this.loadCharacterSprites = async function(_func, _extraIds, _kk, _excludeMain, _useCurrentEnemies) {
-// 		if(this.menu)
-// 		{
-// 			_func();
-// 			return;
-// 		}
-// 		if(!_kk)
-// 			this.disposing = 1;
-// 		const _ids = this.mobs.map(x => x.id);
-// 		if(mainCharacter && !_excludeMain)
-// 			_ids.push(mainCharacter.realId ?? mainCharacter.id);
-// 		if(_extraIds?.[0])
-// 			for(let _id of _extraIds)
-// 				if(_ids.indexOf(_id) === -1)
-// 					_ids.push(_id);
-// 		const _spls = [];
-// 		const _loadCharacterSprite = async function(_e) {
-// 			const _keys = _kk ?? Object.keys(_e.animations);
-// 			for(let _key of _keys) {
-// 				const _anim = _e.animations[_key];
-// 				// if(_key.startsWith('idle') || _key.startsWith('counter') || _key === 'release' || _key === 'before' || _key === 'start' ||
-// 				// 	_anim.type === 'move' || _anim.interactive || _anim.baseKey === 'finish' ||
-// 				// 	_anim.key.startsWith('dead') || _anim.key.startsWith('knockback'))
-// 				// 	continue;
-// 				if(!_anim) {
-// 					console.log('enemy' + _e?.id + ' ' + _key);
-// 					continue;
-// 				}
-// 				if(_anim.frames?.[0]){
-// 					for(let _f of _anim.frames) {
-// 						if(_f.spell?.key && _spls.indexOf(_f.spell.key) === -1) {
-// 							if(_f.spell.key.indexOf(',') !== -1) {
-// 								const _keys = _f.spell.key.split(',');
-// 								for(let _kk of _keys)
-// 									_spls.push(_kk);
-// 							}
-// 							else
-// 								_spls.push(_f.spell.key);
-// 						}
-// 						const _cKey = 'l' + _f.spriteLeft + 't' + _f.spriteTop + 'w' + _f.spriteWidth + 'h' + _f.spriteHeight;
-// 						let _src = _f.src ?? _anim.src ?? _e.src;
-// 						if(!_src || (typeof _src !== 'string' || _src === 'undefined' ||
-// 							 _src === 'null' || _src === ' ')) {
-//     						console.log('Invalid src: ' + _src);
-// 							continue;
-// 						}
-// 						if(episode.croppedSprites.get(_src)?.[_cKey])
-// 							continue;
-// 						else if(!_src.endsWith('.png'))
-// 							_src += 'sprite.png';
-// 						const _img = await getImagePromise(_src, 1);
-// 						const _cacheCAN = document.createElement('canvas');
-// 						_cacheCAN.width = _f.spriteWidth;
-// 						let _additionalHeight = 0;
-// 						let _rel, _relZoom;
-// 						// if(_e.hasShadow !== false){
-// 						// 	_rel = structuredClone2(relatedObjects.find(x => x.id === 'shadow'));
-// 						// 	_relZoom = _f.spriteWidth / _rel.width;
-// 						// 	const _shadowHeight = _relZoom * (_e.yGap < 5 ? 8 : _e.yGap) * 3;
-// 						// 	_additionalHeight = MathCeil(_shadowHeight / 2);
-							
-// 						// }
-// 						_cacheCAN.height = _f.spriteHeight + _additionalHeight;
-// 						const _cacheCTX = _cacheCAN.getContext('2d');
-// 						_cacheCAN.imageSmoothingEnabled = false;
-// 						if(_additionalHeight > 0) {
-// 							_cacheCTX.drawImage(
-// 								episode.FootShadow, 
-// 								_rel.left ?? 0, 
-// 								_rel.top ?? 0, 
-// 								_rel.width, 
-// 								_rel.height,
-// 								0,
-// 								_f.spriteHeight - _additionalHeight,
-// 								MathFloor(_rel.width * _relZoom), 
-// 								_additionalHeight * 2);
-// 						}
-// 						_cacheCTX.drawImage(_img, _f.spriteLeft, _f.spriteTop, 
-// 						_f.spriteWidth, _f.spriteHeight, 0, 0, _cacheCAN.width, _cacheCAN.height);
-// 						// if (!episode.croppedSprites.has(_src))
-// 						// 	episode.croppedSprites.set(_src, {});
-// 						// const _map = episode.croppedSprites.get(_src);
-// 						// if (!_map[_cKey])
-// 						// 	_map[_cKey] = _cacheCAN;
-// 						let srcMap = episode.croppedSprites.get(_src);
-// 						if (!srcMap) {
-// 							srcMap = new Map();
-// 							episode.croppedSprites.set(_src, srcMap);
-// 						}
-// 						if (!srcMap.has(_cKey)) {
-// 							srcMap.set(_cKey, _cacheCAN);
-// }
-// 					}
-// 				}
-// 			}
-// 		}
-// 		for(const id of _ids)
-// 			await _loadCharacterSprite(_useCurrentEnemies ? episode.enemies.find(x => x.id === id) : _allEnemies['enemy' + id]());
-// 		_spls.push('electricboltsmall');
-// 		for(const key of _spls)
-// 			await _loadCharacterSprite(new enemy(structuredClone2(spells[key])));
-// 		if(!_kk)
-// 			delete this.disposing;
-// 		_func();
-// 	}
+
 	this.croppedSprites = new Map();
 	this.croppedSpritesOrder = [];
-	this.MAX_CROPPED_SPRITES = 800; // mobil-safe limit
+	this.MAX_CROPPED_SPRITES = 800;
 	this._touchCroppedSprite = function (_src, _key) {
 		const flatKey = _src + '|' + _key;
 		const i = this.croppedSpritesOrder.indexOf(flatKey);
-		if (i === -1)
-			this.croppedSpritesOrder.push(flatKey);
+		if (i === -1) this.croppedSpritesOrder.push(flatKey);
 		else if (i < this.croppedSpritesOrder.length - 1) {
 			this.croppedSpritesOrder.splice(i, 1);
 			this.croppedSpritesOrder.push(flatKey);
 		}
 	};
 	this.getCroppedSprite = function (_x, _y, _w, _h, _char, _src, _fKey) {
-		if (!_src || !_w || !_h)
-			return undefined;
-		const _key = _fKey ?? ('l' + _x + 't' + _y + 'w' + _w + 'h' + _h);
+		if (!_src || !_w || !_h) return undefined;
+		const _key = _fKey ?? 'l' + _x + 't' + _y + 'w' + _w + 'h' + _h;
 		if (_char.lastSpriteKey === _key && _char.lastSprite?.width > 0 && _char.lastSprite?.height > 0) {
 			this._touchCroppedSprite(_src, _key);
 			return _char.lastSprite;
@@ -381,8 +231,7 @@ function map(_m) {
 		if (sprite && (sprite.width < 1 || sprite.height < 1)) {
 			srcMap.delete(_key);
 			const _at = this.croppedSpritesOrder.indexOf(_src + '|' + _key);
-			if (_at > -1)
-				this.croppedSpritesOrder.splice(_at, 1);
+			if (_at > -1) this.croppedSpritesOrder.splice(_at, 1);
 			sprite = undefined;
 		}
 		if (!sprite) {
@@ -397,19 +246,16 @@ function map(_m) {
 				this._storeCroppedSprite(_src, _key, canvas);
 				sprite = this.croppedSprites.get(_src)?.get(_key) || canvas;
 			}
-		}
-		else
-			this._touchCroppedSprite(_src, _key);
+		} else this._touchCroppedSprite(_src, _key);
 		if (sprite?.width > 0 && sprite?.height > 0) {
 			_char.lastSprite = sprite;
 			_char.lastSpriteKey = _key;
 			return sprite;
 		}
-		//console.log('sprite bulunamadı: ' + _src + ' ' + _key);
+
 		return undefined;
 	};
 	this._storeCroppedSprite = function (_src, _key, canvas) {
-
 		let srcMap = this.croppedSprites.get(_src);
 
 		if (!srcMap) {
@@ -417,9 +263,7 @@ function map(_m) {
 			this.croppedSprites.set(_src, srcMap);
 		}
 
-		// dedup: zaten varsa tekrar yazma
-		if (srcMap.has(_key))
-			return;
+		if (srcMap.has(_key)) return;
 
 		srcMap.set(_key, canvas);
 
@@ -427,9 +271,7 @@ function map(_m) {
 
 		this.croppedSpritesOrder.push(flatKey);
 
-		// LRU cleanup
 		if (this.croppedSpritesOrder.length > this.MAX_CROPPED_SPRITES) {
-
 			const old = this.croppedSpritesOrder.shift();
 			const [src, key] = old.split('|');
 
@@ -438,13 +280,11 @@ function map(_m) {
 			if (map) {
 				map.delete(key);
 
-				if (map.size === 0)
-					this.croppedSprites.delete(src);
+				if (map.size === 0) this.croppedSprites.delete(src);
 			}
 		}
 	};
 	this.loadCharacterSprites = async function (_func, _extraIds, _kk, _excludeMain, _useCurrentEnemies) {
-
 		if (this.menu) {
 			_func?.();
 			return;
@@ -452,42 +292,28 @@ function map(_m) {
 
 		this.disposing = 1;
 
-		const _ids = this.mobs.map(x => x.id);
+		const _ids = this.mobs.map((x) => x.id);
 
-		if (mainCharacter && !_excludeMain)
-			_ids.push(mainCharacter.realId ?? mainCharacter.id);
+		if (mainCharacter && !_excludeMain) _ids.push(mainCharacter.realId ?? mainCharacter.id);
 
-		if (_extraIds?.length)
-			for (let id of _extraIds)
-				if (!_ids.includes(id))
-					_ids.push(id);
+		if (_extraIds?.length) for (let id of _extraIds) if (!_ids.includes(id)) _ids.push(id);
 
-		const enemies = _ids.map(id =>
-			_useCurrentEnemies
-				? episode.enemies.find(x => x.id === id)
-				: _allEnemies['enemy' + id]()
-		).filter(Boolean);
+		const enemies = _ids
+			.map((id) => (_useCurrentEnemies ? episode.enemies.find((x) => x.id === id) : _allEnemies['enemy' + id]()))
+			.filter(Boolean);
 
-		// ⚠ MOBILE SAFE: SERIAL LOAD (crash önler)
-		// for (const e of enemies) {
-		// 	await this._loadCharacterSprite(e, _kk);
-		// }
-		await Promise.all(
-			enemies.map(e => this._loadCharacterSprite(e, _kk))
-		);
+		await Promise.all(enemies.map((e) => this._loadCharacterSprite(e, _kk)));
 
 		delete this.disposing;
 
 		_func?.();
 	};
 	this._loadCharacterSprite = async function (_e, _kk) {
-
 		if (!_e) return;
 
 		const _keys = _kk ?? Object.keys(_e.animations);
 
 		for (let _key of _keys) {
-
 			const _anim = _e.animations[_key];
 			if (!_anim?.frames?.length) continue;
 
@@ -497,19 +323,13 @@ function map(_m) {
 				let _src = _f.src ?? _srcBase;
 				if (!_src) continue;
 
-				if (!_src.endsWith('.png'))
-					_src += 'sprite.png';
+				if (!_src.endsWith('.png')) _src += 'sprite.png';
 
-				const key =
-					'l' + _f.spriteLeft +
-					't' + _f.spriteTop +
-					'w' + _f.spriteWidth +
-					'h' + _f.spriteHeight;
+				const key = 'l' + _f.spriteLeft + 't' + _f.spriteTop + 'w' + _f.spriteWidth + 'h' + _f.spriteHeight;
 
 				const srcMap = this.croppedSprites.get(_src);
 
-				if(srcMap?.has(key))
-					continue;
+				if (srcMap?.has(key)) continue;
 
 				const img = await getImagePromise(_src, 1);
 
@@ -536,118 +356,96 @@ function map(_m) {
 			}
 		}
 	};
-	this.setRepeat = function(_mSprite) {
+	this.setRepeat = function (_mSprite) {
 		if (_mSprite.do) {
-			if(_mSprite.repeat){
+			if (_mSprite.repeat) {
 				this.do = _mSprite.do;
 				this.doTime = _gameTick;
 				this.repeat = _mSprite.repeat;
 			}
 			_mSprite.do();
 		}
-	}
+	};
 	this.setRepeat(_mapSprite);
 	let _canvasAreas = document.querySelectorAll('.canvas');
-	for (var _ca of _canvasAreas)
-		_ca.innerHTML = '';
+	for (var _ca of _canvasAreas) _ca.innerHTML = '';
 	_canvasAreas = document.querySelectorAll('canvas');
-	for (var _ca of _canvasAreas)
-		_ca.getContext('2d').clearRect(0, 0, _ca.width, _ca.height);
+	for (var _ca of _canvasAreas) _ca.getContext('2d').clearRect(0, 0, _ca.width, _ca.height);
 	const _healtbars = document.querySelectorAll('.health-bar-tiny, .war-player-name');
-	for (var _hb of _healtbars)
-		_hb.remove();
-	if (pvpCounter)
-		pvpCounter.remove();
+	for (var _hb of _healtbars) _hb.remove();
+	if (pvpCounter) pvpCounter.remove();
 	if (this.ground) {
 		this.ground.src = './images/texture/' + this.assetPath + '-ground.png';
-		// if (this.ground.yRate)
-		// 	groundheight = MathRound(idealground_height * this.ground.yRate);
-		// else
-		// 	groundheight = idealground_height;
-		// minPositionY = this.ground.bottomGap ? MathRound(this.ground.bottomGap * __zoom) : 1;
-		// minLeft = this.ground.leftGap ? MathRound(this.ground.leftGap * __zoom) : 0;
-		// maxLeft = this.ground.rightGap ? MathRound(this.ground.rightGap * __zoom) : 0;
 	}
-	// else
-	// 	groundheight = idealground_height;
-	
-	// this.XStep = MathRound(getGroundHeight() / 4);
-	// this.YStep = MathRound(getGroundHeight() / 5);
-	this.moveCamera = function(_endFunc, speed, force) {
-		if(!mainCharacter)
-			return;
-		if(!force && 
-			(mainCharacter.left <= centerMinX) ||
-			((mainCharacter.left + mainCharacter.WIDTH) >= centerMaxX)){
-			if(_endFunc)
-				_endFunc();
+
+	this.moveCamera = function (_endFunc, speed, force) {
+		if (!mainCharacter) return;
+		if ((!force && mainCharacter.left <= centerMinX) || mainCharacter.left + mainCharacter.WIDTH >= centerMaxX) {
+			if (_endFunc) _endFunc();
 			return;
 		}
-		const _chars = this.enemies.filter(x => x.class !== 'object' && !x.isDead() && !x.remove && (!x.immobilize || force));
-		if(_chars?.[0]) {
-			if(!this.cameraMoveStep) {
-				_chars.forEach(x => x.immobilize = x.disableKeyboard = true);
+		const _chars = this.enemies.filter(
+			(x) => x.class !== 'object' && !x.isDead() && !x.remove && (!x.immobilize || force)
+		);
+		if (_chars?.[0]) {
+			if (!this.cameraMoveStep) {
+				_chars.forEach((x) => (x.immobilize = x.disableKeyboard = true));
 				mainCharacter.fps = 1;
 				blurKeyboard();
 				this.cameraMoveStep = (speed ?? 1) * MathCeil((mainCharacter.calculateMoveXStep() * this.cWidth) / 100);
 				this.cameraMoveEndFunc = _endFunc;
 			}
 		}
-	}
+	};
 	this.installMob = function (_mob, _func, _return, _respawn) {
 		for (var i = 0; i < (_respawn ? 1 : (_mob.count ?? 1)); i++) {
-			if (_mob.chanceRate && getRandomValue2(1, 100) > _mob.chanceRate)
-				continue;
+			if (_mob.chanceRate && getRandomValue2(1, 100) > _mob.chanceRate) continue;
 			let _id = _mob.id;
-			if (_mob.ids)
-				_id = _mob.ids[getRandomValue2(0, _mob.ids.length - 1)];
-			const _enemy = _store.getMainCharacter(_allEnemies[('enemy' + _id)]());
+			if (_mob.ids) _id = _mob.ids[getRandomValue2(0, _mob.ids.length - 1)];
+			const _enemy = _store.getMainCharacter(_allEnemies['enemy' + _id]());
 			_store.setCharacterStats(_enemy);
-			_enemy.yPosition = (_mob.yPosition ? (typeof _mob.yPosition === 'function' ? _mob.yPosition(_enemy) : _mob.yPosition) : getRandomValue2(minPositionY, getGroundHeight()));
-			_enemy.direction = _mob.direction ?? getRandomValue2(0, 1) < 1 ? __left : __right;
-			_enemy.left = getRandomValue2((_mob.spawnMinX ?? _mob.minX) ? MathRound((_mob.spawnMinX ?? _mob.minX) * __zoom) : 0,
-				(_mob.spawnMaxX ?? _mob.maxX) ? MathRound((_mob.spawnMaxX ?? _mob.maxX) * __zoom) : this.width - _enemy.WIDTH);
-			if(_respawn)
-				_enemy.respawned = _enemy.located = _enemy.started = 1;
+			_enemy.yPosition = _mob.yPosition
+				? typeof _mob.yPosition === 'function'
+					? _mob.yPosition(_enemy)
+					: _mob.yPosition
+				: getRandomValue2(minPositionY, getGroundHeight());
+			_enemy.direction = (_mob.direction ?? getRandomValue2(0, 1) < 1) ? __left : __right;
+			_enemy.left = getRandomValue2(
+				(_mob.spawnMinX ?? _mob.minX) ? MathRound((_mob.spawnMinX ?? _mob.minX) * __zoom) : 0,
+				(_mob.spawnMaxX ?? _mob.maxX)
+					? MathRound((_mob.spawnMaxX ?? _mob.maxX) * __zoom)
+					: this.width - _enemy.WIDTH
+			);
+			if (_respawn) _enemy.respawned = _enemy.located = _enemy.started = 1;
 			_enemy.platformX = platformX;
 			_enemy.experience = _mob.experience ?? 0;
 			_enemy.grade = _mob.grade ?? 1;
 			if (_enemy.grade > 1) {
 				_enemy.gradeLeft = _enemy.grade - 1;
-				_enemy.zoom *= (1 + ((_enemy.gradeZoomRate ?? .1) * _enemy.gradeLeft));
+				_enemy.zoom *= 1 + (_enemy.gradeZoomRate ?? 0.1) * _enemy.gradeLeft;
 				_enemy.atk *= _enemy.grade;
 				_enemy.experience *= _enemy.grade;
 			}
-			if(_mob.spawn)
-				_enemy.respawnAfterSeconds = _mob.spawn;
-			if(_mob.spawnAsGroup)
-				_enemy.spawnAsGroup = _mob.spawnAsGroup;
-			if(_mob.spawnTime)
-				_enemy.spawnTime = _mob.spawnTimeStart = _mob.spawnTime;
-			if (_mob.groupId)
-				_enemy.groupId = _mob.groupId;
-			if (_mob.teamId)
-				_enemy.teamId = _mob.teamId;
+			if (_mob.spawn) _enemy.respawnAfterSeconds = _mob.spawn;
+			if (_mob.spawnAsGroup) _enemy.spawnAsGroup = _mob.spawnAsGroup;
+			if (_mob.spawnTime) _enemy.spawnTime = _mob.spawnTimeStart = _mob.spawnTime;
+			if (_mob.groupId) _enemy.groupId = _mob.groupId;
+			if (_mob.teamId) _enemy.teamId = _mob.teamId;
 			_enemy.displayName = _mob.name;
-			_enemy.level = getRandomValue2(_mob.minLevel ?? 1, _mob.maxLevel ?? (_mob.minLevel ?? 1));
+			_enemy.level = getRandomValue2(_mob.minLevel ?? 1, _mob.maxLevel ?? _mob.minLevel ?? 1);
 			let _levelRate = 1;
-			if(_enemy.level > (_mob.minLevel ?? _enemy.level))
-				_levelRate = 1 + ((_enemy.level - _mob.minLevel) / 10);
-			_enemy.atk = _mob.atk ?? MathRound(_enemy.atk *_levelRate);
-			_enemy.maxHP = MathRound(_enemy.maxHP *_levelRate);
-			_enemy.def = MathRound(_enemy.def *_levelRate);
-			if (_mob.hp)
-				_enemy.maxHP = _enemy.MAXHP = _enemy.health = _mob.hp;
+			if (_enemy.level > (_mob.minLevel ?? _enemy.level)) _levelRate = 1 + (_enemy.level - _mob.minLevel) / 10;
+			_enemy.atk = _mob.atk ?? MathRound(_enemy.atk * _levelRate);
+			_enemy.maxHP = MathRound(_enemy.maxHP * _levelRate);
+			_enemy.def = MathRound(_enemy.def * _levelRate);
+			if (_mob.hp) _enemy.maxHP = _enemy.MAXHP = _enemy.health = _mob.hp;
 			_enemy.setHealth(_enemy.MAXHP);
 			_enemy.sight = _mob.sight;
-			if(_mob.zoom)
-				_enemy.zoom *= _mob.zoom;
+			if (_mob.zoom) _enemy.zoom *= _mob.zoom;
 			_enemy.actions = _mob.actions;
-			if (_mob.props)
-				_enemy.setProps(_mob.props);
-			if (_mob.difficulty >= 0)
-				_enemy.difficulty = _mob.difficulty;
-			if(_mob.inventory) {
+			if (_mob.props) _enemy.setProps(_mob.props);
+			if (_mob.difficulty >= 0) _enemy.difficulty = _mob.difficulty;
+			if (_mob.inventory) {
 				_enemy.inventory = _mob.inventory;
 				applyCharacterStats(null, _enemy);
 			}
@@ -656,66 +454,55 @@ function map(_m) {
 			_enemy.main = false;
 			_enemy.setAutoMode(_mob.attackAfterHit ? 0 : 2);
 			this.enemies.push(_enemy);
-			if (_func)
-				_func(_enemy);
-			// if((this.dungeon || this.pvp) && mainCharacter.leader) 
-			// {
-			// 	_enemy.socketId = (this.enemies.filter(x => x.socketId < 1000).map(x => x.socketId).sort().slice(-1)[0] ?? 0) + 1;
-			// 	_enemy.station = mainCharacter.socketId;
-			// 	//_enemy.getNewStatus(1, 1);
-			// }
-			if(_mob.do)
-				_mob.do(_enemy);
-			if(_mob.targetKey) {
+			if (_func) _func(_enemy);
+
+			if (_mob.do) _mob.do(_enemy);
+			if (_mob.targetKey) {
 				let _tKey = _mob.targetKey;
-				if(_mob.targetKey.indexOf(',') !== -1)
-				{
+				if (_mob.targetKey.indexOf(',') !== -1) {
 					const _arr = _mob.targetKey.split(',');
 					_tKey = _arr[getRandomValue2(0, _arr.length - 1)];
 				}
-				const _m = this.enemies.find(x => x.key === _tKey);
-				if(_m)
-					_enemy.setAutoTarget(_m);
+				const _m = this.enemies.find((x) => x.key === _tKey);
+				if (_m) _enemy.setAutoTarget(_m);
 			}
-			if(_mob.ownerKey){
-				_enemy.owner = this.enemies.find(x => x.key === _mob.ownerKey);
-				if(!_enemy.owner.enemy)
-					_enemy.enemy = false;
+			if (_mob.ownerKey) {
+				_enemy.owner = this.enemies.find((x) => x.key === _mob.ownerKey);
+				if (!_enemy.owner.enemy) _enemy.enemy = false;
 			}
-			if(_mob.pick)
-				_enemy.pickNewTarget();
-			if (_return)
-				return _enemy;
+			if (_mob.pick) _enemy.pickNewTarget();
+			if (_return) return _enemy;
 		}
-	}
+	};
 	this.installMobs = function (_arr, _func) {
-		if (!mainCharacter.leader && this.dungeon)
-			return;
+		if (!mainCharacter.leader && this.dungeon) return;
 		if (this.mobs?.[0] || _arr)
-			for (var _mob of _arr ?? this.mobs){
+			for (var _mob of _arr ?? this.mobs) {
 				delete _mob.spawnMinX;
 				delete _mob.spawnMaxX;
-				if(_mob.spawnAsGroup)
-					_mob.spawnAsGroup = (_arr ?? this.mobs).filter(x => x.id === _mob.id && x.groupId === _mob.groupId)?.map(x => x.count)?.reduce((prev, next) => prev + next) ?? 1;
+				if (_mob.spawnAsGroup)
+					_mob.spawnAsGroup =
+						(_arr ?? this.mobs)
+							.filter((x) => x.id === _mob.id && x.groupId === _mob.groupId)
+							?.map((x) => x.count)
+							?.reduce((prev, next) => prev + next) ?? 1;
 				this.installMob(_mob, _func);
 			}
-		if(_arr && !this.mobs?.[0])
-			this.mobs = _arr.filter(x => x.spawn);
-	}
+		if (_arr && !this.mobs?.[0]) this.mobs = _arr.filter((x) => x.spawn);
+	};
 	this.road = _mapSprite.road;
-	if (this.road)
-		this.road.src = './images/texture/' + this.assetPath + '-road.png';
-	this.loadLayers = function(_arr) {
+	if (this.road) this.road.src = './images/texture/' + this.assetPath + '-road.png';
+	this.loadLayers = function (_arr) {
 		const _tiles = _arr ?? _mapSprite.tiles ?? [];
 		this.layers = [];
-		for(let _tile of _tiles)
-			for(var i = 1; i <= _tile.count; i++)
+		for (let _tile of _tiles)
+			for (var i = 1; i <= _tile.count; i++)
 				this.layers.push({
 					theme: _tile.theme,
 					name: _tile.name,
 					locate: {
 						bottom: _tile.bottom,
-						left: _tile.left ? _tile.left :  (i - 1) * _tile.width
+						left: _tile.left ? _tile.left : (i - 1) * _tile.width
 					},
 					marginTop: _tile.marginTop,
 					marginLeft: _tile.marginLeft ? _tile.marginLeft : (i - 1) * _tile.width,
@@ -730,16 +517,15 @@ function map(_m) {
 				});
 		if (this.layers)
 			for (var _lay of this.layers)
-				_lay.src = './images/texture/' + (_lay.theme ?? this.assetPath) + '-' + _lay.name + '.png?z=' + _lay.zoom;
-				
-	}
+				_lay.src =
+					'./images/texture/' + (_lay.theme ?? this.assetPath) + '-' + _lay.name + '.png?z=' + _lay.zoom;
+	};
 	this.floor = _mapSprite.floor;
 	this.bgAnimations = _mapSprite.bgAnimations;
 	if (this.bgAnimations)
 		for (var _lay of this.bgAnimations) {
 			_lay.src = './images/texture/' + this.assetPath + '-bg-sprite-' + _lay.name + '.png';
-			if (_lay.delay)
-				_lay.delayLeft = _lay.delay;
+			if (_lay.delay) _lay.delayLeft = _lay.delay;
 			if (_lay.from) {
 				_lay.left = _lay.from;
 				const _distance = MathAbs(_lay.from - _lay.to);
@@ -747,40 +533,37 @@ function map(_m) {
 			}
 		}
 	if (this.floor)
-		for (var _lay of this.floor)
-			_lay.src = './images/texture/' + this.assetPath + '-' + _lay.name + '.png';
-	if (this.ground && !this.ground.totalFrames)
-		this.ground.totalFrames = 1;
+		for (var _lay of this.floor) _lay.src = './images/texture/' + this.assetPath + '-' + _lay.name + '.png';
+	if (this.ground && !this.ground.totalFrames) this.ground.totalFrames = 1;
 	this.drops = _m.drops;
 	this.experience = _m.experience;
 	this.finalDrops = _m.finalDrops;
 	this.perfectCompleteRequirements = _m.perfectCompleteRequirements;
 	this.key = _m.key;
 	this.minGearScore = _m.minGearScore;
-	this.loadObject = function(_obj) {
-		if(_obj.frames && !_obj.speedUp){
+	this.loadObject = function (_obj) {
+		if (_obj.frames && !_obj.speedUp) {
 			_obj.speedUp = 1;
-			_obj.frames.forEach(x => x.speed = MathRound(x.speed / (__globalMS / 20)));
+			_obj.frames.forEach((x) => (x.speed = MathRound(x.speed / (__globalMS / 20))));
 		}
 		const _maxCount = 1;
 		for (var i = 0; i < _maxCount; i++) {
-			if (!_obj.key)
-				_obj.key = _obj.id;
+			if (!_obj.key) _obj.key = _obj.id;
 			const _clone = structuredClone2(_obj);
 			let _src = _clone.src;
 			if (!_clone.text && !_src)
-				_clone.src = (_obj.id === 'artifact' ? './images/artifacts/' : './images/texture/') +
-					(_obj.totalFrames > 1 ? (_obj.theme ?? this.assetPath) + '-' + _obj.key + '.gif' :
-					(_obj.id !== 'artifact' ? (_obj.theme ?? this.assetPath) + _obj.key + '.png' : _obj.artifactId + '.png'));
-			if (!_clone.totalFrames)
-				_clone.totalFrames = 1;
-			if (!_clone.zoom)
-				_clone.zoom = 1;
+				_clone.src =
+					(_obj.id === 'artifact' ? './images/artifacts/' : './images/texture/') +
+					(_obj.totalFrames > 1
+						? (_obj.theme ?? this.assetPath) + '-' + _obj.key + '.gif'
+						: _obj.id !== 'artifact'
+							? (_obj.theme ?? this.assetPath) + _obj.key + '.png'
+							: _obj.artifactId + '.png');
+			if (!_clone.totalFrames) _clone.totalFrames = 1;
+			if (!_clone.zoom) _clone.zoom = 1;
 			const _object = getObject(_clone, _obj.locate.left, _obj.locate.bottom);
-			if (_obj.when)
-				_object.when = _obj.when;
-			if (_obj.do)
-				_object.do = _obj.do;
+			if (_obj.when) _object.when = _obj.when;
+			if (_obj.do) _object.do = _obj.do;
 			_object.totalFrames = _clone.totalFrames;
 			_object.speed = _clone.speed;
 			_object.delay = _clone.delay;
@@ -795,46 +578,40 @@ function map(_m) {
 			_object.sound = _clone.sound;
 			_object.to = _clone.to;
 			_object.text = _clone.text;
-			if(_clone.artifactId)
-				_object.artifactId = _clone.artifactId;
-			if(_src)
-				_object.src = _src;
-			if(_clone.maxWidth)
-				_object.maxWidth = MathRound((_clone.zoom ?? 1) * __zoom * _clone.maxWidth);
-			if (_clone.rightGap)
-				_object.rightGap = MathRound(_clone.rightGap * (_clone.zoom ?? 1) * __zoom);
-			if (_clone.topGap)
-				_object.topGap = MathRound(_clone.topGap * (_clone.zoom ?? 1) * __zoom);
+			if (_clone.artifactId) _object.artifactId = _clone.artifactId;
+			if (_src) _object.src = _src;
+			if (_clone.maxWidth) _object.maxWidth = MathRound((_clone.zoom ?? 1) * __zoom * _clone.maxWidth);
+			if (_clone.rightGap) _object.rightGap = MathRound(_clone.rightGap * (_clone.zoom ?? 1) * __zoom);
+			if (_clone.topGap) _object.topGap = MathRound(_clone.topGap * (_clone.zoom ?? 1) * __zoom);
 			_object.quest = _clone.quest;
 			_object.rate = _clone.rate;
 			_object.col = _clone.col ?? _object.totalFrames;
-			if (_clone.foreground)
-				_object.foreground = _clone.foreground;
-			if (_clone.background)
-				_object.background = _clone.background;
-			if (!_object.realWidth)
-				_object.realWidth = _object.width;
+			if (_clone.foreground) _object.foreground = _clone.foreground;
+			if (_clone.background) _object.background = _clone.background;
+			if (!_object.realWidth) _object.realWidth = _object.width;
 			this.sprites.push(_object);
 			return _object;
 		}
-	}
-	
-	this.checkTowerResult = function(_timeIsUp, _diff) {
+	};
+
+	this.checkTowerResult = function (_timeIsUp, _diff) {
 		let _end;
-		if(mainCharacter.isDead()) {
-			this.resultStars.forEach(x => x.failed = 1);
+		if (mainCharacter.isDead()) {
+			this.resultStars.forEach((x) => (x.failed = 1));
 			_end = 1;
 		}
-		const _drawCount = this.enemies?.filter(x => x.enemy && x.class !== __spell && x.class !== 'object' && !x.remove)?.length ?? 0;
-		const _enemyCount = this.enemies?.filter(x => x.enemy && x.class !== __spell && x.class !== 'object' && !x.isDead())?.length ?? 0;
-		const _object = this.enemies?.find(x => x.enemy && x.class === 'object');
-		if(_enemyCount === 0 && !this.pauseTime)
-			this.pauseTime = Date.now();
-		if(_timeIsUp && _enemyCount > 0)
-			this.resultStars[1].failed = _end = 1;
-		const _t = __account.missions.find(x => x.key === 'tower');
+		const _drawCount =
+			this.enemies?.filter((x) => x.enemy && x.class !== __spell && x.class !== 'object' && !x.remove)?.length ??
+			0;
+		const _enemyCount =
+			this.enemies?.filter((x) => x.enemy && x.class !== __spell && x.class !== 'object' && !x.isDead())
+				?.length ?? 0;
+		const _object = this.enemies?.find((x) => x.enemy && x.class === 'object');
+		if (_enemyCount === 0 && !this.pauseTime) this.pauseTime = Date.now();
+		if (_timeIsUp && _enemyCount > 0) this.resultStars[1].failed = _end = 1;
+		const _t = __account.missions.find((x) => x.key === 'tower');
 		const _noObject = _t.current <= _t.max;
-		if(_drawCount === 0 && !_object && !_noObject) {
+		if (_drawCount === 0 && !_object && !_noObject) {
 			const _chest = {
 				id: 4,
 				count: 1,
@@ -848,26 +625,26 @@ function map(_m) {
 			_respawner.respawn();
 			return;
 		}
-		if(!_object?.remove && !_end && !_noObject)
-			return;
-		if(!_end)
-			_end = (_enemyCount === 0);
-		if(!_end)
-			return;
-		if (!pvpResult)
-			pvpResult = document.getElementById('pvp-result');
-		if (!pvpStatus)
-			pvpStatus = document.getElementById('pvp-status');
+		if (!_object?.remove && !_end && !_noObject) return;
+		if (!_end) _end = _enemyCount === 0;
+		if (!_end) return;
+		if (!pvpResult) pvpResult = document.getElementById('pvp-result');
+		if (!pvpStatus) pvpStatus = document.getElementById('pvp-status');
 		showMyModalPopUp('pvp-result');
 		this.pauseAmbianceMusic();
-		const _fail = this.resultStars.find(x => x.failed);
-		if(!_fail)
-			this.playSound({ key: 'victory', volume: .2 });
-		else
-			this.enemies.forEach(x => x.immobilize = true);
+		const _fail = this.resultStars.find((x) => x.failed);
+		if (!_fail) this.playSound({ key: 'victory', volume: 0.2 });
+		else this.enemies.forEach((x) => (x.immobilize = true));
 		const _missionGain = !_diff ? 0 : _diff * 100;
-		let _table = '<div class="flex full pvp-result-table tower-result"><div class="flex" style="width:100%;height:15cqh;position:relative"><img src="./images/icons/reward-star.png" style="height:100%;position:absolute"' + (_fail ? ' class="gray"': '') + ' /><span style="z-index:2;margin-top:4.7cqh;font-size:3.15cqh!important;font-weight:600;text-shadow:0px 0px 1cqh #000;color:' + (_fail ? 'crimson' : '#F4BB44') + ' !important">' + getLangData('Mission' + (_fail ? ' Failed' : ' Cleared')) + '</span></div><div style="width:100%;overflow-y:auto;height:calc(100% - 15cqh)"><div style="width:100%" class="flex"><span>';
-		for(let _star of this.resultStars)
+		let _table =
+			'<div class="flex full pvp-result-table tower-result"><div class="flex" style="width:100%;height:15cqh;position:relative"><img src="./images/icons/reward-star.png" style="height:100%;position:absolute"' +
+			(_fail ? ' class="gray"' : '') +
+			' /><span style="z-index:2;margin-top:4.7cqh;font-size:3.15cqh!important;font-weight:600;text-shadow:0px 0px 1cqh #000;color:' +
+			(_fail ? 'crimson' : '#F4BB44') +
+			' !important">' +
+			getLangData('Mission' + (_fail ? ' Failed' : ' Cleared')) +
+			'</span></div><div style="width:100%;overflow-y:auto;height:calc(100% - 15cqh)"><div style="width:100%" class="flex"><span>';
+		for (let _star of this.resultStars)
 			_table += `<div class="flex" style="padding:2cqh 2cqh 0 2cqh;width:100%;height:6cqh">
 				<img src="./images/icons/star.png" style="height:4cqh"${_star.failed ? ' class="gray"' : ' class="glow"'} />
 				<div class="flex flex-jc-start" style="padding-left:2cqh;flex:1;font-size:2.4cqh !important;height:100%;${_star.failed ? 'color:#f7f7f799 !important;text-decoration: line-through' : 'color:F4BB44 !important'}">
@@ -876,31 +653,26 @@ function map(_m) {
 			</div>`;
 		_table += `</span></div>`;
 		let _needUpdateFirst;
-		if(!_fail) {
-			const _mission = _missions.find(x => x.key === 'tower').props.find(x => x.level === _t.level);
-			const _gain = _mission.floors.find(x => x.floor = _t.current).gain;
+		if (!_fail) {
+			const _mission = _missions.find((x) => x.key === 'tower').props.find((x) => x.level === _t.level);
+			const _gain = _mission.floors.find((x) => (x.floor = _t.current)).gain;
 			const _rewards = [];
-			for(const _g of _gain)
-				if(_g.key === 'chest' && _t.max < _t.current)
-					for(let _i = 0; _i < (_g.count ?? 1); _i++)
-						_rewards.push(getChestReward(_g.grade ?? 1));
-				else
-					_rewards.push(structuredClone2(_g));
+			for (const _g of _gain)
+				if (_g.key === 'chest' && _t.max < _t.current)
+					for (let _i = 0; _i < (_g.count ?? 1); _i++) _rewards.push(getChestReward(_g.grade ?? 1));
+				else _rewards.push(structuredClone2(_g));
 			_table += `<div class="flex" style="width:100%;padding:2cqh 0 1cqh 0;color:#F4BB44 !important; font-size:2.6cqh !important; font-weight: 600">${getLangData('Chest Rewards')}</div>`;
-				for(let _reward of _rewards)
-					_table += `<div class="flex" style="width:100%;height:5cqh"><div style="height:100%" class="flex"><img style="width:5cqh" src="${_reward.src ?? './images/icons/' + _reward.key + '.png'}" /><div class="flex" style="height:100%;font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">${_reward.count ?? 1}x ${getLangData(_reward.title ?? _reward.type).toProperCase()}</div></div></div>`;
-				_table += `<div class="flex" style="width:100%;padding:2cqh 0 1cqh 0;color:#F4BB44 !important; font-size:2.6cqh !important; font-weight: 600">${getLangData('Mission Rewards')}</div>
+			for (let _reward of _rewards)
+				_table += `<div class="flex" style="width:100%;height:5cqh"><div style="height:100%" class="flex"><img style="width:5cqh" src="${_reward.src ?? './images/icons/' + _reward.key + '.png'}" /><div class="flex" style="height:100%;font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">${_reward.count ?? 1}x ${getLangData(_reward.title ?? _reward.type).toProperCase()}</div></div></div>`;
+			_table += `<div class="flex" style="width:100%;padding:2cqh 0 1cqh 0;color:#F4BB44 !important; font-size:2.6cqh !important; font-weight: 600">${getLangData('Mission Rewards')}</div>
 				<div class="flex" style="width:100%;height:5cqh"><div style="height:100%" class="flex"><img style="width:5cqh" src="./images/icons/coin.png" /><div class="flex" style="height:100%;font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">${_missionGain} ${getLangData('Gold')} (+Bonus)</div></div></div>
 			`;
-			if(_t.current < 10) {
-				if(_t.max < _t.current)
-					_t.max = _t.current;
+			if (_t.current < 10) {
+				if (_t.max < _t.current) _t.max = _t.current;
 				_t.current++;
 				_t.lastActivity = _gameTick;
 				_client.saveState(1);
-			}
-			else 
-				_needUpdateFirst = 1;
+			} else _needUpdateFirst = 1;
 		}
 		_table += `</div><div class="flex" style="width:100%;height:8cqh">
 			<div class="flex" style="width:calc(50% - 1cqh);margin-right:1cqh;overflow:hidden;position:relative;height:100%">
@@ -916,90 +688,90 @@ function map(_m) {
 		pvpStatus.innerHTML = _table + '</div>';
 		this.pvpEnded = true;
 		switchAutoMode(1);
-	}
+	};
 	this.addScoreBoard = function () {
 		_sb = document.createElement('div');
 		_sb.className = 'flex fade-me';
 		_sb.id = 'score-board';
 		_sb.innerHTML = `<div class="team1-score flex flex-jc-start">0</div><div class="team2-score flex flex-jc-end">0</div>`;
 		_gameUI.appendChild(_sb);
-	}
+	};
 	this.checkMapName = function () {
-		if (!_mapSprite.coords?.title || _mapSprite.gold || _mapSprite.tower || _mapSprite.pvp)
-			return;
-		if(!this.nameWriten) {
+		if (!_mapSprite.coords?.title || _mapSprite.gold || _mapSprite.tower || _mapSprite.pvp) return;
+		if (!this.nameWriten) {
 			this.nameWriten = _gameTick;
 			pvpCounter = document.createElement('div');
 			pvpCounter.className = 'flex animate-me-600 map-name countdown';
 			pvpCounter.id = 'pvp-counter';
-			if(!__storyScene?.leaderBoards)
-				pvpCounter.innerText = __locations.find(x => x.mapId === _mapSprite.id)?.titles?.[getLang()] ?? getLangData( _mapSprite.coords.title);
-			else
-				this.updateStoryPoint();
+			if (!__storyScene?.leaderBoards)
+				pvpCounter.innerText =
+					__locations.find((x) => x.mapId === _mapSprite.id)?.titles?.[getLang()] ??
+					getLangData(_mapSprite.coords.title);
+			else this.updateStoryPoint();
 			_gameUI.appendChild(pvpCounter);
-		}
-		else if((_gameTick - this.nameWriten) > 2399) {
+		} else if (_gameTick - this.nameWriten > 2399) {
 			this.nameWriten *= 2;
 			removeClass(pvpCounter, 'countdown');
 		}
-	}
-	this.updateStoryPoint = function(_add) {
-		if(_add)
-			__story.point += _add;
-		pvpCounter.innerHTML = '<div class="flex stage-name-text wot-subtitle">' + 
-				getLangData('Stage') + ' ' + __storySceneOrder + '</div><div class="story-point-text flex w-100 wot-subtitle">' + 
-				getLangData('Score') + ': ' + (__story.point ?? 0).formatWithDots() + '</div>'; 
-	}
-	this.checkGoldResult = function(_timeIsUp, _diff) {
+	};
+	this.updateStoryPoint = function (_add) {
+		if (_add) __story.point += _add;
+		pvpCounter.innerHTML =
+			'<div class="flex stage-name-text wot-subtitle">' +
+			getLangData('Stage') +
+			' ' +
+			__storySceneOrder +
+			'</div><div class="story-point-text flex w-100 wot-subtitle">' +
+			getLangData('Score') +
+			': ' +
+			(__story.point ?? 0).formatWithDots() +
+			'</div>';
+	};
+	this.checkGoldResult = function (_timeIsUp, _diff) {
 		let _end;
 		let _fail = false;
-		const _enemyCount = this.enemies?.filter(x => x.enemy && x.class != 'object' && !x.isDead())?.length ?? 0;
-		if(_enemyCount === 0 && !this.pauseTime){
+		const _enemyCount = this.enemies?.filter((x) => x.enemy && x.class != 'object' && !x.isDead())?.length ?? 0;
+		if (_enemyCount === 0 && !this.pauseTime) {
 			this.pauseTime = Date.now();
-			if(__story)
-				__story.endTime = _gameTick;
+			if (__story) __story.endTime = _gameTick;
 		}
-		const _t = __account.missions.find(x => x.key === 'gold');
-		const _miss = _missions.find(x => x.key === 'gold');
-		const _mission = _miss.props.find(x => x.level === _t.level);
+		const _t = __account.missions.find((x) => x.key === 'gold');
+		const _miss = _missions.find((x) => x.key === 'gold');
+		const _mission = _miss.props.find((x) => x.level === _t.level);
 		let _goldGain = _mission.gold;
-		const _en = this.enemies.find(x => x.enemy);
-		if(_timeIsUp && _enemyCount > 0){
+		const _en = this.enemies.find((x) => x.enemy);
+		if (_timeIsUp && _enemyCount > 0) {
 			_fail = _end = 1;
 			const _hpAll = _en.MAXHP * _en.grade;
-			const _hpLeft = (_en.MAXHP * _en.gradeLeft) + _en.health;
+			const _hpLeft = _en.MAXHP * _en.gradeLeft + _en.health;
 			_goldGain = MathRound(_goldGain * ((_hpAll - _hpLeft) / _hpAll));
 		}
-		if(!_en?.remove && !_end)
-			return;
-		if(!_end)
-			_end = (_enemyCount === 0);
-		if(!_end)
-			return;
+		if (!_en?.remove && !_end) return;
+		if (!_end) _end = _enemyCount === 0;
+		if (!_end) return;
 		this.pvpEnded = true;
-		const _missionGain = _fail ? 0 : (!_diff ? 0 : _diff * 100);
-		if(!_fail)
-			installStoryFinish();
-		else
-			installStoryFinish(1, {key:'gold', count:_missionGain + _goldGain});
+		const _missionGain = _fail ? 0 : !_diff ? 0 : _diff * 100;
+		if (!_fail) installStoryFinish();
+		else installStoryFinish(1, { key: 'gold', count: _missionGain + _goldGain });
 		return;
 		this.pauseAmbianceMusic();
-		if(!_fail)
-			this.playSound({ key: 'victory', volume: .2 });
-		else
-			mainCharacter.immobilize = true;
-		//const _missionGain = _fail ? 0 : (!_diff ? 0 : _diff * 100);
-		let _table = '<div class="flex full pvp-result-table tower-result"><div class="flex" style="width:100%;height:16cqh;position:relative"><span style="margin-top:4.7cqh;z-index:2;font-size:3.15cqh !important;font-weight:600;text-shadow:0px 0px 1cqh #000;color:' + (_fail ? 'crimson' : '#F4BB44') + ' !important">' + getLangData('Mission' + (_fail ? ' Failed' : ' Cleared')) + '!</span></div><div style="width:100%;overflow-y:auto;height:calc(100% - 24cqh);z-index:2"><div style="width:100%" class="flex"><span>';
+		if (!_fail) this.playSound({ key: 'victory', volume: 0.2 });
+		else mainCharacter.immobilize = true;
+
+		let _table =
+			'<div class="flex full pvp-result-table tower-result"><div class="flex" style="width:100%;height:16cqh;position:relative"><span style="margin-top:4.7cqh;z-index:2;font-size:3.15cqh !important;font-weight:600;text-shadow:0px 0px 1cqh #000;color:' +
+			(_fail ? 'crimson' : '#F4BB44') +
+			' !important">' +
+			getLangData('Mission' + (_fail ? ' Failed' : ' Cleared')) +
+			'!</span></div><div style="width:100%;overflow-y:auto;height:calc(100% - 24cqh);z-index:2"><div style="width:100%" class="flex"><span>';
 		_table += `</span></div>`;
 		let _reachedMax = false;
 		_table += `<div class="flex flex-jc-start" style="z-index:2;width:100%;padding:2cqh 0 1cqh 0;color:#F3F4F5 !important; font-size:2.6cqh !important;padding-top: 4%;padding: 1%;border-bottom: 1px solid #9d987f60">${getLangData('Finish Rewards')}</div>`;
 		_table += `<div class="flex flex-jc-start" style="padding:4% 2%;z-index:2;width:100%"><div class="flex flex-ai-end"><img style="width:5cqh" src="./images/icons/gold.png" /><div style="font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">&nbsp;x&nbsp;${_goldGain}</div></div></div>`;
-		if(!_fail && _missionGain > 0)
+		if (!_fail && _missionGain > 0)
 			_table += `<div class="flex flex-jc-start" style="z-index:2;width:100%;padding:2cqh 0 1cqh 0;color:#F3F4F5 !important; font-size:2.6cqh !important; ;padding-top: 4%;padding: 1%;border-bottom: 1px solid #9d987f60">${getLangData('Mission Rewards')}</div>
 				<div class="flex flex-jc-start" style="padding:4% 2%;z-index:2;width:100%"><div class="flex"><img style="width:5cqh" src="./images/icons/coin.png" /><div style="font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">&nbsp;x&nbsp;${_missionGain} (+Bonus)</div></div></div>`;
-		//_t.current++;
-		// if(_miss.limit <= _t.current)
-		// 	_reachedMax = 1;
+
 		updateGold(_missionGain + _goldGain);
 		_table += `</div><div class="flex" style="width:100%;height:8cqh;z-index:2">
 			<div class="flex" style="width:calc(50% - 1cqh);margin-left:1cqh;overflow:hidden;position:relative;height:100%">
@@ -1009,14 +781,16 @@ function map(_m) {
 				<div class="game-menu-button btn-info full flex animate-me${_reachedMax ? ' disabled' : ''}" style="right:unset;top:unset;cursor:pointer;color:#F4BB44 !important;font-size:3cqh !important" onexactclick="loadLastStoryCheckPoint()">${getLangData('RETRY')}</div>
 			</div>
 		</div>`;
-		//pvpStatus.innerHTML = _table + '</div>';
+
 		const _parent = document.createElement('div');
-		_parent.innerHTML = `<div class="flex my-pop-up-wrapper show" id="pvp-result">
+		_parent.innerHTML =
+			`<div class="flex my-pop-up-wrapper show" id="pvp-result">
 				<div id="game-over-pvp-content" class="flex" style="padding: 2%; width: 50%; height: 80%; border: 2px solid #b8860bcc; border-radius: 4cqh; box-shadow: 0px 0px 2cqh #000; background: linear-gradient(180deg, #000000cc, #00000099), url(./images/icons/battle.png); background-size:cover">
 					<div style="width:100%" class="flex full">
-						<div class="full" style="width:80%;color:#fff;text-align:center" id="pvp-status">`
-							+ _table + '</div>' +
-						`</div>
+						<div class="full" style="width:80%;color:#fff;text-align:center" id="pvp-status">` +
+			_table +
+			'</div>' +
+			`</div>
 					</div>
 				</div>
 			</div>`;
@@ -1024,46 +798,46 @@ function map(_m) {
 		_gameUI.appendChild(this.pvpResult);
 		this.pvpEnded = true;
 		switchAutoMode(1);
-	}
+	};
 	this.checkPVPResult = function () {
-		if (this.pvpEnded || this.pvpResult || _storySceneSwitching || __switchingMap || this.disposing)
-			return;
-		// if(this.lastPvPTimeCheck > (_gameTick - 1000))
-		// 	return;
-		// this.lastPvPTimeCheck = _gameTick;
+		if (this.pvpEnded || this.pvpResult || _storySceneSwitching || __switchingMap || this.disposing) return;
+
 		let _end, _diff;
 		let _holdIntro = false;
 		if (!this.pvpStarted) {
 			const _clock = this.duelStartedAt || (this.season === 500 ? window.__duelClock : 0);
-			if(_clock)
-				delete window.__duelClock;
+			if (_clock) delete window.__duelClock;
 			this.pvpStarted = _clock ? _clock + 3000 : Date.now();
-			_holdIntro = !_clock || (Date.now() - this.pvpStarted) < 1000;
+			_holdIntro = !_clock || Date.now() - this.pvpStarted < 1000;
 			const _splash = document.getElementById('splash');
 			addClass(_splash, 'd-none');
 			const _ts = document.getElementById('tip-screen');
-			if(_ts)
-				_ts.remove();
+			if (_ts) _ts.remove();
 			this.missionCountDown = 1;
 			pvpCounter = document.createElement('div');
 			pvpCounter.className = 'flex animate-me countdown pop2';
 			pvpCounter.id = 'pvp-counter';
-			if(this.tower)
-				pvpCounter.innerHTML = '<span style="font-weight:600;color:crimson!important">FLOOR ' +__account.missions.find(x => x.key === 'tower').current + '</span>';
-			else if(_holdIntro) {
+			if (this.tower)
+				pvpCounter.innerHTML =
+					'<span style="font-weight:600;color:crimson!important">FLOOR ' +
+					__account.missions.find((x) => x.key === 'tower').current +
+					'</span>';
+			else if (_holdIntro) {
 				pvpCounter.innerHTML = 3;
-				this.playSound({ key: 'beep', volume:.3 });
+				this.playSound({ key: 'beep', volume: 0.3 });
 			}
 			_gameUI.appendChild(pvpCounter);
 		}
-		if(!_holdIntro) {
+		if (!_holdIntro) {
 			let _baseTime = this.baseTime;
-			if(!_baseTime) 
-				_baseTime = ((this.tower && (__account.missions.find(x => x.key === 'tower').current % 10) > 0) || this.gold) ? 60 : 180;
+			if (!_baseTime)
+				_baseTime =
+					(this.tower && __account.missions.find((x) => x.key === 'tower').current % 10 > 0) || this.gold
+						? 60
+						: 180;
 			const _clockNow = this.realTime ? Date.now() : (this.pauseTime ?? Date.now());
-			_diff = (_baseTime + (this.tower ? 4 : 3)) - MathFloor((_clockNow - this.pvpStarted) / 1000);
-			if (_diff < 10)
-				addClass(pvpCounter, 'pvp-end-soon');
+			_diff = _baseTime + (this.tower ? 4 : 3) - MathFloor((_clockNow - this.pvpStarted) / 1000);
+			if (_diff < 10) addClass(pvpCounter, 'pvp-end-soon');
 			if (_diff < 0 || (_diff > _baseTime && this.challangeStarted)) {
 				_end = true;
 				delete this.challangeStarted;
@@ -1071,8 +845,8 @@ function map(_m) {
 			}
 			if (_diff > _baseTime) {
 				if (pvpCounter.innerText !== (_diff - _baseTime).toString()) {
-					if((_diff - _baseTime) <= 3) {
-						this.playSound({ key: 'beep', volume:.3 });
+					if (_diff - _baseTime <= 3) {
+						this.playSound({ key: 'beep', volume: 0.3 });
 						pvpCounter.innerHTML = '';
 						pvpCounter.innerText = _diff - _baseTime;
 						removeClass(pvpCounter, 'pop2');
@@ -1081,50 +855,31 @@ function map(_m) {
 						addClass(pvpCounter, 'pop');
 					}
 				}
-			}
-			else if (_diff === _baseTime) {
+			} else if (_diff === _baseTime) {
 				const _start = getLangData('FIGHT');
 				if (pvpCounter.innerText !== _start) {
-					this.playSound({ key: 'questaccepted', volume: .3 });
+					this.playSound({ key: 'questaccepted', volume: 0.3 });
 					pvpCounter.innerText = _start;
 					this.addScoreBoard();
-					if(this.beforePVPStart)
-						this.beforePVPStart();
+					if (this.beforePVPStart) this.beforePVPStart();
 					removeClass(pvpCounter, 'pop');
 					void pvpCounter.offsetWidth;
 					addClass(pvpCounter, 'pop');
 					delete this.missionCountDown;
 				}
-			}
-			// else if (pvpCounter.innerText !== _diff.toString()) {
-			// 	if (_diff === _baseTime || (_diff < _baseTime && hasClass(pvpCounter, 'countdown'))) {
-			// 		removeClass(pvpCounter, 'countdown');
-			// 		episode.enemies?.forEach(x => x.immobilize = false);
-			// 		if(__story) {
-			// 			__story.startTime = _gameTick;
-			// 			this.challangeStarted = 1;
-			// 			__story.endTime = undefined;
-			// 		}
-			// 	}
-			// 	if (_diff >= 0 && pvpCounter.innerText !== _diff.toString())
-			// 		pvpCounter.innerText = _diff;
-			// }
-			else {
-				if(this.missionCountDown && _diff >= 0) {
-					if(!document.getElementById('score-board'))
-						this.addScoreBoard();
-					if(this.beforePVPStart)
-						this.beforePVPStart();
+			} else {
+				if (this.missionCountDown && _diff >= 0) {
+					if (!document.getElementById('score-board')) this.addScoreBoard();
+					if (this.beforePVPStart) this.beforePVPStart();
 					delete this.missionCountDown;
 				}
 				const diffStr = _diff.toString();
 				const currentText = pvpCounter.textContent;
 
 				if (currentText !== diffStr) {
-
 					if (_diff === _baseTime || (_diff < _baseTime && hasClass(pvpCounter, 'countdown'))) {
 						removeClass(pvpCounter, 'countdown');
-						episode.enemies?.forEach(x => x.immobilize = false);
+						episode.enemies?.forEach((x) => (x.immobilize = false));
 
 						if (__story) {
 							__story.startTime = _gameTick;
@@ -1140,32 +895,47 @@ function map(_m) {
 				}
 			}
 		}
-		if(this.tower) {
+		if (this.tower) {
 			this.checkTowerResult(_end, _diff);
 			return;
-		}
-		else if(this.gold) {
+		} else if (this.gold) {
 			this.checkGoldResult(_end, _diff);
 			return;
 		}
-		const _enemies = this.enemies?.filter(x => x.enemy && x.class !== __spell && x.class !== 'object' && !x.isDead() && !x.remove);
-		const _teamMates = this.enemies?.filter(x => (x.friendly || x.main || (x.teamId && x.teamId === (mainCharacter.realTeamId ?? mainCharacter.teamId))) && x.class !== __spell && x.class !== 'object' && !x.isDead() && !x.remove);
-		const _deads = this.enemies?.filter(x => x.class !== __spell && x.class !== 'minion' && x.class !== 'object' && x.killedBy);
-		if(this.war){
-			if(mainCharacter.remove && !mainCharacter.ghosted) {
+		const _enemies = this.enemies?.filter(
+			(x) => x.enemy && x.class !== __spell && x.class !== 'object' && !x.isDead() && !x.remove
+		);
+		const _teamMates = this.enemies?.filter(
+			(x) =>
+				(x.friendly ||
+					x.main ||
+					(x.teamId && x.teamId === (mainCharacter.realTeamId ?? mainCharacter.teamId))) &&
+				x.class !== __spell &&
+				x.class !== 'object' &&
+				!x.isDead() &&
+				!x.remove
+		);
+		const _deads = this.enemies?.filter(
+			(x) => x.class !== __spell && x.class !== 'minion' && x.class !== 'object' && x.killedBy
+		);
+		if (this.war) {
+			if (mainCharacter.remove && !mainCharacter.ghosted) {
 				const _isMyTeamAlive = _teamMates?.[0];
-				if(_isMyTeamAlive) {
+				if (_isMyTeamAlive) {
 					const _isOtherTeamAlive = _enemies?.[0];
-					if(_isOtherTeamAlive) {
+					if (_isOtherTeamAlive) {
 						this.realClass = mainCharacter.class;
-						const _ghost = summonMob(500, MathRound(mainCharacter.SCREENLEFT / __zoom),
-						mainCharacter.yPosition);
+						const _ghost = summonMob(
+							500,
+							MathRound(mainCharacter.SCREENLEFT / __zoom),
+							mainCharacter.yPosition
+						);
 						_ghost.killCount = mainCharacter.killCount;
 						_ghost.teamId = _ghost.realTeamId = mainCharacter.teamId;
 						_ghost.noDirection = _ghost.still = _ghost.hasShadow = false;
 						_ghost.stepX = mainCharacter.stepX;
 						_ghost.stepXRate = mainCharacter.oldProps.stepXRate;
-						_ghost.animations.idle.frames.forEach(x => x.objects = undefined);
+						_ghost.animations.idle.frames.forEach((x) => (x.objects = undefined));
 						_ghost.animations.run = {
 							key: 'run',
 							type: 'move',
@@ -1182,10 +952,8 @@ function map(_m) {
 						mainCharacter = _ghost;
 						if (!episode.enemies.includes(oldMain)) {
 							const gidx = episode.enemies.indexOf(_ghost);
-							if (gidx === -1)
-								episode.enemies.push(oldMain);
-							else
-								episode.enemies.splice(gidx, 0, oldMain);
+							if (gidx === -1) episode.enemies.push(oldMain);
+							else episode.enemies.splice(gidx, 0, oldMain);
 						}
 						_ghost.main = true;
 						_ghost.enemy = false;
@@ -1195,40 +963,45 @@ function map(_m) {
 						_ghost.autoMode = undefined;
 						_ghost.unseen = false;
 						_ghost.located = true;
-						warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/ghost.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('You are in ghost mode') + '</span></div>', null, null, 1);
+						warn(
+							'<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/ghost.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' +
+								getLangData('You are in ghost mode') +
+								'</span></div>',
+							null,
+							null,
+							1
+						);
 					}
 				}
 			}
-			_deads?.forEach(x => {
+			_deads?.forEach((x) => {
 				if (this.realTime) {
 					if (!x.grayAvatar) {
 						const _own = x.main || x.socketId === __socketId || x.duelSocket === __socketId;
 						const _myBot = this.duelLeader && x.duelBot && !x.realTime;
 						if (_own || _myBot) {
-							const _killer = this.enemies.find(y => y && y.key === x.killedBy);
+							const _killer = this.enemies.find((y) => y && y.key === x.killedBy);
 							const _ks = typeof duelKillerSocket === 'function' ? duelKillerSocket(_killer) : undefined;
-							if (_ks)
-								applyDuelKill(x, _ks);
+							if (_ks) applyDuelKill(x, _ks);
 						}
 					}
 					return;
 				}
 				if (!x.grayAvatar) {
 					x.grayAvatar = true;
-					const _killer = episode.enemies.find(y => y.key === x.killedBy);
+					const _killer = episode.enemies.find((y) => y.key === x.killedBy);
 					_killer.killCount++;
 					const _gsb = document.querySelector('.team' + _killer.teamId + '-score');
-					if(_gsb) {
+					if (_gsb) {
 						const _teamScore = parseInt(_gsb.innerText) + 1;
 						episode['team' + _killer.teamId + 'score'] = _teamScore;
-						if(_teamScore > 9) {
+						if (_teamScore > 9) {
 							this.pvpStarted = 1;
 						}
-						if(_teamScore > episode['team' + x.teamId + 'score']){
-							if(episode.winningTeam && episode.winningTeam !== _killer.teamId) {
-								//comeback
+						if (_teamScore > episode['team' + x.teamId + 'score']) {
+							if (episode.winningTeam && episode.winningTeam !== _killer.teamId) {
 								const isMain = mainCharacter.teamId === _killer.teamId;
-								//warn('<div class="flex important achievement" style="position:relative"><img style="height:12cqh" src="./images/icons/flag' + _killer.teamId + '.png" />&nbsp;<span style="text-shadow:0 0 .8cqh #000;color:#ffffffcc !important;flex:1">' + getLangData('Comeback') + '!</span></div>', null, null, 1);
+
 								PlaySound({ key: isMain ? 'comebackwin' : 'comebackloose', volume: 1 });
 							}
 							episode.winningTeam = _killer.teamId;
@@ -1238,37 +1011,54 @@ function map(_m) {
 					let _msg = '';
 					if (_killer.killCount > 1) {
 						this.playSound({ key: _killer.gender + 'laugh', reset: true });
-						_msg = '<div class="flex" style="color:#FD1C03;font-weight:600;font-size:larger !important">' + _killer.killCount + ' x Killing Spree!</div>';
+						_msg =
+							'<div class="flex" style="color:#FD1C03;font-weight:600;font-size:larger !important">' +
+							_killer.killCount +
+							' x Killing Spree!</div>';
 					}
-					if(x.pvpRespawn)
-						x.addPVPRespawnFrame();
-					warn('<div class="pvp-kill">' + _msg + (_killer.main ? __account.name : _killer.displayName ?? _killer.name) + '&nbsp;<span class="' + (_killer.enemy ? 'red' : 'blue') + '-killed">' + getLangData('killed') + '</span>&nbsp;' + (x.main ? __account.name : x.displayName ?? x.name) + '</div>', 'level-up', null, null, 1);
-				}
-				else
-					return;
+					if (x.pvpRespawn) x.addPVPRespawnFrame();
+					warn(
+						'<div class="pvp-kill">' +
+							_msg +
+							(_killer.main ? __account.name : (_killer.displayName ?? _killer.name)) +
+							'&nbsp;<span class="' +
+							(_killer.enemy ? 'red' : 'blue') +
+							'-killed">' +
+							getLangData('killed') +
+							'</span>&nbsp;' +
+							(x.main ? __account.name : (x.displayName ?? x.name)) +
+							'</div>',
+						'level-up',
+						null,
+						null,
+						1
+					);
+				} else return;
 				if (!x.enemy) {
 					const _avatar = document.getElementById('char-' + x.key);
-					if (_avatar)
-						addClass(_avatar, 'gray');
+					if (_avatar) addClass(_avatar, 'gray');
 				}
 			});
 		}
 		const _eCount = _enemies?.length ?? 0;
 		const _tCount = _teamMates?.length ?? 0;
-		if(!this.realTime && !this.pauseTime && this.canPause !== false && (!_enemies?.filter(x => !x.isDead())?.length || !_teamMates?.filter(x => !x.isDead())?.length))
+		if (
+			!this.realTime &&
+			!this.pauseTime &&
+			this.canPause !== false &&
+			(!_enemies?.filter((x) => !x.isDead())?.length || !_teamMates?.filter((x) => !x.isDead())?.length)
+		)
 			this.pauseTime = Date.now();
-		if(_deads?.length) {
-			if((_deads.filter(x => x.remove)?.length ?? 0) < _deads.length)
-				return;
+		if (_deads?.length) {
+			if ((_deads.filter((x) => x.remove)?.length ?? 0) < _deads.length) return;
 		}
-		if ((_eCount === 0 || _tCount === 0 || _end)) {
-			//this.pauseAmbianceMusic();
+		if (_eCount === 0 || _tCount === 0 || _end) {
 			let _rewards = [];
-			let _status = (_eCount > 0 && _tCount > 0) ? 1 : (_tCount > 0 ? 2 : 0);
+			let _status = _eCount > 0 && _tCount > 0 ? 1 : _tCount > 0 ? 2 : 0;
 			let _table;
-			if(!this.skipPvPFinalScreen) {
-				const _duelFinalRow = function(_p, _teamId) {
-					if(!_p)
+			if (!this.skipPvPFinalScreen) {
+				const _duelFinalRow = function (_p, _teamId) {
+					if (!_p)
 						return `<div class="war-final-screen-row flex"><div class="war-final-screen-cell-50 flex flex-jc-start"></div><div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:1cqh"></div><div class="war-final-screen-cell-25 flex flex-jc-end" style="padding-right:2cqh"></div></div>`;
 					return `<div class="war-final-screen-row flex${_p.main ? ' war-final-screen-row-me' : ''}">
 						<div class="war-final-screen-cell-50 flex flex-jc-start">${_p.main ? __account.name : (_p.displayName ?? _p.name ?? '')}</div>
@@ -1277,12 +1067,12 @@ function map(_m) {
 						<div class="war-final-screen-cell-25 flex flex-jc-center" style="padding-right:2cqh"><img src="./images/ui/game/duel-dead-count.png" />&nbsp;${_p.isDead() ? 1 : 0}</div>
 					</div>`;
 				};
-				const _duelFinalTable = function(_team1, _team2) {
+				const _duelFinalTable = function (_team1, _team2) {
 					return `<div class="flex full pvp-result-table arena-result duel-final-board">
 							<div class="war-final-screen flex w-100">
 								<div class="w-100 duel-final-blue-team-bg">
 									<div class="war-final-screen-row flex team-1-header">
-										<div class="w-100 flex flex-jc-start">${getLangData("Blue Team")}</div>
+										<div class="w-100 flex flex-jc-start">${getLangData('Blue Team')}</div>
 									</div>
 									${_duelFinalRow(_team1[0], 1)}
 									<hr class="war-final-blue-separator" />
@@ -1292,7 +1082,7 @@ function map(_m) {
 								</div>
 								<div class="w-100 duel-final-red-team-bg">
 									<div class="war-final-screen-row flex team-2-header">
-										<div class="w-100 flex flex-jc-start">${getLangData("Red Team")}</div>
+										<div class="w-100 flex flex-jc-start">${getLangData('Red Team')}</div>
 									</div>
 									${_duelFinalRow(_team2[0], 2)}
 									<hr class="war-final-red-separator" />
@@ -1304,141 +1094,127 @@ function map(_m) {
 						<div class="duel-honor-slot flex"></div>
 					</div>`;
 				};
-				if(this.war) {
-					const _team1 = this.enemies.filter(x => x.teamId === 1 && !x.ghosted);
-					const _team2 = this.enemies.filter(x => x.teamId === 2 && !x.ghosted);
+				if (this.war) {
+					const _team1 = this.enemies.filter((x) => x.teamId === 1 && !x.ghosted);
+					const _team2 = this.enemies.filter((x) => x.teamId === 2 && !x.ghosted);
 					let _rewardsHtml = '';
-					_rewards.push({key:'honor', title:getLangData('Blood Honor'), count:mainCharacter.killCount ?? 0});
-					if(_status > 1){
-						let _honorCount = (mainCharacter.killCount ?? 0) + (mainCharacter.killCount > 1 ? 1: 0) + (mainCharacter.killCount > 2 ? 1: 0);
-						//__account.pvp.honor+=_honorCount;
+					_rewards.push({
+						key: 'honor',
+						title: getLangData('Blood Honor'),
+						count: mainCharacter.killCount ?? 0
+					});
+					if (_status > 1) {
+						let _honorCount =
+							(mainCharacter.killCount ?? 0) +
+							(mainCharacter.killCount > 1 ? 1 : 0) +
+							(mainCharacter.killCount > 2 ? 1 : 0);
+
 						_client.saveState();
-						_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:1});
-						// _rewardsHtml = `<div class="flex w-100" style="padding:1cqh 0;color:#F4BB44 !important; font-size:3.15cqh !important; font-weight: 600">
-						// 				${getLangData('Victory Rewards')}
-						// 			</div>
-						// 			<div class="flex w-100">
-						// 				<div class="flex" style="height:4.5cqh">
-						// 					<img style="width:4cqh" src="./images/icons/honor.png" />
-						// 					<div style="font-size:3cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">+1 ${getLangData('Win Bonus')}</div>
-						// 				</div>
-						// 			</div>`;
-						// if(mainCharacter.killCount > 0)
-						// 		_rewardsHtml += `<div class="flex w-100">
-						// 				<div class="flex" style="height:4.5cqh">
-						// 					<img style="width:4cqh" src="./images/icons/honor.png" />
-						// 					<div style="font-size:3cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">+${mainCharacter.killCount} ${getLangData('Kill Bonus')}</div>
-						// 				</div>
-						// 			</div>`;
-					}
-					else
-						_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:0});
+						_rewards.push({ key: 'honor', title: getLangData('Victory Honor'), count: 1 });
+					} else _rewards.push({ key: 'honor', title: getLangData('Victory Honor'), count: 0 });
 					_table = _duelFinalTable(_team1, _team2);
-				}
-				else {
-					const _roster = (this.enemies || []).filter(x => x && !x.ghosted && x.class !== __spell && x.class !== 'object' && x.class !== 'minion');
-					let _blue = _roster.filter(x => x.main || !x.enemy);
-					let _red = _roster.filter(x => x.enemy && !x.main);
-					if(!_blue.length || !_red.length) {
-						_blue = _roster.filter(x => x.main);
-						_red = _roster.filter(x => !x.main);
+				} else {
+					const _roster = (this.enemies || []).filter(
+						(x) => x && !x.ghosted && x.class !== __spell && x.class !== 'object' && x.class !== 'minion'
+					);
+					let _blue = _roster.filter((x) => x.main || !x.enemy);
+					let _red = _roster.filter((x) => x.enemy && !x.main);
+					if (!_blue.length || !_red.length) {
+						_blue = _roster.filter((x) => x.main);
+						_red = _roster.filter((x) => !x.main);
 					}
-					switch(_status) {
-						case 2: 
-							_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:1});
-							if(__account.pvp.lastDuelWin)
-								__account.pvp.winStreak++;
-							else
-								__account.pvp.winStreak = 1;
-							if(__account.pvp.maxWinCount < __account.pvp.winStreak)
+					switch (_status) {
+						case 2:
+							_rewards.push({ key: 'honor', title: getLangData('Victory Honor'), count: 1 });
+							if (__account.pvp.lastDuelWin) __account.pvp.winStreak++;
+							else __account.pvp.winStreak = 1;
+							if (__account.pvp.maxWinCount < __account.pvp.winStreak)
 								__account.pvp.maxWinCount = __account.pvp.winStreak;
 							__account.pvp.winCount++;
 							__account.pvp.lastDuelWin = true;
 							break;
-						case 1: 
-							_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:0});
+						case 1:
+							_rewards.push({ key: 'honor', title: getLangData('Victory Honor'), count: 0 });
 							__account.pvp.lastDuelWin = false;
 							__account.pvp.winStreak = 0;
 							break;
-						case 0: 
-							_rewards.push({key:'honor', title:getLangData('Victory Honor'), count:0});
+						case 0:
+							_rewards.push({ key: 'honor', title: getLangData('Victory Honor'), count: 0 });
 							__account.pvp.lastDuelWin = false;
 							__account.pvp.winStreak = 0;
 							__account.pvp.looseCount++;
-						break;
+							break;
 					}
-					if(_status > 1) {
-						//__account.pvp.honor++;
+					if (_status > 1) {
 						updateGlobalQuest('pvp-win');
 						const _oldOrder = __account.pvp.order;
-						if(this.pvpOrder)
-							__account.pvp.order = this.pvpOrder;
+						if (this.pvpOrder) __account.pvp.order = this.pvpOrder;
 						const _newOrder = __account.pvp.order;
-						if((_oldOrder > 10000 && _newOrder < 10000) ||
+						if (
+							(_oldOrder > 10000 && _newOrder < 10000) ||
 							(_oldOrder > 5000 && _newOrder < 5000) ||
-							(_oldOrder > 1000 && _newOrder < 1000)) {
-							if(_newOrder > 5000)
-								updateGlobalQuest('pvp-league-silver');
-							else if(_newOrder > 1000)
-								updateGlobalQuest('pvp-league-gold');
-							warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/pvp.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Pvp League Updated') + '</span></div>', null, null, 1);
+							(_oldOrder > 1000 && _newOrder < 1000)
+						) {
+							if (_newOrder > 5000) updateGlobalQuest('pvp-league-silver');
+							else if (_newOrder > 1000) updateGlobalQuest('pvp-league-gold');
+							warn(
+								'<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/pvp.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' +
+									getLangData('Pvp League Updated') +
+									'</span></div>',
+								null,
+								null,
+								1
+							);
 						}
-						// _table += `<div class="flex" style="width:100%;padding:4cqh 0 1cqh 0;color:#F4BB44 !important; font-size:2.6cqh !important; font-weight: 600">${getLangData('Duel Rewards')}</div>
-						// 	<div class="flex" style="width:100%"><div class="flex"><img style="width:5cqh" src="./images/icons/honor.png" /><div style="font-size:2.4cqh !important;color:#f7f7f7cc !important;padding-left:2cqh">+1 ${getLangData('Honor Point')}</div></div></div>`;
 					}
 					_client.saveState();
 					_table = _duelFinalTable(_blue, _red);
 				}
 			}
-			_enemies?.forEach(x => {
+			_enemies?.forEach((x) => {
 				x.immobilize = true;
 				x.animate('idle', 1);
 				x.upcomingAnimation = 'idle';
 			});
-			_teamMates?.forEach(x => {
+			_teamMates?.forEach((x) => {
 				x.immobilize = !x.main;
 				x.animate('idle', 1);
 				x.upcomingAnimation = 'idle';
 			});
 			this.pvpEnded = true;
-			if(this.realTime && this.duelLeader)
-				markDuelMatchEnded();
+			if (this.realTime && this.duelLeader) markDuelMatchEnded();
 			switchAutoMode(1);
-			if(this.realTime)
-				_rewards = [];
-			if(!this.skipPvPFinalScreen)
-				installStoryFinish(_status === 2 ? 0 : (_status === 1 ? 2 : 1), _rewards, _table);
+			if (this.realTime) _rewards = [];
+			if (!this.skipPvPFinalScreen)
+				installStoryFinish(_status === 2 ? 0 : _status === 1 ? 2 : 1, _rewards, _table);
 		}
-	}
-	
-	this.focusOnPlayer = function(_key) {
-		if(!mainCharacter.ghosted)
-			return;
-		const char = episode.enemies.find(x => x.key === _key);
-		if(!char || char.main || char.remove)
-			return;
+	};
+
+	this.focusOnPlayer = function (_key) {
+		if (!mainCharacter.ghosted) return;
+		const char = episode.enemies.find((x) => x.key === _key);
+		if (!char || char.main || char.remove) return;
 		const _center = MathRound(this.cWidth / 2);
 		platformX = char.left - _center;
 		mainCharacter.left = _center;
 		mainCharacter.updateVariables();
 		prevPlatformX = undefined;
 		playClick();
-	}
-	this.checkRespawn = function() {
-		if(!this.respawners?.[0])
-			return;
-		for(let i = 0; i < this.respawners.length; i++)
-		{
+	};
+	this.checkRespawn = function () {
+		if (!this.respawners?.[0]) return;
+		for (let i = 0; i < this.respawners.length; i++) {
 			const _mob = this.respawners[i];
-			if((_mob.date + _mob.ms) < _gameTick) {
+			if (_mob.date + _mob.ms < _gameTick) {
 				let _respawner = this.installMob(
-					_mob.spawnSettings ??
-					this.mobs.find(x => x.id === _mob.id),
-					null, 1, 1
+					_mob.spawnSettings ?? this.mobs.find((x) => x.id === _mob.id),
+					null,
+					1,
+					1
 				);
-				//_respawner.zoom *= this.getPerspectiveRate(_respawner, 1);
+
 				this.respawners.splice(i, 1);
-				if(!_respawner.animations.respawn)
+				if (!_respawner.animations.respawn)
 					_respawner.animations.respawn = {
 						key: 'respawn',
 						type: 'skill',
@@ -1450,122 +1226,123 @@ function map(_m) {
 								spriteWidth: 0,
 								spriteOrigin: 0,
 								spriteHeight: _respawner.HEIGHT,
-								objects: _mob.spawnDirection ? undefined : [
-									{ 
-									key:'respawn', 
-									position: 'middle',
-									scale: (_respawner.zoom * _respawner.height) / 100
-								}
-								],
-								sound: _mob.spawnDirection ? undefined : { skipUnseen: true, key: 'puff', volume: .3, range: 50 },
+								objects: _mob.spawnDirection
+									? undefined
+									: [
+											{
+												key: 'respawn',
+												position: 'middle',
+												scale: (_respawner.zoom * _respawner.height) / 100
+											}
+										],
+								sound: _mob.spawnDirection
+									? undefined
+									: { skipUnseen: true, key: 'puff', volume: 0.3, range: 50 },
 								speed: 20,
 								def: { iframe: true }
 							}
 						]
 					};
-				//_respawner.addObject({ key: 'respawn', position: 'around' });
+
 				_respawner.animate('respawn', 1);
 				_respawner.immobilize = false;
 				_respawner.updateVariables();
 				return;
 			}
 		}
-	}
-	this.checkStoryTicketTimer = function() {
-		if(__account.storyTicket > 99){
-			if(__account.lastStoryTicketNeedTime)
-				delete __account.lastStoryTicketNeedTime;
+	};
+	this.checkStoryTicketTimer = function () {
+		if (__account.storyTicket > 99) {
+			if (__account.lastStoryTicketNeedTime) delete __account.lastStoryTicketNeedTime;
 			return;
 		}
 		const _now = Date.now();
-		if(!__account.lastStoryTicketNeedTime)
-			__account.lastStoryTicketNeedTime = _now;
+		if (!__account.lastStoryTicketNeedTime) __account.lastStoryTicketNeedTime = _now;
 		const _diff = _now - __account.lastStoryTicketNeedTime;
 		let _finish = 0;
-		if(_diff >= 600000) {
+		if (_diff >= 600000) {
 			updateTicket(1);
-			if(__account.storyTicket > 99){
+			if (__account.storyTicket > 99) {
 				delete __account.lastStoryTicketNeedTime;
 				_finish = 2;
-			}
-			else {
+			} else {
 				__account.lastStoryTicketNeedTime = _now - (_diff - 600000);
 				_finish = 1;
 			}
 			_client.saveState();
 		}
-		if(this.menu) {
+		if (this.menu) {
 			const _pt = document.getElementById('portal-timer');
-			if(!_pt)
-				return;
-			if(this.lastStoryTicketTimerCheck > (_gameTick - 1000))
-				return;
-			switch(_finish) {
-				case 2: 
-					if(_pt.innerText !== '')
-						_pt.innerText = '';
+			if (!_pt) return;
+			if (this.lastStoryTicketTimerCheck > _gameTick - 1000) return;
+			switch (_finish) {
+				case 2:
+					if (_pt.innerText !== '') _pt.innerText = '';
 					break;
 				case 1:
-					if(_pt.innerText !== '(09:59)')
-						_pt.innerText = '(09:59)';
+					if (_pt.innerText !== '(09:59)') _pt.innerText = '(09:59)';
 					break;
 				default:
 					const _txt = convertTimespanToTime(_diff);
-					if(_pt.innerText !== _txt)
-						_pt.innerText = _txt;
+					if (_pt.innerText !== _txt) _pt.innerText = _txt;
 					break;
 			}
 			this.lastStoryTicketTimerCheck = _gameTick;
 		}
-	}
-	this.tryMoveMainCamera = function() {
-		if(this.cameraMoveStep){
-			if(mainCharacter.left > centerMinX) {
+	};
+	this.tryMoveMainCamera = function () {
+		if (this.cameraMoveStep) {
+			if (mainCharacter.left > centerMinX) {
 				prevPlatformX = undefined;
 				platformX += this.cameraMoveStep;
 				mainCharacter.left -= this.cameraMoveStep;
 				mainCharacter.platformX = platformX;
-				if(mainCharacter.left <= centerMinX){
+				if (mainCharacter.left <= centerMinX) {
 					mainCharacter.direction = __right;
 					delete this.cameraMoveStep;
 					mainCharacter.disableKeyboard = mainCharacter.immobilize = false;
-					if(this.cameraMoveEndFunc) {
+					if (this.cameraMoveEndFunc) {
 						this.cameraMoveEndFunc();
 						delete this.cameraMoveEndFunc;
 					}
 				}
-			}
-			else {
+			} else {
 				prevPlatformX = undefined;
 				platformX -= this.cameraMoveStep;
 				mainCharacter.left += this.cameraMoveStep;
 				mainCharacter.platformX = platformX;
-				if(mainCharacter.left >= centerMinX){
+				if (mainCharacter.left >= centerMinX) {
 					mainCharacter.direction = __left;
 					delete this.cameraMoveStep;
 					mainCharacter.disableKeyboard = mainCharacter.immobilize = false;
-					if(this.cameraMoveEndFunc) {
+					if (this.cameraMoveEndFunc) {
 						this.cameraMoveEndFunc();
 						delete this.cameraMoveEndFunc;
 					}
 				}
 			}
 		}
-	}
-	this.tinyMoveCamera = function() {
-		if(__storyCutScenePlaying || this.end || _dialogAppeared || this.cameraMoveStep || _game.suspended)
+	};
+	this.tinyMoveCamera = function () {
+		if (__storyCutScenePlaying || this.end || _dialogAppeared || this.cameraMoveStep || _game.suspended)
 			return false;
-		if(this.skipTinyCameraMove) {
+		if (this.skipTinyCameraMove) {
 			this.skipTinyCameraMove--;
-			if (!this.skipTinyCameraMove)
-				this.cameraEaseIn = 0;
+			if (!this.skipTinyCameraMove) this.cameraEaseIn = 0;
 			return false;
 		}
-		if(!mainCharacter || mainCharacter.hitStop || this?.still || this.ultimateTimeStop || __storyCutScenePlaying || mainCharacter.animation === 'run')
+		if (
+			!mainCharacter ||
+			mainCharacter.hitStop ||
+			this?.still ||
+			this.ultimateTimeStop ||
+			__storyCutScenePlaying ||
+			mainCharacter.animation === 'run'
+		)
 			return false;
-		const _deadLeft = mainCharacter.direction === __left ? this.cWidth * .55 : this.cWidth * .35;
-		const _deadRight = mainCharacter.direction === __left ? this.cWidth * .65 : this.cWidth * .45;
-		if(mainCharacter.left > _deadLeft && mainCharacter.left < _deadRight) {
+		const _deadLeft = mainCharacter.direction === __left ? this.cWidth * 0.55 : this.cWidth * 0.35;
+		const _deadRight = mainCharacter.direction === __left ? this.cWidth * 0.65 : this.cWidth * 0.45;
+		if (mainCharacter.left > _deadLeft && mainCharacter.left < _deadRight) {
 			this.cameraEaseIn = 0;
 			return false;
 		}
@@ -1573,135 +1350,134 @@ function map(_m) {
 		const _part = this.cWidth / 10;
 		let _step = episode.cWidth / 400;
 		let ramp = this.cameraEaseIn || 0;
-		if(ramp < 8)
-			ramp++;
+		if (ramp < 8) ramp++;
 		this.cameraEaseIn = ramp;
 		const t = ramp / 8;
 		_step *= t * t * (3 - 2 * t);
-		if(mainCharacter.left < (_half - _step))
-		{
-			if(mainCharacter.getCurrentAnimation()?.attack || mainCharacter.animation === 'roll'
-		|| mainCharacter.animation === 'dash' || mainCharacter.animation === 'escape')
+		if (mainCharacter.left < _half - _step) {
+			if (
+				mainCharacter.getCurrentAnimation()?.attack ||
+				mainCharacter.animation === 'roll' ||
+				mainCharacter.animation === 'dash' ||
+				mainCharacter.animation === 'escape'
+			)
 				_step *= 2;
-			if(mainCharacter.chargeProperties)
-				_step *= 4;
-			if(_step > 1 && mainCharacter.left > (_half - _part))
-				_step *= .5;
-			else if(_step > 1 && mainCharacter.left > (_half - _part * 2))
-				_step *= .75;
-			if(mainCharacter.direction === __right)
-				_step *= .75;
+			if (mainCharacter.chargeProperties) _step *= 4;
+			if (_step > 1 && mainCharacter.left > _half - _part) _step *= 0.5;
+			else if (_step > 1 && mainCharacter.left > _half - _part * 2) _step *= 0.75;
+			if (mainCharacter.direction === __right) _step *= 0.75;
 			_step = MathCeil(_step);
-			if((platformX - _step) >= 0){
+			if (platformX - _step >= 0) {
 				platformX -= _step;
 				mainCharacter.left += _step;
 				return true;
 			}
-		}
-		else if(mainCharacter.left > (_half + _step)) {
-			if(mainCharacter.getCurrentAnimation()?.attack || mainCharacter.animation === 'roll'
-		|| mainCharacter.animation === 'dash' || mainCharacter.animation === 'escape')
+		} else if (mainCharacter.left > _half + _step) {
+			if (
+				mainCharacter.getCurrentAnimation()?.attack ||
+				mainCharacter.animation === 'roll' ||
+				mainCharacter.animation === 'dash' ||
+				mainCharacter.animation === 'escape'
+			)
 				_step *= 2;
-			if(mainCharacter.chargeProperties)
-				_step *= 4;
-			if(_step > 1 && mainCharacter.left < (_half + _part))
-				_step *= .5;
-			else if(_step > 1 && mainCharacter.left < (_half + _part * 2))
-				_step *= .75;
-			if(mainCharacter.direction === __left)
-				_step *= .75;
+			if (mainCharacter.chargeProperties) _step *= 4;
+			if (_step > 1 && mainCharacter.left < _half + _part) _step *= 0.5;
+			else if (_step > 1 && mainCharacter.left < _half + _part * 2) _step *= 0.75;
+			if (mainCharacter.direction === __left) _step *= 0.75;
 			_step = MathCeil(_step);
 			const _maxW = this.width - this.cWidth;
-			if((platformX + _step) <= _maxW){
+			if (platformX + _step <= _maxW) {
 				platformX += _step;
 				mainCharacter.left -= _step;
 				return true;
 			}
 		}
 		return false;
-	}
+	};
 	this.drawEnemies = function (_queue) {
-		//const rect = getVisibleRectangle();
-		if(this.disposing)
-			return;
+		if (this.disposing) return;
 		__pvp.updatePlayStatus();
 		this.checkRespawn();
 		this.checkStoryTicketTimer();
 		checkCSSAnimations();
-		if(this.repeat){
-			if(!this.doTime)
-				this.doTime = _gameTick;
-			if((_gameTick - this.doTime) > this.repeat) {
+		if (this.repeat) {
+			if (!this.doTime) this.doTime = _gameTick;
+			if (_gameTick - this.doTime > this.repeat) {
 				this.doTime = _gameTick;
 				this.do();
 			}
 		}
 		this.hasSolid = false;
-		//this.enemies?.filter(x => x.nextPoint)?.forEach(x => {delete x.nextPoint;});
-		//this.enemies?.filter(x => x.unseen && x.class !== 'boss' && x.healthBarDrawn)?.forEach(x => episode.hideHealthBar(x));
-		//if(this.enemies?.find(x => x.related?.dead || x.remove))
-		//	this.enemies = this.enemies.filter(x => !x.related?.dead && !x.remove);
-		let _len = this.enemies?.length, updateUnseen;
-		if((_gameTick - this.lastUnseenCheck) > 200) {
+
+		let _len = this.enemies?.length,
+			updateUnseen;
+		if (_gameTick - this.lastUnseenCheck > 200) {
 			updateUnseen = 1;
 			this.lastUnseenCheck = _gameTick;
 			this.seenEnemies.length = 0;
 		}
-		if(this.lastTalkAttached && ((_gameTick - this.lastTalkAttached.time) > 3000)) {
+		if (this.lastTalkAttached && _gameTick - this.lastTalkAttached.time > 3000) {
 			let _sttsScr = this.lastTalkAttached.elem;
-			if(_sttsScr)
-				try { _sttsScr.remove(); } catch(_){}
+			if (_sttsScr)
+				try {
+					_sttsScr.remove();
+				} catch (_) {}
 			delete this.lastTalkAttached;
 		}
 		this.limitedEffects.length = this.activeSpells.length = 0;
-		if(mainCharacter)
-			mainCharacter.hasLeftEnemy = mainCharacter.hasRightEnemy =
-		mainCharacter.hasLeftPackage = mainCharacter.hasRightPackage = undefined;
+		if (mainCharacter)
+			mainCharacter.hasLeftEnemy =
+				mainCharacter.hasRightEnemy =
+				mainCharacter.hasLeftPackage =
+				mainCharacter.hasRightPackage =
+					undefined;
 		this._edgeLeft = [];
 		this._edgeRight = [];
 		this._crowdPvp = false;
-		if((this.pvp || this.war) && mainCharacter && _len > 2) {
+		if ((this.pvp || this.war) && mainCharacter && _len > 2) {
 			let _others = 0;
-			for(let _j = 0; _j < _len; _j++) {
+			for (let _j = 0; _j < _len; _j++) {
 				const _e = this.enemies[_j];
-				if(!_e || _e.main || _e === mainCharacter || !_e.alp || _e.ghost || _e.isDead?.()
-					|| _e.class === __spell || _e.class === 'object' || _e.class === 'minion')
+				if (
+					!_e ||
+					_e.main ||
+					_e === mainCharacter ||
+					!_e.alp ||
+					_e.ghost ||
+					_e.isDead?.() ||
+					_e.class === __spell ||
+					_e.class === 'object' ||
+					_e.class === 'minion'
+				)
 					continue;
 				_others++;
-				if(_others > 1)
-					break;
+				if (_others > 1) break;
 			}
 			this._crowdPvp = _others > 1;
 		}
 		if (_len)
 			for (var i = 0; i < _len; i++) {
 				let sprite = this.enemies[i];
-				if(!sprite)
-					continue;
-				if(sprite.tagContainer && sprite.tagSkillUsed && ((_gameTick - sprite.tagSkillUsed) > 1500)) {
+				if (!sprite) continue;
+				if (sprite.tagContainer && sprite.tagSkillUsed && _gameTick - sprite.tagSkillUsed > 1500) {
 					const _wrapper = sprite.tagContainer;
 					addClass(_wrapper, 'fade-out');
-					_wrapper.onanimationend = function(ev) {
-						if(ev.animationName === 'fade-out-me'){
-							if(_wrapper)
-								_wrapper.remove();
+					_wrapper.onanimationend = function (ev) {
+						if (ev.animationName === 'fade-out-me') {
+							if (_wrapper) _wrapper.remove();
 							delete sprite.tagContainer;
 						}
-					}
+					};
 				}
-				if(sprite.slot && sprite.isDead())
-					sprite.releaseSlot(true);
-				if(sprite.remove || (sprite.related?.dead && !sprite.noRemove))
-				{
+				if (sprite.slot && sprite.isDead()) sprite.releaseSlot(true);
+				if (sprite.remove || (sprite.related?.dead && !sprite.noRemove)) {
 					sprite.tagContainer?.remove?.();
-					const _bubble = episode.bubbles?.find(x => x.key === sprite.key)?.elem;
-					if (_bubble)
-						removeBubble(_bubble, sprite);
-					if(sprite.remove)
-						sprite.checkSpawn();
-					if(!this.war || sprite.owner || sprite.class === __spell || sprite.class === 'minion') {
+					const _bubble = episode.bubbles?.find((x) => x.key === sprite.key)?.elem;
+					if (_bubble) removeBubble(_bubble, sprite);
+					if (sprite.remove) sprite.checkSpawn();
+					if (!this.war || sprite.owner || sprite.class === __spell || sprite.class === 'minion') {
 						const spriteAnima = sprite.getCurrentAnimation();
-						if(spriteAnima?.sound?.stop){
+						if (spriteAnima?.sound?.stop) {
 							spriteAnima.sound.stop();
 							delete spriteAnima.sound;
 						}
@@ -1709,284 +1485,297 @@ function map(_m) {
 						i--;
 						_len--;
 					}
+				} else if (sprite.relatedObjects?.[0]) {
+					for (let _spr of sprite.relatedObjects)
+						if (_spr.removeId && !_spr.remove) this.limitedEffects.push(_spr);
 				}
-				else if(sprite.relatedObjects?.[0]) {
-					for(let _spr of sprite.relatedObjects)
-						if(_spr.removeId && !_spr.remove)
-							this.limitedEffects.push(_spr);
-				}
-				if(sprite.main){
-					if(updateUnseen)
-						this.seenEnemies.push(sprite);
-					if(sprite.hitStop > 0)
-						sprite.hitStop--;
+				if (sprite.main) {
+					if (updateUnseen) this.seenEnemies.push(sprite);
+					if (sprite.hitStop > 0) sprite.hitStop--;
 					continue;
 				}
-				if(!this.hasSolid && sprite.solid)
-					this.hasSolid = 1;
+				if (!this.hasSolid && sprite.solid) this.hasSolid = 1;
 				let _skipIfUnseen = !sprite.pvpRespawn || (sprite.pvpRespawn && !sprite.isDead());
-				sprite.out = (_skipIfUnseen && (isNaN(sprite.EXACTLEFT) || (((sprite.EXACTLEFT) + sprite.WIDTH) < 0 ||
-						(sprite.EXACTLEFT) > this.cWidth)));
+				sprite.out =
+					_skipIfUnseen &&
+					(isNaN(sprite.EXACTLEFT) || sprite.EXACTLEFT + sprite.WIDTH < 0 || sprite.EXACTLEFT > this.cWidth);
 				sprite.unseen = sprite.out && !sprite.npc && sprite.dropType !== 'quest-item';
-				if(sprite.unseen && !sprite.main) {
-					if(this._crowdPvp && sprite.alp && !sprite.ghost && !sprite.isDead()
-						&& sprite.class !== __spell && sprite.class !== 'object' && sprite.class !== 'minion' && mainCharacter) {
+				if (sprite.unseen && !sprite.main) {
+					if (
+						this._crowdPvp &&
+						sprite.alp &&
+						!sprite.ghost &&
+						!sprite.isDead() &&
+						sprite.class !== __spell &&
+						sprite.class !== 'object' &&
+						sprite.class !== 'minion' &&
+						mainCharacter
+					) {
 						const _sign = this.playerTag(sprite);
-						if(_sign && _sign !== this.meSign) {
-							if(mainCharacter.EXACTLEFT > sprite.EXACTLEFT)
-								this._edgeLeft.push(_sign);
-							else
-								this._edgeRight.push(_sign);
+						if (_sign && _sign !== this.meSign) {
+							if (mainCharacter.EXACTLEFT > sprite.EXACTLEFT) this._edgeLeft.push(_sign);
+							else this._edgeRight.push(_sign);
 						}
-					}
-					else if(sprite.autoTarget && !sprite.invulnerable && !sprite.friendly && 
-						!sprite.puppetMode && sprite.enemy && sprite.class !== __spell && 
-						sprite.class !== 'object' && !sprite.isDead() && mainCharacter &&
-						sprite.autoTarget === mainCharacter)
-						{
-							if(mainCharacter.EXACTLEFT > sprite.EXACTLEFT)
-							{
-								if(!mainCharacter.hasLeftEnemy)
-									mainCharacter.hasLeftEnemy = 1;
-							}
-							else if(!mainCharacter.hasRightEnemy)
-								mainCharacter.hasRightEnemy = 1;
-						}
-					else if(sprite.package) {
-						if(mainCharacter.EXACTLEFT > sprite.EXACTLEFT)
-						{
-							if(!mainCharacter.hasLeftPackage)
-								mainCharacter.hasLeftPackage = 1;
-						}
-						else if(!mainCharacter.hasRightPackage)
-							mainCharacter.hasRightPackage = 1;
+					} else if (
+						sprite.autoTarget &&
+						!sprite.invulnerable &&
+						!sprite.friendly &&
+						!sprite.puppetMode &&
+						sprite.enemy &&
+						sprite.class !== __spell &&
+						sprite.class !== 'object' &&
+						!sprite.isDead() &&
+						mainCharacter &&
+						sprite.autoTarget === mainCharacter
+					) {
+						if (mainCharacter.EXACTLEFT > sprite.EXACTLEFT) {
+							if (!mainCharacter.hasLeftEnemy) mainCharacter.hasLeftEnemy = 1;
+						} else if (!mainCharacter.hasRightEnemy) mainCharacter.hasRightEnemy = 1;
+					} else if (sprite.package) {
+						if (mainCharacter.EXACTLEFT > sprite.EXACTLEFT) {
+							if (!mainCharacter.hasLeftPackage) mainCharacter.hasLeftPackage = 1;
+						} else if (!mainCharacter.hasRightPackage) mainCharacter.hasRightPackage = 1;
 					}
 				}
-				if((!sprite.unseen || sprite.mustDraw) && updateUnseen && !sprite.remove){
+				if ((!sprite.unseen || sprite.mustDraw) && updateUnseen && !sprite.remove) {
 					this.seenEnemies.push(sprite);
-					if(sprite.class === __spell)
-						this.activeSpells.push(sprite);
+					if (sprite.class === __spell) this.activeSpells.push(sprite);
 				}
-				if (sprite.autoMode > 0)
-					sprite.started = true;
-				else if (sprite.autoMode === 0 && sprite.dmgTaken)
-					sprite.started = true;
-				if (!sprite.located && sprite.animations.run)
-					sprite.located = true;
+				if (sprite.autoMode > 0) sprite.started = true;
+				else if (sprite.autoMode === 0 && sprite.dmgTaken) sprite.started = true;
+				if (!sprite.located && sprite.animations.run) sprite.located = true;
 				if (!episode.end || (episode.end && sprite.class !== __spell))
-					if (!sprite.unseen || sprite.mustDraw || sprite.started || sprite.socketId || (this.pvp || this.dungeon))
+					if (
+						!sprite.unseen ||
+						sprite.mustDraw ||
+						sprite.started ||
+						sprite.socketId ||
+						this.pvp ||
+						this.dungeon
+					)
 						sprite.draw(_queue);
-				if(sprite.hitStop > 0)
-					sprite.hitStop--;
+				if (sprite.hitStop > 0) sprite.hitStop--;
 			}
-		if(this.realTime && !this.pvpEnded && !__switchingMap && !this._duelHoldSend)
-		{
+		if (this.realTime && !this.pvpEnded && !__switchingMap && !this._duelHoldSend) {
 			const _pack = [];
-			if(!mainCharacter.ghosted && !mainCharacter.ghost) {
+			if (!mainCharacter.ghosted && !mainCharacter.ghost) {
 				let _dataItem;
-				if(!mainCharacter.firstTransferDone){
+				if (!mainCharacter.firstTransferDone) {
 					_dataItem = mainCharacter.getNewStatus2(1);
 					mainCharacter.firstTransferDone = 1;
 					mainCharacter.synced = true;
-				}
-				else
-					_dataItem = mainCharacter.getNewStatus2(0);
-				if(_dataItem) {
+				} else _dataItem = mainCharacter.getNewStatus2(0);
+				if (_dataItem) {
 					const _last = JSON.stringify(_dataItem);
-					if(mainCharacter.lastRealTimePack !== _last) {
+					if (mainCharacter.lastRealTimePack !== _last) {
 						mainCharacter.lastRealTimePack = _last;
 						_dataItem.s = __socketId;
 						_pack.push(_dataItem);
-						if(_dataItem.n)
-							applyDuelKill(mainCharacter, _dataItem.n);
+						if (_dataItem.n) applyDuelKill(mainCharacter, _dataItem.n);
 					}
 				}
 			}
-			const _realtimeBody = function(_e) {
-				if(!_e)
-					return false;
-				if(_e.main || _e === mainCharacter)
-					return true;
+			const _realtimeBody = function (_e) {
+				if (!_e) return false;
+				if (_e.main || _e === mainCharacter) return true;
 				return !!(_e.realTime && !_e.duelBot);
 			};
-			const _pushActor = function(_actor) {
-				if(!_actor || _actor.main || _actor.ghost || _actor.ghosted)
-					return;
-				const _death = episode.war && _actor.health <= 0 && _actor.killedBy && !_actor.killAnnounced && _actor.class !== __spell && _actor.class !== 'minion' && _actor.class !== 'object';
-				const _gone = episode.war && _actor.remove && !_actor.removeSent && _actor.class !== __spell && _actor.class !== 'minion' && _actor.class !== 'object';
-				if(_actor.remove && !_death && !_gone)
-					return;
-				if(_actor.class === __spell || _actor.class === 'object')
-					return;
+			const _pushActor = function (_actor) {
+				if (!_actor || _actor.main || _actor.ghost || _actor.ghosted) return;
+				const _death =
+					episode.war &&
+					_actor.health <= 0 &&
+					_actor.killedBy &&
+					!_actor.killAnnounced &&
+					_actor.class !== __spell &&
+					_actor.class !== 'minion' &&
+					_actor.class !== 'object';
+				const _gone =
+					episode.war &&
+					_actor.remove &&
+					!_actor.removeSent &&
+					_actor.class !== __spell &&
+					_actor.class !== 'minion' &&
+					_actor.class !== 'object';
+				if (_actor.remove && !_death && !_gone) return;
+				if (_actor.class === __spell || _actor.class === 'object') return;
 				const _first = !_actor.firstTransferDone;
 				const _item = _actor.getNewStatus2(_first ? 1 : 0);
-				if(_first)
-					_actor.firstTransferDone = 1;
-				if(!_item)
-					return;
-				if(_item.x !== undefined) {
-					const _worldX = _actor.main ? (_actor.left + platformX) : _actor.left;
+				if (_first) _actor.firstTransferDone = 1;
+				if (!_item) return;
+				if (_item.x !== undefined) {
+					const _worldX = _actor.main ? _actor.left + platformX : _actor.left;
 					_item.x = to4Decimals(_worldX / episode.width);
 				}
-				if(!_actor.socketId) {
+				if (!_actor.socketId) {
 					const _root = _actor.owner || _actor.related;
 					_actor.socketId = (_root?.socketId || __socketId) + ':' + (_actor.key ?? _actor.id ?? '');
 				}
 				_item.s = _actor.socketId;
 				_pack.push(_item);
-				if(_actor.remove)
-					_actor.removeSent = 1;
-				if(_item.n)
-					applyDuelKill(_actor, _item.n);
+				if (_actor.remove) _actor.removeSent = 1;
+				if (_item.n) applyDuelKill(_actor, _item.n);
 			};
-			for(const _actor of this.enemies) {
-				if(!_actor || _actor.main)
-					continue;
-				const _death = this.war && _actor.health <= 0 && _actor.killedBy && !_actor.killAnnounced && _actor.class !== __spell && _actor.class !== 'minion' && _actor.class !== 'object';
-				const _gone = this.war && _actor.remove && !_actor.removeSent && duelActorMine(_actor) && _actor.class !== __spell && _actor.class !== 'minion' && _actor.class !== 'object';
-				if(_actor.remove && !_death && !_gone)
-					continue;
-				if(_gone) {
+			for (const _actor of this.enemies) {
+				if (!_actor || _actor.main) continue;
+				const _death =
+					this.war &&
+					_actor.health <= 0 &&
+					_actor.killedBy &&
+					!_actor.killAnnounced &&
+					_actor.class !== __spell &&
+					_actor.class !== 'minion' &&
+					_actor.class !== 'object';
+				const _gone =
+					this.war &&
+					_actor.remove &&
+					!_actor.removeSent &&
+					duelActorMine(_actor) &&
+					_actor.class !== __spell &&
+					_actor.class !== 'minion' &&
+					_actor.class !== 'object';
+				if (_actor.remove && !_death && !_gone) continue;
+				if (_gone) {
 					_pushActor(_actor);
 					continue;
 				}
 				const _roots = [_actor.owner, _actor.related].filter(Boolean);
-				if(_roots.some(r => r === mainCharacter || r.main)) {
+				if (_roots.some((r) => r === mainCharacter || r.main)) {
 					_pushActor(_actor);
 					continue;
 				}
-				if(_death) {
+				if (_death) {
 					const _own = _actor.socketId === __socketId || _actor.duelSocket === __socketId;
 					const _myBot = this.duelLeader && _actor.duelBot && !_actor.realTime;
-					if(_own || _myBot)
-						_pushActor(_actor);
+					if (_own || _myBot) _pushActor(_actor);
 					continue;
 				}
-				if(!this.duelLeader)
-					continue;
-				if(_realtimeBody(_actor) || _roots.some(_realtimeBody))
-					continue;
+				if (!this.duelLeader) continue;
+				if (_realtimeBody(_actor) || _roots.some(_realtimeBody)) continue;
 				_pushActor(_actor);
 			}
-			if(!_pack.length)
-				return;
-			if(String(this.roomId || '').indexOf('duel:') === 0) {
-				if(typeof relayDuelPack === 'function' && typeof duelTargets === 'function')
-					for(const _peer of duelTargets())
-						relayDuelPack(_peer, _pack);
-			}
-			else
-				setTransferMessage(_pack);
+			if (!_pack.length) return;
+			if (String(this.roomId || '').indexOf('duel:') === 0) {
+				if (typeof relayDuelPack === 'function' && typeof duelTargets === 'function')
+					for (const _peer of duelTargets()) relayDuelPack(_peer, _pack);
+			} else setTransferMessage(_pack);
 		}
-		if(this.splash) {
+		if (this.splash) {
 			addClass(this.splash, 'd-none');
 			this.splash = undefined;
 		}
-	}
+	};
 	this.drawBGAnimations = function () {
 		return;
-		if (!this.bgAnimations)
-			return;
+		if (!this.bgAnimations) return;
 		c5.clearRect(0, 0, _canvasB.clientWidth, _canvasB.clientHeight);
 		for (var _lay of this.bgAnimations) {
 			if (_lay.delayLeft) {
 				_lay.delayLeft--;
 				continue;
 			}
-			if (_lay.frame === undefined)
-				_lay.frame = 0;
-			if (_lay.start === undefined)
-				_lay.start = 0;
-			if (_lay.stepX === undefined)
-				_lay.stepX = 0;
+			if (_lay.frame === undefined) _lay.frame = 0;
+			if (_lay.start === undefined) _lay.start = 0;
+			if (_lay.stepX === undefined) _lay.stepX = 0;
 			const _layer = getObject(_lay.zoom, _lay, _lay.left, _lay.top);
 			_layer.realWidth = _lay.realWidth;
-			if (isObjectInVisibleRectangle(_lay,
-				{ left: MathRound(platformX * (_lay.platformRate ?? 0)), right: MathRound(platformX * (_lay.platformRate ?? 0)) + _canvas.width, top: 0, bottom: _canvas.height, width: _canvas.width, realWidth: _canvas.width }
-			)) {
-				c5.drawImage(_layer.animation.sprites[0].image,
+			if (
+				isObjectInVisibleRectangle(_lay, {
+					left: MathRound(platformX * (_lay.platformRate ?? 0)),
+					right: MathRound(platformX * (_lay.platformRate ?? 0)) + _canvas.width,
+					top: 0,
+					bottom: _canvas.height,
+					width: _canvas.width,
+					realWidth: _canvas.width
+				})
+			) {
+				c5.drawImage(
+					_layer.animation.sprites[0].image,
 					_lay.frameDirection === 'vertical' ? 0 : _lay.frame * _lay.width,
-					_lay.frameDirection === 'vertical' ? _lay.frame * _lay.height : 0, _lay.width, _lay.height,
-					_lay.left - MathRound(platformX * (_lay.platformRate ?? 0)), _lay.top, _layer.width, _layer.height);
+					_lay.frameDirection === 'vertical' ? _lay.frame * _lay.height : 0,
+					_lay.width,
+					_lay.height,
+					_lay.left - MathRound(platformX * (_lay.platformRate ?? 0)),
+					_lay.top,
+					_layer.width,
+					_layer.height
+				);
 			}
-			if (_lay.start > 0 && (_lay.start % _lay.speed) === 0) {
+			if (_lay.start > 0 && _lay.start % _lay.speed === 0) {
 				_lay.frame++;
 				_lay.start = 0;
-				if (_lay.frame === _lay.totalFrames)
-					_lay.frame = 0;
-				if (_lay.to !== undefined && _lay.left >= _lay.to)
-					_lay.left = _lay.from;
-			}
-			else {
+				if (_lay.frame === _lay.totalFrames) _lay.frame = 0;
+				if (_lay.to !== undefined && _lay.left >= _lay.to) _lay.left = _lay.from;
+			} else {
 				_lay.start++;
-				_lay.left += MathRound((_lay.stepX * (_lay.platformRate ?? 1)) * __zoom);
+				_lay.left += MathRound(_lay.stepX * (_lay.platformRate ?? 1) * __zoom);
 			}
 		}
-	}
+	};
 	this.layersDrawn = 0;
 	this.drawLayers = function () {
 		this.drawLayers7();
-	}
-	this.checkForgeDone = function() {
-		if(__account.forges?.[0]) {
-			var _forges = __account.forges.filter(x => !x.warned);
-			if(_forges?.[0]){
+	};
+	this.checkForgeDone = function () {
+		if (__account.forges?.[0]) {
+			var _forges = __account.forges.filter((x) => !x.warned);
+			if (_forges?.[0]) {
 				let _warn;
-				for(let _f of _forges) {
+				for (let _f of _forges) {
 					const _time = __forges[_f.type].time * 60 * 60 * 1000;
-					if(_gameTick > (_f.start + _time))
-						_f.warned = _warn = 1;
+					if (_gameTick > _f.start + _time) _f.warned = _warn = 1;
 				}
-				if(_warn) {
+				if (_warn) {
 					_client.saveState();
-					warn('<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/forge.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' + getLangData('Item Is Ready') + '</span></div>',  null, null, 1);
-					PlaySound({ key: 'forgeready', volume: .5 });
+					warn(
+						'<div class="flex achievement important" style="position:relative"><img style="height:12cqh" src="./images/icons/forge.png" />&nbsp;<span style="text-shadow:0px 0px 4px #000;color:#ffffffcc !important;flex:1">' +
+							getLangData('Item Is Ready') +
+							'</span></div>',
+						null,
+						null,
+						1
+					);
+					PlaySound({ key: 'forgeready', volume: 0.5 });
 				}
 			}
 		}
-	}
-	this.addEffect = function(_key, _props){
-		if(!this.effect)
-			this.effect = {};
+	};
+	this.addEffect = function (_key, _props) {
+		if (!this.effect) this.effect = {};
 		this.effect[_key] = structuredClone2(_props);
-	}
-	this.removeEffect = function(_key){
-		if(!this.effect)
-			return;
+	};
+	this.removeEffect = function (_key) {
+		if (!this.effect) return;
 		delete this.effect[_key];
-		if(Object.keys(this.effect).length === 0)
-			delete this.effect;
-	}
-	this.checkWeatherEffect = function() {
-		if(__weather.status === 'autumn') {
+		if (Object.keys(this.effect).length === 0) delete this.effect;
+	};
+	this.checkWeatherEffect = function () {
+		if (__weather.status === 'autumn') {
 			const _leaves = document.querySelectorAll('img.leaf');
-			if(_leaves?.[0])
-				for(let _leaf of _leaves) {
+			if (_leaves?.[0])
+				for (let _leaf of _leaves) {
 					let _p = _leaf.parentNode;
-					if(_gameTick > (_leaf.fallingStart + _leaf.fallingTime)) {
+					if (_gameTick > _leaf.fallingStart + _leaf.fallingTime) {
 						createLeaf(_leaf, _p);
 						continue;
 					}
-					_p.style.transform = 'translateX(' + (-1 * MathRound((platformX - _leaf.startPlatformX) * 1.1)) + 'px)';
+					_p.style.transform =
+						'translateX(' + -1 * MathRound((platformX - _leaf.startPlatformX) * 1.1) + 'px)';
 					_p.style.setProperty('-webkit-transform', _p.style.transform);
 				}
-		}
-		else if(__weather.status === 'quake') {
+		} else if (__weather.status === 'quake') {
 			const _rocks = document.querySelectorAll('img.rock');
-			if(_rocks?.[0])
-				for(let _rock of _rocks) {
+			if (_rocks?.[0])
+				for (let _rock of _rocks) {
 					let _p = _rock.parentNode;
-					_p.style.transform = 'translateX(' + (-1 * MathRound((platformX - _rock.startPlatformX) * 1.1)) + 'px)';
+					_p.style.transform =
+						'translateX(' + -1 * MathRound((platformX - _rock.startPlatformX) * 1.1) + 'px)';
 					_p.style.setProperty('-webkit-transform', _p.style.transform);
 				}
-		}
-		else if(letItSnow)
-			letItSnow.drawSnowFlakes();
-	}
+		} else if (letItSnow) letItSnow.drawSnowFlakes();
+	};
 	this.drawLayers7 = async function () {
-
-		if (this.disposing || __batterySaveMode)
-			return;
+		if (this.disposing || __batterySaveMode) return;
 
 		const layers = this.layers;
 		const scale = __scale;
@@ -1996,70 +1785,48 @@ function map(_m) {
 		let firstDraw = !this.layersDrawn;
 
 		for (let i = 0, len = layers.length; i < len; i++) {
-
 			const _lay = layers[i];
-
-			// -------- TARGET CONTAINER --------
 
 			let _c;
 
-			if (_lay.foreground)
-				_c = c9;
-			else if (_lay.rate >= .9)
-				_c = c90;
-			else if (_lay.rate >= .75)
-				_c = c85;
-			else if (_lay.rate <= .5)
-				_c = c50;
-			else
-				_c = c3;
-
-			// -------- PARALLAX POSITION --------
+			if (_lay.foreground) _c = c9;
+			else if (_lay.rate >= 0.9) _c = c90;
+			else if (_lay.rate >= 0.75) _c = c85;
+			else if (_lay.rate <= 0.5) _c = c50;
+			else _c = c3;
 
 			const rate = _lay.rate || 1;
 			const p = MathRound(platX * rate * scale);
 
-			// -------- FIRST LOAD --------
-
 			if (firstDraw) {
-
 				let _img = _lay._cachedImg;
 
 				if (!_img) {
-
 					const srcImg = await getImagePromise(_lay.src);
 					if (!srcImg) return;
 
 					if (_lay.new) {
-
 						const copyc = document.createElement('canvas');
 						copyc.width = srcImg.width;
 						copyc.height = srcImg.height;
 
-						const copyctx = copyc.getContext("2d");
+						const copyctx = copyc.getContext('2d');
 						copyctx.imageSmoothingEnabled = false;
 						copyctx.drawImage(srcImg, 0, 0);
 
 						_img = copyc;
-
 					} else {
-
 						_img = srcImg;
 					}
 
-					// ---------- STATIC STYLE ONCE ----------
-
 					if (_lay.marginTop || _lay.marginLeft) {
-
 						_img.style.position = 'absolute';
 
 						if (_lay.marginTop)
-							_img.style.top =
-								MathFloor(_lay.marginTop * scale * zoom * _lay.zoom) + 'px';
+							_img.style.top = MathFloor(_lay.marginTop * scale * zoom * _lay.zoom) + 'px';
 
 						if (_lay.marginLeft)
-							_img.style.left =
-								MathFloor(_lay.marginLeft * scale * zoom * _lay.zoom) + 'px';
+							_img.style.left = MathFloor(_lay.marginLeft * scale * zoom * _lay.zoom) + 'px';
 
 						_img.style.width = MathRound(_img.width * scale) + 'px';
 						_img.style.height = MathRound(_img.height * scale) + 'px';
@@ -2070,161 +1837,67 @@ function map(_m) {
 				}
 			}
 
-			// -------- FAST TRANSFORM --------
-
-			if(this.effect?.shake && !_lay.foreground && rate < 1) {
+			if (this.effect?.shake && !_lay.foreground && rate < 1) {
 				let _yGap = this.effect.shake.yGap;
-				if(_yGap === undefined) {
+				if (_yGap === undefined) {
 					const _yRate = this.effect.shake.rate;
 					const _yGap = (this.cHeight * _yRate) / 100;
 					this.effect.shake.yGap = _yGap;
-				}
-				else {
-					_yGap *= .85;
+				} else {
+					_yGap *= 0.85;
 					this.effect.shake.yGap = _yGap;
 				}
 				_c.style.transform = `translate3d(${-p}px,${_yGap}px,0)`;
-			}
-			else
-				_c.style.transform = `translate3d(${-p}px,0,0)`;
+			} else _c.style.transform = `translate3d(${-p}px,0,0)`;
 		}
 
 		this.layersDrawn = 1;
 	};
 
-	// this.drawLayers5 = function () {
-	// 	for (let _lay of this.layers) {
-	// 		const p = MathRound(platformX * (_lay.rate ?? 1));
-	// 			getObject(_lay.zoom, _lay, _lay.locate.left, _lay.locate.bottom, function(_layer, lay) {
-	// 				let _c = lay.foreground ? c9 : (lay.rate == .9 ? c90 : (lay.rate == .85 ? c85 : (lay.rate == .5 ? c50 : c3)));
-	// 				_c.save();
-	// 				_c.clearRect(0, 0, episode.width, _canvasR.height);
-	// 				_c.translate(-p, 0);
-	// 				if(!__batterySaveMode)
-	// 					_c.drawImage(_layer.animation.sprites[0].image, 0, 0, _lay.width, _lay.height,
-	// 						0, 0, _layer.width, _canvasR.height);
-	// 				_c.restore();
-	// 			});
-	// 	}
-	// }
-	// this.drawLayers5 = function () {
-	// 	for (let _lay of this.layers) {
-	// 		const p = MathRound(platformX * (_lay.rate ?? 1));
-	// 			getObject(_lay.zoom, _lay, _lay.locate.left, _lay.locate.bottom, function(_layer, lay) {
-	// 				let _c = lay.foreground ? c9 : (lay.rate == .9 ? c90 : (lay.rate == .85 ? c85 : (lay.rate == .5 ? c50 : c3)));
-	// 				_c.save();
-	// 				_c.clearRect(0, 0, episode.width, _canvasR.height);
-	// 				_c.translate(-p, 0);
-	// 				_c.drawImage(_layer.animation.sprites[0].image, 0, 0, _lay.width, _lay.height,
-	// 					0, 0, _layer.width, _canvasR.height);
-	// 				_c.restore();
-	// 			});
-	// 	}
-	// }
-	// this.drawLayers7 = async function () {
-	// 	if(this.disposing || __batterySaveMode)
-	// 		return;
-	// 	let i = 0;
-	// 	for (let _lay of this.layers) {
-	// 		let _c;// = _lay.foreground ? c9 : (_lay.rate == .9 ? c90 : (_lay.rate == .85 ? c85 : (_lay.rate == .5 ? c50 : c3)));
-	// 		if(_lay.foreground)
-	// 			_c = c9;
-	// 		else if(_lay.rate >= .75 && _lay.rate < .9)
-	// 			_c = c85;
-	// 		else if(_lay.rate >= .9 && _lay.rate < 1)
-	// 			_c = c90;
-	// 		else if(_lay.rate <= .5)
-	// 			_c = c50;
-	// 		else
-	// 			_c = c3;
-	// 		const p = MathRound(platformX * (_lay.rate ?? 1) * __scale);
-	// 		if(!this.layersDrawn)
-	// 		{
-	// 			const _i = await getImagePromise(_lay.src);
-	// 			let _img;
-	// 			if(_lay.new) {
-	// 				const copyc = document.createElement('canvas');
-	// 				copyc.width = _i.width;
-	// 				copyc.height = _i.height;
-	// 				const copyctx = copyc.getContext("2d");
-	// 				copyc.imageSmoothingEnabled = false;
-	// 				copyctx.drawImage(_i, 0, 0);
-	// 				_img = copyc;
-	// 			}
-	// 			else 
-	// 				_img = _i; //bitmapToCanvas(_i); // _i;
-	// 			if(!_img)
-	// 				return;
-	// 			if(_lay.marginTop)
-	// 				_img.style.top = MathFloor(_lay.marginTop * __scale * __zoom * _lay.zoom) + 'px';
-	// 			if(_lay.marginLeft)
-	// 				_img.style.left = MathFloor(_lay.marginLeft * __scale * __zoom * _lay.zoom) + 'px';
-	// 			if(_lay.marginTop || _lay.marginLeft) {
-	// 				_img.style.position = 'absolute';
-	// 				_img.style.setProperty('width', MathRound(_img.width * __scale) + 'px', 'important');
-	// 				_img.style.setProperty('height', MathRound(_img.height * __scale) + 'px', 'important');
-	// 			}
-	// 			_c.appendChild(_img);
-	// 		}	
-	// 		_c.style.transform = 'translateX(-' + p + 'px)';
-	// 		_c.style.setProperty('-webkit-transform', _c.style.transform);
-	// 		i++;
-	// 	}
-	// 	if(!this.layersDrawn)
-	// 		this.layersDrawn = 1;
-	// }
-	
 	this.drawSpriteObjects2 = function (_forceId, _reset) {
-		if(this.disposing)
-			return;
-		if(_reset) {
+		if (this.disposing) return;
+		if (_reset) {
 			const _nodes = document.querySelectorAll('.quest-sign') ?? [];
-			for (var _node of _nodes)
-				_node.remove();
+			for (var _node of _nodes) _node.remove();
 		}
-		if(_forceId || !(this.lastNPCCheckTime > (_gameTick - 1000))){
-			this.NPCS = this.enemies?.filter(x => x.npc);
+		if (_forceId || !(this.lastNPCCheckTime > _gameTick - 1000)) {
+			this.NPCS = this.enemies?.filter((x) => x.npc);
 			this.lastNPCCheckTime = _gameTick;
 		}
 		let npcs;
-		if (_forceId)
-			npcs = this.NPCS.filter(x => x.class === _forceId);
-		else
-			npcs = this.NPCS;
-		if(npcs?.[0]) {
+		if (_forceId) npcs = this.NPCS.filter((x) => x.class === _forceId);
+		else npcs = this.NPCS;
+		if (npcs?.[0]) {
 			if (!this.spritesDrawnForeGround || _forceId || _reset) {
 				for (var sprite of npcs) {
-					let _unseen = false;//true;
-					// let _w = sprite.WIDTH, _l = sprite.LEFT;
-					// if((platformX < _l && (platformX + _canvas.width) > _l) || 
-					// (platformX < (_l + _w) && (platformX + _canvas.width) > (_l + _w)))	
-						//_unseen = false;
+					let _unseen = false;
+
 					this.resetMainQuest(sprite, _unseen);
 					this.resetSideQuests(sprite, _unseen);
 				}
 			}
 		}
-		let sprites = this.sprites?.filter(x => (x.totalFrames > 1 || x.npc) && !x.remove);
-		if (_forceId)
-			sprites = sprites.filter(x => x.animation.id === _forceId);
+		let sprites = this.sprites?.filter((x) => (x.totalFrames > 1 || x.npc) && !x.remove);
+		if (_forceId) sprites = sprites.filter((x) => x.animation.id === _forceId);
 		if (sprites?.[0]) {
 			if (!this.spritesDrawnForeGround || _forceId || _reset) {
 				for (var sprite of sprites) {
 					let _unseen = false;
-					if((platformX < sprite.left && (platformX + this.cWidth) > sprite.left) || 
-					(platformX < (sprite.left + sprite.width) && (platformX + this.cWidth) > (sprite.left + sprite.width)))	
+					if (
+						(platformX < sprite.left && platformX + this.cWidth > sprite.left) ||
+						(platformX < sprite.left + sprite.width && platformX + this.cWidth > sprite.left + sprite.width)
+					)
 						_unseen = false;
 					this.resetMainQuest(sprite, _unseen);
 					this.resetSideQuests(sprite, _unseen);
 					if (!sprite.frames && sprite.when && !sprite.when(sprite)) {
 						const _id = 'SPRT-' + sprite.animation.id;
-						let _img = this.elements?.find(x => x.key === _id)?.elem;
-						if(!_img) {
+						let _img = this.elements?.find((x) => x.key === _id)?.elem;
+						if (!_img) {
 							_img = document.getElementById(_id);
-							if(_img) {
-								if(!this.elements)
-									this.elements = [];
-								this.elements.push({key:_id, elem:_img});
+							if (_img) {
+								if (!this.elements) this.elements = [];
+								this.elements.push({ key: _id, elem: _img });
 							}
 						}
 						if (_img) {
@@ -2233,24 +1906,22 @@ function map(_m) {
 						}
 						continue;
 					}
-					const _c = sprite.rate == .9 ? _canvasAnimated90 : cc;
+					const _c = sprite.rate == 0.9 ? _canvasAnimated90 : cc;
 					const _l = MathRound(sprite.left);
 					const _t = MathRound(sprite.top);
 					if (sprite.text) {
 						let _labelid = 'SIGN' + sprite.animation.id;
-						let _label = this.elements?.find(x => x.key === _labelid)?.elem;
-						if(!_label) {
+						let _label = this.elements?.find((x) => x.key === _labelid)?.elem;
+						if (!_label) {
 							_label = document.getElementById(_labelid);
-							if(_label) {
-								if(!this.elements)
-									this.elements = [];
-								this.elements.push({key:_labelid, elem:_label});
+							if (_label) {
+								if (!this.elements) this.elements = [];
+								this.elements.push({ key: _labelid, elem: _label });
 							}
 						}
-						if(_label && _unseen)
-							addClass(_label, 'd-none');
-						if(!_unseen){
-							if(!_label) {
+						if (_label && _unseen) addClass(_label, 'd-none');
+						if (!_unseen) {
+							if (!_label) {
 								_label = document.createElement('span');
 								_label.left = _l;
 								_label.style.left = _label.left + 'px';
@@ -2259,28 +1930,24 @@ function map(_m) {
 								_label.innerText = sprite.text;
 								_label.className = 'waypoint-title-sign';
 								_c.appendChild(_label);
-							}
-							else
-								removeClass(_label, 'd-none');
+							} else removeClass(_label, 'd-none');
 						}
 						continue;
 					}
 					const _isCanvas = sprite.npc && sprite.frames?.length;
 					const _id = 'SPRT-' + sprite.animation.id;
-					let _img = this.elements?.find(x => x.key === _id)?.elem;
-					if(!_img) {
+					let _img = this.elements?.find((x) => x.key === _id)?.elem;
+					if (!_img) {
 						_img = document.getElementById(_id);
-						if(_img) {
-							if(!this.elements)
-								this.elements = [];
-							this.elements.push({key:_id, elem:_img});
+						if (_img) {
+							if (!this.elements) this.elements = [];
+							this.elements.push({ key: _id, elem: _img });
 						}
 					}
-					if(_img && _unseen)
-						addClass(_img, 'd-none');
-					if(!_unseen){
-						if(!_img) {
-							if(!_isCanvas) {
+					if (_img && _unseen) addClass(_img, 'd-none');
+					if (!_unseen) {
+						if (!_img) {
+							if (!_isCanvas) {
 								_img = document.createElement('img');
 								_img.src = sprite.animation.src;
 								const _w = MathRound(sprite.width);
@@ -2291,224 +1958,155 @@ function map(_m) {
 								_img.style.height = _h + 'px';
 								_img.style.top = _t + 'px';
 								_img.id = _id;
-								if (sprite.to)
-									_img.className = 'portal';
-								if (sprite.questItem)
-									addClass(_img, 'glow-quest-item');
+								if (sprite.to) _img.className = 'portal';
+								if (sprite.questItem) addClass(_img, 'glow-quest-item');
 								_img.style.position = 'absolute';
-								if (sprite.alpha)
-									_img.style.opacity = sprite.alpha;
-								// if (_isCanvas) {
-								// 	_img.width = _w;
-								// 	_img.height = _h;
-								// 	const _context = _img.getContext('2d');
-								// 	sprite.drawNPCAnimation = function () {
-								// 		episode.drawNPCAnimation(_img, _context, this);
-								// 	}
-								// }
-								else if (sprite.rotate)
-									_img.className = 'rotate';
+								if (sprite.alpha) _img.style.opacity = sprite.alpha;
+								else if (sprite.rotate) _img.className = 'rotate';
 								_c.appendChild(_img);
-							}
-							else {
+							} else {
 								sprite.drawNPCAnimation = function () {
 									episode.drawNPCAnimation(this, _l, _t);
-								}
+								};
 							}
-						}
-						else
-							removeClass(_img, 'd-none');
+						} else removeClass(_img, 'd-none');
 					}
 				}
-				if(!this.spritesDrawnForeGround || _forceId){
+				if (!this.spritesDrawnForeGround || _forceId) {
 					this.spritesDrawnForeGround = true;
 					this.reset();
 				}
 				return true;
-			}
-			else {
-				_canvasS.style.transform = 'translateX(-' + (platformX * __scale) + 'px)';
+			} else {
+				_canvasS.style.transform = 'translateX(-' + platformX * __scale + 'px)';
 				_canvasS.style.setProperty('-webkit-transform', _canvasS.style.transform);
 			}
-			cc.style.transform = 'translateX(-' + (platformX * __scale)+ 'px)';
+			cc.style.transform = 'translateX(-' + platformX * __scale + 'px)';
 			cc.style.setProperty('-webkit-transform', cc.style.transform);
 		}
 		return false;
-	}
-	this.spritesDrawnBackGround = false, this.spritesDrawnForeGround = false;
+	};
+	((this.spritesDrawnBackGround = false), (this.spritesDrawnForeGround = false));
 	this.drawSpriteObjects = function (_forceId, _reset) {
 		return this.drawSpriteObjects2(_forceId, _reset);
-	}
-	this.createBgMusic = function(_path, _start, _end, _key, _newVolume) {
-		if(!this.bgMusic)
-			this.bgMusic = (_path && _path.indexOf('.') === -1) ? getSound(null, _path) :
-		new Audio(_path ?? './images/music/' + (_key ?? getRandomValue(1, 13)) + '.mp3');
+	};
+	this.createBgMusic = function (_path, _start, _end, _key, _newVolume) {
+		if (!this.bgMusic)
+			this.bgMusic =
+				_path && _path.indexOf('.') === -1
+					? getSound(null, _path)
+					: new Audio(_path ?? './images/music/' + (_key ?? getRandomValue(1, 13)) + '.mp3');
 		this.minBgMusicVolume = _newVolume;
-		this.bgMusicVolume = _newVolume ?? .1;
-		if(_start)
-			this.bgMusic.oncanplay = function() {
+		this.bgMusicVolume = _newVolume ?? 0.1;
+		if (_start)
+			this.bgMusic.oncanplay = function () {
 				_start();
-			}
-		if(_end)
-			this.bgMusic.onended = function() {
+			};
+		if (_end)
+			this.bgMusic.onended = function () {
 				_end();
-			}
-	}
-	this.setBgMusicVolume = function(_new, _force, _noRate) {
-		if(this.bgMusic && !this.bgMusic.still) {
-			if(this.bgMusic.volumeDown)
-				delete this.bgMusic.volumeDown;
-			if(!(this.bgMusic.lastVolumeChangeTime > (_gameTick - 300))){
-				let _musicVolume = .5 * __volume;
-				if(_musicVolume < .2)
-					_musicVolume = .2;
-				if((this.bgMusic.volume <= _musicVolume && _new > 0 && _new <= _musicVolume) || _force)
-					if(this.bgMusic.volume !== _new){
+			};
+	};
+	this.setBgMusicVolume = function (_new, _force, _noRate) {
+		if (this.bgMusic && !this.bgMusic.still) {
+			if (this.bgMusic.volumeDown) delete this.bgMusic.volumeDown;
+			if (!(this.bgMusic.lastVolumeChangeTime > _gameTick - 300)) {
+				let _musicVolume = 0.5 * __volume;
+				if (_musicVolume < 0.2) _musicVolume = 0.2;
+				if ((this.bgMusic.volume <= _musicVolume && _new > 0 && _new <= _musicVolume) || _force)
+					if (this.bgMusic.volume !== _new) {
 						this.bgMusic.volume = _new;
 						this.bgMusic.lastVolumeChangeTime = _gameTick;
-						if(!_noRate)
-							this.setBgMusicPlayBackRate();
+						if (!_noRate) this.setBgMusicPlayBackRate();
 					}
 			}
 		}
-	}
-	this.setBgMusicPlayBackRate = function() {
+	};
+	this.setBgMusicPlayBackRate = function () {
 		return;
-		if(this.bgMusic.volume < (.25 * __volume)) {
-			if(this.bgMusic.playbackRate !== 1)
-				this.bgMusic.playbackRate = 1;
+		if (this.bgMusic.volume < 0.25 * __volume) {
+			if (this.bgMusic.playbackRate !== 1) this.bgMusic.playbackRate = 1;
+		} else if (this.bgMusic.volume < 0.5 * __volume) {
+			if (this.bgMusic.playbackRate !== 1.05) this.bgMusic.playbackRate = 1.05;
+		} else {
+			if (this.bgMusic.playbackRate !== 1.1) this.bgMusic.playbackRate = 1.1;
 		}
-		else if(this.bgMusic.volume < (.5 * __volume)) {
-			if(this.bgMusic.playbackRate !== 1.05)
-				this.bgMusic.playbackRate = 1.05;
-		}
-		else {
-			if(this.bgMusic.playbackRate !== 1.1)
-				this.bgMusic.playbackRate = 1.1;
-		}
-	}
-	this.resetBgMusicVolume = function() {
-		if(this.bgMusic  && !this.bgMusic.still)
-			if(this.bgMusic.volumeDown && this.bgMusic.volume > (this.minBgMusicVolume ?? .1))
-				if ((_gameTick - 500) > this.bgMusic.lastVolumeChangeTime){
-					this.bgMusic.volume -= (.02 * __volume);
+	};
+	this.resetBgMusicVolume = function () {
+		if (this.bgMusic && !this.bgMusic.still)
+			if (this.bgMusic.volumeDown && this.bgMusic.volume > (this.minBgMusicVolume ?? 0.1))
+				if (_gameTick - 500 > this.bgMusic.lastVolumeChangeTime) {
+					this.bgMusic.volume -= 0.02 * __volume;
 					this.bgMusic.lastVolumeChangeTime = _gameTick;
 					this.setBgMusicPlayBackRate();
 				}
-	}
+	};
 	this.playBgMusic = function (_once, _still) {
-		// if(!_once)
-		// 	return;
-		if(!__account.options.ambiance || episodeVisibilityHidden || this.tower || !this.bgMusic)
-			return;
-		if(__batterySaveMode) {
+		if (!__account.options.ambiance || episodeVisibilityHidden || this.tower || !this.bgMusic) return;
+		if (__batterySaveMode) {
 			this.pauseBgMusic();
 			return;
 		}
-		if(this.bgMusic && !this.bgMusic.paused){
-			if((_gameTick - this.bgMusic.startTime) > 10000) {
-				//this.bgMusic.playbackRate = parseFloat((this.bgMusic.playbackRate + .025).toFixed(2));
-				//if(this.bgMusic.playbackRate > 1.25)
-				//	this.bgMusic.playbackRate = 1.25;
+		if (this.bgMusic && !this.bgMusic.paused) {
+			if (_gameTick - this.bgMusic.startTime > 10000) {
 				this.bgMusic.startTime = _gameTick;
 			}
 			return;
 		}
-		if(this.bgMusic?.playRequestSent)
-			return;
+		if (this.bgMusic?.playRequestSent) return;
 		try {
-			this.bgMusic.volume = (this.minBgMusicVolume ?? .1) * __volume;
+			this.bgMusic.volume = (this.minBgMusicVolume ?? 0.1) * __volume;
 			this.bgMusic.crossOrigin = 'anonymous';
-			if(!_once)
-				this.bgMusic.loop = true;
-			//this.bgMusic.playbackRate = 1;
+			if (!_once) this.bgMusic.loop = true;
+
 			this.bgMusic.play();
 			this.bgMusic.still = _still;
 			this.bgMusic.playRequestSent = 1;
 			this.bgMusic.startTime = _gameTick;
-			if(this.bgMusicTimer) {
+			if (this.bgMusicTimer) {
 				clearInterval(episode.bgMusicTimer);
 				delete episode.bgMusicTimer;
 			}
-			this.bgMusicTimer = setInterval(function() {
-				if(!episode.bgMusic || episode.bgMusic.volume >= ((episode.bgMusicVolume ?? (episode.minBgMusicVolume ?? .1)) * __volume)) {
-					episode.bgMusic.volume = (episode.bgMusicVolume ?? (episode.minBgMusicVolume ?? .1)) * __volume;
+			this.bgMusicTimer = setInterval(function () {
+				if (
+					!episode.bgMusic ||
+					episode.bgMusic.volume >= (episode.bgMusicVolume ?? episode.minBgMusicVolume ?? 0.1) * __volume
+				) {
+					episode.bgMusic.volume = (episode.bgMusicVolume ?? episode.minBgMusicVolume ?? 0.1) * __volume;
 					clearInterval(episode.bgMusicTimer);
 					delete episode.bgMusicTimer;
 					return;
 				}
-				episode.bgMusic.volume += .01 * __volume;
+				episode.bgMusic.volume += 0.01 * __volume;
 			}, 100);
-		} catch (e) {
+		} catch (e) {}
+	};
 
-		}
-	}
-	// this.pauseBgMusic = function (_force) {
-	// 	if(!this.bgMusic || this.bgMusicTimer)
-	// 		return;
-	// 	if(this.bgMusic && this.bgMusic.paused && !_force)
-	// 		return;
-	// 	try {
-	// 		if(this.bgMusic && _force) {
-	// 			if(this.bgMusicTimer)
-	// 				clearInterval(this.bgMusicTimer);
-	// 			if(this.bgMusic){
-	// 				if(!this.bgMusic.paused)
-	// 					this.bgMusic.pause();
-	// 				this.bgMusic = null;
-	// 			}
-	// 			return;
-	// 		}
-	// 		this.bgMusic.volume = this.bgMusicVolume ?? (this.minBgMusicVolume ?? .1);
-	// 		if(this.bgMusicTimer) {
-	// 			clearInterval(episode.bgMusicTimer);
-	// 			delete episode.bgMusicTimer;
-	// 		}
-	// 		this.bgMusicTimer = setInterval(function() {
-	// 			if(!episode.bgMusic || episode.bgMusic.volume <= (episode.bgMusicVolume ?? .01)) {
-	// 				clearInterval(episode.bgMusicTimer);
-	// 				delete episode.bgMusicTimer;
-	// 				if(!episode.bgMusic)
-	// 					return;
-	// 				episode.bgMusic.pause();
-	// 				delete episode.bgMusic.playRequestSent;
-	// 				return;
-	// 			}
-	// 			episode.bgMusic.volume -= .01;
-	// 		}, 100);
-	// 	} catch (e) {
-
-	// 	}
-	// }
 	this.pauseBgMusic = function (_force) {
-
 		if (!this.bgMusic) return;
 
 		if (_force) {
-			if(this.bgMusicTimer)
-				clearInterval(this.bgMusicTimer);
+			if (this.bgMusicTimer) clearInterval(this.bgMusicTimer);
 			this.bgMusic.pause();
 			this.bgMusic = null;
 			return;
 		}
 
-		if(this.bgMusicTimer) {
+		if (this.bgMusicTimer) {
 			clearInterval(this.bgMusicTimer);
 			this.bgMusicTimer = null;
 		}
-		const fadeSpeed = 0.005; // daha yumuşak
-		const interval = 16; // ~60fps
+		const fadeSpeed = 0.005;
+		const interval = 16;
 
 		this.bgMusicTimer = setInterval(() => {
-
 			if (!this.bgMusic) {
-				if(this.bgMusicTimer)
-					clearInterval(this.bgMusicTimer);
+				if (this.bgMusicTimer) clearInterval(this.bgMusicTimer);
 				this.bgMusicTimer = null;
 				return;
 			}
 
-			if (this.bgMusic.volume <= (0.01 * __volume)) {
+			if (this.bgMusic.volume <= 0.01 * __volume) {
 				this.bgMusic.volume = 0;
 				this.bgMusic.pause();
 				delete this.bgMusic.playRequestSent;
@@ -2518,36 +2116,25 @@ function map(_m) {
 			}
 
 			this.bgMusic.volume = Math.max(0, this.bgMusic.volume - fadeSpeed);
-
 		}, interval);
-	}
-	this.pauseAmbianceMusic = function() {
-		if(this.bgSound)
-			this.bgSound.pause();
-	}
-	this.resumeAmbianceMusic = function() {
-		if(!__account.options.ambiance || episodeVisibilityHidden)
-			return;
-		if(this.bgSound && this.bgSound.paused)
-			this.bgSound.play();
-	}
+	};
+	this.pauseAmbianceMusic = function () {
+		if (this.bgSound) this.bgSound.pause();
+	};
+	this.resumeAmbianceMusic = function () {
+		if (!__account.options.ambiance || episodeVisibilityHidden) return;
+		if (this.bgSound && this.bgSound.paused) this.bgSound.play();
+	};
 	this.playAmbianceMusic = function (_src, _force) {
-		// if(!__account.cs)
-		// 	return;
-		let _name=this.theme;
-		if(this.theme.endsWith('mobile'))
-			_name  =  _name.slice(0, this.theme.length - 6);
-		if(!_src)
-			_src = this.dungeon ? 'dungeon' : _name.replace(/\d+/, '');
-		if(episodeVisibilityHidden)
-			return;
-		if((!__account.options.ambiance || __batterySaveMode) && !_force)
-			return;
+		let _name = this.theme;
+		if (this.theme.endsWith('mobile')) _name = _name.slice(0, this.theme.length - 6);
+		if (!_src) _src = this.dungeon ? 'dungeon' : _name.replace(/\d+/, '');
+		if (episodeVisibilityHidden) return;
+		if ((!__account.options.ambiance || __batterySaveMode) && !_force) return;
 		try {
-			//console.log('AMBIANCE = ' + this.ambiancePath + ', ' + _src);
 			const _sound = getSound(this.ambiancePath, _src, 1, this.ambiancePath);
 			if (_sound) {
-				_sound.volume = (this.ambianceVolume ?? .05) * __volume;
+				_sound.volume = (this.ambianceVolume ?? 0.05) * __volume;
 				_sound.crossOrigin = 'anonymous';
 				_sound.loop = true;
 				if (this.bgSound) {
@@ -2560,61 +2147,44 @@ function map(_m) {
 		} catch (e) {
 			console.log(_src);
 		}
-	}
+	};
 	this.playSound = function (_s, _alternateKeys, _volumeRate) {
 		return PlaySound(_s, _alternateKeys, _volumeRate);
 		return undefined;
 		let _sound = getSound(null, _soundKey);
 		let _play = _s?.reset;
-		if(!_sound && _s.path){
+		if (!_sound && _s.path) {
 			_sound = getSound(_s.path);
 			_play = true;
 		}
-		if(_sound && (_sound.lastUsed > (_gameTick - 100)))
-			return undefined;
+		if (_sound && _sound.lastUsed > _gameTick - 100) return undefined;
 		if (_sound && (_sound.paused || _sound.currentTime === 0 || _play)) {
-			const _vol = (_volumeRate ?? 1) * (_s.volume ?? .1) * __volume;
-			if(_sound.volume !== _vol)
-				_sound.volume = _vol;
-			if (_s.loop && !_sound.loop)
-				_sound.loop = true;
-			
-			// let _speed = _s.speed;
-			// const _fps = _s.owner ? _s.owner.getFps() : 1;
-			// if (_s.owner && _fps !== 1)
-			// 	_speed = (_speed ?? 1) / _fps;
-			// if (_speed && _speed !== 1){
-			// 	const _r = _speed < 1 ? .5 : 2;
-			// 	if(_sound.playbackRate !== _r)
-			// 		_sound.playbackRate = _r;
-			// }
+			const _vol = (_volumeRate ?? 1) * (_s.volume ?? 0.1) * __volume;
+			if (_sound.volume !== _vol) _sound.volume = _vol;
+			if (_s.loop && !_sound.loop) _sound.loop = true;
+
 			_sound.key = _soundKey;
-			if(_sound.crossOrigin !== 'anonymous')
-				_sound.crossOrigin = 'anonymous';
-			if (_sound.currentTime > 0 && !_sound.paused && (_s.reset && (_soundKey === _sound.key))) {
+			if (_sound.crossOrigin !== 'anonymous') _sound.crossOrigin = 'anonymous';
+			if (_sound.currentTime > 0 && !_sound.paused && _s.reset && _soundKey === _sound.key) {
 				_sound.currentTime = 0;
-				if(!_sound.paused)
-					_sound.pause();
+				if (!_sound.paused) _sound.pause();
 				_sound.play();
 				_sound.lastUsed = _gameTick;
-				if (_s.end)
-					_sound.addEventListener('ended', _s.end);
+				if (_s.end) _sound.addEventListener('ended', _s.end);
 				return _sound;
 			}
 			if (_sound.currentTime === 0 || _sound.paused)
 				try {
 					_sound.play();
 					_sound.lastUsed = _gameTick;
-					if (_s.end)
-						_sound.addEventListener('ended', _s.end);
+					if (_s.end) _sound.addEventListener('ended', _s.end);
 					return _sound;
 				} catch (e) {
-					if (_s.end)
-						_sound.addEventListener('ended', _s.end);
+					if (_s.end) _sound.addEventListener('ended', _s.end);
 				}
 		}
 		return undefined;
-	}
+	};
 	this.stopSound = function (_sf) {
 		return;
 		const _soundKey = _sf.key;
@@ -2627,153 +2197,127 @@ function map(_m) {
 				_sound.currentTime = 0;
 			}
 		}
-	}
+	};
 	this.drawNPCAnimation = function (_rel) {
-		if(__batterySaveMode)
-			return false;
-		if((platformX < _rel.left && (platformX + this.cWidth) > _rel.left) || 
-				(platformX < (_rel.left + (_rel.maxWidth ?? _rel.width)) && (platformX + this.cWidth) > (_rel.left + (_rel.maxWidth ?? _rel.width))))	
-		{
-			if (!_rel.frames || this.disposing || _rel.remove)
-				return false;
-			if (_rel.start === undefined)
-				_rel.start = 0;
-			if (_rel.frame === undefined)
-				_rel.frame = 0;
+		if (__batterySaveMode) return false;
+		if (
+			(platformX < _rel.left && platformX + this.cWidth > _rel.left) ||
+			(platformX < _rel.left + (_rel.maxWidth ?? _rel.width) &&
+				platformX + this.cWidth > _rel.left + (_rel.maxWidth ?? _rel.width))
+		) {
+			if (!_rel.frames || this.disposing || _rel.remove) return false;
+			if (_rel.start === undefined) _rel.start = 0;
+			if (_rel.frame === undefined) _rel.frame = 0;
 			let _f = _rel.frames[_rel.frame];
-			if ((_rel.start % _f.speed) === 0) {
+			if (_rel.start % _f.speed === 0) {
 				_rel.start = 0;
-				if (_rel.frame >= (_rel.frames.length - 1))
-					_rel.frame = 0;
-				else
-					_rel.frame++;
+				if (_rel.frame >= _rel.frames.length - 1) _rel.frame = 0;
+				else _rel.frame++;
 			}
 			_rel.start++;
-			if(!__batterySaveMode) {
-				if(_rel.rotate) {
+			if (!__batterySaveMode) {
+				if (_rel.rotate) {
 					_cNPC.save();
 					_cNPC.scale(-1, 1);
 				}
-				_cNPC.drawImage(_rel.animation.sprites[0].image,
-					_f.left ?? (_rel.frame * _rel.animation.width),
-					(_f.top ?? 0),
-					_f.width, 
+				_cNPC.drawImage(
+					_rel.animation.sprites[0].image,
+					_f.left ?? _rel.frame * _rel.animation.width,
+					_f.top ?? 0,
+					_f.width,
 					_rel.animation.height,
-					(_rel.rotate ? -1 : 1) *_rel.left + MathRound(((_f.leftGap ?? 0) * _rel.zoom * __zoom)), 
+					(_rel.rotate ? -1 : 1) * _rel.left + MathRound((_f.leftGap ?? 0) * _rel.zoom * __zoom),
 					_rel.top,
-					_rel.width, 
-					_rel.height);
-				if(_rel.rotate)
-					_cNPC.restore();
+					_rel.width,
+					_rel.height
+				);
+				if (_rel.rotate) _cNPC.restore();
 			}
 			return true;
 		}
 		return false;
-	}
-	this.removeLocationHand = function() {
+	};
+	this.removeLocationHand = function () {
 		let _hand = document.getElementById('go-location');
-		if(_hand) 
-			_hand.remove();
-		// if(window.SoundManager.stop('go')) {
-		// 	if(!episode.goSound.paused)
-		// 		episode.goSound.pause();
-		// 	episode.goSound = null;
-		// }
+		if (_hand) _hand.remove();
+
 		this.stopGoSound();
 		this.hasGoSound = 0;
-	}
-	this.stopGoSound = function() {
+	};
+	this.stopGoSound = function () {
 		window.SoundManager.stop('go');
-	}
-	this.showLocationHand = function(_dir) {
+	};
+	this.showLocationHand = function (_dir) {
 		let _hand = document.getElementById('go-location');
-		if(!_hand) {
+		if (!_hand) {
 			_hand = document.createElement('div');
 			_hand.id = 'go-location';
 			_hand.className = 'go go-' + _dir;
-			this.playSound({key:'go', force: true, loop:true, volume:.5});
+			this.playSound({ key: 'go', force: true, loop: true, volume: 0.5 });
 			this.hasGoSound = 1;
 			_gameUI.appendChild(_hand);
-		}
-		else if(!hasClass(_hand, 'go-' + _dir)) {
+		} else if (!hasClass(_hand, 'go-' + _dir)) {
 			removeClass(_hand, 'go-' + (_dir === __left ? __right : __left));
-			// if(episode.goSound) {
-			// 	if(!episode.goSound.paused)
-			// 		episode.goSound.pause();
-			// 	episode.goSound = null;
-			// }
+
 			this.stopGoSound();
-			this.playSound({key:'go', force: true, loop:true, volume:.5});
+			this.playSound({ key: 'go', force: true, loop: true, volume: 0.5 });
 			this.hasGoSound = 1;
 			addClass(_hand, 'go-' + _dir);
 		}
-	}
+	};
 	this.drawQuestNavIcon = function () {
 		return;
 		let _nav = document.querySelector('.quest-nav');
 		if (this.pvp || this.id > 99) {
 			addClass(_nav, 'd-none');
 			return;
-		}
-		else
-			removeClass(_nav, 'd-none');
-		const _quest = _npcQuests.find(x => x.id === __account.questStatus.order);
-		if (!_quest)
-			return;
+		} else removeClass(_nav, 'd-none');
+		const _quest = _npcQuests.find((x) => x.id === __account.questStatus.order);
+		if (!_quest) return;
 		if (__account.questStatus.state === 'progress') {
 			if (_quest.maps && _quest.maps.indexOf(episode.id) === -1) {
 				if (!_nav) {
 					_nav = document.createElement('img');
-					_nav.src = './images/icons/nav.png';//sağ
+					_nav.src = './images/icons/nav.png';
 					_nav.className = 'quest-nav';
 					_gameUI.appendChild(_nav);
 				}
-				let _closestSide = _quest.maps[0], _sideDiff = MathAbs(_quest.maps[0] - episode.id);
+				let _closestSide = _quest.maps[0],
+					_sideDiff = MathAbs(_quest.maps[0] - episode.id);
 				for (var _m of _quest.maps)
 					if (MathAbs(_m - episode.id) < _sideDiff) {
 						_sideDiff = MathAbs(_m - episode.id);
 						_closestSide = _m;
 					}
 				let _side = __left;
-				// if (((_closestSide % 2) === 0) && _closestSide < episode.id && ((episode.id % 2) === 0))
-				// 	_side = __left;
-				// else 
-				if (((_closestSide % 2) === 1) && _closestSide > episode.id)
-					_side = __right;
+
+				if (_closestSide % 2 === 1 && _closestSide > episode.id) _side = __right;
 				if (_side === __left) {
 					addClass(_nav, __left);
 					removeClass(_nav, __right);
-				}
-				else {
+				} else {
 					addClass(_nav, __right);
 					removeClass(_nav, __left);
 				}
-			}
-			else if (_nav)
-				_nav.remove();
-		}
-		else if (_nav)
-			_nav.remove();
-	}
+			} else if (_nav) _nav.remove();
+		} else if (_nav) _nav.remove();
+	};
 	this.reset = function () {
 		addClass(document.getElementById('quest-dialog'), 'd-none');
 		this.drawQuestNavIcon();
 		this.drawSpriteObjects2(null, 1);
-	}
-	this.resetMainQuest = function(_sprite, _unseen) {
-		if(!mainCharacter || this.menu)
-			return;
-		const sprites =  _sprite ? [_sprite] : this.enemies?.filter(x => x.npc);
+	};
+	this.resetMainQuest = function (_sprite, _unseen) {
+		if (!mainCharacter || this.menu) return;
+		const sprites = _sprite ? [_sprite] : this.enemies?.filter((x) => x.npc);
 		if (sprites?.[0]) {
-			if(!_sprite) {
+			if (!_sprite) {
 				const _nodes = document.querySelectorAll('.quest-sign');
-				for (var _node of _nodes)
-					_node.remove();
+				for (var _node of _nodes) _node.remove();
 			}
-			let _quest = __story?.quests.find(x => x.id === __account.questStatus.order);
-			if (!_quest)
-				return;
-			let _status; //1 başlamadı, 2 alındı, 3 devam ediyor, 4 bitti git ödülü al
+			let _quest = __story?.quests.find((x) => x.id === __account.questStatus.order);
+			if (!_quest) return;
+			let _status;
 			switch (__account.questStatus.state) {
 				case 'begin':
 					_status = 2;
@@ -2785,40 +2329,39 @@ function map(_m) {
 					_status = 3;
 					break;
 				default:
-					_status = _quest.minLevel > (__account.characters.find(x => x.class === mainCharacter.class)?.level ?? 1) ? 1 : 2;
+					_status =
+						_quest.minLevel >
+						(__account.characters.find((x) => x.class === mainCharacter.class)?.level ?? 1)
+							? 1
+							: 2;
 					break;
 			}
 			for (var sprite of sprites) {
-				if (sprite.class !== _quest.owner)
-					continue;
-				if(!sprite.animations?.idle)
-					continue;
-				if(!sprite.animations.idle.frames[1].objects)
-					sprite.animations.idle.frames[1].objects = [];
-				if(!sprite.animations.idle.frames[1].objects.find(x => x.key === 'questprogress'))
+				if (sprite.class !== _quest.owner) continue;
+				if (!sprite.animations?.idle) continue;
+				if (!sprite.animations.idle.frames[1].objects) sprite.animations.idle.frames[1].objects = [];
+				if (!sprite.animations.idle.frames[1].objects.find((x) => x.key === 'questprogress'))
 					sprite.animations.idle.frames[1].objects.push({
-						key:'questprogress',
-						position:'middle',
+						key: 'questprogress',
+						position: 'middle',
 						yGap: MathRound(sprite.animations.idle.frames[1].spriteHeight / 2) + 100
 					});
 				sprite.frame = 1;
 				sprite.start = 0;
 			}
 		}
-	}
+	};
 	this.resetSideQuests = function (_sprite, _unseen) {
 		return;
-		const sprites = _sprite ? [_sprite] : this.sprites?.filter(x => x.frames && x.npc);
+		const sprites = _sprite ? [_sprite] : this.sprites?.filter((x) => x.frames && x.npc);
 		if (sprites?.[0]) {
-			if(!_sprite) {
+			if (!_sprite) {
 				const _nodes = document.querySelectorAll('.side-quest-sign');
-				for (var _node of _nodes)
-					_node.remove();
+				for (var _node of _nodes) _node.remove();
 			}
-			const _quest = _sideQuests.find(x => x.id === __account.questStatus.side.order);
-			if (!_quest)
-				return;
-			let _status; //1 başlamadı, 2 devam ediyor
+			const _quest = _sideQuests.find((x) => x.id === __account.questStatus.side.order);
+			if (!_quest) return;
+			let _status;
 			switch (__account.questStatus.side.state) {
 				case 'begin':
 					_status = 2;
@@ -2834,23 +2377,21 @@ function map(_m) {
 					break;
 			}
 			for (var sprite of sprites) {
-				if (sprite.animation.id !== _quest.owner)
-					continue;
-				const _id =_sprite.animation.id + '-side-quest-mark';
+				if (sprite.animation.id !== _quest.owner) continue;
+				const _id = _sprite.animation.id + '-side-quest-mark';
 				let _imgQuest = document.getElementById(_id);
-				if(_imgQuest && _unseen)
-					addClass(_imgQuest, 'd-none');
-				if(!_unseen) {
-					if(!_imgQuest) {
+				if (_imgQuest && _unseen) addClass(_imgQuest, 'd-none');
+				if (!_unseen) {
+					if (!_imgQuest) {
 						const _w = MathRound(sprite.width);
 						const _l = MathRound(sprite.left);
 						const _t = MathRound(sprite.top);
-						const _c = sprite.rate == .9 ? _canvasAnimated90 : cc;
+						const _c = sprite.rate == 0.9 ? _canvasAnimated90 : cc;
 						_imgQuest = document.createElement('img');
 						_imgQuest.oldStatus = _status;
-						_imgQuest.src = "./images/icons/side-quest-" + (_status < 3 ? 'start' : 'progress') + ".png";
+						_imgQuest.src = './images/icons/side-quest-' + (_status < 3 ? 'start' : 'progress') + '.png';
 						const _questMarkHeight = MathRound(this.cHeight / 16);
-						const _left = MathRound(_l + (((_w - (sprite.rightGap ?? 0)) - _questMarkHeight) / 2));
+						const _left = MathRound(_l + (_w - (sprite.rightGap ?? 0) - _questMarkHeight) / 2);
 						_imgQuest.left = _left;
 						_imgQuest.style.left = _left + 'px';
 						_imgQuest.style.height = _imgQuest.style.width = _questMarkHeight + 'px';
@@ -2858,166 +2399,75 @@ function map(_m) {
 						_imgQuest.style.position = 'absolute';
 						_imgQuest.id = _id;
 						_imgQuest.className = 'side-quest-sign';
-						if ((_status % 2) === 0)
-							_imgQuest.className += ' glow-dark';
-						else
-							_imgQuest.className += ' gray';
+						if (_status % 2 === 0) _imgQuest.className += ' glow-dark';
+						else _imgQuest.className += ' gray';
 						_c.appendChild(_imgQuest);
-					}
-					else {
-						if(_imgQuest.oldStatus !== _status) {
-							_imgQuest.src = "./images/icons/side-quest-" + (_status < 3 ? 'start' : 'progress') + ".png";
-							if ((_status % 2) === 0) {
+					} else {
+						if (_imgQuest.oldStatus !== _status) {
+							_imgQuest.src =
+								'./images/icons/side-quest-' + (_status < 3 ? 'start' : 'progress') + '.png';
+							if (_status % 2 === 0) {
 								removeClass(_imgQuest, 'gray');
 								addClass(_imgQuest, 'glow-dark');
-							}
-							else {
+							} else {
 								addClass(_imgQuest, 'gray');
 								removeClass(_imgQuest, 'glow-dark');
 							}
 						}
-						//_imgQuest.style.left = (_imgQuest.left - platformX) + 'px';
+
 						removeClass(_imgQuest, 'd-none');
 					}
 				}
 			}
 		}
-	}
+	};
 	this.drawObjects = function () {
-		if(this.disposing || __batterySaveMode)
-			return;
+		if (this.disposing || __batterySaveMode) return;
 		const rect = getVisibleRectangle();
 		c6.clearRect(0, 0, this.cWidth, this.cHeight);
-		const sprites = this.sprites?.filter(x => (!x.totalFrames || x.totalFrames < 2) && !x.npc && !x.foreground && isObjectInVisibleRectangle(x, rect));
+		const sprites = this.sprites?.filter(
+			(x) =>
+				(!x.totalFrames || x.totalFrames < 2) && !x.npc && !x.foreground && isObjectInVisibleRectangle(x, rect)
+		);
 		if (sprites?.[0]) {
 			for (var sprite of sprites)
-				c6.drawImage(sprite.animation.sprites[0].image, 0,
-					0, sprite.animation.width, sprite.animation.height,
+				c6.drawImage(
+					sprite.animation.sprites[0].image,
+					0,
+					0,
+					sprite.animation.width,
+					sprite.animation.height,
 					sprite.left - platformX,
 					sprite.top,
-					sprite.width, sprite.height);
+					sprite.width,
+					sprite.height
+				);
 		}
-	}
-	this.hurtSprites = {}; 
+	};
+	this.hurtSprites = {};
 	this.hurtRelSprites = {};
 	this.hurtFlashSprites = {};
-	// this.colorizeSprite4 = function (_item, _col, _force) {
-	// 	let _opc = .01;
-	// 	// switch (_item?.char?.hurting?.count) {
-	// 	// 	case 5: case 4: case 3:
-	// 	// 		_item.char.hurting.count = 2;
-	// 	// 		_opc = 90 / MathCeil((_item.char.attackerRange ?? 10) / 10);
-	// 	// 		break;
-	// 	// 	case 1: case 2:
-	// 	// 		_opc = 150 / MathCeil((_item.char.attackerRange ?? 10) / 10);
-	// 	// 		break;
-	// 	// }
-	// 	// _opc = Math.min(1, _opc / 100);
-	// 	let _color;
-	// 	if (_item?.char?.hurting?.hit) {
-	// 		// _color = `rgba(255,255,255,${_force ? _opc : _item.char.hurting.hit > 2 ? 1 : _item.char.hurting.hit * .3})`;
-	// 		// _item.char.hurting.hit--;
-	// 		let h = _item.char.hurting.hit;
-	// 		if (h >= 3) {
-	// 			// İlk şok
-	// 			_color = 'rgba(255,255,255,1)';
-	// 		}
-	// 		else if (h === 2) {
-	// 			// Heat flash
-	// 			_color = 'rgba(255,230,150,0.85)';
-	// 		}
-	// 		else if (h === 1) {
-	// 			// Burn fade
-	// 			_color = 'rgba(255,110,40,0.55)';
-	// 		}
-	// 		_item.char.hurting.hit--;
-	// 	} else {
-	// 		const base = _col ?? _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
-	// 		if (base.startsWith('#') && base.length >= 7) {
-	// 			let r = parseInt(base.slice(1, 3), 16);
-	// 			let g = parseInt(base.slice(3, 5), 16);
-	// 			let b = parseInt(base.slice(5, 7), 16);
-	// 			if(base.length === 9)
-	// 				_opc = parseInt(base.slice(7, 9), 16) / 255;
-	// 			_color = `rgba(${r},${g},${b},${_force ? MathRound(_opc * 10) / 10 : 1})`;
-	// 		} else
-	// 			_color = base;
-	// 	}
-	// 	const _key1 = 'i' + _item.char.id;
-	// 	const _key2 = 'a' + _item.animation;
-	// 	const _key3 = 
-	// 		'c' + _color + 'l' + _item.spriteX + 't' + _item.spriteY +
-	// 		'w' + _item.spriteWidth + 'h' + _item.spriteHeight;
-	// 	const _key = _key1 + _key2 + _key3;
-	// 	if(_key === _item.char.lastHurtSpriteKey)
-	// 		return _item.char.lastHurtSprite;
-	// 	let _hs = this.hurtSprites[_key1]?.[_key2]?.[_key3];
-	// 	if(!_hs) {
-	// 		this._colorizeCanvas = document.createElement('canvas');
-	// 		const _osc = this._colorizeCanvas;
-	// 		_osc.width = MathRound(_item.spriteWidth);
-	// 		_osc.height = MathRound(_item.spriteHeight);
-	// 		const ctx = _osc.getContext('2d');
-	// 		if(_osc.imageSmoothingEnabled != false)
-	// 			_osc.imageSmoothingEnabled = false;
-	// 		ctx.clearRect(0, 0, _osc.width, _osc.height);
-	// 		ctx.drawImage(_item.sprite,
-	// 			_item.spriteX,
-	// 			_item.spriteY,
-	// 			_item.spriteWidth,
-	// 			_item.spriteHeight,
-	// 			0, 0,
-	// 			_osc.width,
-	// 			_osc.height
-	// 		);
-	// 		ctx.globalCompositeOperation = 'source-atop';
-	// 		ctx.fillStyle = _color;
-	// 		ctx.fillRect(0, 0, _osc.width, _osc.height);
-	// 		ctx.globalCompositeOperation = 'source-over';
-	// 		if(!this.hurtSprites[_key1])
-	// 			this.hurtSprites[_key1] = {};
-	// 		if(!this.hurtSprites[_key1][_key2])
-	// 			this.hurtSprites[_key1][_key2] = {};
-	// 		this.hurtSprites[_key1][_key2][_key3] = _hs = _osc;
-	// 	}
-	// 	if (_hs) {
-	// 		_item.char.lastHurtSprite = _hs;
-	// 		_item.char.lastHurtSpriteKey = _key;
-	// 		return _hs;
-	// 	}
-	// 	else 	
-	// 		_item.char.lastHurtSprite = _item.char.lastHurtSpriteKey = undefined;
-	// 	if (_item.char?.hurting?.count <= 0)
-	// 		delete _item.char.hurtColor;
-	// 	return null;
-	// };
+
 	this.colorizeSprite4 = function (_item, _col, _force) {
-		if (!this._colorCache)
-			this._colorCache = Object.create(null);
+		if (!this._colorCache) this._colorCache = Object.create(null);
 		let _opc = 1;
 		let _color, _isHurtFlash;
 		const _hurt = _item?.char?.hurting;
 		if (_hurt?.flicker != null) {
-			_color = (_hurt.flicker % 4) === 0 ? 'rgba(255,255,255,1)' : 'rgba(243,231,161,1)';
+			_color = _hurt.flicker % 4 === 0 ? 'rgba(255,255,255,1)' : 'rgba(243,231,161,1)';
 			_isHurtFlash = 1;
-		}
-		else if (_hurt?.tint <= 1) {
+		} else if (_hurt?.tint <= 1) {
 			_color = 'rgba(255,255,255,1)';
 			_hurt.tint++;
 			_isHurtFlash = 1;
-		}
-		else if (_hurt?.hit) {
+		} else if (_hurt?.hit) {
 			const h = _hurt.hit;
-			if (h >= 3)
-				_color = 'rgba(255,255,255,1)';
-			else if (h === 2)
-				_color = 'rgba(255,230,150,0.85)';
-			else
-				_color = 'rgba(255,110,40,0.55)';
+			if (h >= 3) _color = 'rgba(255,255,255,1)';
+			else if (h === 2) _color = 'rgba(255,230,150,0.85)';
+			else _color = 'rgba(255,110,40,0.55)';
 			_hurt.hit--;
 			_isHurtFlash = 1;
-		}
-		else {
+		} else {
 			const base = _col ?? _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
 			_color = this._colorCache[base];
 			if (!_color) {
@@ -3025,25 +2475,31 @@ function map(_m) {
 					const r = parseInt(base.slice(1, 3), 16);
 					const g = parseInt(base.slice(3, 5), 16);
 					const b = parseInt(base.slice(5, 7), 16);
-					if (base.length === 9)
-						_opc = parseInt(base.slice(7, 9), 16) / 255;
+					if (base.length === 9) _opc = parseInt(base.slice(7, 9), 16) / 255;
 					_color = `rgba(${r},${g},${b},${_force ? Math.round(_opc * 10) / 10 : 1})`;
-				}
-				else
-					_color = base;
+				} else _color = base;
 				this._colorCache[base] = _color;
 			}
 		}
 		const _key1 = 'i' + _item.char.id;
 		const _key2 = 'a' + _item.animation;
 		const _key3 =
-			'c' + _color +
-			'l' + _item.spriteX +
-			't' + _item.spriteY +
-			'w' + _item.spriteWidth +
-			'h' + _item.spriteHeight;
+			'c' +
+			_color +
+			'l' +
+			_item.spriteX +
+			't' +
+			_item.spriteY +
+			'w' +
+			_item.spriteWidth +
+			'h' +
+			_item.spriteHeight;
 		const _key = _key1 + _key2 + _key3;
-		if (_key === _item.char.lastHurtSpriteKey && _item.char.lastHurtSprite?.width > 0 && _item.char.lastHurtSprite?.height > 0)
+		if (
+			_key === _item.char.lastHurtSpriteKey &&
+			_item.char.lastHurtSprite?.width > 0 &&
+			_item.char.lastHurtSprite?.height > 0
+		)
 			return _item.char.lastHurtSprite;
 		const _arr = _isHurtFlash ? this.hurtFlashSprites : this.hurtSprites;
 		let _hs = _arr[_key1]?.[_key2]?.[_key3];
@@ -3054,307 +2510,173 @@ function map(_m) {
 		if (!_hs) {
 			const _sw = _item.spriteWidth;
 			const _sh = _item.spriteHeight;
-			if (!_sw || !_sh)
-				return undefined;
-			const _cropped = this.getCroppedSprite(_item.spriteX, _item.spriteY, _sw, _sh,
-				_item.char, _item.sprite.relativeSrc, _item.frameKey);
+			if (!_sw || !_sh) return undefined;
+			const _cropped = this.getCroppedSprite(
+				_item.spriteX,
+				_item.spriteY,
+				_sw,
+				_sh,
+				_item.char,
+				_item.sprite.relativeSrc,
+				_item.frameKey
+			);
 			const _sheet = _item.sprite;
 			const _useCrop = _cropped?.width > 0 && _cropped?.height > 0;
-			if (!_useCrop && (!_sheet || _sheet.notYet || !_sheet.width))
-				return undefined;
+			if (!_useCrop && (!_sheet || _sheet.notYet || !_sheet.width)) return undefined;
 			const out = document.createElement('canvas');
 			out.width = _sw;
 			out.height = _sh;
 			const ctx = out.getContext('2d');
 			ctx.imageSmoothingEnabled = false;
-			if (_useCrop)
-				ctx.drawImage(_cropped, 0, 0, _sw, _sh);
-			else
-				ctx.drawImage(_sheet, _item.spriteX, _item.spriteY, _sw, _sh, 0, 0, _sw, _sh);
+			if (_useCrop) ctx.drawImage(_cropped, 0, 0, _sw, _sh);
+			else ctx.drawImage(_sheet, _item.spriteX, _item.spriteY, _sw, _sh, 0, 0, _sw, _sh);
 			ctx.globalCompositeOperation = 'source-atop';
 			ctx.fillStyle = _color;
 			ctx.fillRect(0, 0, _sw, _sh);
 			ctx.globalCompositeOperation = 'source-over';
-			if (!_arr[_key1])
-				_arr[_key1] = Object.create(null);
+			if (!_arr[_key1]) _arr[_key1] = Object.create(null);
 			if (!_arr[_key1][_key2]) _arr[_key1][_key2] = Object.create(null);
 			_arr[_key1][_key2][_key3] = _hs = out;
 		}
 		_item.char.lastHurtSprite = _hs;
 		_item.char.lastHurtSpriteKey = _key;
-		if (_item.char?.hurting?.count <= 0)
-			delete _item.char.hurtColor;
+		if (_item.char?.hurting?.count <= 0) delete _item.char.hurtColor;
 		return _hs;
 	};
 
-	// this.colorizeRelSprite4 = function (_item, _col, _animationKey) {
-	// 	let _opc = .01;
-	// 	let _color;
-	// 	const base = _col;
-	// 	if (base.startsWith('#') && base.length >= 7) {
-	// 		let r = parseInt(base.slice(1, 3), 16);
-	// 		let g = parseInt(base.slice(3, 5), 16);
-	// 		let b = parseInt(base.slice(5, 7), 16);
-	// 		if(base.length === 9)
-	// 			_opc = parseInt(base.slice(7, 9), 16) / 255;
-	// 		_color = `rgba(${r},${g},${b},1)`;
-	// 	} 
-	// 	else
-	// 		_color = base;
-
-	// 	const _key = _animationKey ?? (
-	// 		_item.animation + 'id' + _item.char.id +
-	// 		'c' + _color + 'l' + _item.spriteX + 't' + _item.spriteY +
-	// 		'w' + _item.spriteWidth + 'h' + _item.spriteHeight
-	// 	);
-	// 	if(_key === _item.char.lastHurtRelSpriteKey)
-	// 		return _item.char.lastHurtRelSprite;
-	// 	let _hs =this.hurtRelSprites[_key];
-	// 	if(!_hs) {
-	// 		this._colorizeCanvas = document.createElement('canvas');
-	// 		const _osc = this._colorizeCanvas;
-	// 		_osc.width = MathRound(_item.spriteWidth);
-	// 		_osc.height = MathRound(_item.spriteHeight);
-	// 		const ctx = _osc.getContext('2d');
-	// 		if(_osc.imageSmoothingEnabled != false)
-	// 			_osc.imageSmoothingEnabled = false;
-	// 		ctx.clearRect(0, 0, _osc.width, _osc.height);
-	// 		ctx.drawImage(_item.sprite,
-	// 			_item.spriteX,
-	// 			_item.spriteY,
-	// 			_item.spriteWidth,
-	// 			_item.spriteHeight,
-	// 			0, 0,
-	// 			_osc.width,
-	// 			_osc.height
-	// 		);
-	// 		ctx.globalCompositeOperation = 'source-atop';
-	// 		ctx.fillStyle = _color;
-	// 		ctx.fillRect(0, 0, _osc.width, _osc.height);
-	// 		ctx.globalCompositeOperation = 'source-over';
-	// 		this.hurtRelSprites[_key] = _hs = _osc;
-	// 	}
-
-	// 	if (_hs) {
-	// 		_item.char.lastHurtRelSprite = _hs;
-	// 		_item.char.lastHurtRelSpriteKey = _key;
-	// 		return _hs;
-	// 	}
-	// 	else 	
-	// 		_item.char.lastHurtRelSprite = _item.char.lastHurtRelSpriteKey = undefined;
-	// 	return null;
-	// };
-	// this.spriteWorker = new Worker('./js/worker.js');
-	// this.spriteWorker.onmessage = (e) => {
-	// 	const { key, result } = e.data;
-	// 	this.hurtSprites[key] = result;
-	// };
-	// this.colorizeSprite2 = function(_item, _col, _animationKey) {
-	// 	let _opc = 'ff';
-	// 	switch(_item?.char?.hurting?.count) {
-	// 		case 4:
-	// 		case 3:
-	// 		case 2:
-	// 			_item.char.hurting.count = 2;
-	// 			let _val = 60;
-	// 			if(_item.char.attackerRange > 10)
-	// 				_val = MathCeil(_val / MathCeil((_item.char.attackerRange / 10)));
-	// 			_opc = _val.toString(16);
-	// 			break;
-	// 		case 1:
-	// 			{
-	// 				let _val = 100;
-	// 				if(_item.char.attackerRange > 10)
-	// 					_val = MathCeil(_val / MathCeil((_item.char.attackerRange / 10)));
-	// 				_opc = _val.toString(16);
-	// 			}
-	// 			break;
-	// 	}
-	// 	let _color;
-	// 	if(_item?.char?.hurting?.hit) {
-	// 		delete _item.char.hurting.hit;
-	// 		_color = '#FFFFFF';
-	// 	}
-	// 	else
-	// 		_color = _item.skinColor ?? _item.char?.hurtColor ?? '#FFFFFF';
-	// 	if(_opc !== 'ff')
-	// 		_color += _opc;
-	// 	if(_col)
-	// 		_color = _col;
-	// 	const _key = _animationKey ?? (_item.char.animation + 'id' + _item.char.id + 'c' + _color +
-	// 	'l' + _item.spriteX + 't' + _item.spriteY + 'w' + _item.spriteWidth + 'h' + _item.spriteHeight);
-	// 	const _sprite = this.hurtSprites[_key];
-	// 	if(_sprite === 1)
-	// 		return null;
-	// 	else if(_sprite)
-	// 		return _sprite;
-	// 	this.hurtSprites[_key] = 1;
-	// 	createImageBitmap(_item.sprite).then((bitmap) => {
-	// 	this.spriteWorker.postMessage({
-	// 			key: _key,
-	// 			bitmap,
-	// 			x: _item.spriteX,
-	// 			y: _item.spriteY,
-	// 			w: _item.spriteWidth,
-	// 			h: _item.spriteHeight,
-	// 			outputW: Math.round(_item.width * (_item.zoom ?? 1)),
-	// 			outputH: Math.round(_item.height * (_item.zoom ?? 1)),
-	// 			color: _color
-	// 		}, [bitmap]);
-	// 	});
-	// 	if(_item.char?.hurting?.count <= 0 && _item.char.hurtColor)
-	// 		delete _item.char.hurtColor;
-	// 	return null;
-	// }
 	this.colorizeRelSprite4 = function (_item, _col, _animationKey) {
+		if (!this._colorCache) this._colorCache = Object.create(null);
 
-	// =====================
-	// COLOR CACHE
-	// =====================
-	if (!this._colorCache)
-		this._colorCache = Object.create(null);
+		let _color = this._colorCache[_col];
+		let _opc = 1;
 
-	let _color = this._colorCache[_col];
-	let _opc = 1;
+		if (!_color) {
+			const base = _col;
+			if (base.startsWith('#') && base.length >= 7) {
+				const r = parseInt(base.slice(1, 3), 16);
+				const g = parseInt(base.slice(3, 5), 16);
+				const b = parseInt(base.slice(5, 7), 16);
+				if (base.length === 9) _opc = parseInt(base.slice(7, 9), 16) / 255;
 
-	if (!_color) {
-		const base = _col;
-		if (base.startsWith('#') && base.length >= 7) {
-			const r = parseInt(base.slice(1, 3), 16);
-			const g = parseInt(base.slice(3, 5), 16);
-			const b = parseInt(base.slice(5, 7), 16);
-			if (base.length === 9)
-				_opc = parseInt(base.slice(7, 9), 16) / 255;
-
-			_color = `rgba(${r},${g},${b},1)`;
-		} else {
-			_color = base;
+				_color = `rgba(${r},${g},${b},1)`;
+			} else {
+				_color = base;
+			}
+			this._colorCache[_col] = _color;
 		}
-		this._colorCache[_col] = _color;
-	}
 
-	// =====================
-	// KEY
-	// =====================
-	const _key = _animationKey ?? (
-		_item.animation + ':' +
-		_item.char.id + ':' +
-		_color + ':' +
-		_item.spriteX + ',' +
-		_item.spriteY + ',' +
-		_item.spriteWidth + ',' +
-		_item.spriteHeight
-	);
+		const _key =
+			_animationKey ??
+			_item.animation +
+				':' +
+				_item.char.id +
+				':' +
+				_color +
+				':' +
+				_item.spriteX +
+				',' +
+				_item.spriteY +
+				',' +
+				_item.spriteWidth +
+				',' +
+				_item.spriteHeight;
 
-	if (_key === _item.char.lastHurtRelSpriteKey)
-		return _item.char.lastHurtRelSprite;
+		if (_key === _item.char.lastHurtRelSpriteKey) return _item.char.lastHurtRelSprite;
 
-	let _hs = this.hurtRelSprites[_key];
-	if (!_hs) {
+		let _hs = this.hurtRelSprites[_key];
+		if (!_hs) {
+			if (!this._colorizeCanvas) this._colorizeCanvas = document.createElement('canvas');
 
-		// =====================
-		// OFFSCREEN CANVAS (REUSE)
-		// =====================
-		if (!this._colorizeCanvas)
-			this._colorizeCanvas = document.createElement('canvas');
+			const _osc = this._colorizeCanvas;
+			_osc.width = _item.spriteWidth;
+			_osc.height = _item.spriteHeight;
 
-		const _osc = this._colorizeCanvas;
-		_osc.width = _item.spriteWidth;
-		_osc.height = _item.spriteHeight;
+			const ctx = _osc.getContext('2d');
 
-		const ctx = _osc.getContext('2d');
+			if (ctx.imageSmoothingEnabled) ctx.imageSmoothingEnabled = false;
 
-		if (ctx.imageSmoothingEnabled)
-			ctx.imageSmoothingEnabled = false;
+			ctx.clearRect(0, 0, _osc.width, _osc.height);
 
-		ctx.clearRect(0, 0, _osc.width, _osc.height);
+			ctx.drawImage(
+				_item.sprite,
+				_item.spriteX,
+				_item.spriteY,
+				_item.spriteWidth,
+				_item.spriteHeight,
+				0,
+				0,
+				_osc.width,
+				_osc.height
+			);
 
-		ctx.drawImage(
-			_item.sprite,
-			_item.spriteX,
-			_item.spriteY,
-			_item.spriteWidth,
-			_item.spriteHeight,
-			0, 0,
-			_osc.width,
-			_osc.height
-		);
+			ctx.globalCompositeOperation = 'source-atop';
+			ctx.fillStyle = _color;
+			ctx.fillRect(0, 0, _osc.width, _osc.height);
+			ctx.globalCompositeOperation = 'source-over';
 
-		ctx.globalCompositeOperation = 'source-atop';
-		ctx.fillStyle = _color;
-		ctx.fillRect(0, 0, _osc.width, _osc.height);
-		ctx.globalCompositeOperation = 'source-over';
+			const out = document.createElement('canvas');
+			out.width = _osc.width;
+			out.height = _osc.height;
+			if (_osc.width > 0) out.getContext('2d').drawImage(_osc, 0, 0);
 
-		// ⚠️ CLONE CANVAS
-		// çünkü shared canvas reuse ediliyor
-		const out = document.createElement('canvas');
-		out.width = _osc.width;
-		out.height = _osc.height;
-		if(_osc.width > 0)
-			out.getContext('2d').drawImage(_osc, 0, 0);
+			this.hurtRelSprites[_key] = _hs = out;
+		}
 
-		this.hurtRelSprites[_key] = _hs = out;
-	}
-
-	_item.char.lastHurtRelSprite = _hs;
-	_item.char.lastHurtRelSpriteKey = _key;
-	return _hs;
-};
+		_item.char.lastHurtRelSprite = _hs;
+		_item.char.lastHurtRelSpriteKey = _key;
+		return _hs;
+	};
 
 	const _maxSort = 200000000;
 	let _yTol = 7 * __zoom;
-	this.getDepthDrawScaleY = function(y) {
+	this.getDepthDrawScaleY = function (y) {
 		const g = getGroundHeight();
-		if (!g || y == null)
-			return 1;
+		if (!g || y == null) return 1;
 		let t = y / g;
-		if (t < 0)
-			t = 0;
-		else if (t > 1)
-			t = 1;
+		if (t < 0) t = 0;
+		else if (t > 1) t = 1;
 		const k = 0.45;
 		const far = 1 / (1 + k);
-		const u = ((1 / (1 + k * t)) - far) / (1 - far);
+		const u = (1 / (1 + k * t) - far) / (1 - far);
 		return 0.9 + 0.2 * u;
-	}
-	this.getDepthDrawScale = function(_char) {
-		if (!_char || _char.yPosition == null)
-			return 1;
+	};
+	this.getDepthDrawScale = function (_char) {
+		if (!_char || _char.yPosition == null) return 1;
 		return this.getDepthDrawScaleY(_char.yPosition);
-	}
-	this.scaleFromFoot = function(x, y, w, h, footX, footY, d) {
-		if (d === 1)
-			return { x: x, y: y, w: w, h: h };
+	};
+	this.scaleFromFoot = function (x, y, w, h, footX, footY, d) {
+		if (d === 1) return { x: x, y: y, w: w, h: h };
 		return {
 			x: footX + (x - footX) * d,
 			y: footY + (y - footY) * d,
 			w: w * d,
 			h: h * d
 		};
-	}
-	this.charFoot = function(_char, yGap) {
+	};
+	this.charFoot = function (_char, yGap) {
 		return {
 			x: _char.EXACTLEFT + _char.WIDTH / 2,
 			y: this.cHeight - _char.yPosition - (yGap ?? 0) - (_char.yGap ?? 0)
 		};
-	}
-	this.getPerspectiveRate = function(_char, _force, _animation) {
-		if(_char.lastYPosition === _char.yPosition)
-			return _char.lastPerspectiveRate;
+	};
+	this.getPerspectiveRate = function (_char, _force, _animation) {
+		if (_char.lastYPosition === _char.yPosition) return _char.lastPerspectiveRate;
 		const _anim = _animation ?? _char.animation;
-		const _x = (_anim === 'walk' || _anim === 'run' || _force) ? 1 + ((((getGroundHeight() - _char.yPosition) * 10) / getGroundHeight()) / 100) : 1;
+		const _x =
+			_anim === 'walk' || _anim === 'run' || _force
+				? 1 + ((getGroundHeight() - _char.yPosition) * 10) / getGroundHeight() / 100
+				: 1;
 		_char.lastYPosition = _char.yPosition;
-		if(_x !== _char.lastPerspectiveRate)
-			_char.lastPerspectiveRate = _x;
+		if (_x !== _char.lastPerspectiveRate) _char.lastPerspectiveRate = _x;
 		return _x;
-	}
+	};
 	this.offCanvas = document.createElement('canvas');
 	this.offCanvas.width = this.cWidth;
 	this.offCanvas.height = this.cHeight;
 	const offCtx = this.offCanvas.getContext('2d');
-	this.getOffContext = function() {
+	this.getOffContext = function () {
 		return offCtx;
-	}
+	};
 	this.offCanvas.imageSmoothingEnabled = false;
 	this.offGoreCanvas = document.createElement('canvas');
 	this.offGoreCanvas.width = this.cWidth;
@@ -3367,117 +2689,87 @@ function map(_m) {
 	this.offDmgCtx = this.offDmgCanvas.getContext('2d');
 	this.offDmgCanvas.imageSmoothingEnabled = false;
 	this.drawChargeParticles = function (_item) {
-		  const list = _item.char.spawnDusts;
-    if (!list || list.length === 0) return;
+		const list = _item.char.spawnDusts;
+		if (!list || list.length === 0) return;
 
-	const prevAlpha = offCtx.globalAlpha;
-	const prevFill = offCtx.fillStyle;
-    for (let d of list) {
+		const prevAlpha = offCtx.globalAlpha;
+		const prevFill = offCtx.fillStyle;
+		for (let d of list) {
+			const pxWorld =
+				d.worldX -
+				(_item.reversed ? -1 : 1) * (platformX - d.p) +
+				d.wobble * Math.sin(d.progress * 6) * 8 -
+				d.progress * 4;
 
-        // local wobble ve ilerleme etkilerini WORLD pozisyonuna uygula:
-        const pxWorld = d.worldX - ((_item.reversed ? -1 : 1) * (platformX - d.p))
-            + d.wobble * Math.sin(d.progress * 6) * 8
-            - (d.progress * 4);
-        // yukarı çıkış (y zaten dünya/ekran uyumlu olduğunu varsayıyoruz)
-        const py = d.y - d.rise * d.progress;
+			const py = d.y - d.rise * d.progress;
 
-        // asıl toz tanesinin boyutu
-        const s = d.size * (1 + d.progress * 1.4);
+			const s = d.size * (1 + d.progress * 1.4);
 
-        // üstteki parlak, alttaki flu
-        const alpha = 0.75 * (1 - d.progress);
+			const alpha = 0.75 * (1 - d.progress);
 
-        // kamera offseti — ekranX = worldX - cameraX
-        const camX = pxWorld;
+			const camX = pxWorld;
 
-        // ----------------------------
-        // 1) DALGA izi üretelim (izlerin de worldX olarak saklanması)
-        // ----------------------------
-        if (Math.random() < 0.6) {
-            d.trails.push({
-                worldX: pxWorld,   // world pozisyonu kaydet
-                y: py,
-                size: s * (1 + Math.random() * 0.6),
-                alpha: alpha * 0.6
-            });
-        }
+			if (Math.random() < 0.6) {
+				d.trails.push({
+					worldX: pxWorld,
+					y: py,
+					size: s * (1 + Math.random() * 0.6),
+					alpha: alpha * 0.6
+				});
+			}
 
-        // İzler çok olursa eskiyi sil
-        if (d.trails.length > 12) d.trails.shift();
+			if (d.trails.length > 12) d.trails.shift();
 
-        // ----------------------------
-        // 2) İZLERİ ÇİZ (izleri world->cam çevir)
-        // ----------------------------
+			offCtx.fillStyle = '#c7b8a3';
+			const _dustD = this.getDepthDrawScale(_item.char);
 
-		offCtx.fillStyle = "#c7b8a3";
-		const _dustD = this.getDepthDrawScale(_item.char);
+			for (let i = d.trails.length - 1; i >= 0; i--) {
+				const t = d.trails[i];
 
-		for (let i = d.trails.length - 1; i >= 0; i--) {
-			const t = d.trails[i];
+				t.alpha *= 0.85;
+				t.size *= 1.03;
 
-			t.alpha *= 0.85;
-			t.size  *= 1.03;
+				if (t.alpha < 0.1) break;
 
-			if (t.alpha < 0.1)
-				break;
+				offCtx.globalAlpha = t.alpha;
 
-			offCtx.globalAlpha = t.alpha;
+				const _trx = t.size * 1.3;
+				const _try = t.size * 0.75;
+				offCtx.beginPath();
+				offCtx.ellipse(t.worldX, t.y + _try * (1 - _dustD), _trx * _dustD, _try * _dustD, 0, 0, Math.PI * 2);
+				offCtx.fill();
+			}
 
-			const _trx = t.size * 1.3;
-			const _try = t.size * 0.75;
+			offCtx.globalAlpha = alpha;
+			offCtx.fillStyle = '#d6c7b4';
+
+			const _prx = s * 1.1;
+			const _pry = s * 0.7;
 			offCtx.beginPath();
-			offCtx.ellipse(
-				t.worldX, t.y + _try * (1 - _dustD),
-				_trx * _dustD, _try * _dustD,
-				0, 0, Math.PI * 2
-			);
+			offCtx.ellipse(camX, py + _pry * (1 - _dustD), _prx * _dustD, _pry * _dustD, 0, 0, Math.PI * 2);
 			offCtx.fill();
+
+			d.progress += 0.1;
 		}
+		offCtx.globalAlpha = prevAlpha;
+		offCtx.fillStyle = prevFill;
 
-
-
-        // ----------------------------
-        // 3) ASIL PARTİKÜLÜ ÇİZ
-        // ----------------------------
-        //offCtx.save();
-        offCtx.globalAlpha = alpha;
-        offCtx.fillStyle = "#d6c7b4";
-
-        const _prx = s * 1.1;
-        const _pry = s * 0.7;
-        offCtx.beginPath();
-        offCtx.ellipse(
-            camX, py + _pry * (1 - _dustD),
-            _prx * _dustD, _pry * _dustD,
-            0, 0, Math.PI * 2
-        );
-        offCtx.fill();
-        //offCtx.restore();
-		
-        d.progress += 0.1;
-    }
-	offCtx.globalAlpha = prevAlpha;
-	offCtx.fillStyle   = prevFill;
-    // Ömür dolunca partikülleri sil
-    _item.char.spawnDusts = list.filter(d => d.progress < 1);
-	return;
+		_item.char.spawnDusts = list.filter((d) => d.progress < 1);
+		return;
 		if (_item.char.spawnDusts) {
-			for(let d of _item.char.spawnDusts) {
+			for (let d of _item.char.spawnDusts) {
 				offCtx.save();
 				const w = d.width;
 				const h = d.height;
 				offCtx.globalAlpha = d.alpha;
-				offCtx.translate(d.x - ((_item.reversed ? -1 : 1) * (platformX - d.p)), d.y);
+				offCtx.translate(d.x - (_item.reversed ? -1 : 1) * (platformX - d.p), d.y);
 
-				// Earth-like color (a bit brownish gray)
-				offCtx.fillStyle = "rgba(200, 180, 160, 0.9)";
+				offCtx.fillStyle = 'rgba(200, 180, 160, 0.9)';
 
-				// Soft horizontal oval
 				offCtx.beginPath();
 				offCtx.ellipse(0, 0, w, h * 0.45, 0, 0, Math.PI * 2);
 				offCtx.fill();
 
-				// Side small puffs (adds realism)
 				offCtx.beginPath();
 				offCtx.ellipse(-w * 0.5, -h * 0.1, h * 0.4, h * 0.35, 0, 0, Math.PI * 2);
 				offCtx.ellipse(w * 0.5, -h * 0.1, h * 0.4, h * 0.35, 0, 0, Math.PI * 2);
@@ -3488,38 +2780,10 @@ function map(_m) {
 				d.vx *= 0.92;
 				d.alpha -= 0.06;
 			}
-			_item.char.spawnDusts = _item.char.spawnDusts.filter(g => g.alpha > 0);
+			_item.char.spawnDusts = _item.char.spawnDusts.filter((g) => g.alpha > 0);
 		}
-	}
-	// this.drawCharacterGhost = function (_item, _sprite, _x,_y,_w,_h) {
-	// 	if (_item.char.chargeProperties && _item.char.ghostData) {
-	// 		let _blur = _item.char.ghostData.length;
-	// 		const _ga = offCtx.globalAlpha;
-	// 		for (let g of _item.char.ghostData) {
-	// 			//offCtx.save();
-	// 			offCtx.globalAlpha = g.alpha;
-	// 			//offCtx.filter = 'blur(' + this.H(_blur) + 'px)';
-	// 			// offCtx.drawImage(
-	// 			// 	g.sprite,
-	// 			// 	g.left - ((_item.reversed ? -1 : 1) * (platformX - g.p)), g.top,
-	// 			// 	g.width, g.height
-	// 			// );
-	// 			 offCtx.drawImage(
-	// 			g.sprite,
-	// 			g.left - ((_item.reversed ? -1 : 1) * (platformX - g.p)),
-	// 			g.top,
-	// 			g.width * scale,
-	// 			g.height * scale
-	// 			);
-	// 			offCtx.filter = '';
-	// 			//offCtx.restore();
-	// 			g.alpha -= 0.12;
-	// 			_blur--;
-	// 		}
-	// 		offCtx.globalAlpha = _ga;
-	// 		_item.char.ghostData = _item.char.ghostData.filter(g => g.alpha > 0);
-	// 	}
-	// }
+	};
+
 	this.drawCharacterGhost = function (_item) {
 		const gd = _item.char.ghostData;
 		if (!_item.char.chargeProperties || !gd) return;
@@ -3536,11 +2800,11 @@ function map(_m) {
 			const scale = 1 + blur * 0.02;
 
 			offCtx.drawImage(
-			g.sprite,
-			g.left - ((_item.reversed ? -1 : 1) * (platformX - g.p)),
-			g.top,
-			g.width * scale,
-			g.height * scale
+				g.sprite,
+				g.left - (_item.reversed ? -1 : 1) * (platformX - g.p),
+				g.top,
+				g.width * scale,
+				g.height * scale
 			);
 
 			g.alpha -= 0.12;
@@ -3549,849 +2813,888 @@ function map(_m) {
 
 		offCtx.globalAlpha = baseAlpha;
 
-		_item.char.ghostData = gd.filter(g => g.alpha > 0);
+		_item.char.ghostData = gd.filter((g) => g.alpha > 0);
 	};
 
-	this.H = function(v) {
+	this.H = function (v) {
 		return v * (episode.cHeight / 768);
-	}
-	this.drawSpriteWithFade = function(_can, img, imgx, imgy, imgw, imgh, x, y, w, h, op) {
-		const temp = document.createElement("canvas");
+	};
+	this.drawSpriteWithFade = function (_can, img, imgx, imgy, imgw, imgh, x, y, w, h, op) {
+		const temp = document.createElement('canvas');
 		temp.width = w;
 		temp.height = h;
-		const tctx = temp.getContext("2d");
+		const tctx = temp.getContext('2d');
 
-		// 1 - Sprite'ı çiz
 		tctx.drawImage(img, imgx, imgy, imgw, imgh, 0, 0, w, h);
 
-		// 2 - Dikey fade: üst %50 → alt %0
 		const g = tctx.createLinearGradient(0, 0, 0, h);
 		g.addColorStop(0.0, `rgba(255,255,255,${op})`);
-		g.addColorStop(0.92, "rgba(255,255,255,0.0)"); // alt
+		g.addColorStop(0.92, 'rgba(255,255,255,0.0)');
 
-		tctx.globalCompositeOperation = "destination-in";
+		tctx.globalCompositeOperation = 'destination-in';
 		tctx.fillStyle = g;
 		tctx.fillRect(0, 0, w, h);
-		tctx.globalCompositeOperation = "source-over";
+		tctx.globalCompositeOperation = 'source-over';
 
-		// 3 - Sonucu ana canvasa aktar
 		_can.drawImage(temp, x, y);
-	}
-// 	this.drawHitParticles = function(_char, x, y, direction, color, strength, reversed, _key) {
-// 	if (!_char.particles) _char.particles = [];
-
-// 	if (x) {
-
-// 		strength = Math.max(1, Math.min(3, strength - 1));
-// 		let _countRate = 1;
-// 		if(strength >= 2 && strength < 3)
-// 			_countRate = getRandomValue2(100, 300) / 100;
-// 		else if(strength >= 3)
-// 			_countRate = 4;
-// 		if(_char.particles.length > 0 && _countRate < 4)
-// 			return;
-// 		const count = (16 + _countRate) + strength * _countRate * ((_char.width * _char.ZOOM) / 30);
-// 		const spread = (20 + _countRate) + strength * 20;
-// 		const baseSpeed = (getRandomValue2(25, 45) / 10) + _countRate * ((_char.width * _char.ZOOM) / (60 + (_countRate * 15)));
-
-// 		// 2.5D için kontrollü aşağı eğim
-// 		let downwardBias = 18 + Math.random() * 6;
-// 		for (let i = 0; i < count; i++) {
-
-// 			const angle =
-// 				direction +
-// 				downwardBias +
-// 				(Math.random() * spread - spread / 2);
-			
-// 			const rad = angle * Math.PI / 180;
-
-// 			// HER PARTİKÜL FARKLI HAREKET PROFİLİ ALIR
-// 			let speedVariance = Math.random();
-// 			let speed =
-// 				baseSpeed *
-// 				(0.6 + speedVariance * speedVariance * 1.6);
-
-// 			let vx = Math.cos(rad) * speed;
-// 			let vy = Math.sin(rad) * speed;
-// 			if (_key === 'slam')
-// 				vy -= speed * 0.8;
-
-// 			// Mikro yön bozulması (robotik hissi öldürür)
-// 			vx += (Math.random() - 0.5) * 0.6;
-// 			vy += (Math.random() - 0.5) * 0.4;
-
-// 			_char.particles.push({
-// 				x,
-// 				y,
-// 				vx,
-// 				vy,
-// 				p: platformX,
-// 				radius: 1.5 + Math.random() * 3.2,
-// 				life: getRandomValue2(80, 110) / 100,
-// 				decay: 0.035 + Math.random() * 0.05,
-// 				frame: 0,
-// 				gravity: 0.28 + Math.random() * 0.5,
-// 				wobble: Math.random() * 2,
-// 				color: randomShade(color)
-// 			});
-// 		}
-// 	}
-
-// 	const oldAlpha = offCtx.globalAlpha;
-// 	const _reversed = (offCtx.reversed && !reversed) || (!offCtx.reversed && reversed);
-// 	for (let i = _char.particles.length - 1; i >= 0; i--) {
-// 		const p = _char.particles[i];
-
-// 		// Agresif başlangıç
-// 		let speedMultiplier = p.frame < 2 ? 2.5 : 1;
-// 		let sizeMultiplier  = p.frame < 2 ? 1.5 : 1;
-
-// 		// Organik jitter (çizgi hissini yok eder)
-// 		p.x += p.vx * speedMultiplier + Math.sin(p.frame + p.wobble) * 0.4;
-// 		p.y += p.vy * speedMultiplier;
-
-// 		p.vy += p.gravity;
-// 		p.vx *= 0.96; // hafif sürtünme
-
-// 		p.life -= p.decay;
-// 		p.frame++;
-
-// 		offCtx.globalAlpha = p.life;
-// 		offCtx.beginPath();
-// 		offCtx.fillStyle = p.color;
-// 		offCtx.ellipse(
-// 			p.x - ((_reversed ? -1 : 1) * (platformX - p.p)),
-// 			p.y,
-// 			p.radius * sizeMultiplier * (getRandomValue2(8, 24) / 10),
-// 			p.radius * sizeMultiplier * (getRandomValue2(8, 12) / 10),
-// 			0,
-// 			0,
-// 			Math.PI * 2
-// 		);
-// 		offCtx.fill();
-
-// 		if (p.life <= 0)
-// 			_char.particles.splice(i, 1);
-// 	}
-
-// 	offCtx.globalAlpha = oldAlpha;
-
-// 	if (_char.particles.length === 0)
-// 		delete _char.particles;
-
-// 	function randomShade(hex) {
-// 		let r = parseInt(hex.substr(1,2),16);
-// 		let g = parseInt(hex.substr(3,2),16);
-// 		let b = parseInt(hex.substr(5,2),16);
-
-// 		r += Math.random() * 35 - 15;
-// 		g += Math.random() * 25 - 10;
-// 		b += Math.random() * 20 - 5;
-
-// 		return `rgb(${r|0},${g|0},${b|0})`;
-// 	}
-// }
-
-// 	this.drawHitParticles = function(_char, x, y, direction, color, strength, reversed) {
-// 	if (!_char.particles) _char.particles = [];
-
-// 	if (x) {
-// 		if(_char.particles.length > 0)
-// 			return;
-
-// 		strength = Math.max(1, Math.min(3, strength - 1));
-// 		let _countRate = 1;
-// 		if(strength >= 2 && strength < 3)
-// 			_countRate = getRandomValue2(100, 300) / 100;
-// 		else if(strength >= 3)
-// 			_countRate = 4;
-// 		const count = 8 + strength * _countRate * ((_char.width * _char.ZOOM) / 30);
-// 		const spread = (18 + _countRate) + strength * 6;
-// 		const baseSpeed = (getRandomValue2(18, 28) / 10) + _countRate * ((_char.width * _char.ZOOM) / 120);
-
-// 		// 2.5D için kontrollü aşağı eğim
-// 		const downwardBias = strength >= 2 ? 12 : 6;
-
-// 		for (let i = 0; i < count; i++) {
-
-// 			const angle =
-// 				direction +
-// 				downwardBias +
-// 				(Math.random() * spread - spread / 2);
-
-// 			const rad = angle * Math.PI / 180;
-
-// 			// HER PARTİKÜL FARKLI HAREKET PROFİLİ ALIR
-// 			let speedVariance = Math.random();
-// 			let speed =
-// 				baseSpeed *
-// 				(0.6 + speedVariance * speedVariance * 1.6);
-
-// 			let vx = Math.cos(rad) * speed;
-// 			let vy = Math.sin(rad) * speed * 0.6;
-
-// 			// Mikro yön bozulması (robotik hissi öldürür)
-// 			vx += (Math.random() - 0.5) * 1.2;
-// 			vy += (Math.random() - 0.5) * 0.8;
-
-// 			_char.particles.push({
-// 				x,
-// 				y,
-// 				vx,
-// 				vy,
-// 				p: platformX,
-// 				radius: 1.5 + Math.random() * 3.2,
-// 				life: 1,
-// 				decay: 0.035 + Math.random() * 0.045,
-// 				frame: 0,
-// 				gravity: 0.32 + Math.random() * 0.18,
-// 				wobble: Math.random() * 2,
-// 				color: randomShade(color)
-// 			});
-// 		}
-// 	}
-
-// 	const oldAlpha = offCtx.globalAlpha;
-// 	const _reversed = (offCtx.reversed && !reversed) || (!offCtx.reversed && reversed);
-// 	for (let i = _char.particles.length - 1; i >= 0; i--) {
-// 		const p = _char.particles[i];
-
-// 		// Agresif başlangıç
-// 		let speedMultiplier = p.frame < 2 ? 3.4 : 1;
-// 		let sizeMultiplier  = p.frame < 2 ? 1.5 : 1;
-
-// 		// Organik jitter (çizgi hissini yok eder)
-// 		p.x += p.vx * speedMultiplier + Math.sin(p.frame + p.wobble) * 0.4;
-// 		p.y += p.vy * speedMultiplier;
-
-// 		p.vy += p.gravity;
-// 		p.vx *= 0.92; // hafif sürtünme
-
-// 		p.life -= p.decay;
-// 		p.frame++;
-
-// 		offCtx.globalAlpha = p.life;
-// 		offCtx.beginPath();
-// 		offCtx.fillStyle = p.color;
-// 		offCtx.ellipse(
-// 			p.x - ((_reversed ? -1 : 1) * (platformX - p.p)),
-// 			p.y,
-// 			p.radius * sizeMultiplier * (getRandomValue2(8, 20) / 10),
-// 			p.radius * sizeMultiplier * (getRandomValue2(8, 12) / 10),
-// 			0,
-// 			0,
-// 			Math.PI * 2
-// 		);
-// 		offCtx.fill();
-
-// 		if (p.life <= 0)
-// 			_char.particles.splice(i, 1);
-// 	}
-
-// 	offCtx.globalAlpha = oldAlpha;
-
-// 	if (_char.particles.length === 0)
-// 		delete _char.particles;
-
-// 	function randomShade(hex) {
-// 		let r = parseInt(hex.substr(1,2),16);
-// 		let g = parseInt(hex.substr(3,2),16);
-// 		let b = parseInt(hex.substr(5,2),16);
-
-// 		r += Math.random() * 35 - 15;
-// 		g += Math.random() * 25 - 10;
-// 		b += Math.random() * 20 - 5;
-
-// 		return `rgb(${r|0},${g|0},${b|0})`;
-// 	}
-// }
-const SIN_LUT = new Float32Array(360);
-for (let i = 0; i < 360; i++)
- SIN_LUT[i] = Math.sin(i * Math.PI / 180);
-let particleScale = Math.max(0.25, Math.min(2, this.cWidth / 1152));
-// ---------------- TUNING ----------------
-
-let BASE_SPEED_MIN = 2 * particleScale;
-let BASE_SPEED_MAX = 3.6 * particleScale;
-let RANDOM_VX = 0.6 * particleScale;
-let RANDOM_VY = 0.4 * particleScale;
-let RADIUS_MIN = 1.05 * particleScale;
-let RADIUS_RANGE = 2.2 * particleScale;
-let GRAVITY_MIN = 0.28;
-let GRAVITY_RANGE = 0.5;
-let WOBBLE_STRENGTH = 0.4;
-
-const SPEED_VARIANCE_BASE = 0.6;
-const SPEED_VARIANCE_MULT = 1.6;
-
-const NORMAL_HIT_SPEED_BOOST = 1.1;
-const SLAM_VERTICAL_BOOST = 0.8;
-
-const RX_MIN = 0.8;
-const RX_MAX = 2.2;
-
-const RY_MIN = 0.8;
-const RY_MAX = 1.2;
-
-const LIFE_MIN = 0.80;
-const LIFE_MAX = 1.10;
-
-const DECAY_MIN = 0.035;
-const DECAY_RANGE = 0.05;
-
-const DOWNWARD_BIAS_MIN = 18;
-const DOWNWARD_BIAS_RANGE = 6;
-
-const FAST_SPEED_MULT = 2.25;
-const FAST_SIZE_MULT = 1.5;
-
-const AIR_RESISTANCE = 0.96;
-
-const PARTICLE_SPEED_START = 1.5;
-const PARTICLE_SPEED_RECOVER = 0.1;
-this.drawHitParticles = function(_char, x, y, direction, color, strength, reversed, _key)
-{
-	if (!_char.particles)
-		_char.particles = [];
-
-	if (x)
-	{
-		strength = Math.max(1, Math.min(3, strength - 1));
-
-		let _countRate = 1;
-
-		if (strength >= 2 && strength < 3)
-			_countRate = getRandomValue2(100, 300) / 100;
-		else if (strength >= 3)
-			_countRate = 4;
-
-		const sizeFactor = (_char.width * _char.ZOOM) / 30;
-
-		let count =
-			(16 + _countRate) +
-			strength * _countRate * sizeFactor;
-		const _sparkCap = (strength >= 2 || _key === 'slam' || _key === 'heavy') ? 18 : 14;
-		if (count > _sparkCap)
-			count = _sparkCap;
-		if (_char.particles.length >= _sparkCap)
-			count = 0;
-		else if (count > _sparkCap - _char.particles.length)
-			count = _sparkCap - _char.particles.length;
-
-		const spread =
-			(20 + _countRate) +
-			strength * 20;
-
-		const baseSpeed =
-			(getRandomValue2(
-				BASE_SPEED_MIN * 10,
-				BASE_SPEED_MAX * 10
-			) / 10)
-			+
-			_countRate * (sizeFactor / (2 + _countRate));
-
-		const downwardBias =
-			DOWNWARD_BIAS_MIN +
-			Math.random() * DOWNWARD_BIAS_RANGE;
-
-		const radMul = Math.PI / 180;
-
-		_char.particleSpeed = PARTICLE_SPEED_START;
-
-		for (let i = 0; i < count; i++)
-		{
-			const angle =
-				direction +
-				downwardBias +
-				(Math.random() * spread - spread * 0.5);
-
-			const rad = angle * radMul;
-
-			const _isHeavyHit =
-				(_key === 'heavy' || _key === 'slam');
-
-			const speedVariance = Math.random();
-
-			let speed =
-				baseSpeed *
-				(
-					SPEED_VARIANCE_BASE +
-					speedVariance * speedVariance * SPEED_VARIANCE_MULT
-				);
-
-			if (!_isHeavyHit)
-				speed *= NORMAL_HIT_SPEED_BOOST;
-
-			let vx = Math.cos(rad) * speed;
-			let vy = Math.sin(rad) * speed;
-
-			if (_key === 'slam')
-				vy -= speed * SLAM_VERTICAL_BOOST;
-
-			vx += (Math.random() - 0.5) * RANDOM_VX;
-			vy += (Math.random() - 0.5) * RANDOM_VY;
-
-			_char.particles.push({
-				x,
-				y,
-				vx,
-				vy,
+	};
+
+	const SIN_LUT = new Float32Array(360);
+	for (let i = 0; i < 360; i++) SIN_LUT[i] = Math.sin((i * Math.PI) / 180);
+	let particleScale = Math.max(0.25, Math.min(2, this.cWidth / 1152));
+
+	let BASE_SPEED_MIN = 2 * particleScale;
+	let BASE_SPEED_MAX = 3.6 * particleScale;
+	let RANDOM_VX = 0.6 * particleScale;
+	let RANDOM_VY = 0.4 * particleScale;
+	let RADIUS_MIN = 1.05 * particleScale;
+	let RADIUS_RANGE = 2.2 * particleScale;
+	let GRAVITY_MIN = 0.28;
+	let GRAVITY_RANGE = 0.5;
+	let WOBBLE_STRENGTH = 0.4;
+
+	const SPEED_VARIANCE_BASE = 0.6;
+	const SPEED_VARIANCE_MULT = 1.6;
+
+	const NORMAL_HIT_SPEED_BOOST = 1.1;
+	const SLAM_VERTICAL_BOOST = 0.8;
+
+	const RX_MIN = 0.8;
+	const RX_MAX = 2.2;
+
+	const RY_MIN = 0.8;
+	const RY_MAX = 1.2;
+
+	const LIFE_MIN = 0.8;
+	const LIFE_MAX = 1.1;
+
+	const DECAY_MIN = 0.035;
+	const DECAY_RANGE = 0.05;
+
+	const DOWNWARD_BIAS_MIN = 18;
+	const DOWNWARD_BIAS_RANGE = 6;
+
+	const FAST_SPEED_MULT = 2.25;
+	const FAST_SIZE_MULT = 1.5;
+
+	const AIR_RESISTANCE = 0.96;
+
+	const PARTICLE_SPEED_START = 1.5;
+	const PARTICLE_SPEED_RECOVER = 0.1;
+	this.smashEnemy = function (_e, _t, _f) {
+		if (!_e || _e._goreDone || _e.class === 'object') return;
+		_e._goreDone = 1;
+		const _atk = _t?.getCurrentAnimation?.();
+		const _charged = !!(_atk?.chargeDistance && (_t.charging || _gameTick - (_t.chargeStarted ?? 0) < 999));
+		const _knock = !!(_f?.atk?.hurt?.knockback || _f?.knockback);
+		const _rate = _f?.atk?.rate ?? 1;
+		const _size = ((_e.width ?? 40) * (_e.zoom ?? _e.ZOOM ?? 1)) / 90;
+		const _bodyH = _e.HURTHEIGHT || _e.HEIGHT || _e.height || 80;
+		const _bodyW = _e.WIDTH || _e.width || 40;
+		const _ground = this.cHeight - (_e.yPosition ?? 0) + (_e.yGap ?? 0);
+		const _top = _e.TOP ?? _ground - _bodyH;
+		const _left = _e.LEFT ?? _e.left ?? 0;
+		const _sign = _t && (_t.LEFT ?? _t.left ?? 0) > _left ? -1 : 1;
+		const _hitX = _t?.HURTLEFT ?? _t?.LEFT ?? _t?.left ?? _left;
+		const _reach = Math.max(48, ((_t?.WIDTH || _t?.width || 70) + _bodyW) * 0.5);
+		const _near = 1 - Math.max(0, Math.min(1, Math.abs(_hitX - (_left + _bodyW * 0.5)) / _reach));
+		let _spread = 1.05 + Math.min(0.9, Math.max(0, _rate - 1) * 0.22);
+		if (_t?.criticalHit) _spread += 0.6;
+		if (_charged) _spread += 0.4;
+		if (_knock) _spread += 0.75;
+		let _swing = 0.3 + Math.min(0.28, Math.max(0, _rate - 1) * 0.14);
+		if (_t?.criticalHit) _swing += 0.2;
+		if (_charged) _swing += 0.15;
+		if (_knock) _swing += 0.18;
+		if (_f?.atk?.hurt?.slam) _swing += 0.16;
+		_swing = Math.max(0.3, Math.min(1, _swing));
+		_e.setSound?.({ key: 'swing', volume: _swing, reset: true }, _e.getCurrentAnimation?.(), true);
+		_spread *= 0.7 + (1 - _near) * 0.9;
+		_spread *= Math.max(0.9, Math.min(1.45, _size));
+		const _hex = _e.bloodColor === 'green' ? '#12381a' : '#4a0808';
+		const _br = parseInt(_hex.substr(1, 2), 16);
+		const _bg = parseInt(_hex.substr(3, 2), 16);
+		const _bb = parseInt(_hex.substr(5, 2), 16);
+		const _bulk = Math.max(0.8, Math.min(1.55, (_bodyW * _bodyH) / 14000));
+		const _hasLimbs = !!_e.limbs?.length;
+		let _n = Math.round((_hasLimbs ? 95 : 100) * _bulk);
+		if (_n > (_hasLimbs ? 130 : 150)) _n = _hasLimbs ? 130 : 150;
+		const _slamHit = !!_f?.atk?.hurt?.slam;
+		if (_slamHit) {
+			_n = Math.round(_n * 1.28);
+			if (_n > (_hasLimbs ? 160 : 180)) _n = _hasLimbs ? 160 : 180;
+		}
+		this._freeGore?.(_n);
+		const _arr = [];
+		const _ps = particleScale;
+		const _reachH = Math.max(56, _bodyH);
+		const _vxCap = _reachH / (_slamHit ? 13 : 16);
+		const _vyCap = _slamHit ? _reachH / 14 : _reachH / 42;
+		let _power = 0.5;
+		if (_t?.criticalHit) _power += 0.22;
+		if (_charged) _power += 0.12;
+		if (_knock) _power += 0.16;
+		if (_rate > 1) _power += Math.min(0.18, (_rate - 1) * 0.07);
+		if (_slamHit) _power += 0.2;
+		_power = Math.min(1, _power);
+		const _burstCols = [
+			'rgb(' + Math.max(32, _br - 8) + ',' + _bg + ',' + _bb + ')',
+			'rgb(' + Math.min(96, _br + 18) + ',' + Math.min(16, _bg + 4) + ',' + _bb + ')',
+			'rgb(' + Math.max(40, _br + 4) + ',' + _bg + ',' + Math.min(12, _bb + 3) + ')',
+			'rgb(' + Math.min(88, _br + 10) + ',' + Math.min(14, _bg + 2) + ',' + _bb + ')'
+		];
+		const _ox = _left + _bodyW * 0.5;
+		const _oy = _top + _bodyH * 0.42;
+		const _core = Math.round(_n * 0.55);
+		for (let i = 0; i < _n; i++) {
+			const _fine = Math.random() < 0.62;
+			const _coreHit = i < _core;
+			const _side = Math.random() < (_knock ? 0.66 : 0.54) ? _sign : -_sign;
+			const _up = _slamHit ? Math.random() < 0.48 : Math.random() < 0.08;
+			const _grain = 0.55 + Math.random() * 0.45;
+			const _ux = _coreHit ? 0.38 + Math.random() * 0.24 : 0.12 + Math.random() * 0.76;
+			const _mid = 1 - Math.min(1, Math.abs(_ux - 0.5) / 0.38);
+			let _vy =
+				(_up
+					? -_vyCap * (0.4 + Math.random() * (_slamHit ? 0.7 : 0.45))
+					: _vxCap * (0.22 + Math.random() * 0.55)) * (_fine ? 0.85 : 1);
+			if (_vy < (_slamHit ? -2.1 : -1.5)) _vy = _slamHit ? -2.1 : -1.5;
+			const _spread = _coreHit ? 0.35 : 1;
+			_arr.push({
+				x: _coreHit ? _ox + (Math.random() - 0.5) * _bodyW * 0.28 : _left + _bodyW * _ux,
+				y: _coreHit
+					? _oy + (Math.random() - 0.5) * _bodyH * 0.34
+					: _top + _bodyH * (0.18 + Math.random() * 0.64),
+				vx:
+					_side *
+					_vxCap *
+					(0.22 + Math.random() * 0.7) *
+					(0.62 + _power * 0.38) *
+					_grain *
+					(_fine ? 0.8 : 1) *
+					_spread,
+				vy: _vy,
 				p: platformX,
-
 				radius:
 					Math.max(
-						this.cWidth * 0.0032,
-						RADIUS_MIN + Math.random() * RADIUS_RANGE
-					),
-
-				rx:
-					getRandomValue2(
-						RX_MIN * 10,
-						RX_MAX * 10
-					) / 10,
-
-				ry:
-					getRandomValue2(
-						RY_MIN * 10,
-						RY_MAX * 10
-					) / 10,
-
-				life:
-					getRandomValue2(
-						LIFE_MIN * 100,
-						LIFE_MAX * 100
-					) / 100,
-
-				decay:
-					DECAY_MIN +
-					Math.random() * DECAY_RANGE,
-
-				frame: 0,
-
-				gravity:
-					GRAVITY_MIN +
-					Math.random() * GRAVITY_RANGE,
-
-				wobble:
-					Math.random() * 360 | 0,
-
-				airTime:
-					_isHeavyHit ? 6 : 0,
-
-				color:
-					randomShade(color)
+						this.cWidth * (_fine ? 0.0028 : 0.0042),
+						((_fine ? 1.7 : 2.45) + Math.random() * (_fine ? 0.85 : 1.15)) * _ps
+					) *
+					(1 + _mid * 0.28),
+				rx: 0.95 + Math.random() * 0.8,
+				ry: 0.75 + Math.random() * 0.55,
+				life: 0.9 + Math.random() * 0.1,
+				decay: 0.016 + Math.random() * 0.014,
+				frame: 2,
+				gravity: (_fine ? 0.52 : 0.68) + Math.random() * (_fine ? 0.16 : 0.22),
+				wobble: (Math.random() * 360) | 0,
+				airTime: _up ? 1 : 0,
+				gore: 1,
+				pool: 1,
+				born: _gameTick,
+				until: _gameTick + 9000 + ((Math.random() * 7000) | 0),
+				sit: Math.round((Math.random() - 0.5) * (_coreHit ? 16 : 26)),
+				stain: 0.74 + Math.random() * 0.16,
+				color: _burstCols[(Math.random() * 4) | 0]
 			});
 		}
-	}
-
-	const arr = _char.particles;
-
-	const oldAlpha = offCtx.globalAlpha;
-
-	const _reversed =
-		(offCtx.reversed && !reversed)
-		||
-		(!offCtx.reversed && reversed);
-
-	let lastColor = null;
-	let lastAlpha = -1;
-
-	const hitSlow =
-		_char.hitStop
-			? 0.85
-			: _char.particleSpeed;
-
-	if (_char.particleSpeed > 1)
-		_char.particleSpeed -= PARTICLE_SPEED_RECOVER;
-	else if (_char.particleSpeed < 1)
-		_char.particleSpeed += PARTICLE_SPEED_RECOVER;
-
-	for (let i = arr.length - 1; i >= 0; i--)
-	{
-		const p = arr[i];
-
-		const fast = p.frame < 2;
-
-		const speedMul =
-			fast
-				? FAST_SPEED_MULT
-				: 1;
-
-		const sizeMul =
-			fast
-				? FAST_SIZE_MULT
-				: 1;
-
-		p.x +=
-			(p.vx * speedMul) * hitSlow
-			+
-			SIN_LUT[(p.frame + p.wobble) % 360]
-			*
-			WOBBLE_STRENGTH
-			*
-			hitSlow;
-
-		p.y +=
-			(p.vy * speedMul)
-			*
-			hitSlow;
-
-		if (p.airTime > 0)
-			p.airTime--;
-		else
-			p.vy += p.gravity;
-
-		p.vx *= AIR_RESISTANCE;
-
-		p.life -= p.decay;
-
-		p.frame++;
-
-		const killY =
-			(this.cHeight - _char.yPosition)
-			+
-			_char.yGap;
-
-		if (p.life <= 0 || p.y > killY)
-		{
-			arr[i] = arr[arr.length - 1];
-			arr.pop();
-			continue;
+		this._goreLive = (this._goreLive || 0) + _arr.length;
+		_e.particles = _arr;
+		_e.particleSpeed = 1;
+		if (_e.limbs?.length) {
+			_e._goreLinger = _gameTick + 12000;
+			let _hitRate = _rate;
+			if (_charged) _hitRate += 0.8;
+			const _pool = [];
+			const _seen = {};
+			for (let i = 0; i < _e.limbs.length; i++) {
+				const _limb = _e.limbs[i];
+				if (!_limb?.src || !_limb.width) continue;
+				const _key = String(_limb.id ?? _limb.type ?? _limb.src) + ':' + (_limb.src || '');
+				if (_seen[_key]) continue;
+				_seen[_key] = 1;
+				_pool.push(_limb);
+			}
+			for (let s = _pool.length - 1; s > 0; s--) {
+				const j = Math.floor(Math.random() * (s + 1));
+				const _swap = _pool[s];
+				_pool[s] = _pool[j];
+				_pool[j] = _swap;
+			}
+			const _throwCount = this.LowPerformance ? 0 : Math.min(5, _pool.length);
+			for (let i = 0; i < _throwCount; i++) {
+				const _limb = _pool[i];
+				const _tmpl = createLimb(
+					_limb.weight,
+					_limb.type,
+					_limb.src,
+					_limb.relatedId ?? _e.id,
+					_limb.id ?? i + 1,
+					_limb.width,
+					_limb.height,
+					_limb.zoom ?? 1,
+					_hitRate,
+					_sign,
+					_knock,
+					!!_t?.criticalHit,
+					!!_f?.atk?.hurt?.slam,
+					_charged,
+					_bodyH
+				);
+				const _keys = Object.keys(_tmpl.animations);
+				for (let k = 0; k < _keys.length; k++)
+					_tmpl.animations[_keys[k]] = new animation(_tmpl.animations[_keys[k]]);
+				const _obj = new enemy(_tmpl);
+				const _heavy = (_limb.weight || 0) > 20;
+				_obj.left =
+					(_e.left ?? _left) + _bodyW * (_heavy ? 0.38 + Math.random() * 0.24 : 0.12 + Math.random() * 0.76);
+				_obj.yPosition = _e.yPosition ?? 0;
+				_obj.bloodColor = _e.bloodColor;
+				_obj._goreReach = _bodyH;
+				_obj.platformX = platformX;
+				_obj.located = _obj.started = true;
+				_obj.animate('skid', 1);
+				this.enemies.push(_obj);
+			}
 		}
-
-		if (p.life !== lastAlpha)
-		{
-			offCtx.globalAlpha = p.life;
-			lastAlpha = p.life;
-		}
-
-		if (p.color !== lastColor)
-		{
-			offCtx.fillStyle = p.color;
-			lastColor = p.color;
-		}
-
-		const _pd = this.getDepthDrawScale(_char);
-		const _rx0 = p.radius * sizeMul * p.rx;
-		const _ry0 = p.radius * sizeMul * p.ry;
-		const _px = p.x - ((_reversed ? -1 : 1) * (platformX - p.p));
-		offCtx.beginPath();
-		offCtx.ellipse(_px, p.y + _ry0 * (1 - _pd), _rx0 * _pd, _ry0 * _pd, 0, 0, Math.PI * 2);
-		offCtx.fill();
-	}
-
-	offCtx.globalAlpha = oldAlpha;
-
-	if (arr.length === 0)
-		delete _char.particles;
-
-	function randomShade(hex)
-	{
-		let r = parseInt(hex.substr(1, 2), 16);
-		let g = parseInt(hex.substr(3, 2), 16);
-		let b = parseInt(hex.substr(5, 2), 16);
-
-		r += Math.random() * 35 - 15;
-		g += Math.random() * 25 - 10;
-		b += Math.random() * 20 - 5;
-
-		return `rgb(${r | 0},${g | 0},${b | 0})`;
-	}
-}
-this.animateIFrameRipple = function (_item, _wDiff) {
-
-	const _char = _item.char;
-
-	if (!_char.ripples)
-		_char.ripples = [];
-
-	// ---------------- SPAWN (rate limitli) ----------------
-	if (_char.hasIframe && !_char.ripples?.[0]) {
-
-		if (!_char._lastRipple || (_gameTick - _char._lastRipple) > 6) {
-
-			_char._lastRipple = _gameTick;
-			
-			_char.ripples.push({
-				y: _char.TOP + MathRound(_char.HEIGHT * 0.5),
+	};
+	this.crushLimb = function (_o, _sign) {
+		if (!_o || _o._goreHide || _o.remove) return;
+		_o._goreHide = 1;
+		_o.stop = true;
+		_o.setSound?.(
+			{ key: 'ezme1,ezme2,ezme3,ezme4,ezme5,ezme6,ezme7,ezme8', volume: 0.5, reset: true },
+			_o.getCurrentAnimation?.(),
+			true
+		);
+		_o.do = undefined;
+		_o.extraStepYRate = 0;
+		_o.extraStepXRate = 0;
+		const _away = _sign < 0 ? -1 : 1;
+		const _ps = typeof particleScale === 'number' && particleScale ? particleScale : 1;
+		const _zoom = _o.ZOOM || _o.zoom || 1;
+		const _bodyW = _o.WIDTH || Math.max(28, (_o.width || 40) * _zoom);
+		const _bodyH = _o.HURTHEIGHT || _o.HEIGHT || Math.max(18, (_o.height || 30) * _zoom);
+		const _ground = this.cHeight - (_o.yPosition ?? 0) + (_o.yGap ?? 0);
+		const _top = _o.TOP ?? _ground - _bodyH;
+		const _left = _o.LEFT ?? _o.left ?? 0;
+		const _hex = _o.bloodColor === 'green' ? '#12381a' : '#4a0808';
+		const _br = parseInt(_hex.substr(1, 2), 16);
+		const _bg = parseInt(_hex.substr(3, 2), 16);
+		const _bb = parseInt(_hex.substr(5, 2), 16);
+		const _arr = [];
+		for (let i = 0; i < 20; i++) {
+			const _fine = Math.random() < 0.62;
+			const _pop = Math.random() < 0.55;
+			const _side = Math.random() < 0.72 ? _away : -_away;
+			const _r = Math.max(32, Math.min(96, _br + Math.random() * 16 - 18));
+			const _g = Math.max(0, Math.min(16, _bg + Math.random() * 4 - 3));
+			const _b = Math.max(0, Math.min(12, _bb + Math.random() * 3 - 2));
+			_arr.push({
+				x: _left + _bodyW * (0.18 + Math.random() * 0.64),
+				y: _top + _bodyH * (0.25 + Math.random() * 0.6),
+				vx: _side * (0.45 + Math.random() * 1.35) * _ps,
+				vy: (_pop ? -(0.7 + Math.random() * 1.5) : 0.35 + Math.random() * 0.9) * _ps,
 				p: platformX,
-				t: 0,
-				life: 1,
-				decay: 0.07 + Math.random() * 0.03,
-
-				startR: (_char._HURTBOX_half) * 0.5,
-				maxR: (_char._HURTBOX_half) * (_char.HURTHEIGHT * .0075),
-
-				wobble: (Math.random() * 360) | 0
+				radius: Math.max(
+					this.cWidth * (_fine ? 0.0028 : 0.0042),
+					((_fine ? 1.7 : 2.6) + Math.random() * (_fine ? 0.6 : 0.9)) * _ps
+				),
+				rx: 0.9 + Math.random() * 0.7,
+				ry: 0.7 + Math.random() * 0.5,
+				life: 0.9 + Math.random() * 0.1,
+				decay: 0.018 + Math.random() * 0.016,
+				frame: 2,
+				gravity: (_fine ? 0.5 : 0.62) + Math.random() * 0.22,
+				wobble: (Math.random() * 360) | 0,
+				airTime: _pop ? 2 : 0,
+				color: 'rgb(' + (_r | 0) + ',' + (_g | 0) + ',' + (_b | 0) + ')'
 			});
-			PlaySound({key:'iframe', volume: .05});
 		}
-	}
+		_o.particles = _arr;
+		_o.particleSpeed = 1;
+	};
+	this._goreFloorHost = function () {
+		if (!this._goreFloor) {
+			this._goreFloor = {
+				particles: [],
+				particleSpeed: 1,
+				yPosition: 0,
+				yGap: 0,
+				name: 'goreFloor'
+			};
+		}
+		if (!this._goreFloor.particles) this._goreFloor.particles = [];
+		return this._goreFloor;
+	};
+	this._detachLimbBlood = function (_o) {
+		if (!_o?.particles?.length) return;
+		const _floor = this._goreFloorHost();
+		for (let i = _o.particles.length - 1; i >= 0; i--) {
+			const _p = _o.particles[i];
+			if (!_p?.pooled) continue;
+			_p.stuck = 1;
+			_p.vx = 0;
+			_p.vy = 0;
+			_p.floor = 1;
+			if (!_p.until) _p.until = (_o._limbLanded || _gameTick) + 9000 + ((Math.random() * 7000) | 0);
+			_floor.particles.push(_p);
+			_o.particles[i] = _o.particles[_o.particles.length - 1];
+			_o.particles.pop();
+		}
+		if (!_o.particles.length) delete _o.particles;
+	};
+	this._freeGore = function (_need) {
+		const _cap = 420;
+		let _over = (this._goreLive || 0) + (_need || 0) - _cap;
+		if (_over <= 0 || !this.enemies) return;
+		if (_over > 36) _over = 36;
+		const _list = [];
+		const _hosts = this.enemies ? this.enemies.slice() : [];
+		if (this._goreFloor) _hosts.push(this._goreFloor);
+		for (let i = 0; i < _hosts.length; i++) {
+			const _ps = _hosts[i]?.particles;
+			if (!_ps) continue;
+			for (let j = 0; j < _ps.length; j++) {
+				if (!_ps[j].gore) continue;
+				_list.push(_ps[j]);
+			}
+		}
+		_list.sort(function (a, b) {
+			const _ap = a.pooled ? 1 : 0;
+			const _bp = b.pooled ? 1 : 0;
+			if (_ap !== _bp) return _ap - _bp;
+			return (a.born || 0) - (b.born || 0);
+		});
+		const _drop = [];
+		for (let k = 0; k < _list.length && _drop.length < _over; k++) _drop.push(_list[k]);
+		if (!_drop.length) return;
+		const _kill = new Set(_drop);
+		for (let i = 0; i < _hosts.length; i++) {
+			const _en = _hosts[i];
+			const _ps = _en?.particles;
+			if (!_ps) continue;
+			for (let j = _ps.length - 1; j >= 0; j--) {
+				if (!_kill.has(_ps[j])) continue;
+				_ps[j] = _ps[_ps.length - 1];
+				_ps.pop();
+				if (this._goreLive > 0) this._goreLive--;
+			}
+			if (!_ps.length && _en.name !== 'goreFloor') delete _en.particles;
+		}
+	};
+	this.trailLimb = function (_o, _stepX, _slam, _risePx) {
+		if (!_o || _o.remove || _o.animation !== 'skid') return;
+		if (!_o.particles) _o.particles = [];
+		let _air = 0;
+		let _oldAir = null;
+		let _pooled = 0;
+		let _oldPool = null;
+		let _fall = null;
+		let _count = 0;
+		for (let n = 0; n < _o.particles.length; n++) {
+			const _p = _o.particles[n];
+			if (!_p.trail) continue;
+			_count++;
+			if (_p.pooled) {
+				_pooled++;
+				if (!_oldPool || (_p.born || 0) < (_oldPool.born || 0)) _oldPool = _p;
+			} else if (_p.airTime > 0) {
+				_air++;
+				if (!_oldAir || (_p.born || 0) < (_oldAir.born || 0)) _oldAir = _p;
+			} else if (!_fall || (_p.born || 0) < (_fall.born || 0)) _fall = _p;
+		}
+		const _drop = _count > 26 ? _oldPool || _fall : null;
+		if (_drop) {
+			const _idx = _o.particles.indexOf(_drop);
+			if (_idx >= 0) {
+				_o.particles[_idx] = _o.particles[_o.particles.length - 1];
+				_o.particles.pop();
+				if (this._goreLive > 0) this._goreLive--;
+			}
+		}
+		if (_air >= 10 && _oldAir) {
+			_oldAir.airTime = 0;
+			_oldAir.vy += 0.55;
+		}
+		const _spawn = Math.random() < 0.28 ? 1 : 2;
+		const _ps = typeof particleScale === 'number' && particleScale ? particleScale : 1;
+		const _zoom = _o.ZOOM || _o.zoom || 1;
+		const _bodyW = _o.WIDTH || Math.max(24, (_o.width || 40) * _zoom);
+		const _bodyH = _o.HURTHEIGHT || _o.HEIGHT || Math.max(16, (_o.height || 30) * _zoom);
+		const _reachH = Math.max(56, _o._goreReach || _bodyH * 2.2);
+		const _lift = (_o.extraStepYRate || 0) * ((this.cHeight || 640) / 100);
+		const _ground = this.cHeight - (_o.yPosition ?? 0) + (_o.yGap ?? 0);
+		const _top = _ground - _bodyH - _lift;
+		const _left = _o.LEFT ?? _o.left ?? 0;
+		if (!_o._trailCols) {
+			const _hex = _o.bloodColor === 'green' ? '#245033' : '#6e1c1c';
+			const _br = parseInt(_hex.substr(1, 2), 16);
+			const _bg = parseInt(_hex.substr(3, 2), 16);
+			const _bb = parseInt(_hex.substr(5, 2), 16);
+			_o._trailCols = [
+				'rgb(' + Math.max(56, _br - 6) + ',' + _bg + ',' + _bb + ')',
+				'rgb(' + Math.min(118, _br + 16) + ',' + Math.min(24, _bg + 6) + ',' + _bb + ')',
+				'rgb(' + Math.min(100, _br + 8) + ',' + Math.min(18, _bg + 3) + ',' + Math.min(16, _bb + 4) + ')'
+			];
+		}
+		const _trailCols = _o._trailCols;
+		const _vxCap = _reachH / 18;
+		const _vyCap = _slam ? _reachH / 22 : _reachH / 48;
+		let _vx = _stepX || 0;
+		if (_vx > _vxCap * 3) _vx = _vxCap * 3;
+		else if (_vx < -_vxCap * 3) _vx = -_vxCap * 3;
+		const _rise = _risePx || 0;
+		let _followY = -_rise * 0.42;
+		if (_followY < -0.85) _followY = -0.85;
+		else if (_followY > 1.4) _followY = 1.4;
+		for (let i = 0; i < _spawn; i++) {
+			const _back = 1.4 + i * 0.9;
+			_o.particles.push({
+				x: _left + _bodyW * (0.35 + Math.random() * 0.3) - _vx * _back,
+				y: _top + _bodyH * (0.28 + Math.random() * 0.4) - Math.max(0, _rise) * 0.35,
+				vx: _vx * (0.04 + Math.random() * 0.06),
+				vy: _followY + 0.5 + Math.random() * 0.35,
+				p: platformX,
+				radius: Math.max(this.cWidth * 0.0037, (2.7 + Math.random() * 1.55) * _ps),
+				rx: 1.1 + Math.random() * 0.7,
+				ry: 0.38 + Math.random() * 0.22,
+				life: 0.9,
+				decay: 0.005,
+				frame: 2,
+				gravity: 0.95 + Math.random() * 0.35,
+				wobble: (Math.random() * 360) | 0,
+				airTime: 2 + ((Math.random() * 2) | 0),
+				pool: 1,
+				gore: 1,
+				trail: 1,
+				born: _gameTick,
+				until: (_o._limbLanded || _gameTick) + 9000 + ((Math.random() * 7000) | 0),
+				stain: 0.76 + Math.random() * 0.14,
+				sit: Math.round((Math.random() - 0.5) * 34),
+				color: _trailCols[(Math.random() * 3) | 0]
+			});
+		}
+		this._goreLive = (this._goreLive || 0) + _spawn;
+		_o.particleSpeed = 1;
+	};
+	this.drawHitParticles = function (_char, x, y, direction, color, strength, reversed, _key) {
+		if (!_char.particles) _char.particles = [];
 
-	const arr = _char.ripples;
-	if (!arr.length) return;
+		if (x) {
+			strength = Math.max(1, Math.min(3, strength - 1));
 
-	const oldAlpha = offCtx.globalAlpha;
-	const oldComp = offCtx.globalCompositeOperation;
-	const oldShadow = offCtx.shadowBlur;
+			let _countRate = 1;
 
-	const _reversed =
-		(offCtx.reversed && !_item.reversed) ||
-		(!offCtx.reversed && _item.reversed);
+			if (strength >= 2 && strength < 3) _countRate = getRandomValue2(100, 300) / 100;
+			else if (strength >= 3) _countRate = 4;
 
-	offCtx.globalCompositeOperation = 'lighter';
-	offCtx.shadowBlur = 12;
-	offCtx.shadowColor = "rgba(80,180,255,0.8)";
+			const sizeFactor = (_char.width * _char.ZOOM) / 30;
 
-	for (let i = arr.length - 1; i >= 0; i--) {
+			let count = 16 + _countRate + strength * _countRate * sizeFactor;
+			const _sparkCap = strength >= 2 || _key === 'slam' || _key === 'heavy' ? 18 : 14;
+			if (count > _sparkCap) count = _sparkCap;
+			if (_char.particles.length >= _sparkCap) count = 0;
+			else if (count > _sparkCap - _char.particles.length) count = _sparkCap - _char.particles.length;
 
-		const r = arr[i];
+			const spread = 20 + _countRate + strength * 20;
 
-		// ---------- PROGRESS ----------
-		r.t += 0.1 + Math.random() * 0.04;
-		r.life -= r.decay;
+			const baseSpeed =
+				getRandomValue2(BASE_SPEED_MIN * 10, BASE_SPEED_MAX * 10) / 10 +
+				_countRate * (sizeFactor / (2 + _countRate));
 
-		if (r.life <= 0) {
-			arr[i] = arr[arr.length - 1];
-			arr.pop();
-			continue;
+			const downwardBias = DOWNWARD_BIAS_MIN + Math.random() * DOWNWARD_BIAS_RANGE;
+
+			const radMul = Math.PI / 180;
+
+			_char.particleSpeed = PARTICLE_SPEED_START;
+
+			for (let i = 0; i < count; i++) {
+				const angle = direction + downwardBias + (Math.random() * spread - spread * 0.5);
+
+				const rad = angle * radMul;
+
+				const _isHeavyHit = _key === 'heavy' || _key === 'slam';
+
+				const speedVariance = Math.random();
+
+				let speed = baseSpeed * (SPEED_VARIANCE_BASE + speedVariance * speedVariance * SPEED_VARIANCE_MULT);
+
+				if (!_isHeavyHit) speed *= NORMAL_HIT_SPEED_BOOST;
+
+				let vx = Math.cos(rad) * speed;
+				let vy = Math.sin(rad) * speed;
+
+				if (_key === 'slam') vy -= speed * SLAM_VERTICAL_BOOST;
+
+				vx += (Math.random() - 0.5) * RANDOM_VX;
+				vy += (Math.random() - 0.5) * RANDOM_VY;
+
+				_char.particles.push({
+					x,
+					y,
+					vx,
+					vy,
+					p: platformX,
+
+					radius: Math.max(this.cWidth * 0.0032, RADIUS_MIN + Math.random() * RADIUS_RANGE),
+
+					rx: getRandomValue2(RX_MIN * 10, RX_MAX * 10) / 10,
+
+					ry: getRandomValue2(RY_MIN * 10, RY_MAX * 10) / 10,
+
+					life: getRandomValue2(LIFE_MIN * 100, LIFE_MAX * 100) / 100,
+
+					decay: DECAY_MIN + Math.random() * DECAY_RANGE,
+
+					frame: 0,
+
+					gravity: GRAVITY_MIN + Math.random() * GRAVITY_RANGE,
+
+					wobble: (Math.random() * 360) | 0,
+
+					airTime: _isHeavyHit ? 6 : 0,
+
+					color: randomShade(color)
+				});
+			}
 		}
 
-		// ---------- EASE OUT ----------
-		const ease = 1 - Math.pow(1 - r.t, 3);
-		const _rd = this.getDepthDrawScale(_char);
+		const arr = _char.particles;
 
-		let radius =
-			(r.startR +
-			(r.maxR - r.startR) * ease) * _rd;
+		const oldAlpha = offCtx.globalAlpha;
+		const _pd = this.getDepthDrawScale(_char);
+		const killY = this.cHeight - _char.yPosition + _char.yGap;
 
-		const alpha = r.life;
+		const _reversed = (offCtx.reversed && !reversed) || (!offCtx.reversed && reversed);
 
-		const wobble =
-			SIN_LUT[(r.t * 120 + r.wobble) % 360] * 2 * _rd;
+		let lastColor = null;
+		let lastAlpha = -1;
 
-		// ---------- WORLD → SCREEN ----------
-		const _centerX = _char.HURTLEFT + _char._HURTBOX_half;
-		let drawX =  (offCtx.reversed ? -1 * _centerX : _centerX);
-		const _footY = _char.TOP + _char.HEIGHT;
-		let drawY = _footY + (r.y - _footY) * _rd;
-		if (r.t < 0.3) {
+		const hitSlow = _char.hitStop ? 0.85 : _char.particleSpeed;
 
-			const coreSize = Math.max(4, radius * 0.5);
-			const intensity = 1 - (r.t / 0.3);
+		if (_char.particleSpeed > 1) _char.particleSpeed -= PARTICLE_SPEED_RECOVER;
+		else if (_char.particleSpeed < 1) _char.particleSpeed += PARTICLE_SPEED_RECOVER;
 
-			const grad = offCtx.createRadialGradient(
-				drawX, drawY, 0,
-				drawX, drawY, coreSize
-			);
+		for (let i = arr.length - 1; i >= 0; i--) {
+			const p = arr[i];
 
-			grad.addColorStop(0, `rgba(255,255,255,${intensity})`);
-			grad.addColorStop(0.3, `rgba(80,180,255,0)`);
-			grad.addColorStop(0.5, `rgba(255,255,255,${intensity * .8})`);
-			grad.addColorStop(1, `rgba(80,180,255,0)`);
+			if (p.stuck || (_char.animation === 'push' && p.pooled)) p.vx = 0;
 
-			const oldComp = offCtx.globalCompositeOperation;
-			const oldAlpha = offCtx.globalAlpha;
+			if (p.pooled) {
+				const _fade = _char.animation === 'fade' || (p.until && _gameTick >= p.until);
+				if (_fade) p.life -= 0.01;
+				else p.life = p.stain || 0.78;
+				if (p.life <= 0) {
+					arr[i] = arr[arr.length - 1];
+					arr.pop();
+					if (p.gore && this._goreLive > 0) this._goreLive--;
+					continue;
+				}
+				if (p.life !== lastAlpha) {
+					offCtx.globalAlpha = p.life;
+					lastAlpha = p.life;
+				}
+				if (p.color !== lastColor) {
+					offCtx.fillStyle = p.color;
+					lastColor = p.color;
+				}
+				const _gx = p.x - (_reversed ? -1 : 1) * (platformX - p.p);
+				const _rw = p.radius * (p.rx || 1) * _pd * 1.2;
+				const _rh = p.radius * (p.ry || 0.7) * _pd * 0.8;
+				offCtx.beginPath();
+				offCtx.ellipse(_gx, p.y, _rw, _rh, 0, 0, Math.PI * 2);
+				offCtx.fill();
+				continue;
+			}
 
-			offCtx.globalCompositeOperation = 'screen';
-			offCtx.globalAlpha = 1;
+			const fast = p.frame < 2;
+
+			const speedMul = fast ? FAST_SPEED_MULT : 1;
+
+			const sizeMul = fast ? FAST_SIZE_MULT : 1;
+
+			p.x +=
+				(p.pooled ? 0 : p.vx * speedMul * hitSlow) +
+				(p.pooled ? 0 : SIN_LUT[(p.frame + p.wobble) % 360] * WOBBLE_STRENGTH * hitSlow);
+
+			if (!p.pooled) p.y += p.vy * speedMul * hitSlow;
+
+			if (p.airTime > 0) p.airTime--;
+			else if (!p.pooled) p.vy += p.gravity;
+
+			if (p.pool && !p.pooled && !p.trail && p.frame > 20) p.vy += 0.42;
+
+			if (!p.pooled) p.vx *= AIR_RESISTANCE;
+
+			p.life -= p.decay;
+
+			p.frame++;
+
+			if (!p.pooled && p.pool && p.y > killY) {
+				p.pooled = 1;
+				p.stuck = 1;
+				p.y = killY - 1 + (p.sit || 0);
+				p.vx = 0;
+				p.vy = 0;
+				p.life = p.stain || 0.78;
+				if (_char.name === 'limb') {
+					const _floor = this._goreFloorHost();
+					p.floor = 1;
+					if (!p.until) p.until = (_char._limbLanded || _gameTick) + 10000;
+					_floor.particles.push(p);
+					arr[i] = arr[arr.length - 1];
+					arr.pop();
+					continue;
+				}
+			}
+
+			if (p.life <= 0 || (!p.pooled && p.y > killY)) {
+				arr[i] = arr[arr.length - 1];
+				arr.pop();
+				if (p.gore && this._goreLive > 0) this._goreLive--;
+				continue;
+			}
+
+			if (p.life !== lastAlpha) {
+				offCtx.globalAlpha = p.life;
+				lastAlpha = p.life;
+			}
+
+			if (p.color !== lastColor) {
+				offCtx.fillStyle = p.color;
+				lastColor = p.color;
+			}
+
+			const _rx0 = p.radius * sizeMul * p.rx;
+			const _ry0 = p.radius * sizeMul * p.ry;
+			const _px = p.x - (_reversed ? -1 : 1) * (platformX - p.p);
+			offCtx.beginPath();
+			offCtx.ellipse(_px, p.y + _ry0 * (1 - _pd), _rx0 * _pd, _ry0 * _pd, 0, 0, Math.PI * 2);
+			offCtx.fill();
+		}
+
+		offCtx.globalAlpha = oldAlpha;
+
+		if (arr.length === 0) delete _char.particles;
+
+		function randomShade(hex) {
+			let r = parseInt(hex.substr(1, 2), 16);
+			let g = parseInt(hex.substr(3, 2), 16);
+			let b = parseInt(hex.substr(5, 2), 16);
+
+			r += Math.random() * 35 - 15;
+			g += Math.random() * 25 - 10;
+			b += Math.random() * 20 - 5;
+
+			return `rgb(${r | 0},${g | 0},${b | 0})`;
+		}
+	};
+	this.animateIFrameRipple = function (_item, _wDiff) {
+		const _char = _item.char;
+
+		if (!_char.ripples) _char.ripples = [];
+
+		if (_char.hasIframe && !_char.ripples?.[0]) {
+			if (!_char._lastRipple || _gameTick - _char._lastRipple > 6) {
+				_char._lastRipple = _gameTick;
+
+				_char.ripples.push({
+					y: _char.TOP + MathRound(_char.HEIGHT * 0.5),
+					p: platformX,
+					t: 0,
+					life: 1,
+					decay: 0.07 + Math.random() * 0.03,
+
+					startR: _char._HURTBOX_half * 0.5,
+					maxR: _char._HURTBOX_half * (_char.HURTHEIGHT * 0.0075),
+
+					wobble: (Math.random() * 360) | 0
+				});
+				PlaySound({ key: 'iframe', volume: 0.05 });
+			}
+		}
+
+		const arr = _char.ripples;
+		if (!arr.length) return;
+
+		const oldAlpha = offCtx.globalAlpha;
+		const oldComp = offCtx.globalCompositeOperation;
+		const oldShadow = offCtx.shadowBlur;
+
+		const _reversed = (offCtx.reversed && !_item.reversed) || (!offCtx.reversed && _item.reversed);
+
+		offCtx.globalCompositeOperation = 'lighter';
+		offCtx.shadowBlur = 12;
+		offCtx.shadowColor = 'rgba(80,180,255,0.8)';
+
+		for (let i = arr.length - 1; i >= 0; i--) {
+			const r = arr[i];
+
+			r.t += 0.1 + Math.random() * 0.04;
+			r.life -= r.decay;
+
+			if (r.life <= 0) {
+				arr[i] = arr[arr.length - 1];
+				arr.pop();
+				continue;
+			}
+
+			const ease = 1 - Math.pow(1 - r.t, 3);
+			const _rd = this.getDepthDrawScale(_char);
+
+			let radius = (r.startR + (r.maxR - r.startR) * ease) * _rd;
+
+			const alpha = r.life;
+
+			const wobble = SIN_LUT[(r.t * 120 + r.wobble) % 360] * 2 * _rd;
+
+			const _centerX = _char.HURTLEFT + _char._HURTBOX_half;
+			let drawX = offCtx.reversed ? -1 * _centerX : _centerX;
+			const _footY = _char.TOP + _char.HEIGHT;
+			let drawY = _footY + (r.y - _footY) * _rd;
+			if (r.t < 0.3) {
+				const coreSize = Math.max(4, radius * 0.5);
+				const intensity = 1 - r.t / 0.3;
+
+				const grad = offCtx.createRadialGradient(drawX, drawY, 0, drawX, drawY, coreSize);
+
+				grad.addColorStop(0, `rgba(255,255,255,${intensity})`);
+				grad.addColorStop(0.3, `rgba(80,180,255,0)`);
+				grad.addColorStop(0.5, `rgba(255,255,255,${intensity * 0.8})`);
+				grad.addColorStop(1, `rgba(80,180,255,0)`);
+
+				const oldComp = offCtx.globalCompositeOperation;
+				const oldAlpha = offCtx.globalAlpha;
+
+				offCtx.globalCompositeOperation = 'screen';
+				offCtx.globalAlpha = 1;
+
+				offCtx.beginPath();
+				offCtx.arc(drawX, drawY, coreSize, 0, Math.PI * 2);
+				offCtx.fillStyle = grad;
+				offCtx.fill();
+
+				offCtx.globalCompositeOperation = oldComp;
+				offCtx.globalAlpha = oldAlpha;
+			}
 
 			offCtx.beginPath();
-			offCtx.arc(drawX, drawY, coreSize, 0, Math.PI * 2);
-			offCtx.fillStyle = grad;
+			offCtx.arc(drawX, drawY, radius * 0.35, 0, Math.PI * 2);
+			offCtx.globalAlpha = alpha * 0.35;
+			offCtx.fillStyle = 'rgba(120,200,255,0.8)';
 			offCtx.fill();
 
-			offCtx.globalCompositeOperation = oldComp;
-			offCtx.globalAlpha = oldAlpha;
+			const _lw = MathRound((this.cWidth / 800) * _rd);
+			offCtx.beginPath();
+			offCtx.arc(drawX, drawY, radius + wobble, 0, Math.PI * 2);
+			offCtx.lineWidth = _lw * 3;
+			offCtx.globalAlpha = alpha * 0.25;
+			offCtx.strokeStyle = 'rgba(80,180,255,0.6)';
+			offCtx.stroke();
+
+			offCtx.beginPath();
+			offCtx.arc(drawX, drawY, radius + wobble, 0, Math.PI * 2);
+			offCtx.lineWidth = _lw;
+			offCtx.globalAlpha = alpha * 0.9;
+			offCtx.strokeStyle = '#ffffff';
+			offCtx.stroke();
 		}
-		// =========================
-		// 🔵 CORE FLASH (dolgu)
-		// =========================
-		offCtx.beginPath();
-		offCtx.arc(drawX, drawY, radius * 0.35, 0, Math.PI * 2);
-		offCtx.globalAlpha = alpha * 0.35;
-		offCtx.fillStyle = "rgba(120,200,255,0.8)";
-		offCtx.fill();
 
-		// =========================
-		// 🔵 GLOW RING (kalın)
-		// =========================
-		const _lw = MathRound((this.cWidth / 800) * _rd);
-		offCtx.beginPath();
-		offCtx.arc(drawX, drawY, radius + wobble, 0, Math.PI * 2);
-		offCtx.lineWidth = _lw * 3;
-		offCtx.globalAlpha = alpha * 0.25;
-		offCtx.strokeStyle = "rgba(80,180,255,0.6)";
-		offCtx.stroke();
+		offCtx.globalAlpha = oldAlpha;
+		offCtx.globalCompositeOperation = oldComp;
+		offCtx.shadowBlur = oldShadow;
 
-		// =========================
-		// ⚪ SHARP OUTER RING
-		// =========================
-		offCtx.beginPath();
-		offCtx.arc(drawX, drawY, radius + wobble, 0, Math.PI * 2);
-		offCtx.lineWidth = _lw;
-		offCtx.globalAlpha = alpha * 0.9;
-		offCtx.strokeStyle = "#ffffff";
-		offCtx.stroke();
-	}
+		if (arr.length === 0) delete _char.ripples;
+	};
 
-	// ---------- RESTORE ----------
-	offCtx.globalAlpha = oldAlpha;
-	offCtx.globalCompositeOperation = oldComp;
-	offCtx.shadowBlur = oldShadow;
+	this.getShadowOffset = function (_char) {
+		const charX = _char.HURTLEFT + _char._HURTBOX_half + platformX;
+		const charY = _char.TOP + _char.HURTHEIGHT / 2;
 
-	if (arr.length === 0)
-		delete _char.ripples;
-};
-// this.getShadowOffset = function(_char) {
+		let light = null;
 
-//     const lights = this.backgroundLayerLighting;
+		const groundLights = this.groundLayerLighting;
 
-//     if (!lights || lights.length === 0) {
-//         return { x: 0, y: 0 };
-//     }
+		if (groundLights && groundLights.length > 0) {
+			let bestWeight = 0;
 
-//     const light = lights[0];
+			for (let i = 0; i < groundLights.length; i++) {
+				const candidate = groundLights[i];
 
-//     const charX = _char.HURTLEFT + _char._HURTBOX_half + platformX;
-//     const charY = _char.TOP + (_char.HURTHEIGHT / 2);
+				const dx = charX - candidate.x;
+				const dy = charY - candidate.y;
 
-//     const dx = charX - light.x;
-//     const dy = charY - light.y;
+				const distance = Math.sqrt(dx * dx + dy * dy);
 
-//     const angle = Math.atan2(dy, dx);
+				if (distance >= candidate.radius) continue;
 
-//     // TEST DEĞERİ
-//     const offset = 50;
+				const distanceFactor = 1 - distance / candidate.radius;
 
-//     return {
-//         x: Math.cos(angle) * offset,
-//         y: Math.sin(angle) * offset
-//     };
-// }
-this.getShadowOffset = function(_char) {
+				const weight = distanceFactor * candidate.intensity;
 
-    const charX = _char.HURTLEFT + _char._HURTBOX_half + platformX;
-    const charY = _char.TOP + (_char.HURTHEIGHT / 2);
+				if (weight > bestWeight) {
+					bestWeight = weight;
+					light = candidate;
+				}
+			}
+		}
 
-    let light = null;
+		if (!light) {
+			const backgroundLights = this.backgroundLayerLighting;
 
-    // --------------------------------------------------
-    // 1. ÖNCE GROUND LIGHT'LARI KONTROL ET
-    // --------------------------------------------------
+			if (backgroundLights && backgroundLights.length > 0) {
+				let bestWeight = 0;
 
-    const groundLights = this.groundLayerLighting;
+				for (let i = 0; i < backgroundLights.length; i++) {
+					const candidate = backgroundLights[i];
 
-    if (groundLights && groundLights.length > 0) {
+					const dx = charX - candidate.x;
+					const dy = charY - candidate.y;
 
-        let bestWeight = 0;
+					const distance = Math.sqrt(dx * dx + dy * dy);
 
-        for (let i = 0; i < groundLights.length; i++) {
+					if (distance >= candidate.radius) continue;
 
-            const candidate = groundLights[i];
+					const distanceFactor = 1 - distance / candidate.radius;
 
-            const dx = charX - candidate.x;
-            const dy = charY - candidate.y;
+					const weight = distanceFactor * candidate.intensity;
 
-            const distance = Math.sqrt(
-                dx * dx +
-                dy * dy
-            );
+					if (weight > bestWeight) {
+						bestWeight = weight;
+						light = candidate;
+					}
+				}
+			}
+		}
 
-            // Işığın radius'u dışındaysa etkisiz
-            if (distance >= candidate.radius)
-                continue;
+		if (!light) {
+			return {
+				x: 0,
+				y: 0
+			};
+		}
 
-            // Merkeze yakınsa daha güçlü
-            const distanceFactor = 1 - (distance / candidate.radius);
+		const dx = charX - light.x;
+		const dy = charY - light.y;
 
-            // Intensity de seçimde etkili olsun
-            const weight = distanceFactor * candidate.intensity;
+		const angle = Math.atan2(dy, dx);
 
-            if (weight > bestWeight) {
-                bestWeight = weight;
-                light = candidate;
-            }
-        }
-    }
+		const offset = this.cWidth * 0.026;
 
-    // --------------------------------------------------
-    // 2. GROUND LIGHT YOKSA BACKGROUND LIGHT'A BAK
-    // --------------------------------------------------
-
-    if (!light) {
-
-        const backgroundLights = this.backgroundLayerLighting;
-
-        if (backgroundLights && backgroundLights.length > 0) {
-
-            let bestWeight = 0;
-
-            for (let i = 0; i < backgroundLights.length; i++) {
-
-                const candidate = backgroundLights[i];
-
-                const dx = charX - candidate.x;
-                const dy = charY - candidate.y;
-
-                const distance = Math.sqrt(
-                    dx * dx +
-                    dy * dy
-                );
-
-                if (distance >= candidate.radius)
-                    continue;
-
-                const distanceFactor =
-                    1 - (distance / candidate.radius);
-
-                const weight =
-                    distanceFactor * candidate.intensity;
-
-                if (weight > bestWeight) {
-                    bestWeight = weight;
-                    light = candidate;
-                }
-            }
-        }
-    }
-
-    // --------------------------------------------------
-    // 3. HİÇ IŞIK YOKSA GÖLGE KAYMASIN
-    // --------------------------------------------------
-
-    if (!light) {
-        return {
-            x: 0,
-            y: 0
-        };
-    }
-
-    // --------------------------------------------------
-    // 4. IŞIK -> KARAKTER YÖNÜ
-    // --------------------------------------------------
-
-    const dx = charX - light.x;
-    const dy = charY - light.y;
-
-    const angle = Math.atan2(dy, dx);
-
-    const offset = this.cWidth * 0.026;
-
-    return {
-        x: Math.cos(angle) * offset,
-        y: Math.sin(angle) * offset
-    };
-};
-	this.drawBoltGlow = function(ctx, img, sx, sy, sw, sh, x, y, w, h, blur) {
-		if(!img || !img.width || !sw || !sh || !w || !h)
-			return;
+		return {
+			x: Math.cos(angle) * offset,
+			y: Math.sin(angle) * offset
+		};
+	};
+	this.drawBoltGlow = function (ctx, img, sx, sy, sw, sh, x, y, w, h, blur) {
+		if (!img || !img.width || !sw || !sh || !w || !h) return;
 		const padX = MathRound(w * 0.14);
 		const padY = MathRound(h * 0.22);
 		ctx.save();
 		ctx.globalCompositeOperation = 'lighter';
 		ctx.globalAlpha = 0.32;
-		if(blur) {
+		if (blur) {
 			ctx.shadowBlur = Math.max(2, MathRound(this.cWidth * 0.006));
 			ctx.shadowColor = 'rgba(190,225,255,0.85)';
 		}
@@ -4399,67 +3702,77 @@ this.getShadowOffset = function(_char) {
 		ctx.restore();
 	};
 	this.drawCharacterQueue = function (_queue) {
-		if (this.disposing || !_queue?.[0]){
+		if (this.disposing || !_queue?.[0]) {
 			this.checkSceneActions();
 			this.checkSceneActions(1);
 			return;
 		}
 		this.checkSceneActions(1);
-		if((this.lastSortedTime + 100) < _gameTick) {
-			for(let a of _queue)
-				a.char.sortOrder = _maxSort - MathFloor((MathRound((a.drawPriority >= 10 ? 
-					0 : a.char.yPosition) / _yTol)
-				* 100000) + 
-				(a.drawPriority * 10000)
-				+ ((999 - (a.char.drawOrder ?? 0)))
-				);
+		if (this.lastSortedTime + 100 < _gameTick) {
+			for (let a of _queue)
+				a.char.sortOrder =
+					_maxSort -
+					MathFloor(
+						MathRound((a.drawPriority >= 10 ? 0 : a.char.yPosition) / _yTol) * 100000 +
+							a.drawPriority * 10000 +
+							(999 - (a.char.drawOrder ?? 0))
+					);
 			this.lastSortedTime = _gameTick;
 		}
-		_queue = radixSortLSD(_queue, a => a.char.sortOrder);
+		_queue = radixSortLSD(_queue, (a) => a.char.sortOrder);
 		c10.clearRect(0, 0, this.cWidth, this.cHeight);
-		if(cSPB.drawHappened) {
-			 cSPB.clearRect(0, 0, this.cWidth, this.cHeight);
-			 cSPB.drawHappened = false;
+		if (cSPB.drawHappened) {
+			cSPB.clearRect(0, 0, this.cWidth, this.cHeight);
+			cSPB.drawHappened = false;
 		}
-		if(cFGA.drawHappened) {
-			 cFGA.clearRect(0, 0, this.cWidth, this.cHeight);
-			 cFGA.drawHappened = false;
+		if (cFGA.drawHappened) {
+			cFGA.clearRect(0, 0, this.cWidth, this.cHeight);
+			cFGA.drawHappened = false;
 		}
 		offCtx.clearRect(0, 0, this.cWidth, this.cHeight);
-		if(__account.options.gore){
+		if (__account.options.gore) {
 			cGore.clearRect(0, 0, this.cWidth, this.cHeight);
 			offGoreCtx.clearRect(0, 0, this.cWidth, this.cHeight);
 		}
+		if (this._goreFloor?.particles?.length) {
+			if (offCtx.reversed) {
+				offCtx.restore();
+				offCtx.reversed = false;
+			}
+			this.drawHitParticles(this._goreFloor);
+		}
 		let _hasDmg, _shadowItems;
 		for (var _item of _queue) {
-			if(_item.unseen || _item.char.out || _item.char.unseen){
+			if (_item.unseen || _item.char.out || _item.char.unseen) {
 				continue;
 			}
-			if(!_hasDmg && (_item.char.hurting?.count > 0 || _item.skinColor))
-				_hasDmg = true;
-			if (!_item.unseen && _item.char?.shadow && !_item.char.unseen && !_item.alpha) {
+			if (!_hasDmg && (_item.char.hurting?.count > 0 || _item.skinColor)) _hasDmg = true;
+			if (!_item.unseen && _item.char?.shadow && !_item.char.unseen && !_item.alpha && !_item.char._goreHide) {
 				const _rel = _item.char.shadow;
-				const _relZoom = _item.char.WIDTH / (_rel.width);
+				const _relZoom = _item.char.WIDTH / _rel.width;
 				const _shadowHeight = _item.char.ZOOM * (_item.char.yGap < 5 ? 8 : _item.char.yGap) * 3;
-				if(!__batterySaveMode && !(_item.char.SHADOWWIDTHRATE <= 0)){
+				if (!__batterySaveMode && !(_item.char.SHADOWWIDTHRATE <= 0)) {
 					let _shadowZoomRate = 1;
-					if(_item.char.SHADOWWIDTHRATE > 0)
-						_shadowZoomRate = _item.char.SHADOWWIDTHRATE;
+					if (_item.char.SHADOWWIDTHRATE > 0) _shadowZoomRate = _item.char.SHADOWWIDTHRATE;
 					const _shadowWidth = MathFloor(_rel.width * _relZoom);
 					const _depth = this.getDepthDrawScale(_item.char);
 					const _shadowZoomedWidth = MathFloor(_shadowWidth * _shadowZoomRate * _depth);
 					const _shadowDrawH = MathFloor(_shadowHeight * _depth);
 					const _shadowAnchor = _item.char.yGap < 5 ? 0.5 : 0.75;
-					const shadowOffset = this.getShadowOffset(_item.char);
+					const _limb = _item.char.name === 'limb';
+					const shadowOffset = _limb ? null : this.getShadowOffset(_item.char);
+					const _shadowX = _limb ? _item.left - (platformX || 0) : _item.char.LEFT;
 					offCtx.drawImage(
-						this.FootShadow, 
+						this.FootShadow,
 						_rel.left ?? 0,
 						_rel.top ?? 0,
 						_rel.width,
 						_rel.height,
-						_item.char.LEFT + MathRound((_shadowWidth - _shadowZoomedWidth) / 2) + shadowOffset.x,
-						MathRound(this.cHeight - _item.char.yPosition - (_shadowDrawH * _shadowAnchor)),
-						_shadowZoomedWidth, 
+						_shadowX +
+							MathRound((_shadowWidth - _shadowZoomedWidth) / 2) +
+							(shadowOffset ? shadowOffset.x : 0),
+						MathRound(this.cHeight - _item.char.yPosition - _shadowDrawH * _shadowAnchor),
+						_shadowZoomedWidth,
 						_shadowDrawH
 					);
 				}
@@ -4467,37 +3780,51 @@ this.getShadowOffset = function(_char) {
 		}
 		let i = 0;
 		let _boltBlur = 0;
-		if(!__batterySaveMode && this.enemies) {
+		if (!__batterySaveMode && this.enemies) {
 			let _bn = 0;
-			for(let _bi = 0; _bi < this.enemies.length; _bi++) {
+			for (let _bi = 0; _bi < this.enemies.length; _bi++) {
 				const _be = this.enemies[_bi];
-				if(_be && !_be.remove && _be.lightColor === '#0000FF10')
-					_bn++;
+				if (_be && !_be.remove && _be.lightColor === '#0000FF10') _bn++;
 			}
-			if(_bn)
-				_boltBlur = _bn <= 4 ? 2 : 1;
+			if (_bn) _boltBlur = _bn <= 4 ? 2 : 1;
 		}
-		offCtx.reversed = c10.reversed = offGoreCtx.reversed = false;// = _cNPC.cleared = false;
-		//let _zoomRate, _zoomedWidth, _zoomedHeight, _zoomedLeft, _zoomedTop, 
-		let _hurt, _hurted, _rotate, rotateX, rotateY, _wDiff, _hDiff, _hurtedCount = 0, _bounceCount = 0;
-		let _preDraws = [], _backgrounds = [], _relateds = [], _afterCanvasAnimations = [], _out;
+		offCtx.reversed = c10.reversed = offGoreCtx.reversed = false;
+
+		let _hurt,
+			_hurted,
+			_rotate,
+			rotateX,
+			rotateY,
+			_wDiff,
+			_hDiff,
+			_hurtedCount = 0,
+			_bounceCount = 0;
+		let _preDraws = [],
+			_backgrounds = [],
+			_relateds = [],
+			_afterCanvasAnimations = [],
+			_out;
 		for (var _item of _queue) {
-			if (_item.unseen || _item.char.remove || _item.char.unseen)
+			if (_item.unseen || _item.char.remove || _item.char.unseen) continue;
+			if (_item.char._goreHide) {
+				if (offCtx.reversed) {
+					offCtx.restore();
+					offCtx.reversed = false;
+				}
+				if (_item.char.particles) this.drawHitParticles(_item.char);
+				if (!_item.char.particles && !(_item.char._goreLinger > _gameTick)) _item.char.remove = true;
 				continue;
-			if(_item.char.bounce){
-				if(_bounceCount > 1)
-					continue;
+			}
+			if (_item.char.bounce) {
+				if (_bounceCount > 1) continue;
 				_bounceCount++;
 			}
 			_backgrounds.length = _preDraws.length = _relateds.length = 0;
-			if(_item.objects)
-				for(let ob of _item.objects) {
-					if(ob.background)
-						_backgrounds.push(ob);
-					else if(ob.preDraw)
-						_preDraws.push(ob);
-					else
-						_relateds.push(ob);
+			if (_item.objects)
+				for (let ob of _item.objects) {
+					if (ob.background) _backgrounds.push(ob);
+					else if (ob.preDraw) _preDraws.push(ob);
+					else _relateds.push(ob);
 				}
 			this.drawRelatedObjects(_item, _backgrounds);
 			this.drawGoreObjects(_item);
@@ -4509,8 +3836,7 @@ this.getShadowOffset = function(_char) {
 						offCtx.save();
 						offCtx.scale(-1, 1);
 					}
-				}
-				else {
+				} else {
 					if (offCtx.reversed) {
 						offCtx.reversed = false;
 						offCtx.restore();
@@ -4519,69 +3845,56 @@ this.getShadowOffset = function(_char) {
 			}
 			++i;
 			_item.char.drawOrder = i;
-			if (!_item.char.main && platformX)
-				_item.left -= platformX;
+			if (!_item.char.main && platformX) _item.left -= platformX;
 			_hurt = _item.char.hurting?.count > 0;
 			const _anim = _item.char.animations?.[_item.animation];
-			if(_hurt && !_item.char.getCurrentAnimation()?.hurt) {
+			if (_hurt && !_item.char.getCurrentAnimation()?.hurt) {
 				_hurt = false;
 				_item.char.hurting.count = 0;
 				delete _item.char.hurting.flicker;
 			}
-			// && (!_item.char.lastHurtTime || ((_gameTick - _item.char.lastHurtTime) > 200));
+
 			_shadowItems = [];
-			// if(_flash || _item.skinColor)
-			// {
-			// }
-			// else 
-			// if (__account.options.effect && (_item.shadow || _item.char.shadowData?.length > 0) && 
-			// !_item.char.unseen && !_hurt) {
-			// 	for (var shadowindex = 0; shadowindex < (_item.char.shadowData?.length ?? 1); shadowindex++) {
-			// 		if ((shadowindex % (_item.char.shadowIndex ?? 2)) > 0)
-			// 			continue;
-			// 		_shadowItems.push(_item.char.shadowData?.[shadowindex] ?? _item);
-			// 	}
-			// }
-			if (__account.options.effect && _item.char.shadowData?.length > 0 && 
-			!_item.char.unseen && !_hurt) {
+
+			if (__account.options.effect && _item.char.shadowData?.length > 0 && !_item.char.unseen && !_hurt) {
 				const _useShadowCount = _item.shadowCount > 0;
 				for (var shadowindex = 0; shadowindex < (_item.char.shadowData?.length ?? 1); shadowindex++) {
-					if (!_useShadowCount && (shadowindex % (_item.char.shadowIndex ?? 2)) > 0)
-						continue;
+					if (!_useShadowCount && shadowindex % (_item.char.shadowIndex ?? 2) > 0) continue;
 					_shadowItems.push(_item.char.shadowData?.[shadowindex] ?? _item);
 				}
 			}
-			if (_hurt){
+			if (_hurt) {
 				_item.char.hurting.count--;
-				if(_item.char.hurting.count <= 0) {
+				if (_item.char.hurting.count <= 0) {
 					_item.char.lastHurtTime = _gameTick;
 					delete _item.char.hurting.flicker;
 				}
 			}
 			if (!_out) {
-				if(_item.char.release || _item.animation === 'release' || 
-					_item.char.buffs?.find(x => x.key === 'release')) {
-					if(!_item.char.releaseCount)
-						_item.char.releaseCount = 0;
+				if (
+					_item.char.release ||
+					_item.animation === 'release' ||
+					_item.char.buffs?.find((x) => x.key === 'release')
+				) {
+					if (!_item.char.releaseCount) _item.char.releaseCount = 0;
 					_item.char.releaseCount++;
-				}
-				else if(_item.char.releaseCount)
-					delete _item.char.releaseCount;
-				if(!_item.char.releaseCount || ((_item.char.releaseCount % 8) < 4)) {
+				} else if (_item.char.releaseCount) delete _item.char.releaseCount;
+				if (!_item.char.releaseCount || _item.char.releaseCount % 8 < 4) {
 					const _z = (_item.zoom ?? 1) * this.getDepthDrawScale(_item.char);
-					_wDiff = (offCtx.reversed ? -1 : 1) * ((_item.width - (_item.width * _z)) / 2);
-					_hDiff = (_item.height - (_item.height * _z));
-					if(!__batterySaveMode) {
-						_hurted = !(_item.char.readyForFatality && _item.animation === 'hurtground1') && 
-						(_hurt || _item.skinColor);// && (_item.char.frame + _item.char.start) > 0;
-						if(!_hurted && !_item.char.dead && _shadowItems?.[0]) {
-							if(_item.shadowCount > 0 && _item.shadow?.startsWith('#')) {
+					_wDiff = (offCtx.reversed ? -1 : 1) * ((_item.width - _item.width * _z) / 2);
+					_hDiff = _item.height - _item.height * _z;
+					if (!__batterySaveMode) {
+						_hurted =
+							!(_item.char.readyForFatality && _item.animation === 'hurtground1') &&
+							(_hurt || _item.skinColor);
+						if (!_hurted && !_item.char.dead && _shadowItems?.[0]) {
+							if (_item.shadowCount > 0 && _item.shadow?.startsWith('#')) {
 								const _tint = this.colorizeSprite4(_item, _item.shadow.slice(0, 7), 1);
 								const _n = Math.min(4, _shadowItems.length);
-								if(_tint?.width > 0 && _n > 0) {
+								if (_tint?.width > 0 && _n > 0) {
 									const _prevAlpha = offCtx.globalAlpha;
 									const _fade = [[], [0.8], [0.4, 0.8], [0.2, 0.6, 0.8], [0.1, 0.2, 0.4, 0.8]];
-									for(let _shadowDrawIndex = 0; _shadowDrawIndex < _n; _shadowDrawIndex++) {
+									for (let _shadowDrawIndex = 0; _shadowDrawIndex < _n; _shadowDrawIndex++) {
 										const _shadowItem = _shadowItems[_shadowItems.length - _n + _shadowDrawIndex];
 										offCtx.globalAlpha = _prevAlpha * _fade[_n][_shadowDrawIndex];
 										const _sd = this.getDepthDrawScale(_item.char);
@@ -4589,211 +3902,224 @@ this.getShadowOffset = function(_char) {
 										const _sh = _shadowItem.height * _sd;
 										const _sl = _shadowItem.left + (_shadowItem.width - _sw) / 2;
 										const _st = _shadowItem.top + (_shadowItem.height - _sh);
-										offCtx.drawImage(_tint,
-											MathRound(_shadowItem.reversed ? (-1 * _sl) + (platformX - (_shadowItem.platformX ?? platformX))
-												: _sl - (platformX - (_shadowItem.platformX ?? platformX))),
-												MathRound(_st),
-												_sw,
-											_sh);
+										offCtx.drawImage(
+											_tint,
+											MathRound(
+												_shadowItem.reversed
+													? -1 * _sl + (platformX - (_shadowItem.platformX ?? platformX))
+													: _sl - (platformX - (_shadowItem.platformX ?? platformX))
+											),
+											MathRound(_st),
+											_sw,
+											_sh
+										);
 									}
 									offCtx.globalAlpha = _prevAlpha;
 								}
-							}
-							else {
+							} else {
 								let _shadowItemOrder = 55;
-								for(let _shadowItem of _shadowItems) {
-									if(_shadowItemOrder > 255)
-										break;
-									const _shadowSprite = this.colorizeSprite4(_item, _item.shadow + _shadowItemOrder.toString(16), 1);
-									if(_shadowSprite?.width > 0) {
+								for (let _shadowItem of _shadowItems) {
+									if (_shadowItemOrder > 255) break;
+									const _shadowSprite = this.colorizeSprite4(
+										_item,
+										_item.shadow + _shadowItemOrder.toString(16),
+										1
+									);
+									if (_shadowSprite?.width > 0) {
 										const _sd = this.getDepthDrawScale(_item.char);
 										const _sw = _shadowItem.width * _sd;
 										const _sh = _shadowItem.height * _sd;
 										const _sl = _shadowItem.left + (_shadowItem.width - _sw) / 2;
 										const _st = _shadowItem.top + (_shadowItem.height - _sh);
-										offCtx.drawImage(_shadowSprite,
-											MathRound(_shadowItem.reversed ? (-1 * _sl) + (platformX - (_shadowItem.platformX ?? platformX))
-												: _sl - (platformX - (_shadowItem.platformX ?? platformX))),
-												MathRound(_st),
-												_sw,
-											_sh);
+										offCtx.drawImage(
+											_shadowSprite,
+											MathRound(
+												_shadowItem.reversed
+													? -1 * _sl + (platformX - (_shadowItem.platformX ?? platformX))
+													: _sl - (platformX - (_shadowItem.platformX ?? platformX))
+											),
+											MathRound(_st),
+											_sw,
+											_sh
+										);
 									}
 									_shadowItemOrder += 50;
 								}
 							}
 						}
-						_rotate = _item.char.rotateAngle ? (_item.char.rotateAngle * Math.PI / 180) :
-						 	(_item.char.animations ? _anim?.rotate : null);
-						if(_rotate) {
+						if (_item.char.rotateAngle) _rotate = (_item.char.rotateAngle * Math.PI) / 180;
+						else if (_item.rotate) _rotate = (_item.rotate * Math.PI) / 180;
+						else _rotate = _anim?.rotate ?? null;
+						if (_rotate) {
 							offCtx.save();
 							rotateX = (offCtx.reversed ? -1 : 1) * (_item.char.HURTLEFT + _item.char._HURTBOX_half);
 							rotateY = _item.char.TOP + _item.char.HURTHEIGHT * (_item.char.rotateVerticalRate ?? 0.72);
-							offCtx.translate(rotateX ,rotateY);  
-							offCtx.rotate(-_rotate * (_item.char.rotateDir === _item.char.direction ? -1 : 1));  
-						}
-						else {
+							offCtx.translate(rotateX, rotateY);
+							offCtx.rotate(-_rotate * (_item.char.rotateDir === _item.char.direction ? -1 : 1));
+						} else {
 							rotateX = rotateY = 0;
 						}
-						// _zoomRate = this.getPerspectiveRate(_item.char, null, _item.animation);
-						// _zoomedWidth = MathRound(_item.width * _zoomRate);
-						// _zoomedHeight = MathRound(_item.height * _zoomRate);
-						// _zoomedLeft = MathRound((_zoomedWidth - _item.width) / 2);
-						// _zoomedTop = MathRound(_zoomedHeight - _item.height);
-						//_colorized = false;
+
 						let _drawParticles = 1;
 						let _w, _x, _h, _y, _coordsSet;
 						_y = MathRound(_item.top + _hDiff) - rotateY;
 						_w = MathRound(_item.width * _z);
 						_h = MathRound(_item.height * _z);
 						const _flicker = _hurt ? _item.char.hurting?.flicker : null;
-						const _zapOn = _flicker != null && (_flicker % 2) === 0;
-						const _wantTint = _flicker != null ? _zapOn : ((_hurted && _anim.hurt && _item.char.hurtingStart < 3 && (_hurtedCount < 4 || _item.char.main)) || _item.skinColor);
+						const _zapOn = _flicker != null && _flicker % 2 === 0;
+						const _wantTint =
+							_flicker != null
+								? _zapOn
+								: (_hurted &&
+										_anim.hurt &&
+										_item.char.hurtingStart < 3 &&
+										(_hurtedCount < 4 || _item.char.main)) ||
+									_item.skinColor;
 						let _hurtSprite;
 						if (_wantTint) {
-							if (_flicker == null)
-								_item.char.hurtingStart++;
+							if (_flicker == null) _item.char.hurtingStart++;
 							_hurtSprite = this.colorizeSprite4(_item, null, _item.skinColor ? 1 : null);
 							_hurtedCount++;
 						}
 						if (_hurtSprite?.width > 0) {
-							offCtx.drawImage(_hurtSprite,
-								MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff)) - rotateX,
+							offCtx.drawImage(
+								_hurtSprite,
+								MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : _item.left + _wDiff) - rotateX,
 								_y,
 								_w * 1.02,
-								_h * 1.02);
-						}
-						else
-						{
-							if(_item.border) {
-								if(_item.char.borderIndex === undefined)
-									_item.char.borderIndex = 0;
+								_h * 1.02
+							);
+						} else {
+							if (_item.border) {
+								if (_item.char.borderIndex === undefined) _item.char.borderIndex = 0;
 								else {
 									_item.char.borderIndex++;
-									if(_item.char.borderIndex >= _borderRates.length)
-										_item.char.borderIndex =  0;
+									if (_item.char.borderIndex >= _borderRates.length) _item.char.borderIndex = 0;
 								}
 								const _borderRate = _borderRates[_item.char.borderIndex];
 								const _zoomBRate = 1 * _borderRate * (_item.char.borderRate ?? 1);
 								let _zoomedBWidth, _zoomedBHeight;
-								if(_item.width >= _item.height) {
+								if (_item.width >= _item.height) {
 									_zoomedBWidth = MathCeil(_item.width * _zoomBRate);
-									_zoomedBHeight = (_zoomedBWidth - _item.width) + _item.height;
-								}
-								else {
+									_zoomedBHeight = _zoomedBWidth - _item.width + _item.height;
+								} else {
 									_zoomedBHeight = MathCeil(_item.height * _zoomBRate);
-									_zoomedBWidth = (_zoomedBHeight - _item.height) + _item.width;
+									_zoomedBWidth = _zoomedBHeight - _item.height + _item.width;
 								}
 								const _zoomedBLeft = MathRound((_zoomedBWidth - _item.width) / 2);
 								const _zoomedBTop = MathRound((_zoomedBHeight - _item.height) / 2);
 								const _borderSprite = this.colorizeSprite4(_item, _item.border);
-								if(_borderSprite?.width > 0)
-									offCtx.drawImage(_borderSprite,
-										MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff + _zoomedBLeft) : 
-										(_item.left + _wDiff - _zoomedBLeft)) - rotateX, 
-										MathRound(_item.top + _hDiff - _zoomedBTop) - rotateY, 
+								if (_borderSprite?.width > 0)
+									offCtx.drawImage(
+										_borderSprite,
+										MathRound(
+											offCtx.reversed
+												? -1 * (_item.left + _wDiff + _zoomedBLeft)
+												: _item.left + _wDiff - _zoomedBLeft
+										) - rotateX,
+										MathRound(_item.top + _hDiff - _zoomedBTop) - rotateY,
 										MathRound(_zoomedBWidth * _z),
-										MathRound(_zoomedBHeight * _z));
-							}
-							else if(_item.char.borderIndex >= 0)
-								delete _item.char.borderIndex;
+										MathRound(_zoomedBHeight * _z)
+									);
+							} else if (_item.char.borderIndex >= 0) delete _item.char.borderIndex;
 							this.drawRelatedObjects(_item, _preDraws);
-							const _cropped = this.getCroppedSprite(_item.spriteX, _item.spriteY, _item.spriteWidth, _item.spriteHeight, 
-								_item.char, _item.sprite.relativeSrc, _item.frameKey);
-							const _charCan = _item.background ? cSPB : (_item.foreground ? cFGA : offCtx);
-							if(_item.background) {
-								if(offCtx.reversed && !cSPB.reversed)
-								{
+							const _cropped = this.getCroppedSprite(
+								_item.spriteX,
+								_item.spriteY,
+								_item.spriteWidth,
+								_item.spriteHeight,
+								_item.char,
+								_item.sprite.relativeSrc,
+								_item.frameKey
+							);
+							const _charCan = _item.background ? cSPB : _item.foreground ? cFGA : offCtx;
+							if (_item.background) {
+								if (offCtx.reversed && !cSPB.reversed) {
 									cSPB.reversed = true;
 									cSPB.save();
 									cSPB.scale(-1, 1);
-								}
-								else if(!offCtx.reversed && cSPB.reversed)
-								{
+								} else if (!offCtx.reversed && cSPB.reversed) {
 									cSPB.reversed = false;
 									cSPB.restore();
 								}
-								if(!cSPB.drawHappened)
-									cSPB.drawHappened = true;
-							}
-							else if(_item.foreground) {
-								if(offCtx.reversed && !cFGA.reversed)
-								{
+								if (!cSPB.drawHappened) cSPB.drawHappened = true;
+							} else if (_item.foreground) {
+								if (offCtx.reversed && !cFGA.reversed) {
 									cFGA.reversed = true;
 									cFGA.save();
 									cFGA.scale(-1, 1);
-								}
-								else if(!offCtx.reversed && cFGA.reversed)
-								{
+								} else if (!offCtx.reversed && cFGA.reversed) {
 									cFGA.reversed = false;
 									cFGA.restore();
 								}
-								if(!cFGA.drawHappened)
-									cFGA.drawHappened = true;
+								if (!cFGA.drawHappened) cFGA.drawHappened = true;
 							}
-							_x = MathRound(_charCan.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff)) - rotateX;
-							if(!_cropped) {
-								if(_boltBlur && _item.char.lightColor === '#0000FF10' && _item.spriteWidth)
-									this.drawBoltGlow(_charCan, _item.sprite, _item.spriteX, _item.spriteY, _item.spriteWidth, _item.spriteHeight, _x, _y, _w, _h, _boltBlur === 2);
-								_charCan.drawImage(_item.sprite, _item.spriteX, _item.spriteY,
-									_item.spriteWidth, _item.spriteHeight,
+							_x =
+								MathRound(_charCan.reversed ? -1 * (_item.left + _wDiff) : _item.left + _wDiff) -
+								rotateX;
+							if (!_cropped) {
+								if (_boltBlur && _item.char.lightColor === '#0000FF10' && _item.spriteWidth)
+									this.drawBoltGlow(
+										_charCan,
+										_item.sprite,
+										_item.spriteX,
+										_item.spriteY,
+										_item.spriteWidth,
+										_item.spriteHeight,
+										_x,
+										_y,
+										_w,
+										_h,
+										_boltBlur === 2
+									);
+								_charCan.drawImage(
+									_item.sprite,
+									_item.spriteX,
+									_item.spriteY,
+									_item.spriteWidth,
+									_item.spriteHeight,
 									_x,
-									_y, 
+									_y,
 									_w,
-									_h);
-								// this.applyLightOnCharacter(
-								// 	_item.char,
-								// 	_charCan,
-								// 	_item.sprite,
-    							// 	_item.spriteX,
-								// 	_item.spriteY,
-								// 	_item.spriteWidth,
-								// 	_item.spriteHeight,
-								// 	_x,
-								// 	_y,
-								// 	_w,
-								// 	_h
-								// );
-							}
-							else if(_cropped.width > 0) {
+									_h
+								);
+							} else if (_cropped.width > 0) {
 								_coordsSet = 1;
-								if(_boltBlur && _item.char.lightColor === '#0000FF10')
-									this.drawBoltGlow(_charCan, _cropped, 0, 0, _cropped.width, _cropped.height, _x, _y, _w, _h, _boltBlur === 2);
-								this.drawCharacterGhost(_item,_cropped,_x,_y,_w,_h);
-								_charCan.drawImage(_cropped,_x,_y,_w,_h);
-								// this.applyLightOnCharacter(
-								// 	_item.char,
-								// 	_charCan,
-								// 	_cropped,
-								// 	0,
-								// 	0,
-								// 	_cropped.width,
-								// 	_cropped.height,
-								// 	_x,
-								// 	_y,
-								// 	_w,
-								// 	_h
-								// );
-								if(_item.char.chargeProperties) {
-									if(!_item.char.ghostData)
-										_item.char.ghostData = [];
+								if (_boltBlur && _item.char.lightColor === '#0000FF10')
+									this.drawBoltGlow(
+										_charCan,
+										_cropped,
+										0,
+										0,
+										_cropped.width,
+										_cropped.height,
+										_x,
+										_y,
+										_w,
+										_h,
+										_boltBlur === 2
+									);
+								this.drawCharacterGhost(_item, _cropped, _x, _y, _w, _h);
+								_charCan.drawImage(_cropped, _x, _y, _w, _h);
+
+								if (_item.char.chargeProperties) {
+									if (!_item.char.ghostData) _item.char.ghostData = [];
 									_item.char.ghostData.push({
 										left: _x,
 										top: _y,
 										width: _w,
 										height: _h,
 										sprite: _cropped,
-										p : platformX,
-										alpha: .6
+										p: platformX,
+										alpha: 0.6
 									});
-									if (_item.char.ghostData.length > 5)
-										_item.char.ghostData.shift();
-									// if(!_item.char.spawnDusts)
-									// 	_item.char.spawnDusts = [];
-									const _trails = (_item.char.relatedObjects.filter(x => x.key === 'trail2')?.length ?? 0);
-									const _scale = 1.5 - (_trails * 0.085);
-									// char init
-									if (_item.char.trailTick === undefined)
-										_item.char.trailTick = 0;
+									if (_item.char.ghostData.length > 5) _item.char.ghostData.shift();
+
+									const _trails =
+										_item.char.relatedObjects.filter((x) => x.key === 'trail2')?.length ?? 0;
+									const _scale = 1.5 - _trails * 0.085;
+
+									if (_item.char.trailTick === undefined) _item.char.trailTick = 0;
 
 									_item.char.trailTick++;
 
@@ -4801,151 +4127,143 @@ this.getShadowOffset = function(_char) {
 										_item.char.addObject({
 											key: 'trail2',
 											position: 'behind-feet',
-											xGap: 100 - (_trails * 10),
+											xGap: 100 - _trails * 10,
 											scale: _scale,
 											yGap: -5
 										});
-									// _item.char.spawnDusts.push({
-									// 	worldX: _x,
-									// 	y: _y + _h - 2,
-									// 	p: platformX,
-
-									// 	rise: (_h * 0.5),
-									// 	progress: 0,
-
-									// 	size: this.H(8) + Math.random() * this.H(4),
-									// 	wobble: (Math.random() - 0.5) * 0.5,
-
-									// 	trails: [] // ← işte dalga izi burada
-									// });
-								}
-								else {
-									if(_item.char.ghostData){
+								} else {
+									if (_item.char.ghostData) {
 										delete _item.char.ghostData;
-										_item.char.relatedObjects = _item.char.relatedObjects.filter(x => x.key !== 'trail2');
+										_item.char.relatedObjects = _item.char.relatedObjects.filter(
+											(x) => x.key !== 'trail2'
+										);
 									}
 								}
 							}
-							if(_item.char.isDead() && !_item.char.animation.startsWith('dead') && _item.char.class !== 'object' && _item.char.class !== 'spell')
-							{
+							if (
+								_item.char.isDead() &&
+								!_item.char.animation.startsWith('dead') &&
+								_item.char.class !== 'object' &&
+								_item.char.class !== 'spell'
+							) {
 								_charCan.save();
-    							_charCan.globalCompositeOperation = "source-atop";
-								_charCan.globalAlpha=.18;
-								_charCan.fillStyle="#000";
-								_charCan.fillRect(
-									_x, _y, _w, _h);
+								_charCan.globalCompositeOperation = 'source-atop';
+								_charCan.globalAlpha = 0.18;
+								_charCan.fillStyle = '#000';
+								_charCan.fillRect(_x, _y, _w, _h);
 								_charCan.restore();
 							}
 						}
-						if (_flicker != null && _item.char.hurting)
-							_item.char.hurting.flicker++;
-						if(_rotate) { 
+						if (_flicker != null && _item.char.hurting) _item.char.hurting.flicker++;
+						if (_rotate) {
 							offCtx.restore();
 						}
-						if(_item.char.hurtingStrength) {
-							if(!_coordsSet) {
-								_x = MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : (_item.left + _wDiff));
+						if (_item.char.hurtingStrength) {
+							if (!_coordsSet) {
+								_x = MathRound(offCtx.reversed ? -1 * (_item.left + _wDiff) : _item.left + _wDiff);
 								_y = MathRound(_item.top + _hDiff);
 								_w = MathRound(_item.width * _z);
 								_h = MathRound(_item.height * _z);
 							}
 							const _knockback = _item.char.animation.startsWith('knockback');
 							let _hs = _item.char.hurtingStrength;
-							if(typeof _hs === 'string')
-								_hs = 4;
-							else 
-								_hs += (_knockback ? 2 : (_item.particleColor ? 3 : 0));
+							if (typeof _hs === 'string') _hs = 4;
+							else _hs += _knockback ? 2 : _item.particleColor ? 3 : 0;
 							const _lean = _item.char.hitSparkDir === 180 ? -16 : 16;
-							this.drawHitParticles(_item.char, _x + MathRound(_w / 2),
-							_y + MathRound(_h / 2), getRandomValue2(150, 190) + _lean, 
-							_item.char.bloodColor === 'green' ? '#1f6f2e' : '#880808', 
-							_hs, _knockback, _item.char.hurtingStrength);
+							this.drawHitParticles(
+								_item.char,
+								_x + MathRound(_w / 2),
+								_y + MathRound(_h / 2),
+								getRandomValue2(150, 190) + _lean,
+								_item.char.bloodColor === 'green' ? '#1f6f2e' : '#880808',
+								_hs,
+								_knockback,
+								_item.char.hurtingStrength
+							);
 							delete _item.char.hitSparkDir;
 							delete _item.char.hurtingStrength;
 							_drawParticles = 0;
-						}
-						else if(_item.char.hasIframe || _item.char.ripples?.[0]){
+						} else if (_item.char.hasIframe || _item.char.ripples?.[0]) {
 							this.animateIFrameRipple(_item, _wDiff);
-							if(_item.char.hasIframe)
-								_item.char.hasIframe = false;
+							if (_item.char.hasIframe) _item.char.hasIframe = false;
 						}
-						if(_drawParticles && _item.char.particles)
-							this.drawHitParticles(_item.char);
-						if(_item.char.text)
-						{
+						if (_drawParticles && _item.char.particles) this.drawHitParticles(_item.char);
+						if (_item.char.text) {
 							let _restored;
 							if (offCtx.reversed) {
 								offCtx.restore();
 								_restored = 1;
 							}
 							const _text = getLangData(_item.char.text.value).toLocaleUpperCase(getLang());
-							if(offCtx.font !== 'bold 3cqh immortal')
-								offCtx.font = "bold 3cqh immortal";
-							offCtx.fillStyle = "#1B1212";
+							if (offCtx.font !== 'bold 3cqh immortal') offCtx.font = 'bold 3cqh immortal';
+							offCtx.fillStyle = '#1B1212';
 							offCtx.textAlign = 'center';
 							const _td = this.getDepthDrawScale(_item.char);
-							offCtx.fillText(_text, 
-								MathRound((_item.left + _wDiff - (_item.char.ZOOM * _item.char.text.left * _td))), 
-								MathRound(_item.top + _hDiff + (_item.char.ZOOM * _item.char.text.top * _td)));
-							if(_restored) {
+							offCtx.fillText(
+								_text,
+								MathRound(_item.left + _wDiff - _item.char.ZOOM * _item.char.text.left * _td),
+								MathRound(_item.top + _hDiff + _item.char.ZOOM * _item.char.text.top * _td)
+							);
+							if (_restored) {
 								offCtx.save();
 								offCtx.scale(-1, 1);
-							}				
+							}
 						}
 					}
 				}
 			}
 			const _myTeam = mainCharacter?.realTeamId ?? mainCharacter?.teamId;
-			const _mateSign = (this.war || this.realTime) && _myTeam && _item.char.teamId === _myTeam && !_item.char.main && _item.char.class !== __spell && _item.char.class !== 'object';
-			if (_mateSign || (!_item.char.friendly && !_item.char.skipHealthBar && (!_anim?.skipHealthBar || _item.char.health <= 0 || _item.char.dead || _item.char.hbBreak >= 0)))
+			const _mateSign =
+				(this.war || this.realTime) &&
+				_myTeam &&
+				_item.char.teamId === _myTeam &&
+				!_item.char.main &&
+				_item.char.class !== __spell &&
+				_item.char.class !== 'object';
+			if (
+				_mateSign ||
+				(!_item.char.friendly &&
+					!_item.char.skipHealthBar &&
+					(!_anim?.skipHealthBar || _item.char.health <= 0 || _item.char.dead || _item.char.hbBreak >= 0))
+			)
 				this.drawHealthBar2(_item);
 			this.checkBubbleText(_item.char);
-			if (_item.shadow 
-				// || (_item.char.chargeProperties && 
-				// (_item.char.main || _item.char.class === 'boss' || _item.char.alp))
-			) {
-				if (!_item.char.shadowData)
-					_item.char.shadowData = [];
+			if (_item.shadow) {
+				if (!_item.char.shadowData) _item.char.shadowData = [];
 				else if (_item.shadowCount > 0) {
 					const _keep = Math.min(4, _item.shadowCount);
 					if (_item.char.shadowData.length >= _keep)
 						_item.char.shadowData.splice(0, _item.char.shadowData.length - _keep + 1);
-				}
-				else if (_item.char.shadowData.length > (_item.char.class === 'boss' ? 3 : 1))
-				_item.char.shadowData.splice(0, _item.char.shadowIndex ?? 2);
+				} else if (_item.char.shadowData.length > (_item.char.class === 'boss' ? 3 : 1))
+					_item.char.shadowData.splice(0, _item.char.shadowIndex ?? 2);
 				_item.platformX = platformX;
 				_item.char.shadowData.push(_item);
-			}
-			else if(_item.char.shadowData?.length > 0) {
+			} else if (_item.char.shadowData?.length > 0) {
 				_item.char.shadowData.splice(0, _item.char.shadowIndex ?? 2);
-				if(_item.char.shadowData?.length === 0)
-					_item.char.shadowData = undefined;
+				if (_item.char.shadowData?.length === 0) _item.char.shadowData = undefined;
 			}
 			this.drawRelatedObjects(_item, _relateds);
-			if(_item.char.canvasObjects?.[0])
-				for(let _cobj of _item.char.canvasObjects){
-					if(!_cobj.params.after)
-						canvasAnimations[_cobj.key](_item.char, _cobj.params, offCtx);
-					else
-						_afterCanvasAnimations.push({key:_cobj.key, char:_item.char,params:_cobj.params});
+			if (_item.char.canvasObjects?.[0])
+				for (let _cobj of _item.char.canvasObjects) {
+					if (!_cobj.params.after) canvasAnimations[_cobj.key](_item.char, _cobj.params, offCtx);
+					else _afterCanvasAnimations.push({ key: _cobj.key, char: _item.char, params: _cobj.params });
 				}
 		}
-		if(_afterCanvasAnimations?.[0])
-			for(let _cobj of _afterCanvasAnimations)
-				canvasAnimations[_cobj.key](_cobj.char, _cobj.params, offCtx);
-		if(offCtx.reversed) {
+		if (_afterCanvasAnimations?.[0])
+			for (let _cobj of _afterCanvasAnimations) canvasAnimations[_cobj.key](_cobj.char, _cobj.params, offCtx);
+		if (offCtx.reversed) {
 			offCtx.restore();
 			offCtx.reversed = false;
 		}
-		if(c10.reversed) {
+		if (c10.reversed) {
 			c10.restore();
 			c10.reversed = false;
 		}
-		if(cSPB.reversed) {
+		if (cSPB.reversed) {
 			cSPB.restore();
 			cSPB.reversed = false;
 		}
-		if(cFGA.reversed) {
+		if (cFGA.reversed) {
 			cFGA.restore();
 			cFGA.reversed = false;
 		}
@@ -4954,1744 +4272,270 @@ this.getShadowOffset = function(_char) {
 		if (this._barDeathQueue?.length) {
 			for (let _i = 0; _i < this._barDeathQueue.length; _i++) {
 				const _d = this._barDeathQueue[_i];
-				if(!_d.c.skipHealthBar)
+				if (!_d.c.skipHealthBar)
 					this.drawHealthBarDeath(c10, _d.x, _d.y, _d.w, _d.h, _d.step, _d.img, _d.bossPad, _d.life);
 			}
 			this._barDeathQueue.length = 0;
 		}
-		if (__account.options.gore){
-			if(offGoreCtx.reversed)
-				offGoreCtx.restore();
+		if (__account.options.gore) {
+			if (offGoreCtx.reversed) offGoreCtx.restore();
 			cGore.drawImage(this.offGoreCanvas, 0, 0);
 		}
 		this.checkUnseenEnemyPointer();
 		this.checkSceneActions();
-	}
-this.applySceneLighting = function (_ctx) {
-
-    if (
-        !_ctx ||
-        (
-            !Array.isArray(this.backgroundLayerLighting) &&
-            !Array.isArray(this.groundLayerLighting)
-        )
-    ) {
-        return;
-    }
-
-    const _lights = [];
-
-    if (Array.isArray(this.backgroundLayerLighting)) {
-        _lights.push(...this.backgroundLayerLighting);
-    }
-
-    if (Array.isArray(this.groundLayerLighting)) {
-        _lights.push(...this.groundLayerLighting);
-    }
-
-    if (!_lights.length) {
-        return;
-    }
-
-    const _width = episode.cWidth;
-    const _height = episode.cHeight;
-    const _screenX = platformX;
-
-    if (
-        !Number.isFinite(_width) ||
-        !Number.isFinite(_height) ||
-        !Number.isFinite(_screenX) ||
-        _width <= 0 ||
-        _height <= 0
-    ) {
-        return;
-    }
-
-    /*
-     * HEX -> RGB
-     *
-     * RGB değerini light üzerinde cache'liyoruz.
-     *
-     * Bu fonksiyon 60 FPS çalışıyorsa aynı rengi
-     * her frame tekrar parse etmemek önemli.
-     */
-    const _hexToRgb = function (_hex) {
-
-        if (typeof _hex !== "string") {
-            return {
-                r: 255,
-                g: 255,
-                b: 255
-            };
-        }
-
-        let _value = _hex
-            .trim()
-            .replace("#", "");
-
-        if (_value.length === 3) {
-            _value =
-                _value[0] + _value[0] +
-                _value[1] + _value[1] +
-                _value[2] + _value[2];
-        }
-
-        if (
-            _value.length !== 6 ||
-            !/^[0-9a-fA-F]+$/.test(_value)
-        ) {
-            return {
-                r: 255,
-                g: 255,
-                b: 255
-            };
-        }
-
-        return {
-            r: parseInt(_value.substring(0, 2), 16),
-            g: parseInt(_value.substring(2, 4), 16),
-            b: parseInt(_value.substring(4, 6), 16)
-        };
-    };
-
-
-    /*
-     * SAHNEYİ TEK SEFER SAVE EDİYORUZ.
-     *
-     * Her ışık için save/restore yapmak yerine
-     * sadece fonksiyon başında yapıyoruz.
-     */
-
-    _ctx.save();
-
-    /*
-     * Ekran koordinatında çalışıyoruz.
-     */
-    _ctx.setTransform(
-        1,
-        0,
-        0,
-        1,
-        0,
-        0
-    );
-
-    /*
-     * Sadece mevcut sahnenin alpha'sı olan bölgeleri
-     * boyamak için source-atop.
-     */
-    _ctx.globalCompositeOperation = "source-atop";
-
-    /*
-     * Alpha'yı gradient içerisinde kontrol edeceğiz.
-     * Bu nedenle burada 1 bırakıyoruz.
-     */
-    _ctx.globalAlpha = 1;
-
-
-    for (let _i = 0; _i < _lights.length; _i++) {
-
-        const _light = _lights[_i];
-
-        if (!_light) {
-            continue;
-        }
-
-        const _lightX = Number(_light.x);
-        const _lightY = Number(_light.y);
-        const _radius = Number(_light.radius);
-        const _intensity = Number(
-            _light.intensity ?? 0
-        );
-
-        /*
-         * Geçersiz ışıkları direkt atla.
-         */
-        if (
-            !Number.isFinite(_lightX) ||
-            !Number.isFinite(_lightY) ||
-            !Number.isFinite(_radius) ||
-            !Number.isFinite(_intensity)
-        ) {
-            continue;
-        }
-
-        if (
-            _radius <= 0 ||
-            _intensity <= 0
-        ) {
-            continue;
-        }
-
-
-        /*
-         * Intensity 0 - 1 arasında tutuluyor.
-         *
-         * 0.5 = merkezde %50
-         * 0.6 = merkezde %60
-         * 1.0 = merkezde %100
-         */
-        const _power =
-            _intensity <= 0
-                ? 0
-                : _intensity >= 1
-                    ? 1
-                    : _intensity;
-
-
-        /*
-         * Dünya koordinatını ekran koordinatına çevir.
-         *
-         * x zaten zoom uygulanmış.
-         */
-        const _screenLightX =
-            _lightX - _screenX;
-
-        const _screenLightY =
-            _lightY;
-
-
-        /*
-         * Işık ekranın tamamen dışındaysa
-         * gradient oluşturma.
-         *
-         * Bu önemli bir optimizasyon.
-         */
-        if (
-            _screenLightX + _radius < 0 ||
-            _screenLightX - _radius > _width ||
-            _screenLightY + _radius < 0 ||
-            _screenLightY - _radius > _height
-        ) {
-            continue;
-        }
-
-
-        /*
-         * RGB CACHE
-         *
-         * Aynı light'ın rengi değişmediyse
-         * tekrar HEX parse etmiyoruz.
-         */
-        const _color =
-            _light._lightingColorCache;
-
-        let _rgb;
-
-        if (
-            _color &&
-            _color.hex === _light.color
-        ) {
-
-            _rgb = _color.rgb;
-
-        } else {
-
-            _rgb = _hexToRgb(
-                _light.color || "#FFFFFF"
-            );
-
-            _light._lightingColorCache = {
-                hex: _light.color,
-                rgb: _rgb
-            };
-        }
-
-
-        /*
-         * RADIAL GRADIENT
-         *
-         * Merkez:
-         *     _power
-         *
-         * Kenara:
-         *     0
-         *
-         * Buradaki değerler LINEAR değil,
-         * smooth easing davranışı oluşturuyor.
-         *
-         * Böylece ışığın sınırında sert geçiş olmaz.
-         */
-        let _gradient;
-
-        try {
-
-            _gradient = _ctx.createRadialGradient(
-                _screenLightX,
-                _screenLightY,
-                0,
-
-                _screenLightX,
-                _screenLightY,
-                _radius
-            );
-
-        } catch (_error) {
-            continue;
-        }
-
-
-        /*
-         * SMOOTH FALLOFF
-         *
-         * 0.00 -> %100
-         * 0.20 -> %90
-         * 0.40 -> %65
-         * 0.60 -> %35
-         * 0.80 -> %10
-         * 1.00 -> %0
-         *
-         * Böylece renk merkezden itibaren
-         * yavaşça kayboluyor.
-         */
-
-
-        /*
-         * MERKEZ
-         */
-        _gradient.addColorStop(
-            0.00,
-            `rgba(${_rgb.r}, ${_rgb.g}, ${_rgb.b}, ${_power})`
-        );
-
-
-        /*
-         * Merkezin hemen çevresi.
-         *
-         * Burada hala güçlü ama artık
-         * yumuşak şekilde azalmaya başlıyor.
-         */
-        _gradient.addColorStop(
-            0.20,
-            `rgba(${_rgb.r}, ${_rgb.g}, ${_rgb.b}, ${_power * 0.90})`
-        );
-
-
-        /*
-         * Radius'ın ortası.
-         */
-        _gradient.addColorStop(
-            0.40,
-            `rgba(${_rgb.r}, ${_rgb.g}, ${_rgb.b}, ${_power * 0.65})`
-        );
-
-
-        /*
-         * Dış bölge.
-         */
-        _gradient.addColorStop(
-            0.60,
-            `rgba(${_rgb.r}, ${_rgb.g}, ${_rgb.b}, ${_power * 0.35})`
-        );
-
-
-        /*
-         * Kenara yaklaşırken çok hafif renk.
-         */
-        _gradient.addColorStop(
-            0.80,
-            `rgba(${_rgb.r}, ${_rgb.g}, ${_rgb.b}, ${_power * 0.10})`
-        );
-
-
-        /*
-         * Radius sonunda tamamen normale dön.
-         */
-        _gradient.addColorStop(
-            1.00,
-            "rgba(0, 0, 0, 0)"
-        );
-
-
-        /*
-         * Gradient'i sahneye tek seferde uygula.
-         */
-        _ctx.fillStyle = _gradient;
-
-        _ctx.fillRect(
-            0,
-            0,
-            _width,
-            _height
-        );
-    }
-
-
-    _ctx.restore();
-};
-// this.applySceneLighting = function(_ctx) {
-//     // =========================================================
-//     // LIGHT SOURCES
-//     // =========================================================
-//     const _lights = [];
-//     if (this.backgroundLayerLighting?.length)
-//         _lights.push(...this.backgroundLayerLighting);
-//     if (this.groundLayerLighting?.length)
-//         _lights.push(...this.groundLayerLighting);
-//     if (!_lights.length)
-//         return;
-//     // =========================================================
-//     // SCREEN
-//     // =========================================================
-
-//     const _width = episode.cWidth;
-//     const _height = episode.cHeight;
-//     const _screenX = platformX;
-//     if (
-//         !_ctx ||
-//         !Number.isFinite(_width) ||
-//         !Number.isFinite(_height) ||
-//         !Number.isFinite(_screenX) ||
-//         _width <= 0 ||
-//         _height <= 0
-//     )
-//         return;
-//     // =========================================================
-//     // LIGHT CANVAS
-//     //
-//     // BU CANVAS TAMAMEN SCREEN SPACE'TİR.
-//     //
-//     // Burada:
-//     //
-//     // x = ekran X
-//     // y = ekran Y
-//     //
-//     // hiçbir camera / character transform'u yok.
-//     // =========================================================
-//     if (
-//         !this._sceneLightingCanvas ||
-//         this._sceneLightingCanvas.width !== _width ||
-//         this._sceneLightingCanvas.height !== _height
-//     ) {
-
-//         this._sceneLightingCanvas =
-//             document.createElement("canvas");
-
-//         this._sceneLightingCanvas.width =
-//             _width;
-
-//         this._sceneLightingCanvas.height =
-//             _height;
-
-//         this._sceneLightingCtx =
-//             this._sceneLightingCanvas.getContext("2d");
-
-//         this._sceneLightingCtx.imageSmoothingEnabled =
-//             false;
-//     }
-
-
-//     const _lightCtx =
-//         this._sceneLightingCtx;
-
-
-//     if (!_lightCtx)
-//         return;
-
-
-//     // =========================================================
-//     // CLEAR
-//     // =========================================================
-
-//     _lightCtx.setTransform(
-//         1,
-//         0,
-//         0,
-//         1,
-//         0,
-//         0
-//     );
-
-//     _lightCtx.globalAlpha =
-//         1;
-
-//     _lightCtx.globalCompositeOperation =
-//         "source-over";
-
-//     _lightCtx.clearRect(
-//         0,
-//         0,
-//         _width,
-//         _height
-//     );
-
-
-//     // =========================================================
-//     // HEX -> RGB
-//     // =========================================================
-
-//     const _hexToRgb = function(_hex) {
-
-//         if (
-//             typeof _hex !== "string"
-//         ) {
-
-//             return {
-//                 r: 255,
-//                 g: 255,
-//                 b: 255
-//             };
-//         }
-
-
-//         let _value =
-//             _hex
-//                 .trim()
-//                 .replace("#", "");
-
-
-//         if (_value.length === 3) {
-
-//             _value =
-//                 _value[0] + _value[0] +
-//                 _value[1] + _value[1] +
-//                 _value[2] + _value[2];
-//         }
-
-
-//         if (
-//             _value.length !== 6 ||
-//             !/^[0-9a-fA-F]+$/.test(_value)
-//         ) {
-
-//             return {
-//                 r: 255,
-//                 g: 255,
-//                 b: 255
-//             };
-//         }
-
-
-//         return {
-
-//             r: parseInt(
-//                 _value.substring(0, 2),
-//                 16
-//             ),
-
-//             g: parseInt(
-//                 _value.substring(2, 4),
-//                 16
-//             ),
-
-//             b: parseInt(
-//                 _value.substring(4, 6),
-//                 16
-//             )
-//         };
-//     };
-//     // =========================================================
-//     // LIGHTS
-//     // =========================================================
-//     for (const _light of _lights) {
-//         const _lightX = _light.x;
-//         const _lightY = _light.y;
-//         const _radius = _light.radius;
-//         const _intensity = _light.intensity ?? 0;
-//         if (
-//             !Number.isFinite(_lightX) ||
-//             !Number.isFinite(_lightY) ||
-//             !Number.isFinite(_radius) ||
-//             !Number.isFinite(_intensity)
-//         )
-//             continue;
-
-
-//         if (
-//             _radius <= 0 ||
-//             _intensity <= 0
-//         )
-//             continue;
-//         // =====================================================
-//         // INTENSITY
-//         // =====================================================
-
-//         const _power =
-//             Math.max(
-//                 0,
-//                 Math.min(
-//                     1,
-//                     _intensity
-//                 )
-//             );
-//         // =====================================================
-//         // LIGHT SCREEN POSITION
-//         // =====================================================
-//         //
-//         // SENİN SİSTEMİNDE KESİN OLARAK:
-//         //
-//         // light.x zaten zoom uygulanmış.
-//         //
-//         // platformX de zoom uygulanmış camera offset.
-//         //
-//         // O yüzden:
-//         //
-//         //       SCREEN X
-//         //           =
-//         //       light.x - platformX
-//         //
-//         // =====================================================
-//         const _gx =
-//             _lightX -
-//             _screenX;
-//         const _gy =
-//             _lightY;
-
-
-//         // =====================================================
-//         // SCREEN CULL
-//         // =====================================================
-
-//         if (
-//             _gx + _radius < 0 ||
-//             _gx - _radius > _width ||
-//             _gy + _radius < 0 ||
-//             _gy - _radius > _height
-//         )
-//             continue;
-
-
-//         // =====================================================
-//         // COLOR
-//         // =====================================================
-
-//         const _rgb =
-//             _hexToRgb(
-//                 _light.color || "#FFFFFF"
-//             );
-
-
-//         const _color =
-//             `rgb(${_rgb.r},${_rgb.g},${_rgb.b})`;
-
-
-//         // =====================================================
-//         // RADIAL GRADIENT
-//         // =====================================================
-//         //
-//         // Burada özellikle:
-//         //
-//         // 0.7 -> color
-//         //
-//         // YOK.
-//         //
-//         // Işık merkezden itibaren düşmeye başlıyor.
-//         //
-//         // =====================================================
-
-//         let _gradient;
-
-//         try {
-
-//             _gradient =
-//                 _lightCtx.createRadialGradient(
-//                     _gx,
-//                     _gy,
-//                     0,
-//                     _gx,
-//                     _gy,
-//                     _radius
-//                 );
-
-//         }
-//         catch (_e) {
-
-//             continue;
-//         }
-
-
-//         // =====================================================
-//         // FALL OFF
-//         // =====================================================
-//         //
-//         // Merkez = 1
-//         // Radius = 0
-//         //
-//         // Bu, eski:
-//         //
-//         // intensity *
-//         // (1 - distance / radius)
-//         //
-//         // davranışının spatial karşılığıdır.
-//         //
-//         // =====================================================
-
-//         _gradient.addColorStop(
-//             0,
-//             _color
-//         );
-
-//         _gradient.addColorStop(
-//             0.25,
-//             _color
-//         );
-
-//         _gradient.addColorStop(
-//             0.50,
-//             _color
-//         );
-
-//         _gradient.addColorStop(
-//             0.75,
-//             _color
-//         );
-
-//         _gradient.addColorStop(
-//             1,
-//             "rgba(0,0,0,0)"
-//         );
-
-
-//         // =====================================================
-//         // APPLY THIS LIGHT
-//         // =====================================================
-
-//         _lightCtx.save();
-
-
-//         _lightCtx.globalCompositeOperation =
-//             "lighter";
-
-
-//         _lightCtx.globalAlpha =
-//             _power;
-
-
-//         _lightCtx.fillStyle =
-//             _gradient;
-
-
-//         _lightCtx.fillRect(
-//             0,
-//             0,
-//             _width,
-//             _height
-//         );
-
-
-//         _lightCtx.restore();
-//     }
-
-
-//     // =========================================================
-//     // APPLY LIGHT CANVAS
-//     // =========================================================
-//     //
-//     // ÇOK ÖNEMLİ:
-//     //
-//     // _ctx'nin mevcut transform'u ne olursa olsun
-//     // light canvas SCREEN SPACE olarak basılacak.
-//     //
-//     // Böylece:
-//     //
-//     // translate
-//     // scale
-//     // flip
-//     //
-//     // ışığın koordinatını değiştiremeyecek.
-//     //
-//     // =========================================================
-
-//     _ctx.save();
-
-
-//     _ctx.setTransform(
-//         1,
-//         0,
-//         0,
-//         1,
-//         0,
-//         0
-//     );
-
-
-//     _ctx.globalCompositeOperation =
-//         "source-atop";
-
-
-//     _ctx.globalAlpha =
-//         1;
-
-
-//     _ctx.drawImage(
-//         this._sceneLightingCanvas,
-//         0,
-//         0,
-//         _width,
-//         _height,
-//         0,
-//         0,
-//         _width,
-//         _height
-//     );
-
-
-//     _ctx.restore();
-// };
-// this.applyLightOnCharacter = function(
-//     _char,
-//     _ctx,
-//     _source,
-//     _sx,
-//     _sy,
-//     _sw,
-//     _sh,
-//     _x,
-//     _y,
-//     _w,
-//     _h
-// ) {
-// 	return;
-//     if (
-// 		_char.class === 'object' ||
-//         !_source ||
-//         isNaN(_char.HURTLEFT) ||
-//         !Number.isFinite(_w) ||
-//         !Number.isFinite(_h) ||
-//         _w <= 0 ||
-//         _h <= 0
-//     )
-//         return;
-//     const _charX =
-//         _char.HURTLEFT +
-//         _char._HURTBOX_half +
-//         platformX;
-
-//     const _charY =
-//         _char.TOP +
-//         (_char.HURTHEIGHT / 2);
-
-//     // ==========================================
-//     // LIGHT SOURCES
-//     // ==========================================
-
-//     const _backgroundLights =
-//         this.backgroundLayerLighting;
-
-//     const _groundLights =
-//         this.groundLayerLighting;
-
-//     if (
-//         (!_backgroundLights || !_backgroundLights.length) &&
-//         (!_groundLights || !_groundLights.length)
-//     )
-//         return;
-
-
-//     // ==========================================
-//     // COMBINE ALL LIGHTS
-//     // ==========================================
-
-//     let _totalWeight = 0;
-
-//     let _lightX = 0;
-//     let _lightY = 0;
-
-//     let _red = 0;
-//     let _green = 0;
-//     let _blue = 0;
-
-//     let _combinedIntensity = 0;
-
-//     let _dirX = 0;
-//     let _dirY = 0;
-
-
-//     const _processLights = (_lights) => {
-
-//         if (!_lights || !_lights.length)
-//             return;
-
-//         for (const _light of _lights) {
-
-//             const _radius =
-//                 Number(_light.radius);
-
-//             if (
-//                 !Number.isFinite(_radius) ||
-//                 _radius <= 0
-//             )
-//                 continue;
-
-
-//             const _dx =
-//                 Number(_light.x) -
-//                 Number(_charX);
-
-//             const _dy =
-//                 Number(_light.y) -
-//                 Number(_charY);
-
-//             if (
-//                 !Number.isFinite(_dx) ||
-//                 !Number.isFinite(_dy)
-//             )
-//                 continue;
-
-
-//             const _distanceSq =
-//                 (_dx * _dx) +
-//                 (_dy * _dy);
-
-//             const _radiusSq =
-//                 _radius * _radius;
-
-
-//             // Karakter ışığın dışında
-//             if (_distanceSq >= _radiusSq)
-//                 continue;
-
-
-//             const _distance =
-//                 Math.sqrt(_distanceSq);
-
-
-//             // ==================================
-//             // FALLOFF
-//             // ==================================
-
-//             const _falloff =
-//                 1 -
-//                 (_distance / _radius);
-
-
-//             const _intensity =
-//                 Number(_light.intensity ?? 0) *
-//                 _falloff;
-
-
-//             if (
-//                 !Number.isFinite(_intensity) ||
-//                 _intensity <= 0
-//             )
-//                 continue;
-
-
-//             // ==================================
-//             // WEIGHT
-//             // ==================================
-
-//             /*
-//              * Işığın karakter üzerindeki gerçek
-//              * etkisini ağırlık olarak kullanıyoruz.
-//              */
-
-//             const _weight =
-//                 _intensity;
-
-
-//             _totalWeight += _weight;
-
-
-//             // ==================================
-//             // VIRTUAL LIGHT POSITION
-//             // ==================================
-
-//             _lightX +=
-//                 Number(_light.x) *
-//                 _weight;
-
-//             _lightY +=
-//                 Number(_light.y) *
-//                 _weight;
-
-
-//             // ==================================
-//             // COLOR
-//             // ==================================
-
-//             let _color =
-//                 _light.color || "#FFFFFF";
-
-//             let _r = 255;
-//             let _g = 255;
-//             let _b = 255;
-
-
-//             if (
-//                 typeof _color === "string" &&
-//                 _color[0] === "#" &&
-//                 (
-//                     _color.length === 7 ||
-//                     _color.length === 9
-//                 )
-//             ) {
-//                 _r =
-//                     parseInt(
-//                         _color.slice(1, 3),
-//                         16
-//                     );
-
-//                 _g =
-//                     parseInt(
-//                         _color.slice(3, 5),
-//                         16
-//                     );
-
-//                 _b =
-//                     parseInt(
-//                         _color.slice(5, 7),
-//                         16
-//                     );
-//             }
-
-
-//             _red +=
-//                 _r * _weight;
-
-//             _green +=
-//                 _g * _weight;
-
-//             _blue +=
-//                 _b * _weight;
-
-
-//             // ==================================
-//             // LIGHT DIRECTION
-//             // ==================================
-
-//             if (_distance > 0) {
-
-//                 _dirX +=
-//                     (_dx / _distance) *
-//                     _weight;
-
-//                 _dirY +=
-//                     (_dy / _distance) *
-//                     _weight;
-//             }
-
-
-//             _combinedIntensity +=
-//                 _intensity;
-//         }
-//     };
-
-
-//     _processLights(_backgroundLights);
-//     _processLights(_groundLights);
-
-
-//     // ==========================================
-//     // NO ACTIVE LIGHT
-//     // ==========================================
-
-//     if (
-//         _totalWeight <= 0 ||
-//         _combinedIntensity <= 0
-//     )
-//         return;
-
-
-//     // ==========================================
-//     // NORMALIZE VIRTUAL LIGHT
-//     // ==========================================
-
-//     const _virtualLightX =
-//         _lightX / _totalWeight;
-
-//     const _virtualLightY =
-//         _lightY / _totalWeight;
-
-
-//     let _finalR =
-//         Math.round(
-//             _red / _totalWeight
-//         );
-
-//     let _finalG =
-//         Math.round(
-//             _green / _totalWeight
-//         );
-
-//     let _finalB =
-//         Math.round(
-//             _blue / _totalWeight
-//         );
-
-
-//     _finalR =
-//         Math.max(
-//             0,
-//             Math.min(255, _finalR)
-//         );
-
-//     _finalG =
-//         Math.max(
-//             0,
-//             Math.min(255, _finalG)
-//         );
-
-//     _finalB =
-//         Math.max(
-//             0,
-//             Math.min(255, _finalB)
-//         );
-
-
-//     /*
-//      * Birden fazla ışığın toplamını sınırsız
-//      * şekilde büyütmeyelim.
-//      */
-
-//     const _finalIntensity =
-//         Math.min(
-//             1,
-//             _combinedIntensity
-//         );
-
-
-//     // ==========================================
-//     // LIGHT POSITION ON CHARACTER CANVAS
-//     // ==========================================
-
-//     const _gx =
-//         (_w / 2) +
-//         (
-//             _virtualLightX -
-//             _charX
-//         );
-
-//     const _gy =
-//         (_h / 2) +
-//         (
-//             _virtualLightY -
-//             _charY
-//         );
-
-
-//     if (
-//         !Number.isFinite(_gx) ||
-//         !Number.isFinite(_gy)
-//     )
-//         return;
-
-
-//     // ==========================================
-//     // CHARACTER LIGHT CANVAS
-//     // ==========================================
-
-//     if (
-//         !this._characterLightCanvas ||
-//         this._characterLightCanvas.width !== _w ||
-//         this._characterLightCanvas.height !== _h
-//     ) {
-
-//         this._characterLightCanvas =
-//             document.createElement("canvas");
-
-//         this._characterLightCanvas.width =
-//             _w;
-
-//         this._characterLightCanvas.height =
-//             _h;
-
-//         this._characterLightCtx =
-//             this._characterLightCanvas.getContext("2d");
-
-//         this._characterLightCtx.imageSmoothingEnabled =
-//             false;
-//     }
-
-
-//     const _lightCtx =
-//         this._characterLightCtx;
-
-
-//     if (!_lightCtx)
-//         return;
-
-
-//     _lightCtx.clearRect(
-//         0,
-//         0,
-//         _w,
-//         _h
-//     );
-
-
-//     // ==========================================
-//     // DRAW CHARACTER ONTO LIGHT CANVAS
-//     // ==========================================
-
-//     _lightCtx.globalCompositeOperation =
-//         "source-over";
-
-//     _lightCtx.globalAlpha = 1;
-
-//     _lightCtx.drawImage(
-//         _source,
-//         _sx,
-//         _sy,
-//         _sw,
-//         _sh,
-//         0,
-//         0,
-//         _w,
-//         _h
-//     );
-
-
-//     // ==========================================
-//     // ONE RADIAL LIGHT
-//     // ==========================================
-
-//     /*
-//      * Birden fazla ışığın radius'larını da
-//      * ağırlıklı olarak birleştiriyoruz.
-//      */
-
-//     let _radiusSum = 0;
-
-//     const _processRadius = (_lights) => {
-
-//         if (!_lights || !_lights.length)
-//             return;
-
-//         for (const _light of _lights) {
-
-//             const _radius =
-//                 Number(_light.radius);
-
-//             if (
-//                 !Number.isFinite(_radius) ||
-//                 _radius <= 0
-//             )
-//                 continue;
-
-//             const _dx =
-//                 Number(_light.x) -
-//                 _charX;
-
-//             const _dy =
-//                 Number(_light.y) -
-//                 _charY;
-
-//             const _distanceSq =
-//                 (_dx * _dx) +
-//                 (_dy * _dy);
-
-//             if (
-//                 _distanceSq >=
-//                 _radius * _radius
-//             )
-//                 continue;
-
-//             const _distance =
-//                 Math.sqrt(_distanceSq);
-
-//             const _falloff =
-//                 1 -
-//                 (_distance / _radius);
-
-//             const _weight =
-//                 Number(_light.intensity ?? 0) *
-//                 _falloff;
-
-//             if (_weight > 0)
-//                 _radiusSum +=
-//                     _radius * _weight;
-//         }
-//     };
-
-
-//     _processRadius(_backgroundLights);
-//     _processRadius(_groundLights);
-
-
-//     let _virtualRadius =
-//         _radiusSum /
-//         Math.max(_totalWeight, 0.0001);
-
-
-//     if (
-//         !Number.isFinite(_virtualRadius) ||
-//         _virtualRadius <= 0
-//     )
-//         return;
-
-
-//     /*
-//      * Karakter canvasına göre gereksiz dev
-//      * gradient oluşturmamak için biraz sınırla.
-//      */
-
-//     const _maxRadius =
-//         Math.max(
-//             _w,
-//             _h
-//         ) * 2;
-
-
-//     _virtualRadius =
-//         Math.min(
-//             _virtualRadius,
-//             _maxRadius
-//         );
-
-
-//     const _radial =
-//         _lightCtx.createRadialGradient(
-//             _gx,
-//             _gy,
-//             0,
-//             _gx,
-//             _gy,
-//             _virtualRadius
-//         );
-
-
-//     const _lightColor =
-//         `rgb(${_finalR},${_finalG},${_finalB})`;
-
-
-//     _radial.addColorStop(
-//         0,
-//         _lightColor
-//     );
-
-//     _radial.addColorStop(
-//         0.7,
-//         _lightColor
-//     );
-
-//     _radial.addColorStop(
-//         1,
-//         "rgba(0,0,0,0)"
-//     );
-
-
-//     // ==========================================
-//     // APPLY ONE LIGHT
-//     // ==========================================
-
-//     _lightCtx.save();
-
-//     _lightCtx.globalCompositeOperation =
-//         "source-atop";
-
-//     _lightCtx.globalAlpha =
-//         _finalIntensity;
-
-//     _lightCtx.fillStyle =
-//         _radial;
-
-//     _lightCtx.fillRect(
-//         0,
-//         0,
-//         _w,
-//         _h
-//     );
-
-//     _lightCtx.restore();
-
-
-//     // ==========================================
-//     // COMBINED LIGHT DIRECTION
-//     // ==========================================
-
-//     const _dirLength =
-//         Math.sqrt(
-//             (_dirX * _dirX) +
-//             (_dirY * _dirY)
-//         );
-
-
-//     if (_dirLength > 0) {
-
-//         _dirX /=
-//             _dirLength;
-
-//         _dirY /=
-//             _dirLength;
-
-
-//         // Işığın tersi = gölge yönü
-
-//         const _shadowDirX =
-//             -_dirX;
-
-//         const _shadowDirY =
-//             -_dirY;
-
-
-//         const _shadowDistance =
-//             Math.sqrt(
-//                 (_w * _w) +
-//                 (_h * _h)
-//             );
-
-
-//         const _centerX =
-//             _w / 2;
-
-//         const _centerY =
-//             _h / 2;
-
-
-//         const _shadowStartX =
-//             _centerX -
-//             (
-//                 _shadowDirX *
-//                 _shadowDistance
-//             );
-
-//         const _shadowStartY =
-//             _centerY -
-//             (
-//                 _shadowDirY *
-//                 _shadowDistance
-//             );
-
-
-//         const _shadowEndX =
-//             _centerX +
-//             (
-//                 _shadowDirX *
-//                 _shadowDistance
-//             );
-
-//         const _shadowEndY =
-//             _centerY +
-//             (
-//                 _shadowDirY *
-//                 _shadowDistance
-//             );
-
-
-//         // ======================================
-//         // ONE DIRECTIONAL SHADOW
-//         // ======================================
-
-//         const _shadowGradient =
-//             _lightCtx.createLinearGradient(
-//                 _shadowStartX,
-//                 _shadowStartY,
-//                 _shadowEndX,
-//                 _shadowEndY
-//             );
-
-
-//         _shadowGradient.addColorStop(
-//             0,
-//             "rgba(0,0,0,0)"
-//         );
-
-
-//         _shadowGradient.addColorStop(
-//             0.5,
-//             "rgba(0,0,20,0.025)"
-//         );
-
-
-//         const _shadowAlpha =
-//             Math.min(
-//                 0.18,
-//                 _finalIntensity * 0.45
-//             );
-
-
-//         _shadowGradient.addColorStop(
-//             1,
-//             `rgba(0,0,20,${_shadowAlpha})`
-//         );
-
-
-//         _lightCtx.save();
-
-//         _lightCtx.globalCompositeOperation =
-//             "source-atop";
-
-//         _lightCtx.globalAlpha =
-//             1;
-
-//         _lightCtx.fillStyle =
-//             _shadowGradient;
-
-//         _lightCtx.fillRect(
-//             0,
-//             0,
-//             _w,
-//             _h
-//         );
-
-//         _lightCtx.restore();
-//     }
-
-
-//     // ==========================================
-//     // FINAL CHARACTER
-//     // ==========================================
-
-//     _ctx.drawImage(
-//         this._characterLightCanvas,
-//         0,
-//         0,
-//         _w,
-//         _h,
-//         _x,
-//         _y,
-//         _w,
-//         _h
-//     );
-// };
-// 	this.applyLightOnCharacter = function(
-//     _char,
-//     _ctx,
-//     _source,
-//     _sx,
-//     _sy,
-//     _sw,
-//     _sh,
-//     _x,
-//     _y,
-//     _w,
-//     _h
-// ) {
-//     if (
-// 		_char.class === 'object' ||
-// 		!_source ||
-// 		!Number.isFinite(_w) ||
-// 		!Number.isFinite(_h) ||
-// 		_w <= 0 ||
-// 		_h <= 0 ||
-// 		isNaN(_char.HURTLEFT)
-// 	)
-//     return;
-//     const _charX =
-//         _char.HURTLEFT +
-//         _char._HURTBOX_half +
-//         platformX;
-
-//     const _charY =
-//         _char.TOP +
-//         (_char.HURTHEIGHT / 2);
-
-//     //const _backgroundLights = this.backgroundLayerLighting;
-// 	const _lights = this.groundLayerLighting;
-
-// 	if (
-// 		//(!_backgroundLights || !_backgroundLights.length) &&
-// 		(!_lights || !_lights.length)
-// 	)
-// 		return;
-
-//     if (
-//         !this._characterLightCanvas ||
-//         this._characterLightCanvas.width !== _w ||
-//         this._characterLightCanvas.height !== _h
-//     ) {
-//         this._characterLightCanvas = document.createElement("canvas");
-//         this._characterLightCanvas.width = _w;
-//         this._characterLightCanvas.height = _h;
-
-//         this._characterLightCtx =
-//             this._characterLightCanvas.getContext("2d");
-
-//         this._characterLightCtx.imageSmoothingEnabled = false;
-//     }
-
-//     const c = this._characterLightCtx;
-
-//     c.clearRect(0, 0, _w, _h);
-
-//     // sadece karakter sprite'ı
-//     c.drawImage(
-//         _source,
-//         _sx,
-//         _sy,
-//         _sw,
-//         _sh,
-//         0,
-//         0,
-//         _w,
-//         _h
-//     );
-
-//     for (const light of _lights) {
-//         const dx = (light.x) - (_charX);
-// 		const dy = (light.y) - (_charY);
-
-// 		if (!Number.isFinite(dx) || !Number.isFinite(dy))
-// 			continue;
-
-//         const d2 = dx * dx + dy * dy;
-
-//         if (d2 >= light.radius * light.radius)
-//             continue;
-
-//         const d = Math.sqrt(d2);
-
-//         const intensity =
-//             (light.intensity ?? 0) *
-//             (1 - d / light.radius);
-
-//         if (intensity <= 0)
-//             continue;
-
-//         const gx = _w / 2 + dx;
-//         const gy = _h / 2 + dy;
-// 		if (
-// 			!Number.isFinite(gx) ||
-// 			!Number.isFinite(gy) ||
-// 			!Number.isFinite(light.radius) ||
-// 			light.radius <= 0
-// 		)
-//     		continue;
-// 		const g = c.createRadialGradient(
-// 				gx,
-// 				gy,
-// 				0,
-// 				gx,
-// 				gy,
-// 				light.radius
-// 			);
-//         g.addColorStop(0, light.color);
-//         g.addColorStop(0.7, light.color);
-//         g.addColorStop(1, "rgba(0,0,0,0)");
-
-//         c.save();
-
-//         c.globalCompositeOperation = "source-atop";
-//         c.globalAlpha = intensity;
-//         c.fillStyle = g;
-//         c.fillRect(0, 0, _w, _h);
-
-//         c.restore();
-//     }
-
-//     _ctx.drawImage(
-//         this._characterLightCanvas,
-//         0,
-//         0,
-//         _w,
-//         _h,
-//         _x,
-//         _y,
-//         _w,
-//         _h
-//     );
-// 	};
-	
-this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 3) {
+	};
+	this.applySceneLighting = function (_ctx) {
+		if (!_ctx || (!Array.isArray(this.backgroundLayerLighting) && !Array.isArray(this.groundLayerLighting))) {
+			return;
+		}
+
+		const _lights = [];
+
+		if (Array.isArray(this.backgroundLayerLighting)) {
+			_lights.push(...this.backgroundLayerLighting);
+		}
+
+		if (Array.isArray(this.groundLayerLighting)) {
+			_lights.push(...this.groundLayerLighting);
+		}
+
+		if (!_lights.length) {
+			return;
+		}
+
+		const _width = episode.cWidth;
+		const _height = episode.cHeight;
+		const _screenX = platformX;
+
+		if (
+			!Number.isFinite(_width) ||
+			!Number.isFinite(_height) ||
+			!Number.isFinite(_screenX) ||
+			_width <= 0 ||
+			_height <= 0
+		) {
+			return;
+		}
+
+		const _hexToRgb = function (_hex) {
+			if (typeof _hex !== 'string') {
+				return {
+					r: 255,
+					g: 255,
+					b: 255
+				};
+			}
+
+			let _value = _hex.trim().replace('#', '');
+
+			if (_value.length === 3) {
+				_value = _value[0] + _value[0] + _value[1] + _value[1] + _value[2] + _value[2];
+			}
+
+			if (_value.length !== 6 || !/^[0-9a-fA-F]+$/.test(_value)) {
+				return {
+					r: 255,
+					g: 255,
+					b: 255
+				};
+			}
+
+			return {
+				r: parseInt(_value.substring(0, 2), 16),
+				g: parseInt(_value.substring(2, 4), 16),
+				b: parseInt(_value.substring(4, 6), 16)
+			};
+		};
+
+		_ctx.save();
+
+		_ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+		_ctx.globalCompositeOperation = 'source-atop';
+
+		_ctx.globalAlpha = 1;
+
+		for (let _i = 0; _i < _lights.length; _i++) {
+			const _light = _lights[_i];
+
+			if (!_light) {
+				continue;
+			}
+
+			const _lightX = Number(_light.x);
+			const _lightY = Number(_light.y);
+			const _radius = Number(_light.radius);
+			const _intensity = Number(_light.intensity ?? 0);
+
+			if (
+				!Number.isFinite(_lightX) ||
+				!Number.isFinite(_lightY) ||
+				!Number.isFinite(_radius) ||
+				!Number.isFinite(_intensity)
+			) {
+				continue;
+			}
+
+			if (_radius <= 0 || _intensity <= 0) {
+				continue;
+			}
+
+			const _power = _intensity <= 0 ? 0 : _intensity >= 1 ? 1 : _intensity;
+
+			const _screenLightX = _lightX - _screenX;
+
+			const _screenLightY = _lightY;
+
+			if (
+				_screenLightX + _radius < 0 ||
+				_screenLightX - _radius > _width ||
+				_screenLightY + _radius < 0 ||
+				_screenLightY - _radius > _height
+			) {
+				continue;
+			}
+
+			const _color = _light._lightingColorCache;
+
+			let _rgb;
+
+			if (_color && _color.hex === _light.color) {
+				_rgb = _color.rgb;
+			} else {
+				_rgb = _hexToRgb(_light.color || '#FFFFFF');
+
+				_light._lightingColorCache = {
+					hex: _light.color,
+					rgb: _rgb
+				};
+			}
+
+			let _gradient;
+
+			try {
+				_gradient = _ctx.createRadialGradient(
+					_screenLightX,
+					_screenLightY,
+					0,
+
+					_screenLightX,
+					_screenLightY,
+					_radius
+				);
+			} catch (_error) {
+				continue;
+			}
+
+			_gradient.addColorStop(0.0, `rgba(${_rgb.r}, ${_rgb.g}, ${_rgb.b}, ${_power})`);
+
+			_gradient.addColorStop(0.2, `rgba(${_rgb.r}, ${_rgb.g}, ${_rgb.b}, ${_power * 0.9})`);
+
+			_gradient.addColorStop(0.4, `rgba(${_rgb.r}, ${_rgb.g}, ${_rgb.b}, ${_power * 0.65})`);
+
+			_gradient.addColorStop(0.6, `rgba(${_rgb.r}, ${_rgb.g}, ${_rgb.b}, ${_power * 0.35})`);
+
+			_gradient.addColorStop(0.8, `rgba(${_rgb.r}, ${_rgb.g}, ${_rgb.b}, ${_power * 0.1})`);
+
+			_gradient.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
+
+			_ctx.fillStyle = _gradient;
+
+			_ctx.fillRect(0, 0, _width, _height);
+		}
+
+		_ctx.restore();
+	};
+
+	this.borderizeSprite = function (ctx, image, x, y, glowColor = 'red', glowSize = 3) {
 		const w = image.width;
 		const h = image.height;
 
-		// Geçici canvas (offscreen)
 		const tempCanvas = document.createElement('canvas');
 		tempCanvas.width = w + glowSize * 2;
 		tempCanvas.height = h + glowSize * 2;
 		const tempCtx = tempCanvas.getContext('2d');
 
-		// Sprite'ı ortalanmış şekilde çiz
 		tempCtx.drawImage(image, glowSize, glowSize);
 
-		// Görseli birkaç kez hafif kaydırarak çizerek glow efekti üret
 		tempCtx.globalCompositeOperation = 'source-in';
 		tempCtx.fillStyle = glowColor;
 		tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
-		// Ana canvas'a glow'lu hali blur ile bastır
 		ctx.save();
 		ctx.shadowColor = glowColor;
 		ctx.shadowBlur = glowSize * 2;
 		ctx.drawImage(tempCanvas, x - glowSize, y - glowSize);
 		ctx.shadowBlur = 0;
 
-		// Ana sprite'ı en üste çiz
 		ctx.drawImage(image, x, y);
 		ctx.restore();
-	}
-	this.drawEdgeSigns = function(_signs, _side) {
-		if(!_signs?.length)
-			return;
+	};
+	this.drawEdgeSigns = function (_signs, _side) {
+		if (!_signs?.length) return;
 		let _diamond = false;
 		const _mates = [];
-		for(let _i = 0; _i < _signs.length; _i++) {
+		for (let _i = 0; _i < _signs.length; _i++) {
 			const _s = _signs[_i];
-			if(_s === this.rivalSign)
-				_diamond = true;
-			else if(_mates.indexOf(_s) < 0)
-				_mates.push(_s);
+			if (_s === this.rivalSign) _diamond = true;
+			else if (_mates.indexOf(_s) < 0) _mates.push(_s);
 		}
 		const _stack = [];
-		if(_diamond)
-			_stack.push(this.rivalSign);
-		for(let _i = 0; _i < _mates.length; _i++)
-			_stack.push(_mates[_i]);
+		if (_diamond) _stack.push(this.rivalSign);
+		for (let _i = 0; _i < _mates.length; _i++) _stack.push(_mates[_i]);
 		const _size = MathRound(this.cHeight * 0.06);
 		const _gap = MathRound(_size * 0.12);
-		const _total = (_stack.length * _size) + ((_stack.length - 1) * _gap);
-		let _y = MathRound((this.cHeight * 0.47) + (_total / 2) - _size);
+		const _total = _stack.length * _size + (_stack.length - 1) * _gap;
+		let _y = MathRound(this.cHeight * 0.47 + _total / 2 - _size);
 		const _x = _side === 'left' ? 0 : MathRound(this.cWidth - _size);
 		c10.save();
 		c10.imageSmoothingEnabled = true;
-		for(let _i = 0; _i < _stack.length; _i++) {
+		for (let _i = 0; _i < _stack.length; _i++) {
 			const _img = _stack[_i];
-			if(_img && _img.complete && _img.naturalWidth)
-				c10.drawImage(_img, _x, _y, _size, _size);
+			if (_img && _img.complete && _img.naturalWidth) c10.drawImage(_img, _x, _y, _size, _size);
 			_y -= _size + _gap;
 		}
 		c10.restore();
-	}
-	this.checkUnseenEnemyPointer = function() {
-		if(this._crowdPvp) {
-			if(!this.enemyLeftArrow)
-				this.enemyLeftArrow = document.querySelector('.enemy-left-arrow');
-			if(!this.enemyRightArrow)
-				this.enemyRightArrow = document.querySelector('.enemy-right-arrow');
-			if(this.enemyLeftArrow)
-				addClass(this.enemyLeftArrow, 'v-none');
-			if(this.enemyRightArrow)
-				addClass(this.enemyRightArrow, 'v-none');
+	};
+	this.checkUnseenEnemyPointer = function () {
+		if (this._crowdPvp) {
+			if (!this.enemyLeftArrow) this.enemyLeftArrow = document.querySelector('.enemy-left-arrow');
+			if (!this.enemyRightArrow) this.enemyRightArrow = document.querySelector('.enemy-right-arrow');
+			if (this.enemyLeftArrow) addClass(this.enemyLeftArrow, 'v-none');
+			if (this.enemyRightArrow) addClass(this.enemyRightArrow, 'v-none');
 			this.drawEdgeSigns(this._edgeLeft, 'left');
 			this.drawEdgeSigns(this._edgeRight, 'right');
 		}
-		if((_gameTick - 500) < this.enemyArrowsShown)
-			return;
+		if (_gameTick - 500 < this.enemyArrowsShown) return;
 		const _l = this._crowdPvp ? false : mainCharacter?.hasLeftEnemy;
 		const _r = this._crowdPvp ? false : mainCharacter?.hasRightEnemy;
 		const _lp = mainCharacter?.hasLeftPackage;
 		const _rp = mainCharacter?.hasRightPackage;
-		if(!this.enemyLeftArrow)
-			this.enemyLeftArrow = document.querySelector('.enemy-left-arrow');
-		else { 
-			if(_l)
-				removeClass(this.enemyLeftArrow, 'v-none');
-			else
-				addClass(this.enemyLeftArrow, 'v-none');
-		}
-			
-		if(!this.enemyRightArrow)
-			this.enemyRightArrow = document.querySelector('.enemy-right-arrow');
+		if (!this.enemyLeftArrow) this.enemyLeftArrow = document.querySelector('.enemy-left-arrow');
 		else {
-			if(_r)
-				removeClass(this.enemyRightArrow, 'v-none');
-			else
-				addClass(this.enemyRightArrow, 'v-none');
+			if (_l) removeClass(this.enemyLeftArrow, 'v-none');
+			else addClass(this.enemyLeftArrow, 'v-none');
 		}
-		if(!this.packageLeftArrow)
-			this.packageLeftArrow = document.querySelector('.package-left-arrow');
-		if(_lp)
-			removeClass(this.packageLeftArrow, 'v-none');
-		else
-			addClass(this.packageLeftArrow, 'v-none');
-		if(!this.packageRightArrow)
-			this.packageRightArrow = document.querySelector('.package-right-arrow');
-		if(_rp)
-			removeClass(this.packageRightArrow, 'v-none');
-		else
-			addClass(this.packageRightArrow, 'v-none');
-		this.enemyArrowsShown  = _gameTick;
+
+		if (!this.enemyRightArrow) this.enemyRightArrow = document.querySelector('.enemy-right-arrow');
+		else {
+			if (_r) removeClass(this.enemyRightArrow, 'v-none');
+			else addClass(this.enemyRightArrow, 'v-none');
+		}
+		if (!this.packageLeftArrow) this.packageLeftArrow = document.querySelector('.package-left-arrow');
+		if (_lp) removeClass(this.packageLeftArrow, 'v-none');
+		else addClass(this.packageLeftArrow, 'v-none');
+		if (!this.packageRightArrow) this.packageRightArrow = document.querySelector('.package-right-arrow');
+		if (_rp) removeClass(this.packageRightArrow, 'v-none');
+		else addClass(this.packageRightArrow, 'v-none');
+		this.enemyArrowsShown = _gameTick;
 		return;
-		if(!_l && !_r)
-			return;
+		if (!_l && !_r) return;
 		const _step = MathCeil(this.cHeight / 30);
 		const _miniStep = MathCeil(_step / 3);
-		const _start = MathRound((this.cHeight / 2) - (_step / 2));
+		const _start = MathRound(this.cHeight / 2 - _step / 2);
 		c10.fillStyle = 'red';
 		c10.strokeStyle = '#000';
-		if(_l) {
+		if (_l) {
 			const path = new Path2D();
 			path.moveTo(0, _start);
 			path.lineTo(_step, _start - _step);
@@ -6701,7 +4545,7 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 			path.lineTo(_step, _start + _step);
 			c10.fill(path);
 		}
-		if(_r) {
+		if (_r) {
 			const path = new Path2D();
 			path.moveTo(this.cWidth, _start);
 			path.lineTo(this.cWidth - _step, _start - _step);
@@ -6711,33 +4555,26 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 			path.lineTo(this.cWidth - _step, _start + _step);
 			c10.fill(path);
 		}
-	}
-	this.checkSceneActions = function(_before) {
-		if(!__storyScene?.actions)
-			return;
-		for(let _act of __storyScene.actions) {
-			if((_act.before && !_before) || (!_act.before && _before))
-				continue;
-			if(_act.when() && _act.do)
-				_act.do();
+	};
+	this.checkSceneActions = function (_before) {
+		if (!__storyScene?.actions) return;
+		for (let _act of __storyScene.actions) {
+			if ((_act.before && !_before) || (!_act.before && _before)) continue;
+			if (_act.when() && _act.do) _act.do();
 		}
-	}
-	
+	};
+
 	this.checkBubbleText = function (_char) {
 		if (_char.remove || _char.dead || _char.dying) {
-			const _bubble = episode.bubbles?.find(x => x.key === _char.key)?.elem; //document.querySelectorAll('.talk-bubble-' + _char.key);
-			if (_bubble)
-				removeBubble(_bubble, _char);
+			const _bubble = episode.bubbles?.find((x) => x.key === _char.key)?.elem;
+			if (_bubble) removeBubble(_bubble, _char);
 		}
-	}
+	};
 	this.drawBuffs = function (_char, _size) {
 		if (_char.buffs?.[0]) {
-			if(!_char.buffContainer)
-				_char.buffContainer = document.querySelector('#char-' + _char.key + ' .buffs');
-			if (!_char.buffContainer)
-				return;
-			if(_char.buffKey === _char.lastBuffKey)
-				return;
+			if (!_char.buffContainer) _char.buffContainer = document.querySelector('#char-' + _char.key + ' .buffs');
+			if (!_char.buffContainer) return;
+			if (_char.buffKey === _char.lastBuffKey) return;
 			while (_char.buffContainer.firstChild) {
 				_char.buffContainer.removeChild(_char.buffContainer.firstChild);
 			}
@@ -6745,17 +4582,17 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 			for (var _buff of _arr) {
 				const _buffItem = document.createElement('img');
 				_buffItem.src = './images/buff/icons/' + _buff.key + '.png';
-				_buffItem.className = (_allBuffs[_buff.key].gain ? 'buff' : 'debuff') + (_buff.level > 3 ? 3 : _buff.level) + '-' + _size;
+				_buffItem.className =
+					(_allBuffs[_buff.key].gain ? 'buff' : 'debuff') + (_buff.level > 3 ? 3 : _buff.level) + '-' + _size;
 				_char.buffContainer.appendChild(_buffItem);
 			}
 			_char.lastBuffKey = _char.buffKey;
-		}
-		else if (_char.buffContainer && _char.hadBuff) {
+		} else if (_char.buffContainer && _char.hadBuff) {
 			delete _char.hadBuff;
 			_char.buffContainer.innerHTML = '';
 			delete _char.lastBuffKey;
 		}
-	}
+	};
 	this.sortBuffs = function (_buffs) {
 		return _buffs.sort((a, b) => {
 			const _at = a.type === 'buff' ? 2 : 1;
@@ -6765,11 +4602,9 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 					return b.level - a.level;
 				}
 				return b.time - a.time;
-			}
-			else
-				return _bt - _at;
+			} else return _bt - _at;
 		});
-	}
+	};
 	this.hideHealthBar = function (_char) {
 		if (_char.remove || _char.skipHealthBar || _char.isDead() || _char.healthBarDrawn) {
 			const hb = _char.healthBarElem ?? document.getElementById('hb-' + _char.key);
@@ -6778,250 +4613,25 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 				hb.remove();
 			}
 		}
-	}
-	this.fillRoundedRect = function(ctx, color, x, y, width, height) {
-        ctx.fillStyle = color;
-		ctx.fillRect(x,y,width,height);
-    }
-    this.drawRoundedRect = function(ctx, color, lineWidth, x, y, width, height) {
-        ctx.strokeStyle = color;
-        ctx.lineWidth = lineWidth;
-		ctx.strokeRect(x,y,width,height);
-    }
-	
-	// this.drawHealthBar2 = function (_item) {
-	// 	if(__batterySaveMode || _item.unseen || _item.char.skipHealthBar || _item.char.remove || _item.char.health <= 0 || _item.char.dead)
-	// 		return;
-	// 	if (_item.char.main) {
-	// 		this.drawBuffs(_item.char, 'big');
-	// 		return;
-	// 	}
-	// 	if (!_item.char.key || !_item.char.hpDropped || _item.char.MAXHP <= 1 || _item.char.class === __spell || _item.char.animation === 'respawn')
-	// 		return;
-	// 	if(_item.char.hpDropped < (_gameTick - 4000))
-	// 		return;
-	// 	const _hpRate = _item.char.healthRate;
-	// 	const isWarPlayer = _item.char.enemy && this.war;
-	// 	const _isBoss = _item.char.class === 'boss';
-	// 	let hbInner = {};
-	// 	let _hWidth = MathRound((this.cWidth / 100) * (_item.char.class === 'boss' ? 8 : 4));
-	// 	if(_item.char.healthBarWidthRate)
-	// 		_hWidth = MathRound(_item.char.healthBarWidthRate * _hWidth); 
-	// 	const _xGap = MathRound((_item.char.WIDTH - _hWidth) / 2);
-	// 	let _hLeft = MathRound(_item.char.EXACTLEFT + _xGap);
-	// 	let _extraTop = isWarPlayer ? MathRound(-40 * _item.char.ZOOM) : 0;
-	// 	let _hHeight = this.defaultHealthBarHeight;
-	// 	if(_item.char.healthBarHeightRate)
-	// 		_hHeight = MathRound(_item.char.healthBarHeightRate * _hHeight); 
-	// 	let _hTop = MathRound((this.cHeight + _extraTop) - _hHeight - (MathRound((_item.char.healtbarGap ?? 0) * __zoom)) - _item.char.yPosition -  _item.char.HEIGHT - (_item.yGap ?? 0) - (_item.char.yGap ?? 0));
-	// 	if(_isBoss) {
-	// 		const _id = 'hb-' + _item.char.key;
-	// 		let hb = _item.char.healthBarElem ?? document.getElementById(_id);
-	// 		if (!hb) {
-	// 			hb = document.createElement('div');
-	// 			hb.id = _id;
-	// 			hb.className = 'health-bar-tiny boss';
-	// 			hbInner = document.createElement('div');
-	// 			hbInner.className = 'health-bar-tiny-inner flex flex-jc-start';
-	// 			hb.appendChild(hbInner);
-	// 			if (_item.char.animations.block && _item.char.enemy) {
-	// 				const _enemyDefBar = document.createElement('div');
-	// 				_enemyDefBar.style = 'height:35%;width:100%;background:#9D00FF';
-	// 				_enemyDefBar.id = 'defbar-' + _id;
-	// 				_enemyDefBar.className = 'enemy-def-bar';
-	// 				hb.appendChild(_enemyDefBar);
-	// 				_item.char.hasFatiqueBar = 1;
-	// 			}
-	// 			if (_item.char.animations.air2 && _item.char.enemy) {
-	// 				const _enemyRageBar = document.createElement('div');
-	// 				_enemyRageBar.style = 'height:20%;width:100%';
-	// 				_enemyRageBar.className = 'enemy-rage-bar';
-	// 				const _innerRageBar = document.createElement('div');
-	// 				_innerRageBar.className = 'enemy-rage-bar-inner';
-	// 				_innerRageBar.id = "ragebar-" + _id;
-	// 				_enemyRageBar.appendChild(_innerRageBar);
-	// 				hb.appendChild(_enemyRageBar);
-	// 				_item.char.hasRageBar = 1;
-	// 			}
-	// 			_gameUI.appendChild(hb);
-	// 			_item.char.healthBarDrawn = true;
-	// 			hb.h = _item.char.HEIGHT;
-	// 			if (_item.char.grade > 1 && _item.char.gradeLeft > 0)
-	// 				hb.style.background = getGradeBGColor(_item.char.grade);
-	// 		}
-	// 		if(hbInner && 
-	// 			hbInner.gradeLeft != _item.char.gradeLeft) {
-	// 			hbInner.gradeLeft = _item.char.gradeLeft;
-	// 			hb.innerHTML = hb.innerHTML + '<span style="position:absolute;height:100%;display:flex;align-items:center;left:1cqw;top:0;color:#f7f7f7 !important;text-shadow:0 0 .5cqh #000">Lvl ' + _item.char.level + ' - ' + _item.char.displayName + '</span><span id="boss-grade-count" style="color:#f7f7f7 !important;text-shadow:0 0 .5cqh #000;position:absolute;top:0;height:100%;right:1cqw;display:flex;align-items:center">' + (_item.char.gradeLeft > 0 ? 'x' + (_item.char.gradeLeft + 1) : '') + '</span>';
-	// 		}
-	// 		hb.scrLeft = _hLeft;
-	// 		hb.scrTop = _hTop;
-	// 		if (!hbInner)
-	// 			hbInner = document.querySelector('#' + _id + ' .health-bar-tiny-inner');
-	// 		if(hbInner?.style && _hpRate !== hbInner.hpRate) {
-	// 			hbInner.style.width = _hpRate + '%';
-	// 			hbInner.hpRate =_hpRate;
-	// 		}
-	// 		if(!isWarPlayer) {
-	// 			if (!_item.char.autoMode) {
-	// 				addClass(hb, 'friendly-enemy');
-	// 				removeClass(hb, 'hostile-enemy');
-	// 			}
-	// 			else if (_item.char.autoMode === 2) {
-	// 				addClass(hb, 'hostile-enemy');
-	// 				removeClass(hb, 'friendly-enemy');
-	// 			}
-	// 		}
-	// 	}
-	// 	let _hpBG = !_item.char.gradeLeft ? '#B2BEB5' : getGradeBGColor(_item.char.gradeLeft + 1), _bg, _border;
-	// 	if (_item.char.gradeLeft > 0) {
-	// 		if(hbInner && hbInner.bg !== 1) {
-	// 			if (__account.questStatus.quest && (__account.questStatus.quest.loots ?? __account.questStatus.quest.kills)?.find(x => x.enemy?.indexOf(_item.char.id) >= 0))
-	// 				_border = '#B87333';
-	// 			let _color = _item.char.grade < 2 ? '#2E8B57' : getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
-	// 			if(!_isBoss)
-	// 				_bg = _color;
-	// 			else if(hbInner?.style)
-	// 				hbInner.style.background = _color;
-	// 			hbInner.bg = 1;
-	// 		}
-	// 	}
-	// 	else if (_hpRate > 50) {
-	// 		if(hbInner && hbInner.bg !== 4) {
-	// 			if (__account.questStatus.quest && (__account.questStatus.quest.loots ?? __account.questStatus.quest.kills)?.find(x => x.enemy?.indexOf(_item.char.id) >= 0))
-	// 				_border = '#B87333';
-	// 			_bg =  _item.char.grade < 2 ? '#2E8B57' : getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
-	// 			hbInner.bg = 4;
-	// 		}
-	// 	}
-	// 	else {//if (_hpRate > 0){
-	// 		if(hbInner && hbInner.bg !== 2) {
-	// 			_bg = 'yellow';
-	// 			hbInner.bg = 2;
-	// 		}
-	// 	}
-	// 	// else {
-	// 	// 	if(hbInner && hbInner.bg !== 3) {
-	// 	// 		_bg = 'red';
-	// 	// 		hbInner.bg = 3;
-	// 	// 	}
-	// 	// }
-	// 	if(_item.char.hurting?.count === 2)
-	// 		_border = '#f3f4f5';
-	// 	else if(!_border) {
-	// 		if (!_item.char.autoMode)
-	// 			_border = '#36454F';
-	// 		else if (_item.char.autoMode === 2)
-	// 			_border = '#C41E3A';
-	// 	}
-	// 	if (offCtx.reversed) 
-	// 		offCtx.restore();
-	// 	const _tinyHeight = MathRound(_hHeight / 5);
-	// 	const _H = (MathRound(_tinyHeight * 1.35) * 2) + _hHeight + 2;
-	// 	let _barHeight = MathRound(_tinyHeight * 1.5) + _hHeight;
-	// 	this.fillRoundedRect(offCtx, _hpBG, _hLeft, _hTop, _hWidth, _hHeight);
-	// 	this.fillRoundedRect(offCtx, _bg, _hLeft, _hTop, MathCeil(_hWidth * (_hpRate / 100)), _hHeight);
-    //     this.drawRoundedRect(offCtx, _border ?? '#E97451', 1, _hLeft, _hTop, _hWidth, _hHeight);
-	// 	//if(px === 1)
-    //     	//this.drawRoundedRect(offCtx, '#cccccc', 1, _hLeft, _hTop + 1, MathRound(MathCeil(_hWidth * (_hpRate / 100)) * .95), 1);
-	// 	// if (_item.char.animations.block && _item.char.enemy) {
-	// 	// 	const _fRate = (_item.char.fatique / _item.char.maxFatique);
-    //     // 	this.fillRoundedRect(offCtx, '#702963', _hLeft, _hTop + _hHeight, _hWidth, MathRound(_tinyHeight * 1.5));
-    //     // 	this.fillRoundedRect(offCtx, '#6082B6', _hLeft, _hTop + _hHeight, MathCeil(_hWidth * _fRate), MathRound(_tinyHeight * 1.5));
-	// 	// 	this.drawRoundedRect(offCtx, '#0437F2', 1, _hLeft, _hTop + _hHeight, _hWidth, MathRound(_tinyHeight * 1.35));
-	// 	// }
-	// 	// if(_item.char.animations.air2 && _item.char.enemy)
-	// 	// 	this.fillRoundedRect(offCtx, '#D2042D', _hLeft, _hTop + _hHeight + MathRound(_tinyHeight * 1.35), _hWidth, MathRound(_tinyHeight * 1.35));
-    //     if(_item.char.healthBarIcon) {
-	// 		_hTop -= (MathRound(((2 * _hHeight) - _barHeight) / 2) - 1);
-	// 		this.fillRoundedRect(offCtx, '#000000', _hLeft - _H - 2, _hTop - 2, _H + 4, _H + 4);
-	// 		getImage('./images/icons/' + _item.char.healthBarIcon + '.png', function(_img) {
-	// 			offCtx.drawImage(_img, _hLeft - _H, _hTop,_H,_H);
-	// 		});
-	// 	}
-	// 	if(offCtx.reversed) {
-	// 		offCtx.save();
-	// 		offCtx.scale(-1, 1);
-	// 	}
-	// }
+	};
+	this.fillRoundedRect = function (ctx, color, x, y, width, height) {
+		ctx.fillStyle = color;
+		ctx.fillRect(x, y, width, height);
+	};
+	this.drawRoundedRect = function (ctx, color, lineWidth, x, y, width, height) {
+		ctx.strokeStyle = color;
+		ctx.lineWidth = lineWidth;
+		ctx.strokeRect(x, y, width, height);
+	};
+
 	this.healthBarCache = this.healthBarCache ?? new Map();
 	this.w100 = MathRound(this.cWidth / 100);
 	this.VH3 = MathRound(window.innerHeight / 33);
-	// this.drawMobHealthBar = function(cofftx, _item, x, y, w) {
-	// 	const _char = _item.char;
-	// 	const h = MathRound(w * (26 / 124));
-	//     // HP Ratio
-	//     let ratio = Math.max(0, Math.min(1, _char.health / _char.MAXHP));
 
-	//     // İlk tick ise previousHPRatio yok → oluştur
-	//     if (_char.previousHPRatio === undefined) {
-	//         _char.previousHPRatio = ratio;
-	//         _char.damageFlash = 0; 
-	//     }
-
-	//     // HP düştüyse flash tetikle
-	//     if (ratio < _char.previousHPRatio) {
-	//         _char.damageFlash = 1; 
-	//     }
-
-	//     // Flash zamanla sönsün
-	//     if (_char.damageFlash > 0) {
-	//         _char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
-	//     }
-
-	//     // Yeni HP değerini sakla
-	//     _char.previousHPRatio = ratio;
-	// 	const _rev = offCtx.reversed;
-	// 	if(offCtx.reversed)
-	// 		offCtx.restore();
-
-	//     // --- 1. ÇERÇEVEYİ ÇİZ ---
-	//     cofftx.drawImage(this.HBMob, x, y, w, h);
-
-
-	//     // --- 2. INNER BAR MARGIN ---
-	// 	let padX = w * .06;
-	// 	let padY = h * .225;
-	//     let innerX = x + padX;
-	//     let innerY = y + padY;
-	//     let innerW = w - padX * 2;
-	//     let innerH = h - padY * 2;
-
-	//     // --- 3. HEALTH COLOR (yeşil → kırmızı) ---
-	//     let r = Math.floor(255 * (1 - ratio));
-	//     let g = Math.floor(255 * ratio);
-	//     let color = `rgb(${r},${g},0)`;
-
-	//     // Bar genişliği
-	//     let barW = innerW * ratio;
-
-	//     // Health bar'ı çiz
-	//     cofftx.save();
-	//     cofftx.fillStyle = color;
-	//     cofftx.fillRect(innerX, innerY, barW, innerH);
-	//     //cofftx.restore();
-
-
-	//     // --- 4. DAMAGE FLASH (otomatik) ---
-	//     if (_char.damageFlash > 0) {
-	//         //cofftx.save();
-	//         cofftx.globalAlpha = _char.damageFlash;
-	//         cofftx.fillStyle = "white";
-	//         cofftx.fillRect(innerX, innerY, innerW, innerH);
-	//         //cofftx.restore();
-	//     }
-	// 	cofftx.restore();
-	// 	if(_rev) {
-	// 		offCtx.save();
-	// 		offCtx.scale(-1, 1);
-	// 	}
-	// }
 	this.queueHealthBarDeath = function (_item) {
 		const _char = _item.char;
-		if (_char.class === __spell || _char.main)
-			return;
-		if (_char.hbBreak === undefined)
-			_char.hbBreak = 0;
+		if (_char.class === __spell || _char.main) return;
+		if (_char.hbBreak === undefined) _char.hbBreak = 0;
 		const _life = (_char.grade ?? 0) <= 1 ? 22 : 16;
 		if (_char.hbBreak >= _life) {
 			_char.hbBreak = -1;
@@ -7031,42 +4641,49 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		const _isBoss = _char.class === 'boss';
 		const _gradeBar = (_char.grade ?? 0) > 1;
 		let w = MathRound((this.cWidth / 100) * (_isBoss ? 10 : 4));
-		if (_char.healthBarWidthRate)
-			w = MathRound(_char.healthBarWidthRate * w);
+		if (_char.healthBarWidthRate) w = MathRound(_char.healthBarWidthRate * w);
 		const _xGap = MathRound((_char.WIDTH - w) / 2);
 		const _hLeft = MathRound(_char.EXACTLEFT + _xGap);
 		const _extraTop = MathRound(-10 * __zoom * __scale);
 		let _hHeight = this.cHeight / 75;
-		if (_char.healthBarHeightRate)
-			_hHeight *= _char.healthBarHeightRate;
+		if (_char.healthBarHeightRate) _hHeight *= _char.healthBarHeightRate;
 		const _hTop = MathRound(
-			(this.cHeight + _extraTop)
-			- _hHeight
-			- ((_item.hbGap ?? 0))
-			- _char.yPosition
-			- _char.HEIGHT
-			- (_item.yGap ?? 0)
-			- ((_char.yGap ?? 0))
+			this.cHeight +
+				_extraTop -
+				_hHeight -
+				(_item.hbGap ?? 0) -
+				_char.yPosition -
+				_char.HEIGHT -
+				(_item.yGap ?? 0) -
+				(_char.yGap ?? 0)
 		);
 		let h = MathRound(w * (26 / 124));
 		let img = this.HBMob;
 		if (_gradeBar) {
 			img = this.HBBoss;
-			w = MathRound(w * 252 / 105);
+			w = MathRound((w * 252) / 105);
 			if (_isBoss) {
-				h = MathRound(h * .6);
-				w = MathRound(w * .6);
+				h = MathRound(h * 0.6);
+				w = MathRound(w * 0.6);
 			}
 		}
-		if (!this._barDeathQueue)
-			this._barDeathQueue = [];
+		if (!this._barDeathQueue) this._barDeathQueue = [];
 		const _foot = this.charFoot(_char, _item.yGap);
 		const _box = this.scaleFromFoot(_hLeft, _hTop, w, h, _foot.x, _foot.y, this.getDepthDrawScale(_char));
-		this._barDeathQueue.push({ c:_char, x: _box.x, y: _box.y, w: _box.w, h: _box.h, step: step, img: img, bossPad: _gradeBar, life: _life });
-	}
+		this._barDeathQueue.push({
+			c: _char,
+			x: _box.x,
+			y: _box.y,
+			w: _box.w,
+			h: _box.h,
+			step: step,
+			img: img,
+			bossPad: _gradeBar,
+			life: _life
+		});
+	};
 	this.drawHealthBarDeath = function (ctx, x, y, w, h, step, img, bossPad, life) {
-		if (!img || w < 1 || h < 1)
-			return;
+		if (!img || w < 1 || h < 1) return;
 		const hold = 6;
 		life = life || 16;
 		const grown = 1 + 0.14 * Math.min(1, (step + 1) / hold);
@@ -7077,12 +4694,10 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 			narrow = 1 - t;
 			alpha = narrow * narrow;
 		}
-		if (narrow <= 0)
-			return;
+		if (narrow <= 0) return;
 		const dw = w * grown * narrow;
 		const dh = h * grown;
-		if (dw < 1)
-			return;
+		if (dw < 1) return;
 		const dx = x + (w - dw) * 0.5;
 		const dy = y - (dh - h) * 0.5;
 		ctx.save();
@@ -7093,7 +4708,7 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		ctx.fillStyle = '#B8B3AA';
 		ctx.fillRect(dx + padX, dy + padY, Math.max(0, dw - padX * 2), Math.max(0, dh - padY * 2));
 		ctx.restore();
-	}
+	};
 	this.drawMobHealthBar = function (ctx, _item, x, y, w) {
 		const _char = _item.char;
 		let h = MathRound(w * (26 / 124));
@@ -7107,18 +4722,23 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 			_char.damageFlash = 0;
 		}
 
-		if (ratio < _char.previousHPRatio)
-			_char.damageFlash = 1;
+		if (ratio < _char.previousHPRatio) _char.damageFlash = 1;
 
-		if (_char.damageFlash > 0)
-			_char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
+		if (_char.damageFlash > 0) _char.damageFlash = Math.max(0, _char.damageFlash - 0.1);
 
 		_char.previousHPRatio = ratio;
 
-		// 🔑 WORLD-SPACE FIX
-		let drawX = ctx.reversed ? (-x - w) : x;
+		let drawX = ctx.reversed ? -x - w : x;
 		const _foot = this.charFoot(_char, _item.yGap);
-		const _box = this.scaleFromFoot(drawX, y, w, h, ctx.reversed ? -_foot.x : _foot.x, _foot.y, this.getDepthDrawScale(_char));
+		const _box = this.scaleFromFoot(
+			drawX,
+			y,
+			w,
+			h,
+			ctx.reversed ? -_foot.x : _foot.x,
+			_foot.y,
+			this.getDepthDrawScale(_char)
+		);
 		drawX = _box.x;
 		y = _box.y;
 		w = _box.w;
@@ -7128,8 +4748,7 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		if (_char.hbPulse > 0) {
 			_ps = 1 + 0.08 * Math.sin(_char.hbPulse * Math.PI);
 			_char.hbPulse -= 0.1;
-			if (_char.hbPulse <= 0)
-				delete _char.hbPulse;
+			if (_char.hbPulse <= 0) delete _char.hbPulse;
 		}
 		if (_ps !== 1) {
 			const _cx = drawX + w * 0.5;
@@ -7140,7 +4759,6 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 			ctx.translate(-_cx, -_cy);
 		}
 
-		// --- FRAME ---
 		ctx.drawImage(this.HBMob, drawX, y, w, h);
 
 		const padX = w * 0.06;
@@ -7159,72 +4777,52 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		ctx.save();
 		ctx.fillStyle = `rgb(${r},${g},0)`;
 
-		// 🔥 YÖN FIX (ASIL MESELE)
-		ctx.fillRect(
-			ctx.reversed ? (innerX + innerW) : innerX,
-			innerY,
-			ctx.reversed ? -barW : barW,
-			innerH
-		);
+		ctx.fillRect(ctx.reversed ? innerX + innerW : innerX, innerY, ctx.reversed ? -barW : barW, innerH);
 
 		if (_char.damageFlash > 0) {
 			ctx.globalAlpha = _char.damageFlash;
-			ctx.fillStyle = "#fff";
-			ctx.fillRect(
-				ctx.reversed ? (innerX + innerW) : innerX,
-				innerY,
-				ctx.reversed ? -innerW : innerW,
-				innerH
-			);
+			ctx.fillStyle = '#fff';
+			ctx.fillRect(ctx.reversed ? innerX + innerW : innerX, innerY, ctx.reversed ? -innerW : innerW, innerH);
 		}
 
 		ctx.restore();
-		if (_ps !== 1)
-			ctx.restore();
+		if (_ps !== 1) ctx.restore();
 	};
 
+	this.drawBossName = function (cofftx, _char, x, y, w, padX, h) {
+		const name = getLangData(_char.displayName ?? _char.name ?? 'BOSS');
+		if (name === '') return;
 
-	this.drawBossName = function(cofftx, _char, x, y, w, padX, h) {
-
-		const name = getLangData(_char.displayName ?? _char.name ?? "BOSS");
-		if(name === '')
-			return;
-
-		// Font ölçeklemesi (her çözünürlükte temiz)
-		let fontSize = MathRound(w * 0.12); // genişliğe göre ayarlanır
+		let fontSize = MathRound(w * 0.12);
 
 		cofftx.save();
 
 		cofftx.font = `${fontSize}px 'Cinzel', serif`;
-		cofftx.textBaseline = "top";
-		cofftx.textAlign = "left";
+		cofftx.textBaseline = 'top';
+		cofftx.textAlign = 'left';
 
-		// Stroke kalınlığı (dinamik)
 		cofftx.lineWidth = fontSize * 0.15;
 
-		// --- OUTLINE ---
-		cofftx.strokeStyle = "black";
+		cofftx.strokeStyle = 'black';
 		cofftx.strokeText(name, x, y - fontSize);
 
-		// --- FILL ---
-		cofftx.fillStyle = "#F2F2F2"; // okunabilir kirli beyaz
+		cofftx.fillStyle = '#F2F2F2';
 		cofftx.fillText(name, x, y - fontSize);
-		if(_char.gradeLeft > 0) {
-			const gradeText = "x" + (_char.gradeLeft + 1);
-    		cofftx.textBaseline = "middle";
-			cofftx.strokeText(gradeText, x + w + padX, y + h/2);
-			cofftx.fillText(gradeText, x + w + padX, y + h/2);
+		if (_char.gradeLeft > 0) {
+			const gradeText = 'x' + (_char.gradeLeft + 1);
+			cofftx.textBaseline = 'middle';
+			cofftx.strokeText(gradeText, x + w + padX, y + h / 2);
+			cofftx.fillText(gradeText, x + w + padX, y + h / 2);
 		}
 		cofftx.restore();
 	};
-	this.drawBossHealthBar = function(cofftx, _item, x, y, w) {
-
+	this.drawBossHealthBar = function (cofftx, _item, x, y, w) {
 		const _char = _item.char;
-		let h = MathRound(w * (26 / 124)); // boss bar aspect ratio
-		w = MathRound(w * 252 / 105);
-		if(_char.class === 'boss') {
-			h = MathRound(h * .6);
-			w = MathRound(w * .6);
+		let h = MathRound(w * (26 / 124));
+		w = MathRound((w * 252) / 105);
+		if (_char.class === 'boss') {
+			h = MathRound(h * 0.6);
+			w = MathRound(w * 0.6);
 		}
 		const _foot = this.charFoot(_char, _item.yGap);
 		const _box = this.scaleFromFoot(x, y, w, h, _foot.x, _foot.y, this.getDepthDrawScale(_char));
@@ -7232,28 +4830,24 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		y = _box.y;
 		w = _box.w;
 		h = _box.h;
-		// HP Ratio
+
 		let ratio = Math.max(0, Math.min(1, _char.health / _char.MAXHP));
 
-		// Init
 		if (_char.previousHPRatio === undefined) {
 			_char.previousHPRatio = ratio;
 			_char.damageFlash = 0;
 		}
 
-		// Flash trigger
 		if (ratio < _char.previousHPRatio) {
 			_char.damageFlash = 1;
 		}
 
-		// Fade flash
 		if (_char.damageFlash > 0) {
-			_char.damageFlash = Math.max(0, _char.damageFlash - 0.10);
+			_char.damageFlash = Math.max(0, _char.damageFlash - 0.1);
 		}
 
 		_char.previousHPRatio = ratio;
 
-		// Reverse fix
 		const _rev = offCtx.reversed;
 		if (_rev) offCtx.restore();
 
@@ -7261,8 +4855,7 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		if (_char.hbPulse > 0) {
 			_ps = 1 + 0.08 * Math.sin(_char.hbPulse * Math.PI);
 			_char.hbPulse -= 0.1;
-			if (_char.hbPulse <= 0)
-				delete _char.hbPulse;
+			if (_char.hbPulse <= 0) delete _char.hbPulse;
 		}
 		if (_ps !== 1) {
 			const _cx = x + w * 0.5;
@@ -7273,25 +4866,22 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 			cofftx.translate(-_cx, -_cy);
 		}
 
-		// --- 1. ÇERÇEVE ---
 		cofftx.drawImage(this.HBBoss, x, y, w, h);
 
-		// --- 2. INNER BAR MARGIN ---
-		let padX = w * .03;
-		let padY = h * .225;
+		let padX = w * 0.03;
+		let padY = h * 0.225;
 		let innerX = x + padX;
 		let innerY = y + padY;
 		let innerW = w - padX * 2;
 		let innerH = h - padY * 2;
 
-		// --- 3. Renkler (daha parlak DF paleti) ---
 		const fantasy = [
-			"#C62828",
-			"#2ECC71",
-			"#2874A6",
-			"#E67E22",
-			"#8E44AD",
-			"#F1C40F",
+			'#C62828',
+			'#2ECC71',
+			'#2874A6',
+			'#E67E22',
+			'#8E44AD',
+			'#F1C40F',
 			'#1FA6A0',
 			'#7CB342',
 			'#C13A4A',
@@ -7304,156 +4894,151 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		let mainColor = fantasy[_char.gradeLeft + 1];
 		let underColor = fantasy[_char.gradeLeft];
 
-		// Bar width
 		let barW = innerW * ratio;
 
-		// --- 4. GradeLeft = 0 → Mob mantığı ---
 		if (_char.gradeLeft === 0) {
-
-			// arka plan yok (transparan)
-			// sadece ratio'lu ön bar var
-
 			if (ratio >= 0.5) {
-				// mob yeşil
-				mainColor = "#3CA64C";
+				mainColor = '#3CA64C';
 			} else {
-				// mob kırmızı
-				mainColor = "#B22222";
+				mainColor = '#B22222';
 			}
 
 			cofftx.save();
 			cofftx.fillStyle = mainColor;
 			cofftx.fillRect(innerX, innerY, barW, innerH);
 			cofftx.restore();
-
 		} else {
-
-			// --- 5. GradeLeft > 0 → Çift katmanlı boss bar ---
-
-			// Arka katman (gradeLeft)
 			cofftx.save();
 			cofftx.fillStyle = underColor;
 			cofftx.fillRect(innerX, innerY, innerW, innerH);
 			cofftx.restore();
 
-			// Üst katman (grade)
 			cofftx.save();
 			cofftx.fillStyle = mainColor;
 			cofftx.fillRect(innerX, innerY, barW, innerH);
 			cofftx.restore();
 		}
 
-		// --- 6. DAMAGE FLASH ---
 		if (_char.damageFlash > 0) {
 			cofftx.save();
 			cofftx.globalAlpha = _char.damageFlash;
-			cofftx.fillStyle = "white";
+			cofftx.fillStyle = 'white';
 			cofftx.fillRect(innerX, innerY, innerW, innerH);
 			cofftx.restore();
 		}
-		
-		if (_ps !== 1)
-			cofftx.restore();
-		this.drawBossName(cofftx, _item.char, x + padX, y, w, MathRound(padX * .5), h);
-		// Reverse geri al
+
+		if (_ps !== 1) cofftx.restore();
+		this.drawBossName(cofftx, _item.char, x + padX, y, w, MathRound(padX * 0.5), h);
+
 		if (_rev) {
 			offCtx.save();
 			offCtx.scale(-1, 1);
 		}
 	};
 
-	this.playerTag = function(_char) {
-		if(!_char || _char.class === __spell || _char.class === 'object' || _char.class === 'minion')
-			return;
-		if(_char.main || _char === mainCharacter)
-			return this.meSign;
-		if(!this._playerTags) {
+	this.playerTag = function (_char) {
+		if (!_char || _char.class === __spell || _char.class === 'object' || _char.class === 'minion') return;
+		if (_char.main || _char === mainCharacter) return this.meSign;
+		if (!this._playerTags) {
 			const _myTeam = mainCharacter?.realTeamId ?? mainCharacter?.teamId;
-			const _sid = function(x) {
+			const _sid = function (x) {
 				return String(x.socketId || x.duelSocket || x.key || x.id || '');
 			};
-			const _body = function(x) {
-				return x && x !== mainCharacter && !x.main && x.class !== __spell && x.class !== 'object' && x.class !== 'minion' && !x.ghost;
+			const _body = function (x) {
+				return (
+					x &&
+					x !== mainCharacter &&
+					!x.main &&
+					x.class !== __spell &&
+					x.class !== 'object' &&
+					x.class !== 'minion' &&
+					!x.ghost
+				);
 			};
-			const _mates = this.enemies.filter(x => _body(x) && _myTeam && x.teamId === _myTeam);
-			const _foes = this.enemies.filter(x => _body(x) && !(_myTeam && x.teamId === _myTeam));
+			const _mates = this.enemies.filter((x) => _body(x) && _myTeam && x.teamId === _myTeam);
+			const _foes = this.enemies.filter((x) => _body(x) && !(_myTeam && x.teamId === _myTeam));
 			_mates.sort((a, b) => _sid(a).localeCompare(_sid(b)));
 			_foes.sort((a, b) => _sid(a).localeCompare(_sid(b)));
 			const _map = new Map();
 			_mates.forEach((x, i) => _map.set(x, i ? this.p2Sign : this.p1Sign));
-			_foes.forEach(x => _map.set(x, this.rivalSign));
+			_foes.forEach((x) => _map.set(x, this.rivalSign));
 			this._playerTags = _map;
 		}
 		return this._playerTags.get(_char);
-	}
+	};
 	this.drawHealthBar2 = function (_item) {
-		const _isPvp = !this.gold && ((this.pvp || this.war) || _item.char.flagCapturer);
-		if (_item.char.hbBreak === -1 && (_item.char.health <= 0 || _item.char.dead))
-			return;
-		if ((_item.char.health <= 0 || _item.char.dead || _item.char.hbBreak >= 0) && !_isPvp && !_item.char.main && !_item.char.skipHealthBar) {
+		const _isPvp = !this.gold && (this.pvp || this.war || _item.char.flagCapturer);
+		if (_item.char.hbBreak === -1 && (_item.char.health <= 0 || _item.char.dead)) return;
+		if (
+			(_item.char.health <= 0 || _item.char.dead || _item.char.hbBreak >= 0) &&
+			!_isPvp &&
+			!_item.char.main &&
+			!_item.char.skipHealthBar
+		) {
 			this.queueHealthBarDeath(_item);
 			return;
 		}
-		if(__batterySaveMode || _item.char.health <= 0 || _item.char.dead)
-			return;
-		if(_item.char.skipHealthBar && !_isPvp)
-			return;
-
-		// if(!(_item.char.grade > 1))
-		// 	return;
+		if (__batterySaveMode || _item.char.health <= 0 || _item.char.dead) return;
+		if (_item.char.skipHealthBar && !_isPvp) return;
 
 		if (_item.char.main || (_isPvp && _item.char.alp)) {
 			this.drawBuffs(_item.char, 'big');
-			if(!_isPvp)
-				return;
+			if (!_isPvp) return;
 		}
-		if(!_isPvp) {
-			if(_item.char.hpDropped < (_gameTick - 4000))
+		if (!_isPvp) {
+			if (_item.char.hpDropped < _gameTick - 4000) return;
+			const _pass = _item.char.class !== 'boss' && _item.char.phased == undefined;
+			if (
+				!_item.char.key ||
+				(!_item.char.hpDropped && _pass) ||
+				_item.char.MAXHP <= 1 ||
+				_item.char.class === __spell ||
+				_item.animation === 'respawn'
+			)
 				return;
-			const _pass = (_item.char.class !== 'boss' && _item.char.phased == undefined);
-			if (!_item.char.key || (!_item.char.hpDropped && _pass) || _item.char.MAXHP <= 1 || _item.char.class === __spell || _item.animation === 'respawn')
-				return;
-			if (_pass && _item.char.hpDropped < mainCharacter.attackedUnitTime)
-				return;
-		}
-		else{
+			if (_pass && _item.char.hpDropped < mainCharacter.attackedUnitTime) return;
+		} else {
 			const isWarPlayer = _item.char.enemy;
 			const _extraTop = isWarPlayer ? MathRound(-40 * __zoom * __scale) : MathRound(-10 * __zoom * __scale);
 			let _hHeight = this.cUIHeight / 75;
-			if (_item.char.healthBarHeightRate)
-				_hHeight *= _item.char.healthBarHeightRate;
+			if (_item.char.healthBarHeightRate) _hHeight *= _item.char.healthBarHeightRate;
 
 			const _hTop = MathRound(
-				(this.cHeight + _extraTop)
-				- _hHeight
-				- ((_item.hbGap ?? 0))
-				- _item.char.yPosition
-				- _item.char.HEIGHT
-				- (_item.yGap ?? 0)
-				- ((_item.char.yGap ?? 0))
+				this.cHeight +
+					_extraTop -
+					_hHeight -
+					(_item.hbGap ?? 0) -
+					_item.char.yPosition -
+					_item.char.HEIGHT -
+					(_item.yGap ?? 0) -
+					(_item.char.yGap ?? 0)
 			);
 			const _sign = this.playerTag(_item.char);
-			if(offCtx.reversed)
-				offCtx.restore();
-			if(_sign) {
+			if (offCtx.reversed) offCtx.restore();
+			if (_sign) {
 				const _base = MathRound(this.cWidth / 44);
 				let _size = _base;
-				if(_sign !== this.meSign)
-					_size = MathRound(_base * 1.35);
-				else
-					_size = MathRound(_base * 1.25);
-				if(_sign === this.rivalSign)
-					_size = MathRound(_size * 1.26);
-				const _tx = MathRound(_item.char.EXACTLEFT + (_item.char.WIDTH / 2) - (_size / 2));
+				if (_sign !== this.meSign) _size = MathRound(_base * 1.35);
+				else _size = MathRound(_base * 1.25);
+				if (_sign === this.rivalSign) _size = MathRound(_size * 1.26);
+				const _tx = MathRound(_item.char.EXACTLEFT + _item.char.WIDTH / 2 - _size / 2);
 				const _ty = _hTop + MathRound(_hHeight * 2) - _size;
 				const _foot = this.charFoot(_item.char, _item.yGap);
-				const _box = this.scaleFromFoot(_tx, _ty, _size, _size, _foot.x, _foot.y, this.getDepthDrawScale(_item.char));
+				const _box = this.scaleFromFoot(
+					_tx,
+					_ty,
+					_size,
+					_size,
+					_foot.x,
+					_foot.y,
+					this.getDepthDrawScale(_item.char)
+				);
 				offCtx.save();
 				offCtx.imageSmoothingEnabled = true;
 				offCtx.drawImage(_sign, _box.x, _box.y, _box.w, _box.h);
 				offCtx.restore();
 			}
-			if(offCtx.reversed) {
+			if (offCtx.reversed) {
 				offCtx.save();
 				offCtx.scale(-1, 1);
 			}
@@ -7461,7 +5046,6 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		}
 		const _hpRate = _item.char.healthRate;
 
-		// === 4'lü gruba dönüştür ===
 		let hpGroupRate;
 		if (_hpRate >= 70) hpGroupRate = 100;
 		else if (_hpRate >= 50) hpGroupRate = 75;
@@ -7471,82 +5055,71 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		const _isBoss = _item.char.class === 'boss';
 
 		let _hWidth = MathRound((this.cWidth / 100) * (_isBoss ? 10 : 4));
-		if (_item.char.healthBarWidthRate)
-			_hWidth = MathRound(_item.char.healthBarWidthRate * _hWidth);
+		if (_item.char.healthBarWidthRate) _hWidth = MathRound(_item.char.healthBarWidthRate * _hWidth);
 
 		const _xGap = MathRound((_item.char.WIDTH - _hWidth) / 2);
 		const _hLeft = MathRound(_item.char.EXACTLEFT + _xGap);
 		const isWarPlayer = _item.char.enemy && _isPvp;
 		const _extraTop = isWarPlayer ? MathRound(-40 * __zoom * __scale) : MathRound(-10 * __zoom * __scale);
 		let _hHeight = this.cHeight / 75;
-		if (_item.char.healthBarHeightRate)
-			_hHeight *= _item.char.healthBarHeightRate;
+		if (_item.char.healthBarHeightRate) _hHeight *= _item.char.healthBarHeightRate;
 		const _hTop = MathRound(
-			(this.cHeight + _extraTop)
-			- _hHeight
-			- ((_item.hbGap ?? 0))
-			- _item.char.yPosition
-			- _item.char.HEIGHT
-			- (_item.yGap ?? 0)
-			- ((_item.char.yGap ?? 0))
+			this.cHeight +
+				_extraTop -
+				_hHeight -
+				(_item.hbGap ?? 0) -
+				_item.char.yPosition -
+				_item.char.HEIGHT -
+				(_item.yGap ?? 0) -
+				(_item.char.yGap ?? 0)
 		);
 		_hHeight = MathCeil(_hHeight);
-		if(!(_item.char.grade > 1))
-			this.drawMobHealthBar(offCtx, _item, _hLeft, _hTop, _hWidth);
-		else 
-			this.drawBossHealthBar(offCtx, _item, _hLeft, _hTop, _hWidth);
+		if (!(_item.char.grade > 1)) this.drawMobHealthBar(offCtx, _item, _hLeft, _hTop, _hWidth);
+		else this.drawBossHealthBar(offCtx, _item, _hLeft, _hTop, _hWidth);
 		return;
 		const _hpBG = !_item.char.gradeLeft ? '#B2BEB5' : getGradeBGColor(_item.char.gradeLeft + 1);
 		let _bg = 'yellow';
 		if (hpGroupRate === 100 || hpGroupRate === 75)
 			_bg = _item.char.grade < 2 ? '#0BDA51' : getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
-		else if(_item.char.gradeLeft)
-			_bg = getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
-		// === Cache'e bak ===
+		else if (_item.char.gradeLeft) _bg = getGradeBGColor((_item.char.gradeLeft ?? 0) + 2);
+
 		const cacheKey = _isPvp ? `group-${_item.char.teamId}` : `group-${hpGroupRate}-${_hWidth}x${_hHeight}-${_bg}`;
 		let cached = this.healthBarCache.get(cacheKey);
 
 		if (!cached) {
-			
-			
-			// let _border = '#E97451';
-			// if(_item.char.hurting?.count === 2) _border = '#f3f4f5';
-			// else if (!_item.char.autoMode) _border = '#36454F';
-			// else if (_item.char.autoMode === 2) _border = '#C41E3A';
-
 			const c = document.createElement('canvas');
-			if(_isPvp) {
+			if (_isPvp) {
 				const _ch = _hHeight * 2;
 				c.width = _hWidth;
 				c.height = _ch;
 				const ctx = c.getContext('2d');
 				ctx.imageSmoothingEnabled = false;
 
-				// Üçgenin noktaları
-				const x1 = MathRound(_hWidth * .25), y1 = 0;   // sol üst
-				const x2 = MathRound(_hWidth * .75), y2 = 0;  // sağ üst
-				const x3 = MathRound(_hWidth * .5), y3 = _ch; // alt orta (uç)
+				const x1 = MathRound(_hWidth * 0.25),
+					y1 = 0;
+				const x2 = MathRound(_hWidth * 0.75),
+					y2 = 0;
+				const x3 = MathRound(_hWidth * 0.5),
+					y3 = _ch;
 
-				// Çizim
 				ctx.beginPath();
 				ctx.moveTo(x1, y1);
 				ctx.lineTo(x2, y2);
 				ctx.lineTo(x3, y3);
 				ctx.closePath();
 
-				// Dolgu rengi
-				ctx.fillStyle = _item.char.main ? "orange" : "red";
+				ctx.fillStyle = _item.char.main ? 'orange' : 'red';
 				ctx.fill();
 
-				// Çerçeve (opsiyonel)
-				ctx.strokeStyle = "black";
+				ctx.strokeStyle = 'black';
 				ctx.lineWidth = MathCeil(episode.cHeight / 500);
 				ctx.stroke();
-			}
-			else {
+			} else {
 				const _isGradedChar = _item.char.grade > 1 && _item.char.gradeLeft > 0;
-				const _maxTextHeight = _isGradedChar ? (_hHeight * 2) : _hHeight;
-				const _maxTextWidth = (_isGradedChar ? (_maxTextHeight * ((_item.char.gradeLeft + 1).toString().length + 1)) + (this.cWidth / 100) : 0);
+				const _maxTextHeight = _isGradedChar ? _hHeight * 2 : _hHeight;
+				const _maxTextWidth = _isGradedChar
+					? _maxTextHeight * ((_item.char.gradeLeft + 1).toString().length + 1) + this.cWidth / 100
+					: 0;
 				c.width = MathRound(_hWidth + _maxTextWidth);
 				c.height = _maxTextHeight;
 				const ctxY = MathFloor((_maxTextHeight - _hHeight) / 2);
@@ -7554,8 +5127,8 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 				ctx.imageSmoothingEnabled = false;
 				this.fillRoundedRect(ctx, _hpBG, 0, ctxY, _hWidth, _hHeight);
 				this.fillRoundedRect(ctx, _bg, 0, ctxY, MathCeil(_hWidth * (hpGroupRate / 100)), _hHeight);
-				//this.drawRoundedRect(ctx, '#C41E3A', 1, 0, ctxY, _hWidth, _height);
-				if(_isGradedChar){
+
+				if (_isGradedChar) {
 					ctx.fillStyle = '#262626';
 					ctx.font = 'bold ' + _maxTextHeight + 'px "Courier New", monospace';
 					const _txt = 'x' + (_item.char.gradeLeft + 1);
@@ -7563,53 +5136,44 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 					ctx.fillRect(_hWidth, 0, metrics.width + this.w100, _maxTextHeight);
 					ctx.fillStyle = '#f3f4f5';
 					ctx.textBaseline = 'middle';
-					ctx.fillText(_txt, 
-						_hWidth + MathRound(this.w100 / 2), _hHeight);
+					ctx.fillText(_txt, _hWidth + MathRound(this.w100 / 2), _hHeight);
 				}
 			}
 			this.healthBarCache.set(cacheKey, c);
 			cached = c;
 		}
-		if(offCtx.reversed)
-			offCtx.restore();
+		if (offCtx.reversed) offCtx.restore();
 		offCtx.drawImage(cached, _hLeft, _hTop);
-		if(offCtx.reversed) {
+		if (offCtx.reversed) {
 			offCtx.save();
 			offCtx.scale(-1, 1);
 		}
 	};
 	this.drawRelatedObjects = function (_item, _arr) {
-		if(!_arr?.[0] || this.disposing || __batterySaveMode || _item.alpha)
-			return;
-		let shouldRemove, _draw, removeIds = [];
+		if (!_arr?.[0] || this.disposing || __batterySaveMode || _item.alpha) return;
+		let shouldRemove,
+			_draw,
+			removeIds = [];
 		for (let _rel of _arr) {
-			if(_rel.ground)
-				continue;
-			if(!_rel.background && !__account.options.effect)
-				continue;
+			if (_rel.ground) continue;
+			if (!_rel.background && !__account.options.effect) continue;
 			var _can = _rel.background ? _cNPC : offCtx;
 			let _left = _item.left;
-			if(this.still && _rel.background){
+			if (this.still && _rel.background) {
 				delete _rel.background;
 				_left = _item.char.LEFT;
 			}
 			_draw = _item.char.main;
-			if (_rel.bind && _item.char.animation.startsWith(_rel.bind))
-				_draw = true;
+			if (_rel.bind && _item.char.animation.startsWith(_rel.bind)) _draw = true;
 			else if (_rel.bind) {
 				_rel.remove = true;
-				if(_rel.type === 'buff' && _item.char.buffs?.find(x => x.key === _rel.bind)){
+				if (_rel.type === 'buff' && _item.char.buffs?.find((x) => x.key === _rel.bind)) {
 					delete _rel.remove;
 					_draw = true;
-				}
-				else
-					_draw = false;
-			}
-			else if (_rel.remove){
-				if(!shouldRemove)
-					shouldRemove = 1;
-				if(_rel.removeId)
-					removeIds.push(_rel.removeId);
+				} else _draw = false;
+			} else if (_rel.remove) {
+				if (!shouldRemove) shouldRemove = 1;
+				if (_rel.removeId) removeIds.push(_rel.removeId);
 				continue;
 			}
 			if (_rel.delay) {
@@ -7622,32 +5186,24 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 				_rel.stillLeft = _rel.stillReversed = undefined;
 			}
 			if (_rel.totalFrames) {
-				if (_rel.start === undefined){
+				if (_rel.start === undefined) {
 					_rel.start = 0;
 					_item.char.calculateRelatedTop(_rel, _rel.position);
 				}
-				if (_rel.frame === undefined)
-					_rel.frame = 0;
-				if (_rel.start > 0 && ((_rel.start % (_rel.speed * (/*_item.char.fps ??*/ 1))) === 0)) {
+				if (_rel.frame === undefined) _rel.frame = 0;
+				if (_rel.start > 0 && _rel.start % (_rel.speed * 1) === 0) {
 					_rel.frame++;
-					if (_rel.skip && (_rel.frame % _rel.skip) === 0)
-						_rel.frame++;
+					if (_rel.skip && _rel.frame % _rel.skip === 0) _rel.frame++;
 					_rel.start = 0;
 					_item.char.calculateRelatedTop(_rel, _rel.position);
 					if (_rel.frame >= _rel.totalFrames) {
 						if (!_rel.stay) {
 							if (_rel.repeat) {
-								if(typeof _rel.repeat === 'number')
-									_rel.repeat--;
-								if(!_rel.repeat)
-									_rel.remove = true;
-								else
-									_rel.frame = 0;
-							}
-							else
-								_rel.remove = true;
-						}
-						else {
+								if (typeof _rel.repeat === 'number') _rel.repeat--;
+								if (!_rel.repeat) _rel.remove = true;
+								else _rel.frame = 0;
+							} else _rel.remove = true;
+						} else {
 							_rel.stay--;
 							_rel.frame--;
 						}
@@ -7655,47 +5211,45 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 				}
 			}
 			if (!_rel.remove || _draw) {
-				if (_rel.sound && _rel.start === 0 && _rel.frame === 0)
-					this.playSound(_rel.sound);
-				let _reversed = (((_rel.reversed ? 1 : 0) + (_item.reversed ? 1 : 0)) % 2) > 0;
-				if (_rel.still && (_rel.stillLeft === undefined || (_rel.stillReversed !== undefined && _rel.stillReversed !== _reversed))) {
+				if (_rel.sound && _rel.start === 0 && _rel.frame === 0) this.playSound(_rel.sound);
+				let _reversed = ((_rel.reversed ? 1 : 0) + (_item.reversed ? 1 : 0)) % 2 > 0;
+				if (
+					_rel.still &&
+					(_rel.stillLeft === undefined ||
+						(_rel.stillReversed !== undefined && _rel.stillReversed !== _reversed))
+				) {
 					_rel.stillPlatformX = platformX;
-					if(_rel.background && (_rel.stillLeft === undefined))
-						_rel.stillLeft = _item.left;
-					else if(!_rel.background)
-						_rel.stillLeft = _item.left;
+					if (_rel.background && _rel.stillLeft === undefined) _rel.stillLeft = _item.left;
+					else if (!_rel.background) _rel.stillLeft = _item.left;
 					_rel.stillTop = _rel.top;
-					// if(_rel.xGapMin && _rel.xGapMax)
-					// 	_rel.xGap = 0; //MathRound(getRandomValue2(_rel.xGapMin, _rel.xGapMax) / (__zoom *__scale));
-					// if(_rel.yGapMin && _rel.yGapMax)
-					// 	_rel.yGap = 0; // MathRound(getRandomValue2(_rel.yGapMin, _rel.yGapMax) / (__zoom *__scale));
-					_rel.stillXGap = (_rel.xGap + ((_rel.reversable === false && _item.reversed) ? _item.char.WIDTH : 0));
-					if (_rel.reversable != false)
-						_rel.stillReversed = _reversed;
-				} 
-				else if(_rel.type === 'buff') {
+
+					_rel.stillXGap = _rel.xGap + (_rel.reversable === false && _item.reversed ? _item.char.WIDTH : 0);
+					if (_rel.reversable != false) _rel.stillReversed = _reversed;
+				} else if (_rel.type === 'buff') {
 					_rel.xGap = _item.char.getObjectXGap(_rel, {});
 					_rel.stillPlatformX = platformX;
 					_rel.stillReversed = _reversed;
 					_rel.stillLeft = _left;
-					_rel.stillXGap = _rel.xGap + ((_item.reversed ? 1 : -1) * (_rel.stillLeft === undefined ? 0 : _rel.stillLeft - _left));
+					_rel.stillXGap =
+						_rel.xGap +
+						(_item.reversed ? 1 : -1) * (_rel.stillLeft === undefined ? 0 : _rel.stillLeft - _left);
 					_rel.stillTop = _rel.top;
-				}else if(_rel.stillOnChar) {
-					if(_rel.stillLeft !== _left || _rel.type === 'buff'){
-						if(!_rel.still && _rel.type !== 'buff')
-							_rel.still = true;
+				} else if (_rel.stillOnChar) {
+					if (_rel.stillLeft !== _left || _rel.type === 'buff') {
+						if (!_rel.still && _rel.type !== 'buff') _rel.still = true;
 						_rel.stillPlatformX = platformX;
 						_rel.stillLeft = _left;
-						_rel.stillXGap = _rel.xGap + ((_item.reversed ? 1 : -1) * (_rel.stillLeft === undefined ? 0 : _rel.stillLeft - _left));
+						_rel.stillXGap =
+							_rel.xGap +
+							(_item.reversed ? 1 : -1) * (_rel.stillLeft === undefined ? 0 : _rel.stillLeft - _left);
 						_rel.stillReversed = _reversed;
 					}
-					if(_rel.stillTop !== _rel.top) {
-						if(!_rel.stillY || _rel.stillTop === undefined)
-							_rel.stillTop = _rel.top;
+					if (_rel.stillTop !== _rel.top) {
+						if (!_rel.stillY || _rel.stillTop === undefined) _rel.stillTop = _rel.top;
 					}
 				}
-				let _relLeft = (_rel.stillLeft !== undefined ? _rel.stillLeft + (_rel.stillPlatformX - platformX) :
-					_left);
+				let _relLeft =
+					_rel.stillLeft !== undefined ? _rel.stillLeft + (_rel.stillPlatformX - platformX) : _left;
 				let _restored;
 				if (_reversed) {
 					if (_rel.reversable != false) {
@@ -7704,14 +5258,12 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 							_can.scale(-1, 1);
 							_can.reversed = true;
 						}
-					}
-					else if (_can.reversed && !_rel.background) {
+					} else if (_can.reversed && !_rel.background) {
 						_can.restore();
 						_can.reversed = false;
 						_restored = 1;
 					}
-				}
-				else if (_can.reversed && !_rel.background) {
+				} else if (_can.reversed && !_rel.background) {
 					_can.restore();
 					_can.reversed = false;
 					_restored = 1;
@@ -7720,125 +5272,134 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 					_can.save();
 					_can.scale(-1, 1);
 					_can.reversed = true;
-				}
-				else if (!_restored && _rel.stillReversed === false && _can.reversed && !_rel.background) {
+				} else if (!_restored && _rel.stillReversed === false && _can.reversed && !_rel.background) {
 					_can.restore();
 					_can.reversed = false;
 				}
-				if(_rel.background && _rel.stillLeft !== undefined)
-					_relLeft = _rel.stillLeft;
-				let _xGap = _rel.locate ? ((_rel.stillXGap ?? _rel.xGap) ?? 0) : (MathAbs(_rel.stillXGap ?? _rel.xGap) ?? 0);
-				_relLeft += ((_can.reversed ? 1 : -1) * (_xGap));
-				if (_can.reversed)
-					_relLeft *= -1;
-				let _fl = _rel.frame, _ft = 0;
+				if (_rel.background && _rel.stillLeft !== undefined) _relLeft = _rel.stillLeft;
+				let _xGap = _rel.locate
+					? (_rel.stillXGap ?? _rel.xGap ?? 0)
+					: (MathAbs(_rel.stillXGap ?? _rel.xGap) ?? 0);
+				_relLeft += (_can.reversed ? 1 : -1) * _xGap;
+				if (_can.reversed) _relLeft *= -1;
+				let _fl = _rel.frame,
+					_ft = 0;
 				if (_rel.col) {
 					const frameIndex = _rel.frame;
 					_fl = frameIndex % _rel.col;
-					_ft = (frameIndex / _rel.col | 0) * _rel.height;
+					_ft = ((frameIndex / _rel.col) | 0) * _rel.height;
 				}
-				if(!__batterySaveMode || _rel.background) {
+				if (!__batterySaveMode || _rel.background) {
 					let _spr = _rel.sprite;
-					if(_rel.color)
-						_spr = this.colorizeRelSprite4({
-							sprite: _spr,
-							char: _item.char,
-							width: MathRound(_rel.width / _rel.zoom),
-							zoom: _rel.zoom ?? 1,
-							height: MathRound(_rel.height / _rel.zoom),
-							spriteX: ((_fl ?? 0) * _rel.width) + (_rel.baseLeft ?? 0),
-							spriteY:  _ft + (_rel.baseTop ?? 0),
-							spriteWidth: _rel.width - (_rel.baseRight ?? 0),
-							spriteHeight: _rel.height
-						}, _rel.color, _rel.key + '-frame' + (_rel.frame ?? 0));
-					if(_spr?.width > 0){
+					if (_rel.color)
+						_spr = this.colorizeRelSprite4(
+							{
+								sprite: _spr,
+								char: _item.char,
+								width: MathRound(_rel.width / _rel.zoom),
+								zoom: _rel.zoom ?? 1,
+								height: MathRound(_rel.height / _rel.zoom),
+								spriteX: (_fl ?? 0) * _rel.width + (_rel.baseLeft ?? 0),
+								spriteY: _ft + (_rel.baseTop ?? 0),
+								spriteWidth: _rel.width - (_rel.baseRight ?? 0),
+								spriteHeight: _rel.height
+							},
+							_rel.color,
+							_rel.key + '-frame' + (_rel.frame ?? 0)
+						);
+					if (_spr?.width > 0) {
 						let _dx = MathRound(_relLeft);
-						let _dy = MathRound((_rel.stillTop ?? _rel.top) - (((_rel.stillTop ? 0 : (_item.yGap ?? 0)) + ((_rel.yGap ?? 0))) / __scale));
+						let _dy = MathRound(
+							(_rel.stillTop ?? _rel.top) -
+								((_rel.stillTop ? 0 : (_item.yGap ?? 0)) + (_rel.yGap ?? 0)) / __scale
+						);
 						let _dw = MathFloor((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom);
 						let _dh = MathFloor(_rel.height * _rel.zoom);
 						const _relFootX = _item.left + _item.width / 2;
-						const _relBox = this.scaleFromFoot(_dx, _dy, _dw, _dh, _can.reversed ? -_relFootX : _relFootX, _item.top + _item.height, this.getDepthDrawScale(_item.char));
+						const _relBox = this.scaleFromFoot(
+							_dx,
+							_dy,
+							_dw,
+							_dh,
+							_can.reversed ? -_relFootX : _relFootX,
+							_item.top + _item.height,
+							this.getDepthDrawScale(_item.char)
+						);
 						_dx = _relBox.x;
 						_dy = _relBox.y;
 						_dw = MathFloor(_relBox.w);
 						_dh = MathFloor(_relBox.h);
-						if(_rel.alpha < 1) {
-							this.drawSpriteWithFade(_can, _spr, 
-								((_fl ?? 0) * _rel.width) + (_rel.baseLeft ?? 0), 
-								_ft + (_rel.baseTop ?? 0), 
-								_rel.width - (_rel.baseRight ?? 0), 
+						if (_rel.alpha < 1) {
+							this.drawSpriteWithFade(
+								_can,
+								_spr,
+								(_fl ?? 0) * _rel.width + (_rel.baseLeft ?? 0),
+								_ft + (_rel.baseTop ?? 0),
+								_rel.width - (_rel.baseRight ?? 0),
 								_rel.height,
-							_dx,
-							_dy,
-							_dw, 
-							_dh, _rel.alpha);
-							if(_rel.fadeZoom)
-								_rel.zoom *= _rel.fadeZoom;
-						}
-						else 
-							_can.drawImage(_spr, ((_fl ?? 0) * _rel.width) + (_rel.baseLeft ?? 0), _ft + (_rel.baseTop ?? 0), _rel.width - (_rel.baseRight ?? 0), _rel.height,
-							_dx,
-							_dy,
-							_dw, _dh);
+								_dx,
+								_dy,
+								_dw,
+								_dh,
+								_rel.alpha
+							);
+							if (_rel.fadeZoom) _rel.zoom *= _rel.fadeZoom;
+						} else
+							_can.drawImage(
+								_spr,
+								(_fl ?? 0) * _rel.width + (_rel.baseLeft ?? 0),
+								_ft + (_rel.baseTop ?? 0),
+								_rel.width - (_rel.baseRight ?? 0),
+								_rel.height,
+								_dx,
+								_dy,
+								_dw,
+								_dh
+							);
 					}
-					if(_rel.fade) {
-						if(!_rel.alpha)
-							_rel.alpha = 1;
+					if (_rel.fade) {
+						if (!_rel.alpha) _rel.alpha = 1;
 						_rel.alpha -= _rel.fade;
-						if(_rel.alpha <= 0)
-							_rel.remove = true;
+						if (_rel.alpha <= 0) _rel.remove = true;
 					}
 				}
 			}
-			if(_rel.remove && !shouldRemove)
-				shouldRemove = 1;
-			if (_rel.start >= 0){
-				if(!_rel.delayedByHitStop && _item.char.hitStop)
-					_rel.delayedByHitStop = 1;
-				else
-					_rel.start++;
+			if (_rel.remove && !shouldRemove) shouldRemove = 1;
+			if (_rel.start >= 0) {
+				if (!_rel.delayedByHitStop && _item.char.hitStop) _rel.delayedByHitStop = 1;
+				else _rel.start++;
 			}
 		}
-		if(shouldRemove) {
-			if(removeIds?.[0])
-				for(let ri of removeIds)
-				{
-					const _index = this.limitedEffects.findIndex(x => x.removeId === ri);
-					if(_index !== -1)
-						this.limitedEffects.splice(_index, 1);
+		if (shouldRemove) {
+			if (removeIds?.[0])
+				for (let ri of removeIds) {
+					const _index = this.limitedEffects.findIndex((x) => x.removeId === ri);
+					if (_index !== -1) this.limitedEffects.splice(_index, 1);
 				}
-			_item.char.relatedObjects = _item.char.relatedObjects.filter(x => !x.remove);
+			_item.char.relatedObjects = _item.char.relatedObjects.filter((x) => !x.remove);
 		}
-	}
+	};
 
 	this.drawGoreObjects = function (_item) {
-		if(!__account.options.gore || this.disposing)
-			return;
+		if (!__account.options.gore || this.disposing) return;
 		for (var _rel of _item.objects) {
-			if (!_rel.ground || _rel.remove)
-				continue;
+			if (!_rel.ground || _rel.remove) continue;
 			if (_rel.delay) {
 				_rel.delay--;
 				continue;
 			}
 			if (_rel.totalFrames) {
-				if (_rel.start === undefined)
-					_rel.start = 0;
-				if (_rel.frame === undefined)
-					_rel.frame = 0;
-				if (_rel.start > 0 && ((_rel.start % _rel.speed) === 0)) {
+				if (_rel.start === undefined) _rel.start = 0;
+				if (_rel.frame === undefined) _rel.frame = 0;
+				if (_rel.start > 0 && _rel.start % _rel.speed === 0) {
 					_rel.frame++;
-					if (_rel.skip && (_rel.frame % _rel.skip) === 0)
-						_rel.frame++;
+					if (_rel.skip && _rel.frame % _rel.skip === 0) _rel.frame++;
 					_rel.start = 0;
 					if (_rel.frame >= _rel.totalFrames) {
 						if (!_rel.stay) {
-							if (_rel.repeat)
-								_rel.frame = 0;
-							else
-								_rel.remove = true;
-						}
-						else {
+							if (_rel.repeat) _rel.frame = 0;
+							else _rel.remove = true;
+						} else {
 							_rel.stay--;
 							_rel.frame--;
 						}
@@ -7846,16 +5407,17 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 				}
 			}
 			if (!_rel.remove) {
-				let _reversed = (((_rel.reversed ? 1 : 0) + (_item.reversed ? 1 : 0)) % 2) > 0;
-				if (_rel.still && !_rel.stillOnChar && (_rel.stillLeft === undefined)) {
+				let _reversed = ((_rel.reversed ? 1 : 0) + (_item.reversed ? 1 : 0)) % 2 > 0;
+				if (_rel.still && !_rel.stillOnChar && _rel.stillLeft === undefined) {
 					_rel.stillPlatformX = platformX;
-					_rel.stillLeft = (_item.char.main ? _item.left + platformX : _item.left) + ((_reversed ? 1 : -1) * (_rel.xGap ?? 0));
+					_rel.stillLeft =
+						(_item.char.main ? _item.left + platformX : _item.left) +
+						(_reversed ? 1 : -1) * (_rel.xGap ?? 0);
 					_rel.stillTop = _rel.top;
-					if(_reversed)
-						_rel.stillReversed = _reversed;
+					if (_reversed) _rel.stillReversed = _reversed;
 				}
-				let _relLeft = (_rel.stillLeft !== undefined ? _rel.stillLeft + (_rel.stillPlatformX - platformX) :
-					_item.left);
+				let _relLeft =
+					_rel.stillLeft !== undefined ? _rel.stillLeft + (_rel.stillPlatformX - platformX) : _item.left;
 				if (_rel.stillReversed ?? _reversed) {
 					if (_rel.reversable != false) {
 						if (!offGoreCtx.reversed) {
@@ -7863,176 +5425,137 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 							offGoreCtx.scale(-1, 1);
 							offGoreCtx.reversed = true;
 						}
-					}
-					else if (offGoreCtx.reversed) {
+					} else if (offGoreCtx.reversed) {
 						offGoreCtx.restore();
 						offGoreCtx.reversed = false;
 					}
-				}
-				else if (offGoreCtx.reversed) {
+				} else if (offGoreCtx.reversed) {
 					offGoreCtx.restore();
 					offGoreCtx.reversed = false;
 				}
 				if (offGoreCtx.reversed) {
 					_relLeft *= -1;
-					_relLeft += (_rel.stillPlatformX ?? platformX)
-				}
-				else
-					_relLeft -= (_rel.stillPlatformX ?? platformX)
-				let _fl = _rel.frame, _ft = 0;
+					_relLeft += _rel.stillPlatformX ?? platformX;
+				} else _relLeft -= _rel.stillPlatformX ?? platformX;
+				let _fl = _rel.frame,
+					_ft = 0;
 				if (_rel.col) {
 					const frameIndex = _rel.frame;
 					_fl = frameIndex % _rel.col;
-					_ft = (frameIndex / _rel.col | 0) * _rel.height;
+					_ft = ((frameIndex / _rel.col) | 0) * _rel.height;
 				}
-				if(!__batterySaveMode) {
+				if (!__batterySaveMode) {
 					const _gx = MathRound(_relLeft);
-					const _gy = MathRound((_rel.stillTop ?? _rel.top) - ((_rel.yGap ?? 0) * _rel.zoom));
+					const _gy = MathRound((_rel.stillTop ?? _rel.top) - (_rel.yGap ?? 0) * _rel.zoom);
 					const _gw = MathFloor((_rel.width - (_rel.baseRight ?? 0)) * _rel.zoom) - (_rel.baseRight ?? 0);
 					const _gh = MathFloor(_rel.height * _rel.zoom);
 					const _gd = this.getDepthDrawScaleY(this.cHeight - (_gy + _gh));
 					const _gBox = this.scaleFromFoot(_gx, _gy, _gw, _gh, _gx + _gw / 2, _gy + _gh, _gd);
-					offGoreCtx.drawImage(_rel.sprite, (_fl ?? 0) * _rel.width, _ft + (_rel.baseTop ?? 0), _rel.width - (_rel.baseRight ?? 0), _rel.height,
+					offGoreCtx.drawImage(
+						_rel.sprite,
+						(_fl ?? 0) * _rel.width,
+						_ft + (_rel.baseTop ?? 0),
+						_rel.width - (_rel.baseRight ?? 0),
+						_rel.height,
 						_gBox.x,
 						_gBox.y,
-						_gBox.w, _gBox.h);
+						_gBox.w,
+						_gBox.h
+					);
 				}
 			}
-			if (_rel.start >= 0)
-				_rel.start++;
+			if (_rel.start >= 0) _rel.start++;
 		}
-	}
+	};
 
 	this.getAvailableEnemies = function (_char, _func, _force) {
-		if(!_force && (_char.lastAvailableEnemyPickDate > (_gameTick - 200)))
-			return  _char.lastAvailableEnemies;
+		if (!_force && _char.lastAvailableEnemyPickDate > _gameTick - 200) return _char.lastAvailableEnemies;
 		_char.lastAvailableEnemyPickDate = _gameTick;
 		const _enemies = this.pvp ? this.enemies : this.seenEnemies;
-		if(_char.onlyTarget){
-			const _en = _enemies.find(x => x.key === _char.onlyTarget);
-			if(_en){
+		if (_char.onlyTarget) {
+			const _en = _enemies.find((x) => x.key === _char.onlyTarget);
+			if (_en) {
 				_char.lastAvailableEnemies = [_en];
 				return _char.lastAvailableEnemies;
 			}
 		}
-		// const onlyTarget = _enemies?.find(x => x.attackingOnlyBy && x.attackingOnlyBy === _char.key && 
-		// 	x != _char && x.enemy != undefined && !x.dead && !(x.knockbacking && x.dying) && 
-		// 	(_ff || x.enemy !== _char.enemy) && isObjectInVisibleRectangle(x));
-		// if (onlyTarget) 
-		// {
-		// 	_char.lastAvailableEnemies = [onlyTarget];
-		// 	return _char.lastAvailableEnemies;
-		// }
-		// if(_char.lastEnemyPick?.[0] && ((_gameTick - _char.lastEnemyPickDate) < 200))
-		// 	return _char.lastEnemyPick;
-		// const activeEnemies = this.seenEnemies?.filter(x =>
-		// 	!x.dead && x.class !== __spell);
+
 		const _iv = !(_char.main && _char.autoMode === 2);
-		if(!_char._enemyBuffer)
-  			_char._enemyBuffer = [];
-		else
-			_char._enemyBuffer.length = 0;
+		if (!_char._enemyBuffer) _char._enemyBuffer = [];
+		else _char._enemyBuffer.length = 0;
 		const _x = _char._enemyBuffer;
 		const _isMinion = _char.class === 'minion';
-		const _ff = _char.friendlyFire && (_char.enemy !== mainCharacter.enemy);
-		for(let x of _enemies) {
-			if(_ff && x.enemy && _char.enemy)
-				continue;
-			if(x.attackingOnlyBy && x.attackingOnlyBy === _char.key && 
-			x != _char && x.enemy != undefined && !x.dead && !(x.knockbacking && x.dying) && 
-			(_ff || x.enemy !== _char.enemy) && isObjectInVisibleRectangle(x))
-			{
-				if(_x.length)
-					_x.length = 0;
+		const _ff = _char.friendlyFire && _char.enemy !== mainCharacter.enemy;
+		for (let x of _enemies) {
+			if (_ff && x.enemy && _char.enemy) continue;
+			if (
+				x.attackingOnlyBy &&
+				x.attackingOnlyBy === _char.key &&
+				x != _char &&
+				x.enemy != undefined &&
+				!x.dead &&
+				!(x.knockbacking && x.dying) &&
+				(_ff || x.enemy !== _char.enemy) &&
+				isObjectInVisibleRectangle(x)
+			) {
+				if (_x.length) _x.length = 0;
 				_x.push(x);
 				break;
 			}
-			if(x.dead || x.class === __spell)
-				continue;
-			if (x === _char || x.enemy == undefined) 
-				continue;
+			if (x.dead || x.class === __spell) continue;
+			if (x === _char || x.enemy == undefined) continue;
 
-			if (!_ff && (
-				x.enemy === _char.enemy ||
-				(x.owner === (_char.coopWith ?? _char)) ||
-				(_char.owner === (x.coopWith ?? x))
-			)) continue;
-			if (x.knockbacking && x.dying && (!_func || !_func(x))) 
+			if (
+				!_ff &&
+				(x.enemy === _char.enemy || x.owner === (_char.coopWith ?? _char) || _char.owner === (x.coopWith ?? x))
+			)
 				continue;
+			if (x.knockbacking && x.dying && (!_func || !_func(x))) continue;
 
-			if (x.attackingOnlyBy) 
-				continue;
+			if (x.attackingOnlyBy) continue;
 
 			const anim = x.getCurrentAnimation?.();
-			if (anim?.interactive && !this?.fatality) 
-				continue;
+			if (anim?.interactive && !this?.fatality) continue;
 
-			if (!this.pvp && _iv && !x.mustDraw && !isObjectInVisibleRectangle(x))
-				continue;
-			if(_isMinion && x.class === 'object')
-				continue;
+			if (!this.pvp && _iv && !x.mustDraw && !isObjectInVisibleRectangle(x)) continue;
+			if (_isMinion && x.class === 'object') continue;
 			_x.push(x);
 		}
 
-		// const _x = activeEnemies.filter(x => {
-		// 	if(x.dead || x.class === __spell)
-		// 		return false;
-		// 	if (x === _char || x.enemy == undefined) 
-		// 		return false;
-
-		// 	if (!_ff && (
-		// 		x.enemy === _char.enemy ||
-		// 		(x.owner === (_char.coopWith ?? _char)) ||
-		// 		(_char.owner === (x.coopWith ?? x))
-		// 	)) return false;
-		// 	if (x.knockbacking && x.dying && (!_func || !_func(x))) 
-		// 		return false;
-
-		// 	if (x.attackingOnlyBy) 
-		// 		return false;
-
-		// 	const anim = x.getCurrentAnimation?.();
-		// 	if (anim?.interactive && !episode?.fatality) 
-		// 		return false;
-
-		// 	if (!episode.pvp && _iv && !isObjectInVisibleRectangle(x))
-		// 		return false;
-
-		// 	return true;
-		// });
 		_char.lastAvailableEnemies = _x;
 		return _char.lastAvailableEnemies;
-		return this.enemies?.filter(x =>
+		return this.enemies?.filter(
+			(x) =>
 				x.class !== __spell &&
-				x != _char && (!x.getCurrentAnimation().interactive || episode?.fatality) &&
+				x != _char &&
+				(!x.getCurrentAnimation().interactive || episode?.fatality) &&
 				x.enemy != undefined &&
-				(_ff || ((x.enemy !== _char.enemy) && (x.owner !== (_char.coopWith ?? _char)) &&
-				(_char.owner !== (x.coopWith ?? x)))) &&
+				(_ff ||
+					(x.enemy !== _char.enemy &&
+						x.owner !== (_char.coopWith ?? _char) &&
+						_char.owner !== (x.coopWith ?? x))) &&
 				(isObjectInVisibleRectangle(x) || episode.pvp || (_char.main && _char.autoMode === 2)) &&
-				!x.dead && !x.remove &&
+				!x.dead &&
+				!x.remove &&
 				(!(x.knockbacking && x.dying) || (_func && _func(x))) &&
 				!x.attackingOnlyBy
-			);
-		//return _enn;
-	}
+		);
+	};
 
 	this.hasEnemyAlive = function (_c) {
-		return this.enemies?.find(x => x.enemy !== _c.enemy && x.class !== __spell && !x.isDead());
-	}
-	this.removeBubbles = function() {
-		if(episode.bubbles?.[0]) {
-			for(let _b of episode.bubbles){
+		return this.enemies?.find((x) => x.enemy !== _c.enemy && x.class !== __spell && !x.isDead());
+	};
+	this.removeBubbles = function () {
+		if (episode.bubbles?.[0]) {
+			for (let _b of episode.bubbles) {
 				const _bubble = _b.elem;
-				if (_bubble?.remove)
-					_bubble.remove();
+				if (_bubble?.remove) _bubble.remove();
 			}
 			episode.bubbles = [];
 		}
-		if(episode.dialogs?.[0])
-			episode.dialogs = [];
-	}
-	this.initLightRadiusLayer = function() {
-
+		if (episode.dialogs?.[0]) episode.dialogs = [];
+	};
+	this.initLightRadiusLayer = function () {
 		const container = document.getElementById('css-canvas-foreground');
 
 		const scale = 1;
@@ -8043,7 +5566,6 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		canvas.height = container.clientHeight * scale;
 
 		const ctx = canvas.getContext('2d');
-		//ctx.scale(scale, scale);
 
 		container.appendChild(canvas);
 
@@ -8051,27 +5573,22 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 			canvas: canvas,
 			ctx: ctx
 		};
-	}
-	this.disposeLightRadiusLayer = function() {
-
+	};
+	this.disposeLightRadiusLayer = function () {
 		const lr = this.lightradius2;
 
 		if (!lr) return;
 
-		// DOM'dan kaldır
 		if (lr.canvas && lr.canvas.parentNode) {
 			lr.canvas.parentNode.removeChild(lr.canvas);
 		}
 
-		// GPU context referansını bırak
 		lr.ctx = null;
 		lr.canvas = null;
 
-		// Objeyi sil
 		this.lightradius2 = null;
-	}
+	};
 	this.clearEpisodeMemory = function () {
-
 		this.croppedSprites.clear();
 		this.croppedSpritesOrder.length = 0;
 
@@ -8081,108 +5598,13 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		this.mobs.length = 0;
 		this.enemies = [];
 	};
-	// this.dispose = function() {
-	// 	if(this.challangeStarted)
-	// 		delete this.challangeStarted;
-	// 	if(this.pvpResult)
-	// 		this.pvpResult.remove();
-	// 	let _sttsScr = document.querySelector('.game-status-screen');
-	// 	if(_sttsScr)
-	// 		_sttsScr.remove();
-	// 	delete this.lastTalkAttached;
-	// 	this.removeBubbles();
-	// 	this.pauseBgMusic(1);
-	// 	this.pauseAmbianceMusic();
-	// 	if(this.after)
-	// 		this.after();
-	// 	this.disposing = 1;
-	// 	if(this.bgMusicTimer)
-	// 		clearInterval(this.bgMusicTimer);
-	// 	if(this.goSound){
-	// 		if(!this.goSound.paused)
-	// 			this.goSound.pause();
-	// 		this.goSound = null;
-	// 	}
-	// 	const _bgAudios = [];
-	// 	if(this.bgMusic)
-	// 		_bgAudios.push(this.bgMusic);
-	// 	if(this.bgSound)
-	// 		_bgAudios.push(this.bgSound);
-	// 	clearAudioCache(_bgAudios);
-	// 	if(mainCharacter.heartbeat) {
-	// 		mainCharacter.heartbeat.pause();
-	// 		mainCharacter.heartbeat = undefined;
-	// 	}
-	// 	if(episode.enemies)
-	// 		episode.enemies.forEach(e => {
-	// 			e.stopStepSound();
-	// 		});
-	// 	// if(episode.mobs?.find(x => !x.listed))
-	// 	// 	episode.mobs = episode.mobs.filter(x => x.listed);
-	// 	this.mobs = [];
-	// 	this.respawners = [];
-	// 	this.cliffs = undefined;
-	// 	this.playGrounds = undefined;
-	// 	if(episode.phase)
-	// 		delete episode.phase;
-	// 	if(episode.boss)
-	// 		delete episode.boss;
-	// 	this.removeLocationHand();
-	// 	for(let _elem of document.querySelectorAll('.dmg'))
-	// 		_elem.remove();
-	// 	if(this.offCanvas) {
-	// 		this.offCanvas.width = 0;
-	// 		this.offCanvas.height = 0;
-	// 		this.offCanvas = null;
-	// 	}
-	// 	if(this.offDmgCanvas) {
-	// 		this.offDmgCanvas.width = 0;
-	// 		this.offDmgCanvas.height = 0;
-	// 		this.offDmgCanvas = null;
-	// 	}
-	// 	if(this.offGoreCanvas) {
-	// 		this.offGoreCanvas.width = 0;
-	// 		this.offGoreCanvas.height = 0;
-	// 		this.offGoreCanvas = null;
-	// 	}
-	// 	for(let _sp of this.sprites)
-	// 		if(_sp.animation.sprites?.[0])
-	// 			for(let _asp of _sp.animation.sprites)
-	// 				if(_asp.image) {
-	// 					_asp.image.remove();
-	// 					_asp.image = null;
-	// 					delete _asp.image;
-	// 					_sp = null;
-	// 				}
-	// 	for(let _sp of this.enemies)
-	// 		if(_sp.sprite?.image) {
-	// 			if(_sp.castContainer)
-	// 				_sp.castContainer.remove();
-	// 			_sp.sprite.image.remove();
-	// 			_sp.sprite.image = null;
-	// 			delete _sp.sprite.image;
-	// 			_sp = null;
-	// 		}
-	// 	addClass(this.enemyRightArrow, 'v-none');
-	// 	addClass(this.enemyLeftArrow, 'v-none');
-	// 	this.layersDrawn = 0;
-	// 	const _wrappers = document.querySelectorAll('.wrapper-3d');
-	// 	_wrappers?.forEach(x => x.remove());
-	// 	stopWeather();
-	// 	this.seenEnemies.length = 0;
-	// 	window.SoundManager.clearLoops();
-	// 	this.disposeLightRadiusLayer();
-	// 	this.clearEpisodeMemory();
-	// }
-	this.dispose = function () {
 
+	this.dispose = function () {
 		this.disposing = 1;
 
-		// 🔴 async loader cancel flag (çok kritik fix)
 		this._disposeToken = (this._disposeToken ?? 0) + 1;
 		const _token = this._disposeToken;
 
-		// UI / state flags
 		this.challangeStarted = undefined;
 		this.pvpResult?.remove?.();
 		this.pvpResult = null;
@@ -8198,13 +5620,10 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 
 		this.after?.();
 
-		// timers
-		if (this.bgMusicTimer)
-			clearInterval(this.bgMusicTimer);
+		if (this.bgMusicTimer) clearInterval(this.bgMusicTimer);
 
 		this.bgMusicTimer = null;
 
-		// audio cleanup
 		const _bgAudios = [];
 		if (this.bgMusic) _bgAudios.push(this.bgMusic);
 		if (this.bgSound) _bgAudios.push(this.bgSound);
@@ -8215,9 +5634,8 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 			mainCharacter.heartbeat = undefined;
 		}
 
-		episode?.enemies?.forEach?.(e => e.stopStepSound?.());
+		episode?.enemies?.forEach?.((e) => e.stopStepSound?.());
 
-		// core reset
 		this.mobs = [];
 		this.enemies = [];
 		this.respawners = [];
@@ -8230,20 +5648,14 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 
 		this.removeLocationHand?.();
 
-		// DOM cleanup (safe batch)
-		document.querySelectorAll('.dmg')?.forEach?.(x => x.remove());
+		document.querySelectorAll('.dmg')?.forEach?.((x) => x.remove());
 		document.getElementById('filter-canvas')?.remove();
-		if (c9)
-			c9.style.opacity = 1;
-		if (typeof _canvasF !== 'undefined' && _canvasF)
-			_canvasF.style.opacity = 1;
-		if (typeof _canvasBRB !== 'undefined' && _canvasBRB)
-			_canvasBRB.style.opacity = 1;
+		if (c9) c9.style.opacity = 1;
+		if (typeof _canvasF !== 'undefined' && _canvasF) _canvasF.style.opacity = 1;
+		if (typeof _canvasBRB !== 'undefined' && _canvasBRB) _canvasBRB.style.opacity = 1;
 		if (typeof cssAnimationProps !== 'undefined')
-			for (const _k of Object.keys(cssAnimationProps))
-				delete cssAnimationProps[_k];
+			for (const _k of Object.keys(cssAnimationProps)) delete cssAnimationProps[_k];
 
-		// canvases HARD invalidate (important)
 		const _killCanvas = (c) => {
 			if (!c) return;
 			try {
@@ -8260,52 +5672,49 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		this.offDmgCanvas = null;
 		this.offGoreCanvas = null;
 
-		// sprite memory release (GC friendly)
-		for (let _sp of (this.sprites ?? [])) {
-			_sp?.animation?.sprites?.forEach?.(a => {
+		for (let _sp of this.sprites ?? []) {
+			_sp?.animation?.sprites?.forEach?.((a) => {
 				if (a?.image) {
-					try { a.image.remove?.(); } catch (_) {}
+					try {
+						a.image.remove?.();
+					} catch (_) {}
 					a.image = null;
 				}
 			});
 		}
 
-		for (let _sp of (this.enemies ?? [])) {
+		for (let _sp of this.enemies ?? []) {
 			if (_sp?.castContainer) _sp.castContainer.remove?.();
 			if (_sp?.sprite?.image) {
-				try { _sp.sprite.image.remove?.(); } catch (_) {}
+				try {
+					_sp.sprite.image.remove?.();
+				} catch (_) {}
 				_sp.sprite.image = null;
 			}
 		}
 
-		// kill CSS wrappers
-		document.querySelectorAll('.wrapper-3d')?.forEach(x => x.remove());
+		document.querySelectorAll('.wrapper-3d')?.forEach((x) => x.remove());
 
-		// sound / systems
 		window.SoundManager?.clearLoops?.();
 		stopWeather?.();
 
 		this.seenEnemies.length = 0;
 
-		// 🔴 CRITICAL: async loaders will now self-abort
 		this.loadCharacterSprites = async function () {
-			return; // dead after dispose
+			return;
 		};
 
 		this._loadCharacterSprite = async function () {
-			return; // dead after dispose
+			return;
 		};
 
-		// cropp cache clear (IMPORTANT: memory leak fix)
 		this.croppedSprites?.clear?.();
 		this.croppedSpritesOrder = [];
 
-		// safety: prevent draw loops continuing mid-frame
 		this.drawEnemies = function () {};
 		this.drawLayers7 = function () {};
 		this.drawCharacterQueue = function () {};
 
-		// light system cleanup
 		this.disposeLightRadiusLayer?.();
 		this.clearEpisodeMemory?.();
 
@@ -8313,18 +5722,15 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 	};
 	setBusyState(!(this.menu || this.lobby));
 	this.initLightRadiusLayer();
-	this.getMinPositionY = function(_e) {
+	this.getMinPositionY = function (_e) {
 		const ready = _startAnimate && !_game.suspended && !__switchingMap && _e.HURTLEFT === _e.HURTLEFT;
 		let box;
 		if (ready) {
 			box = _e._minYBox;
-			if (!box)
-				box = _e._minYBox = { y: 0, minX: 0, maxX: -1 };
+			if (!box) box = _e._minYBox = { y: 0, minX: 0, maxX: -1 };
 			const center = _e.HURTLEFT + _e._HURTBOX_half + platformX;
-			if (!box.slope && center >= box.minX && center <= box.maxX)
-				return box;
-		}
-		else {
+			if (!box.slope && center >= box.minX && center <= box.maxX) return box;
+		} else {
 			box = { y: 0 };
 			if (_e._minYBox) {
 				_e._minYBox.slope = 1;
@@ -8344,8 +5750,7 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 			return box;
 		}
 		for (let _pg of this.playGrounds) {
-			if (_eCenter < _pg.minX || _eCenter > _pg.maxX)
-				continue;
+			if (_eCenter < _pg.minX || _eCenter > _pg.maxX) continue;
 			if (_pg.round) {
 				box.slope = 1;
 				if (ready) {
@@ -8357,15 +5762,12 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 				if (_pg.round.dir === __right) {
 					const _esik = _pg.maxX - _rate;
 					if (_eCenter > _esik) {
-						//noXRate: _oldCenter < _eCenter
 						box.y = MathRound(((_eCenter - _esik) * minPositionY) / _rate);
 						return box;
 					}
-				}
-				else {
+				} else {
 					const _esik = _pg.minX + _rate;
 					if (_eCenter < _esik) {
-						//noXRate: _oldCenter > _eCenter
 						box.y = MathRound(((_esik - _eCenter) * minPositionY) / _rate);
 						return box;
 					}
@@ -8387,10 +5789,9 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 			box.maxX = -1;
 		}
 		return box;
-	}
-	this.resize = function() {
+	};
+	this.resize = function () {
 		particleScale = Math.max(0.25, Math.min(2, this.cWidth / 1152));
-		// ---------------- TUNING ----------------
 
 		BASE_SPEED_MIN = 2 * particleScale;
 		BASE_SPEED_MAX = 3.6 * particleScale;
@@ -8400,62 +5801,54 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		RADIUS_RANGE = 2.2 * particleScale;
 		GRAVITY_MIN = 0.28;
 		GRAVITY_RANGE = 0.5;
-		WOBBLE_STRENGTH = 0.4 ;
-		const _ms = mapSprites.find(x => x.id == this.season);
-		this.width = MathRound((_ms.width) * __zoom);
-		if(this.width < _canvas.width)
-			this.width = _canvas.width;
-		_canvasR.width = _canvasS.width = (this.width);
-		_canvasS.style.width = (this.width * __scale) + 'px';
-		for(let _c of _cArr) {
+		WOBBLE_STRENGTH = 0.4;
+		const _ms = mapSprites.find((x) => x.id == this.season);
+		this.width = MathRound(_ms.width * __zoom);
+		if (this.width < _canvas.width) this.width = _canvas.width;
+		_canvasR.width = _canvasS.width = this.width;
+		_canvasS.style.width = this.width * __scale + 'px';
+		for (let _c of _cArr) {
 			_c.innerHTML = '';
 			_c.style.transform = 'translateX(0)';
 			_c.style.setProperty('-webkit-transform', 'translateX(0)');
 			_c.backgroundSet = undefined;
 		}
 		this.height = _canvas.height;
-		this.distance = (__globalDistance ? parseFloat(__globalDistance) / 100 : undefined) ?? (_ms.distance ?? .5);
+		this.distance = (__globalDistance ? parseFloat(__globalDistance) / 100 : undefined) ?? _ms.distance ?? 0.5;
 		this.zoom = __zoom * (this.ground.zoom ?? 1);
 		this.cHeight = _canvas.height;
 		this.cUIHeight = _canvas.height * __scale;
 		this.cWidth = _canvas.width;
 		this.cUIWidth = _canvas.width * __scale;
 		this.dmgFrameHeight = this.cHeight / 20;
-		this.dmgFrameTopBoundary = MathRound(this.cHeight * .15);
-		this.RECT = { 
-			left: 0, 
+		this.dmgFrameTopBoundary = MathRound(this.cHeight * 0.15);
+		this.RECT = {
+			left: 0,
 			right: this.cWidth,
-			top: 0, 
-			bottom: this.cHeight, 
-			width: this.cWidth, 
-			realWidth: this.cWidth 
+			top: 0,
+			bottom: this.cHeight,
+			width: this.cWidth,
+			realWidth: this.cWidth
 		};
 		if (this.ground) {
-			if (this.ground.yRate)
-				groundheight = MathRound(idealground_height * this.ground.yRate);
-			else
-				groundheight = idealground_height;
+			if (this.ground.yRate) groundheight = MathRound(idealground_height * this.ground.yRate);
+			else groundheight = idealground_height;
 			minPositionY = this.ground.bottomGap ? MathRound(this.ground.bottomGap * __zoom) : 1;
 			minLeft = this.ground.leftGap ? MathRound(this.ground.leftGap * __zoom) : 0;
 			maxLeft = this.ground.rightGap ? MathRound(this.ground.rightGap * __zoom) : 0;
-		}
-		else
-			groundheight = idealground_height;
-		
+		} else groundheight = idealground_height;
+
 		this.loadLayers();
 		if (this.loadObjects) {
 			const _objects = _mapSprite.objects ?? [];
 			let _arr;
-			if(this.artifacts?.length > 0 && !this.artifactLocated) {
+			if (this.artifacts?.length > 0 && !this.artifactLocated) {
 				_arr = _objects.concat(this.artifacts);
 				this.artifactLocated = 1;
-			}
-			else
-				_arr = _objects;
+			} else _arr = _objects;
 			for (var _obj of _arr) {
-				const _clone = this.sprites.find(x => x.id === _obj.id);
-				if(_clone)
-					this.sprites = this.sprites.filter(x => x !== _clone);
+				const _clone = this.sprites.find((x) => x.id === _obj.id);
+				if (_clone) this.sprites = this.sprites.filter((x) => x !== _clone);
 				this.loadObject(_obj);
 			}
 		}
@@ -8473,23 +5866,21 @@ this.borderizeSprite = function(ctx, image, x, y, glowColor = 'red', glowSize = 
 		this.spritesDrawnBackGround = this.spritesDrawnForeGround = false;
 		this.layersDrawn = 0;
 		prevPlatformX = -1;
-		if(this.cliffs) {
-			this.cliffs.forEach(x => {
+		if (this.cliffs) {
+			this.cliffs.forEach((x) => {
 				x.minX = MathRound(x.min_X * __zoom);
 				x.maxX = MathRound(x.max_X * __zoom);
 			});
 		}
-		if(this.playGrounds) {
-			this.playGrounds.forEach(x => {
+		if (this.playGrounds) {
+			this.playGrounds.forEach((x) => {
 				x.minX = MathRound(x.min_X * __zoom);
 				x.maxX = MathRound(x.max_X * __zoom);
 				x.bottomGap = MathRound(x.bottom_Gap * __zoom);
 			});
-		}
-		else
-			this.playGrounds = [];
+		} else this.playGrounds = [];
 		this.drawSpriteObjects2();
 		this.drawLayers();
-	}
+	};
 	this.resize();
 }
