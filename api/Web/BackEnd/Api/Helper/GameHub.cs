@@ -743,6 +743,50 @@ namespace Web.BackEnd.Api.Helper {
 			await PushRoom(room);
 		}
 
+		public async Task DuelSwapPlayers(string key, string otherKey) {
+			var me = Me();
+			var room = FindDuel(Context.ConnectionId) ?? throw new HubException("Room not found");
+			RequireLeader(room, me);
+			if(key == otherKey)
+				return;
+			lock(room.Sync) {
+				NormalizeSlots(room.Players);
+				var first = room.Players.FirstOrDefault(x => SeatKey(x) == key);
+				var second = room.Players.FirstOrDefault(x => SeatKey(x) == otherKey);
+				if(first == null || second == null)
+					throw new HubException("missing");
+				var team = first.T;
+				var slot = first.I;
+				first.T = second.T;
+				first.I = second.I;
+				second.T = team;
+				second.I = slot;
+			}
+			await PushRoom(room);
+		}
+
+		public async Task DuelMovePlayer(string key, byte team, byte slot) {
+			var me = Me();
+			var room = FindDuel(Context.ConnectionId) ?? throw new HubException("Room not found");
+			RequireLeader(room, me);
+			if((team != 1 && team != 2) || slot > 2)
+				throw new HubException("missing");
+			lock(room.Sync) {
+				NormalizeSlots(room.Players);
+				var player = room.Players.FirstOrDefault(x => SeatKey(x) == key);
+				if(player == null)
+					throw new HubException("missing");
+				var other = room.Players.FirstOrDefault(x => x.T == team && x.I == slot && !ReferenceEquals(x, player));
+				if(other != null) {
+					other.T = player.T;
+					other.I = player.I;
+				}
+				player.T = team;
+				player.I = slot;
+			}
+			await PushRoom(room);
+		}
+
 		public async Task DuelBot(string id, string name, string className, int power, byte team, int index = -1, int slot = -1) {
 			var me = Me();
 			var room = FindDuel(Context.ConnectionId) ?? throw new HubException("Room not found");

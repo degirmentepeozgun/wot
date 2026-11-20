@@ -1062,6 +1062,15 @@ const __stories = [
 							mainCharacter.updateVariables();
 							episode.removeLocationHand();
 							mainCharacter.disableSkills();
+							if(!__isPC) {
+								const _skls = document.querySelectorAll('.skill');
+								_skls.forEach((x) => {
+									if(!hasClass(x, 'v-none')) {
+										addClass(x, 'v-none');
+										x.invincible = true;
+									}
+								});
+							}
 							const _mLeft = MathRound(mainCharacter.SCREENLEFT + mainCharacter.WIDTH / 2);
 							for (let i = 1; i < 13; i++) {
 								let _left = MathRound(
@@ -1124,6 +1133,15 @@ const __stories = [
 								text: 'You got me trapped',
 								onend: function () {
 									mainCharacter.direction = 'left';
+									if(!__isPC) {
+										const _skls = document.querySelectorAll('.skill');
+										_skls.forEach((x) => {
+											if(x.invincible) {
+												removeClass(x, 'v-none');
+												delete x.invincible;
+											}
+										});
+									}
 									mainCharacter.enableSkills();
 									delete mainCharacter.animations.defense.delay;
 									mainCharacter.animations.defense.coolDownLeft = 0;

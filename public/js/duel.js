@@ -267,6 +267,7 @@
 			if (!_room) return;
 			const _right = document.querySelector('.duel-content-right .menu-modal-right-container');
 			if (!_right) return;
+			if (this.roomId !== _roomId || !_room.p?.some((x) => (x.s ?? x.id) === this.moveKey)) delete this.moveKey;
 			this.roomId = _roomId;
 			this.openRoomChat(_room);
 			if (!_noSound) playClick();
@@ -284,7 +285,7 @@
 			for (let i = 0; i < 3; i++) {
 				const _p = _blueSlots[i];
 				if (!_p) {
-					_blueHTML += `<div class="flex w-100 team-player-row--blue">
+					_blueHTML += `<div class="flex w-100 team-player-row--blue"${mainCharacter.leader ? ` onexactclick="getRef('duel')?.MoveToSlot(1, ${i})"` : ''}>
 				<div onexactclick="getRef('duel')?.AddBot('${_room.s}', 1, ${i})" class="duel-add-bot-btn list-item-btn animate-me flex${mainCharacter.leader ? '' : ' d-none'}">
 					<img src="./images/ui/game/add-count.png" /> ${getLangData('Add Bot')}
 				</div>
@@ -300,7 +301,8 @@
 				const _grade = _ch?.grade ?? 3;
 				const _ready = _p.r ? 'ready' : 'away';
 				const _isBot = _p.id;
-				_blueHTML += `<div class="flex w-100 team-player-row--blue${_isMe ? ' me' : ''}">
+				const _key = _p.s ?? _p.id;
+				_blueHTML += `<div class="flex w-100 team-player-row--blue${_isMe ? ' me' : ''}${this.moveKey === _key ? ' moving' : ''}" data-seat="${_key}"${mainCharacter.leader ? ` onexactclick="getRef('duel')?.MoveTarget('${_key}', event)"` : ''}>
 				<div class="flex duel-join-player-avatar">
 					<img class="grade${_grade}-item" src="./images/main/avatars/${_p.c}.png" />
 				</div>
@@ -309,7 +311,7 @@
 						<img class="duel-join-player-leader${_p.l ? '' : ' d-none'}" src="./images/ui/game/duel-leader.png" />${_p.n}
 					</div>
 					<div class="flex duel-join-player-info-power">
-						${getLangData('Power')}:&nbsp;${_p.p.formatWithDots()}
+						${getLangData('Power')}<span class="duel-join-player-info-power-value">${_p.p.formatWithDots()}</span>
 					</div>
 				</div>
 				<div class="flex duel-join-player-buttons">
@@ -328,13 +330,13 @@
 					<div class="duel-square${_isBot && mainCharacter.leader ? '' : ' d-none'}" onexactclick="getRef('duel')?.RePickBot('${_p.id}')">
 						<img src="./images/ui/game/duel-refresh.png" />
 					</div>
-					<div class="duel-square${mainCharacter.leader ? '' : ' d-none'}" onexactclick="getRef('duel')?.SwapPlayers('${_p.s ?? _p.id}', 1)">
-						<img src="./images/ui/game/duel-arrow-up.png" />
+					<div class="duel-square${mainCharacter.leader ? '' : ' d-none'}" onexactclick="getRef('duel')?.MoveSelect('${_key}')">
+						<img src="./images/ui/game/duel-move.png" />
 					</div>
-					<div class="duel-square${mainCharacter.leader ? '' : ' d-none'}" onexactclick="getRef('duel')?.SwapPlayers('${_p.s ?? _p.id}', 2)">
-						<img src="./images/ui/game/duel-arrow-down.png" />
+					<div class="duel-square${_isMeOrLeader ? '' : ' d-none'}" onexactclick="getRef('duel')?.AskKickPlayer('${_key}')">
+						<img src="./images/ui/game/duel-kick.png" />
 					</div>
-					<div class="duel-square${_isMeOrLeader ? '' : ' d-none'}" onexactclick="getRef('duel')?.AskKickPlayer('${_p.s ?? _p.id}')">
+					<div class="duel-square duel-move-cancel" onexactclick="getRef('duel')?.MoveCancel()">
 						<img src="./images/ui/game/duel-kick.png" />
 					</div>
 				</div>
@@ -345,7 +347,7 @@
 			for (let i = 0; i < 3; i++) {
 				const _p = _redSlots[i];
 				if (!_p) {
-					_redHTML += `<div class="flex w-100 team-player-row--red">
+					_redHTML += `<div class="flex w-100 team-player-row--red"${mainCharacter.leader ? ` onexactclick="getRef('duel')?.MoveToSlot(2, ${i})"` : ''}>
 				<div onexactclick="getRef('duel')?.AddBot('${_room.s}', 2, ${i})" class="duel-add-bot-btn list-item-btn animate-me flex${mainCharacter.leader ? '' : ' d-none'}">
 					<img src="./images/ui/game/add-count.png" /> ${getLangData('Add Bot')}
 				</div>
@@ -361,7 +363,8 @@
 				const _isMeOrLeader = _isMe || mainCharacter.leader;
 				const _isBot = _p.id;
 				const _ready = _p.r ? 'ready' : 'away';
-				_redHTML += `<div class="flex w-100 team-player-row--red${_isMe ? ' me' : ''}">
+				const _key = _p.s ?? _p.id;
+				_redHTML += `<div class="flex w-100 team-player-row--red${_isMe ? ' me' : ''}${this.moveKey === _key ? ' moving' : ''}" data-seat="${_key}"${mainCharacter.leader ? ` onexactclick="getRef('duel')?.MoveTarget('${_key}', event)"` : ''}>
 				<div class="flex duel-join-player-avatar">
 					<img class="grade${_grade}-item" src="./images/main/avatars/${_p.c}.png" />
 				</div>
@@ -370,7 +373,7 @@
 						<img class="duel-join-player-leader${_p.l ? '' : ' d-none'}" src="./images/ui/game/duel-leader.png" />${_p.n}
 					</div>
 					<div class="flex duel-join-player-info-power">
-						${getLangData('Power')}:&nbsp;${_p.p.formatWithDots()}
+						${getLangData('Power')}<span class="duel-join-player-info-power-value">${_p.p.formatWithDots()}</span>
 					</div>
 				</div>
 				<div class="flex duel-join-player-buttons">
@@ -389,13 +392,13 @@
 					<div class="duel-square${_isBot && mainCharacter.leader ? '' : ' d-none'}" onexactclick="getRef('duel')?.RePickBot('${_p.id}')">
 						<img src="./images/ui/game/duel-refresh.png" />
 					</div>
-					<div class="duel-square${mainCharacter.leader ? '' : ' d-none'}" onexactclick="getRef('duel')?.SwapPlayers('${_p.s ?? _p.id}', 1)">
-						<img src="./images/ui/game/duel-arrow-up.png" />
+					<div class="duel-square${mainCharacter.leader ? '' : ' d-none'}" onexactclick="getRef('duel')?.MoveSelect('${_key}')">
+						<img src="./images/ui/game/duel-move.png" />
 					</div>
-					<div class="duel-square${mainCharacter.leader ? '' : ' d-none'}" onexactclick="getRef('duel')?.SwapPlayers('${_p.s ?? _p.id}', 2)">
-						<img src="./images/ui/game/duel-arrow-down.png" />
+					<div class="duel-square${_isMeOrLeader ? '' : ' d-none'}" onexactclick="getRef('duel')?.AskKickPlayer('${_key}')">
+						<img src="./images/ui/game/duel-kick.png" />
 					</div>
-					<div class="duel-square${_isMeOrLeader ? '' : ' d-none'}" onexactclick="getRef('duel')?.AskKickPlayer('${_p.s ?? _p.id}')">
+					<div class="duel-square duel-move-cancel" onexactclick="getRef('duel')?.MoveCancel()">
 						<img src="./images/ui/game/duel-kick.png" />
 					</div>
 				</div>
@@ -483,11 +486,47 @@
 				delete this.pending;
 			}
 		};
-		this.SwapPlayers = function (_socketId, _upOrDown) {
+		this.markMoving = function () {
+			document.querySelectorAll('.duel-join-room-container [data-seat]').forEach((x) => {
+				if (x.dataset.seat === this.moveKey) addClass(x, 'moving');
+				else removeClass(x, 'moving');
+			});
+		};
+		this.MoveSelect = function (_key) {
+			if (!mainCharacter.leader) return;
+			if (this.moveKey && this.moveKey !== _key) return this.MoveSwap(_key);
+			playClick();
+			this.moveKey = _key;
+			this.markMoving();
+		};
+		this.MoveCancel = function () {
+			playClick();
+			delete this.moveKey;
+			this.markMoving();
+		};
+		this.MoveTarget = function (_key, _event) {
+			if (!this.moveKey || this.moveKey === _key) return;
+			if (_event?.target?.closest?.('.duel-square, .duel-add-bot-btn')) return;
+			this.MoveSwap(_key);
+		};
+		this.MoveToSlot = function (_team, _slot) {
+			if (!this.moveKey) return;
 			const _room = this.roomById(this.roomId);
+			const _from = this.moveKey;
+			delete this.moveKey;
+			this.markMoving();
 			if (!_room || !mainCharacter.leader) return;
 			playClick();
-			this.invoke('DuelSwap', _socketId, _upOrDown).then((_res) => this.afterInvoke(_res));
+			this.invoke('DuelMovePlayer', _from, _team, _slot).then((_res) => this.afterInvoke(_res));
+		};
+		this.MoveSwap = function (_key) {
+			const _room = this.roomById(this.roomId);
+			const _from = this.moveKey;
+			delete this.moveKey;
+			this.markMoving();
+			if (!_room || !_from || !mainCharacter.leader) return;
+			playClick();
+			this.invoke('DuelSwapPlayers', _from, _key).then((_res) => this.afterInvoke(_res));
 		};
 		this.AskKickPlayer = function (_socketId) {
 			const _room = this.roomById(this.roomId);
@@ -530,7 +569,7 @@
 		};
 		this.StartDuel = function () {
 			const _room = this.roomById(this.roomId);
-			if (!_room) return;
+			if (!_room || this.moveKey) return;
 			if (_room.s !== mainCharacter.socketId) {
 				warn('<span>' + getLangData('Only the room leader can start the duel') + '</span>', 'warn');
 				return;

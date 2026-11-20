@@ -1,0 +1,15 @@
+C:\Users\Administrator\Desktop\wot\api\web\backend\api\bin\Release\net8.0\publish\Api.exe
+C:\Users\Administrator\Desktop\wot\api\web\backend\api\bin\Release\net8.0\publish\appsettings.Development.json
+C:\Users\Administrator\Desktop\wot\api\web\backend\api\bin\Release\net8.0\publish\appsettings.json
+C:\Users\Administrator\Desktop\wot\api\web\backend\api\bin\Release\net8.0\publish\Api.dll
+C:\Users\Administrator\Desktop\wot\api\web\backend\api\bin\Release\net8.0\publish\Api.deps.json
+C:\Users\Administrator\Desktop\wot\api\web\backend\api\bin\Release\net8.0\publish\Api.runtimeconfig.json
+C:\Users\Administrator\Desktop\wot\api\web\backend\api\bin\Release\net8.0\publish\Api.pdb
+C:\Users\Administrator\Desktop\wot\api\web\backend\api\bin\Release\net8.0\publish\MessagePack.dll
+C:\Users\Administrator\Desktop\wot\api\web\backend\api\bin\Release\net8.0\publish\MessagePack.Annotations.dll
+C:\Users\Administrator\Desktop\wot\api\web\backend\api\bin\Release\net8.0\publish\Microsoft.AspNetCore.Connections.Abstractions.dll
+C:\Users\Administrator\Desktop\wot\api\web\backend\api\bin\Release\net8.0\publish\Microsoft.AspNetCore.SignalR.Common.dll
+C:\Users\Administrator\Desktop\wot\api\web\backend\api\bin\Release\net8.0\publish\Microsoft.AspNetCore.SignalR.Protocols.MessagePack.dll
+C:\Users\Administrator\Desktop\wot\api\web\backend\api\bin\Release\net8.0\publish\Microsoft.Extensions.Features.dll
+C:\Users\Administrator\Desktop\wot\api\web\backend\api\bin\Release\net8.0\publish\Microsoft.Extensions.Options.dll
+C:\Users\Administrator\Desktop\wot\api\web\backend\api\bin\Release\net8.0\publish\Microsoft.NET.StringTools.dll

@@ -16,7 +16,7 @@
 	border: 1px solid rgba(100, 190, 230, 0.75);
 	box-sizing: border-box;
 	border-radius: 2px;
-	height: 10%;
+	height: 10.35%;
 	margin: 0.25% 2% !important;
 	width: 96% !important;
 }
@@ -26,9 +26,40 @@
 	border: 1px solid rgba(235, 115, 105, 0.75);
 	box-sizing: border-box;
 	border-radius: 2px;
-	height: 10%;
+	height: 10.35%;
 	margin: 0.25% 2% !important;
 	width: 96% !important;
+}
+
+.team-player-row--blue.moving,
+.team-player-row--red.moving {
+	background: rgba(150, 120, 25, 0.28);
+	border-color: rgba(240, 205, 100, 0.85);
+}
+
+.duel-join-player-buttons .duel-move-cancel {
+	display: none;
+}
+
+.moving .duel-join-player-buttons .duel-square {
+	display: none;
+}
+
+.moving .duel-join-player-buttons .duel-move-cancel {
+	display: flex;
+}
+
+.duel-join-room-container:has(.moving) .duel-start-button {
+	pointer-events: none !important;
+	opacity: 0.7 !important;
+}
+
+.duel-join-room-container:has(.moving) [data-seat]:not(.moving) .duel-join-player-buttons,
+.duel-join-room-container:has(.moving) .duel-add-bot-btn {
+	transition: none !important;
+	-webkit-transition: none !important;
+	visibility: hidden !important;
+	pointer-events: none !important;
 }
 
 .duel-start-button {
@@ -44,7 +75,7 @@
 }
 
 .duel-join-room-title {
-	margin: 1.5% 0 0.5% 0 !important;
+	margin: 0 !important;
 }
 
 .duel-vs-sign {
@@ -52,6 +83,10 @@
 	position: relative;
 	z-index: 2;
 	overflow: visible;
+}
+.duel-vs-sign,
+.duel-vs-sign * {
+	pointer-events: none !important;
 }
 
 .duel-vs-sign img {
@@ -76,9 +111,9 @@
 }
 
 .duel-square {
-	height: 84%;
+	height: 100%;
 	display: flex;
-	margin: 0 0.5%;
+	margin: 0 1%;
 	justify-content: center;
 	align-items: center;
 }
@@ -94,13 +129,14 @@
 	aspect-ratio: 4 / 1;
 	height: 100%;
 	justify-content: flex-end !important;
+	margin-right: 1%;
 }
 
 .duel-join-player-avatar {
 	height: 90%;
 	aspect-ratio: 91/89;
 	position: relative;
-	margin: 0 0.5% 0 3%;
+	margin: 0 0.5% 0 2%;
 }
 
 .duel-join-player-avatar img {
@@ -137,8 +173,8 @@
 	color: #ad9385 !important;
 	font-weight: 600 !important;
 	padding-top: 0.5%;
-	font-family: "Grenze" !important;
-	font-size: calc(var(--wot-font-base) * 1.1) !important;
+	font-family: "Alegreya" !important;
+	font-size: calc(var(--wot-font-base) * 1.2) !important;
 	line-height: calc(var(--wot-font-base) * 1.1) !important;
 }
 
@@ -147,13 +183,21 @@
 	width: 100%;
 	justify-content: flex-start !important;
 	padding-left: 7%;
-	padding-bottom: 5% !important;
+	align-items: baseline !important;
 	color: #edddc5 !important;
-	font-family: "Grenze" !important;
-	font-size: calc(var(--wot-font-base) * 1.1) !important;
-	line-height: calc(var(--wot-font-base) * 1.1) !important;
+	font-family: "Alegreya" !important;
+	font-size: calc(var(--wot-font-base) * 1.2) !important;
+	line-height: calc(var(--wot-font-base)) !important;
 }
-
+.duel-join-player-info .duel-join-player-info-power-value {
+	display:inline-block;
+	padding-left: 5%;
+	color: #F5EAD6 !important;
+	font-family: "Alegreya" !important;
+	font-size: calc(var(--wot-font-base) * 1.4) !important;
+	line-height: calc(var(--wot-font-base)) !important;
+	font-weight: 500 !important;
+}
 .duel-join-player-info-red {
 	background: url(./../images/ui/game/duel-red-nameframe.png);
 	background-size: 100% 100% !important;
@@ -165,8 +209,10 @@
 }
 
 .duel-join-player-leader {
-	height: 60%;
+	height: 66%;
 	margin-right: 3%;
+	display:block;
+	margin-bottom: 1%;
 }
 
 .duel-add-bot-btn {
@@ -610,7 +656,7 @@ div[data-module="duel"] .room-visibility {
 	margin: 4% 0 3% 0
 }
 .duel-create-room-title-item {
-	height: 100% !important;
+	height: 90% !important;
 	background:url('./../images/ui/game/duel-title-frame.png') !important;
 	aspect-ratio: 625 / 96;
 	background-size: auto 100% !important;
@@ -686,4 +732,12 @@ div[data-module="duel"] .room-visibility {
 }
 .duel-create-room-container .gray input::placeholder {
 	opacity: .5 !important;
+}
+
+@media (hover: none), (pointer: coarse), (max-width: 1024px) {
+	.team-player-row--blue,
+	.team-player-row--red {
+		width: 100% !important;
+		margin: .25% 0 !important;
+	}
 }

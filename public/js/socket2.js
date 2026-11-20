@@ -2182,6 +2182,7 @@ async function connectSocket() {
 
 	_my_hub = new signalR.HubConnectionBuilder()
 		.withUrl(
+			//'http://localhost:5298/gamehub?n=' +
 			'wss://api.warriorsoftengri.com/gamehub?n=' +
 				encodeURIComponent(__account.name) +
 				(_priorSocket ? '&s=' + _priorSocket : '') +
