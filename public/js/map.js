@@ -2916,7 +2916,7 @@ function map(_m) {
 		const _bg = parseInt(_hex.substr(3, 2), 16);
 		const _bb = parseInt(_hex.substr(5, 2), 16);
 		const _bulk = Math.max(0.8, Math.min(1.55, (_bodyW * _bodyH) / 14000));
-		const _hasLimbs = !!_e.limbs?.length;
+		const _hasLimbs = !!_e.limbs?.length && !!__account.options.gore;
 		let _n = Math.round((_hasLimbs ? 95 : 100) * _bulk);
 		if (_n > (_hasLimbs ? 130 : 150)) _n = _hasLimbs ? 130 : 150;
 		const _slamHit = !!_f?.atk?.hurt?.slam;
@@ -3001,7 +3001,7 @@ function map(_m) {
 		this._goreLive = (this._goreLive || 0) + _arr.length;
 		_e.particles = _arr;
 		_e.particleSpeed = 1;
-		if (_e.limbs?.length) {
+		if (_hasLimbs) {
 			_e._goreLinger = _gameTick + 12000;
 			let _hitRate = _rate;
 			if (_charged) _hitRate += 0.8;
@@ -3881,7 +3881,7 @@ function map(_m) {
 				} else if (_item.char.releaseCount) delete _item.char.releaseCount;
 				if (!_item.char.releaseCount || _item.char.releaseCount % 8 < 4) {
 					const _z = (_item.zoom ?? 1) * this.getDepthDrawScale(_item.char);
-					_wDiff = (offCtx.reversed ? -1 : 1) * ((_item.width - _item.width * _z) / 2);
+					_wDiff = (offCtx.reversed ? -1 : 1) * ((_item.spriteOriginX ?? _item.width / 2) * (1 - _z));
 					_hDiff = _item.height - _item.height * _z;
 					if (!__batterySaveMode) {
 						_hurted =
@@ -4143,6 +4143,7 @@ function map(_m) {
 							if (
 								_item.char.isDead() &&
 								!_item.char.animation.startsWith('dead') &&
+								_item.char.animation !== 'hurtfeet' &&
 								_item.char.class !== 'object' &&
 								_item.char.class !== 'spell'
 							) {
@@ -4255,6 +4256,7 @@ function map(_m) {
 			offCtx.restore();
 			offCtx.reversed = false;
 		}
+		goreFx.draw(offCtx, this);
 		if (c10.reversed) {
 			c10.restore();
 			c10.reversed = false;

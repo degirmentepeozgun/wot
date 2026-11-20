@@ -276,7 +276,7 @@ const __stories = [
 				maps: [105],
 				after: function () {
 					episode.enemies.forEach(
-						(x) => (x.limbs = x.spawnAsGroup = x.respawnAfterSeconds = x.spawn = undefined)
+						(x) => (x.limbs = x.spawnAsGroup = x.respawnAfterSeconds = x.spawn = x.spawnTime = x.spawnTimeStart = undefined)
 					);
 					updateQuestArea();
 					__account.questStatus.quest = undefined;
@@ -1408,7 +1408,7 @@ const __stories = [
 						count: 1,
 						groupId: 2,
 						spawnDirection: 'left',
-						spawnAsGroup: 1,
+						spawnAsGroup: 2,
 						spawnTime: 3,
 						spawn: 1,
 						sight: 1000,
@@ -1431,7 +1431,7 @@ const __stories = [
 						count: 1,
 						groupId: 2,
 						spawnDirection: 'left',
-						spawnAsGroup: 1,
+						spawnAsGroup: 2,
 						spawnTime: 3,
 						spawn: 1,
 						sight: 1000,
@@ -1454,7 +1454,7 @@ const __stories = [
 						count: 1,
 						groupId: 2,
 						spawnDirection: 'left',
-						spawnAsGroup: 1,
+						spawnAsGroup: 2,
 						spawnTime: 3,
 						spawn: 1,
 						sight: 1000,
@@ -1519,6 +1519,10 @@ const __stories = [
 						x.immobilize = true;
 						if (!x.deadFirst) x.invulnerable = true;
 					});
+					episode.enemies.filter(x => x.id === 53).forEach(x => {
+						x.loyal = true;
+						x.swapAnimation('idle');
+					});
 					setTimeout(() => {
 						let _goblinsInstalled;
 						cssAnimations.film(
@@ -1533,11 +1537,7 @@ const __stories = [
 												?.forEach((x) => (x.invulnerable = true));
 											const _e = episode.enemies.find((x) => x.enemy && x.deadFirst);
 											if (!_e || _e.isDead()) return;
-											if (!_e.animations.hurtfeet)
-												_e.animations.hurtfeet = new animation(
-													createHurtFeet(_e.zoom, _e.bloodColor, null, null, null, _e.width)
-												);
-											_e.animate('hurtfeet', 1);
+											_e.smash(mainCharacter);
 										};
 										mainCharacter.animate('roll', 1);
 									},
@@ -1547,7 +1547,11 @@ const __stories = [
 									do: function () {
 										episode.enemies
 											.filter((x) => x !== mainCharacter && !x.isDead())
-											.forEach((x) => (x.direction = __left));
+											.forEach((x) => {
+												x.direction = __left;
+												delete x.loyal;
+												x.swapAnimation('idle');
+											});
 									},
 									ms: 2100
 								},
@@ -8992,9 +8996,9 @@ const __stories = [
 								let i = 0;
 								for (const _h of _hyennas) {
 									if (_h.HURTLEFT < _tagCenterX) {
-										if (_h.animation !== 'hurtfeet') _h.smash(mainCharacter);
+										if (!_h.smashed) _h.smash(mainCharacter);
 									}
-									if (_h.animation === 'hurtfeet') {
+									if (_h.smashed) {
 										i++;
 									}
 								}

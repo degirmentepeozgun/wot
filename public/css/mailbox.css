@@ -55,10 +55,6 @@
 .mailbox-desc:has(+ .mailbox-attachment:not(:empty)) {
     height: 80% !important;
 }
-.mailbox-buttons {
-    margin:0 7%;
-    width:86%  !important
-}
 .mailbox-card-ts {
     color: #f3f4f580 !important
 }

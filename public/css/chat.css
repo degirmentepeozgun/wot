@@ -1,3 +1,81 @@
+.chat-emoji-btn {
+	position: absolute;
+	right: 1.5%;
+	top: 50%;
+	transform: translateY(-50%);
+	height: 62%;
+	aspect-ratio: 1;
+	z-index: 3;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	background: none;
+	border: none;
+	padding: 0;
+}
+
+.chat-emoji-btn img {
+	height: 100%;
+	width: 100%;
+	display: block;
+	object-fit: contain;
+}
+
+.chat-emoji-panel {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 100%;
+	margin-bottom: 1.5%;
+	z-index: 6;
+	overflow: hidden;
+	background: #140e0a;
+	border: 0.16cqh solid #8a6a3a;
+	border-radius: 0.8cqh;
+	box-shadow: 0 0.4cqh 1.2cqh #000;
+	padding: 1.2% 1.4% 1.4%;
+	box-sizing: border-box;
+}
+
+.chat-emoji-tabs {
+	display: flex;
+	gap: 2%;
+}
+
+.chat-emoji-tab {
+	flex: 1;
+	text-align: center;
+	cursor: pointer;
+	color: #8a7a62 !important;
+	font-family: "Grenze", serif !important;
+	font-size: calc(var(--wot-font-base) * 1.2) !important;
+	line-height: 1.3 !important;
+	border-bottom: 0.15cqh solid #3a2e1c;
+	padding-bottom: 0.8%;
+}
+
+.chat-emoji-tab.on {
+	color: #e6d2a2 !important;
+	border-bottom-color: #d6a73b;
+}
+
+.chat-emoji-grid {
+	display: grid;
+	grid-template-columns: repeat(6, 1fr);
+	overflow: hidden;
+	margin-top: 1.2%;
+}
+
+.chat-emoji-item {
+	height: 6.4cqh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	font-size: 4.4cqh;
+	line-height: 1 !important;
+}
 
 .chat-container .book-page-bg{
 	padding:.25cqw 1.25cqw 1cqw 1.25cqw !important

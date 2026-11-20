@@ -1,3 +1,56 @@
+.stage-achievement-item-right-1 {
+	flex: 1 !important;
+	width: auto !important;
+	height: 100% !important;
+	justify-content: flex-start !important;
+	text-align: left !important;
+	padding-left: 4%;
+	flex-wrap: nowrap;
+	flex-shrink: 0;
+	min-width: 0;
+	white-space: nowrap;
+	overflow: visible;
+	text-overflow: clip;
+}
+
+.stage-achievement-item-right-1 * {
+	font-size: calc(var(--wot-font-base) * 1.5) !important;
+}
+
+.stage-achievement-item-right-2 {
+	width: 30% !important;
+	height: 100% !important;
+}
+
+.stage-final-stars-title {
+	background: url(./../images/ui/game/final-header-wings-frame.png) !important;
+	background-size: 100% 100% !important;
+	aspect-ratio: 565 / 111 !important;
+	width: 80% !important;
+	height: auto !important;
+	left: unset !important;
+}
+
+#story-finish[data-module="stagefinish"] .stars .one-line.stage-final-stars-title {
+	height: auto !important;
+	align-items: flex-start !important;
+	padding-top: 7.5% !important;
+	line-height: 1px !important;
+	color: #ecc791 !important;
+	font-size: calc(var(--wot-font-base) * 2) !important;
+	font-weight: 400 !important;
+	position: relative;
+	top: 12.5%;
+}
+
+.final-screen-before-next .stage-final-stars-title {
+	background: none !important;
+}
+
+#story-finish[data-module="stagefinish"] .final-screen-before-next .stars .one-line.stage-final-stars-title {
+	padding-top: 10% !important;
+	font-family: "Grenze", serif !important;
+}
 
 #story-finish .op-none {
 	opacity:0

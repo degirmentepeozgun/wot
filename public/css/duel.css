@@ -1,3 +1,557 @@
+.list-item-btn {
+	background: url("./../images/ui/game/duel-item-btn.png") !important;
+	background-size: 100% 100% !important;
+	aspect-ratio: 257 / 61;
+}
+
+.list-item-btn,
+.list-item-btn * {
+	color: #e7c47f !important;
+	font-family: "Alegreya", serif !important;
+	font-size: calc(var(--wot-font-base) * 1.15) !important;
+}
+
+.team-player-row--blue {
+	background: rgba(25, 105, 145, 0.22);
+	border: 1px solid rgba(100, 190, 230, 0.75);
+	box-sizing: border-box;
+	border-radius: 2px;
+	height: 10%;
+	margin: 0.25% 2% !important;
+	width: 96% !important;
+}
+
+.team-player-row--red {
+	background: rgba(145, 40, 35, 0.22);
+	border: 1px solid rgba(235, 115, 105, 0.75);
+	box-sizing: border-box;
+	border-radius: 2px;
+	height: 10%;
+	margin: 0.25% 2% !important;
+	width: 96% !important;
+}
+
+.duel-start-button {
+	height: 78%;
+	background: url("./../images/ui/game/duel-start-btn.png") !important;
+	aspect-ratio: 508 / 123;
+	background-size: 100% 100% !important;
+	color: #ebca8b !important;
+	font-family: "Alegreya", serif !important;
+	font-size: calc(var(--wot-font-base) * 1.4) !important;
+	font-weight: 600 !important;
+	margin-top: 0% !important;
+}
+
+.duel-join-room-title {
+	margin: 1.5% 0 0.5% 0 !important;
+}
+
+.duel-vs-sign {
+	height: 6.75%;
+	position: relative;
+	z-index: 2;
+	overflow: visible;
+}
+
+.duel-vs-sign img {
+	width: 100% !important;
+	position: absolute;
+}
+
+.duel-create-room-container.duel-join-room-container {
+	background: linear-gradient(to bottom, #00000080, #00000060), url("./../images/ui/game/duel-bg.jpg") !important;
+	background-size:
+		auto 100%,
+		100% 100% !important;
+	background-position:
+		center center,
+		center center !important;
+	background-repeat: no-repeat, no-repeat !important;
+}
+
+.duel-join-room-container .duel-create-room-button {
+	height: 18% !important;
+	margin-top: 0% !important;
+}
+
+.duel-square {
+	height: 84%;
+	display: flex;
+	margin: 0 0.5%;
+	justify-content: center;
+	align-items: center;
+}
+
+.duel-square img {
+	width: auto !important;
+	height: 90% !important;
+	aspect-ratio: 1/1;
+	display: block;
+}
+
+.duel-join-player-buttons {
+	aspect-ratio: 4 / 1;
+	height: 100%;
+	justify-content: flex-end !important;
+}
+
+.duel-join-player-avatar {
+	height: 90%;
+	aspect-ratio: 91/89;
+	position: relative;
+	margin: 0 0.5% 0 3%;
+}
+
+.duel-join-player-avatar img {
+	width: 100%;
+	height: auto;
+	display: block;
+}
+
+.duel-join-player-avatar::after {
+	content: "";
+	position: absolute;
+	z-index: 2 !important;
+	top: -4%;
+	left: -4%;
+	width: 108%;
+	height: auto;
+	background-image: url(./../images/ui/game/skill-frame.png) !important;
+	background-size: 100% 100% !important;
+	aspect-ratio: 91 / 89 !important;
+	pointer-events: none !important;
+	cursor: default !important;
+}
+
+.duel-join-player-info {
+	height: 94%;
+	flex: 1;
+}
+
+.duel-join-player-info .duel-join-player-info-name {
+	height: 50%;
+	width: 100%;
+	justify-content: flex-start !important;
+	padding-left: 6%;
+	color: #ad9385 !important;
+	font-weight: 600 !important;
+	padding-top: 0.5%;
+	font-family: "Grenze" !important;
+	font-size: calc(var(--wot-font-base) * 1.1) !important;
+	line-height: calc(var(--wot-font-base) * 1.1) !important;
+}
+
+.duel-join-player-info .duel-join-player-info-power {
+	height: 50%;
+	width: 100%;
+	justify-content: flex-start !important;
+	padding-left: 7%;
+	padding-bottom: 5% !important;
+	color: #edddc5 !important;
+	font-family: "Grenze" !important;
+	font-size: calc(var(--wot-font-base) * 1.1) !important;
+	line-height: calc(var(--wot-font-base) * 1.1) !important;
+}
+
+.duel-join-player-info-red {
+	background: url(./../images/ui/game/duel-red-nameframe.png);
+	background-size: 100% 100% !important;
+}
+
+.duel-join-player-info-blue {
+	background: url(./../images/ui/game/duel-blue-nameframe.png);
+	background-size: 100% 100% !important;
+}
+
+.duel-join-player-leader {
+	height: 60%;
+	margin-right: 3%;
+}
+
+.duel-add-bot-btn {
+	height: 80% !important;
+	width: auto !important;
+	justify-content: center !important;
+}
+
+.duel-add-bot-btn img {
+	height: 66% !important;
+	margin-right: 6%;
+	display: block;
+}
+
+#duel-join-room-password {
+	padding: 15% 12.5% !important;
+}
+
+.duel-card.selected .list-item-btn {
+	visibility: hidden !important;
+	pointer-events: none !important;
+}
+
+.team-player-row--red.me .duel-join-player-info .duel-join-player-info-name,
+.team-player-row--blue.me .duel-join-player-info .duel-join-player-info-name {
+	color: #f4bb44 !important;
+}
+
+.duel-rooms-container:has(.duel-room-chat) {
+	position: absolute !important;
+	top: 5% !important;
+	right: 5% !important;
+	bottom: 6% !important;
+	left: 5% !important;
+	width: auto !important;
+	height: auto !important;
+	overflow: hidden !important;
+	display: flex !important;
+	flex-direction: column !important;
+}
+
+.duel-room-chat {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 0;
+	width: 100%;
+	height: 100%;
+	min-height: 0;
+	overflow: hidden;
+	position: relative;
+	box-sizing: border-box;
+}
+
+.duel-chat-log {
+	flex: 1 1 0% !important;
+	min-height: 0 !important;
+	height: 0 !important;
+	width: 100% !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	overflow-x: hidden !important;
+	overflow-y: auto !important;
+	display: flex;
+	flex-direction: column;
+	scrollbar-width: thin !important;
+	scrollbar-color: #a67133 rgba(0, 0, 0, 0.45) !important;
+}
+
+.duel-chat-log::-webkit-scrollbar,
+.duel-emoji-grid::-webkit-scrollbar {
+	width: 1cqh !important;
+	display: block !important;
+	visibility: visible !important;
+	background: rgba(0, 0, 0, 0.45) !important;
+}
+
+.duel-chat-log::-webkit-scrollbar-track,
+.duel-emoji-grid::-webkit-scrollbar-track {
+	visibility: visible !important;
+	background: rgba(0, 0, 0, 0.45) !important;
+	border-radius: 1cqh;
+}
+
+.duel-chat-log::-webkit-scrollbar-thumb,
+.duel-emoji-grid::-webkit-scrollbar-thumb {
+	visibility: visible !important;
+	background: #d6a73b !important;
+	border-radius: 1cqh;
+	border: 1px solid #292725;
+}
+
+.duel-chat-log::-webkit-scrollbar-thumb:hover,
+.duel-emoji-grid::-webkit-scrollbar-thumb:hover {
+	background: #e5bc55 !important;
+}
+
+.duel-emoji-grid {
+	scrollbar-width: thin !important;
+	scrollbar-color: #d6a73b rgba(0, 0, 0, 0.45) !important;
+}
+
+.duel-chat-spacer {
+	flex: 1 0 0;
+	min-height: 0;
+}
+
+.duel-chat-rows {
+	flex: 0 0 auto;
+	width: 100%;
+}
+
+.duel-chat-row {
+	display: flex;
+	align-items: stretch;
+	gap: 3%;
+	width: 100%;
+	padding: 1.2% 1% 1.6%;
+	box-sizing: border-box;
+}
+
+.duel-chat-avatar-wrap {
+	position: relative;
+	width: 14%;
+	flex: 0 0 14%;
+	aspect-ratio: 1;
+	align-self: flex-start;
+	line-height: 0 !important;
+}
+
+.duel-chat-avatar {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	display: block;
+	object-fit: cover;
+	border-radius: 0.45cqh;
+	box-shadow: inset 0 0 0 0.1cqh #5c4324;
+	background: #140e0a;
+}
+
+.duel-chat-avatar-wrap::after {
+	content: "";
+	position: absolute;
+	z-index: 2 !important;
+	top: -4%;
+	left: -4%;
+	width: 108%;
+	height: auto;
+	background-image: url(./../images/ui/game/skill-frame.png) !important;
+	background-size: 100% 100% !important;
+	aspect-ratio: 91 / 89 !important;
+	pointer-events: none !important;
+	cursor: default !important;
+}
+
+.duel-chat-main {
+	flex: 1 1 auto;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	align-self: stretch;
+	gap: 0.45cqh;
+}
+
+.duel-chat-top {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 4%;
+	padding: 0 1% 0.4%;
+}
+
+.duel-chat-name {
+	color: #e6d2a2 !important;
+	font-family: "Grenze", serif !important;
+	line-height: 1 !important;
+	font-size: calc(var(--wot-font-base) * 1.4) !important;
+}
+
+.duel-chat-time {
+	color: #b89a68 !important;
+	line-height: 1 !important;
+	flex: 0 0 auto;
+	font-family: "Grenze", serif !important;
+	font-size: calc(var(--wot-font-base) * 1.3) !important;
+}
+
+.duel-chat-body {
+	flex: 1 0 auto;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	color: #f6ead0 !important;
+	background: rgba(16, 11, 8, 0.92);
+	border: 0.16cqh solid #3f332899 !important;
+	border-radius: 1.4cqh !important;
+	box-shadow: inset 0 0 0 0.12cqh #5c432499 !important;
+	padding: 0 3%1.5% 3% !important;
+	font-size: calc(var(--wot-font-base) * 1.25) !important;
+	font-family: "Alegreya", sans-serif !important;
+}
+
+.duel-chat-text {
+	width: 100%;
+	min-width: 0;
+	color: inherit;
+	-webkit-text-fill-color: inherit;
+	line-height: 1.35 !important;
+	white-space: pre-wrap;
+	word-break: break-word;
+	font-size: inherit;
+	font-family: inherit;
+}
+
+.duel-system-message {
+	width: 100%;
+	background: none !important;
+	border: none !important;
+	box-shadow: none !important;
+	color: #8c8275 !important;
+	font-family: "Alegreya", sans-serif !important;
+	font-size: calc(var(--wot-font-base) * 1.05) !important;
+	line-height: 1.3 !important;
+	padding: 0.3cqh 0.5cqh;
+	justify-content: flex-start !important;
+}
+
+.duel-chat-mine .duel-chat-body {
+	color: #e8be72 !important;
+	-webkit-text-fill-color: #e8be72 !important;
+}
+
+.duel-chat-compose {
+	position: relative;
+	z-index: 3;
+	display: flex;
+	align-items: stretch;
+	gap: 2%;
+	width: 100%;
+	height: 5cqh;
+	padding-top: 0.75%;
+	box-sizing: content-box;
+	border-top: 0.2cqh solid #563d2b !important;
+	flex: 0 0 auto;
+	background: transparent;
+}
+
+.duel-chat-field {
+	flex: 1;
+	height: 100%;
+	min-width: 0;
+	display: flex;
+	align-items: stretch;
+	background: #140e0a;
+	border: 0.16cqh solid #5b422c;
+	border-radius: 0.7cqh;
+	box-shadow: inset 0 0 0 0.12cqh #5c432499;
+	overflow: hidden;
+}
+
+.duel-chat-text-input {
+	flex: 1;
+	min-width: 0;
+	height: 100%;
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	border-radius: 0 !important;
+	color: #f6ead0 !important;
+	-webkit-text-fill-color: #f6ead0 !important;
+	caret-color: #f6ead0;
+	font-family: "Alegreya", sans-serif !important;
+	font-size: calc(var(--wot-font-base) * 1.25) !important;
+	line-height: 4.8cqh !important;
+	padding: 0 3% !important;
+	outline: none !important;
+}
+
+.duel-chat-text-input::placeholder {
+	color: #a89060 !important;
+	-webkit-text-fill-color: #a89060 !important;
+	opacity: 1;
+}
+
+.duel-emoji-btn {
+	height: 100%;
+	aspect-ratio: 1 / 1;
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	padding: 0;
+	cursor: pointer;
+	line-height: 1 !important;
+}
+
+.duel-emoji-btn img {
+	height: 75%;
+	display: block;
+}
+
+.duel-chat-send {
+	height: 100%;
+	aspect-ratio: 76 / 59;
+	flex: 0 0 auto;
+	padding: 0;
+	border: none;
+	background: none;
+	cursor: pointer;
+	line-height: 0;
+}
+
+.duel-chat-send img {
+	height: 100%;
+	display: block;
+}
+
+.duel-emoji-panel {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 100%;
+	margin-bottom: 2%;
+	height: 28cqh;
+	background: #120e0a;
+	border: 0.16cqh solid #c9a36a;
+	border-radius: 0.7cqh;
+	box-shadow: inset 0 0 0 0.12cqh #5c4324;
+	display: flex;
+	flex-direction: column;
+	z-index: 5;
+	padding: 2%;
+	box-sizing: border-box;
+}
+
+.duel-emoji-tabs {
+	display: flex;
+	gap: 2%;
+	flex: 0 0 auto;
+}
+
+.duel-emoji-tab {
+	flex: 1;
+	text-align: center;
+	color: #8a7a62 !important;
+	border-bottom: 1px solid #3a2e1c;
+	padding: 0 0 1% 0;
+	cursor: pointer;
+	line-height: calc(var(--wot-font-base) * 1.15) !important;
+	font-family: "Grenze", serif !important;
+	font-size: calc(var(--wot-font-base) * 1.05) !important;
+}
+
+.duel-emoji-tab.on {
+	color: #e6d2a2 !important;
+	border-bottom-color: #d6a73b;
+}
+
+.duel-emoji-grid {
+	flex: 1 1 auto;
+	min-height: 0;
+	width: 100% !important;
+	height: auto !important;
+	margin: 2% 0 0 !important;
+	padding: 0 !important;
+	display: flex;
+	flex-wrap: wrap;
+	align-content: flex-start;
+}
+
+.duel-emoji-item {
+	width: 16.66%;
+	aspect-ratio: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	line-height: 1 !important;
+	font-size: 2.4cqh;
+}
+
 .duel-create-top {
 	height: 82%;
 	flex: none;

@@ -119,12 +119,12 @@
 			</div>
 			<div class="mailbox-buttons flex w-100 action-button-container" style="height:14%">
 				<div class="flex w-100 page-detail-splitter"></div>
-				<div class="flex w-50${!_m.attachment ? ' d-none' : ''}" style="height:100%">
+				<div class="flex w-50${!_m.attachment ? ' d-none' : ''}" style="height:82%">
 					<div class="page-detail-button-half animate-me flex${_mail?.looted ? ' disabled' : ''}" onexactclick="getRef(\'mailbox\')?.lootMail(${_id})" style="height:65%">
 						<div class="flex">${getLangData('TAKE')}</div>
 					</div>
 				</div>
-				<div class="flex w-50${!_m.attachment ? ' d-none' : ''}" style="height:100%">
+				<div class="flex w-50${!_m.attachment ? ' d-none' : ''}" style="height:82%">
 					<div class="page-detail-button-half animate-me flex" onexactclick="getRef(\'mailbox\')?.askDeleteMail(${_id})" style="height:65%">
 						<div class="flex">${getLangData('DELETE')}</div>
 					</div>

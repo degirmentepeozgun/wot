@@ -65,6 +65,7 @@ function createMenu() {
 		__account.storyResults = [];
 		_actIds.forEach((x) => __account.storyResults.push({ id: x, stars: [1, 2, 4], perfect: true }));
 		__account.gold = 0;
+		__account.pvp.honor = 200;
 		updateGold(1000000);
 		connectSocket();
 	}

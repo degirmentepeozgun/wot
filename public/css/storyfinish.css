@@ -1,3 +1,16 @@
+#story-finish .finish-actions {
+	height: 9% !important;
+}
+
+#story-finish .finish-actions .w-50 {
+	justify-content: center !important;
+}
+
+#story-finish:not([data-module="stagefinish"]) .side-right .finish-actions .w-50:not(.flex-jc-end) {
+	justify-content: center !important;
+	padding-left: 0 !important;
+}
+
 #story-finish .op-none {
 	opacity:0
 }

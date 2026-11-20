@@ -115,8 +115,8 @@
 }
 .talent-level{
 	padding:2% 7% 0 7%;
-    font-family: "Grenze", serif !important;
-    font-size: calc(var(--wot-font-base) * 1.5) !important;
+    font-family: cinzel, serif !important;
+    font-size: calc(var(--wot-font-base) * 1.25) !important;
 	color:#f3f4f5cc !important
 }
 .talent-desc .page-detail-splitter {

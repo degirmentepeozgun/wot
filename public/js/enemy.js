@@ -2421,7 +2421,7 @@ function enemy(_e) {
 	this.finishAnimation = function (_num) {
 		let _anima = this.animations[this.animation];
 		if (_anima.chargeStarted) _anima.chargeStarted = undefined;
-		if (this.animation.startsWith('counter') || _anima.ultimate) {
+		if (this.animation.startsWith('counter') || _anima.ultimate || this.animation === 'escape') {
 			this.newBlocked = -1 * counterAttackTolerance;
 			this.comfortStarted = _gameTick;
 		} else this.newBlocked = false;
@@ -3445,10 +3445,15 @@ function enemy(_e) {
 		if (this.respawnAfterSeconds && !this.respawnRequested) {
 			let _skip;
 			if (this.groupId && this.spawnAsGroup) {
-				if (episode.enemies?.find((x) => x !== this && x.groupId === this.groupId && !x.remove)) _skip = 1;
+				if (episode.enemies?.find((x) => x !== this && x.groupId === this.groupId && !x.remove && !x.smashed))
+					_skip = 1;
 			}
 			if (!_skip) {
 				this.respawnRequested = 1;
+				if (this.groupId && this.spawnAsGroup)
+					episode.enemies?.forEach((x) => {
+						if (x.groupId === this.groupId) x.respawnRequested = 1;
+					});
 				if (!episode.respawners) episode.respawners = [];
 				const _mobs = episode.mobs.filter(
 					(x) => x.id === this.id && x.groupId === this.groupId && (x.spawnAsGroup || x.spawn)
@@ -5652,9 +5657,11 @@ function enemy(_e) {
 		this.animations.hurtfeet = new animation(
 			_f.atk?.hurt?.burn
 				? createHurtFeetAndBurn(this)
-				: _f.atk?.hurt?.knockback
-					? createHurtFeetWithKnockback(this, _f.atk.hurt.knockback)
-					: createHurtFeet(this.zoom, this.bloodColor, null, _f.bottomGap, _f.atk?.type, this.width)
+				: _f.atk?.type === 'ice'
+					? createHurtFeetAndFreeze(this)
+					: _f.atk?.hurt?.knockback
+						? createHurtFeetWithKnockback(this, _f.atk.hurt.knockback)
+						: createHurtFeet(this.zoom, this.bloodColor, null, _f.bottomGap, _f.atk?.type, this.width)
 		);
 	};
 	this.installFall = function (_cliff) {
@@ -5671,6 +5678,7 @@ function enemy(_e) {
 			});
 	};
 	this.smash = function (_t, _f) {
+		if (this.smashed) return;
 		_t.setKillScore(this);
 		_f = _f ?? _t.getCurrentFrame?.() ?? this.getCurrentFrame();
 		this.smasher = _t.owner ?? _t;
@@ -5679,6 +5687,16 @@ function enemy(_e) {
 		if (!_hasStop && _t.class !== __spell && !(_t.hitStop > 0) && _t.hitStopFrame !== _t.frame) {
 			_t.hitStop = 2;
 			_t.hitStopFrame = _t.frame;
+		}
+		this.smashed = true;
+		const _burn = !!_f?.atk?.hurt?.burn;
+		const _custom = this.animations.hurtfeet && !goreFx.isGenericFeet(this.animations.hurtfeet);
+		if (_burn || _custom) {
+			if (!_custom) this.installHurtFeet(_f);
+			this.animate('hurtfeet', 1);
+			this.smasher.talk();
+			this.checkSpawn();
+			return;
 		}
 		this.setProps({
 			killingBy: undefined,
@@ -5691,7 +5709,9 @@ function enemy(_e) {
 		this.checkExperience();
 		this.checkKillQuest();
 		this.smasher.talk();
-		episode.smashEnemy?.(this, _t, _f);
+		if (_f?.atk?.type === 'ice') goreFx.ice(this, _t);
+		else episode.smashEnemy?.(this, _t, _f);
+		this.checkSpawn();
 	};
 	this.addPVPRespawnFrame = function () {
 		const x = this;
@@ -7510,6 +7530,7 @@ function enemy(_e) {
 						background: _frame.background ?? _anima.background,
 						foreground: _frame.foreground ?? _anima.foreground,
 						width: _sw,
+						spriteOriginX: _frame.spriteOrigin * this.ZOOM,
 						height: _frame.spriteHeight * this.ZOOM,
 						yGap: _stepY ?? 0,
 						reversed: _reversed,

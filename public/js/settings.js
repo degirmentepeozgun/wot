@@ -96,7 +96,6 @@ function langSelect(_lang) {
 	}
 }
 const _optionActions = [
-	{ key: 'gore', disabled: true },
 	{
 		key: 'ambiance',
 		do: function (_status) {

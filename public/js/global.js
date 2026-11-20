@@ -38699,7 +38699,7 @@ const cssAnimations = {
 					if (cssAnimationProps.film) cssAnimationProps.film.p3 = 0;
 				};
 				_skipBtn.className = 'film-skip flex fade-me';
-				_skipBtn.innerHTML = getLangData('SKIP') + '&gt;';
+				_skipBtn.innerHTML = getLangData('SKIP');
 			}
 			document.documentElement.appendChild(_top);
 			document.documentElement.appendChild(_bottom);

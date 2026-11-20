@@ -50938,6 +50938,7 @@ const _allEnemies = {
 					order: 7,
 					type: 'skill',
 					useExtraStepXRate: true,
+					priority: 2,
 					src: './images/sprites/ep47/attack1.png',
 					frames: [
 						{
@@ -51036,6 +51037,14 @@ const _allEnemies = {
 									xGap: -10
 								}
 							],
+							atk: {
+								yRange: 15,
+								rate: 1,
+								hurt: {
+									smash: true
+								},
+								type: 'common'
+							},
 							speed: 6,
 							def: {
 								iframe: true
@@ -52174,7 +52183,6 @@ const _allEnemies = {
 					type: 'skill',
 					attack: true,
 					cooldown: 15000,
-					move: true,
 					still: true,
 					priority: 1,
 					skipHealthBar: true,
@@ -55249,7 +55257,7 @@ const _allEnemies = {
 			direction: 'left',
 			defaultDirection: 'right',
 			defaultAnimationKey: 'idle',
-			zoom: 1.3,
+			zoom: 1.25,
 			height: 153,
 			width: 123,
 			maxHP: 500,
@@ -55938,21 +55946,49 @@ const _allEnemies = {
 					key: 'idle',
 					type: 'skill',
 					imediateBreak: true,
+					alternateFrames: [
+						{
+							rate: 1,
+							when: function(_e) {
+								return _e.loyal;
+							},
+							frames: [
+								{
+									spriteLeft: 141,
+									spriteTop: 71,
+									spriteWidth: 130,
+									spriteHeight: 229,
+									spriteOrigin: 59,
+									speed: 64
+								},
+								{
+									spriteLeft: 542,
+									spriteTop: 72,
+									spriteWidth: 129,
+									spriteHeight: 228,
+									spriteOrigin: 58,
+									speed: 32
+								}
+							]
+						}
+					],
 					frames: [
 						{
-							spriteLeft: 141,
-							spriteTop: 71,
-							spriteWidth: 130,
-							spriteHeight: 229,
-							spriteOrigin: 59,
+							spriteLeft: 0,
+							spriteTop: 0,
+							spriteWidth: 171,
+							spriteHeight: 227,
+							spriteOrigin: 72,
+							src: './images/sprites/ep53/idle.png',
 							speed: 64
 						},
 						{
-							spriteLeft: 542,
-							spriteTop: 72,
-							spriteWidth: 129,
-							spriteHeight: 228,
-							spriteOrigin: 58,
+							spriteLeft: 222,
+							spriteTop: 0,
+							spriteWidth: 171,
+							spriteHeight: 227,
+							src: './images/sprites/ep53/idle.png',
+							spriteOrigin: 74,
 							speed: 32
 						}
 					]
@@ -56235,7 +56271,7 @@ const _allEnemies = {
 			direction: 'left',
 			defaultDirection: 'right',
 			defaultAnimationKey: 'idle',
-			zoom: 1.3,
+			zoom: 1.25,
 			height: 153,
 			width: 123,
 			maxHP: 500,
@@ -73390,16 +73426,14 @@ function createGroundRelease(_sprite1, _sprite2, _src) {
 	};
 }
 function createHurtFeetAndBurn(_c) {
-	const _cw = _c.HURTWIDTH;
-	let _z = _cw / 130;
-	_z /= _c.ZOOM;
+	const _z = _c.HURTWIDTH / (130 * (_c.ZOOM || _c.getZoom()));
 	return {
 		key: 'hurtfeet',
 		type: 'skill',
 		hurt: 'feet',
 		interactive: true,
 		src: './images/sprites/ep02/burn.png',
-		zoom: _z / 2,
+		zoom: _z,
 		frames: [
 			{
 				spriteLeft: 610,
@@ -73502,14 +73536,15 @@ function createHurtFeetAndBurn(_c) {
 		]
 	};
 }
-function createHurtFeetAndFreeze(_z) {
+function createHurtFeetAndFreeze(_c) {
+	const _z = Math.max(1, (_c.height || 91) / 91);
 	return {
 		key: 'hurtfeet',
 		type: 'skill',
 		hurt: 'feet',
 		interactive: true,
 		src: './images/related/ice-crack-5.png',
-		zoom: 1.5 * (_z < 1 ? 1 / _z : 1),
+		zoom: 1.5 * _z,
 		frames: [
 			{
 				spriteLeft: 211,
@@ -73519,7 +73554,7 @@ function createHurtFeetAndFreeze(_z) {
 				spriteOrigin: 38,
 				speed: 1,
 				bottomGap: -25,
-				zoom: _z < 1 ? 1 / _z : 1,
+				zoom: _z,
 				props: {
 					killingBy: undefined,
 					finishTarget: undefined,
@@ -73536,7 +73571,7 @@ function createHurtFeetAndFreeze(_z) {
 				spriteWidth: 76,
 				spriteHeight: 91,
 				spriteOrigin: 38,
-				zoom: _z < 1 ? 1 / _z : 1,
+				zoom: _z,
 				sound: { key: 'icecrack', volume: 0.3 },
 				speed: 3,
 				bottomGap: -25,
@@ -73726,7 +73761,6 @@ function createHurtFeet(_z, _c0l0r, _key, _bottomGap, _atkType, _hurtUnscaledWid
 		const _needZoom = MathRound(_hurtUnscaledWidth / 60);
 		_z = _needZoom;
 	}
-	if (_atkType === 'ice') return createHurtFeetAndFreeze(_z);
 	const _gaps = [0, 0, 0];
 	if (_bottomGap < 0) {
 		_gaps[0] = _bottomGap;

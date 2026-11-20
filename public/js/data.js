@@ -110,7 +110,7 @@ function dataOperations(_quickPlay) {
 			],
 			lang: __account?.lang ? __account.lang : 'en',
 			options: {
-				gore: 0,
+				gore: 1,
 				effect: 1,
 				weather: 1,
 				request: 1,
