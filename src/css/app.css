@@ -1640,10 +1640,10 @@ svg#use-progress.use-in-progress circle {
 .friendly-profile {
 	height: 18% !important;
 	margin-top: 5%;
-	transform: scale(0.65) !important;
-	-webkit-transform: scale(0.65) !important;
-	transform-origin: left 40% !important;
-	-webkit-transform-origin: left 40% !important;
+	transform: scale(0.6) !important;
+	-webkit-transform: scale(0.6) !important;
+	transform-origin: left 50% !important;
+	-webkit-transform-origin: left 50% !important;
 	will-change: transform;
 	transform: translateZ(0);
 	-webkit-transform: translateZ(0);
@@ -10654,7 +10654,7 @@ body:not(.pc-mission) .tag-sf.bgless {
 	align-items: flex-start !important;
 }
 .game-btn2 {
-	font-size: calc(var(--wot-font-base) * 1.6) !important;
+	font-size: calc(var(--wot-font-base) * 1.5) !important;
 	color: #e8d8b0;
 	text-shadow: 1px 1px 2px #000;
 }
@@ -17078,4 +17078,8 @@ div[data-module="dailylogin"] .book-page-bg {
 	padding: 0 !important;
 	height: calc(var(--wot-font-base) * 2.5) !important;
 	justify-content: center !important;
+}
+body.mobile-device .skill.disabled-skill,
+body.mobile-device .skill-charge.disabled-skill {
+	visibility: hidden !important;
 }

@@ -846,6 +846,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 				addClass(document.getElementById('game-opening-screen-menu'), 'd-none');
 				if (_onEnd) _onEnd();
 				else if (!episode.pvp && !episode.war) {
+					episode.splash = document.getElementById('splash');
 					const _ts = document.getElementById('tip-screen');
 					if (_ts) _ts.remove();
 				}

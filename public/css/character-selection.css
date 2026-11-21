@@ -59,6 +59,8 @@
 	background:url(./../images/icons/txtbg.png), radial-gradient(#000000, transparent, transparent);
 	background-repeat: no-repeat;
 	background-position: center;
+	font-family: "Alegreya" !important;
+	font-size: calc(var(--wot-font-base) * 1.7) !important;
 	background-size:56cqh auto, cover !important
 }
 .char-selection-right, .char-selection-left {
@@ -183,10 +185,6 @@
     bottom: 0;
 	background-repeat: no-repeat !important;
 	background-position: center !important;
-}
-.c-i-choose {
-	font-family: "Alegreya" !important;
-	font-size: calc(var(--wot-font-base) * 1.8) !important;
 }
 .c-i-props {
 	flex:1 !important;

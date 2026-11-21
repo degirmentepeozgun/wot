@@ -5655,8 +5655,22 @@ function map(_m) {
 		if (c9) c9.style.opacity = 1;
 		if (typeof _canvasF !== 'undefined' && _canvasF) _canvasF.style.opacity = 1;
 		if (typeof _canvasBRB !== 'undefined' && _canvasBRB) _canvasBRB.style.opacity = 1;
-		if (typeof cssAnimationProps !== 'undefined')
+		if (typeof cssAnimationProps !== 'undefined') {
+			if (cssAnimationProps.black) {
+				const _cf = document.getElementById('css-canvas-foreground');
+				if (_cf) {
+					_cf.innerHTML = '';
+					removeClass(_cf, 'black-bg');
+					removeClass(_cf, 'flex');
+				}
+				removeClass(_gameUI, 'd-none');
+			}
+			if (cssAnimationProps.blackui) {
+				_gameUI.querySelector('.intro-screen')?.remove();
+				removeClass(_gameUI, 'black-bg');
+			}
 			for (const _k of Object.keys(cssAnimationProps)) delete cssAnimationProps[_k];
+		}
 
 		const _killCanvas = (c) => {
 			if (!c) return;

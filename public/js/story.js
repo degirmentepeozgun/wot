@@ -22,7 +22,7 @@ function getLobbyScene() {
 			removeCoopCharacter(1);
 			addClass(_gameUI, 'disable-ui');
 			if (mainCharacter) {
-				mainCharacter.left = MathRound(1735 * __zoom);
+				mainCharacter.left = MathRound(1700 * __zoom);
 				mainCharacter.direction = 'right';
 				mainCharacter.skipHealthBar = true;
 				mainCharacter.noDirection = true;
@@ -92,7 +92,7 @@ function getLobbyScene() {
 		},
 		afterInit: function () {
 			mainCharacter.positionable = true;
-			mainCharacter.yPosition = MathRound(getGroundHeight() * 1.3);
+			mainCharacter.yPosition = MathRound(getGroundHeight() * 1.33);
 		},
 		save: true,
 		mobs: [
@@ -445,7 +445,7 @@ const __stories = [
 				minLevel: 1,
 				kills: [
 					{
-						enemy: [619],
+						enemy: [19],
 						limit: 5,
 						descriptions: {
 							en: 'Goblin Cleared',
@@ -714,7 +714,7 @@ const __stories = [
 		},
 		boss: 'king',
 		minLevel: 1,
-
+		//startScene: 2,
 		scenes: [
 			{
 				map: 105,
@@ -1736,8 +1736,6 @@ const __stories = [
 						},
 						do: function () {
 							episode.phase = 1;
-							const _dead = episode.enemies.find((x) => x.id === 78);
-							_dead.npc = 'bow';
 						}
 					},
 					{
@@ -2112,7 +2110,7 @@ const __stories = [
 						hp: 100
 					},
 					{
-						id: 619,
+						id: 19,
 						minX: 1800,
 						maxX: 1800,
 						sight: 15,

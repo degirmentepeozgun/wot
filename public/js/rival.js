@@ -58784,6 +58784,7 @@ const _allEnemies = {
 			bleed: true,
 			ranged: true,
 			skipHealthBar: true,
+			drawPriority: 999,
 			src: './images/sprites/ep67/',
 			buffs: []
 		};
@@ -58960,6 +58961,7 @@ const _allEnemies = {
 			noDirection: true,
 			noLoot: true,
 			skipHealthBar: true,
+			drawPriority: 999,
 			src: './images/sprites/ep69/',
 			buffs: []
 		};
@@ -59014,6 +59016,7 @@ const _allEnemies = {
 			noDirection: true,
 			noLoot: true,
 			skipHealthBar: true,
+			drawPriority: 999,
 			src: './images/sprites/ep70/',
 			buffs: []
 		};
@@ -59303,6 +59306,7 @@ const _allEnemies = {
 			noDirection: true,
 			noLoot: true,
 			skipHealthBar: true,
+			drawPriority: 999,
 			src: './images/sprites/ep72/',
 			buffs: []
 		};
@@ -59991,6 +59995,7 @@ const _allEnemies = {
 			noDirection: true,
 			noLoot: true,
 			skipHealthBar: true,
+			drawPriority: 999,
 			src: './images/sprites/ep73/',
 			buffs: []
 		};
@@ -61712,7 +61717,6 @@ const _allEnemies = {
 			key: 'ddarch-' + Math.random().toString().replace(/[.]/g, ''),
 			yGap: 80,
 			id: 78,
-			solid: true,
 			skipHealthBar: true,
 			still: true,
 			name: 'Dead Archer',

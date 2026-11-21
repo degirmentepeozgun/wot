@@ -2552,7 +2552,7 @@ function enemy(_e) {
 				let _portal = document.getElementById('SPRT-' + this.action?.loot);
 				if (_portal) _portal.remove();
 				if (this.action.enemyKey) {
-					_portal = episode.seenEnemies.find((x) => x.key === this.action.enemyKey);
+					_portal = episode.enemies.find((x) => x.key === this.action.enemyKey);
 					if (_portal) {
 						_portal.npc = undefined;
 						if (!_portal.canSkin && _portal.animations.dead) _portal.animate('dead', 1);
