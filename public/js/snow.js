@@ -1,7 +1,9 @@
 'use strict';
 var letItSnow;
 function startSnow() {
-	if (__account.options.weather) letItSnow = new snowyWeather();
+	if (!__account.options.weather) return;
+	if (letItSnow || __weather.status === 'snowy') stopWeather();
+	letItSnow = new snowyWeather();
 }
 function endSnow() {
 	if (letItSnow) {
@@ -10,30 +12,42 @@ function endSnow() {
 	}
 }
 function snowyWeather() {
-	var c = document.getElementById('canv'),
-		snowMsPrev = window.performance.now();
-	if (!c) {
-		c = document.createElement('canvas');
-		c.id = 'canv';
-		const _parent = document.getElementById('dobj-foreground');
-		c.width = _parent.clientWidth;
-		c.height = _parent.clientHeight;
-		_parent.appendChild(c);
-	}
+	var c = document.getElementById('canv');
+	if (c) c.remove();
+	c = document.createElement('canvas');
+	c.id = 'canv';
+	c.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:20';
+	const _pad = document.getElementById('game-pad');
+	_pad.appendChild(c);
 	var $ = c.getContext('2d');
-	var w = c.width,
-		f,
-		h = c.height;
+	var w = 0,
+		h = 0;
+	const self = this;
+	const _syncSize = function () {
+		const _bw = _pad.clientWidth || (typeof _canvas !== 'undefined' ? _canvas.width : 0) || 0;
+		const _bh = _pad.clientHeight || (typeof _canvas !== 'undefined' ? _canvas.height : 0) || 0;
+		if (!_bw || !_bh) return false;
+		if (c.width !== _bw || c.height !== _bh) {
+			c.width = _bw;
+			c.height = _bh;
+			w = _bw;
+			h = _bh;
+			self.snows = null;
+		} else {
+			w = _bw;
+			h = _bh;
+		}
+		return true;
+	};
 	this.Purify = function () {
 		if (c) {
 			c.remove();
 			c = null;
 		}
 	};
-	this.snows = Snowy();
-	function Snowy() {
-		if (__weather.status === 'snowy') return;
-		else if (__weather.status) stopWeather();
+	this.snows = null;
+	function buildSnows() {
+		if (__weather.status && __weather.status !== 'snowy') stopWeather();
 		__weather.status = 'snowy';
 		var snow,
 			arr = [];
@@ -41,7 +55,6 @@ function snowyWeather() {
 			tsc = 1,
 			sp = 1;
 		var sc = 1.3 * __zoom,
-			t = 0,
 			mv = MathRound(50 * __zoom),
 			min = 1;
 		for (var i = 0; i < num; ++i) {
@@ -55,8 +68,6 @@ function snowyWeather() {
 			snow.sp = snow.sp < min ? min : snow.sp;
 			arr.push(snow);
 		}
-
-		function go() {}
 		function Flake() {
 			this.draw = function (_still) {
 				const _left = MathRound((platformX - this.p) * 0.5);
@@ -75,7 +86,6 @@ function snowyWeather() {
 				this.g = $.createRadialGradient(this.x - _left, this.y, 0, this.x - _left, this.y, this.sz);
 				this.g.addColorStop(0, 'hsla(255,255%,255%,1)');
 				this.g.addColorStop(1, 'hsla(255,255%,255%,0)');
-				$.moveTo(this.x - _left, this.y);
 				$.fillStyle = this.g;
 				$.beginPath();
 				$.arc(this.x - _left, this.y, this.sz, 0, Math.PI * 2, true);
@@ -84,7 +94,15 @@ function snowyWeather() {
 		}
 		return arr;
 	}
+	_syncSize();
+	if (w && h) {
+		this.snows = buildSnows();
+	} else {
+		__weather.status = 'snowy';
+	}
 	this.drawSnowFlakes = function () {
+		if (!_syncSize()) return;
+		if (!this.snows) this.snows = buildSnows();
 		$.clearRect(0, 0, w, h);
 		const _still = prevPlatformX === platformX;
 		this.snows.forEach((x) => x.draw(_still));

@@ -4211,7 +4211,7 @@ function enemy(_e) {
 			if (_objects?.[0]) {
 				for (var _o of _objects) {
 					const _of = _o.getCurrentFrame();
-					if (_of.bottomGap || _of.def?.iframe) continue;
+					if (_of.bottomGap || (_o.deadAnimationKey && _of.def?.iframe)) continue;
 					const _foot = _char.getClone(-1 * (_char.WIDTH / 3));
 					const _t = isObjectsInTouch(_o, _foot);
 					if (_t.touch || __batterySaveMode) {
@@ -5708,6 +5708,7 @@ function enemy(_e) {
 		this.stop = true;
 		this.checkExperience();
 		this.checkKillQuest();
+		this.checkLoot({ alpha: true });
 		this.smasher.talk();
 		if (_f?.atk?.type === 'ice') goreFx.ice(this, _t);
 		else episode.smashEnemy?.(this, _t, _f);
@@ -5968,9 +5969,12 @@ function enemy(_e) {
 				_f.atk.hitTaken ??= 1;
 				if (_f.atk.hitTaken > 0) {
 					if (_ea.hurt) {
-						if (_e.hitTakenCount === undefined) _e.hitTakenCount = 0;
-						_e.hitTakenCount += _f.atk.hitTaken;
-					} else _e.hitTakenCount = _f.atk.hitTaken;
+						if (_e.hitTakenCount === undefined) 
+							_e.hitTakenCount = 0;
+						if(_ea.key !== 'hurtblock')
+							_e.hitTakenCount += _f.atk.hitTaken;
+					} else 
+						_e.hitTakenCount = _f.atk.hitTaken;
 				}
 				let _erelease;
 				if (!_e.isDead() && !_e.still && _e.hitTakenCount > _e.releaseAfter && _e.class !== 'object') {

@@ -3232,6 +3232,9 @@ const __stories = [
 					_wagon.noDirection = _wagon.harmless = true;
 					_wagon.experience = 0;
 					mainCharacter.solid = true;
+					episode.enemies.forEach((x) => {
+						x.important = true;
+					});
 				}
 			},
 			getLobbyScene()

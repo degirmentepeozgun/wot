@@ -70506,7 +70506,7 @@ const _allEnemies = {
 							spriteWidth: 100,
 							spriteHeight: 112,
 							spriteOrigin: 50,
-							bottomGap: -480,
+							bottomGap: -465,
 							sound: { key: 'flap', volume: 0.8 },
 							extraStepXRate: 1,
 							def: {
@@ -70520,7 +70520,7 @@ const _allEnemies = {
 							spriteWidth: 100,
 							spriteHeight: 112,
 							spriteOrigin: 50,
-							bottomGap: -510,
+							bottomGap: -495,
 							extraStepXRate: 1,
 							def: {
 								iframe: true
@@ -70533,7 +70533,7 @@ const _allEnemies = {
 							spriteWidth: 100,
 							spriteHeight: 112,
 							spriteOrigin: 50,
-							bottomGap: -540,
+							bottomGap: -525,
 							extraStepXRate: 1,
 							def: {
 								iframe: true
@@ -70546,7 +70546,7 @@ const _allEnemies = {
 							spriteWidth: 100,
 							spriteHeight: 112,
 							spriteOrigin: 50,
-							bottomGap: -580,
+							bottomGap: -565,
 							extraStepXRate: 1,
 							def: {
 								iframe: true
@@ -70559,7 +70559,7 @@ const _allEnemies = {
 							spriteWidth: 100,
 							spriteHeight: 112,
 							spriteOrigin: 50,
-							bottomGap: -610,
+							bottomGap: -595,
 							extraStepXRate: 1,
 							def: {
 								iframe: true
@@ -70572,7 +70572,7 @@ const _allEnemies = {
 							spriteWidth: 100,
 							spriteHeight: 112,
 							spriteOrigin: 50,
-							bottomGap: -640,
+							bottomGap: -625,
 							extraStepXRate: 1,
 							def: {
 								iframe: true
@@ -70585,7 +70585,7 @@ const _allEnemies = {
 							spriteWidth: 100,
 							spriteHeight: 112,
 							spriteOrigin: 50,
-							bottomGap: -670,
+							bottomGap: -655,
 							extraStepXRate: 1,
 							def: {
 								iframe: true
@@ -70598,7 +70598,7 @@ const _allEnemies = {
 							spriteWidth: 100,
 							spriteHeight: 112,
 							spriteOrigin: 50,
-							bottomGap: -700,
+							bottomGap: -685,
 							extraStepXRate: 1,
 							def: {
 								iframe: true
@@ -70611,7 +70611,7 @@ const _allEnemies = {
 							spriteWidth: 100,
 							spriteHeight: 112,
 							spriteOrigin: 50,
-							bottomGap: -730,
+							bottomGap: -715,
 							extraStepXRate: 1,
 							def: {
 								iframe: true
@@ -70624,7 +70624,7 @@ const _allEnemies = {
 							spriteWidth: 100,
 							spriteHeight: 112,
 							spriteOrigin: 50,
-							bottomGap: -765,
+							bottomGap: -750,
 							extraStepXRate: 1,
 							def: {
 								iframe: true
@@ -70637,7 +70637,7 @@ const _allEnemies = {
 							spriteWidth: 100,
 							spriteHeight: 112,
 							spriteOrigin: 50,
-							bottomGap: -800,
+							bottomGap: -785,
 							extraStepXRate: 1,
 							def: {
 								iframe: true
@@ -70650,7 +70650,7 @@ const _allEnemies = {
 							spriteWidth: 100,
 							spriteHeight: 112,
 							spriteOrigin: 50,
-							bottomGap: -825,
+							bottomGap: -810,
 							extraStepXRate: 1,
 							def: {
 								iframe: true
@@ -70663,7 +70663,7 @@ const _allEnemies = {
 							spriteWidth: 100,
 							spriteHeight: 112,
 							spriteOrigin: 50,
-							bottomGap: -850,
+							bottomGap: -835,
 							extraStepXRate: 1,
 							def: {
 								iframe: true
@@ -70676,7 +70676,7 @@ const _allEnemies = {
 							spriteWidth: 100,
 							spriteHeight: 112,
 							spriteOrigin: 50,
-							bottomGap: -875,
+							bottomGap: -860,
 							extraStepXRate: 1,
 							def: {
 								iframe: true
@@ -70689,7 +70689,7 @@ const _allEnemies = {
 							spriteWidth: 0,
 							spriteHeight: 0,
 							spriteOrigin: 0,
-							bottomGap: -875,
+							bottomGap: -860,
 							extraStepXRate: 1,
 							def: {
 								iframe: true
@@ -70712,7 +70712,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 3
 						},
 						{
@@ -70721,7 +70721,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 3
 						},
 						{
@@ -70730,7 +70730,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 3
 						},
 						{
@@ -70739,7 +70739,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 3
 						},
 						{
@@ -70748,7 +70748,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 3
 						},
 						{
@@ -70757,7 +70757,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 3
 						},
 						{
@@ -70766,7 +70766,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 3
 						},
 						{
@@ -70775,7 +70775,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 3
 						},
 						{
@@ -70784,7 +70784,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							sound: { key: 'crow', volume: 0.5, bind: true },
 							speed: 4
 						},
@@ -70794,7 +70794,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70803,7 +70803,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70812,7 +70812,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70821,7 +70821,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70830,7 +70830,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70839,7 +70839,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70848,7 +70848,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70857,7 +70857,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70866,7 +70866,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70875,7 +70875,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70884,7 +70884,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70893,7 +70893,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70902,7 +70902,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70911,7 +70911,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70920,7 +70920,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70929,7 +70929,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70938,7 +70938,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 4
 						},
 						{
@@ -70947,7 +70947,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 3
 						},
 						{
@@ -70956,7 +70956,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 3
 						},
 						{
@@ -70965,7 +70965,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 3
 						},
 						{
@@ -70974,7 +70974,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 3
 						},
 						{
@@ -70983,7 +70983,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 3
 						},
 						{
@@ -70992,7 +70992,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 3
 						},
 						{
@@ -71001,7 +71001,7 @@ const _allEnemies = {
 							spriteWidth: 50,
 							spriteHeight: 83,
 							spriteOrigin: 25,
-							bottomGap: -444,
+							bottomGap: -429,
 							speed: 72
 						}
 					]
@@ -71410,7 +71410,7 @@ const _allEnemies = {
 			key: 'wgn-' + Math.random().toString().replace(/[.]/g, ''),
 			yGap: 40,
 			id: 2000,
-			healtbarGap: 40,
+			healtbarGap: -20,
 			still: true,
 			name: 'Wagon',
 			class: 'boss',
@@ -71418,7 +71418,7 @@ const _allEnemies = {
 			direction: 'left',
 			defaultDirection: 'right',
 			defaultAnimationKey: 'idle',
-			zoom: 0.7,
+			zoom: 0.66,
 			size: 'big',
 			width: 758,
 			height: 573,

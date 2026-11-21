@@ -860,7 +860,7 @@ function map(_m) {
 				if (pvpCounter.innerText !== _start) {
 					this.playSound({ key: 'questaccepted', volume: 0.3 });
 					pvpCounter.innerText = _start;
-					this.addScoreBoard();
+					if (!this.gold) this.addScoreBoard();
 					if (this.beforePVPStart) this.beforePVPStart();
 					removeClass(pvpCounter, 'pop');
 					void pvpCounter.offsetWidth;
@@ -869,7 +869,7 @@ function map(_m) {
 				}
 			} else {
 				if (this.missionCountDown && _diff >= 0) {
-					if (!document.getElementById('score-board')) this.addScoreBoard();
+					if (!this.gold && !document.getElementById('score-board')) this.addScoreBoard();
 					if (this.beforePVPStart) this.beforePVPStart();
 					delete this.missionCountDown;
 				}

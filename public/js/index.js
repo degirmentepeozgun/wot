@@ -898,7 +898,7 @@ function switchMap(_x, _force, _func, _effect, _ss, _onEnd, _afterInit) {
 				removeClass(_gameUI, 'ghost');
 				disposeFocus();
 
-				if (episode.war || episode.pvp) {
+				if ((episode.war || episode.pvp) && !episode.gold) {
 					addClass(_gameUI, 'war-map');
 				} else {
 					removeClass(_gameUI, 'war-map');

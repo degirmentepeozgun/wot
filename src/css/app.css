@@ -3020,9 +3020,14 @@ img.grade1-item {
 	border: none !important;
 	height: 12%;
 	color: #f8f8f8cc !important;
-	background: none;
+	background: none !important;
 	font-weight: 700;
 	letter-spacing: 0.2cqh;
+	min-width: 0 !important;
+	box-shadow: none !important;
+	-webkit-box-shadow: none !important;
+	filter: none !important;
+	-webkit-filter: none !important;
 	text-shadow:
 		0 0 0.2cqh #000,
 		0 0 0.4cqh #000,
@@ -3030,7 +3035,6 @@ img.grade1-item {
 		0 0 0.5cqh #ffd700,
 		0 0 1.5cqh #ffd700,
 		0 0 3cqh #ffae00;
-	filter: contrast(1.1) brightness(1.1);
 }
 #pvp-counter.map-name.countdown {
 	font-size: 6cqh !important;
@@ -3060,19 +3064,8 @@ img.grade1-item {
 	color: red !important;
 }
 #pvp-counter.countdown::before {
-	content: "";
-	position: absolute;
-	inset: 0;
-
-	background: repeating-linear-gradient(
-		to bottom,
-		rgba(0, 0, 0, 0.15) 0px,
-		rgba(0, 0, 0, 0.15) 1px,
-		transparent 2px,
-		transparent 4px
-	);
-
-	pointer-events: none;
+	content: none !important;
+	display: none !important;
 }
 #touch-d-pad {
 	position: absolute;

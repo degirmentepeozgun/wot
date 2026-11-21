@@ -138,7 +138,12 @@ function applyDmgDepth(_item) {
 	const ground = getGroundHeight() || 1;
 	let depth = 1;
 	let behind = 0;
-	if (attackerY === attackerY && victimY === victimY) {
+	if (
+		attackerY != null &&
+		victimY != null &&
+		attackerY === attackerY &&
+		victimY === victimY
+	) {
 		const span = ground * 0.28;
 		behind = (victimY - attackerY) / (span > 0 ? span : 1);
 		if (behind < 0) behind = 0;

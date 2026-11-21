@@ -263,7 +263,7 @@ function checkTimedQuest() {
 			episode.timedQuestWrapperElem = document.querySelector('.timedquest-progress-wrapper');
 		if (!episode.timedQuestElem) episode.timedQuestElem = document.querySelector('.timedquest-progress');
 		if (!episode.timedQuestCounter) episode.timedQuestCounter = document.querySelector('.timedquest-counter');
-		if (!episode.timedQuestElem.dataRate) episode.timedQuestElem.dataRate = 100;
+		if (episode.timedQuestElem && !episode.timedQuestElem.dataRate) episode.timedQuestElem.dataRate = 100;
 		const _rate = MathCeil(
 			((__account.questStatus.quest.timer.ms - _time) / __account.questStatus.quest.timer.ms) * 100
 		);
